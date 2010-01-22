@@ -75,6 +75,28 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
         return rv;
     }
 
+    public boolean addElements(List<I_GetConceptData> conceptList) {
+        boolean modified = elements.addAll(conceptList);
+        if (modified) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                fireIntervalAdded(this, elements.size() - 1, elements.size() - 1);
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            fireIntervalAdded(this, elements.size() - 1, elements.size() - 1);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return modified;
+    }
+    
     public void addElement(final int index, I_GetConceptData element) {
         elements.add(index, element);
         if (SwingUtilities.isEventDispatchThread()) {

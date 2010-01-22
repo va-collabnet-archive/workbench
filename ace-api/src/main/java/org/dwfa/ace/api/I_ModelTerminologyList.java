@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.api;
 
+import java.util.List;
+
 import javax.swing.ListModel;
 
 public interface I_ModelTerminologyList extends ListModel {
@@ -25,6 +27,8 @@ public interface I_ModelTerminologyList extends ListModel {
 
     public boolean addElement(I_GetConceptData concept);
 
+    public boolean addElements(List<I_GetConceptData> conceptList);
+    
     public void addElement(int index, I_GetConceptData element);
 
     public I_GetConceptData removeElement(int index);

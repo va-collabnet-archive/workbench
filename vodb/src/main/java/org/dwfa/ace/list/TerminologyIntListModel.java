@@ -17,6 +17,7 @@
 package org.dwfa.ace.list;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.event.ListDataListener;
 
@@ -61,6 +62,14 @@ public class TerminologyIntListModel implements I_ModelTerminologyList {
         return rv;
     }
 
+    public boolean addElements(List<I_GetConceptData> conceptList) {
+        boolean rv = false;
+        for (I_GetConceptData concept : conceptList) {
+            rv |= addElement(concept); 
+        }
+        return rv;
+    }
+    
     public void addElement(int index, I_GetConceptData element) {
         elements.add(index, element.getConceptId());
     }

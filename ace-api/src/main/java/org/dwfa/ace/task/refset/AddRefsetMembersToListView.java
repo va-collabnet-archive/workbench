@@ -19,6 +19,7 @@ package org.dwfa.ace.task.refset;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -86,15 +87,19 @@ public class AddRefsetMembersToListView extends AbstractTask {
             JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
-            List<I_ThinExtByRefVersioned> extVersions = tf.getRefsetExtensionMembers(refset.getConceptId());
+            List<I_GetConceptData> conceptsToAdd = new ArrayList<I_GetConceptData>();
+            List<I_ThinExtByRefVersioned> extVersions = tf.getRefsetExtensionMembers(refset.getConceptId());            
             for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
-                List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
-                    config.getViewPositionSet(), true);
+                List<I_ThinExtByRefTuple> extensions = 
+                    thinExtByRefVersioned.getTuples(config.getAllowedStatus(),config.getViewPositionSet(), true, true);
+                
                 for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
-                    model.addElement(tf.getConcept(thinExtByRefTuple.getComponentId()));
+                    conceptsToAdd.add(tf.getConcept(thinExtByRefTuple.getComponentId()));
                 }
             }
 
+            model.addElements(conceptsToAdd);
+            
             return Condition.CONTINUE;
 
         } catch (Exception e) {

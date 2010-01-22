@@ -76,10 +76,8 @@ public class AddConceptListToListView extends AbstractTask {
 
             List<I_GetConceptData> conceptsToAdd = (List<I_GetConceptData>) process.readAttachement(conceptListPropName);
 
-            for (I_GetConceptData concept : conceptsToAdd) {
-                model.addElement(concept);
-            }
-
+            model.addElements(conceptsToAdd);
+            
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
