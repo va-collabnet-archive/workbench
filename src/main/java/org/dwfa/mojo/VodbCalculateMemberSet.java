@@ -108,7 +108,7 @@ public class VodbCalculateMemberSet extends AbstractMojo {
 
                     List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
                     for (I_RelVersioned rel : rels) {
-                        List<I_RelTuple> tuples = rel.getTuples();
+                        List<? extends I_RelTuple> tuples = rel.getTuples();
                         for (I_RelTuple tuple : tuples) {
                             if (tuple.getStatusId() == termFactory.getConcept(
                                 ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId()
