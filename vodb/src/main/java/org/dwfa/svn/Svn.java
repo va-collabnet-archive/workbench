@@ -332,9 +332,7 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	private static boolean isBusinessProcessFile(String filePath) {
-		return filePath.contains(".")
-				&& filePath.substring(filePath.lastIndexOf(".") + 1)
-						.equalsIgnoreCase("bp");
+		return filePath.toLowerCase().endsWith(".bp");
 	}
 
 	private static class HandleStatus implements StatusCallback {
