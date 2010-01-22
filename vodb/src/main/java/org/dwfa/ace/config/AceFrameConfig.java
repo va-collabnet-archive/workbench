@@ -3079,4 +3079,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().setSelectedPreferencesTab(tabName);
     }
 
+    public void showWizardPanel() {
+        aceFrame.getCdePanel().showWizardPanel();
+    }
+
 }

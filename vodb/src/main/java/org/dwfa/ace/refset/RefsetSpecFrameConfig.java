@@ -1207,4 +1207,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setSelectedPreferencesTab(String tabName) {
         frameConfig.setSelectedPreferencesTab(tabName);
     }
+
+    public void showWizardPanel() {
+        frameConfig.showWizardPanel();
+    }
 }

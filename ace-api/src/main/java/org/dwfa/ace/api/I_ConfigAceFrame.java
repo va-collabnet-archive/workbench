@@ -324,6 +324,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void showRefsetSpecPanel();
 
+    public void showWizardPanel();
+    
     public void setShowAddresses(boolean shown);
 
     public void setShowComponentView(boolean shown);

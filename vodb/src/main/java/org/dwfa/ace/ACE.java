@@ -1408,6 +1408,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JScrollPane dataCheckListScroller;
     private JPanel dataCheckListPanel;
     private RefsetSpecPanel refsetSpecPanel;
+    private WizardPanel wizardPanel;
     private TermTreeHelper treeHelper;
 
     public String getPluginRoot() {
@@ -1709,9 +1710,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetTabIndex = conceptTabs.getTabCount();
 
         refsetSpecPanel = new RefsetSpecPanel(this);
-        conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
-            refsetSpecPanel);
+        conceptTabs.addTab(
+            "refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")), refsetSpecPanel);
 
+        wizardPanel = new WizardPanel(this);
+        setWorkflowPanel(wizardPanel.getWfPanel());
+        setWorkflowDetailsSheet(wizardPanel.getWfDetailsPanel());
+        conceptTabs.addTab(
+            "wizard", new ImageIcon(ACE.class.getResource("/images/Wizard.gif")), wizardPanel);
+        
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
@@ -3390,6 +3397,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public JPanel getWorkflowPanel() {
+        showWizardPanel();
         return workflowPanel;
     }
 
@@ -3398,6 +3406,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public JPanel getWorkflowDetailsPanel() {
+        showWizardPanel();
         return workflowDetailsSheet;
     }
 
@@ -3801,6 +3810,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptTabs.setSelectedComponent(refsetSpecPanel);
     }
 
+    /**
+     * Switch view to the Wizard tab. 
+     * This contains the workflow panel and the workflow detail sheet.
+     */
+    public void showWizardPanel() {
+        setShowComponentView(true);
+        conceptTabs.setSelectedComponent(wizardPanel);
+        wizardPanel.setVisible(true);
+    }
+    
     public void setShowActivityViewer(boolean show) {
         if (show) {
             ActivityViewer.toFront();
@@ -3814,6 +3833,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public JPanel getWorkflowDetailsSheet() {
+        showWizardPanel();
         return workflowDetailsSheet;
     }
 

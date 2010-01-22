@@ -1106,4 +1106,8 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.svnCommitNoPrompt(svd);
     }
 
+    public void showWizardPanel() {
+        frameConfig.showWizardPanel();
+    }
+
 }

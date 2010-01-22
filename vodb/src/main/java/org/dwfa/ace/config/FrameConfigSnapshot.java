@@ -1223,4 +1223,8 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setSelectedPreferencesTab(String tabName) {
         baseFrame.setSelectedPreferencesTab(tabName);
     }
+
+    public void showWizardPanel() {
+        baseFrame.showWizardPanel();
+    }
 }
