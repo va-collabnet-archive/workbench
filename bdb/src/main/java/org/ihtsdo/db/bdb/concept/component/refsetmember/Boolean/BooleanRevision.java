@@ -8,12 +8,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetBooleanVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
+public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMember>
 	implements I_ThinExtByRefPartBoolean {
 	
 	private boolean booleanValue;
@@ -24,8 +24,8 @@ public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (BooleanVersion.class.isAssignableFrom(obj.getClass())) {
-			BooleanVersion another = (BooleanVersion) obj;
+		if (BooleanRevision.class.isAssignableFrom(obj.getClass())) {
+			BooleanRevision another = (BooleanRevision) obj;
 			if (this.booleanValue != another.booleanValue) {
 				return false;
 			}
@@ -34,24 +34,24 @@ public class BooleanVersion extends RefsetVersion<BooleanVersion, BooleanMember>
 		return false;
 	}
 
-	protected BooleanVersion(int statusNid, int pathNid, long time, 
+	protected BooleanRevision(int statusNid, int pathNid, long time, 
 			BooleanMember primoridalMember) {
 		super(statusNid, pathNid, time, primoridalMember);
 	}
 
-	protected BooleanVersion(int statusAtPositionNid, 
+	protected BooleanRevision(int statusAtPositionNid, 
 			BooleanMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public BooleanVersion(TupleInput input, 
+	public BooleanRevision(TupleInput input, 
 			BooleanMember primoridalMember) {
 		super(input, primoridalMember);
 		booleanValue = input.readBoolean();
 	}
 
-	public BooleanVersion(ERefsetBooleanVersion eVersion,
+	public BooleanRevision(ERefsetBooleanVersion eVersion,
 			BooleanMember booleanMember) {
 		super(eVersion, booleanMember);
 		this.booleanValue = eVersion.isBooleanValue();

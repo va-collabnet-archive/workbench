@@ -76,14 +76,14 @@ public class ConceptAttributesVersionTest {
 	}
 
 	/**
-	 * Test method for {@link org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion#ConceptAttributesVersion(com.sleepycat.bind.tuple.TupleInput, org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes)}.
+	 * Test method for {@link org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision#ConceptAttributesVersion(com.sleepycat.bind.tuple.TupleInput, org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes)}.
 	 */
 	@Test
 	public void testConceptAttributesVersionTupleInputConceptAttributes() {
 		try {
 			Concept c = Concept.get(testConcept);
 			assertNotNull(c.getConceptAttributes());
-			ConceptComponentBinder<ConceptAttributesVersion, ConceptAttributes> cab = 
+			ConceptComponentBinder<ConceptAttributesRevision, ConceptAttributes> cab = 
 				new ConceptAttributesBinder();
 			DatabaseEntry entry = new DatabaseEntry();
 			ArrayList<ConceptAttributes> origList = c.getConceptAttributesList();
@@ -116,7 +116,7 @@ public class ConceptAttributesVersionTest {
 	private void testCa1(ConceptAttributes ca1) {
 		assertNotNull(ca1.additionalVersions);
 		assertEquals(ca1.additionalVersions.size(), 1);
-		ConceptAttributesVersion cav = ca1.additionalVersions.get(0);
+		ConceptAttributesRevision cav = ca1.additionalVersions.get(0);
 		assertEquals(ca1.getStatusId(), cav.getStatusId());
 		assertEquals(ca1.getPathId(), cav.getPathId());
 		if (ca1.primordialSapNid == cav.statusAtPositionNid) {

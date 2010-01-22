@@ -16,7 +16,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
+public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> {
 
 	private int c1Nid;
 	private int intValue;
@@ -30,16 +30,16 @@ public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		intValue = refsetMember.getIntValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidIntVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidIntRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidIntVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidIntVersion(eVersion, this));
+				additionalVersions.add(new CidIntRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidIntVersion, CidIntMember> obj) {
+			ConceptComponent<CidIntRevision, CidIntMember> obj) {
 		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
 			CidIntMember another = (CidIntMember) obj;
 			return this.c1Nid == another.c1Nid && this.intValue == another.intValue;
@@ -51,14 +51,14 @@ public class CidIntMember extends RefsetMember<CidIntVersion, CidIntMember> {
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidIntVersion>(
+			additionalVersions = new ArrayList<CidIntRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidIntVersion(input, this));
+			additionalVersions.add(new CidIntRevision(input, this));
 		}
 	}
 	@Override

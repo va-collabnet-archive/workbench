@@ -15,7 +15,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class Version<V extends Version<V, C>, 
+public abstract class Revision<V extends Revision<V, C>, 
 							  C extends ConceptComponent<V, C>> 
 	implements I_AmPart, I_AmTuple, I_HandleFutureStatusAtPositionSetup {
 	
@@ -25,7 +25,7 @@ public abstract class Version<V extends Version<V, C>,
 	public int statusAtPositionNid = Integer.MAX_VALUE;
 	public C primordialComponent;
 
-	public Version(int statusAtPositionNid, C primordialComponent) {
+	public Revision(int statusAtPositionNid, C primordialComponent) {
 		super();
 		this.statusAtPositionNid = statusAtPositionNid;
 		this.primordialComponent = primordialComponent;
@@ -33,14 +33,14 @@ public abstract class Version<V extends Version<V, C>,
 		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 
-	public Version(int statusNid, int pathNid, long time, C primordialComponent) {
+	public Revision(int statusNid, int pathNid, long time, C primordialComponent) {
 		this.statusAtPositionNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
 		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 	
-	public Version(TupleInput input, C conceptComponent) {
+	public Revision(TupleInput input, C conceptComponent) {
 		this(input.readInt(), conceptComponent);
 	}
 
@@ -180,8 +180,8 @@ public abstract class Version<V extends Version<V, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
-		if (Version.class.isAssignableFrom(obj.getClass())) {
-			Version<V, C> another = (Version<V, C>) obj;
+		if (Revision.class.isAssignableFrom(obj.getClass())) {
+			Revision<V, C> another = (Revision<V, C>) obj;
 			if (this.statusAtPositionNid == another.statusAtPositionNid) {
 				return true;
 			}

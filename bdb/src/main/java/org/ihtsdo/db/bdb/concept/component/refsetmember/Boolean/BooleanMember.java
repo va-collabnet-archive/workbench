@@ -14,7 +14,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
+public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> {
 
 	private boolean booleanValue;
 
@@ -27,18 +27,18 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 		super(refsetMember, enclosingConcept);
 		booleanValue = refsetMember.getBooleanValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<BooleanVersion>(refsetMember
+			additionalVersions = new ArrayList<BooleanRevision>(refsetMember
 					.getExtraVersionsList().size());
 			for (ERefsetBooleanVersion eVersion : refsetMember
 					.getExtraVersionsList()) {
-				additionalVersions.add(new BooleanVersion(eVersion, this));
+				additionalVersions.add(new BooleanRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<BooleanVersion, BooleanMember> obj) {
+			ConceptComponent<BooleanRevision, BooleanMember> obj) {
 		if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
 			BooleanMember another = (BooleanMember) obj;
 			return this.booleanValue = another.booleanValue;
@@ -50,14 +50,14 @@ public class BooleanMember extends RefsetMember<BooleanVersion, BooleanMember> {
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<BooleanVersion>(
+			additionalVersions = new ArrayList<BooleanRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new BooleanVersion(input, this));
+			additionalVersions.add(new BooleanRevision(input, this));
 		}
 	}
 	@Override

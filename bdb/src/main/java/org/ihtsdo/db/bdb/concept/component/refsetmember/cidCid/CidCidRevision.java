@@ -1,68 +1,68 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
-import org.ihtsdo.etypes.ERefsetCidIntVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.etypes.ERefsetCidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidIntVersion  
-				extends RefsetVersion<CidIntVersion, CidIntMember>
-	implements I_ThinExtByRefPartConceptInt {
+public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember> 
+	implements I_ThinExtByRefPartConceptConcept {
 
 	private int c1Nid;
-	private int intValue;
-	
+	private int c2Nid;
+
 	public String toString() {
-		return " c1Nid: " + c1Nid + " intValue: " + intValue + " " +super.toString();
+		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " " +super.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidIntVersion.class.isAssignableFrom(obj.getClass())) {
-			CidIntVersion another = (CidIntVersion) obj;
-			if (this.c1Nid != another.intValue) {
+		if (CidCidRevision.class.isAssignableFrom(obj.getClass())) {
+			CidCidRevision another = (CidCidRevision) obj;
+			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
-			if (this.intValue != another.intValue) {
+			if (this.c2Nid != another.c2Nid) {
 				return false;
 			}
 			return super.equals(obj);
 		}
 		return false;
 	}
-	protected CidIntVersion(int statusNid, int pathNid, long time, 
-			CidIntMember primoridalMember) {
+
+	public CidCidRevision(int statusNid, int pathNid, long time, 
+			CidCidMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	protected CidIntVersion(int statusAtPositionNid, 
-			CidIntMember primoridalMember) {
+	public CidCidRevision(int statusAtPositionNid, 
+			CidCidMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidIntVersion(TupleInput input, 
-			CidIntMember primoridalMember) {
+	public CidCidRevision(TupleInput input, 
+			CidCidMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
-		intValue = input.readInt();
+		c2Nid = input.readInt();
 	}
 
-	public CidIntVersion(ERefsetCidIntVersion eVersion,
-			CidIntMember member) {
+	public CidCidRevision(ERefsetCidCidVersion eVersion,
+			CidCidMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-		intValue = eVersion.getIntValue();
+		c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
 	}
 
 	@Override
@@ -85,13 +85,13 @@ public class CidIntVersion
 	}
 
 	@Override
-	public int getIntValue() {
-		return intValue;
+	public int getC2id() {
+		return c2Nid;
 	}
 
 	@Override
-	public void setIntValue(int intValue) {
-		this.intValue = intValue;
+	public void setC2id(int c2id) {
+		this.c2Nid = c2id;
 	}
 
 	public int getC1Nid() {
@@ -100,6 +100,14 @@ public class CidIntVersion
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+	}
+
+	public int getC2Nid() {
+		return c2Nid;
+	}
+
+	public void setC2Nid(int c2Nid) {
+		this.c2Nid = c2Nid;
 	}
 
 	@Override

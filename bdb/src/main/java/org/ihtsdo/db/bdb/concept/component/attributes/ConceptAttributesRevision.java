@@ -4,53 +4,53 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributesVersion 
-	extends Version<ConceptAttributesVersion, ConceptAttributes> 
+public class ConceptAttributesRevision 
+	extends Revision<ConceptAttributesRevision, ConceptAttributes> 
 	implements I_ConceptAttributePart, I_ConceptAttributeTuple {
 
 	private transient ConceptAttributes conceptAttributes;
 	
 	private boolean defined = false;
 	
-	public ConceptAttributesVersion(int statusAtPositionNid, 
+	public ConceptAttributesRevision(int statusAtPositionNid, 
 			ConceptAttributes primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public ConceptAttributesVersion(I_ConceptualizeExternally another, 
+	public ConceptAttributesRevision(I_ConceptualizeExternally another, 
 			ConceptAttributes primoridalMember) {
 		super(Bdb.uuidToNid(another.getStatusUuid()), 
 				Bdb.uuidToNid(another.getPathUuid()),
 				another.getTime(), primoridalMember);
 		defined = isDefined();
 	}
-	public ConceptAttributesVersion(I_ConceptAttributePart another,
+	public ConceptAttributesRevision(I_ConceptAttributePart another,
 			int statusNid, int pathNid, long time, 
 			ConceptAttributes primoridalMember) {
 		super(statusNid, pathNid, time, primoridalMember);
 		this.defined = another.isDefined();
 	}
 
-	public ConceptAttributesVersion(I_ConceptAttributePart another, 
+	public ConceptAttributesRevision(I_ConceptAttributePart another, 
 			ConceptAttributes primoridalMember) {
 		super(another.getStatusId(), another.getPathId(), another.getTime(), 
 				primoridalMember);
 		this.defined = another.isDefined();
 	}
 
-	public ConceptAttributesVersion(int statusNid, int pathNid, long time, 
+	public ConceptAttributesRevision(int statusNid, int pathNid, long time, 
 			ConceptAttributes primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public ConceptAttributesVersion(TupleInput input, 
+	public ConceptAttributesRevision(TupleInput input, 
 			ConceptAttributes primoridalMember) {
 		super(input.readInt(), primoridalMember);
 		defined = input.readBoolean();
@@ -58,8 +58,8 @@ public class ConceptAttributesVersion
 
 
 	@Override
-	public ConceptAttributesVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ConceptAttributesVersion(this, statusNid, pathNid, time, this.primordialComponent);
+	public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
+		return new ConceptAttributesRevision(this, statusNid, pathNid, time, this.primordialComponent);
 	}
 
 	@Override
@@ -78,8 +78,8 @@ public class ConceptAttributesVersion
 	}
 
 	@Override
-	public ConceptAttributesVersion duplicate() {
-		return new ConceptAttributesVersion(this, this.primordialComponent);
+	public ConceptAttributesRevision duplicate() {
+		return new ConceptAttributesRevision(this, this.primordialComponent);
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class ConceptAttributesVersion
 	}
 
 	@Override
-	public ConceptAttributesVersion getMutablePart() {
+	public ConceptAttributesRevision getMutablePart() {
 		return this;
 	}
 	public String toString() {
@@ -112,8 +112,8 @@ public class ConceptAttributesVersion
 
 	@Override
 	public boolean equals(Object obj) {
-		if (ConceptAttributesVersion.class.isAssignableFrom(obj.getClass())) {
-			ConceptAttributesVersion another = (ConceptAttributesVersion) obj;
+		if (ConceptAttributesRevision.class.isAssignableFrom(obj.getClass())) {
+			ConceptAttributesRevision another = (ConceptAttributesRevision) obj;
 			if (this.defined == another.defined) {
 				return super.equals(obj);
 			}

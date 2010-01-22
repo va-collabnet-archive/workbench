@@ -32,11 +32,11 @@ import org.ihtsdo.etypes.ERelationshipVersion;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class Relationship extends ConceptComponent<RelationshipVersion, Relationship> 
+public class Relationship extends ConceptComponent<RelationshipRevision, Relationship> 
 	implements I_RelVersioned, I_RelPart, I_RelTuple {
 
 	private static class RelTupleComputer extends
-			VersionComputer<Relationship, RelationshipVersion> {
+			VersionComputer<Relationship, RelationshipRevision> {
 	}
 
 	private static RelTupleComputer computer = new RelTupleComputer();
@@ -64,9 +64,9 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(eRel);
 		if (eRel.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<RelationshipVersion>(eRel.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<RelationshipRevision>(eRel.getExtraVersionsList().size());
 			for (ERelationshipVersion erv: eRel.getExtraVersionsList()) {
-				additionalVersions.add(new RelationshipVersion(erv, this));
+				additionalVersions.add(new RelationshipRevision(erv, this));
 			}
 		}
 	}
@@ -90,7 +90,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	@Override
-	public boolean fieldsEqual(ConceptComponent<RelationshipVersion, Relationship> obj) {
+	public boolean fieldsEqual(ConceptComponent<RelationshipRevision, Relationship> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
 			Relationship another = (Relationship) obj;
 			if (this.c2Nid != another.c2Nid) {
@@ -124,9 +124,9 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
-			additionalVersions = new ArrayList<RelationshipVersion>(additionalVersionCount);
+			additionalVersions = new ArrayList<RelationshipRevision>(additionalVersionCount);
 			for (int i = 0; i < additionalVersionCount; i++) {
-				additionalVersions.add(new RelationshipVersion(input, this));
+				additionalVersions.add(new RelationshipRevision(input, this));
 			}
 		}
 	}
@@ -134,9 +134,9 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
-		List<RelationshipVersion> partsToWrite = new ArrayList<RelationshipVersion>();
+		List<RelationshipRevision> partsToWrite = new ArrayList<RelationshipRevision>();
 		if (additionalVersions != null) {
-			for (RelationshipVersion p : additionalVersions) {
+			for (RelationshipRevision p : additionalVersions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
@@ -150,7 +150,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 		output.writeInt(refinabilityNid);
 		output.writeInt(typeNid);
 		output.writeShort(partsToWrite.size());
-		for (RelationshipVersion p : partsToWrite) {
+		for (RelationshipRevision p : partsToWrite) {
 			p.writePartToBdb(output);
 		}
 	}
@@ -177,7 +177,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<RelationshipVersion> matchingTuples) {
+			List<RelationshipRevision> matchingTuples) {
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
 				additionalVersions, this);
 	}
@@ -193,10 +193,10 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	public boolean addVersion(I_RelPart part) {
-		return additionalVersions.add((RelationshipVersion) part);
+		return additionalVersions.add((RelationshipRevision) part);
 	}
 
-	public boolean addPart(RelationshipVersion part) {
+	public boolean addPart(RelationshipRevision part) {
 		return additionalVersions.add(part);
 	}
 
@@ -216,12 +216,12 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	}
 
 	@Override
-	public RelationshipVersion getFirstTuple() {
+	public RelationshipRevision getFirstTuple() {
 		return additionalVersions.get(0);
 	}
 
 	@Override
-	public RelationshipVersion getLastTuple() {
+	public RelationshipRevision getLastTuple() {
 		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
@@ -233,7 +233,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	@Override
 	public List<I_RelTuple> getTuples() {
 		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (RelationshipVersion p: additionalVersions) {
+		for (RelationshipRevision p: additionalVersions) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -243,7 +243,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 	public List<I_RelTuple> getTuples(boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-		for (RelationshipVersion p : getVersions(returnConflictResolvedLatestState)) {
+		for (RelationshipRevision p : getVersions(returnConflictResolvedLatestState)) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -257,7 +257,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 				enclosingConcept.getUids(), 
 				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
 				additionalVersions.size());
-		for (RelationshipVersion part : additionalVersions) {
+		for (RelationshipRevision part : additionalVersions) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
 			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
 			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());
@@ -286,13 +286,13 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
 			throws IOException, TerminologyException {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<RelationshipVersion> matchingTuples = new ArrayList<RelationshipVersion>();
+		List<RelationshipRevision> matchingTuples = new ArrayList<RelationshipRevision>();
 		addTuples(allowedStatus, viewPosition, matchingTuples);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (RelationshipVersion rt : matchingTuples) {
+			for (RelationshipRevision rt : matchingTuples) {
 				if (rt.getPathId() == viewPathId) {
-					RelationshipVersion promotionPart = 
+					RelationshipRevision promotionPart = 
 						rt.makeAnalog(rt.getStatusId(),
 									promotionPath.getConceptId(),
 									Long.MAX_VALUE);
@@ -395,7 +395,7 @@ public class Relationship extends ConceptComponent<RelationshipVersion, Relation
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipVersion(this, statusNid, pathNid, time, this);
+		return new RelationshipRevision(this, statusNid, pathNid, time, this);
 	}
 
 	@Override

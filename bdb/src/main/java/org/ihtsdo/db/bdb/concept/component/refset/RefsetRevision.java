@@ -3,32 +3,32 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetVersion<V extends RefsetVersion<V, C>, 
+public abstract class RefsetRevision<V extends RefsetRevision<V, C>, 
                                               C extends RefsetMember<V, C>> 
-	extends Version<V, C> 
+	extends Revision<V, C> 
 	implements I_ThinExtByRefPart {
 
 
-	public RefsetVersion(int statusNid, int pathNid, long time, 
+	public RefsetRevision(int statusNid, int pathNid, long time, 
 			C primordialComponent) {
 		super(statusNid, pathNid, time, primordialComponent);
 	}
 
-	public RefsetVersion(int statusAtPositionNid, C primordialComponent) {
+	public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
 		super(statusAtPositionNid, primordialComponent);
 	}
 
-	public RefsetVersion(TupleInput input, C primordialComponent) {
+	public RefsetRevision(TupleInput input, C primordialComponent) {
 		super(input, primordialComponent);
 	}
 
-	public RefsetVersion(EVersion eVersion,
+	public RefsetRevision(EVersion eVersion,
 			C member) {
 		super(Bdb.uuidToNid(eVersion.getStatusUuid()), 
 				Bdb.uuidToNid(eVersion.getPathUuid()),

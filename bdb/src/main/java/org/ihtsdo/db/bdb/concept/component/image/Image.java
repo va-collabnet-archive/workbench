@@ -33,11 +33,11 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image 
-	extends ConceptComponent<ImageVersion, Image> 
+	extends ConceptComponent<ImageRevision, Image> 
 	implements I_ImageVersioned, I_ImagePart, I_ImageTuple {
 
 	private static class ImageTupleComputer extends
-			VersionComputer<Image, ImageVersion> {
+			VersionComputer<Image, ImageRevision> {
 
 	}
 
@@ -60,9 +60,9 @@ public class Image
 		typeNid = Bdb.uuidToNid(eImage.getPrimordialComponentUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(eImage);
 		if (eImage.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<ImageVersion>(eImage.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<ImageRevision>(eImage.getExtraVersionsList().size());
 			for (EImageVersion eiv: eImage.getExtraVersionsList()) {
-				additionalVersions.add(new ImageVersion(eiv, this));
+				additionalVersions.add(new ImageRevision(eiv, this));
 			}
 		}
 	}
@@ -85,7 +85,7 @@ public class Image
 
 
 	@Override
-	public boolean fieldsEqual(ConceptComponent<ImageVersion, Image> obj) {
+	public boolean fieldsEqual(ConceptComponent<ImageRevision, Image> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
 			Image another = (Image) obj;
 			if (!this.format.equals(another.format)) {
@@ -113,15 +113,15 @@ public class Image
 		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new ImageVersion(input, this));
+			additionalVersions.add(new ImageRevision(input, this));
 		}
 	}
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<ImageVersion> partsToWrite = new ArrayList<ImageVersion>();
+		List<ImageRevision> partsToWrite = new ArrayList<ImageRevision>();
 		if (additionalVersions != null) {
-			for (ImageVersion p: additionalVersions) {
+			for (ImageRevision p: additionalVersions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
@@ -135,7 +135,7 @@ public class Image
 		output.writeString(textDescription);
 		output.writeInt(typeNid);
 		output.writeShort(partsToWrite.size());
-		for (ImageVersion p: partsToWrite) {
+		for (ImageRevision p: partsToWrite) {
 			p.writePartToBdb(output);
 		}
 	}
@@ -182,7 +182,7 @@ public class Image
 	 * 
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
-	public ImageVersion getLastTuple() {
+	public ImageRevision getLastTuple() {
 		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
@@ -193,7 +193,7 @@ public class Image
 	 */
 	public List<I_ImageTuple> getTuples() {
 		List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
-		for (ImageVersion p : additionalVersions) {
+		for (ImageRevision p : additionalVersions) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -228,7 +228,7 @@ public class Image
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
 				getImage(), new ArrayList<UniversalAceImagePart>(additionalVersions
 						.size()), getFormat(), enclosingConcept.getUids());
-		for (ImageVersion part : additionalVersions) {
+		for (ImageRevision part : additionalVersions) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -243,14 +243,14 @@ public class Image
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
 		int viewPathId = viewPosition.getPath().getConceptId();
-		List<ImageVersion> matchingTuples = new ArrayList<ImageVersion>();
+		List<ImageRevision> matchingTuples = new ArrayList<ImageRevision>();
 		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
 				additionalVersions, this);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
-			for (ImageVersion it : matchingTuples) {
+			for (ImageRevision it : matchingTuples) {
 				if (it.getPathId() == viewPathId) {
-					ImageVersion promotionPart = it.makeAnalog(
+					ImageRevision promotionPart = it.makeAnalog(
 							it.getStatusId(), promotionPath.getConceptId(),
 							Long.MAX_VALUE);
 					it.getVersioned().addVersion(promotionPart);
@@ -263,7 +263,7 @@ public class Image
 
 	@Override
 	public boolean addVersion(I_ImagePart part) {
-		return additionalVersions.add((ImageVersion) part);
+		return additionalVersions.add((ImageRevision) part);
 	}
 
 	@Override
@@ -299,8 +299,8 @@ public class Image
 	}
 
 	@Override
-	public ImageVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageVersion(this, statusNid, pathNid, time, this);
+	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
+		return new ImageRevision(this, statusNid, pathNid, time, this);
 	}
 
 	@Override

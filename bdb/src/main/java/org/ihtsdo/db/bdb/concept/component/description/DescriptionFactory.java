@@ -5,7 +5,7 @@ import org.ihtsdo.db.bdb.concept.component.ComponentFactory;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class DescriptionFactory extends ComponentFactory<DescriptionVersion, Description> {
+public class DescriptionFactory extends ComponentFactory<DescriptionRevision, Description> {
 
 	@Override
 	public Description create(Concept enclosingConcept, TupleInput input) {

@@ -75,7 +75,7 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 				refsetMembersToWrite.add(refsetMember);
 			} else {
 				if (refsetMember.additionalVersions != null) {
-					for (RefsetVersion<?, ?> extraVersions: refsetMember.additionalVersions) {
+					for (RefsetRevision<?, ?> extraVersions: refsetMember.additionalVersions) {
 						if (extraVersions.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 							refsetMembersToWrite.add(refsetMember);
 							break;

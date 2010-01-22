@@ -1,68 +1,68 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptLong;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
-import org.ihtsdo.etypes.ERefsetCidLongVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.etypes.ERefsetCidIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidLongVersion extends RefsetVersion<CidLongVersion, CidLongMember>
-	implements I_ThinExtByRefPartConceptLong {
+public class CidIntRevision  
+				extends RefsetRevision<CidIntRevision, CidIntMember>
+	implements I_ThinExtByRefPartConceptInt {
 
 	private int c1Nid;
-	private long longValue;
+	private int intValue;
 	
 	public String toString() {
-		return " c1Nid: " + c1Nid + " longValue: " + longValue + " " +super.toString();
+		return " c1Nid: " + c1Nid + " intValue: " + intValue + " " +super.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidLongVersion.class.isAssignableFrom(obj.getClass())) {
-			CidLongVersion another = (CidLongVersion) obj;
-			if (this.c1Nid != another.c1Nid) {
+		if (CidIntRevision.class.isAssignableFrom(obj.getClass())) {
+			CidIntRevision another = (CidIntRevision) obj;
+			if (this.c1Nid != another.intValue) {
 				return false;
 			}
-			if (this.longValue != another.longValue) {
+			if (this.intValue != another.intValue) {
 				return false;
 			}
 			return super.equals(obj);
 		}
 		return false;
 	}
-
-	protected CidLongVersion(int statusNid, int pathNid, long time, 
-			CidLongMember primoridalMember) {
+	protected CidIntRevision(int statusNid, int pathNid, long time, 
+			CidIntMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	protected CidLongVersion(int statusAtPositionNid, 
-			CidLongMember primoridalMember) {
+	protected CidIntRevision(int statusAtPositionNid, 
+			CidIntMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidLongVersion(TupleInput input, 
-			CidLongMember primoridalMember) {
+	public CidIntRevision(TupleInput input, 
+			CidIntMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
-		longValue = input.readLong();
+		intValue = input.readInt();
 	}
 
-	public CidLongVersion(ERefsetCidLongVersion eVersion,
-			CidLongMember member) {
+	public CidIntRevision(ERefsetCidIntVersion eVersion,
+			CidIntMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-		longValue = eVersion.getLongValue();
+		intValue = eVersion.getIntValue();
 	}
 
 	@Override
@@ -84,12 +84,22 @@ public class CidLongVersion extends RefsetVersion<CidLongVersion, CidLongMember>
 		throw new UnsupportedOperationException();
 	}
 
-	public long getLongValue() {
-		return longValue;
+	@Override
+	public int getIntValue() {
+		return intValue;
 	}
 
-	public void setLongValue(long longValue) {
-		this.longValue = longValue;
+	@Override
+	public void setIntValue(int intValue) {
+		this.intValue = intValue;
+	}
+
+	public int getC1Nid() {
+		return c1Nid;
+	}
+
+	public void setC1Nid(int c1Nid) {
+		this.c1Nid = c1Nid;
 	}
 
 	@Override

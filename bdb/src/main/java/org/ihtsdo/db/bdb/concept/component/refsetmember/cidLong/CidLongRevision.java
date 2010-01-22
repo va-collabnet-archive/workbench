@@ -1,37 +1,37 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
-import org.ihtsdo.etypes.ERefsetCidStrVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.etypes.ERefsetCidLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember> 
-	implements I_ThinExtByRefPartConceptString {
+public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMember>
+	implements I_ThinExtByRefPartConceptLong {
 
 	private int c1Nid;
-	private String strValue;
+	private long longValue;
 	
 	public String toString() {
-		return " c1Nid: " + c1Nid + " strValue: " + strValue + " " +super.toString();
+		return " c1Nid: " + c1Nid + " longValue: " + longValue + " " +super.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidStrVersion.class.isAssignableFrom(obj.getClass())) {
-			CidStrVersion another = (CidStrVersion) obj;
+		if (CidLongRevision.class.isAssignableFrom(obj.getClass())) {
+			CidLongRevision another = (CidLongRevision) obj;
 			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
-			if (this.strValue.equals(another.strValue)) {
+			if (this.longValue != another.longValue) {
 				return false;
 			}
 			return super.equals(obj);
@@ -39,30 +39,30 @@ public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember>
 		return false;
 	}
 
-	public CidStrVersion(int statusNid, int pathNid, long time, 
-			CidStrMember primoridalMember) {
+	protected CidLongRevision(int statusNid, int pathNid, long time, 
+			CidLongMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public CidStrVersion(int statusAtPositionNid, 
-			CidStrMember primoridalMember) {
+	protected CidLongRevision(int statusAtPositionNid, 
+			CidLongMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidStrVersion(TupleInput input, 
-			CidStrMember primoridalMember) {
+	public CidLongRevision(TupleInput input, 
+			CidLongMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
-		strValue = input.readString();
+		longValue = input.readLong();
 	}
 
-	public CidStrVersion(ERefsetCidStrVersion eVersion,
-			CidStrMember member) {
+	public CidLongRevision(ERefsetCidLongVersion eVersion,
+			CidLongMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-		strValue = eVersion.getStrValue();
+		longValue = eVersion.getLongValue();
 	}
 
 	@Override
@@ -84,21 +84,12 @@ public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember>
 		throw new UnsupportedOperationException();
 	}
 
-
-	public int getC1Nid() {
-		return c1Nid;
+	public long getLongValue() {
+		return longValue;
 	}
 
-	public void setC1Nid(int c1Nid) {
-		this.c1Nid = c1Nid;
-	}
-
-	public String getStrValue() {
-		return strValue;
-	}
-
-	public void setStrValue(String strValue) {
-		this.strValue = strValue;
+	public void setLongValue(long longValue) {
+		this.longValue = longValue;
 	}
 
 	@Override
@@ -107,8 +98,8 @@ public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember>
 	}
 
 	@Override
-	public String getStr() {
-		return strValue;
+	public int getConceptId() {
+		return c1Nid;
 	}
 
 	@Override
@@ -117,8 +108,8 @@ public class CidStrVersion extends RefsetVersion<CidStrVersion, CidStrMember>
 	}
 
 	@Override
-	public void setStr(String str) {
-		this.strValue = str;
+	public void setConceptId(int conceptId) {
+		this.c1Nid = conceptId;
 	}
 
 	@Override

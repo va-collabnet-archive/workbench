@@ -15,7 +15,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMember> {
+public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMember> {
 
 	private int c1Nid;
 	private int c2Nid;
@@ -31,9 +31,9 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		strValue = refsetMember.getStrValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidCidStrVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidCidStrRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidCidStrVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidCidStrVersion(eVersion, this));
+				additionalVersions.add(new CidCidStrRevision(eVersion, this));
 			}
 		}
 	}
@@ -41,7 +41,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidCidStrVersion, CidCidStrMember> obj) {
+			ConceptComponent<CidCidStrRevision, CidCidStrMember> obj) {
 		if (CidCidStrMember.class.isAssignableFrom(obj.getClass())) {
 			CidCidStrMember another = (CidCidStrMember) obj;
 			return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid && this.strValue.equals(another.strValue);
@@ -53,14 +53,14 @@ public class CidCidStrMember extends RefsetMember<CidCidStrVersion, CidCidStrMem
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidCidStrVersion>(
+			additionalVersions = new ArrayList<CidCidStrRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidCidStrVersion(input, this));
+			additionalVersions.add(new CidCidStrRevision(input, this));
 		}
 	}
 	@Override

@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
-public class ImageBinder extends ConceptComponentBinder<ImageVersion, Image> {
+public class ImageBinder extends ConceptComponentBinder<ImageRevision, Image> {
 
 	public static AtomicInteger encountered = new AtomicInteger();
 	public static AtomicInteger written = new AtomicInteger();

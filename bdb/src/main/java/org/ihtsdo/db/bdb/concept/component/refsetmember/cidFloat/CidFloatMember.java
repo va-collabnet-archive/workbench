@@ -15,7 +15,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember> {
+public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember> {
 
 	private int c1Nid;
 	private float floatValue;
@@ -29,16 +29,16 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		floatValue = refsetMember.getFloatValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidFloatVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidFloatRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidFloatVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidFloatVersion(eVersion, this));
+				additionalVersions.add(new CidFloatRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidFloatVersion, CidFloatMember> obj) {
+			ConceptComponent<CidFloatRevision, CidFloatMember> obj) {
 		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
 			CidFloatMember another = (CidFloatMember) obj;
 			return this.c1Nid == another.c1Nid && this.floatValue == another.floatValue;
@@ -51,14 +51,14 @@ public class CidFloatMember extends RefsetMember<CidFloatVersion, CidFloatMember
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidFloatVersion>(
+			additionalVersions = new ArrayList<CidFloatRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidFloatVersion(input, this));
+			additionalVersions.add(new CidFloatRevision(input, this));
 		}
 	}
 	@Override

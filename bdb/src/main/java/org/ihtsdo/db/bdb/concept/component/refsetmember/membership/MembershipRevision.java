@@ -6,12 +6,12 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class MembershipVersion extends RefsetVersion<MembershipVersion, MembershipMember> {
+public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> {
 
 	
 	
@@ -21,29 +21,29 @@ public class MembershipVersion extends RefsetVersion<MembershipVersion, Membersh
 
 	@Override
 	public boolean equals(Object obj) {
-		if (MembershipVersion.class.isAssignableFrom(obj.getClass())) {
+		if (MembershipRevision.class.isAssignableFrom(obj.getClass())) {
 			return super.equals(obj);
 		}
 		return false;
 	}
 
-	public MembershipVersion(int statusNid, int pathNid, long time, 
+	public MembershipRevision(int statusNid, int pathNid, long time, 
 			MembershipMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public MembershipVersion(int statusAtPositionNid, 
+	public MembershipRevision(int statusAtPositionNid, 
 			MembershipMember primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public MembershipVersion(TupleInput input, 
+	public MembershipRevision(TupleInput input, 
 			MembershipMember primoridalMember) {
 		super(input, primoridalMember);
 	}
 
-	public MembershipVersion(ERefsetVersion eVersion,
+	public MembershipRevision(ERefsetVersion eVersion,
 			MembershipMember member) {
 		super(eVersion, member);
 	}
@@ -56,7 +56,7 @@ public class MembershipVersion extends RefsetVersion<MembershipVersion, Membersh
 	}
 
 	@Override
-	public RefsetVersion<MembershipVersion, MembershipMember> makePromotionPart(I_Path promotionPath) {
+	public RefsetRevision<MembershipRevision, MembershipMember> makePromotionPart(I_Path promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}
@@ -68,7 +68,7 @@ public class MembershipVersion extends RefsetVersion<MembershipVersion, Membersh
 	}
 
 	@Override
-	public MembershipVersion getMutablePart() {
+	public MembershipRevision getMutablePart() {
 		return this;
 	}
 

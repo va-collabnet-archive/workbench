@@ -5,14 +5,14 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.ERelationshipVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class RelationshipVersion 
-	extends Version<RelationshipVersion, Relationship> 
+public class RelationshipRevision 
+	extends Revision<RelationshipRevision, Relationship> 
 	implements I_RelPart, I_RelTuple {
 	
 	private transient Relationship relationship;
@@ -30,8 +30,8 @@ public class RelationshipVersion
 
 	@Override
 	public boolean equals(Object obj) {
-		if (RelationshipVersion.class.isAssignableFrom(obj.getClass())) {
-			RelationshipVersion another = (RelationshipVersion) obj;
+		if (RelationshipRevision.class.isAssignableFrom(obj.getClass())) {
+			RelationshipRevision another = (RelationshipRevision) obj;
 			if (this.characteristicNid != another.characteristicNid) {
 				return false;
 			}
@@ -48,12 +48,12 @@ public class RelationshipVersion
 		}
 		return false;
 	}
-	public RelationshipVersion(int statusAtPositionNid, 
+	public RelationshipRevision(int statusAtPositionNid, 
 			Relationship primordialRel) {
 		super(statusAtPositionNid, primordialRel);
 	}
 
-	public RelationshipVersion(RelationshipVersion another, 
+	public RelationshipRevision(RelationshipRevision another, 
 			Relationship primordialRel) {
 		super(another.statusAtPositionNid, primordialRel);
 		this.characteristicNid = another.characteristicNid;
@@ -62,7 +62,7 @@ public class RelationshipVersion
 		this.typeNid = another.typeNid;
 	}
 
-	public RelationshipVersion(I_RelPart another, int statusNid,
+	public RelationshipRevision(I_RelPart another, int statusNid,
 			int pathNid, long time, 
 			Relationship primordialRel) {
 		super(statusNid, pathNid, time, primordialRel);
@@ -72,7 +72,7 @@ public class RelationshipVersion
 		this.typeNid = another.getTypeId();
 	}
 
-	public RelationshipVersion(TupleInput input, 
+	public RelationshipRevision(TupleInput input, 
 			Relationship primordialRel) {
 		super(input.readInt(), primordialRel);
 		this.characteristicNid = input.readInt();
@@ -81,7 +81,7 @@ public class RelationshipVersion
 		this.typeNid = input.readInt();
 	}
 
-	public RelationshipVersion(ERelationshipVersion erv, 
+	public RelationshipRevision(ERelationshipVersion erv, 
 			Relationship primordialRel) {
 		super(Bdb.uuidToNid(erv.getStatusUuid()), 
 				Bdb.uuidToNid(erv.getPathUuid()), erv.getTime(), 
@@ -139,13 +139,13 @@ public class RelationshipVersion
 	}
 
 	@Override
-	public RelationshipVersion duplicate() {
-		return new RelationshipVersion(this, primordialComponent);
+	public RelationshipRevision duplicate() {
+		return new RelationshipRevision(this, primordialComponent);
 	}
 	
 	@Override
-	public RelationshipVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipVersion(this, statusNid, pathNid, time,
+	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
+		return new RelationshipRevision(this, statusNid, pathNid, time,
 				primordialComponent);
 	}
 

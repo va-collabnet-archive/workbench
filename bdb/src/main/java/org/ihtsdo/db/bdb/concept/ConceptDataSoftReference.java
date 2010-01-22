@@ -21,7 +21,7 @@ import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 import org.ihtsdo.db.bdb.concept.component.DataVersionBinder;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
@@ -167,7 +167,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		}
 	}
 
-	private <C extends ConceptComponent<V, C>, V extends Version<V, C>> ArrayList<C> getList(
+	private <C extends ConceptComponent<V, C>, V extends Revision<V, C>> ArrayList<C> getList(
 			ConceptComponentBinder<V, C> binder, OFFSETS offset,
 			Concept enclosingConcept) throws InterruptedException,
 			ExecutionException, IOException {

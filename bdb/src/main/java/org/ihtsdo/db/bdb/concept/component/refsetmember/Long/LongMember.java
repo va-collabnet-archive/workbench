@@ -14,7 +14,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class LongMember extends RefsetMember<LongVersion, LongMember> {
+public class LongMember extends RefsetMember<LongRevision, LongMember> {
 	private long longValue;
 
 	public LongMember(Concept enclosingConcept, TupleInput input) {
@@ -25,16 +25,16 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 		super(refsetMember, enclosingConcept);
 		longValue =refsetMember.getLongValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<LongVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<LongRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetLongVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new LongVersion(eVersion, this));
+				additionalVersions.add(new LongRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<LongVersion, LongMember> obj) {
+			ConceptComponent<LongRevision, LongMember> obj) {
 		if (LongMember.class.isAssignableFrom(obj.getClass())) {
 			LongMember another = (LongMember) obj;
 			return this.longValue == another.longValue;
@@ -45,14 +45,14 @@ public class LongMember extends RefsetMember<LongVersion, LongMember> {
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<LongVersion>(
+			additionalVersions = new ArrayList<LongRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new LongVersion(input, this));
+			additionalVersions.add(new LongRevision(input, this));
 		}
 	}
 	@Override

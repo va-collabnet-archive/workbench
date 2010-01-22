@@ -16,7 +16,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidLongMember 
-				extends RefsetMember<CidLongVersion, CidLongMember> {
+				extends RefsetMember<CidLongRevision, CidLongMember> {
 
 	private int c1Nid;
 	private long longValue;
@@ -30,15 +30,15 @@ public class CidLongMember
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		longValue = refsetMember.getLongValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidLongVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidLongRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidLongVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidLongVersion(eVersion, this));
+				additionalVersions.add(new CidLongRevision(eVersion, this));
 			}
 		}
 	}
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidLongVersion, CidLongMember> obj) {
+			ConceptComponent<CidLongRevision, CidLongMember> obj) {
 		if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
 			CidLongMember another = (CidLongMember) obj;
 			return this.c1Nid == another.c1Nid && this.longValue == another.longValue;
@@ -50,14 +50,14 @@ public class CidLongMember
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidLongVersion>(
+			additionalVersions = new ArrayList<CidLongRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidLongVersion(input, this));
+			additionalVersions.add(new CidLongRevision(input, this));
 		}
 	}
 	@Override

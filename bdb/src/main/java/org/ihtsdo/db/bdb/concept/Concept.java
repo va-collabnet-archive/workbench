@@ -35,15 +35,15 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
-import org.ihtsdo.db.bdb.concept.component.description.DescriptionVersion;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
-import org.ihtsdo.db.bdb.concept.component.image.ImageVersion;
+import org.ihtsdo.db.bdb.concept.component.image.ImageRevision;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
-import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipVersion;
+import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
@@ -82,7 +82,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		c.data.set(attr);
 		if (eAttr.getExtraVersionsList() != null) {
 			for (I_ConceptualizeExternally eav: eAttr.getExtraVersionsList()) {
-				attr.addVersion(new ConceptAttributesVersion(eav, attr));
+				attr.addVersion(new ConceptAttributesRevision(eav, attr));
 			}
 		}
 		if (eConcept.getDescriptions() != null) {
@@ -250,14 +250,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesVersion> getConceptAttributeTuples(
+	public List<ConceptAttributesRevision> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesVersion> getConceptAttributeTuples(
+	public List<ConceptAttributesRevision> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
@@ -265,14 +265,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesVersion> getConceptAttributeTuples(
+	public List<ConceptAttributesRevision> getConceptAttributeTuples(
 			I_IntSet allowedStatus, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ConceptAttributesVersion> getConceptAttributeTuples(
+	public List<ConceptAttributesRevision> getConceptAttributeTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -292,7 +292,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return nid;
 	}
 
-	public DescriptionVersion getDescTuple(I_IntList typePrefOrder,
+	public DescriptionRevision getDescTuple(I_IntList typePrefOrder,
 			I_IntList langPrefOrder, I_IntSet allowedStatus,
 			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref)
 			throws IOException {
@@ -301,27 +301,27 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	@Override
-	public DescriptionVersion getDescTuple(I_IntList descTypePreferenceList,
+	public DescriptionRevision getDescTuple(I_IntList descTypePreferenceList,
 			I_ConfigAceFrame config) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionVersion> getDescriptionTuples(I_IntSet allowedStatus,
+	public List<DescriptionRevision> getDescriptionTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionVersion> getDescriptionTuples(I_IntSet allowedStatus,
+	public List<DescriptionRevision> getDescriptionTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean returnConflictResolvedLatestState) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<DescriptionVersion> getDescriptionTuples(
+	public List<DescriptionRevision> getDescriptionTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -350,14 +350,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipRevision> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipVersion> getDestRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipRevision> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
@@ -380,14 +380,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getRefsetMembers();
 	}
 
-	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
+	public List<ImageRevision> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions)
 			throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ImageVersion> getImageTuples(I_IntSet allowedStatus,
+	public List<ImageRevision> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
@@ -395,7 +395,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<ImageVersion> getImageTuples(
+	public List<ImageRevision> getImageTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
 		//TODO
@@ -438,14 +438,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipVersion> getSourceRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipRevision> getSourceRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
 
-	public List<RelationshipVersion> getSourceRelTuples(I_IntSet allowedStatus,
+	public List<RelationshipRevision> getSourceRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, Set<I_Position> positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {

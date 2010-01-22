@@ -8,10 +8,10 @@ import java.util.concurrent.ExecutionException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesBinder;
-import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesVersion;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.image.ImageBinder;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
@@ -189,7 +189,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			boolean primordial,
 			OFFSETS offset,
 			SoftReference<ConceptAttributes> reference,
-			ConceptComponentBinder<ConceptAttributesVersion, ConceptAttributes> conceptComponentBinder)
+			ConceptComponentBinder<ConceptAttributesRevision, ConceptAttributes> conceptComponentBinder)
 			throws InterruptedException, ExecutionException, IOException {
 		byte[] componentBytes;
 		if (!primordial && reference == null) {
@@ -208,7 +208,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 		return componentBytes;
 	}
 
-	private <C extends ConceptComponent<V, C>, V extends Version<V, C>> byte[] getComponentBytes(
+	private <C extends ConceptComponent<V, C>, V extends Revision<V, C>> byte[] getComponentBytes(
 			I_ManageConceptData conceptData, boolean primordial, OFFSETS offset,
 			SoftReference<ArrayList<C>> softReference,
 			ConceptComponentBinder<V, C> binder) throws InterruptedException,

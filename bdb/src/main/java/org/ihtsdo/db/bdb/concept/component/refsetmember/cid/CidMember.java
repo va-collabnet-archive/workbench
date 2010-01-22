@@ -18,7 +18,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidMember extends RefsetMember<CidVersion, CidMember> implements I_ThinExtByRefPartConcept {
+public class CidMember extends RefsetMember<CidRevisioin, CidMember> implements I_ThinExtByRefPartConcept {
 
 	private int c1Nid;
 
@@ -32,16 +32,16 @@ public class CidMember extends RefsetMember<CidVersion, CidMember> implements I_
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidRevisioin>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidVersion(eVersion, this));
+				additionalVersions.add(new CidRevisioin(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidVersion, CidMember> obj) {
+			ConceptComponent<CidRevisioin, CidMember> obj) {
 		if (CidMember.class.isAssignableFrom(obj.getClass())) {
 			CidMember another = (CidMember) obj;
 			return this.c1Nid == another.c1Nid;
@@ -53,14 +53,14 @@ public class CidMember extends RefsetMember<CidVersion, CidMember> implements I_
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidVersion>(
+			additionalVersions = new ArrayList<CidRevisioin>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidVersion(input, this));
+			additionalVersions.add(new CidRevisioin(input, this));
 		}
 	}
 	@Override

@@ -23,7 +23,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMember<V extends RefsetVersion<V, C>, 
+public abstract class RefsetMember<V extends RefsetRevision<V, C>, 
 								   C extends RefsetMember<V, C>> 
 			extends ConceptComponent<V, C> 
 			implements I_ThinExtByRefVersioned {
@@ -106,9 +106,9 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<RefsetVersion<V, C>> additionalVersionsToWrite = new ArrayList<RefsetVersion<V, C>>();
+		List<RefsetRevision<V, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<V, C>>();
 		if (additionalVersions != null) {
-			for (RefsetVersion<V, C> p: additionalVersions) {
+			for (RefsetRevision<V, C> p: additionalVersions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					additionalVersionsToWrite.add(p);
 				}
@@ -117,7 +117,7 @@ public abstract class RefsetMember<V extends RefsetVersion<V, C>,
 		output.writeInt(referencedComponentNid);
 		writeMember(output);
 		output.writeShort(additionalVersionsToWrite.size());
-		for (RefsetVersion<V, C> p: additionalVersionsToWrite) {
+		for (RefsetRevision<V, C> p: additionalVersionsToWrite) {
 			p.writePartToBdb(output);
 		}		
 	}

@@ -17,10 +17,10 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 
 public abstract class VersionComputer<C extends ConceptComponent<P, C>, 
-									P extends Version<P, C>> {
+									P extends Revision<P, C>> {
 
 	private class SortPartsByTime implements Comparator<P> {
 

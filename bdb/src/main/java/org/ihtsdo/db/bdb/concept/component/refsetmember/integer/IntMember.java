@@ -14,7 +14,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IntMember extends RefsetMember<IntVersion, IntMember> {
+public class IntMember extends RefsetMember<IntRevision, IntMember> {
 	private int intValue;
 
 	public IntMember(Concept enclosingConcept, TupleInput input) {
@@ -26,15 +26,15 @@ public class IntMember extends RefsetMember<IntVersion, IntMember> {
 		super(refsetMember, enclosingConcept);
 		intValue =refsetMember.getIntValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<IntVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<IntRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetIntVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new IntVersion(eVersion, this));
+				additionalVersions.add(new IntRevision(eVersion, this));
 			}
 		}
 	}
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<IntVersion, IntMember> obj) {
+			ConceptComponent<IntRevision, IntMember> obj) {
 		if (IntMember.class.isAssignableFrom(obj.getClass())) {
 			IntMember another = (IntMember) obj;
 			return this.intValue == another.intValue;
@@ -46,14 +46,14 @@ public class IntMember extends RefsetMember<IntVersion, IntMember> {
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<IntVersion>(
+			additionalVersions = new ArrayList<IntRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new IntVersion(input, this));
+			additionalVersions.add(new IntRevision(input, this));
 		}
 	}
 	@Override

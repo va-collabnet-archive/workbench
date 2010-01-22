@@ -14,7 +14,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class StrMember extends RefsetMember<StrVersion, StrMember> {
+public class StrMember extends RefsetMember<StrRevision, StrMember> {
 
 	private String stringValue;
 
@@ -26,16 +26,16 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<StrVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<StrRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetStrVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new StrVersion(eVersion, this));
+				additionalVersions.add(new StrRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<StrVersion, StrMember> obj) {
+			ConceptComponent<StrRevision, StrMember> obj) {
 		if (StrMember.class.isAssignableFrom(obj.getClass())) {
 			StrMember another = (StrMember) obj;
 			return this.stringValue.equals(another.stringValue);
@@ -47,14 +47,14 @@ public class StrMember extends RefsetMember<StrVersion, StrMember> {
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<StrVersion>(
+			additionalVersions = new ArrayList<StrRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new StrVersion(input, this));
+			additionalVersions.add(new StrRevision(input, this));
 		}
 	}
 	@Override

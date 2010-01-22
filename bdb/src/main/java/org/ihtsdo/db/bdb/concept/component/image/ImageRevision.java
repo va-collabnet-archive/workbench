@@ -7,13 +7,13 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.EImageVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ImageVersion extends Version<ImageVersion, Image> 
+public class ImageRevision extends Revision<ImageRevision, Image> 
 		implements I_ImagePart, I_ImageTuple {
 
 	private transient Image image;
@@ -26,8 +26,8 @@ public class ImageVersion extends Version<ImageVersion, Image>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (ImageVersion.class.isAssignableFrom(obj.getClass())) {
-			ImageVersion another = (ImageVersion) obj;
+		if (ImageRevision.class.isAssignableFrom(obj.getClass())) {
+			ImageRevision another = (ImageRevision) obj;
 			if (this.typeNid != another.typeNid) {
 				return false;
 			}
@@ -48,14 +48,14 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		return partComponentNids;
 	}
 
-	protected ImageVersion(TupleInput input, 
+	protected ImageRevision(TupleInput input, 
 			Image primoridalMember) {
 		super(input.readInt(), primoridalMember);
 		this.textDescription = input.readString();
 		this.typeNid = input.readInt();
 	}
 
-	private ImageVersion(ImageVersion another, 
+	private ImageRevision(ImageRevision another, 
 			Image primoridalMember) {
 		super(another.statusAtPositionNid, 
 				primoridalMember);
@@ -63,7 +63,7 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		this.typeNid = another.typeNid;
 	}
 
-	protected ImageVersion(I_ImagePart another, int statusNid, 
+	protected ImageRevision(I_ImagePart another, int statusNid, 
 			int pathNid, long time, 
 			Image primoridalMember) {
 		super(statusNid, pathNid, time, primoridalMember);
@@ -72,8 +72,8 @@ public class ImageVersion extends Version<ImageVersion, Image>
 	}
 
 	@Override
-	public ImageVersion makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageVersion(this, statusNid, pathNid, time, this.primordialComponent);
+	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
+		return new ImageRevision(this, statusNid, pathNid, time, this.primordialComponent);
 	}
 
 	@Override
@@ -82,13 +82,13 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		output.writeInt(typeNid);
 	}
 
-	private ImageVersion(int statusAtPositionNid, 
+	private ImageRevision(int statusAtPositionNid, 
 			Image primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 
 
-	public ImageVersion(EImageVersion eiv, 
+	public ImageRevision(EImageVersion eiv, 
 			Image primoridalMember) {
 		super(Bdb.uuidToNid(eiv.getStatusUuid()), 
 			  Bdb.uuidToNid(eiv.getPathUuid()), 
@@ -125,7 +125,7 @@ public class ImageVersion extends Version<ImageVersion, Image>
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
 	 */
-	public boolean hasNewData(ImageVersion another) {
+	public boolean hasNewData(ImageRevision another) {
 		return ((this.getPathId() != another.getPathId()) ||
 				(this.getStatusId() != another.getStatusId()) ||
 				((this.textDescription.equals(another.getTextDescription()) == false) ||
@@ -138,7 +138,7 @@ public class ImageVersion extends Version<ImageVersion, Image>
 		throw new UnsupportedOperationException();
 	}
 	
-	public ImageVersion duplicate() {
+	public ImageRevision duplicate() {
 		throw new UnsupportedOperationException();
 	}
 

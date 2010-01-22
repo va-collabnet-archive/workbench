@@ -6,12 +6,12 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class StrVersion extends RefsetVersion<StrVersion, StrMember> 
+public class StrRevision extends RefsetRevision<StrRevision, StrMember> 
 	//implements I_ThinExtByRefPartString 
 	{
 
@@ -23,8 +23,8 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (StrVersion.class.isAssignableFrom(obj.getClass())) {
-			StrVersion another = (StrVersion) obj;
+		if (StrRevision.class.isAssignableFrom(obj.getClass())) {
+			StrRevision another = (StrRevision) obj;
 			if (this.stringValue.equals(another.stringValue)) {
 				return false;
 			}
@@ -33,24 +33,24 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 		return false;
 	}
 
-	public StrVersion(int statusNid, int pathNid, long time, 
+	public StrRevision(int statusNid, int pathNid, long time, 
 			StrMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				 primoridalMember);
 	}
 
-	public StrVersion(int statusAtPositionNid, 
+	public StrRevision(int statusAtPositionNid, 
 			StrMember primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public StrVersion(TupleInput input, 
+	public StrRevision(TupleInput input, 
 			StrMember primoridalMember) {
 		super(input, primoridalMember);
 		stringValue = input.readString();
 	}
 
-	public StrVersion(ERefsetStrVersion eVersion,
+	public StrRevision(ERefsetStrVersion eVersion,
 			StrMember primoridalMember) {
 		super(eVersion, primoridalMember);
 		this.stringValue = eVersion.getStringValue();
@@ -84,7 +84,7 @@ public class StrVersion extends RefsetVersion<StrVersion, StrMember>
 	}
 
 	@Override
-	public StrVersion getMutablePart() {
+	public StrRevision getMutablePart() {
 		return this;
 	}
 

@@ -8,12 +8,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidVersion extends RefsetVersion<CidVersion, CidMember>
+public class CidRevisioin extends RefsetRevision<CidRevisioin, CidMember>
 	implements I_ThinExtByRefPartConcept {
 	
 	private int c1Nid;
@@ -24,8 +24,8 @@ public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidVersion.class.isAssignableFrom(obj.getClass())) {
-			CidVersion another = (CidVersion) obj;
+		if (CidRevisioin.class.isAssignableFrom(obj.getClass())) {
+			CidRevisioin another = (CidRevisioin) obj;
 			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
@@ -34,25 +34,25 @@ public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 		return false;
 	}
 
-	protected CidVersion(int statusNid, int pathNid, long time, 
+	protected CidRevisioin(int statusNid, int pathNid, long time, 
 			CidMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	protected CidVersion(int statusAtPositionNid, 
+	protected CidRevisioin(int statusAtPositionNid, 
 			CidMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidVersion(TupleInput input, 
+	public CidRevisioin(TupleInput input, 
 			CidMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
 	}
 
-	public CidVersion(ERefsetCidVersion eVersion,
+	public CidRevisioin(ERefsetCidVersion eVersion,
 			CidMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
@@ -100,7 +100,7 @@ public class CidVersion extends RefsetVersion<CidVersion, CidMember>
 	}
 
 	@Override
-	public CidVersion getMutablePart() {
+	public CidRevisioin getMutablePart() {
 		return this;
 	}
 

@@ -7,12 +7,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetCidFloatVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMember> {
+public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember> {
 
 	private int c1Nid;
 	private float floatValue;
@@ -23,8 +23,8 @@ public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMemb
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidFloatVersion.class.isAssignableFrom(obj.getClass())) {
-			CidFloatVersion another = (CidFloatVersion) obj;
+		if (CidFloatRevision.class.isAssignableFrom(obj.getClass())) {
+			CidFloatRevision another = (CidFloatRevision) obj;
 			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
@@ -36,26 +36,26 @@ public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMemb
 		return false;
 	}
 
-	public CidFloatVersion(int statusNid, int pathNid, long time, 
+	public CidFloatRevision(int statusNid, int pathNid, long time, 
 			CidFloatMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public CidFloatVersion(int statusAtPositionNid, 
+	public CidFloatRevision(int statusAtPositionNid, 
 			CidFloatMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidFloatVersion(TupleInput input, 
+	public CidFloatRevision(TupleInput input, 
 			CidFloatMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
 		floatValue = input.readFloat();
 	}
 
-	public CidFloatVersion(ERefsetCidFloatVersion eVersion,
+	public CidFloatRevision(ERefsetCidFloatVersion eVersion,
 			CidFloatMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
@@ -82,7 +82,7 @@ public class CidFloatVersion extends RefsetVersion<CidFloatVersion, CidFloatMemb
 	}
 
 	@Override
-	public CidFloatVersion getMutablePart() {
+	public CidFloatRevision getMutablePart() {
 		return this;
 	}
 

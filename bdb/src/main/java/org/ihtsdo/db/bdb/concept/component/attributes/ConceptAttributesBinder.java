@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.db.bdb.concept.component.ConceptComponentBinder;
 
-public class ConceptAttributesBinder extends ConceptComponentBinder<ConceptAttributesVersion, ConceptAttributes> {
+public class ConceptAttributesBinder extends ConceptComponentBinder<ConceptAttributesRevision, ConceptAttributes> {
 	
 
 	public static AtomicInteger encountered = new AtomicInteger();

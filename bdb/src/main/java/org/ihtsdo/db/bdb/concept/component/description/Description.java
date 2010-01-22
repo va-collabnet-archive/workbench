@@ -40,11 +40,11 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Description 
-	extends ConceptComponent<DescriptionVersion, Description> 
+	extends ConceptComponent<DescriptionRevision, Description> 
 	implements I_DescriptionVersioned, I_DescriptionPart, I_DescriptionTuple {
 
 	private static class DescTupleComputer extends
-			VersionComputer<Description, DescriptionVersion> {
+			VersionComputer<Description, DescriptionRevision> {
 	}
 
 	private static DescTupleComputer computer = new DescTupleComputer();
@@ -67,9 +67,9 @@ public class Description
 		typeNid = Bdb.uuidToNid(eDesc.getTypeUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(eDesc);
 		if (eDesc.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<DescriptionVersion>(eDesc.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<DescriptionRevision>(eDesc.getExtraVersionsList().size());
 			for (EDescriptionVersion edv: eDesc.getExtraVersionsList()) {
-				additionalVersions.add(new DescriptionVersion(edv, this));
+				additionalVersions.add(new DescriptionRevision(edv, this));
 			}
 		}
 	}
@@ -94,7 +94,7 @@ public class Description
 
 
 	@Override
-	public boolean fieldsEqual(ConceptComponent<DescriptionVersion, Description> obj) {
+	public boolean fieldsEqual(ConceptComponent<DescriptionRevision, Description> obj) {
 		if (Description.class.isAssignableFrom(obj.getClass())) {
 			Description another = (Description) obj;
 			if (this.initialCaseSignificant != another.initialCaseSignificant) {
@@ -123,18 +123,18 @@ public class Description
 		// nid, list size, and conceptNid are read already by the binder...
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
-			additionalVersions = new ArrayList<DescriptionVersion>(additionalVersionCount);
+			additionalVersions = new ArrayList<DescriptionRevision>(additionalVersionCount);
 			for (int i = 0; i < additionalVersionCount; i++) {
-				additionalVersions.add(new DescriptionVersion(input, this));
+				additionalVersions.add(new DescriptionRevision(input, this));
 			}
 		}
 	}
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<DescriptionVersion> partsToWrite = new ArrayList<DescriptionVersion>();
+		List<DescriptionRevision> partsToWrite = new ArrayList<DescriptionRevision>();
 		if (additionalVersions != null) {
-			for (DescriptionVersion p: additionalVersions) {
+			for (DescriptionRevision p: additionalVersions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
@@ -147,7 +147,7 @@ public class Description
 		output.writeInt(typeNid);
 		output.writeShort(partsToWrite.size());
 		// conceptNid is the enclosing concept, does not need to be written. 
-		for (DescriptionVersion p: partsToWrite) {
+		for (DescriptionRevision p: partsToWrite) {
 			p.writePartToBdb(output);
 		}
 
@@ -169,12 +169,12 @@ public class Description
 	}
 
 	@Override
-	public DescriptionVersion getFirstTuple() {
+	public DescriptionRevision getFirstTuple() {
 		return additionalVersions.get(0);
 	}
 
 	@Override
-	public DescriptionVersion getLastTuple() {
+	public DescriptionRevision getLastTuple() {
 		return additionalVersions.get(additionalVersions.size() - 1);
 	}
 
@@ -184,7 +184,7 @@ public class Description
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionVersion p : getMutableParts(returnConflictResolvedLatestState)) {
+		for (DescriptionRevision p : getMutableParts(returnConflictResolvedLatestState)) {
 			tuples.add(p);
 		}
 		return tuples;
@@ -195,7 +195,7 @@ public class Description
 			TerminologyException {
 		UniversalAceDescription universal = new UniversalAceDescription(
 				getUids(nid), enclosingConcept.getUids(), this.versionCount());
-		for (DescriptionVersion part : additionalVersions) {
+		for (DescriptionRevision part : additionalVersions) {
 			UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
 			universalPart.setInitialCaseSignificant(part
 					.isInitialCaseSignificant());
@@ -213,7 +213,7 @@ public class Description
 	@Override
 	public boolean matches(Pattern p) {
 		String lastText = null;
-		for (DescriptionVersion desc : additionalVersions) {
+		for (DescriptionRevision desc : additionalVersions) {
 			if (desc.getText() != lastText) {
 				lastText = desc.getText();
 				Matcher m = p.matcher(lastText);
@@ -267,7 +267,7 @@ public class Description
 
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
-		return additionalVersions.add((DescriptionVersion) newPart);
+		return additionalVersions.add((DescriptionRevision) newPart);
 	}
 
 	@Override
@@ -287,7 +287,7 @@ public class Description
 
 	public final List<? extends I_DescriptionTuple> getTuples() {
 		List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
-		for (DescriptionVersion p : additionalVersions) {
+		for (DescriptionRevision p : additionalVersions) {
 			tuples.add(p);
 		}
 		return additionalVersions;
@@ -316,7 +316,7 @@ public class Description
 			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<DescriptionVersion> tuples = new ArrayList<DescriptionVersion>();
+		List<DescriptionRevision> tuples = new ArrayList<DescriptionRevision>();
 
 		computer.addTuples(allowedStatus, allowedTypes, positions,
 				tuples, addUncommitted, additionalVersions, this);
@@ -396,7 +396,7 @@ public class Description
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionVersion(this, statusNid, pathNid, time, this);
+		return new DescriptionRevision(this, statusNid, pathNid, time, this);
 	}
 
 	@Override

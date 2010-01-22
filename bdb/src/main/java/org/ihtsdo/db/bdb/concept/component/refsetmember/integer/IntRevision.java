@@ -7,12 +7,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class IntVersion extends RefsetVersion<IntVersion, IntMember>
+public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	implements I_ThinExtByRefPartInteger {
 
 	private int intValue;
@@ -23,8 +23,8 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (IntVersion.class.isAssignableFrom(obj.getClass())) {
-			IntVersion another = (IntVersion) obj;
+		if (IntRevision.class.isAssignableFrom(obj.getClass())) {
+			IntRevision another = (IntRevision) obj;
 			if (this.intValue != another.intValue) {
 				return false;
 			}
@@ -33,25 +33,25 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 		return false;
 	}
 
-	public IntVersion(int statusNid, int pathNid, long time, 
+	public IntRevision(int statusNid, int pathNid, long time, 
 			IntMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public IntVersion(int statusAtPositionNid, 
+	public IntRevision(int statusAtPositionNid, 
 			IntMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public IntVersion(TupleInput input, 
+	public IntRevision(TupleInput input, 
 			IntMember primoridalMember) {
 		super(input, primoridalMember);
 		intValue = input.readInt();
 	}
 
-	public IntVersion(ERefsetIntVersion eVersion,
+	public IntRevision(ERefsetIntVersion eVersion,
 			IntMember member) {
 		super(eVersion, member);
 		this.intValue = eVersion.getIntValue();
@@ -97,7 +97,7 @@ public class IntVersion extends RefsetVersion<IntVersion, IntMember>
 	}
 
 	@Override
-	public IntVersion getMutablePart() {
+	public IntRevision getMutablePart() {
 		return this;
 	}
 

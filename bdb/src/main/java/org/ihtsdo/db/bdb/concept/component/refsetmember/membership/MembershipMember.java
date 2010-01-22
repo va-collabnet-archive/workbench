@@ -14,7 +14,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class MembershipMember extends RefsetMember<MembershipVersion, MembershipMember> {
+public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> {
 
 	public MembershipMember(Concept enclosingConcept, TupleInput input) {
 		super(enclosingConcept, input);
@@ -23,16 +23,16 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 	public MembershipMember(ERefsetMember refsetMember, Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<MembershipVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<MembershipRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new MembershipVersion(eVersion, this));
+				additionalVersions.add(new MembershipRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<MembershipVersion, MembershipMember> obj) {
+			ConceptComponent<MembershipRevision, MembershipMember> obj) {
 		if (MembershipMember.class.isAssignableFrom(obj.getClass())) {
 			return true;
 		}
@@ -43,14 +43,14 @@ public class MembershipMember extends RefsetMember<MembershipVersion, Membership
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<MembershipVersion>(
+			additionalVersions = new ArrayList<MembershipRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new MembershipVersion(input, this));
+			additionalVersions.add(new MembershipRevision(input, this));
 		}
 	}
 	@Override

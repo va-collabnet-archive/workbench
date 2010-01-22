@@ -8,14 +8,14 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.Version;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 import org.ihtsdo.etypes.EDescriptionVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class DescriptionVersion 
-	extends Version<DescriptionVersion, Description> 
+public class DescriptionRevision 
+	extends Revision<DescriptionRevision, Description> 
 	implements I_DescriptionPart, I_DescriptionTuple {
 	
 	@SuppressWarnings("unused")
@@ -35,8 +35,8 @@ public class DescriptionVersion
 
 	@Override
 	public boolean equals(Object obj) {
-		if (DescriptionVersion.class.isAssignableFrom(obj.getClass())) {
-			DescriptionVersion another = (DescriptionVersion) obj;
+		if (DescriptionRevision.class.isAssignableFrom(obj.getClass())) {
+			DescriptionRevision another = (DescriptionRevision) obj;
 			if (this.initialCaseSignificant != another.initialCaseSignificant) {
 				return false;
 			}
@@ -54,12 +54,12 @@ public class DescriptionVersion
 		return false;
 	}
 
-	public DescriptionVersion(int statusAtPositionNid, 
+	public DescriptionRevision(int statusAtPositionNid, 
 			Description primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 	
-	protected DescriptionVersion(DescriptionVersion another, 
+	protected DescriptionRevision(DescriptionRevision another, 
 			Description primoridalMember) {
 		super(another.getStatusAtPositionNid(), primoridalMember);
 		this.text = another.text;
@@ -68,7 +68,7 @@ public class DescriptionVersion
 		this.initialCaseSignificant = another.initialCaseSignificant;
 	}
 
-	protected DescriptionVersion(I_DescriptionPart another, 
+	protected DescriptionRevision(I_DescriptionPart another, 
 			int statusNid, int pathNid, long time, 
 			Description primoridalMember) {
 		super(statusNid, pathNid, time, primoridalMember);
@@ -78,7 +78,7 @@ public class DescriptionVersion
 		this.initialCaseSignificant = another.isInitialCaseSignificant();
 	}
 
-	protected DescriptionVersion(TupleInput input, 
+	protected DescriptionRevision(TupleInput input, 
 			Description primoridalMember) {
 		super(input.readInt(), primoridalMember);
 		text = input.readString();
@@ -93,7 +93,7 @@ public class DescriptionVersion
 		typeNid = input.readInt();
 	}
 
-	public DescriptionVersion(UniversalAceDescriptionPart umPart, 
+	public DescriptionRevision(UniversalAceDescriptionPart umPart, 
 			Description primoridalMember) {
 		super(Bdb.uuidsToNid(umPart.getStatusId()),
 				Bdb.uuidsToNid(umPart.getPathId()),
@@ -104,7 +104,7 @@ public class DescriptionVersion
 		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
 	}
 
-	public DescriptionVersion(EDescriptionVersion edv, 
+	public DescriptionRevision(EDescriptionVersion edv, 
 			Description primoridalMember) {
 		super(Bdb.uuidToNid(edv.getStatusUuid()),
 				Bdb.uuidToNid(edv.getPathUuid()),
@@ -178,14 +178,14 @@ public class DescriptionVersion
 	}
 
 	@Override
-	public DescriptionVersion duplicate() {
-		return new DescriptionVersion(this, this.primordialComponent);
+	public DescriptionRevision duplicate() {
+		return new DescriptionRevision(this, this.primordialComponent);
 	}
 
 	@Override
-	public DescriptionVersion makeAnalog(int statusNid, int pathNid, 
+	public DescriptionRevision makeAnalog(int statusNid, int pathNid, 
 			long time) {
-		return new DescriptionVersion(this, statusNid, 
+		return new DescriptionRevision(this, statusNid, 
 				pathNid, time, this.primordialComponent);
 	}
 

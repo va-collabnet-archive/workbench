@@ -1,41 +1,42 @@
-package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid;
+package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr;
 
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
-import org.ihtsdo.etypes.ERefsetCidCidCidVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidMember> 
-	implements I_ThinExtByRefPartConceptConceptConcept {
+public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidStrMember>
+	implements I_ThinExtByRefPartConceptConceptString {
 
 	private int c1Nid;
 	private int c2Nid;
-	private int c3Nid;
+	private String strValue;
+	
 	
 	public String toString() {
-		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " c3Nid: " + c3Nid + " " +super.toString();
+		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " strValue: " + strValue + " " +super.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (CidCidCidVersion.class.isAssignableFrom(obj.getClass())) {
-			CidCidCidVersion another = (CidCidCidVersion) obj;
+		if (CidCidStrRevision.class.isAssignableFrom(obj.getClass())) {
+			CidCidStrRevision another = (CidCidStrRevision) obj;
 			if (this.c1Nid != another.c1Nid) {
 				return false;
 			}
 			if (this.c2Nid != another.c2Nid) {
 				return false;
 			}
-			if (this.c3Nid != another.c3Nid) {
+			if (this.strValue.equals(another.strValue)) {
 				return false;
 			}
 			return super.equals(obj);
@@ -43,33 +44,33 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 		return false;
 	}
 
-	public CidCidCidVersion(int statusNid, int pathNid,
+	public CidCidStrRevision(int statusNid, int pathNid,
 			long time, 
-			CidCidCidMember primoridalMember) {
+			CidCidStrMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public CidCidCidVersion(int statusAtPositionNid, 
-			CidCidCidMember primoridalMember) {
+	public CidCidStrRevision(int statusAtPositionNid, 
+			CidCidStrMember primoridalMember) {
 		super(statusAtPositionNid, 
 				primoridalMember);
 	}
 
-	public CidCidCidVersion(TupleInput input, 
-			CidCidCidMember primoridalMember) {
+	public CidCidStrRevision(TupleInput input, 
+			CidCidStrMember primoridalMember) {
 		super(input, primoridalMember);
 		c1Nid = input.readInt();
 		c2Nid = input.readInt();
-		c3Nid = input.readInt();
+		strValue = input.readString();
 	}
 
-	public CidCidCidVersion(ERefsetCidCidCidVersion eVersion,
-			CidCidCidMember member) {
+	public CidCidStrRevision(ERefsetCidCidStrVersion eVersion,
+			CidCidStrMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
-		c3Nid = Bdb.uuidToNid(eVersion.getC3Uuid());
+		strValue = eVersion.getStringValue();
 	}
 
 	@Override
@@ -92,13 +93,23 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 	}
 
 	@Override
-	public int getC3id() {
-		return c3Nid;
+	public String getStr() {
+		return strValue;
 	}
 
 	@Override
-	public void setC3id(int c3nid) {
-		this.c3Nid = c3nid;
+	public String getStringValue() {
+		return strValue;
+	}
+
+	@Override
+	public void setStr(String str) {
+		this.strValue = str;
+	}
+
+	@Override
+	public void setStringValue(String value) {
+		this.strValue = value;
 	}
 
 	public int getC1Nid() {
@@ -117,22 +128,12 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 		this.c2Nid = c2Nid;
 	}
 
-	public int getC3Nid() {
-		return c3Nid;
+	public String getStrValue() {
+		return strValue;
 	}
 
-	public void setC3Nid(int c3Nid) {
-		this.c3Nid = c3Nid;
-	}
-
-	@Override
-	public int getC2id() {
-		return c2Nid;
-	}
-
-	@Override
-	public void setC2id(int c2id) {
-		this.c2Nid = c2id;
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
 	}
 
 	@Override
@@ -141,8 +142,8 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 	}
 
 	@Override
-	public int getConceptId() {
-		return c1Nid;
+	public int getC2id() {
+		return c2Nid;
 	}
 
 	@Override
@@ -151,8 +152,8 @@ public class CidCidCidVersion extends RefsetVersion<CidCidCidVersion, CidCidCidM
 	}
 
 	@Override
-	public void setConceptId(int conceptId) {
-		this.c1Nid = conceptId;
+	public void setC2id(int c2id) {
+		this.c2Nid = c2id;
 	}
 
 	@Override

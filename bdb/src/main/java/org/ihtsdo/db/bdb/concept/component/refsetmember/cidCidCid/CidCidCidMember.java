@@ -15,7 +15,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidCidCidMember extends RefsetMember<CidCidCidVersion, CidCidCidMember> {
+public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMember> {
 
 	private int c1Nid;
 	private int c2Nid;
@@ -32,16 +32,16 @@ public class CidCidCidMember extends RefsetMember<CidCidCidVersion, CidCidCidMem
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		c3Nid = Bdb.uuidToNid(refsetMember.getC3Uuid());
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidCidCidVersion>(refsetMember.getExtraVersionsList().size());
+			additionalVersions = new ArrayList<CidCidCidRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidCidCidVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidCidCidVersion(eVersion, this));
+				additionalVersions.add(new CidCidCidRevision(eVersion, this));
 			}
 		}
 	}
 
 	@Override
 	protected boolean membersEqual(
-			ConceptComponent<CidCidCidVersion, CidCidCidMember> obj) {
+			ConceptComponent<CidCidCidRevision, CidCidCidMember> obj) {
 		if (CidCidCidMember.class.isAssignableFrom(obj.getClass())) {
 			CidCidCidMember another = (CidCidCidMember) obj;
 			return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid && this.c3Nid == another.c3Nid;
@@ -53,14 +53,14 @@ public class CidCidCidMember extends RefsetMember<CidCidCidVersion, CidCidCidMem
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidCidCidVersion>(
+			additionalVersions = new ArrayList<CidCidCidRevision>(
 					additionalVersionCount);
 		} else {
 			additionalVersions.ensureCapacity(additionalVersions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidCidCidVersion(input, this));
+			additionalVersions.add(new CidCidCidRevision(input, this));
 		}
 	}
 	@Override

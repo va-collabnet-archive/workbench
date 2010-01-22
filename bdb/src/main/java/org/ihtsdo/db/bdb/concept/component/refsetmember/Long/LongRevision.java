@@ -7,12 +7,12 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.concept.component.refset.RefsetVersion;
+import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-public class LongVersion extends RefsetVersion<LongVersion, LongMember>
+public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	implements I_ThinExtByRefPartLong {
 
 	private long longValue;
@@ -23,8 +23,8 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 
 	@Override
 	public boolean equals(Object obj) {
-		if (LongVersion.class.isAssignableFrom(obj.getClass())) {
-			LongVersion another = (LongVersion) obj;
+		if (LongRevision.class.isAssignableFrom(obj.getClass())) {
+			LongRevision another = (LongRevision) obj;
 			if (this.longValue != another.longValue) {
 				return false;
 			}
@@ -33,24 +33,24 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 		return false;
 	}
 
-	public LongVersion(int statusNid, int pathNid, long time, 
+	public LongRevision(int statusNid, int pathNid, long time, 
 			LongMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
 	}
 
-	public LongVersion(int statusAtPositionNid, 
+	public LongRevision(int statusAtPositionNid, 
 			LongMember primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
 
-	public LongVersion(TupleInput input, 
+	public LongRevision(TupleInput input, 
 			LongMember primoridalMember) {
 		super(input, primoridalMember);
 		longValue = input.readLong();
 	}
 
-	public LongVersion(ERefsetLongVersion eVersion,
+	public LongRevision(ERefsetLongVersion eVersion,
 			LongMember member) {
 		super(eVersion, member);
 		this.longValue = eVersion.getLongValue();
@@ -77,7 +77,7 @@ public class LongVersion extends RefsetVersion<LongVersion, LongMember>
 
 
 	@Override
-	public LongVersion getMutablePart() {
+	public LongRevision getMutablePart() {
 		return this;
 	}
 

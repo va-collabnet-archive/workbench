@@ -44,7 +44,7 @@ import org.ihtsdo.etypes.EIdentifierVersionUuid;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class ConceptComponent<V extends Version<V, C>, 
+public abstract class ConceptComponent<V extends Revision<V, C>, 
 									   C extends ConceptComponent<V, C>> 
 	implements I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion,
 	I_HandleFutureStatusAtPositionSetup {
@@ -140,7 +140,7 @@ public abstract class ConceptComponent<V extends Version<V, C>,
 		buf.append(" (path: ");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
 		buf.append(" tm: ");
-		buf.append(Version.fileDateFormat.format(new Date(getTime())));
+		buf.append(Revision.fileDateFormat.format(new Date(getTime())));
 		buf.append(" status: ");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
 		buf.append(")");
