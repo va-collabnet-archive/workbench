@@ -115,19 +115,20 @@ public class ProcessPaths {
 				System.out.println("sequential iteration found " + counter.descCount.get() + " descriptions in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 				
-				ParallelDescriptions parallelCounter = new ParallelDescriptions();
 				startTime = System.currentTimeMillis();
+				ParallelDescriptions parallelCounter = new ParallelDescriptions();
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelCounter);
 				System.out.println("parallel iteration found " + parallelCounter.descCount.get() + " descriptions in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 
+				startTime = System.currentTimeMillis();
 				CountDescriptionTuples tupleCounter = new CountDescriptionTuples(pos);
 				Bdb.getConceptDb().iterateConceptDataInSequence(tupleCounter);
 				System.out.println("sequential iteration found " + tupleCounter.descCount.get() + " description tuples in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
 				
-				ParallelCountDescriptionTuples parallelTupleCounter = new ParallelCountDescriptionTuples(pos);
 				startTime = System.currentTimeMillis();
+				ParallelCountDescriptionTuples parallelTupleCounter = new ParallelCountDescriptionTuples(pos);
 				Bdb.getConceptDb().iterateConceptDataInParallel(parallelTupleCounter);
 				System.out.println("parallel iteration found " + parallelTupleCounter.descCount.get() + " description tuples in: " + 
 						(System.currentTimeMillis() - startTime) + " ms.");
