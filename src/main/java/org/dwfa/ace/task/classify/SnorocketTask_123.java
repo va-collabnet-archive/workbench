@@ -151,8 +151,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // :DEBUG:
-    private boolean debug = true;
-    private boolean debugDump = true; // save to files
+    private boolean debug = false;
+    private boolean debugDump = false; // save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -216,8 +216,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        debug = true;
-        debugDump = true;
+        debug = false;
+        debugDump = false;
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
@@ -285,6 +285,9 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             int nextRIdx = 0;
             for (SnoRel roleSnoRel : roleList)
                 rNidArray[nextRIdx++] = roleSnoRel.typeId;
+
+            // SETUP CLASSIFIER QUERY
+            SnoQuery.initAll();
 
             // SETUP CLASSIFIER
             Snorocket_123 rocket_123 = new Snorocket_123(cNidArray, nextCIdx, rNidArray, nextRIdx,
@@ -566,9 +569,6 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         int countB_Diff = 0;
         int countB_DiffISA = 0;
         int countB_Total = 0;
-
-        // SETUP CLASSIFIER QUERY
-        SnoQuery.initAll();
 
         long startTime = System.currentTimeMillis();
         Collections.sort(snorelA);
@@ -1270,7 +1270,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
     // :DEBUG: dumps role-types to console
     private void dumpRoles() { // SORT BY [ROLE-C1-GROUP-C2]
         boolean countRoles = true;
-        boolean countRolesVerbose = true; // :DEBUG:
+        boolean countRolesVerbose = false; // :DEBUG:
 
         Comparator<SnoRel> comp = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
