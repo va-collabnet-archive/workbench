@@ -197,7 +197,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 	
 	public int getPathId(int index) {
-		assert index != 0;
 		if (getReadOnlyIndex(index) < readOnlyArray.getSize()) {
 			return readOnlyArray.pathNids[getReadOnlyIndex(index)];
 		} else {
