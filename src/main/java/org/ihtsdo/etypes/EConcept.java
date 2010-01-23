@@ -460,7 +460,6 @@ public class EConcept {
         		assert m.getComponentId() == c.getNid() : 
         			"getRefsetMembersForComponent query error: componentId: " + m.getComponentId() + 
         			" conceptId: " + c.getNid();
-        		System.out.println("Found concept extension: " + m + " for component: " + this);
                 UUID refsetUuid = EVersion.nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForConcept.add(refsetUuid);
                 UUID memberUuid = EVersion.nidToUuid(m.getNid());
