@@ -62,8 +62,10 @@ public class AttributePopupListener extends MouseAdapter {
             try {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
                 for (I_Path p : config.getEditingPathSet()) {
-                	I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple();
-                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                    I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple();
+                    I_ConceptAttributePart newPart =
+                            (I_ConceptAttributePart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(),
+                                p.getConceptId(), Long.MAX_VALUE);
                     sourceBean.getConceptAttributes().addVersion(newPart);
                 }
                 ACE.addUncommitted(sourceBean);
@@ -71,8 +73,8 @@ public class AttributePopupListener extends MouseAdapter {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
             model.allTuples = null;
-            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
-                model.host.getTermComponent()));
+            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
+                .getTermComponent()));
         }
     }
 
@@ -111,8 +113,11 @@ public class AttributePopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ConceptAttributePart newPart = selectedObject.getTuple().getMutablePart();
                     if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
-                    	I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple();
-                    	newPart = (I_ConceptAttributePart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), currentPart.getPathId(), Long.MAX_VALUE);
+                        I_ConceptAttributePart currentPart =
+                                (I_ConceptAttributePart) selectedObject.getTuple().getMutablePart();
+                        newPart =
+                                (I_ConceptAttributePart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart
+                                    .getPathId(), Long.MAX_VALUE);
                         selectedObject.getTuple().getConVersioned().addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());
@@ -131,16 +136,15 @@ public class AttributePopupListener extends MouseAdapter {
 
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(),
-                        ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
                 }
                 ACE.addUncommitted(sourceBean);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
             model.allTuples = null;
-            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
-                model.host.getTermComponent()));
+            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
+                .getTermComponent()));
         }
     }
 
