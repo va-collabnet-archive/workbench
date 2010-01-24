@@ -19,6 +19,7 @@ package org.dwfa.ace.table.refset;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -62,8 +63,9 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             List<? extends I_RelTuple> promotionTuples;
             try {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
-                promotionTuples = refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(),
-                    promotionRefsetIds, host.getConfig().getViewPositionSetReadOnly(), true);
+                promotionTuples =
+                        refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), promotionRefsetIds, host
+                            .getConfig().getViewPositionSetReadOnly(), true);
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
@@ -103,14 +105,15 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             switch (col.invokeOnObjectType) {
                             case CONCEPT_COMPONENT:
                                 if (col.readParamaters != null) {
-                                    Object readValue = col.getReadMethod().invoke(
-                                        ConceptBean.get(extension.getComponentId()), col.readParamaters);
+                                    Object readValue =
+                                            col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()),
+                                                col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
-                                    Object readValue = col.getReadMethod().invoke(
-                                        ConceptBean.get(extension.getComponentId()));
+                                    Object readValue =
+                                            col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
@@ -137,8 +140,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                     case COMPONENT_IDENTIFIER:
                                         if (LocalVersionedTerminology.get().hasConcept(
                                             (Integer) col.getReadMethod().invoke(ebrTuple.getMutablePart())) == false) {
-                                            conceptsToFetch.add((Integer) col.getReadMethod()
-                                                .invoke(ebrTuple.getMutablePart()));
+                                            conceptsToFetch.add((Integer) col.getReadMethod().invoke(
+                                                ebrTuple.getMutablePart()));
                                             break;
                                         }
                                     case CONCEPT_IDENTIFIER:
@@ -240,13 +243,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         }
     }
 
-    protected Object getPromotionRefsetValue(I_ThinExtByRefVersioned extension, ReflexiveRefsetFieldData col)
+    public Object getPromotionRefsetValue(I_ThinExtByRefVersioned extension, ReflexiveRefsetFieldData col)
             throws IOException, IllegalAccessException, InvocationTargetException {
         for (I_ThinExtByRefVersioned extForMember : LocalVersionedTerminology.get().getAllExtensionsForComponent(
             extension.getComponentId())) {
             if (promotionRefsetId == extForMember.getRefsetId()) {
-                List<I_ThinExtByRefTuple> promotionTuples = extForMember.getTuples(host.getConfig().getAllowedStatus(),
-                    host.getConfig().getViewPositionSet(), false);
+                List<I_ThinExtByRefTuple> promotionTuples =
+                        extForMember.getTuples(host.getConfig().getAllowedStatus(), host.getConfig()
+                            .getViewPositionSet(), false);
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -287,5 +291,9 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     @Override
     protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2) {
         return new TableChangedSwingWorker(tableComponentId2);
+    }
+
+    public Set<ThinExtByRefTuple> getSelectedTuples() {
+        return new HashSet<ThinExtByRefTuple>();
     }
 }

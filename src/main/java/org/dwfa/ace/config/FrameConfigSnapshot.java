@@ -1206,16 +1206,26 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setSelectedPreferencesTab(tabName);
     }
 
-	@Override
-	public PositionSetReadOnly getViewPositionSetReadOnly() {
-		return new PositionSetReadOnly(viewPositionSet);
-	}
+    @Override
+    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        return new PositionSetReadOnly(viewPositionSet);
+    }
 
-	public PathSetReadOnly getEditingPathSetReadOnly() {
-		return baseFrame.getEditingPathSetReadOnly();
-	}
+    public PathSetReadOnly getEditingPathSetReadOnly() {
+        return baseFrame.getEditingPathSetReadOnly();
+    }
 
-	public PathSetReadOnly getPromotionPathSetReadOnly() {
-		return baseFrame.getPromotionPathSetReadOnly();
-	}
+    public PathSetReadOnly getPromotionPathSetReadOnly() {
+        return baseFrame.getPromotionPathSetReadOnly();
+    }
+
+    @Override
+    public Boolean getShowPromotionCheckBoxes() {
+        return baseFrame.getShowPromotionCheckBoxes();
+    }
+
+    @Override
+    public void setShowPromotionCheckBoxes(Boolean show) {
+        baseFrame.setShowPromotionCheckBoxes(show);
+    }
 }

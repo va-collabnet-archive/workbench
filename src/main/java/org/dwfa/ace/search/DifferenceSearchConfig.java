@@ -1074,18 +1074,27 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setSelectedPreferencesTab(tabName);
     }
 
-	@Override
-	public PositionSetReadOnly getViewPositionSetReadOnly() {
-		return new PositionSetReadOnly(positionSet);
-	}
+    @Override
+    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        return new PositionSetReadOnly(positionSet);
+    }
 
-	public PathSetReadOnly getEditingPathSetReadOnly() {
-		return frameConfig.getEditingPathSetReadOnly();
-	}
+    public PathSetReadOnly getEditingPathSetReadOnly() {
+        return frameConfig.getEditingPathSetReadOnly();
+    }
 
-	public PathSetReadOnly getPromotionPathSetReadOnly() {
-		return frameConfig.getPromotionPathSetReadOnly();
-	}
+    public PathSetReadOnly getPromotionPathSetReadOnly() {
+        return frameConfig.getPromotionPathSetReadOnly();
+    }
 
-    
+    @Override
+    public Boolean getShowPromotionCheckBoxes() {
+        return frameConfig.getShowPromotionCheckBoxes();
+    }
+
+    @Override
+    public void setShowPromotionCheckBoxes(Boolean show) {
+        frameConfig.setShowPromotionCheckBoxes(show);
+    }
+
 }
