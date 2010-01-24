@@ -21,28 +21,29 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.CheckboxEditor;
+import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class SetPromotionCheckBoxesTaskBeanInfo extends SimpleBeanInfo {
+public class HasUnreviewedItemsTaskBeanInfo extends SimpleBeanInfo {
 
     /**
      *
      */
-    public SetPromotionCheckBoxesTaskBeanInfo() {
+    public HasUnreviewedItemsTaskBeanInfo() {
         super();
     }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         try {
-            PropertyDescriptor showPromotionCheckBoxes =
-                    new PropertyDescriptor("showPromotionCheckBoxes", getBeanDescriptor().getBeanClass());
-            showPromotionCheckBoxes.setBound(true);
-            showPromotionCheckBoxes.setPropertyEditorClass(CheckboxEditor.class);
-            showPromotionCheckBoxes.setDisplayName("<html><font color='green'>show promotion check boxes:");
-            showPromotionCheckBoxes.setShortDescription("Whether to show the promotion check boxes");
+            PropertyDescriptor promotionUuidPropName =
+                    new PropertyDescriptor("promotionUuidPropName", getBeanDescriptor().getBeanClass());
+            promotionUuidPropName.setBound(true);
+            promotionUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            promotionUuidPropName.setDisplayName("<html><font color='green'>promotion UUID prop:");
+            promotionUuidPropName
+                .setShortDescription("The property that will contain the UUID of the promotion refset");
 
-            PropertyDescriptor rv[] = { showPromotionCheckBoxes };
+            PropertyDescriptor rv[] = { promotionUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -53,8 +54,8 @@ public class SetPromotionCheckBoxesTaskBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(SetPromotionCheckBoxesTask.class);
-        bd.setDisplayName("<html><font color='blue'><center>Show/hide promotion<br>check boxes");
+        BeanDescriptor bd = new BeanDescriptor(HasUnreviewedItemsTask.class);
+        bd.setDisplayName("<html><font color='blue'><center>Has members with<br>unreviewed promotion<br>status");
         return bd;
     }
 
