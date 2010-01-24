@@ -109,7 +109,7 @@ public class RefsetSpecPanel extends JPanel {
 
     private Box verticalBox;
 
-    private Boolean showPromotionCheckBoxes;
+    private Boolean showPromotionCheckBoxes = false;
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
