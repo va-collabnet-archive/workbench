@@ -25,9 +25,10 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.SpecRefsetHelper;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -78,7 +79,7 @@ public class HasDisapprovedItemsTask extends AbstractTask {
 
         try {
             this.process = process;
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
 
             if (hasDisapprovedItems()) {
                 return Condition.TRUE;
@@ -93,16 +94,25 @@ public class HasDisapprovedItemsTask extends AbstractTask {
     }
 
     private boolean hasDisapprovedItems() throws Exception {
-        UUID promotionRefsetUuid = (UUID) process.readProperty(promotionUuidPropName);
-        I_GetConceptData promotionRefsetConcept = termFactory.getConcept(new UUID[] { promotionRefsetUuid });
-        I_GetConceptData disapprovedAdditionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
-        I_GetConceptData disapprovedDeletionStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
-
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
-        List<I_GetConceptData> disapprovedAdditions = refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), disapprovedAdditionStatus);
-        List<I_GetConceptData> disapprovedDeletions = refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), disapprovedDeletionStatus);
+        UUID promotionRefsetUuid = (UUID) process.getProperty(promotionUuidPropName);
+        if (promotionRefsetUuid == null) {
+            RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor());
+            promotionRefsetUuid = spec.getPromotionRefsetConcept().getUids().iterator().next();
+
+        }
+        I_GetConceptData promotionRefsetConcept = termFactory.getConcept(new UUID[] { promotionRefsetUuid });
+        I_GetConceptData disapprovedAdditionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids());
+        I_GetConceptData disapprovedDeletionStatus =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
+
+        List<I_GetConceptData> disapprovedAdditions =
+                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
+                    .getConceptId()), disapprovedAdditionStatus);
+        List<I_GetConceptData> disapprovedDeletions =
+                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
+                    .getConceptId()), disapprovedDeletionStatus);
 
         if (disapprovedAdditions.size() > 0) {
             return true;

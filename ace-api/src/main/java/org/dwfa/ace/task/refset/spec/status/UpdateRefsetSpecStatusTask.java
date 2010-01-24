@@ -147,6 +147,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
         try {
 
             termFactory = Terms.get();
+            termFactory.commit();
 
             retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
 

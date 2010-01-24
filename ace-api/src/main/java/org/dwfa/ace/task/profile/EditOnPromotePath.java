@@ -270,9 +270,9 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public Set<I_Path> getEditingPathSet() {
         return config.getPromotionPathSet();
     }
-    
+
     public PathSetReadOnly getEditingPathSetReadOnly() {
-    	return new PathSetReadOnly(config.getPromotionPathSet());
+        return new PathSetReadOnly(config.getPromotionPathSet());
     }
 
     public I_IntList getEditRelCharacteristicPopup() {
@@ -1075,11 +1075,21 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.validate();
     }
 
-	public PositionSetReadOnly getViewPositionSetReadOnly() {
-		return config.getViewPositionSetReadOnly();
-	}
+    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        return config.getViewPositionSetReadOnly();
+    }
 
-	public PathSetReadOnly getPromotionPathSetReadOnly() {
-		return config.getPromotionPathSetReadOnly();
-	}
+    public PathSetReadOnly getPromotionPathSetReadOnly() {
+        return config.getPromotionPathSetReadOnly();
+    }
+
+    @Override
+    public Boolean getShowPromotionCheckBoxes() {
+        return config.getShowPromotionCheckBoxes();
+    }
+
+    @Override
+    public void setShowPromotionCheckBoxes(Boolean show) {
+        config.setShowPromotionCheckBoxes(show);
+    }
 }
