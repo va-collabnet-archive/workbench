@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -222,6 +223,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
         tf = LocalVersionedTerminology.get();
+        SnoQuery.initAll();
 
         if (setupCoreNids().equals(Condition.STOP))
             return Condition.STOP;
@@ -243,15 +245,20 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             gui.addActionListener(this);
             gui.setProgressInfoUpper("Classifier 1/5: load data");
             gui.setIndeterminate(false);
-            gui.setMaximum(1000000);
+            gui.setMaximum(1500000);
             gui.setValue(0);
 
             // GET EDIT_PATH RELS & ADD TO SNOROCKET
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
             long startTime = System.currentTimeMillis();
+
+            // SETUP ROLE NID ARRAY
+            int[] rNidArray = getRoleNids();
+            int nextRIdx = rNidArray.length;
+
             SnoPathProcess pcEdit = new SnoPathProcess(logger, null, cEditSnoCons, cEditSnoRels,
-                    cEditPathPos, gui);
+                    rNidArray, cEditPathPos, gui);
             tf.iterateConcepts(pcEdit);
             logger
                     .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
@@ -259,7 +266,6 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
             if (debugDump) {
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
-                dumpRoles();
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
             }
 
@@ -279,16 +285,6 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             // Fill array to make binary search work correctly.
             Arrays.fill(cNidArray, nextCIdx, cNidArray.length, Integer.MAX_VALUE);
 
-            // SETUP ROLE NID ARRAY
-            ArrayList<SnoRel> roleList = getRoles();
-            int rNidArray[] = new int[roleList.size()];
-            int nextRIdx = 0;
-            for (SnoRel roleSnoRel : roleList)
-                rNidArray[nextRIdx++] = roleSnoRel.typeId;
-
-            // SETUP CLASSIFIER QUERY
-            SnoQuery.initAll();
-
             // SETUP CLASSIFIER
             Snorocket_123 rocket_123 = new Snorocket_123(cNidArray, nextCIdx, rNidArray, nextRIdx,
                     rootNid);
@@ -306,8 +302,16 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             Collections.sort(cEditSnoRels);
             for (SnoRel sr : cEditSnoRels) {
                 int err = rocket_123.addRelationship(sr.c1Id, sr.typeId, sr.c2Id, sr.group);
-                if (debug && err > 0)
-                    logger.info("\r\n::: " + dumpSnoRelStr(sr));
+                if (debug && err > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    if ((err & 1) == 1)
+                        sb.append(" --UNDEFINED_C1-- ");
+                    if ((err & 2) == 2)
+                        sb.append(" --UNDEFINED_ROLE-- ");
+                    if ((err & 4) == 4)
+                        sb.append(" --UNDEFINED_C2-- ");
+                    logger.info("\r\n::: " + sb + dumpSnoRelStr(sr));
+                }
             }
 
             // 
@@ -414,8 +418,8 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             startTime = System.currentTimeMillis();
             ProcessResults pr = new ProcessResults(cRocketSnoRels);
             rocket_123.getDistributionFormRelationships(pr);
-            logger.info("\r\n::: [SnorocketTask] GET CLASSIFIER RESULTS count=" + pr.countRel + " time= "
-                    + toStringLapseSec(startTime));
+            logger.info("\r\n::: [SnorocketTask] GET CLASSIFIER RESULTS count=" + pr.countRel
+                    + " time= " + toStringLapseSec(startTime));
 
             // ** GUI: 3 -- done
             if (continueThisAction) {
@@ -450,7 +454,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels,
-                    cClassPathPos, gui);
+                    rNidArray, cClassPathPos, gui);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -509,11 +513,11 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         return Condition.CONTINUE;
     }
 
-    private void addPathOrigins(List<I_Position> origins, I_Path p) {
+    private void getPathOrigins(List<I_Position> origins, I_Path p) {
         List<I_Position> thisLevel = new ArrayList<I_Position>();
 
         for (I_Position o : p.getOrigins()) {
-                origins.add(o);
+            origins.add(o);
             thisLevel.add(o);
         }
 
@@ -569,6 +573,9 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         int countB_Diff = 0;
         int countB_DiffISA = 0;
         int countB_Total = 0;
+
+        // SETUP CLASSIFIER QUERY
+        SnoQuery.clearDiff();
 
         long startTime = System.currentTimeMillis();
         Collections.sort(snorelA);
@@ -821,7 +828,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         // CHECKPOINT DATABASE
         tf.getDirectInterface().sync();
 
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         s.append("\r\n::: [SnorocketTask] compareAndWriteBack()");
         long lapseTime = System.currentTimeMillis() - startTime;
         s.append("\r\n::: [Time] Sort/Compare Input & Output: \t" + lapseTime + "\t(mS)\t"
@@ -1022,7 +1029,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             cEditIPath = tf.getPath(cEditPathObj.getUids());
             cEditPathPos = new ArrayList<I_Position>();
             cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-            addPathOrigins(cEditPathPos, cEditIPath);
+            getPathOrigins(cEditPathPos, cEditIPath);
 
             // GET ALL CLASSIFER_PATH ORIGINS
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
@@ -1035,7 +1042,7 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
             cClassIPath = tf.getPath(cClassPathObj.getUids());
             cClassPathPos = new ArrayList<I_Position>();
             cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            addPathOrigins(cClassPathPos, cClassIPath);
+            getPathOrigins(cClassPathPos, cClassIPath);
 
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -1053,20 +1060,12 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
      */
     private String toStringPathPos(List<I_Position> pathPos, String pStr) {
         // BUILD STRING
-        StringBuffer s = new StringBuffer();
-        s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr);
-        try {
+        StringBuilder s = new StringBuilder();
+        s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr + "\r\n");
             for (I_Position position : pathPos) {
-                s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptId()
-                        + "\tVersion:\t" + position.getVersion() + "\tUUIDs:\t"
-                        + position.getPath().getUniversal());
+            s.append("::: ... PATH:\t" + toStringCNid(position.getPath().getConceptId()) + "\r\n");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        }
-        s.append("\r\n:::");
+        s.append(":::");
         return s.toString();
     }
 
@@ -1094,6 +1093,24 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         long lapseTime = stopTime - startTime;
         s.append(((float) lapseTime / 1000) + " (seconds)");
         return s.toString();
+    }
+
+    private String toStringCNid(int cNid) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            I_GetConceptData c = tf.getConcept(cNid);
+            sb.append(c.getUids().iterator().next() + "\t");
+            sb.append(cNid + "\t");
+            sb.append(c.getInitialText());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (TerminologyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
 
     private String toStringNids() {
@@ -1208,6 +1225,73 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         return CONTINUE_CONDITION;
     }
 
+    // 
+    private int[] getRoleNids() throws TerminologyException, IOException {
+        int countRelDuplVersion = 0;
+        LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
+
+        I_GetConceptData rootConcept = tf.getConcept(rootRoleNid);
+        List<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
+        while (thisLevel.size() > 0) {
+            ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
+            for (I_RelVersioned rv : thisLevel) {
+                I_RelPart rPart1 = null;
+                for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
+                    for (I_RelPart rPart : rv.getMutableParts()) {
+                        if (pos.getPath().getConceptId() == rPart.getPathId()) {
+                            if (rPart1 == null) {
+                                rPart1 = rPart; // ... KEEP FIRST_INSTANCE
+                            } else if (rPart1.getVersion() < rPart.getVersion()) {
+                                rPart1 = rPart; // ... KEEP MORE_RECENT PART
+                            } else if (rPart1.getVersion() == rPart.getVersion()) {
+                                countRelDuplVersion++;
+                                if (rPart.getStatusId() == isCURRENT)
+                                    rPart1 = rPart; // KEEP CURRENT PART
+                            }
+                        }
+                    }
+                    if (rPart1 != null)
+                        break; // IF FOUND ON THIS PATH, STOP SEARCHING
+                }
+
+                if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
+                        && (rPart1.getTypeId() == isaNid)) {
+                    // KEEP C1 AS RESULT
+                    resultSet.add(rv.getC1Id());
+
+                    // GET C1 DESTINATION RELS FOR NEXT LEVEL
+                    I_GetConceptData c1 = tf.getConcept(rv.getC1Id());
+                    List<? extends I_RelVersioned> c1Rels = c1.getDestRels();
+                    for (I_RelVersioned nextRel : c1Rels)
+                        nextLevel.add(nextRel);
+                }
+            } // for thisLevel
+
+            thisLevel = nextLevel;
+        } // while thisLevel
+
+        // IS-A is outside the active SNOMED role root
+        resultSet.add(isaNid);
+
+        // 
+        StringBuilder sb = new StringBuilder("::: ALLOWED ROLES = " + resultSet.size() + "\r\n");
+        for (Integer cNid : resultSet) {
+            sb.append(":::    " + toStringCNid(cNid) + "\r\n");
+        }
+        logger.info(sb.toString());
+
+        // prepare the role nid array.
+        int[] resultInt = new int[resultSet.size()];
+        int i = 0;
+        for (Integer rNid : resultSet) {
+            resultInt[i] = rNid;
+            i++;
+        }
+        Arrays.sort(resultInt);
+
+        return resultInt;
+    }
+
     // GET ROLES
     private ArrayList<SnoRel> getRoles() { // SORT BY [ROLE-C1-GROUP-C2]
         ArrayList<SnoRel> results = new ArrayList<SnoRel>();
@@ -1267,10 +1351,10 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         return results;
     }
 
-    // :DEBUG: dumps role-types to console
+    // dumps role-types to console
     private void dumpRoles() { // SORT BY [ROLE-C1-GROUP-C2]
-        boolean countRoles = true;
-        boolean countRolesVerbose = false; // :DEBUG:
+        boolean countRolesFlag = true;
+        boolean countRolesVerboseFlag = true;
 
         Comparator<SnoRel> comp = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
@@ -1308,27 +1392,25 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
 
         Collections.sort(cEditSnoRels, comp);
 
-        if (countRoles) {
-            int debugCountRoles = 0;
-            int debugLastRole = Integer.MIN_VALUE;
-            StringBuilder debugSB = new StringBuilder(4096);
-            for (SnoRel debugSR : cEditSnoRels) {
-                if (debugSR.typeId != debugLastRole) {
-                    debugCountRoles += 1;
-                    if (countRolesVerbose) {
-                        debugSB.append("::: "
-                                + SnoTable.toStringIsaAncestry(debugSR.typeId, cEditPathPos)
+        if (countRolesFlag) {
+            int countRoles = 0;
+            int lastRole = Integer.MIN_VALUE;
+            StringBuilder sb = new StringBuilder(4096);
+            for (SnoRel sr : cEditSnoRels) {
+                if (sr.typeId != lastRole) {
+                    countRoles += 1;
+                    if (countRolesVerboseFlag) {
+                        sb.append("::: " + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathPos)
                                 + "\r\n");
                     }
                 }
-                debugLastRole = debugSR.typeId;
+                lastRole = sr.typeId;
             }
-            logger.info("\r\n::: [SnorocketTask] :DEBUG: COUNTED ROLES == " + debugCountRoles
-                    + "\r\n" + debugSB);
+            logger.info("\r\n::: [SnorocketTask] COUNTED ROLES == " + countRoles + "\r\n" + sb);
         }
     }
 
-    // :DEBUG: dump concepts to file
+    // dump concepts to file
     private void dumpSnoCon(List<SnoCon> scl, String fName, int format) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
@@ -1414,24 +1496,24 @@ public class SnorocketTask_123 extends AbstractTask implements ActionListener {
         }
     }
 
-    // :DEBUG: dumps relationships to a file
+    // dumps relationships to a file
     private String dumpSnoRelStr(SnoRel sr) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             I_GetConceptData c1 = tf.getConcept(sr.c1Id);
             I_GetConceptData t = tf.getConcept(sr.typeId);
             I_GetConceptData c2 = tf.getConcept(sr.c2Id);
             int g = sr.group;
             sb.append(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next() + "\t"
-                    + c2.getUids().iterator().next() + "\t" + g + "\t");
-            sb.append(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
-            sb.append(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
+                    + c2.getUids().iterator().next() + "\t" + g + "\t<br>\t");
+            sb.append(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t<br>\t");
+            sb.append("|" + c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
                     + c2.getInitialText() + "\t" + g + "\r\n");
 
-            sb.append("\tc2 versions: ");
+            sb.append("\tc2 status: ** ");
             for (I_ConceptAttributePart mp : c2.getConceptAttributes().getMutableParts())
-                sb.append(mp.getVersion()+", ");
-            
+                sb.append(toStringCNid(mp.getStatusId()) + " ** ");
+
             return sb.toString();
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block

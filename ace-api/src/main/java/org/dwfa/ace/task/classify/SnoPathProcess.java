@@ -81,13 +81,14 @@ public class SnoPathProcess implements I_ProcessConcepts {
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
+    private int[] allowedRoles;
 
     // GUI
     I_ShowActivity gui = null;
 
     public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons,
-            List<SnoRel> snorels, List<I_Position> fromPathPos, I_ShowActivity gui)
-            throws TerminologyException, IOException {
+            List<SnoRel> snorels, int[] allowedRoles, List<I_Position> fromPathPos,
+            I_ShowActivity gui) throws TerminologyException, IOException {
         this.logger = logger;
         this.rocket = rocket;
         this.snocons = snocons;
@@ -95,7 +96,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         this.fromPathPos = fromPathPos;
         this.gui = gui;
         setupCoreNids();
-
+        this.allowedRoles = allowedRoles;
     }
 
     public void processConcept(I_GetConceptData concept) throws Exception {
@@ -210,11 +211,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
             }
 
             if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)) {
-                // must FIND at least one SNOMED IS-A relationship
-                if (rPart1.getTypeId() == isaNid) {
-                    isSnomedConcept = true;
-                }
-
                 // SET UP STATED FORMS LOOP
                 // NOTE: inferred_only, descriptive and historic relationships
                 // are not included
@@ -232,6 +228,23 @@ public class SnoPathProcess implements I_ProcessConcepts {
                 } else if (p1c == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
                     keep = true;
                     tmpCountRelCharStatedSubsumed++;
+                }
+
+                // must FIND at least one SNOMED IS-A relationship
+                int typeNid = rPart1.getTypeId();
+                if (typeNid == isaNid) {
+                    isSnomedConcept = true;
+                } else if (allowedRoles != null) {
+                    // must be an allowed role type
+                    boolean isAllowed = false;
+                    int i = 0;
+                    while (isAllowed == false && i < allowedRoles.length) {
+                        if (typeNid == allowedRoles[i])
+                            isAllowed = true;
+                        i++;
+                    }
+                    if (isAllowed == false)
+                        keep = false;
                 }
 
                 if (keep) {
