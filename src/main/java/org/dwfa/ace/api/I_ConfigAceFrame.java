@@ -480,6 +480,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getRefsetInSpecEditor();
 
     public void setRefsetInSpecEditor(I_GetConceptData refset);
+    
+    public void setShowPromotionCheckBoxes(Boolean show);
+    
+    public Boolean getShowPromotionCheckBoxes();
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException;
 

@@ -95,6 +95,8 @@ public class PromoteRefset extends AbstractTask {
 
             I_TermFactory tf = LocalVersionedTerminology.get();
 
+            tf.commit();
+
             I_Position viewPosition = viewPositionSet.iterator().next();
             promoteRefset(config, viewPosition, promotionPaths, tf, refsetToPromote);
 

@@ -8,8 +8,8 @@ import java.util.Set;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -61,6 +61,7 @@ public class PromoteConcept extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
+            Terms.get().commit();
             Set<I_Position> viewPositionSet = config.getViewPositionSet();
             PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
             if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
@@ -74,9 +75,8 @@ public class PromoteConcept extends AbstractTask {
             }
 
             I_Position viewPosition = viewPositionSet.iterator().next();
-            conceptToPromote.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-            		config.getAllowedStatus());
-            LocalVersionedTerminology.get().addUncommittedNoChecks(conceptToPromote);
+            conceptToPromote.promote(viewPosition, config.getPromotionPathSetReadOnly(), config.getAllowedStatus());
+            Terms.get().addUncommittedNoChecks(conceptToPromote);
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
@@ -99,12 +99,12 @@ public class PromoteConcept extends AbstractTask {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getConceptPropName() {
-		return conceptPropName;
-	}
+    public String getConceptPropName() {
+        return conceptPropName;
+    }
 
-	public void setConceptPropName(String conceptPropName) {
-		this.conceptPropName = conceptPropName;
-	}
+    public void setConceptPropName(String conceptPropName) {
+        this.conceptPropName = conceptPropName;
+    }
 
 }

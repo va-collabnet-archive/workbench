@@ -39,7 +39,7 @@ import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
@@ -58,7 +58,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Computes the members of a refset given a refset spec. This refset spec is the
+ * Computes the members of a concept refset given a refset spec. This refset spec is the
  * one currently displayed in the refset spec editing panel. The refset spec's
  * "specifies refset" relationship indicates which member refset will be
  * created.
@@ -108,7 +108,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
         try {
             long startTime = new Date().getTime();
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
             I_GetConceptData normalMemberConcept =
                     termFactory.getConcept(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
             int conceptsToProcess = termFactory.getConceptCount();
