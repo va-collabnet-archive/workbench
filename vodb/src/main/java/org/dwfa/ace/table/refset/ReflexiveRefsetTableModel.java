@@ -296,4 +296,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     public Set<ThinExtByRefTuple> getSelectedTuples() {
         return new HashSet<ThinExtByRefTuple>();
     }
+
+    public void setShowPromotionCheckBoxes(boolean show) {
+        // nothing to do
+    }
 }

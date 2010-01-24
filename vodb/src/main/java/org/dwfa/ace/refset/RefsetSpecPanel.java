@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -108,8 +109,15 @@ public class RefsetSpecPanel extends JPanel {
     private static final String COMMENT_VIEW = "comments";
 
     private Box verticalBox;
+    private Box horizontalBox;
 
-    private Boolean showPromotionCheckBoxes = false;
+    private boolean showPromotionCheckBoxes = false;
+    private JButton approveButton;
+    private JButton disapproveButton;
+    private JLabel filterLabel = new JLabel("Filter view:");
+    private JComboBox filterComboBox;
+    private JTableWithDragImage refsetTable;
+    private TableColumn checkBoxColumn;
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
@@ -377,14 +385,8 @@ public class RefsetSpecPanel extends JPanel {
             columns.add(column6);
         }
 
-        if (getShowPromotionCheckBoxes()) {
-            refsetTableModel =
-                    new SelectableReflexiveTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns
-                        .size()]));
-        } else {
-            refsetTableModel =
-                    new ReflexiveRefsetTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
-        }
+        refsetTableModel =
+                new SelectableReflexiveTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
 
         aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
@@ -394,22 +396,22 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel.getRowCount();
         TableSorter sortingTable = new TableSorter(refsetTableModel);
 
-        JTableWithDragImage refsetTable = new JTableWithDragImage(sortingTable);
+        refsetTable = new JTableWithDragImage(sortingTable);
         refsetTable.getColumnModel().getColumn(0).setIdentifier(column1);
         refsetTable.getColumnModel().getColumn(1).setIdentifier(column2);
 
         // set renderer and editor for checkbox column
-        if (getShowPromotionCheckBoxes()) {
-            // get the last column
-            int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
-            CheckBoxCellRenderer renderer = new CheckBoxCellRenderer();
-            TableColumn column = refsetTable.getColumnModel().getColumn(columnIndex);
-            column.setPreferredWidth(renderer.getPreferredWidth());
-            column.setResizable(false);
-            column.setMaxWidth(renderer.getPreferredWidth());
-            column.setMinWidth(renderer.getPreferredWidth());
-            column.setCellRenderer(renderer);
-        }
+        // get the last column
+        int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
+        CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
+        checkBoxColumn = refsetTable.getColumnModel().getColumn(columnIndex);
+        checkBoxColumn.setResizable(false);
+        checkBoxColumn.setMaxWidth(checkBoxRenderer.getPreferredWidth());
+        checkBoxColumn.setMaxWidth(checkBoxRenderer.getPreferredWidth());
+        checkBoxColumn.setPreferredWidth(checkBoxRenderer.getPreferredWidth());
+        checkBoxColumn.setCellRenderer(checkBoxRenderer);
+        // hide column
+        refsetTable.getColumnModel().removeColumn(checkBoxColumn);
 
         sortingTable.setTableHeader(refsetTable.getTableHeader());
         sortingTable.getTableHeader().setToolTipText(
@@ -425,36 +427,37 @@ public class RefsetSpecPanel extends JPanel {
 
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(TABLE_VIEW)) {
-                Box horizontalBox = new Box(BoxLayout.X_AXIS);
+                horizontalBox = new Box(BoxLayout.X_AXIS);
 
-                if (getShowPromotionCheckBoxes()) {
-                    JButton approveButton = new JButton("Approve selected");
-                    approveButton.addActionListener(new ApproveActionListener());
-                    JButton disapproveButton = new JButton("Disapprove selected");
-                    disapproveButton.addActionListener(new DisapproveActionListener());
-                    approveButton.setPreferredSize(disapproveButton.getPreferredSize());
+                approveButton = new JButton("Approve selected");
+                approveButton.addActionListener(new ApproveActionListener());
+                disapproveButton = new JButton("Disapprove selected");
+                disapproveButton.addActionListener(new DisapproveActionListener());
+                approveButton.setPreferredSize(disapproveButton.getPreferredSize());
 
-                    JLabel filterLabel = new JLabel("Filter view:");
-                    JComboBox filterComboBox =
-                            new JComboBox(new String[] { "All", "New additions", "New deletions", "Approved additions",
-                                                        "Disapproved additions", "Approved deletions",
-                                                        "Disapproved deletions" });
-                    filterComboBox.setMaximumSize(filterComboBox.getPreferredSize());
+                filterLabel = new JLabel("Filter view:");
+                filterComboBox =
+                        new JComboBox(new String[] { "All", "New additions", "New deletions", "Approved additions",
+                                                    "Disapproved additions", "Approved deletions",
+                                                    "Disapproved deletions" });
+                filterComboBox.setMaximumSize(filterComboBox.getPreferredSize());
+                filterLabel.setEnabled(false);
+                filterComboBox.setEnabled(false);
 
-                    horizontalBox.add(Box.createHorizontalStrut(5));
-                    horizontalBox.add(approveButton);
-                    horizontalBox.add(Box.createHorizontalStrut(5));
-                    horizontalBox.add(disapproveButton);
-                    horizontalBox.add(Box.createHorizontalGlue());
-                    horizontalBox.add(filterLabel);
-                    horizontalBox.add(Box.createHorizontalStrut(5));
-                    horizontalBox.add(filterComboBox);
-                    horizontalBox.add(Box.createHorizontalStrut(5));
+                setShowButtons(showPromotionCheckBoxes);
 
-                    verticalBox.add(horizontalBox);
-                    verticalBox.add(Box.createVerticalGlue());
+                horizontalBox.add(Box.createHorizontalStrut(5));
+                horizontalBox.add(approveButton);
+                horizontalBox.add(Box.createHorizontalStrut(5));
+                horizontalBox.add(disapproveButton);
+                horizontalBox.add(Box.createHorizontalGlue());
+                horizontalBox.add(filterLabel);
+                horizontalBox.add(Box.createHorizontalStrut(5));
+                horizontalBox.add(filterComboBox);
+                horizontalBox.add(Box.createHorizontalStrut(5));
 
-                }
+                verticalBox.add(horizontalBox);
+                verticalBox.add(Box.createVerticalGlue());
 
                 JScrollPane scrollPane = new JScrollPane();
                 scrollPane.setViewportView(refsetTable);
@@ -670,7 +673,39 @@ public class RefsetSpecPanel extends JPanel {
         return showPromotionCheckBoxes;
     }
 
-    public void setShowPromotionCheckBoxes(Boolean b) {
-        showPromotionCheckBoxes = b;
+    public void setShowPromotionCheckBoxes(Boolean show) {
+        if (showPromotionCheckBoxes != show) {
+            showPromotionCheckBoxes = show;
+            refsetTableModel.setShowPromotionCheckBoxes(show);
+            setShowButtons(show);
+        }
+    }
+
+    public void setShowButtons(boolean show) {
+        approveButton.setVisible(show);
+        disapproveButton.setVisible(show);
+        filterLabel.setVisible(show);
+        filterComboBox.setVisible(show);
+
+        if (show) {
+            refsetTable.getColumnModel().addColumn(checkBoxColumn);
+            horizontalBox.setMaximumSize(null);
+            horizontalBox.setMinimumSize(null);
+            horizontalBox.setPreferredSize(null);
+            for (int i = 0; i < bottomTabs.getTabCount(); i++) {
+                if (bottomTabs.getTitleAt(i).equals(TABLE_VIEW)) {
+                    bottomTabs.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } else {
+            refsetTable.getColumnModel().removeColumn(checkBoxColumn);
+            horizontalBox.setMaximumSize(new Dimension(0, 0));
+            horizontalBox.setMinimumSize(new Dimension(0, 0));
+            horizontalBox.setPreferredSize(new Dimension(0, 0));
+            if (refsetTable.getParent() != null) {
+                refsetTable.getParent().validate();
+            }
+        }
     }
 }
