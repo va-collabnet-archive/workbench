@@ -142,7 +142,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             cEditSnoRels = new ArrayList<SnoRel>();
             long startTime = System.currentTimeMillis();
             SnoPathProcess pcEdit;
-            pcEdit = new SnoPathProcess(logger, null, null, cEditSnoRels, cEditPathPos, gui);
+            pcEdit = new SnoPathProcess(logger, null, null, cEditSnoRels, null, cEditPathPos, gui);
             tf.iterateConcepts(pcEdit);
             logger.info("\r\n::: [SnorocketTaskExp] GET STATED PATH DATA" + pcEdit.getStats(startTime));
 
@@ -171,7 +171,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             // GET CLASSIFIER_PATH RELS
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
-            SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels, cClassPathPos, gui);
+            SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels, null, cClassPathPos, gui);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTaskExp] GET INFERRED PATH DATA" + pcClass.getStats(startTime));
 
