@@ -1202,4 +1202,14 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public PathSetReadOnly getPromotionPathSetReadOnly() {
         return frameConfig.getPromotionPathSetReadOnly();
     }
+
+    @Override
+    public Boolean getShowPromotionCheckBoxes() {
+        return frameConfig.getShowPromotionCheckBoxes();
+    }
+
+    @Override
+    public void setShowPromotionCheckBoxes(Boolean show) {
+        frameConfig.setShowPromotionCheckBoxes(show);
+    }
 }

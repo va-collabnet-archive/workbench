@@ -23,33 +23,53 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.table.refset.CheckBoxCellRenderer;
 import org.dwfa.ace.table.refset.ExtTableRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
+import org.dwfa.ace.table.refset.SelectableReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.Position;
+import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class RefsetSpecPanel extends JPanel {
     private class HistoryActionListener implements ActionListener {
@@ -87,17 +107,21 @@ public class RefsetSpecPanel extends JPanel {
     private static final String TABLE_VIEW = " members";
     private static final String COMMENT_VIEW = "comments";
 
+    private Box verticalBox;
+
+    private Boolean showPromotionCheckBoxes;
+
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
         aceFrameConfig = ace.getAceFrameConfig();
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
 
-        TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
-            new IntSet(), false), ace);
+        TermTreeHelper hierarchicalTreeHelper =
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
 
-        TermTreeHelper refsetAndParentOnlyTreeHelper = new TermTreeHelper(new RefsetSpecFrameConfig(
-            ace.getAceFrameConfig(), new IntSet(), true), ace);
+        TermTreeHelper refsetAndParentOnlyTreeHelper =
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
 
         editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
@@ -114,7 +138,8 @@ public class RefsetSpecPanel extends JPanel {
         bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
         bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
-        bottomTabs.addTab(TABLE_VIEW, new JScrollPane());
+        verticalBox = new Box(BoxLayout.Y_AXIS);
+        bottomTabs.addTab(TABLE_VIEW, verticalBox);
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
         commentTableModel = setupCommentTable();
         setupRefsetMemberTable(commentTableModel);
@@ -230,8 +255,9 @@ public class RefsetSpecPanel extends JPanel {
             columns.add(column5);
         }
 
-        ReflexiveRefsetCommentTableModel commentTableModel = new ReflexiveRefsetCommentTableModel(editor,
-            columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+        ReflexiveRefsetCommentTableModel commentTableModel =
+                new ReflexiveRefsetCommentTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns
+                    .size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
         editor.getLabel().addTermChangeListener(commentTableModel);
@@ -270,7 +296,8 @@ public class RefsetSpecPanel extends JPanel {
         column1.setPref(150);
         column1.setMax(1000);
         column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.CONCEPT_COMPONENT);
-        column1.setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", I_IntList.class, I_ConfigAceFrame.class));
+        column1
+            .setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", I_IntList.class, I_ConfigAceFrame.class));
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(aceFrameConfig.getTableDescPreferenceList());
         parameters.add(aceFrameConfig);
@@ -350,8 +377,15 @@ public class RefsetSpecPanel extends JPanel {
             columns.add(column6);
         }
 
-        refsetTableModel = new ReflexiveRefsetTableModel(editor,
-            columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+        if (getShowPromotionCheckBoxes()) {
+            refsetTableModel =
+                    new SelectableReflexiveTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns
+                        .size()]));
+        } else {
+            refsetTableModel =
+                    new ReflexiveRefsetTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+        }
+
         aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
@@ -364,6 +398,19 @@ public class RefsetSpecPanel extends JPanel {
         refsetTable.getColumnModel().getColumn(0).setIdentifier(column1);
         refsetTable.getColumnModel().getColumn(1).setIdentifier(column2);
 
+        // set renderer and editor for checkbox column
+        if (getShowPromotionCheckBoxes()) {
+            // get the last column
+            int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
+            CheckBoxCellRenderer renderer = new CheckBoxCellRenderer();
+            TableColumn column = refsetTable.getColumnModel().getColumn(columnIndex);
+            column.setPreferredWidth(renderer.getPreferredWidth());
+            column.setResizable(false);
+            column.setMaxWidth(renderer.getPreferredWidth());
+            column.setMinWidth(renderer.getPreferredWidth());
+            column.setCellRenderer(renderer);
+        }
+
         sortingTable.setTableHeader(refsetTable.getTableHeader());
         sortingTable.getTableHeader().setToolTipText(
             "Click to specify sorting; Control-Click to specify secondary sorting");
@@ -375,10 +422,45 @@ public class RefsetSpecPanel extends JPanel {
         refsetTable.setDefaultRenderer(Integer.class, renderer);
         refsetTable.setDefaultRenderer(Double.class, renderer);
         refsetTable.setDefaultRenderer(String.class, renderer);
+
         for (int i = 0; i < bottomTabs.getTabCount(); i++) {
             if (bottomTabs.getTitleAt(i).equals(TABLE_VIEW)) {
-                JScrollPane tableScroller = (JScrollPane) bottomTabs.getComponentAt(i);
-                tableScroller.setViewportView(refsetTable);
+                Box horizontalBox = new Box(BoxLayout.X_AXIS);
+
+                if (getShowPromotionCheckBoxes()) {
+                    JButton approveButton = new JButton("Approve selected");
+                    approveButton.addActionListener(new ApproveActionListener());
+                    JButton disapproveButton = new JButton("Disapprove selected");
+                    disapproveButton.addActionListener(new DisapproveActionListener());
+                    approveButton.setPreferredSize(disapproveButton.getPreferredSize());
+
+                    JLabel filterLabel = new JLabel("Filter view:");
+                    JComboBox filterComboBox =
+                            new JComboBox(new String[] { "All", "New additions", "New deletions", "Approved additions",
+                                                        "Disapproved additions", "Approved deletions",
+                                                        "Disapproved deletions" });
+                    filterComboBox.setMaximumSize(filterComboBox.getPreferredSize());
+
+                    horizontalBox.add(Box.createHorizontalStrut(5));
+                    horizontalBox.add(approveButton);
+                    horizontalBox.add(Box.createHorizontalStrut(5));
+                    horizontalBox.add(disapproveButton);
+                    horizontalBox.add(Box.createHorizontalGlue());
+                    horizontalBox.add(filterLabel);
+                    horizontalBox.add(Box.createHorizontalStrut(5));
+                    horizontalBox.add(filterComboBox);
+                    horizontalBox.add(Box.createHorizontalStrut(5));
+
+                    verticalBox.add(horizontalBox);
+                    verticalBox.add(Box.createVerticalGlue());
+
+                }
+
+                JScrollPane scrollPane = new JScrollPane();
+                scrollPane.setViewportView(refsetTable);
+                verticalBox.add(scrollPane);
+                verticalBox.add(Box.createVerticalGlue());
+
                 break;
             }
         }
@@ -414,5 +496,181 @@ public class RefsetSpecPanel extends JPanel {
 
     public RefsetSpecEditor getRefsetSpecEditor() {
         return editor;
+    }
+
+    private class DisapproveActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+
+                I_TermFactory tf = Terms.get();
+
+                int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+                IntSet currentSet = new IntSet();
+                currentSet.add(currentNid);
+                Set<ThinExtByRefTuple> tuples = refsetTableModel.getSelectedTuples();
+
+                PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
+                for (ThinExtByRefTuple tuple : tuples) {
+                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tuple.getComponentId())) {
+                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
+                        int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
+                        if (promotionRefsetId == extForMember.getRefsetId()) {
+                            List<I_ThinExtByRefTuple> promotionTuples =
+                                    extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
+                                        .getViewPositionSet(), false, false);
+                            if (promotionTuples.size() > 0) {
+                                I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                                if (promotionPart instanceof I_ThinExtByRefPartConcept) {
+
+                                    for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+
+                                        int approveId;
+
+                                        I_ThinExtByRefPartConcept clone =
+                                                (I_ThinExtByRefPartConcept) promotionPart.makeAnalog(promotionPart
+                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+
+                                        if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
+                                            .localize().getNid()) {
+                                            break;
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
+                                            .localize().getNid()) {
+                                            break;
+                                        } else {
+                                            break;
+                                        }
+
+                                        clone.setC1id(approveId);
+                                        promotionTuples.get(0).getCore().addVersion(clone);
+                                        tf.addUncommitted(tuple.getCore());
+                                        promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
+                                            promotionPath, currentSet);
+                                        tf.addUncommitted(tuple.getCore());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (tf.getUncommitted().size() > 0) {
+                    tf.commit();
+                }
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private class ApproveActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+
+                I_TermFactory tf = Terms.get();
+
+                int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+                IntSet currentSet = new IntSet();
+                currentSet.add(currentNid);
+                Set<ThinExtByRefTuple> tuples = refsetTableModel.getSelectedTuples();
+
+                PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
+                for (ThinExtByRefTuple tuple : tuples) {
+                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tuple.getComponentId())) {
+                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
+                        int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
+                        if (promotionRefsetId == extForMember.getRefsetId()) {
+                            List<I_ThinExtByRefTuple> promotionTuples =
+                                    extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
+                                        .getViewPositionSet(), false, false);
+                            if (promotionTuples.size() > 0) {
+                                I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                                if (promotionPart instanceof I_ThinExtByRefPartConcept) {
+
+                                    for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+
+                                        int approveId;
+
+                                        I_ThinExtByRefPartConcept clone =
+                                                (I_ThinExtByRefPartConcept) promotionPart.makeAnalog(promotionPart
+                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+
+                                        if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
+                                            .localize().getNid()) {
+                                            break;
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
+                                            .localize().getNid()) {
+                                            break;
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
+                                                        .localize().getNid();
+                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
+                                            .localize().getNid()) {
+                                            approveId =
+                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
+                                                        .localize().getNid();
+                                        } else {
+                                            break;
+                                        }
+
+                                        clone.setC1id(approveId);
+                                        promotionTuples.get(0).getCore().addVersion(clone);
+                                        tf.addUncommitted(tuple.getCore());
+                                        promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
+                                            promotionPath, currentSet);
+                                        tf.addUncommitted(tuple.getCore());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (tf.getUncommitted().size() > 0) {
+                    tf.commit();
+                }
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    public boolean getShowPromotionCheckBoxes() {
+        return showPromotionCheckBoxes;
+    }
+
+    public void setShowPromotionCheckBoxes(Boolean b) {
+        showPromotionCheckBoxes = b;
     }
 }

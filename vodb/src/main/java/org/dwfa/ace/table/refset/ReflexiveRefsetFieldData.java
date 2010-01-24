@@ -22,11 +22,21 @@ import java.util.List;
 public class ReflexiveRefsetFieldData {
 
     public enum REFSET_FIELD_TYPE {
-        CONCEPT_IDENTIFIER, COMPONENT_IDENTIFIER, STRING, VERSION
+        CONCEPT_IDENTIFIER,
+        COMPONENT_IDENTIFIER,
+        STRING,
+        VERSION,
+        CHECK_BOX;
     }
 
     public enum INVOKE_ON_OBJECT_TYPE {
-        IMMUTABLE, PART, COMPONENT, CONCEPT, CONCEPT_COMPONENT, PROMOTION_REFSET_PART;
+        IMMUTABLE,
+        PART,
+        COMPONENT,
+        CONCEPT,
+        CONCEPT_COMPONENT,
+        PROMOTION_REFSET_PART,
+        CHECK_BOX;
     }
 
     protected REFSET_FIELD_TYPE type;

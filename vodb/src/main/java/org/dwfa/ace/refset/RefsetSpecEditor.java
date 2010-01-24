@@ -191,8 +191,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
                     EXT_TYPE extType = ThinExtBinder.getExtensionType(ext);
 
-                    EnumSet<EXT_TYPE> allowedTypes = EnumSet.of(EXT_TYPE.CONCEPT_CONCEPT,
-                        EXT_TYPE.CONCEPT_CONCEPT_CONCEPT, EXT_TYPE.CONCEPT_CONCEPT_STRING);
+                    EnumSet<EXT_TYPE> allowedTypes =
+                            EnumSet.of(EXT_TYPE.CONCEPT_CONCEPT, EXT_TYPE.CONCEPT_CONCEPT_CONCEPT,
+                                EXT_TYPE.CONCEPT_CONCEPT_STRING);
 
                     if (allowedTypes.contains(extType) == false) {
                         throw new Exception("Can't handle " + extType);
@@ -278,8 +279,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         columns.add(column6);
                     }
 
-                    ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(
-                        RefsetSpecEditor.this, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+                    ReflexiveRefsetMemberTableModel reflexiveModel =
+                            new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this, columns
+                                .toArray(new ReflexiveRefsetFieldData[columns.size()]));
 
                     reflexiveModel.setComponentId(ext.getMemberId());
 
@@ -299,8 +301,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 try {
                     List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
                     getDefaultSpecColumns(EXT_TYPE.CONCEPT_CONCEPT, columns);
-                    ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(
-                        RefsetSpecEditor.this, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+                    ReflexiveRefsetMemberTableModel reflexiveModel =
+                            new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this, columns
+                                .toArray(new ReflexiveRefsetFieldData[columns.size()]));
                     reflexiveModel.setComponentId(Integer.MIN_VALUE);
                     reflexiveModel.getRowCount();
                     clauseTable.setModel(reflexiveModel);
@@ -338,8 +341,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
 
         private void perform() {
-            firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(),
-                historyButton.isSelected());
+            firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(), historyButton
+                .isSelected());
             try {
                 updateSpecTree(false);
             } catch (Exception e1) {
@@ -502,16 +505,17 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         this.refsetSpecPanel = refsetSpecPanel;
         topPanel = new JPanel(new GridBagLayout());
 
-        this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(
-            TAB_HISTORY_KEY);
+        this.tabHistoryList =
+                (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(TAB_HISTORY_KEY);
 
         if (this.tabHistoryList == null) {
             this.tabHistoryList = new LinkedList<I_GetConceptData>();
             ace.getAceFrameConfig().getTabHistoryMap().put(TAB_HISTORY_KEY, this.tabHistoryList);
         }
 
-        plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(
-            Arrays.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] {}));
+        plugins =
+                new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(Arrays
+                    .asList(new org.dwfa.ace.api.I_PluginToConceptPanel[] {}));
         ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
         label = new TermComponentLabel(this.ace.getAceFrameConfig());
         label.addMouseListener(new RefsetCommentPopupListener(ace.getAceFrameConfig(), this));
@@ -536,7 +540,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.gridx++;
         componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
         componentHistoryButton.addActionListener(new ShowHistoryListener());
-        componentHistoryButton.setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
+        componentHistoryButton
+            .setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
         topPanel.add(componentHistoryButton, c);
 
         c.gridx = 0;
@@ -710,8 +715,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
                             worker.execute(process);
 
-                            SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
-                                process.getExecutionRecords());
+                            SortedSet<ExecutionRecord> sortedRecords =
+                                    new TreeSet<ExecutionRecord>(process.getExecutionRecords());
                             Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
                             StringBuffer buff = new StringBuffer();
                             while (recordItr.hasNext()) {
@@ -776,13 +781,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
         getDefaultSpecColumns(EXT_TYPE.CONCEPT_CONCEPT, columns);
-        ReflexiveRefsetMemberTableModel reflexiveModel = new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this,
-            columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+        ReflexiveRefsetMemberTableModel reflexiveModel =
+                new ReflexiveRefsetMemberTableModel(RefsetSpecEditor.this, columns
+                    .toArray(new ReflexiveRefsetFieldData[columns.size()]));
         reflexiveModel.setComponentId(Integer.MIN_VALUE);
         reflexiveModel.getRowCount();
 
-        JPanel clauseTablePanel = ReflexiveRefsetUtil.getExtensionPanel(null, reflexiveModel, RefsetSpecEditor.this,
-            false, false);
+        JPanel clauseTablePanel =
+                ReflexiveRefsetUtil.getExtensionPanel(null, reflexiveModel, RefsetSpecEditor.this, false, false);
         clauseTable = (JTableWithDragImage) clauseTablePanel.getClientProperty("extTable");
         int columnIndex = 0;
         for (ReflexiveRefsetFieldData columnId : reflexiveModel.getColumns()) {
@@ -1018,8 +1024,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             ;
             if (refsetConcept != null) {
                 relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
-                List<? extends I_RelTuple> refsetSpecTuples = refsetConcept.getDestRelTuples(ace.getAceFrameConfig()
-                    .getAllowedStatus(), relTypes, ace.getAceFrameConfig().getViewPositionSetReadOnly(), true);
+                List<? extends I_RelTuple> refsetSpecTuples =
+                        refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), relTypes, ace
+                            .getAceFrameConfig().getViewPositionSetReadOnly(), true);
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
                     localRefsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
@@ -1043,8 +1050,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 if (newRefset == false) {
                     addChildrenExpandedNodes(oldRoot);
                 }
-                List<? extends I_ThinExtByRefVersioned> extensions =Terms.get()
-                    .getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
+                List<? extends I_ThinExtByRefVersioned> extensions =
+                        Terms.get().getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
                 fetchedComponents.add(localRefsetSpecConcept.getConceptId());
@@ -1092,14 +1099,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 throws IOException {
             for (I_ThinExtByRefVersioned ext : list) {
                 if (ext.getRefsetId() == localRefsetSpecConcept.getConceptId()) {
-                    int currentTupleCount = ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(),
-                        ace.getAceFrameConfig().getViewPositionSet(), true).size();
+                    int currentTupleCount =
+                            ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(),
+                                ace.getAceFrameConfig().getViewPositionSet(), true).size();
                     if (currentTupleCount > 0 || historyButton.isSelected()) {
                         extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
                         if (fetchedComponents.contains(ext.getMemberId()) == false) {
                             fetchedComponents.add(ext.getMemberId());
-                            addExtensionsToMap(Terms.get().getAllExtensionsForComponent(
-                                ext.getMemberId(), true), extensionMap, fetchedComponents);
+                            addExtensionsToMap(Terms.get().getAllExtensionsForComponent(ext.getMemberId(), true),
+                                extensionMap, fetchedComponents);
                         }
                     }
                 }
@@ -1166,8 +1174,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
         if (refsetConcept != null) {
-            Set<? extends I_GetConceptData> specs = RefsetHelper.getSpecificationRefsetForRefset(refsetConcept,
-                ace.getAceFrameConfig());
+            Set<? extends I_GetConceptData> specs =
+                    RefsetHelper.getSpecificationRefsetForRefset(refsetConcept, ace.getAceFrameConfig());
             if (specs.size() > 0) {
                 refsetSpecConcept = specs.iterator().next();
             }
