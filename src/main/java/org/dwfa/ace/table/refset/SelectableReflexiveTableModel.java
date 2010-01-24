@@ -10,12 +10,14 @@ import org.dwfa.vodb.types.ThinExtByRefTuple;
 public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
 
     private HashMap<ThinExtByRefTuple, Boolean> selectedTuplesMap = new HashMap<ThinExtByRefTuple, Boolean>();
+    private boolean showCheckBoxColumn = false;
 
     public SelectableReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super(host, columns);
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
+
         if (columnIndex == getColumnCount() - 1) {
             ThinExtByRefTuple tuple = allTuples.get(rowIndex);
             if (!selectedTuplesMap.containsKey(tuple)) {
@@ -45,6 +47,10 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
         } else {
             super.setValueAt(value, row, col);
         }
+    }
+
+    public void setShowPromotionCheckBoxes(boolean show) {
+        showCheckBoxColumn = show;
     }
 
     public int getColumnCount() {
