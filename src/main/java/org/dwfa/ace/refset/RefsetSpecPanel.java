@@ -70,7 +70,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
-import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class RefsetSpecPanel extends JPanel {
     private class HistoryActionListener implements ActionListener {
@@ -511,11 +510,14 @@ public class RefsetSpecPanel extends JPanel {
                 int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
                 IntSet currentSet = new IntSet();
                 currentSet.add(currentNid);
-                Set<ThinExtByRefTuple> tuples = refsetTableModel.getSelectedTuples();
+                Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
+                System.out.println(">>>>>>> SELECTED TUPLE COUNT: " + tupleMemberIds.size());
 
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
-                for (ThinExtByRefTuple tuple : tuples) {
-                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tuple.getComponentId())) {
+                for (Integer tupleMemberId : tupleMemberIds) {
+                    I_ThinExtByRefVersioned tupleVersioned = tf.getExtension(tupleMemberId);
+                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tupleVersioned
+                        .getComponentId())) {
                         RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
@@ -524,6 +526,7 @@ public class RefsetSpecPanel extends JPanel {
                                         .getViewPositionSet(), false, false);
                             if (promotionTuples.size() > 0) {
                                 I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                                System.out.println(promotionPart.getUniversalPart());
                                 if (promotionPart instanceof I_ThinExtByRefPartConcept) {
 
                                     for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -566,10 +569,10 @@ public class RefsetSpecPanel extends JPanel {
 
                                         clone.setC1id(approveId);
                                         promotionTuples.get(0).getCore().addVersion(clone);
-                                        tf.addUncommitted(tuple.getCore());
+                                        tf.addUncommitted(tupleVersioned);
                                         promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
                                             promotionPath, currentSet);
-                                        tf.addUncommitted(tuple.getCore());
+                                        tf.addUncommitted(tupleVersioned);
                                     }
                                 }
                             }
@@ -579,6 +582,7 @@ public class RefsetSpecPanel extends JPanel {
                 if (tf.getUncommitted().size() > 0) {
                     tf.commit();
                 }
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -595,11 +599,14 @@ public class RefsetSpecPanel extends JPanel {
                 int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
                 IntSet currentSet = new IntSet();
                 currentSet.add(currentNid);
-                Set<ThinExtByRefTuple> tuples = refsetTableModel.getSelectedTuples();
+                Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
+                System.out.println(">>>>>>> SELECTED TUPLE COUNT: " + tupleMemberIds.size());
 
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
-                for (ThinExtByRefTuple tuple : tuples) {
-                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tuple.getComponentId())) {
+                for (Integer tupleMemberId : tupleMemberIds) {
+                    I_ThinExtByRefVersioned tupleVersioned = tf.getExtension(tupleMemberId);
+                    for (I_ThinExtByRefVersioned extForMember : tf.getAllExtensionsForComponent(tupleVersioned
+                        .getComponentId())) {
                         RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
@@ -608,6 +615,7 @@ public class RefsetSpecPanel extends JPanel {
                                         .getViewPositionSet(), false, false);
                             if (promotionTuples.size() > 0) {
                                 I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                                System.out.println(promotionPart.getUniversalPart());
                                 if (promotionPart instanceof I_ThinExtByRefPartConcept) {
 
                                     for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -650,10 +658,11 @@ public class RefsetSpecPanel extends JPanel {
 
                                         clone.setC1id(approveId);
                                         promotionTuples.get(0).getCore().addVersion(clone);
-                                        tf.addUncommitted(tuple.getCore());
+                                        tf.addUncommitted(tupleVersioned);
+
                                         promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
                                             promotionPath, currentSet);
-                                        tf.addUncommitted(tuple.getCore());
+                                        tf.addUncommitted(tupleVersioned);
                                     }
                                 }
                             }
