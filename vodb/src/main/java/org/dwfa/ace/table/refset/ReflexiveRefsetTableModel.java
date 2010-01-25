@@ -293,8 +293,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         return new TableChangedSwingWorker(tableComponentId2);
     }
 
-    public Set<ThinExtByRefTuple> getSelectedTuples() {
-        return new HashSet<ThinExtByRefTuple>();
+    public Set<Integer> getSelectedTuples() {
+        return new HashSet<Integer>();
     }
 
     public void setShowPromotionCheckBoxes(boolean show) {
