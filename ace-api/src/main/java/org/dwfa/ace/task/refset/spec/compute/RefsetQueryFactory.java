@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
@@ -42,6 +41,8 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class RefsetQueryFactory {
+
+    static I_TermFactory termFactory = LocalVersionedTerminology.get();
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
             I_GetConceptData refsetSpec, I_GetConceptData refset, RefsetComputeType refsetType) throws IOException,
@@ -77,7 +78,7 @@ public class RefsetQueryFactory {
     /**
      * Create a "possible" query that contains all historical clauses to iterate
      * over, even retired clauses.
-     * 
+     *
      * @param configFrame
      * @param termFactory
      * @param refsetSpec
@@ -120,7 +121,7 @@ public class RefsetQueryFactory {
      * node, we recursively determine the refset type (corresponds to a
      * sub-query or statement). This includes checking any grandchildren,
      * great-grandchildren etc.
-     * 
+     *
      * @param node
      *            The node to which the processing begins.
      * @param query
@@ -276,7 +277,7 @@ public class RefsetQueryFactory {
      * Determines whether or not the associated statement or query needs to be
      * negated. If negation is required, the concept passed in will be
      * "boolean circle icon false".
-     * 
+     *
      * @param c1
      *            The concept
      * @param termFactory
@@ -299,7 +300,7 @@ public class RefsetQueryFactory {
      * Recursively adds extensions to a map - this is used to create a tree
      * structure representing the refset spec, prior to being converted to a
      * query object.
-     * 
+     *
      * @param list
      * @param extensionMap
      * @param fetchedComponents
@@ -312,8 +313,7 @@ public class RefsetQueryFactory {
             extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
             if (fetchedComponents.contains(ext.getMemberId()) == false) {
                 fetchedComponents.add(ext.getMemberId());
-                addExtensionsToMap(Terms.get()
-                    .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents);
+                addExtensionsToMap(termFactory.getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents);
             }
         }
     }

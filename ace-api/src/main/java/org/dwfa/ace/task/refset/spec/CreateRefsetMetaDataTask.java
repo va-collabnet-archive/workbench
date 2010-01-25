@@ -233,9 +233,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             String name = (String) process.getProperty(newRefsetPropName);
             status = termFactory.getConcept(statusTermEntry.getIds());
-            UUID[] reviewerUuids = (UUID[]) process.getProperty(reviewerUuidPropName);
+
             I_GetConceptData owner = termFactory.getConcept((UUID[]) process.getProperty(ownerUuidPropName));
-            I_GetConceptData editor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
             I_GetConceptData refsetComputeType =
                     termFactory.getConcept((UUID[]) process.getProperty(computeTypeUUIDPropName));
 
@@ -256,10 +255,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                     termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
             I_GetConceptData specifiesRefsetRel =
                     termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
-            I_GetConceptData refsetReviewerRel =
-                    termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_REVIEWER.getUids());
+
             I_GetConceptData refsetOwnerRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OWNER.getUids());
-            I_GetConceptData refsetEditorRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_EDITOR.getUids());
+
             I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             I_GetConceptData commentsRel = termFactory.getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
             I_GetConceptData purposeRel = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
@@ -331,13 +329,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(commentsRefset, isA, supportingRefset, aceConfig);
 
             newRelationship(memberRefset, refsetOwnerRel, owner, aceConfig);
-            newRelationship(memberRefset, refsetEditorRel, editor, aceConfig);
-            if (reviewerUuids != null) {
-                for (UUID reviewerUuid : reviewerUuids) {
-                    I_GetConceptData reviewer = termFactory.getConcept(new UUID[] { reviewerUuid });
-                    newRelationship(memberRefset, refsetReviewerRel, reviewer, aceConfig);
-                }
-            }
 
             newRelationship(memberRefset, promotionRel, promotionRefset, aceConfig);
             newRelationship(memberRefset, commentsRel, commentsRefset, aceConfig);

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +45,6 @@ import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -60,7 +57,7 @@ import org.dwfa.util.bean.Spec;
  * This task prepares the Workflow Details Sheet to display the PanelRefsetAndParameters
  * panel where the user will be asked to enter a number of fields required to start the
  * Refresh Refset process.
- * 
+ *
  * @author Perry Reid
  * @version 1.0, November 2009
  */
@@ -139,7 +136,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     /**
      * Handles actions required by the task after normal task completion (such as moving a
      * process to another user's input queue).
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -154,7 +151,7 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     /**
      * Performs the primary action of the task, which in this case is to gather and
      * validate data that has been entered by the user on the Workflow Details Sheet.
-     * 
+     *
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -240,89 +237,6 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
-            }
-
-            // -----------------------------------------
-            // Editor - Field Initialization
-            // -----------------------------------------
-            try {
-                I_GetConceptData previousEditor = null;
-
-                // TODO: UUID[] CONVERT
-                // UUID[] editorUUID = (UUID[]) process.getProperty(editorUuidPropName);
-                // previousEditor = (I_GetConceptData) AceTaskUtil.getConceptFromObject(editorUUID);
-                previousEditor = termFactory.getConcept((UUID[]) process.getProperty(editorUuidPropName));
-
-                if (previousEditor != null) {
-                    // set the ComboBox to point to the selected editor
-                    newPanel.setEditor(previousEditor);
-                }
-            } catch (NullPointerException e) {
-                // TODO Just ignore the NPE for now - remove this when you add the
-                // isPropertyDefined class back in.
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (IntrospectionException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-
-            // -----------------------------------------
-            // Reviewer - Field Initialization
-            // -----------------------------------------
-            try {
-                I_GetConceptData previousReviewer = null;
-
-                // TODO: UUID[] CONVERT
-                // Retrieve the UUID for the reviewer
-                // UUID reviewerUUID = (UUID) process.getProperty(reviewerUuidPropName);
-                // previousReviewer = (I_GetConceptData) AceTaskUtil.getConceptFromObject(reviewerUUID);
-                previousReviewer = termFactory.getConcept((UUID[]) process.getProperty(reviewerUuidPropName));
-
-                if (previousReviewer != null) {
-                    // set the ComboBox to point to the selected reviewer
-                    newPanel.setReviewer(previousReviewer);
-                }
-            } catch (NullPointerException e) {
-                // TODO Just ignore the NPE for now - remove this when you add the
-                // isPropertyDefined class back in.
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (IntrospectionException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-
-            // Priority - Field Initialization
-            Priority previousPriority = process.getPriority();
-            if (previousPriority == Priority.HIGHEST) {
-                newPanel.setPriority("Highest");
-            } else if (previousPriority == Priority.HIGH) {
-                newPanel.setPriority("High");
-            } else if (previousPriority == Priority.NORMAL) {
-                newPanel.setPriority("Normal");
-            } else if (previousPriority == Priority.LOW) {
-                newPanel.setPriority("Low");
-            } else if (previousPriority == Priority.LOWEST) {
-                newPanel.setPriority("Lowest");
-            } else {
-                // set priority to Normal by default
-                newPanel.setPriority("Normal");
-            }
-
-            // Deadline - Field Initialization
-            Date previousDeadlineDate = null;
-            previousDeadlineDate = (Date) process.getDeadline();
-            if (previousDeadlineDate != null) {
-                Calendar previousDeadline = Calendar.getInstance();
-                previousDeadline.setTime(previousDeadlineDate);
-                newPanel.setDeadline(previousDeadline);
             }
 
             // Comments - Field Initialization

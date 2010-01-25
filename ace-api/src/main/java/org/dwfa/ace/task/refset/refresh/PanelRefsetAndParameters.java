@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,10 +68,10 @@ import org.dwfa.tapi.TerminologyException;
  * 4) deadline (date picker)
  * 5) priority (from pulldown menu)
  * 6) request attachments (file chooser)
- * 
+ *
  * @author Perry Reid
  * @version 1.0, November 2009
- * 
+ *
  */
 public class PanelRefsetAndParameters extends JPanel {
 
@@ -85,18 +85,10 @@ public class PanelRefsetAndParameters extends JPanel {
 
     // components
     private JLabel refsetSpecLabel;
-    private JLabel editorLabel;
-    private JLabel reviewerLabel;
     private JLabel commentsLabel;
-    private JLabel deadlineLabel;
-    private JLabel priorityLabel;
     private JButton openFileChooserButton;
     private JComboBox refsetSpecComboBox;
-    private JComboBox editorComboBox;
-    private JComboBox reviewerComboBox;
-    private JComboBox priorityComboBox;
     private JTextArea commentsTextField;
-    private DatePicker deadlinePicker;
     private JScrollPane commentsScrollPane;
 
     private JList attachmentList;
@@ -108,7 +100,7 @@ public class PanelRefsetAndParameters extends JPanel {
     private Set<I_GetConceptData> reviewers;
 
     /**
-     * 
+     *
      * @param refsets
      */
     public PanelRefsetAndParameters(Set<I_GetConceptData> refsets) {
@@ -122,22 +114,11 @@ public class PanelRefsetAndParameters extends JPanel {
          */
         // labels
         refsetSpecLabel = new JLabel("Refset Spec (required):");
-        editorLabel = new JLabel("Editor (required):");
-        editorLabel = new JLabel("Reviewer (required):");
-        deadlineLabel = new JLabel("Deadline (required):");
-        priorityLabel = new JLabel("Priority (required):");
         commentsLabel = new JLabel("Comments (optional):");
 
         // buttons and boxes
         openFileChooserButton = new JButton("Attach a file...");
         refsetSpecComboBox = new JComboBox(refsets.toArray());
-        editorComboBox = new JComboBox();
-        reviewerComboBox = new JComboBox();
-        priorityComboBox = new JComboBox(new String[] { "Highest", "High", "Normal", "Low", "Lowest" });
-
-        // date picker
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        deadlinePicker = new DatePicker(Calendar.getInstance(), null, dateFormat);
 
         // text fields
         commentsTextField = new JTextArea();
@@ -184,105 +165,6 @@ public class PanelRefsetAndParameters extends JPanel {
         } else {
             this.add(refsetSpecComboBox, gridBagConstraints);
         }
-
-        // editor
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(editorLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-
-        editors = null;
-        try {
-            editors = getValidEditors();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (editors == null || editors.size() == 0) {
-            this.add(new JLabel("No available editors."), gridBagConstraints);
-        } else {
-            // Populate the editorComboBox with the list of valid editors
-            editorComboBox = new JComboBox(editors.toArray());
-            this.add(editorComboBox, gridBagConstraints);
-        }
-
-        // reviewer
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(reviewerLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-
-        reviewers = null;
-        try {
-            reviewers = getValidReviewers();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (reviewers == null || reviewers.size() == 0) {
-            this.add(new JLabel("No available reviewers."), gridBagConstraints);
-        } else {
-            // Populate the reviewerComboBox with the list of valid reviewers
-            reviewerComboBox = new JComboBox(reviewers.toArray());
-            this.add(reviewerComboBox, gridBagConstraints);
-        }
-
-        // deadline
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(deadlineLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        this.add(deadlinePicker, gridBagConstraints);
-
-        // priority
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new Insets(5, 10, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityLabel, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5); // padding
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        this.add(priorityComboBox, gridBagConstraints);
 
         // comments
         gridBagConstraints = new GridBagConstraints();
@@ -468,52 +350,6 @@ public class PanelRefsetAndParameters extends JPanel {
 
     public void setRefset(I_GetConceptData newRefset) {
         this.refsetSpecComboBox.setSelectedItem(newRefset);
-    }
-
-    // -----------------------
-    // Editor
-    // -----------------------
-    public I_GetConceptData getEditor() {
-        I_GetConceptData selectedEditor = (I_GetConceptData) editorComboBox.getSelectedItem();
-        return selectedEditor;
-    }
-
-    public void setEditor(I_GetConceptData newEditor) {
-        this.editorComboBox.setSelectedItem(newEditor);
-    }
-
-    // -----------------------
-    // Reviewer
-    // -----------------------
-    public I_GetConceptData getReviewer() {
-        I_GetConceptData selectedReviewer = (I_GetConceptData) reviewerComboBox.getSelectedItem();
-        return selectedReviewer;
-    }
-
-    public void setReviewer(I_GetConceptData newReviewer) {
-        this.reviewerComboBox.setSelectedItem(newReviewer);
-    }
-
-    // -----------------------
-    // Deadline
-    // -----------------------
-    public Calendar getDeadline() {
-        return (Calendar) deadlinePicker.getSelectedDate();
-    }
-
-    public void setDeadline(Calendar newDeadline) {
-        deadlinePicker.setSelectedDate(newDeadline);
-    }
-
-    // -----------------------
-    // Priority
-    // -----------------------
-    public String getPriority() {
-        return (String) priorityComboBox.getSelectedItem();
-    }
-
-    public void setPriority(String newPriority) {
-        priorityComboBox.setSelectedItem(newPriority);
     }
 
     // -----------------------

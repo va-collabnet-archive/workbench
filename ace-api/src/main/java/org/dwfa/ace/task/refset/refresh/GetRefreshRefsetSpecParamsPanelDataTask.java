@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,10 +53,10 @@ import org.dwfa.util.bean.Spec;
  * This task collects the Refresh Refset Spec Params data entered on the
  * PanelRefsetAndParameters panel currently displayed in the Workflow
  * Details Sheet and verifies that the required data has been filled in.
- * 
+ *
  * @author Perry Reid
  * @version 1.0, November 2009
- * 
+ *
  */
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/wf", type = BeanType.TASK_BEAN) })
 public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
@@ -136,7 +136,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
      * Handles actions required by the task after normal task completion (such
      * as moving a
      * process to another user's input queue).
-     * 
+     *
      * @return void
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -153,7 +153,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
      * and
      * validate data that has been entered by the user on the Workflow Details
      * Sheet.
-     * 
+     *
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
      * @param worker The worker currently executing this task
@@ -177,11 +177,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                     // Retrieve values from the panel / environment
                     // ---------------------------------------------
                     I_GetConceptData refset = panel.getRefset();
-                    I_GetConceptData editor = panel.getEditor();
-                    I_GetConceptData reviewer = panel.getReviewer();
                     String comments = panel.getComments();
-                    Calendar deadline = panel.getDeadline();
-                    String priority = panel.getPriority();
                     HashSet<File> fileAttachments = panel.getAttachments();
                     I_GetConceptData owner = config.getDbConfig().getUserConcept();
 
@@ -203,97 +199,6 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
                         process.setSubject("Refresh Refset : " + refset.getInitialText());
                         process.setName("Refresh Refset : " + refset.getInitialText());
                         process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
-                    }
-
-                    // -----------------------------------------
-                    // Editor Field is required!
-                    // -----------------------------------------
-                    if (editor == null) {
-                        // Warn the user that Editor is required.
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select an editor. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    } else {
-                        // Set the Editor property
-                        process.setProperty(editorUuidPropName, editor.getUids().iterator().next());
-
-                        // Set the WF's Next User based on selected Editor
-                        RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
-                        String inboxAddress = wizard.getInbox(editor);
-                        if (inboxAddress == null) {
-                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "Refresh Refset process cannot continue... The selected editor has no assigned inbox : "
-                                    + editor, "", JOptionPane.ERROR_MESSAGE);
-                            return Condition.ITEM_CANCELED;
-                        } else {
-                            process.setDestination(inboxAddress);
-                            process.setProperty(editorInboxPropName, inboxAddress);
-                        }
-                    }
-
-                    // -----------------------------------------
-                    // Reviewer Field is required!
-                    // -----------------------------------------
-                    if (reviewer == null) {
-                        // Warn the user that Reviewer is required.
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select an reviewer. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    } else {
-                        // Set the Reviewer property
-                        process.setProperty(reviewerUuidPropName, reviewer.getUids().iterator().next());
-
-                        // Set the WF's Next User based on selected Editor
-                        RefsetSpecWizardTask wizard = new RefsetSpecWizardTask();
-                        String inboxAddress = wizard.getInbox(reviewer);
-                        if (inboxAddress == null) {
-                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "Refresh Refset process cannot continue... The selected reviewer has no assigned inbox: "
-                                    + reviewer, "", JOptionPane.ERROR_MESSAGE);
-                            return Condition.ITEM_CANCELED;
-                        } else {
-                            process.setProperty(editorInboxPropName, inboxAddress);
-                        }
-                    }
-
-                    // -----------------------------------------
-                    // Deadline Field is required
-                    // -----------------------------------------
-                    if (deadline == null) {
-                        // Warn the user that Editor is required.
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select a deadline. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    } else {
-                        // Set the Deadline property
-                        process.setDeadline(deadline.getTime());
-                    }
-
-                    // -----------------------------------------
-                    // Priority Field is required!
-                    // -----------------------------------------
-                    Priority newPriority;
-                    if (priority == null) {
-                        // Warn the user that Priority is required!
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "You must select a priority. ", "", JOptionPane.ERROR_MESSAGE);
-                        return Condition.ITEM_CANCELED;
-                    } else {
-                        // Set the priority based on the value selected
-                        if (priority.equals("Highest")) {
-                            newPriority = Priority.HIGHEST;
-                        } else if (priority.equals("High")) {
-                            newPriority = Priority.HIGH;
-                        } else if (priority.equals("Normal")) {
-                            newPriority = Priority.NORMAL;
-                        } else if (priority.equals("Low")) {
-                            newPriority = Priority.LOW;
-                        } else if (priority.equals("Lowest")) {
-                            newPriority = Priority.LOWEST;
-                        } else {
-                            newPriority = null;
-                        }
-                        process.setPriority(newPriority);
                     }
 
                     // -----------------------------------------
@@ -355,7 +260,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
 
     /**
      * This method overrides: getDataContainerIds() in AbstractTask
-     * 
+     *
      * @return The data container identifiers used by this task.
      */
     public int[] getDataContainerIds() {
@@ -365,7 +270,7 @@ public class GetRefreshRefsetSpecParamsPanelDataTask extends AbstractTask {
     /**
      * This method implements the interface method specified by: getConditions()
      * in I_DefineTask
-     * 
+     *
      * @return The possible evaluation conditions for this task.
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */

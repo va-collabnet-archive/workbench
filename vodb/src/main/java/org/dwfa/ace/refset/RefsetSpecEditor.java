@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,8 +78,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -110,6 +110,7 @@ import org.dwfa.vodb.types.IntSet;
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    I_TermFactory termFactory = LocalVersionedTerminology.get();
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
@@ -319,8 +320,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     /**
-	 *
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     private class UncommittedChangeListener implements PropertyChangeListener {
@@ -407,8 +408,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         private class ShowHistoryAction extends AbstractAction {
 
             /**
-			 *
-			 */
+             *
+             */
             private static final long serialVersionUID = 1L;
             I_GetConceptData concept;
 
@@ -1043,8 +1044,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 if (newRefset == false) {
                     addChildrenExpandedNodes(oldRoot);
                 }
-                List<? extends I_ThinExtByRefVersioned> extensions =Terms.get()
-                    .getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
+                List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(localRefsetSpecConcept.getConceptId(), true);
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap = new HashMap<Integer, RefsetSpecTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
                 fetchedComponents.add(localRefsetSpecConcept.getConceptId());
@@ -1098,7 +1098,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
                         if (fetchedComponents.contains(ext.getMemberId()) == false) {
                             fetchedComponents.add(ext.getMemberId());
-                            addExtensionsToMap(Terms.get().getAllExtensionsForComponent(
+                            addExtensionsToMap(termFactory.getAllExtensionsForComponent(
                                 ext.getMemberId(), true), extensionMap, fetchedComponents);
                         }
                     }
