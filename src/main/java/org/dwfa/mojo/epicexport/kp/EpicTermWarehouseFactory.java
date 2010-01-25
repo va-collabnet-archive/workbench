@@ -30,17 +30,49 @@ import com.mysql.jdbc.Connection;
 public class EpicTermWarehouseFactory implements I_ExportFactory {
 
 	Connection connection;
-    public EpicExportManager getExportManager(String baseDir) {
+ 	/**
+ 	 * The URL of the database
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
+	private String dbUrl;
+
+ 	/**
+ 	 * The database username
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
+	private String userName;
+ 	/**
+ 	 * The database password
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
+	private String password;
+	
+
+    /*public EpicExportManager getExportManager(String baseDir) {
         return new EpicExportManager(baseDir, this);
+    }*/
+
+    public EpicExportManager getExportManager() throws Exception {
+    	return new EpicExportManager(getConnection(this.dbUrl, this.userName, this.password), this);
     }
 
-    public EpicExportManager getExportManager(String dburl, String user, String pw) throws Exception {
+/*    public EpicExportManager getExportManager(String dburl, String user, String pw) throws Exception {
+    	return new EpicExportManager(getConnection(dburl, user, pw), this);
+    }
+*/
+    private Connection getConnection(String dburl, String user, String pw) throws Exception {
     	dburl = new String("jdbc:mysql://").concat(dburl);
     	Class.forName("com.mysql.jdbc.Driver").newInstance();
     	Connection conn = (Connection) DriverManager.getConnection(dburl, user, pw);
-    	return new EpicExportManager(conn, this);
+    	return conn;
     }
-
+    
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
         I_EpicLoadFileBuilder ret = new EpicExportBuilderWritesAll(this, em);
         ret.setMasterfile(masterfile);

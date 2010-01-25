@@ -40,12 +40,21 @@ import com.mysql.jdbc.Connection;
 public class EpicExportManager {
     // private List<EpicExportWriter> writers;
     // private List<AbstractEpicLoadFileBuilder> builders;
-    private String baseDir;
+    
+    /**
+     * The directory where the output will end up
+     * 
+     * @parameter
+     */
+	private String baseDir;
     private Connection connection;
     private I_ExportFactory exportFactory;
     private HashMap<String, I_EpicExportRecordWriter> writers = new HashMap<String, I_EpicExportRecordWriter>();
     private HashMap<String, I_EpicLoadFileBuilder> builders = new HashMap<String, I_EpicLoadFileBuilder>();
 
+    public EpicExportManager() {
+    	
+    }
     public EpicExportManager(String baseDir, I_ExportFactory exportFactory) {
         this.baseDir = baseDir;
         if (!this.baseDir.endsWith("/")) {

@@ -19,9 +19,9 @@ package org.dwfa.mojo.epicexport;
 import com.mysql.jdbc.Connection;
 
 public interface I_ExportFactory {
-	public EpicExportManager getExportManager(String baseDir);
+	public EpicExportManager getExportManager() throws Exception;
 	
-	public EpicExportManager getExportManager(String dburl, String user, String pw)  throws Exception ;
+	// public EpicExportManager getExportManager(String dburl, String user, String pw)  throws Exception ;
 	
 	public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception;
 	
