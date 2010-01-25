@@ -25,7 +25,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
@@ -211,7 +211,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	String icd9 = null;
     	String icd10 = null;
     	
-    	I_GetConceptData idConcept = LocalVersionedTerminology.get().getConcept(extensionTuple.getComponentId());
+    	I_GetConceptData idConcept = Terms.get().getConcept(extensionTuple.getComponentId());
 		uuid = getIdForConcept(idConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
 		rootUuid = getIdForConcept(rootConcept, "2faa9262-8fb2-11db-b606-0800200c9a66");
 		
@@ -223,7 +223,8 @@ public class ExportValueConverter implements I_ExportValueConverter{
 			dot11 = getIdForConcept(idConcept, "bf3e7556-38cb-5395-970d-f11851c9f41e");
 			dot1 = getIdForConcept(idConcept, "af8be384-dc60-5b56-9ad8-bc1e4b5dfbae");
 		}
-		snomed = getIdForConcept(rootConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
+		//snomed = getIdForConcept(rootConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
+		snomed = getIdForConcept(idConcept, "0418a591-f75b-39ad-be2c-3ab849326da9");
 		icd9 = getIdForConcept(idConcept, "a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
 		icd10 = getIdForConcept(idConcept, "9228d285-e625-33f9-bf46-9cfba3beee6d");
 		
@@ -248,7 +249,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     public String getIdForConcept(I_GetConceptData concept, String idTypeUUID) throws Exception {
     	String ret = null;
     	//getLog().info("Looking for id in: " + concept);
-		I_GetConceptData idSourceConcept = LocalVersionedTerminology.get().getConcept(new UUID[] { UUID
+		I_GetConceptData idSourceConcept = Terms.get().getConcept(new UUID[] { UUID
 				.fromString(idTypeUUID) }); 
 		int idSourceNid = idSourceConcept.getConceptId();
 		for (I_IdPart part : concept.getIdentifier().getMutableIdParts()) {

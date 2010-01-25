@@ -89,20 +89,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	private File buildDirectory;
 
      /**
-      * Location of the build directory.
-      *
-      * @parameter expression="${project.build.directory}"
-      * @required
-      */
-     
- 	/**
- 	 * The name of the writer, used to determine the output
- 	 *
- 	 * @parameter
- 	 * @required
- 	 */
- 	private String writerName;
-     /**
       * The date to start looking for changes
       * 
       * @parameter
@@ -118,29 +104,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
       */
      private String dropName;
      
-     
-     /**
-      * The URL of the database
-      * 
-      * @parameter
-      * @optional
-      */
-     private String database;
-     /**
-      * The username of the database
-      * 
-      * @parameter
-      * @optional
-      */
-     private String username;
-     /**
-      * The password of the database
-      * 
-      * @parameter
-      * @optional
-      */
-     private String password;
-     
      private File targetDirectory;
 
 	private HashSet<I_Position> positions;
@@ -148,7 +111,15 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 	private I_IntSet statusValues;
 	
 	private I_TermFactory termFactory;
+	
+ 	/**
+ 	 * The factory used to get objects for the export
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
 	private I_ExportFactory exportFactory;
+	
 	private EpicExportManager exportManager;
 
      public void execute() throws MojoExecutionException, MojoFailureException {
@@ -175,7 +146,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 				statusValueList.add(statusConcept);
 			}
 			
-			this.setFactories();
+			this.exportManager = exportFactory.getExportManager();
 			ExternalTermPublisher publisher = new ExternalTermPublisher(this.exportFactory);
 			publisher.setStartingDate(deltaStartDate);
 			publisher.setPositions(positions);
@@ -226,18 +197,6 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 
 	}// End method execute
 
-     private void setFactories() throws Exception {
-		if (this.writerName.equals("kp loadfile export")) {
-			exportFactory = new EpicLoadFileFactory();
-			exportManager = exportFactory.getExportManager(this.outputDirectory);
-		}
-		else if (this.writerName.equals("kp term warehouse build")){
-			exportFactory = new EpicTermWarehouseFactory();
-			exportManager = exportFactory.getExportManager(this.database, this.username, this.password);
-		}
-		else
-			throw new Exception("Unknown writer name: " + this.writerName);
-     }
      
      private class ExportIterator implements I_ProcessConcepts {
     	 private ExternalTermPublisher publisher;

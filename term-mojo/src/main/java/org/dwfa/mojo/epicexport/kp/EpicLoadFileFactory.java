@@ -39,6 +39,18 @@ public class EpicLoadFileFactory implements I_ExportFactory {
 	public static final String EPIC_MASTERFILE_NAME_WILDCARD = "*";
 	public static final String DISPLAYNAME_ITEM = "2";
 	
+ 	/**
+ 	 * The directory to output the load files to
+ 	 *
+ 	 * @parameter
+ 	 * @required
+ 	 */
+	private String baseDir;
+
+    public EpicExportManager getExportManager() {
+        return new EpicExportManager(this.baseDir, this);
+    }
+
     public EpicExportManager getExportManager(String baseDir) {
         return new EpicExportManager(baseDir, this);
     }
