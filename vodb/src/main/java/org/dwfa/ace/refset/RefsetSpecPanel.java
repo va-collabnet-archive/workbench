@@ -511,7 +511,6 @@ public class RefsetSpecPanel extends JPanel {
                 IntSet currentSet = new IntSet();
                 currentSet.add(currentNid);
                 Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
-                System.out.println(">>>>>>> SELECTED TUPLE COUNT: " + tupleMemberIds.size());
 
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
                 for (Integer tupleMemberId : tupleMemberIds) {
@@ -526,7 +525,6 @@ public class RefsetSpecPanel extends JPanel {
                                         .getViewPositionSet(), false, false);
                             if (promotionTuples.size() > 0) {
                                 I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
-                                System.out.println(promotionPart.getUniversalPart());
                                 if (promotionPart instanceof I_ThinExtByRefPartConcept) {
 
                                     for (I_Path p : aceFrameConfig.getEditingPathSet()) {
@@ -568,20 +566,19 @@ public class RefsetSpecPanel extends JPanel {
                                         }
 
                                         clone.setC1id(approveId);
-                                        promotionTuples.get(0).getCore().addVersion(clone);
-                                        tf.addUncommitted(tupleVersioned);
-                                        promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
-                                            promotionPath, currentSet);
-                                        tf.addUncommitted(tupleVersioned);
+                                        extForMember.addVersion(clone);
+                                        tf.addUncommittedNoChecks(extForMember);
+                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
+                                            currentSet);
+                                        tf.addUncommittedNoChecks(extForMember);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (tf.getUncommitted().size() > 0) {
-                    tf.commit();
-                }
+
+                tf.commit();
 
             } catch (Exception e1) {
                 e1.printStackTrace();
@@ -600,7 +597,6 @@ public class RefsetSpecPanel extends JPanel {
                 IntSet currentSet = new IntSet();
                 currentSet.add(currentNid);
                 Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
-                System.out.println(">>>>>>> SELECTED TUPLE COUNT: " + tupleMemberIds.size());
 
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
                 for (Integer tupleMemberId : tupleMemberIds) {
@@ -615,9 +611,7 @@ public class RefsetSpecPanel extends JPanel {
                                         .getViewPositionSet(), false, false);
                             if (promotionTuples.size() > 0) {
                                 I_ThinExtByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
-                                System.out.println(promotionPart.getUniversalPart());
                                 if (promotionPart instanceof I_ThinExtByRefPartConcept) {
-
                                     for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 
                                         int approveId;
@@ -657,21 +651,20 @@ public class RefsetSpecPanel extends JPanel {
                                         }
 
                                         clone.setC1id(approveId);
-                                        promotionTuples.get(0).getCore().addVersion(clone);
-                                        tf.addUncommitted(tupleVersioned);
-
-                                        promotionTuples.get(0).getCore().promote(new Position(Integer.MAX_VALUE, p),
-                                            promotionPath, currentSet);
-                                        tf.addUncommitted(tupleVersioned);
+                                        extForMember.addVersion(clone);
+                                        tf.addUncommittedNoChecks(extForMember);
+                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
+                                            currentSet);
+                                        tf.addUncommittedNoChecks(extForMember);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (tf.getUncommitted().size() > 0) {
-                    tf.commit();
-                }
+
+                tf.commit();
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
