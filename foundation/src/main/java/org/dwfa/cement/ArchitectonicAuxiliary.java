@@ -372,6 +372,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                              new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_READ_V2_V3_ANALOG("is a Read V2 analog of Read V3(relationship type)",
                        		new I_ConceptualizeUniversally[] { RELATIONSHIP }),
+            IS_READ_V3_ICD10_ANALOG("is a Read V3 analog of ICD10(relationship type)",
+                               		new I_ConceptualizeUniversally[] { RELATIONSHIP }),           		
             IS_READ_4B_V3_ANALOG("is a Read 4Byte analog of Read V3 (relationship type)",
                            new I_ConceptualizeUniversally[] { RELATIONSHIP }),
             IS_SNOMED_READ_V3_ANALOG("is a Read V3 analog of SNOMED(relationship type)",
