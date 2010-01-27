@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,12 +56,15 @@ import net.jini.config.ConfigurationProvider;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.LogWithAlerts;
@@ -274,6 +277,11 @@ public class AceRunner {
                             }
 
                         }
+                        configAceFrame.setClassifierIsaType(LocalVersionedTerminology.get().getConcept(SNOMED.Concept.IS_A.getUids()));
+                        configAceFrame.setClassificationRoot(LocalVersionedTerminology.get().getConcept(SNOMED.Concept.ROOT.getUids()));
+                        configAceFrame.setClassificationRoleRoot(LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+                        configAceFrame.setClassifierInputPath(LocalVersionedTerminology.get().getConcept(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()));
+                        configAceFrame.setClassifierOutputPath(AceConfig.config.getUserPath());
                     }
                 }
 

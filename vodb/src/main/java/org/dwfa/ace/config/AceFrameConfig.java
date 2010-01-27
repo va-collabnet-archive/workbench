@@ -2039,8 +2039,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             Map<String, SubversionData> relativeSubversionMap = new HashMap<String, SubversionData>();
 
             // get properties from ace.properties
-            // get users details from .... new user and password...fucks me do I
-            // have to come up with all the ideas??? cunt
             // set and return map
 
             return relativeSubversionMap;
