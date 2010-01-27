@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -152,7 +153,7 @@ public class ExportToEpicLoadFilesMojo extends AbstractMojo {
 			publisher.setPositions(positions);
 			publisher.setStatusValues(statusValues);
 			/* //TEST CODE: dbdd4eb3-1457-34d5-a248-bdeb1b86bd3f
-			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("1ca9b835-cbf6-40e8-82b3-acbf0eb30293"));
+			I_GetConceptData concept = termFactory.getConcept(UUID.fromString("beb91a4a-1aba-38c0-8513-43fe1d0b8eec"));
 
 			List<ExternalTermRecord> er = publisher.getExternalTermRecordsForConcept(concept);
 			for (ExternalTermRecord record: er) {
