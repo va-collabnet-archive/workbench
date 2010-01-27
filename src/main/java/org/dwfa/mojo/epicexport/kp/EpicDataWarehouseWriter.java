@@ -322,7 +322,8 @@ public class EpicDataWarehouseWriter implements I_EpicExportRecordWriter {
 		assureColumnIsAdded("icd9");
 		assureColumnIsAdded("icd10");
 		assureColumnIsAdded("snomed");
-		assureColumnIsAdded("rootuuid");
+		assureColumnIsAdded("snomedparent");
+		assureColumnIsAdded("parentuuid");
 		
 	}
 	

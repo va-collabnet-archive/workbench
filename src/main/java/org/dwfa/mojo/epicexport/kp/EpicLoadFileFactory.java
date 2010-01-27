@@ -19,8 +19,6 @@ package org.dwfa.mojo.epicexport.kp;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.sql.SQLException;
-
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.EpicExportWriter;
@@ -50,15 +48,6 @@ public class EpicLoadFileFactory implements I_ExportFactory {
     public EpicExportManager getExportManager() {
         return new EpicExportManager(this.baseDir, this);
     }
-
-    public EpicExportManager getExportManager(String baseDir) {
-        return new EpicExportManager(baseDir, this);
-    }
-    
-    public EpicExportManager getExportManager(String dburl, String user, String pw) throws SQLException {
-    	throw new UnsupportedOperationException();
-    }
-
 
     public I_EpicLoadFileBuilder getLoadFileBuilder(String masterfile, EpicExportManager em) throws Exception {
         I_EpicLoadFileBuilder ret;
@@ -107,5 +96,4 @@ public class EpicLoadFileFactory implements I_ExportFactory {
     public I_ExportValueConverter getValueConverter(int startingVersion) {
     	return new ExportValueConverter(startingVersion);
     }
-
 }

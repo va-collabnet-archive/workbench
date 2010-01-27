@@ -17,6 +17,7 @@
 package org.dwfa.mojo.epicexport.kp;
 
 import java.sql.DriverManager;
+import java.util.List;
 
 import org.dwfa.mojo.epicexport.EpicExportManager;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
@@ -52,20 +53,11 @@ public class EpicTermWarehouseFactory implements I_ExportFactory {
  	 * @required
  	 */
 	private String password;
-	
-
-    /*public EpicExportManager getExportManager(String baseDir) {
-        return new EpicExportManager(baseDir, this);
-    }*/
 
     public EpicExportManager getExportManager() throws Exception {
     	return new EpicExportManager(getConnection(this.dbUrl, this.userName, this.password), this);
     }
 
-/*    public EpicExportManager getExportManager(String dburl, String user, String pw) throws Exception {
-    	return new EpicExportManager(getConnection(dburl, user, pw), this);
-    }
-*/
     private Connection getConnection(String dburl, String user, String pw) throws Exception {
     	dburl = new String("jdbc:mysql://").concat(dburl);
     	Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -79,7 +71,6 @@ public class EpicTermWarehouseFactory implements I_ExportFactory {
         return ret;
     }
 
-    
     public I_EpicExportRecordWriter getWriter(String writerName, String baseDir, Connection conn) throws Exception {
 
     	I_EpicExportRecordWriter ret = new EpicDataWarehouseWriter(writerName, conn);
@@ -93,5 +84,6 @@ public class EpicTermWarehouseFactory implements I_ExportFactory {
     public I_ExportValueConverter getValueConverter(int startingVersion) {
     	return new ExportValueConverter(startingVersion);
     }
+    
 }
 
