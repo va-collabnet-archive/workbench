@@ -172,7 +172,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
     }
 
     @Override
-    protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2) {
+    protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId) {
         return new TableChangedSwingWorker(tableComponentId2);
     }
 
