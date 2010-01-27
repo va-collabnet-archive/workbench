@@ -302,6 +302,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected int tableComponentId = Integer.MIN_VALUE;
 
+    protected Integer promotionFilterId = null;
+
     protected JButton addButton = new JButton();
 
     public ReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
@@ -337,6 +339,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         propertyChange(null);
     }
 
+    public void setPromotionFilterId(Integer promotionFilterId) {
+        this.promotionFilterId = promotionFilterId;
+    }
+
     public int getRowCount() {
         if (allTuples == null) {
             allTuples = new ArrayList<ThinExtByRefTuple>();
@@ -345,7 +351,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             }
             conceptsToFetch.clear();
             referencedConcepts.clear();
-            tableChangeWorker = getTableChangedSwingWorker(tableComponentId);
+            tableChangeWorker = getTableChangedSwingWorker(tableComponentId, promotionFilterId);
             tableChangeWorker.start();
             return 0;
         }
@@ -372,15 +378,17 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 id = tuple.getComponentId();
                 if (columns[columnIndex].readParamaters != null) {
                     if (tf.hasConcept(id)) {
-                        value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
-                                                                            columns[columnIndex].readParamaters);
+                        value =
+                                columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
+                                    columns[columnIndex].readParamaters);
                     } else {
-                        I_DescriptionVersioned desc = tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
+                        I_DescriptionVersioned desc =
+                                tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
                         if (desc != null) {
                             value = desc.getLastTuple().getText();
                         }
                     }
-                    
+
                 } else {
                     value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()));
                 }
@@ -399,8 +407,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 break;
             case PART:
                 if (columns[columnIndex].readParamaters != null) {
-                    value = columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart(),
-                        columns[columnIndex].readParamaters);
+                    value =
+                            columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart(),
+                                columns[columnIndex].readParamaters);
                 } else {
                     try {
                         value = columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart());
@@ -440,24 +449,25 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     id = (Integer) value;
                     if (tf.hasConcept(id)) {
                         I_GetConceptData concept = tf.getConcept(id);
-                        I_DescriptionTuple obj = concept.getDescTuple(
-                            (I_IntList) columns[columnIndex].readParamaters[0],
-                            (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
+                        I_DescriptionTuple obj =
+                                concept.getDescTuple((I_IntList) columns[columnIndex].readParamaters[0],
+                                    (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
                         if (obj != null) {
                             return new StringWithExtTuple(obj.getText(), tuple, id);
-                        } 
+                        }
                         return new StringWithExtTuple("null obj", tuple, id);
-                        
+
                     } else if (tf.hasExtension(id)) {
                         I_ThinExtByRefVersioned ext = tf.getExtension(id);
                         I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
-                        List<I_ThinExtByRefTuple> tuples = ext.getTuples(config.getAllowedStatus(),
-                            config.getViewPositionSet(), false);
+                        List<I_ThinExtByRefTuple> tuples =
+                                ext.getTuples(config.getAllowedStatus(), config.getViewPositionSet(), false);
                         if (tuples.size() > 0) {
                             I_ThinExtByRefTuple obj = tuples.iterator().next();
                             ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
-                            I_DescriptionTuple refsetDesc = componentRefset.getDescTuple(host.getConfig()
-                                .getTableDescPreferenceList(), host.getConfig());
+                            I_DescriptionTuple refsetDesc =
+                                    componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(), host
+                                        .getConfig());
                             StringBuffer buff = new StringBuffer();
                             buff.append("<html>");
                             buff.append(refsetDesc.getText());
@@ -473,13 +483,13 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
                             return new StringWithExtTuple(buff.toString(), tuple, id);
                         } else {
-                        	tuples = ext.getTuples(null,
-                                    config.getViewPositionSet(), false);
+                            tuples = ext.getTuples(null, config.getViewPositionSet(), false);
                             if (tuples.size() > 0) {
                                 I_ThinExtByRefTuple obj = tuples.iterator().next();
                                 ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
-                                I_DescriptionTuple refsetDesc = componentRefset.getDescTuple(host.getConfig()
-                                    .getTableDescPreferenceList(), host.getConfig());
+                                I_DescriptionTuple refsetDesc =
+                                        componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
+                                            host.getConfig());
                                 StringBuffer buff = new StringBuffer();
                                 buff.append("<html>");
                                 buff.append(refsetDesc.getText());
@@ -487,7 +497,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 // @TODO replace this test with a call to determine
                                 // "refset purpose" once the purpose is available.
                                 if (refsetDesc.getText().toLowerCase().endsWith("refset spec")) {
-                                    RefsetSpecTreeCellRenderer renderer = new RefsetSpecTreeCellRenderer(host.getConfig());
+                                    RefsetSpecTreeCellRenderer renderer =
+                                            new RefsetSpecTreeCellRenderer(host.getConfig());
                                     buff.append(renderer.getHtmlRendering(obj));
                                 } else {
                                     buff.append(obj.getMutablePart().toString());
@@ -658,6 +669,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         return columns[c].getFieldClass();
     }
 
-    protected abstract I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2);
+    public void removeRow(int rowIndex) {
+        allTuples.remove(rowIndex);
+    }
+
+    protected abstract I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId);
 
 }

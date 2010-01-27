@@ -71,4 +71,8 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
         }
         return super.isCellEditable(row, column);
     }
+
+    public void removeRow(int rowIndex) {
+        super.removeRow(rowIndex);
+    }
 }

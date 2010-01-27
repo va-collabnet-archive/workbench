@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -72,6 +73,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
 public class RefsetSpecPanel extends JPanel {
+
     private class HistoryActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent arg0) {
@@ -117,6 +119,7 @@ public class RefsetSpecPanel extends JPanel {
     private JComboBox filterComboBox;
     private JTableWithDragImage refsetTable;
     private TableColumn checkBoxColumn;
+    private Set<Object> promotionTypes = new HashSet<Object>();
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
@@ -392,6 +395,7 @@ public class RefsetSpecPanel extends JPanel {
         editor.getLabel().addTermChangeListener(refsetTableModel);
 
         refsetTableModel.setComponentId(Integer.MIN_VALUE);
+        refsetTableModel.setPromotionFilterId(null);
         refsetTableModel.getRowCount();
         TableSorter sortingTable = new TableSorter(refsetTableModel);
 
@@ -409,7 +413,7 @@ public class RefsetSpecPanel extends JPanel {
         checkBoxColumn.setMaxWidth(checkBoxRenderer.getPreferredWidth());
         checkBoxColumn.setPreferredWidth(checkBoxRenderer.getPreferredWidth());
         checkBoxColumn.setCellRenderer(checkBoxRenderer);
-        // hide column
+        // hide column as default (should only be visible during promotions BP)
         refsetTable.getColumnModel().removeColumn(checkBoxColumn);
 
         sortingTable.setTableHeader(refsetTable.getTableHeader());
@@ -435,13 +439,25 @@ public class RefsetSpecPanel extends JPanel {
                 approveButton.setPreferredSize(disapproveButton.getPreferredSize());
 
                 filterLabel = new JLabel("Filter view:");
-                filterComboBox =
-                        new JComboBox(new String[] { "All", "New additions", "New deletions", "Approved additions",
-                                                    "Disapproved additions", "Approved deletions",
-                                                    "Disapproved deletions" });
+                promotionTypes = new HashSet<Object>();
+                promotionTypes.add("All");
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(
+                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids()));
+
+                filterComboBox = new JComboBox(promotionTypes.toArray());
+                filterComboBox.setSelectedItem("All");
+                filterComboBox.addActionListener(new FilterSelectionActionListener());
                 filterComboBox.setMaximumSize(filterComboBox.getPreferredSize());
-                filterLabel.setEnabled(false);
-                filterComboBox.setEnabled(false);
 
                 setShowButtons(showPromotionCheckBoxes);
 
@@ -709,5 +725,29 @@ public class RefsetSpecPanel extends JPanel {
                 refsetTable.getParent().validate();
             }
         }
+    }
+
+    private Integer getSelectedPromotionFilter() {
+        Object o = filterComboBox.getSelectedItem();
+        if (o == null) {
+            return null;
+        } else if (o.equals("All")) {
+            return null;
+        } else {
+            I_GetConceptData concept = (I_GetConceptData) o;
+            return concept.getConceptId();
+        }
+    }
+
+    public class FilterSelectionActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            Integer selectedPromotionFilter = getSelectedPromotionFilter();
+            refsetTableModel.setPromotionFilterId(selectedPromotionFilter);
+            refsetTableModel.getRowCount();
+            editor.getLabel().setTermComponent(editor.getTermComponent());
+        }
+
     }
 }

@@ -55,9 +55,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
         private boolean stopWork = false;
 
-        public TableChangedSwingWorker(Integer componentId) {
+        public TableChangedSwingWorker(Integer componentId, Integer promotionFilterId) {
             super();
             refsetId = componentId;
+
             I_GetConceptData refsetConcept = ConceptBean.get(refsetId);
             IntSet promotionRefsetIds = new IntSet();
             List<? extends I_RelTuple> promotionTuples;
@@ -76,6 +77,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (TerminologyException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
+        }
+
+        public TableChangedSwingWorker(Integer componentId) {
+            this(componentId, null);
         }
 
         @Override
@@ -100,6 +105,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 }
                 for (I_ThinExtByRefPart part : extension.getTuples(statusSet, positionSet, true, false)) {
                     ThinExtByRefTuple ebrTuple = (ThinExtByRefTuple) part;
+                    boolean addPart = true;
                     for (ReflexiveRefsetFieldData col : columns) {
                         if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
                             switch (col.invokeOnObjectType) {
@@ -177,11 +183,15 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 if (obj != null) {
                                     if (obj instanceof Integer) {
                                         conceptsToFetch.add((Integer) obj);
+                                        if (promotionFilterId != null && !promotionFilterId.equals((Integer) obj)) {
+                                            addPart = false;
+                                        }
                                     } else {
                                         AceLog.getAppLog().alertAndLogException(
                                             new Exception(obj + " is not an instance of Integer"));
                                     }
                                 }
+
                                 break;
 
                             default:
@@ -199,7 +209,11 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                         AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                         return false;
                     }
-                    allTuples.add(ebrTuple);
+                    if (addPart) {
+                        allTuples.add(ebrTuple);
+                    } else {
+                        allTuples.remove(ebrTuple);
+                    }
                 }
             }
 
@@ -230,6 +244,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
+            System.out.println(">>>>>>>>>>> FIRE TABLE DATA CHANGED");
             fireTableDataChanged();
 
         }
@@ -289,8 +304,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     }
 
     @Override
-    protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2) {
-        return new TableChangedSwingWorker(tableComponentId2);
+    protected I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId) {
+        return new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
     }
 
     public Set<Integer> getSelectedTuples() {
