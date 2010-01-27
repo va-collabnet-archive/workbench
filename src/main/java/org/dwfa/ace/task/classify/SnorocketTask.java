@@ -258,7 +258,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             int nextRIdx = rNidArray.length;
 
             SnoPathProcess pcEdit = new SnoPathProcess(logger, null, cEditSnoCons, cEditSnoRels,
-                    rNidArray, cEditPathPos, gui);
+                    rNidArray, cEditPathPos, gui,false);
             tf.iterateConcepts(pcEdit);
             logger
                     .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
@@ -454,7 +454,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels,
-                    rNidArray, cClassPathPos, gui);
+                    rNidArray, cClassPathPos, gui, true);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -488,6 +488,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cClassPathNid));
             logger.info("\r\n::: *** WRITEBACK *** LAPSED TIME =\t" + toStringLapseSec(startTime)
                     + " ***");
+            
+            if (debug) {
+                dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
+                dumpSnoRel(SnoQuery.getIsaDropped(), "SnoRelIsaDrop_full.txt", 4);
+                dumpSnoRel(SnoQuery.getRoleAdded(), "SnoRelRoleAdd_full.txt", 4);
+                dumpSnoRel(SnoQuery.getRoleDropped(), "SnoRelRoleDrop_full.txt", 4);
+            }
 
             // ** GUI: 5 COMPLETE **
             gui.setProgressInfoLower("writeback completed, lapsed time = "

@@ -49,6 +49,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
     private I_SnorocketFactory rocket;
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
+    // Do not filter 'Is a' on classifier path
+    // The classifier itself is a "filter" what gets dropped.
+    private boolean doNotCareIfHasSnomedIsa;
 
     // STATISTICS COUNTERS
     private int countConSeen = 0;
@@ -88,7 +91,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
     public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons,
             List<SnoRel> snorels, int[] allowedRoles, List<I_Position> fromPathPos,
-            I_ShowActivity gui) throws TerminologyException, IOException {
+            I_ShowActivity gui, boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
         this.logger = logger;
         this.rocket = rocket;
         this.snocons = snocons;
@@ -97,6 +100,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         this.gui = gui;
         setupCoreNids();
         this.allowedRoles = allowedRoles;
+        this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
     }
 
     public void processConcept(I_GetConceptData concept) throws Exception {
@@ -264,7 +268,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
             }
         }
 
-        if (isSnomedConcept) {
+        if (isSnomedConcept || doNotCareIfHasSnomedIsa) {
             countRelCharStated += tmpCountRelCharStated;
             countRelCharDefining += tmpCountRelCharDefining;
             countRelCharStatedInferred += tmpCountRelCharStatedInferred;

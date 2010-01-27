@@ -283,7 +283,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             int nextRIdx = rNidArray.length;
 
             SnoPathProcess pcEdit = new SnoPathProcess(logger, null, cEditSnoCons, cEditSnoRels,
-                    rNidArray, cEditPathPos, gui);
+                    rNidArray, cEditPathPos, gui,false);
             tf.iterateConcepts(pcEdit);
             logger
                     .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
@@ -409,7 +409,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels,
-                    rNidArray, cClassPathPos, gui);
+                    rNidArray, cClassPathPos, gui, true);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
