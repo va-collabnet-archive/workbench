@@ -50,7 +50,8 @@ import org.dwfa.vodb.types.ThinImageVersioned;
 public class ImagePopupListener extends MouseAdapter {
 
     enum FieldToChange {
-        TYPE, STATUS
+        TYPE,
+        STATUS
     };
 
     private ImageTableModel model;
@@ -64,7 +65,10 @@ public class ImagePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             for (I_Path p : config.getEditingPathSet()) {
-                I_ImagePart newPart = (I_ImagePart) selectedObject.getTuple().makeAnalog(config.getDefaultStatus().getConceptId(), p.getConceptId(), Long.MAX_VALUE);
+                I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
+                I_ImagePart newPart =
+                        (I_ImagePart) currentPart.makeAnalog(config.getDefaultStatus().getConceptId(),
+                            p.getConceptId(), Long.MAX_VALUE);
 
                 selectedObject.getTuple().getVersioned().addVersion(newPart);
             }
@@ -106,8 +110,10 @@ public class ImagePopupListener extends MouseAdapter {
             try {
                 ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
                 for (I_Path p : config.getEditingPathSet()) {
-                	I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple();
-                    I_ImagePart newPart = (I_ImagePart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), p.getConceptId(), Integer.MAX_VALUE);
+                    I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
+                    I_ImagePart newPart =
+                            (I_ImagePart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
+                                Integer.MAX_VALUE);
                     switch (field) {
                     case STATUS:
                         newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));

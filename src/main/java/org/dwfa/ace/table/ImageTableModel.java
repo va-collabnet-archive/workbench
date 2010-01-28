@@ -169,7 +169,15 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
     }
 
     public enum IMAGE_FIELD {
-        IMAGE_ID("iid", 5, 100, 100), CON_ID("cid", 5, 100, 100), DESC("Description", 5, 200, 1000), IMAGE("image", 5, 200, 1000), STATUS("status", 5, 50, 250), FORMAT("format", 5, 30, 30), TYPE("type", 5, 85, 85), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 150);
+        IMAGE_ID("iid", 5, 100, 100),
+        CON_ID("cid", 5, 100, 100),
+        DESC("Description", 5, 200, 1000),
+        IMAGE("image", 5, 200, 1000),
+        STATUS("status", 5, 50, 250),
+        FORMAT("format", 5, 30, 30),
+        TYPE("type", 5, 85, 85),
+        VERSION("version", 5, 140, 140),
+        PATH("path", 5, 90, 150);
 
         private String columnName;
         private int min;
@@ -464,14 +472,18 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
             if (rowIndex >= getRowCount()) {
                 return null;
             }
+            if (rowIndex == -1) {
+                return null;
+            }
             I_ImageTuple image = getImage(rowIndex);
             if (image == null) {
                 return null;
             }
 
             I_ConfigAceFrame config = host.getConfig();
-            boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_ImageVersioned) image.getFixedPart());
+            boolean inConflict =
+                    config.getHighlightConflictsInComponentPanel()
+                        && config.getConflictResolutionStrategy().isInConflict((I_ImageVersioned) image.getFixedPart());
 
             switch (columns[columnIndex]) {
             case IMAGE_ID:
