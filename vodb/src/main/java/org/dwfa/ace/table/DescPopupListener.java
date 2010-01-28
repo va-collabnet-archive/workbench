@@ -50,7 +50,8 @@ import org.dwfa.vodb.types.ThinDescVersioned;
 public class DescPopupListener extends MouseAdapter {
 
     enum FieldToChange {
-        TYPE, STATUS
+        TYPE,
+        STATUS
     };
 
     private DescriptionsForConceptTableModel model;
@@ -64,8 +65,9 @@ public class DescPopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
             for (I_Path p : config.getEditingPathSet()) {
-            	I_DescriptionPart current = (I_DescriptionPart) selectedObject.getTuple();
-                I_DescriptionPart newPart = (I_DescriptionPart) selectedObject.getTuple().makeAnalog(current.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                I_DescriptionPart current = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
+                I_DescriptionPart newPart =
+                        (I_DescriptionPart) current.makeAnalog(current.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
                 selectedObject.getTuple().getDescVersioned().addVersion(newPart);
             }
             ACE.addUncommitted(sourceBean);
@@ -108,8 +110,10 @@ public class DescPopupListener extends MouseAdapter {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_DescriptionPart newPart = selectedObject.getTuple().getMutablePart();
                     if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
-                    	I_DescriptionPart currentPart = (I_DescriptionPart) selectedObject.getTuple();
-                        newPart = (I_DescriptionPart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(), currentPart.getPathId(), Long.MAX_VALUE);
+                        I_DescriptionPart currentPart = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
+                        newPart =
+                                (I_DescriptionPart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart
+                                    .getPathId(), Long.MAX_VALUE);
                         selectedObject.getTuple().getDescVersioned().addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());

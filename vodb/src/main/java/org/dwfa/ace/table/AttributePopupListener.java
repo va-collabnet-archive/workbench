@@ -59,19 +59,18 @@ public class AttributePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            try {
-                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
-                for (I_Path p : config.getEditingPathSet()) {
-                    I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple();
-                    I_ConceptAttributePart newPart =
-                            (I_ConceptAttributePart) selectedObject.getTuple().makeAnalog(currentPart.getStatusId(),
-                                p.getConceptId(), Long.MAX_VALUE);
-                    sourceBean.getConceptAttributes().addVersion(newPart);
-                }
-                ACE.addUncommitted(sourceBean);
-            } catch (IOException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
+
+            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
+            for (I_Path p : config.getEditingPathSet()) {
+                I_ConceptAttributePart currentPart =
+                        (I_ConceptAttributePart) selectedObject.getTuple().getMutablePart();
+                I_ConceptAttributePart newPart =
+                        (I_ConceptAttributePart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
+                            Long.MAX_VALUE);
+                selectedObject.getTuple().getConVersioned().addVersion(newPart);
             }
+            ACE.addUncommitted(sourceBean);
+
             model.allTuples = null;
             model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
                 .getTermComponent()));

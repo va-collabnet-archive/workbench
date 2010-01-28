@@ -244,7 +244,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-            System.out.println(">>>>>>>>>>> FIRE TABLE DATA CHANGED");
+
             fireTableDataChanged();
 
         }
