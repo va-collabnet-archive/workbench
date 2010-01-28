@@ -1038,13 +1038,14 @@ public class VersionDiff extends AbstractMojo {
                 continue;
             relationships_filtered++;
 
+            String relationshipId = getId(tf.getConcept(relationshipVersion.getRelId()).getId());
             String sourceId = getId(tf.getConcept(relationshipVersion.getC1Id()).getId());
             String destinationId = getId(tf.getConcept(relationshipVersion.getC2Id()).getId());
 
             I_GetConceptData sourceRelationship = tf.getConcept(relationshipVersion.getC1Id());
             I_GetConceptData destinationRelationship = tf.getConcept(relationshipVersion.getC2Id());
             if (this.added_relationships && previousRelationshipPart == null && currentRelationshipPart != null) {
-                addToRefset(c.getConceptId(), this.added_relationship_change, sourceId + "\t" + destinationId
+                addToRefset(c.getConceptId(), this.added_relationship_change, relationshipId + "\t" + sourceId + "\t" + destinationId
                     + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                     + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                     + tf.getConcept(currentRelationshipPart.getStatusId()).getInitialText() + "\t"
@@ -1052,7 +1053,7 @@ public class VersionDiff extends AbstractMojo {
                 incr(this.added_relationship_change);
             }
             if (this.deleted_relationships && previousRelationshipPart != null && currentRelationshipPart == null) {
-                addToRefset(c.getConceptId(), this.deleted_relationship_change, sourceId + "\t" + destinationId
+                addToRefset(c.getConceptId(), this.deleted_relationship_change, relationshipId + "\t" + sourceId + "\t" + destinationId
                     + "/t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                     + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                     + tf.getConcept(previousRelationshipPart.getStatusId()).getInitialText() + "\t"
@@ -1066,7 +1067,7 @@ public class VersionDiff extends AbstractMojo {
                     && previousRelationshipPart.getStatusId() != currentRelationshipPart.getStatusId()
                     && (this.v1_relationship_status.size() == 0 || this.v1_relationship_status_int.contains(previousRelationshipPart.getStatusId()))
                     && (this.v2_relationship_status.size() == 0 || this.v2_relationship_status_int.contains(currentRelationshipPart.getStatusId()))) {
-                    addToRefset(c.getConceptId(), this.relationship_status_change, sourceId + "\t"
+                    addToRefset(c.getConceptId(), this.relationship_status_change, relationshipId + "\t" + sourceId + "\t"
                         + destinationId + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                         + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                         + tf.getConcept(previousRelationshipPart.getStatusId()).getInitialText() + "\t"
@@ -1076,7 +1077,7 @@ public class VersionDiff extends AbstractMojo {
                 // characteristic
                 if (this.changed_relationship_characteristic
                     && previousRelationshipPart.getCharacteristicId() != currentRelationshipPart.getCharacteristicId()) {
-                    addToRefset(c.getConceptId(), this.relationship_characteristic_change, sourceId + "\t"
+                    addToRefset(c.getConceptId(), this.relationship_characteristic_change, relationshipId + "\t" + sourceId + "\t"
                         + destinationId + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                         + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                         + tf.getConcept(previousRelationshipPart.getCharacteristicId()).getInitialText() + "\t"
@@ -1086,7 +1087,7 @@ public class VersionDiff extends AbstractMojo {
                 // refinability
                 if (this.changed_relationship_refinability
                     && previousRelationshipPart.getRefinabilityId() != currentRelationshipPart.getRefinabilityId()) {
-                    addToRefset(c.getConceptId(), this.relationship_refinability_change, sourceId + "\t"
+                    addToRefset(c.getConceptId(), this.relationship_refinability_change, relationshipId + "\t" + sourceId + "\t"
                         + destinationId + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                         + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                         + tf.getConcept(previousRelationshipPart.getCharacteristicId()).getInitialText() + "\t"
@@ -1096,7 +1097,7 @@ public class VersionDiff extends AbstractMojo {
                 // type
                 if (this.changed_relationship_type
                     && previousRelationshipPart.getTypeId() != currentRelationshipPart.getTypeId()) {
-                    addToRefset(c.getConceptId(), this.relationship_type_change, sourceId + "\t" + destinationId
+                    addToRefset(c.getConceptId(), this.relationship_type_change, relationshipId + "\t" + sourceId + "\t" + destinationId
                         + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                         + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                         + tf.getConcept(previousRelationshipPart.getTypeId()).getInitialText() + "\t"
@@ -1106,7 +1107,7 @@ public class VersionDiff extends AbstractMojo {
                 // group
                 if (this.changed_relationship_group
                     && previousRelationshipPart.getGroup() != currentRelationshipPart.getGroup()) {
-                    addToRefset(c.getConceptId(), this.relationship_group_change, sourceId + "\t" + destinationId
+                    addToRefset(c.getConceptId(), this.relationship_group_change, relationshipId + "\t" + sourceId + "\t" + destinationId
                         + "\t" + sourceRelationship.toString().replaceAll("\t", " ") + "\t"
                         + destinationRelationship.toString().replaceAll("\t", " ") + "\t"
                         + previousRelationshipPart.getGroup() + "\t" + currentRelationshipPart.getGroup());
