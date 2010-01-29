@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -33,6 +35,10 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
 		}
 	}
 
+    public StrMember() {
+        super();
+    }
+
 	@Override
 	protected boolean membersEqual(
 			ConceptComponent<StrRevision, StrMember> obj) {
@@ -43,7 +49,23 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
 		return false;
 	}
 
-	@Override
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (StrMember.class.isAssignableFrom(obj.getClass())) {
+            StrMember another = (StrMember) obj;
+            return this.nid == another.nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { this.nid });
+    } 
+    
+    @Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
@@ -98,5 +120,18 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
 		buf.append(stringValue);
 		return buf.toString();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" stringValue:" + "'" + this.stringValue + "'");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

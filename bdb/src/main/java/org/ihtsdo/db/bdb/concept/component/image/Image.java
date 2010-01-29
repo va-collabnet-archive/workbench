@@ -22,6 +22,7 @@ import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
@@ -157,24 +158,49 @@ public class Image
 		}
 	}
 
+    public Image() {
+        super();
+    }
+
+	/**
+	 * Returns a string representation of the object.
+	 */
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("nid: ");
-		buf.append(nid);
-		buf.append(" format: ");
-		buf.append(format);
-		buf.append(" textDescription: ");
-		buf.append(textDescription);
-		buf.append(" typeNid: ");
-		ConceptComponent.addNidToBuffer(buf, typeNid);
-		buf.append(" ");
-		buf.append(super.toString());
-		return buf.toString();
+	    StringBuffer buf = new StringBuffer();  
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" computer:" + Image.computer);
+	    buf.append(" format:" + "'" + this.format + "'");
+	    buf.append(" image:" + this.image);
+	    buf.append(" textDescription:" + "'" + this.textDescription + "'");
+	    buf.append(" typeNid:");
+        ConceptComponent.addNidToBuffer(buf, typeNid);
+	    buf.append("; ");
+	    buf.append(super.toString());
+	    return buf.toString();
 	}
 
 
-	@Override
+    //TODO Verify this is a correct implementation 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (Image.class.isAssignableFrom(obj.getClass())) {
+            Image another = (Image) obj;
+            if (this.nid == another.nid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] {this.getNid() });
+    }
+
+    @Override
 	public boolean fieldsEqual(ConceptComponent<ImageRevision, Image> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
 			Image another = (Image) obj;

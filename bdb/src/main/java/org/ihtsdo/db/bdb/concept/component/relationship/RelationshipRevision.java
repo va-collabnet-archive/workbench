@@ -5,6 +5,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.etypes.ERelationshipVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -22,32 +23,37 @@ public class RelationshipRevision
 	private int typeNid;
 
 	
-	public String toString() {
-		return " characteristicNid: " + characteristicNid + " group: " + group + 
-		" refinabilityNid: " + refinabilityNid + " typeNid: " + typeNid+ " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" relationship:" + this.relationship);
+        buf.append(" characteristicNid:" + this.characteristicNid);
+        buf.append(" group:" + this.group);
+        buf.append(" refinabilityNid:" + this.refinabilityNid);
+        buf.append(" typeNid:" + this.typeNid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (RelationshipRevision.class.isAssignableFrom(obj.getClass())) {
-			RelationshipRevision another = (RelationshipRevision) obj;
-			if (this.characteristicNid != another.characteristicNid) {
-				return false;
-			}
-			if (this.group != another.group) {
-				return false;
-			}
-			if (this.refinabilityNid != another.refinabilityNid) {
-				return false;
-			}
-			if (this.typeNid != another.typeNid) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
-	public RelationshipRevision(int statusAtPositionNid, 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (RelationshipRevision.class.isAssignableFrom(obj.getClass())) {
+            RelationshipRevision another = (RelationshipRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    
+    public RelationshipRevision(int statusAtPositionNid, 
 			Relationship primordialRel) {
 		super(statusAtPositionNid, primordialRel);
 	}
@@ -91,6 +97,10 @@ public class RelationshipRevision
 		this.typeNid = Bdb.uuidToNid(erv.getTypeUuid());
 		this.sapNid = Bdb.getStatusAtPositionNid(erv);
 	}
+
+    public RelationshipRevision() {
+        super();
+    }
 
 	@Override
 	public void writeFieldsToBdb(TupleOutput output) {

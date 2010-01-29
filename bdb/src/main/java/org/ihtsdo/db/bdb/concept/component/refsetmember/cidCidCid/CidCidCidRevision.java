@@ -7,8 +7,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidRevision;
 import org.ihtsdo.etypes.ERefsetCidCidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -20,27 +22,34 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 	private int c2Nid;
 	private int c3Nid;
 	
-	public String toString() {
-		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " c3Nid: " + c3Nid + " " +super.toString();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (CidCidCidRevision.class.isAssignableFrom(obj.getClass())) {
-			CidCidCidRevision another = (CidCidCidRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.c2Nid != another.c2Nid) {
-				return false;
-			}
-			if (this.c3Nid != another.c3Nid) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c2Nid:" + this.c2Nid);
+        buf.append(" c3Nid:" + this.c3Nid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
+    
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidCidCidRevision.class.isAssignableFrom(obj.getClass())) {
+            CidCidCidRevision another = (CidCidCidRevision) obj;
+            return this.c1Nid == another.c1Nid 
+                && this.c2Nid == another.c2Nid
+                && this.c3Nid == another.c3Nid;
+        }
+        return false;
+    }
 
 	public CidCidCidRevision(int statusNid, int pathNid,
 			long time, 
@@ -71,7 +80,11 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 		c3Nid = Bdb.uuidToNid(eVersion.getC3Uuid());
 	}
 
-	@Override
+    public CidCidCidRevision() {
+        super();
+    }
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

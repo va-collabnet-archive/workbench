@@ -20,6 +20,10 @@ public class IdentifierVersionString extends IdentifierVersion {
 		stringDenotation = idv.getDenotation();
 	}
 
+    public IdentifierVersionString() {
+        super();
+    }
+
 	@Override
 	public IDENTIFIER_PART_TYPES getType() {
 		return IDENTIFIER_PART_TYPES.STRING;
@@ -40,17 +44,28 @@ public class IdentifierVersionString extends IdentifierVersion {
 		stringDenotation = (String) sourceDenotation;
 	}
 
+	/**
+	 * Returns a string representation of the object.
+	 */
 	@Override
 	public String toString() {
-		return "denotation: " + stringDenotation + " " + super.toString();
+	    StringBuffer buf = new StringBuffer();
+	    
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" stringDenotation:" + "'" + this.stringDenotation + "'");
+	    buf.append("; ");
+	    buf.append(super.toString());
+	    return buf.toString();
 	}
 
+	
 	@Override
 	public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
 		if (IdentifierVersionString.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersionString another = (IdentifierVersionString) obj;
-			return this.stringDenotation.equals(another.stringDenotation) && 
-				super.equals(another);
+            return this.getStatusAtPositionNid() == another.getStatusAtPositionNid(); 
 		}
 		return false;
 	}

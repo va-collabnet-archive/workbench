@@ -43,7 +43,10 @@ public abstract class Revision<V extends Revision<V, C>,
 		this(input.readInt(), conceptComponent);
 	}
 
-	
+    public Revision() {
+        super();
+    }
+    	
 	public final void writePartToBdb(TupleOutput output) {
 		output.writeInt(sapNid);
 		writeFieldsToBdb(output);
@@ -152,23 +155,28 @@ public abstract class Revision<V extends Revision<V, C>,
 		throw new UnsupportedOperationException();
 	}
 	
-	
-	
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append(" path: ");
-		ConceptComponent.addNidToBuffer(buf, getPathId());
-		buf.append(" tm: ");
-		buf.append(fileDateFormat.format(new Date(getTime())));
-		buf.append(" status: ");
-		ConceptComponent.addNidToBuffer(buf, getStatusId());
-		return buf.toString();
-		
-	}
+    /**
+     * Returns a string representation of the object.
+     */ 
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" (path:");
+        ConceptComponent.addNidToBuffer(buf, getPathId());
+        buf.append(" tm:");
+        buf.append(fileDateFormat.format(new Date(getTime())));
+        buf.append(" status:");
+        ConceptComponent.addNidToBuffer(buf, getStatusId());
+        buf.append("); ");
+        return buf.toString();
+    }
 
+		
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
 		if (Revision.class.isAssignableFrom(obj.getClass())) {
 			Revision<V, C> another = (Revision<V, C>) obj;
 			if (this.sapNid == another.sapNid) {

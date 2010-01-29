@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -17,23 +18,33 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 
 	private long longValue;
 	
-	public String toString() {
-		return " longValue: " + longValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" longValue:" + this.longValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (LongRevision.class.isAssignableFrom(obj.getClass())) {
-			LongRevision another = (LongRevision) obj;
-			if (this.longValue != another.longValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	public LongRevision(int statusNid, int pathNid, long time, 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (LongRevision.class.isAssignableFrom(obj.getClass())) {
+            LongRevision another = (LongRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    
+    public LongRevision(int statusNid, int pathNid, long time, 
 			LongMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -56,7 +67,11 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		this.longValue = eVersion.getLongValue();
 	}
 
-	@Override
+    public LongRevision() {
+        super();
+    }
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

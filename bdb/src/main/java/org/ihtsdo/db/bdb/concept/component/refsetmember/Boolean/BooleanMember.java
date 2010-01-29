@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
@@ -36,7 +37,11 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		}
 	}
 
-	@Override
+    public BooleanMember() {
+        super();
+    }
+
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<BooleanRevision, BooleanMember> obj) {
 		if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
@@ -98,5 +103,34 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	protected String getTypeFieldsString() {
 		return Boolean.toString(booleanValue);
 	}
+
+	/**
+	 * Returns a string representation of the object.
+	 */
+	@Override
+	public String toString() {
+	    StringBuffer buf = new StringBuffer();  
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" booleanValue:" + this.booleanValue);
+	    buf.append("; ");
+	    buf.append(super.toString());
+	    return buf.toString();
+	}
+
+	@Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
+            BooleanMember another = (BooleanMember) obj;
+            return this.nid == another.nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { nid });
+    }
 
 }

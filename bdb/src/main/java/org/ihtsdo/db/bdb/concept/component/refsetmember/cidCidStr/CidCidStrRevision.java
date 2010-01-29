@@ -9,6 +9,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidRevision;
 import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -21,29 +22,34 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 	private String strValue;
 	
 	
-	public String toString() {
-		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " strValue: " + strValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c2Nid:" + this.c2Nid);
+        buf.append(" strValue:" + "'" + this.strValue + "'");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidCidStrRevision.class.isAssignableFrom(obj.getClass())) {
-			CidCidStrRevision another = (CidCidStrRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.c2Nid != another.c2Nid) {
-				return false;
-			}
-			if (this.strValue.equals(another.strValue)) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	public CidCidStrRevision(int statusNid, int pathNid,
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidCidStrRevision.class.isAssignableFrom(obj.getClass())) {
+            CidCidStrRevision another = (CidCidStrRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    public CidCidStrRevision(int statusNid, int pathNid,
 			long time, 
 			CidCidStrMember primoridalMember) {
 		super(statusNid, pathNid, time, 
@@ -72,7 +78,11 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 		strValue = eVersion.getStringValue();
 	}
 
-	@Override
+    public CidCidStrRevision() {
+        super();
+    }
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

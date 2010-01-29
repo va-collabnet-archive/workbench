@@ -22,6 +22,10 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 		uNid = Bdb.getUuidsToNidMap().getUNid(idv.getDenotation());
 	}
 
+    public IdentifierVersionUuid() {
+        super();
+    }
+
 	@Override
 	public IDENTIFIER_PART_TYPES getType() {
 		return IDENTIFIER_PART_TYPES.UUID;
@@ -46,13 +50,24 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
+	/**
+	 * Returns a string representation of the object.
+	 */
+    @Override
 	public String toString() {
-		return "denotation: " + getUuid() + " " + super.toString();
+	    StringBuffer buf = new StringBuffer();
+	    
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" uNid:" + getUuid());
+	    buf.append("; ");
+	    buf.append(super.toString());
+	    return buf.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
 		if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
 			return this.uNid == another.uNid && super.equals(another);

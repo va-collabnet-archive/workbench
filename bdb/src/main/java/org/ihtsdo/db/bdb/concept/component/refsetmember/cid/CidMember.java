@@ -7,10 +7,12 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -39,6 +41,10 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		}
 	}
 
+    public CidMember() {
+        super();
+    }
+
 	@Override
 	protected boolean membersEqual(
 			ConceptComponent<CidRevision, CidMember> obj) {
@@ -49,7 +55,26 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		return false;
 	}
 
-	@Override
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidMember.class.isAssignableFrom(obj.getClass())) {
+            CidMember another = (CidMember) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { c1Nid });
+    }
+    
+    
+    
+    @Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
 		if (additionalVersions == null) {
@@ -149,5 +174,16 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		throw new UnsupportedOperationException();
 	}
 
-
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 }

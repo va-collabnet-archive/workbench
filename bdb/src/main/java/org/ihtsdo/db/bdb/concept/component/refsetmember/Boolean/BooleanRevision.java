@@ -17,21 +17,32 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 	
 	private boolean booleanValue;
 
-	public String toString() {
-		return " booleanValue: " + booleanValue + " " + super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" booleanValue:" + this.booleanValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (BooleanRevision.class.isAssignableFrom(obj.getClass())) {
-			BooleanRevision another = (BooleanRevision) obj;
-			if (this.booleanValue != another.booleanValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (BooleanRevision.class.isAssignableFrom(obj.getClass())) {
+            BooleanRevision another = (BooleanRevision) obj;
+            if (this.sapNid == another.sapNid) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	protected BooleanRevision(int statusNid, int pathNid, long time, 
 			BooleanMember primoridalMember) {
@@ -55,6 +66,10 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 		super(eVersion, booleanMember);
 		this.booleanValue = eVersion.isBooleanValue();
 	}
+
+    public BooleanRevision() {
+        super();
+    }
 
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()

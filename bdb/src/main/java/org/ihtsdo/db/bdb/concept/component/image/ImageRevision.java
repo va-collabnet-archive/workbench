@@ -16,25 +16,33 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	private String textDescription;
 	private int typeNid;
 	
+	/**
+	 *  Returns a string representation of the object.
+	 */
+	@Override
 	public String toString() {
-		return " textDescription: " + textDescription + " typeNid: " + 
-				typeNid + " " + super.toString();
+	    StringBuffer buf = new StringBuffer();  
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" textDescription:" + "'" + this.textDescription + "'");
+	    buf.append(" typeNid:" + this.typeNid);
+	    buf.append("; ");
+	    buf.append(super.toString());
+	    return buf.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (ImageRevision.class.isAssignableFrom(obj.getClass())) {
-			ImageRevision another = (ImageRevision) obj;
-			if (this.typeNid != another.typeNid) {
-				return false;
-			}
-			if (!this.textDescription.equals(another.textDescription)) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
+        if (obj == null)
+            return false;
+	    if (ImageRevision.class.isAssignableFrom(obj.getClass())) {
+	        ImageRevision another = (ImageRevision) obj;
+	        if (this.sapNid == another.sapNid) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
+
 
 	protected ArrayIntList getVariableVersionNids() {
 		ArrayIntList partComponentNids = new ArrayIntList(3);
@@ -65,7 +73,11 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 		this.typeNid = another.getTypeId();
 	}
 
-	@Override
+	protected ImageRevision() {
+        super();
+    }
+    
+    @Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
 		return new ImageRevision(this, statusNid, pathNid, time, this.primordialComponent);
 	}

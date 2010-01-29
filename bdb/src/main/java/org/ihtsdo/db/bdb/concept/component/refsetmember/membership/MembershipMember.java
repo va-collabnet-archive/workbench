@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.Long.LongMember;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -30,7 +32,28 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 		}
 	}
 
-	@Override
+    public MembershipMember() {
+        super();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (MembershipMember.class.isAssignableFrom(obj.getClass())) {
+            MembershipMember another = (MembershipMember) obj;
+            return this.nid == another.nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { this.nid });
+    } 
+    
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<MembershipRevision, MembershipMember> obj) {
 		if (MembershipMember.class.isAssignableFrom(obj.getClass())) {
@@ -84,5 +107,17 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 	protected String getTypeFieldsString() {
 		return "";
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

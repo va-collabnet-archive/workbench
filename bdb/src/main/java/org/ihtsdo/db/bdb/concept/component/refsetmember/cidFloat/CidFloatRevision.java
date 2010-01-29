@@ -6,8 +6,10 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrRevision;
 import org.ihtsdo.etypes.ERefsetCidFloatVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -17,26 +19,33 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 	private int c1Nid;
 	private float floatValue;
 
-	public String toString() {
-		return " c1Nid: " + c1Nid + " floatValue: " + floatValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" floatValue:" + this.floatValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidFloatRevision.class.isAssignableFrom(obj.getClass())) {
-			CidFloatRevision another = (CidFloatRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.floatValue != another.floatValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	public CidFloatRevision(int statusNid, int pathNid, long time, 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidFloatRevision.class.isAssignableFrom(obj.getClass())) {
+            CidFloatRevision another = (CidFloatRevision) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+    
+    public CidFloatRevision(int statusNid, int pathNid, long time, 
 			CidFloatMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -62,7 +71,11 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		floatValue = eVersion.getFloatValue();
 	}
 
-	@Override
+    public CidFloatRevision() {
+        super();
+    }
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

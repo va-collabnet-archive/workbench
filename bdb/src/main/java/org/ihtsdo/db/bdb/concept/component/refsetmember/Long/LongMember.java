@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -32,6 +34,27 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		}
 	}
 
+	public LongMember() {
+        super();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (LongMember.class.isAssignableFrom(obj.getClass())) {
+            LongMember another = (LongMember) obj;
+            return this.nid == another.nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { this.nid });
+    } 
+    
 	@Override
 	protected boolean membersEqual(
 			ConceptComponent<LongRevision, LongMember> obj) {
@@ -97,5 +120,18 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.LONG.getTypeNid();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" longValue:" + this.longValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

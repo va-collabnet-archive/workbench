@@ -9,6 +9,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong.CidLongRevision;
 import org.ihtsdo.etypes.ERefsetCidStrVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -19,26 +20,34 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 	private int c1Nid;
 	private String strValue;
 	
-	public String toString() {
-		return " c1Nid: " + c1Nid + " strValue: " + strValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" strValue:" + "'" + this.strValue + "'");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidStrRevision.class.isAssignableFrom(obj.getClass())) {
-			CidStrRevision another = (CidStrRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.strValue.equals(another.strValue)) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	public CidStrRevision(int statusNid, int pathNid, long time, 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidStrRevision.class.isAssignableFrom(obj.getClass())) {
+            CidStrRevision another = (CidStrRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    public CidStrRevision(int statusNid, int pathNid, long time, 
 			CidStrMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -63,6 +72,10 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
 		strValue = eVersion.getStrValue();
 	}
+
+    public CidStrRevision() {
+        super();
+    }
 
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()

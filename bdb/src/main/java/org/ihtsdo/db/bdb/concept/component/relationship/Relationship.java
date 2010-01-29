@@ -207,20 +207,28 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 	}
 
+    public Relationship() {
+        super();
+    }
+    
+   /**
+     * Returns a string representation of the object.
+     */
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("relid: ");
-		buf.append(nid);
-		buf.append(" c2: ");
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" computer:" + Relationship.computer);
+		buf.append(" c2Nid:");
 		ConceptComponent.addNidToBuffer(buf, c2Nid);
-		buf.append(" group: ");
-		buf.append(group);
-		buf.append(" refinability: ");
+        buf.append(" characteristicNid:");
+        ConceptComponent.addNidToBuffer(buf, characteristicNid);
+		buf.append(" group:" + group);
+		buf.append(" refinabilityNid:");
 		ConceptComponent.addNidToBuffer(buf, refinabilityNid);
-		buf.append(" type: ");
+		buf.append(" typeNid:");
 		ConceptComponent.addNidToBuffer(buf, typeNid);
-		buf.append(" ");
+		buf.append("; ");
 		buf.append(super.toString());
 		return buf.toString();
 	}
@@ -294,6 +302,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
 		if (Relationship.class.isAssignableFrom(obj.getClass())) {
 			Relationship another = (Relationship) obj;
 			return nid == another.nid;

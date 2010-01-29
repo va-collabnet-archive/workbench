@@ -9,6 +9,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat.CidFloatRevision;
 import org.ihtsdo.etypes.ERefsetCidIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -20,25 +21,34 @@ public class CidIntRevision
 	private int c1Nid;
 	private int intValue;
 	
-	public String toString() {
-		return " c1Nid: " + c1Nid + " intValue: " + intValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" intValue:" + this.intValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidIntRevision.class.isAssignableFrom(obj.getClass())) {
-			CidIntRevision another = (CidIntRevision) obj;
-			if (this.c1Nid != another.intValue) {
-				return false;
-			}
-			if (this.intValue != another.intValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
-	protected CidIntRevision(int statusNid, int pathNid, long time, 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidIntRevision.class.isAssignableFrom(obj.getClass())) {
+            CidIntRevision another = (CidIntRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    
+    protected CidIntRevision(int statusNid, int pathNid, long time, 
 			CidIntMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -64,7 +74,13 @@ public class CidIntRevision
 		intValue = eVersion.getIntValue();
 	}
 
-	@Override
+    public CidIntRevision() {
+        super();
+    }
+
+
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

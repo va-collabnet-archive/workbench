@@ -48,6 +48,10 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 		this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
 	}
 	
+	protected IdentifierVersion() {
+        super();
+    }
+
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
 	 */
@@ -178,21 +182,31 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 	}
 
 	
+	/**
+	 * Returns a string representation of the object.
+	 */
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append(" authority: ");
+	    StringBuffer buf = new StringBuffer();
+	    
+	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(" sapBdb:" + IdentifierVersion.sapBdb);
+        buf.append(" conceptComponent:" + conceptComponent);
+		buf.append(" authority:");
 		ConceptComponent.addNidToBuffer(buf, authorityNid);
-		buf.append(" path: ");
+		buf.append(" (path:");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
-		buf.append(" tm: ");
+		buf.append(" tm:");
 		buf.append(Revision.fileDateFormat.format(new Date(getTime())));
-		buf.append(" status: ");
+		buf.append(" status:");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
+	    buf.append("); ");
 		return buf.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
 		if (IdentifierVersion.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersion another = (IdentifierVersion) obj;
 			return this.statusAtPositionNid == another.statusAtPositionNid &&

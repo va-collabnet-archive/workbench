@@ -7,8 +7,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt.CidIntRevision;
 import org.ihtsdo.etypes.ERefsetCidLongVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -19,26 +21,33 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 	private int c1Nid;
 	private long longValue;
 	
-	public String toString() {
-		return " c1Nid: " + c1Nid + " longValue: " + longValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" longValue:" + this.longValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidLongRevision.class.isAssignableFrom(obj.getClass())) {
-			CidLongRevision another = (CidLongRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.longValue != another.longValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	protected CidLongRevision(int statusNid, int pathNid, long time, 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidLongRevision.class.isAssignableFrom(obj.getClass())) {
+            CidLongRevision another = (CidLongRevision) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+    
+    protected CidLongRevision(int statusNid, int pathNid, long time, 
 			CidLongMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -64,7 +73,11 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 		longValue = eVersion.getLongValue();
 	}
 
-	@Override
+    public CidLongRevision() {
+        super();
+    }
+    
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

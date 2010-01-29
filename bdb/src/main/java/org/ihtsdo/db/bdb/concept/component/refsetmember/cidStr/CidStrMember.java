@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong.CidLongMember;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -36,6 +38,27 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> {
 		}
 	}
 
+    public CidStrMember() {
+        super();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidStrMember.class.isAssignableFrom(obj.getClass())) {
+            CidStrMember another = (CidStrMember) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { c1Nid });
+    } 
+    
+    
 	@Override
 	protected boolean membersEqual(
 			ConceptComponent<CidStrRevision, CidStrMember> obj) {
@@ -45,6 +68,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> {
 		}
 		return false;
 	}
+	
+	
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
@@ -111,5 +136,19 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.CID_STR.getTypeNid();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" strValue:" + "'" + this.strValue + "'");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

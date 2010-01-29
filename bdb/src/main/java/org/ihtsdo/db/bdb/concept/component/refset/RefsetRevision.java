@@ -2,8 +2,10 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.concept.component.image.ImageRevision;
 import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -36,7 +38,11 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 				member);
 	}
 
-	@Override
+    public RefsetRevision() {
+        super();
+    }
+    
+    @Override
 	public final int getStatus() {
 		return getStatusId();
 	}
@@ -68,5 +74,31 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 	public I_ThinExtByRefPart duplicate() {
 		throw new UnsupportedOperationException();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (RefsetRevision.class.isAssignableFrom(obj.getClass())) {
+            RefsetRevision<?, ?> another = (RefsetRevision<?, ?>) obj;
+            if (this.sapNid == another.sapNid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -37,7 +39,12 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 			}
 		}
 	}
-	@Override
+
+    public CidCidMember() {
+        super();
+    }
+   
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<CidCidRevision, CidCidMember> obj) {
 		if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
@@ -46,6 +53,22 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 		}
 		return false;
 	}
+ 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
+            CidCidMember another = (CidCidMember) obj;
+            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { c1Nid, c2Nid });
+    }
 
 	@Override
 	protected final void readMemberParts(TupleInput input,
@@ -113,5 +136,19 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.CID_CID.getTypeNid();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c2Nid:" + this.c2Nid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

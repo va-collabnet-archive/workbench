@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -32,7 +34,29 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 			}
 		}
 	}
-	@Override
+
+    public IntMember() {
+        super();
+    }
+
+	
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (IntMember.class.isAssignableFrom(obj.getClass())) {
+            IntMember another = (IntMember) obj;
+            return this.nid == another.nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { this.nid });
+    } 
+    
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<IntRevision, IntMember> obj) {
 		if (IntMember.class.isAssignableFrom(obj.getClass())) {
@@ -95,5 +119,18 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.INT.getTypeNid();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" intValue:" + this.intValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

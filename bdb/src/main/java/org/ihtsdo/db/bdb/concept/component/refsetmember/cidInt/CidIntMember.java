@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
@@ -37,7 +38,27 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> {
 		}
 	}
 
-	@Override
+    public CidIntMember() {
+        super();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidIntMember.class.isAssignableFrom(obj.getClass())) {
+            CidIntMember another = (CidIntMember) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { c1Nid });
+    } 
+    
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<CidIntRevision, CidIntMember> obj) {
 		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
@@ -115,5 +136,19 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> {
 	public int getTypeId() {
 		return REFSET_TYPES.CID_INT.getTypeNid();
 	}
+
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" intValue:" + this.intValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
 }

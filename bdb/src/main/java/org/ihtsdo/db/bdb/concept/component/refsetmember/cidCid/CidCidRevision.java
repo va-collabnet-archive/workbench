@@ -7,8 +7,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean.BooleanRevision;
 import org.ihtsdo.etypes.ERefsetCidCidVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -19,26 +21,35 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 	private int c1Nid;
 	private int c2Nid;
 
-	public String toString() {
-		return " c1Nid: " + c1Nid + " c2Nid: " + c2Nid + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c2Nid:" + this.c2Nid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
+    
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidCidRevision.class.isAssignableFrom(obj.getClass())) {
-			CidCidRevision another = (CidCidRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			if (this.c2Nid != another.c2Nid) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidCidRevision.class.isAssignableFrom(obj.getClass())) {
+            CidCidRevision another = (CidCidRevision) obj;
+            if ((this.c1Nid == another.c1Nid) && (this.c2Nid == another.c2Nid)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public CidCidRevision(int statusNid, int pathNid, long time, 
+    public CidCidRevision(int statusNid, int pathNid, long time, 
 			CidCidMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -63,6 +74,11 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
 	}
+
+    public CidCidRevision() {
+        super();
+    }
+	   
 
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()

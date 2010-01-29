@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetRevision;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.etypes.ERefsetIntVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -17,23 +18,32 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 
 	private int intValue;
 	
-	public String toString() {
-		return " intValue: " + intValue + " " +super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" intValue:" + this.intValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (IntRevision.class.isAssignableFrom(obj.getClass())) {
-			IntRevision another = (IntRevision) obj;
-			if (this.intValue != another.intValue) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	public IntRevision(int statusNid, int pathNid, long time, 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (IntRevision.class.isAssignableFrom(obj.getClass())) {
+            IntRevision another = (IntRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
+
+    public IntRevision(int statusNid, int pathNid, long time, 
 			IntMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -56,6 +66,10 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 		super(eVersion, member);
 		this.intValue = eVersion.getIntValue();
 	}
+
+    public IntRevision() {
+        super();
+    }
 
 	@Override
 	public UniversalAceExtByRefPart getUniversalPart()

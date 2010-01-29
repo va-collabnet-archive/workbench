@@ -18,23 +18,35 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	
 	private int c1Nid;
 
-	public String toString() {
-		return " c1Nid: " + c1Nid + " " + super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (CidRevision.class.isAssignableFrom(obj.getClass())) {
-			CidRevision another = (CidRevision) obj;
-			if (this.c1Nid != another.c1Nid) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
 
-	protected CidRevision(int statusNid, int pathNid, long time, 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidRevision.class.isAssignableFrom(obj.getClass())) {
+            CidRevision another = (CidRevision) obj;
+            if (this.c1Nid == another.c1Nid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    protected CidRevision(int statusNid, int pathNid, long time, 
 			CidMember primoridalMember) {
 		super(statusNid, pathNid, time, 
 				primoridalMember);
@@ -58,7 +70,11 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
 	}
 
-	@Override
+    public CidRevision() {
+        super();
+    }
+
+    @Override
 	public UniversalAceExtByRefPart getUniversalPart()
 			throws TerminologyException, IOException {
 		// TODO

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
 import org.ihtsdo.etypes.ERefsetCidFloatVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -36,7 +38,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		}
 	}
 
-	@Override
+    public CidFloatMember() {
+        super();
+    }
+    
+    @Override
 	protected boolean membersEqual(
 			ConceptComponent<CidFloatRevision, CidFloatMember> obj) {
 		if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
@@ -115,4 +121,33 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		return REFSET_TYPES.CID_FLOAT.getTypeNid();
 	}
 
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();  
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" floatValue:" + this.floatValue);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
+            CidFloatMember another = (CidFloatMember) obj;
+            return this.c1Nid == another.c1Nid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { c1Nid });
+    }  
 }

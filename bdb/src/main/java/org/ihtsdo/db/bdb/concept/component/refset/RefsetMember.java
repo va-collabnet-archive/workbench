@@ -13,6 +13,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
@@ -43,19 +44,24 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		assert primordialSapNid != Integer.MAX_VALUE;
 	}
 	
+    public RefsetMember() {
+        super();
+    }
 
+    /**
+     * Returns a string representation of the object.
+     */
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("nid: ");
-		buf.append(nid);
-		buf.append(" refset: ");
+        buf.append(this.getClass().getSimpleName() + ": ");
+		buf.append(" refset:");
 		try {
 			buf.append(enclosingConcept.getInitialText());
 		} catch (IOException e1) {
 			buf.append(e1.getLocalizedMessage());
 		}
-		buf.append(" type: ");
+		buf.append(" type:");
 		try {
 			buf.append(REFSET_TYPES.nidToType(getTypeId()));
 		} catch (TerminologyException e) {
@@ -63,14 +69,15 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		} catch (IOException e) {
 			buf.append(e.getLocalizedMessage());
 		}
-		buf.append(" rcNid: ");
+		buf.append(" rcNid:");
 		addNidToBuffer(buf, referencedComponentNid);
 		buf.append(" ");
 		buf.append(getTypeFieldsString());
-		buf.append(" ");
+		buf.append("; ");
 		buf.append(super.toString());
 		return buf.toString();
 	}
+
 
 	protected abstract String getTypeFieldsString();
 
@@ -230,5 +237,20 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (RefsetMember.class.isAssignableFrom(obj.getClass())) {
+            RefsetMember<?,?> another = (RefsetMember<?,?>) obj;
+            return this.referencedComponentNid == another.referencedComponentNid;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { referencedComponentNid });
+    }
 
 }
