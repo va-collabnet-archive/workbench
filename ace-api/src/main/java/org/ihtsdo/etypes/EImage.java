@@ -143,22 +143,19 @@ public class EImage extends EComponent<EImageVersion> {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" conceptUuid:");
         buff.append(this.conceptUuid);
         buff.append(" format:");
-        buff.append(this.format);
+        buff.append("'" + this.format + "'");
         buff.append(" image:");       
         buff.append( new String(this.image));
         buff.append(" textDescription:");
-        buff.append(this.textDescription);
+        buff.append("'" + this.textDescription + "'");
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
 

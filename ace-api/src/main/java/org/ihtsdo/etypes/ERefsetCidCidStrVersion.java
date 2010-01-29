@@ -83,18 +83,15 @@ public class ERefsetCidCidStrVersion extends EVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append(" c2Uuid:");
         buff.append(this.c2Uuid);
         buff.append(" stringValue:");
-        buff.append(this.stringValue);
+        buff.append("'" + this.stringValue + "'");
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

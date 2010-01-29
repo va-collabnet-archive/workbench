@@ -562,8 +562,7 @@ public class EConcept {
     public String toString() {
         StringBuffer buff = new StringBuffer();
 
-        buff.append(this.getClass().getSimpleName());
-        buff.append(": ");
+        buff.append(this.getClass().getSimpleName() + ": ");
         buff.append("\n   ConceptAttributes: \n\t");
         buff.append(this.conceptAttributes);
         buff.append("\n   Descriptions: \n\t");

@@ -94,14 +94,11 @@ public class ERefsetLongMember extends ERefset<ERefsetLongVersion> {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" longValue:");
         buff.append(this.longValue);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

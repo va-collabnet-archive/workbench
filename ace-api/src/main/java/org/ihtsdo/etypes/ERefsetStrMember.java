@@ -94,14 +94,11 @@ public class ERefsetStrMember extends ERefset<ERefsetStrVersion> {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" strValue:");
-        buff.append(this.strValue);
+        buff.append("'" + this.strValue + "'");
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     
