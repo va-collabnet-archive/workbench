@@ -30,6 +30,7 @@ import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
@@ -54,6 +55,10 @@ public class ConceptAttributes
 		defined = eAttr.isDefined();
 	}
 	
+	public ConceptAttributes() {
+        super();
+    }
+
 	public class Version 
 		extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version 
 		implements I_ConceptAttributeTuple {
@@ -274,8 +279,15 @@ public class ConceptAttributes
 
 	@Override
 	public boolean equals(Object obj) {
-		ConceptAttributes another = (ConceptAttributes) obj;
-		return nid == another.nid;
+        if (obj == null)
+            return false;
+	    if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+	        ConceptAttributes another = (ConceptAttributes) obj;
+	        if (this.nid == another.nid) {
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 
 	@Override
@@ -303,18 +315,21 @@ public class ConceptAttributes
 		return conceptAttributes;
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("nid: ");
-		buf.append(nid);
-		buf.append(" def: ");
-		buf.append(defined);
-		buf.append(" ");
-		buf.append(super.toString());
-		return buf.toString();
-	}
-
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" defined:" + this.defined);
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();    
+    }
+    
+    
 	public void setConId(int cNid) {
 		if (this.nid == Integer.MIN_VALUE) {
 			this.nid = cNid;
