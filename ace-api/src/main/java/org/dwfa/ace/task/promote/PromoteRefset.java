@@ -131,14 +131,14 @@ public class PromoteRefset extends AbstractTask {
             .getRefsetExtensionMembers(refsetIdentity.getConceptId()));
     }
 
-    private void promoteMembers(I_ConfigAceFrame config, I_Position viewPosition, Set<I_Path> promitionSets,
+    private void promoteMembers(I_ConfigAceFrame config, I_Position viewPosition, Set<I_Path> promotionSets,
             List<I_ThinExtByRefVersioned> refsetMembers) throws TerminologyException, IOException {
         I_TermFactory tf = LocalVersionedTerminology.get();
         Set<I_Position> positionSet = new HashSet<I_Position>();
         positionSet.add(viewPosition);
         for (I_ThinExtByRefVersioned ext : refsetMembers) {
-            for (I_ThinExtByRefTuple tuple : ext.getTuples(config.getAllowedStatus(), positionSet, false, false)) {
-                for (I_Path path : promitionSets) {
+            for (I_ThinExtByRefTuple tuple : ext.getTuples(null, positionSet, false, false)) {
+                for (I_Path path : promotionSets) {
                     if (tuple.promote(path)) {
                         tf.addUncommittedNoChecks(tuple.getCore());
                     }
