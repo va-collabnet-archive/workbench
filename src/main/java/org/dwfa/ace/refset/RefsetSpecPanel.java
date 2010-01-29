@@ -471,6 +471,9 @@ public class RefsetSpecPanel extends JPanel {
                 horizontalBox.add(filterComboBox);
                 horizontalBox.add(Box.createHorizontalStrut(5));
 
+                if (verticalBox != null) {
+                    verticalBox.removeAll();
+                }
                 verticalBox.add(horizontalBox);
                 verticalBox.add(Box.createVerticalGlue());
 
