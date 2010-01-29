@@ -111,14 +111,13 @@ public class EVersion implements I_VersionExternally {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
+        buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(" pathUuid:");
         buff.append(this.pathUuid);
         buff.append(" statusUuid:");
         buff.append(this.statusUuid);
         buff.append(" Time:");
         buff.append("(" + new Date(this.time) + ")");
-
         return buff.toString();
     }
 

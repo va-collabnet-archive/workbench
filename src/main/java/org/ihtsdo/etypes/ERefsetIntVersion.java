@@ -55,14 +55,11 @@ public class ERefsetIntVersion extends EVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" intValue:");
         buff.append(this.intValue);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

@@ -52,14 +52,11 @@ public class EIdentifierVersionString extends EIdentifierVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" denotation:");
-        buff.append(this.denotation);
+        buff.append("'" + this.denotation + "'");
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

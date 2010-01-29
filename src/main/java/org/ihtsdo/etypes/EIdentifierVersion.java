@@ -55,13 +55,10 @@ public abstract class EIdentifierVersion extends EVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
-        buff.append(super.toString());
-
         buff.append(" authorityUuid:");
         buff.append(this.authorityUuid);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

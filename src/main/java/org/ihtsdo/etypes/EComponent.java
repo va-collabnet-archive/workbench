@@ -219,16 +219,13 @@ public abstract class EComponent<V extends EVersion> extends EVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
-        buff.append(super.toString());
-
         buff.append(" primordialComponentUuid:");
         buff.append(this.primordialComponentUuid);
         buff.append(" additionalIdComponents:");
         buff.append(this.additionalIdComponents);
         buff.append(" extraVersions:");
         buff.append(this.extraVersions);
-
+        buff.append(super.toString());
         return buff.toString();
     }
 

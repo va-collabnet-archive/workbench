@@ -96,16 +96,13 @@ public class ERefsetIntMember extends ERefset<ERefsetIntVersion> {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" intValue:");
         buff.append(this.intValue);
         buff.append(" extraVersions:");
         buff.append(this.extraVersions);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
     

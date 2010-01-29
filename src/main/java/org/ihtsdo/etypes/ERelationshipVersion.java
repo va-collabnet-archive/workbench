@@ -95,10 +95,7 @@ public class ERelationshipVersion extends EVersion {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-
         buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(super.toString());
-
         buff.append(" characteristicUuid:");
         buff.append(this.characteristicUuid);
         buff.append(" refinabilityUuid:");
@@ -108,7 +105,7 @@ public class ERelationshipVersion extends EVersion {
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
-
+        buff.append(super.toString());
         return buff.toString();
     }
 
