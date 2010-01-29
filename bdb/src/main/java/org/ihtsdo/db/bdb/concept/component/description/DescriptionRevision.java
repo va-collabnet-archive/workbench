@@ -27,32 +27,37 @@ public class DescriptionRevision
 	private int typeNid; 
 	private String lang;
 
-	public String toString() {
-		return " text: " + text + " cs: " + initialCaseSignificant 
-		+ " typeNid: " + typeNid + " lang: " + lang + " " + super.toString();
-	}
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(" utf8:" + DescriptionRevision.utf8);
+        buf.append(" description:" + this.description);
+        buf.append(" text:" + "'" + this.getText() + "'");
+        buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
+        buf.append(" typeNid:" + this.getTypeId());
+        buf.append(" lang:" + this.getLang());
+        buf.append("; ");
+        buf.append(super.toString());
+        return buf.toString();
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (DescriptionRevision.class.isAssignableFrom(obj.getClass())) {
-			DescriptionRevision another = (DescriptionRevision) obj;
-			if (this.initialCaseSignificant != another.initialCaseSignificant) {
-				return false;
-			}
-			if (this.typeNid != another.typeNid) {
-				return false;
-			}
-			if (!this.text.equals(another.text)) {
-				return false;
-			}
-			if (!this.lang.equals(another.lang)) {
-				return false;
-			}
-			return super.equals(obj);
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (DescriptionRevision.class.isAssignableFrom(obj.getClass())) {
+            DescriptionRevision another = (DescriptionRevision) obj;
+            return this.sapNid == another.sapNid;
+        }
+        return false;
+    }
 
+    
 	public DescriptionRevision(int statusAtPositionNid, 
 			Description primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
@@ -115,7 +120,11 @@ public class DescriptionRevision
 		sapNid = Bdb.getStatusAtPositionNid(edv);
 	}
 
-	@Override
+    public DescriptionRevision() {
+        super();
+    }
+    
+    @Override
 	protected void writeFieldsToBdb(TupleOutput output) {
 		if (text.equals(primordialComponent.getText())) {
 			output.writeString((String) null);
