@@ -227,14 +227,16 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (Concept.class.isAssignableFrom(obj.getClass())) {
-			Concept another = (Concept) obj;
-			return nid == another.nid;
-		}
-		return false;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (Concept.class.isAssignableFrom(obj.getClass())) {
+            Concept another = (Concept) obj;
+            return nid == another.nid;
+        }
+        return false;
+    }
 
 	@Override
 	public int hashCode() {
