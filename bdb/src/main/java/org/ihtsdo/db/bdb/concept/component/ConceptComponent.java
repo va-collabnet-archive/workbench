@@ -220,20 +220,20 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append("ConceptComponent: {");
         buf.append(" nid:" + getNid());
         buf.append(" pUuid:" + Bdb.getUuidDb().getUuid(primordialUNid));
         buf.append(" xtraIds:" + additionalIdentifierParts);
-        buf.append(" xtraVersions: " + additionalVersions);
+        buf.append(" xtraVersions:" + additionalVersions);
         buf.append(" sap:" + primordialSapNid);
-        buf.append(" enclosingConcept:" + enclosingConcept);
+        buf.append(" enclosingConcept:" + "(nid=" + enclosingConcept.getNid() + ")");
         buf.append(" (path:");
         ConceptComponent.addNidToBuffer(buf, getPathId());
         buf.append(" tm:");
         buf.append(Revision.fileDateFormat.format(new Date(getTime())));
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
-        buf.append("); ");
+        buf.append(")}; ");
         return buf.toString();
     }
 
