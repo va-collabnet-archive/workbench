@@ -114,11 +114,11 @@ public class CidCidCidMemberTest {
         obj.setC1Nid(1);
         obj.setC2Nid(1);
         obj.setC3Nid(1);
-        obj.additionalVersions = new ArrayList<CidCidCidRevision>(1);
+        obj.revisions = new ArrayList<CidCidCidRevision>(1);
         CidCidCidRevision rev = new CidCidCidRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
 
         obj.enclosingConcept = null; 
         obj.nid = 1;
@@ -135,11 +135,11 @@ public class CidCidCidMemberTest {
         obj.setC1Nid(2);
         obj.setC2Nid(2);
         obj.setC3Nid(3);
-        obj.additionalVersions = new ArrayList<CidCidCidRevision>(1);
+        obj.revisions = new ArrayList<CidCidCidRevision>(1);
         CidCidCidRevision rev = new CidCidCidRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
 
         obj.enclosingConcept = null; 
         obj.nid = 2;

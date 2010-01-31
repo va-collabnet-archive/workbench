@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class NidCNidMapBdbTest {
+	private static final int TEST_SIZE = 50000;
 	String dbTarget;
 
 	@Before
@@ -23,7 +24,7 @@ public class NidCNidMapBdbTest {
 
 	@Test
 	public void addRetrieveTest() {
-		for (int i = 0; i < 500000; i++) {
+		for (int i = 0; i < TEST_SIZE; i++) {
 			Bdb.getUuidsToNidMap().uuidToNid(UUID.randomUUID());
 			try {
 				Bdb.getNidCNidMap().setCidForNid(i, Integer.MIN_VALUE + i);
@@ -31,7 +32,7 @@ public class NidCNidMapBdbTest {
 				Assert.fail(e.getLocalizedMessage());
 			}
 		}
-		for (int i = 0; i < 500000; i++) {
+		for (int i = 0; i < TEST_SIZE; i++) {
 			Assert.assertEquals(i, 
 					Bdb.getNidCNidMap().getCNid(Integer.MIN_VALUE + i));
 		}
@@ -43,7 +44,7 @@ public class NidCNidMapBdbTest {
 			Assert.fail(e.getLocalizedMessage());
 		}
 		Bdb.setup(dbTarget);
-		for (int i = 0; i < 500000; i++) {
+		for (int i = 0; i < TEST_SIZE; i++) {
 			Assert.assertEquals(i, 
 					Bdb.getNidCNidMap().getCNid(Integer.MIN_VALUE + i));
 		}

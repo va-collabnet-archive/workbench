@@ -177,7 +177,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 		return conceptComponent.nid;
 	}
 
-	public int getStatusAtPositionNid() {
+	public int getSapNid() {
 		return statusAtPositionNid;
 	}
 

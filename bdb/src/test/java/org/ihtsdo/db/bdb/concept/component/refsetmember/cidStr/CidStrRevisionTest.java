@@ -121,7 +121,7 @@ public class CidStrRevisionTest {
         obj.sapNid = 1; 
         
         CidStrMember member = new CidStrMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -144,7 +144,7 @@ public class CidStrRevisionTest {
         obj.sapNid = 2; 
         
         CidStrMember member = new CidStrMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

@@ -33,18 +33,18 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidCidRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidCidRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidCidVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidCidRevision(eVersion, this));
+				revisions.add(new CidCidRevision(eVersion, this));
 			}
 		}
 	}
 
     public CidCidMember() {
-        super();
-    }
-   
-    @Override
+		super();
+	}
+
+	@Override
 	protected boolean membersEqual(
 			ConceptComponent<CidCidRevision, CidCidMember> obj) {
 		if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
@@ -73,15 +73,15 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidCidRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidCidRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidCidRevision(input, this));
+			revisions.add(new CidCidRevision(input, this));
 		}
 	}
 	@Override

@@ -1,6 +1,8 @@
 package org.ihtsdo.db.uuidmap;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -401,6 +403,18 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 		return Bdb.getUuidDb().getUuidAsLongArray(unids[i]);
 	}
 
+	public List<UUID> keysOf(int value) {
+		List<UUID> keys = new ArrayList<UUID>(3);
+		final int val[] = values;
+		final byte stat[] = state;
+
+		for (int i = stat.length; --i >= 0;) {
+			if (stat[i] == FULL && val[i] == value) {
+				keys.add(Bdb.getUuidDb().getUuid(unids[i]));
+			}
+		}
+		return keys;
+	}
 	/**
 	 * Fills all keys contained in the receiver into the specified list. Fills
 	 * the list, starting at index 0. After this call returns the specified list

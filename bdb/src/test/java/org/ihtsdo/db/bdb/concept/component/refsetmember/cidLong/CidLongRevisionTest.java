@@ -122,7 +122,7 @@ public class CidLongRevisionTest {
         obj.sapNid = 1; 
         
         CidLongMember member = new CidLongMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -146,7 +146,7 @@ public class CidLongRevisionTest {
         obj.sapNid = 2; 
         
         CidLongMember member = new CidLongMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

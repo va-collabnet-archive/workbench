@@ -1,22 +1,19 @@
 package org.ihtsdo.db.standalone;
 
-import java.awt.FileDialog;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.swing.JFrame;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
@@ -29,27 +26,16 @@ import org.ihtsdo.db.bdb.concept.component.description.DescriptionBinder;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.etypes.EDescription;
+import org.ihtsdo.etypes.EDescriptionVersion;
 
 public class BinaryLoad {
 	public static void main(String[] args) {
         try {
         	long startTime = System.currentTimeMillis();
-			FileDialog fd = new FileDialog(new JFrame(), "Select ids file", FileDialog.LOAD);
-			fd.setDirectory(System.getProperty("user.dir"));
-			
-			//fd.setVisible(true); // Display dialog and wait for response
-			//if (fd.getFile() != null) {
 			if (true) {
-			    //File idsFile = new File(fd.getDirectory(), fd.getFile());
-			    File idsFile = new File("/Users/kec/Documents/workspace/bdb/Export Files/uuids.jbin");
-			    System.out.println(idsFile);
-			    FileInputStream fis = new FileInputStream(idsFile);
-			    BufferedInputStream bis = new BufferedInputStream(fis);
-			    
-			    File metaFile = new File(idsFile.getParent(), "exportData.xml");
-			    File conceptsFile = new File(idsFile.getParent(), "eConcepts.jbin");
-			    Properties dataProps = new Properties();
-			    dataProps.loadFromXML(new FileInputStream(metaFile));
+			    File conceptsFile = new File("/Users/kec/Documents/workspace/bdb/Export Files/eConcepts.jbin");
+
 			    
 			    int numIdsRead = 0;
 			    int numUuidsRead = 0;
@@ -60,28 +46,50 @@ public class BinaryLoad {
 	            AceLog.getAppLog().info("totalMemory: " + Runtime.getRuntime().totalMemory());
 
 	            FileIO.recursiveDelete(new File("target/berkeley-db"));
-	        	Bdb.setup();
+	        	Bdb.setup("target/berkeley-db");
 
-	        	boolean preload = false;
-	        	if (preload) {
-		        	preloadIdentifiers(idsFile, numIdsRead, numUuidsRead);
-	        	}
 	            
-	            
-			    fis = new FileInputStream(conceptsFile);
-			    bis = new BufferedInputStream(fis);
+			    FileInputStream fis = new FileInputStream(conceptsFile);
+			    BufferedInputStream bis = new BufferedInputStream(fis);
 			    DataInputStream in = new DataInputStream(bis);
-			    
-	            while (fis.available() > 0) {
-	            	conceptsRead.incrementAndGet();
-	            	EConcept eConcept = new EConcept(in);
-	            	I_ProcessEConcept conceptConverter = converters.take(); 
-	            	conceptConverter.setEConcept(eConcept);
-	            	executors.execute(conceptConverter);
-	    			if (conceptsRead.get() % 10000 == 0) {
-	    				System.out.println("concepts: " + conceptsRead);
-	    			}	
+			    try {
+		            while (true) {
+		            	conceptsRead.incrementAndGet();
+		            	EConcept eConcept = new EConcept(in);
+		            	if (eConcept.getConceptAttributes().getUuids().contains(
+		            		UUID.fromString("181e45e8-b05a-33da-8b52-7027cbee6856")) ||
+		            		eConcept.getConceptAttributes().primordialComponentUuid.getMostSignificantBits() ==
+		            			1737903371905020890L) {
+		            		System.out.println("Found it...");
+		            	}
+		            	for (EDescription d: eConcept.getDescriptions()) {
+		            		if (d.extraVersions != null) {
+		            			if (d.getText().startsWith("concept retired")) {
+		            				System.out.println("Found by desc: " + eConcept);
+		            			}
+			            		for (EDescriptionVersion dv: d.getExtraVersions()) {
+			            			if (dv.getText().startsWith("concept retired")) {
+			            				System.out.println("Found by desc: " + eConcept);
+			            			}
+			            		}
+		            		}
+		            	}
+		            	
+		            	if (conceptsRead.get() > 649896) {
+	        				System.out.println("count: " + conceptsRead.get());
+	        				System.out.println("Found by count: " + eConcept);
+		            	}
+		            	//I_ProcessEConcept conceptConverter = converters.take(); 
+		            	//conceptConverter.setEConcept(eConcept);
+		            	//executors.execute(conceptConverter);
+		    			if (conceptsRead.get() % 10000 == 0) {
+		    				System.out.println("concepts: " + conceptsRead);
+		    			}	
+				    }
+			    } catch (EOFException ex)  {
+			    	in.close();
 			    }
+				System.out.println("concepts read: " + conceptsRead.get());
 	            // See if any exceptions in the last converters;
 	            while (converters.isEmpty() == false) {
 	            	I_ProcessEConcept conceptConverter = converters.take();

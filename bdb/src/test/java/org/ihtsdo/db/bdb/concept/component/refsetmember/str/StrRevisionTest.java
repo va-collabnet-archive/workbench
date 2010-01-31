@@ -120,7 +120,7 @@ public class StrRevisionTest {
         obj.sapNid = 1; 
         
         StrMember member = new StrMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -141,7 +141,7 @@ public class StrRevisionTest {
         obj.sapNid = 2; 
         
         StrMember member = new StrMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

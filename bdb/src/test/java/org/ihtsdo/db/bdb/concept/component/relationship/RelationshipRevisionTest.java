@@ -177,7 +177,7 @@ public class RelationshipRevisionTest {
         member.nid = 1;
         member.primordialSapNid = 1; 
         member.primordialUNid = 1;
-        member.additionalVersions = null;
+        member.revisions = null;
         member.versions = null;
         obj.primordialComponent = member; 
 
@@ -212,7 +212,7 @@ public class RelationshipRevisionTest {
         member.nid = 2;
         member.primordialSapNid = 2; 
         member.primordialUNid = 2;
-        member.additionalVersions = null;
+        member.revisions = null;
         member.versions = null;
         obj.primordialComponent = member; 
 

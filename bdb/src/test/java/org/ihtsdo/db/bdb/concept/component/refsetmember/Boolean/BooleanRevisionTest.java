@@ -117,7 +117,7 @@ public class BooleanRevisionTest {
         BooleanRevision obj = new BooleanRevision();
 
         BooleanMember member = new BooleanMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -135,7 +135,7 @@ public class BooleanRevisionTest {
         BooleanRevision obj = new BooleanRevision();
 
         BooleanMember member = new BooleanMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

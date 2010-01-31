@@ -2,10 +2,14 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -18,6 +22,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
 import org.ihtsdo.etypes.ERefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -31,11 +36,121 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 
 	private int referencedComponentNid;
 
+	public class Version 
+	extends ConceptComponent<V, C>.Version 
+	implements I_ThinExtByRefTuple, I_ThinExtByRefPart {
+
+		public Version() {
+			super();
+		}
+
+		public Version(int index) {
+			super(index);
+		}
+
+		@Override
+		public ArrayIntList getVariableVersionNids() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+			return RefsetMember.this.makeAnalog(statusNid, pathNid, time);
+		}
+
+		@Override
+		public void addVersion(I_ThinExtByRefPart part) {
+			versions = null;
+			revisions.add((V) part);
+		}
+
+		@Override
+		public int getComponentId() {
+			return referencedComponentNid;
+		}
+
+		@Override
+		public I_ThinExtByRefVersioned getCore() {
+			return RefsetMember.this;
+		}
+
+		@Override
+		public int getMemberId() {
+			return nid;
+		}
+
+		@Override
+		public int getRefsetId() {
+			return enclosingConcept.getNid();
+		}
+
+		@Override
+		public int getStatus() {
+			if (index >= 0) {
+				return revisions.get(index).getStatus();
+			}
+			return RefsetMember.this.getStatusId();
+		}
+
+		@Override
+		public int getTypeId() {
+			return RefsetMember.this.getTypeId();
+		}
+
+		@Override
+		public List<? extends I_ThinExtByRefPart> getVersions() {
+			return RefsetMember.this.getVersions();
+		}
+
+		@Override
+		public boolean promote(I_Path path) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setStatus(int idStatus) {
+			if (index >= 0) {
+				revisions.get(index).setStatus(idStatus);
+			} else {
+				RefsetMember.this.setStatusId(idStatus);
+			}
+		}
+
+		@Override
+		public UniversalAceExtByRefPart getUniversalPart()
+				throws TerminologyException, IOException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public I_ThinExtByRefPart makePromotionPart(I_Path promotionPath) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int compareTo(I_ThinExtByRefPart o) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public I_ThinExtByRefPart duplicate() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public I_ThinExtByRefPart getMutablePart() {
+			return (I_ThinExtByRefPart) super.getMutablePart();
+		}
+		
+		
+		
+	}
 
 	public RefsetMember(Concept enclosingConcept, TupleInput input) {
 		super(enclosingConcept, input);
 	}
 	
+
 	public RefsetMember(ERefset<?> refsetMember, 
 			Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
@@ -44,13 +159,12 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		assert primordialSapNid != Integer.MAX_VALUE;
 	}
 	
-    public RefsetMember() {
-        super();
-    }
 
-    /**
-     * Returns a string representation of the object.
-     */
+	public RefsetMember() {
+		super();
+	}
+
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
@@ -77,7 +191,6 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		buf.append(super.toString());
 		return buf.toString();
 	}
-
 
 	protected abstract String getTypeFieldsString();
 
@@ -114,8 +227,8 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<RefsetRevision<V, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<V, C>>();
-		if (additionalVersions != null) {
-			for (RefsetRevision<V, C> p: additionalVersions) {
+		if (revisions != null) {
+			for (RefsetRevision<V, C> p: revisions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					additionalVersionsToWrite.add(p);
 				}
@@ -145,7 +258,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addVersion(I_ThinExtByRefPart part) {
-		additionalVersions.add((V) part);
+		revisions.add((V) part);
 	}
 
 
@@ -238,6 +351,35 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	}
 
 	@Override
+	public List<? extends I_ThinExtByRefPart> getMutableParts() {
+		return getVersions();
+	}
+
+	List<Version> versions;
+
+	public List<Version> getTuples() {
+		return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+	}
+
+	private List<Version> getVersions() {
+		if (versions == null) {
+			int count = 1;
+			if (revisions != null) {
+				count = count + revisions.size();
+			}
+			ArrayList<Version> list = new ArrayList<Version>(count);
+			list.add(new Version());
+			if (revisions != null) {
+				for (int i = 0; i < revisions.size(); i++) {
+					list.add(new Version(i));
+				}
+			}
+			versions = list;
+		}
+		return versions;
+	}
+	
+		@Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -252,5 +394,5 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
     public int hashCode() {
         return HashFunction.hashCode(new int[] { referencedComponentNid });
     }
-
+	
 }

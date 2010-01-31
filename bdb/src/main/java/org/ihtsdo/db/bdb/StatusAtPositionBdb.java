@@ -1,18 +1,24 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Position;
+
+import cern.colt.list.IntArrayList;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -398,6 +404,16 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			expandPermit.release();
 		}
 		super.sync();
+	}
+
+	public List<TimePathId> getTimePathList() {
+		HashSet<TimePathId> returnValues = new HashSet<TimePathId>();
+		IntArrayList values = sapToIntMap.values();
+		for (int i = 0; i < values.size(); i++) {
+			int sapNid = values.getQuick(i);
+			returnValues.add(new TimePathId(getVersion(sapNid), getPathId(sapNid)));
+		}
+		return new ArrayList<TimePathId>(returnValues);
 	}
 
 }

@@ -28,9 +28,9 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 		super(refsetMember, enclosingConcept);
 		intValue =refsetMember.getIntValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<IntRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<IntRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetIntVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new IntRevision(eVersion, this));
+				revisions.add(new IntRevision(eVersion, this));
 			}
 		}
 	}
@@ -69,15 +69,15 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<IntRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<IntRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new IntRevision(input, this));
+			revisions.add(new IntRevision(input, this));
 		}
 	}
 	@Override

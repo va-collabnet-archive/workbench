@@ -89,6 +89,16 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		nidData = new NidDataInMemory(new byte[] {}, data.getData());
 	}
 
+	public ConceptDataSoftReference(Concept enclosingConcept, byte[] roBytes,
+			byte[] mutableBytes) {
+		assert enclosingConcept != null : "enclosing concept cannot be null.";
+		this.enclosingConcept = enclosingConcept;
+		if (enclosingConcept.isEditable()) {
+			strongReferences = new ArrayList<Object>();
+		}
+		nidData = new NidDataInMemory(roBytes, mutableBytes);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -266,10 +276,11 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 			ArrayList<ConceptAttributes> components = getList(
 					new ConceptAttributesBinder(), OFFSETS.ATTRIBUTES,
 					enclosingConcept);
-			if (components != null && components.size() == 1) {
+			if (components != null && components.size() > 0) {
 				if (enclosingConcept.isEditable()) {
 					strongReferences.add(components.get(0));
 				}
+				attributesRef = new SoftReference<ConceptAttributes>(components.get(0));
 				return components.get(0);
 			}
 		} catch (InterruptedException e) {
@@ -802,6 +813,10 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 
 	@Override
 	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
+		if (getConceptAttributes() != null && getConceptAttributes().nid == nid) {
+			return getConceptAttributes();
+		}
+		
 		if (getDescNids().contains(nid)) {
 			for (Description d : getDescriptions()) {
 				if (d.getNid() == nid) {

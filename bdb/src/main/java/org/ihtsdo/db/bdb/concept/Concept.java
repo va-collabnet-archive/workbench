@@ -2,6 +2,8 @@ package org.ihtsdo.db.bdb.concept;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -9,11 +11,14 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntIterator;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.apache.commons.collections.primitives.IntList;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
@@ -26,24 +31,28 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.ToIoException;
+import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
-import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
+import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
 import org.ihtsdo.db.bdb.concept.component.image.Image;
-import org.ihtsdo.db.bdb.concept.component.image.ImageRevision;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
-import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
@@ -169,17 +178,31 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return new Concept(nid, editable);
 	}
 
+	public static Concept get(int nid, boolean editable,
+			byte[] roBytes, byte[] mutableBytes) throws IOException {
+		return new Concept(nid, editable, roBytes, mutableBytes);
+	}
+
 	private static I_Transact transactionHandler = new TransactionHandler();
 
 	private int nid;
 	private boolean editable;
 	private I_ManageConceptData data;
+    private int fsDescNid = Integer.MIN_VALUE;
+    private int fsXmlDescNid = Integer.MIN_VALUE;
 
 	protected Concept(int nid, boolean editable) throws IOException {
 		super();
 		this.nid = nid;
 		this.editable = editable;
 		data = new ConceptDataSoftReference(this);
+	}
+
+	public Concept(int nid, boolean editable, byte[] roBytes,
+			byte[] mutableBytes) throws IOException {
+		this.nid = nid;
+		this.editable = editable;
+		data = new ConceptDataSoftReference(this, roBytes, mutableBytes);
 	}
 
 	public int getNid() {
@@ -244,41 +267,48 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<UUID> getUids() throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+		return getConceptAttributes().getUUIDs();
 	}
 
 	public List<UUID> getUidsForComponent(int componentNid) throws IOException {
-		throw new UnsupportedOperationException();
+		return getComponent(componentNid).getUUIDs();
 	}
 
-	public List<ConceptAttributesRevision> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positions)
+	public List<ConceptAttributes.Version> getConceptAttributeTuples(
+			I_IntSet allowedStatus, PositionSetReadOnly positionSet)
 			throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getConceptAttributeTuples(allowedStatus, positionSet, true);
 	}
 
-	public List<ConceptAttributesRevision> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positions,
+	public List<ConceptAttributes.Version> getConceptAttributeTuples(
+			I_IntSet allowedStatus, PositionSetReadOnly positionSet,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        List<ConceptAttributes.Version> returnTuples = new ArrayList<ConceptAttributes.Version>();
+        I_ConceptAttributeVersioned attr = getConceptAttributes();
+        if (attr != null) {
+            getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted,
+                returnConflictResolvedLatestState);
+        }
+        return returnTuples;
 	}
 
-	public List<ConceptAttributesRevision> getConceptAttributeTuples(
-			I_IntSet allowedStatus, Set<I_Position> positions,
+	public List<ConceptAttributes.Version> getConceptAttributeTuples(
+			I_IntSet allowedStatus, PositionSetReadOnly positionSet,
 			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        List<ConceptAttributes.Version> returnTuples = new ArrayList<ConceptAttributes.Version>();
+        getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
+        return returnTuples;
 	}
 
 	public List<ConceptAttributes.Version> getConceptAttributeTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
+        return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), true,
+            returnConflictResolvedLatestState);
 	}
 
 	public ConceptAttributes getConceptAttributes() throws IOException {
@@ -294,84 +324,150 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return nid;
 	}
 
-	public DescriptionRevision getDescTuple(I_IntList typePrefOrder,
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
 			I_IntList langPrefOrder, I_IntSet allowedStatus,
-			Set<I_Position> positionSet, LANGUAGE_SORT_PREF sortPref)
+			PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref)
 			throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        I_IntSet typeSet = new IntSet();
+		for (int nid : typePrefOrder.getListArray()) {
+		    typeSet.add(nid);
+		}
+		switch (sortPref) {
+		case LANG_B4_TYPE:
+		    return getLangPreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, true),
+		        typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+		case TYPE_B4_LANG:
+		    return getTypePreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, true),
+		        typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+		default:
+		    throw new IOException("Can't handle sort type: " + sortPref);
+		}
 	}
+
+    private I_DescriptionTuple getLangPreferredDesc(Collection<I_DescriptionTuple> descriptions,
+            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, PositionSetReadOnly positionSet,
+            I_IntSet typeSet) throws IOException, ToIoException {
+        if (descriptions.size() > 0) {
+            if (descriptions.size() > 1) {
+                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+                if (langPrefOrder != null && langPrefOrder.getListValues() != null) {
+                    for (int langId : langPrefOrder.getListValues()) {
+                        for (I_DescriptionTuple d : descriptions) {
+                            try {
+                                int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang())
+                                    .localize()
+                                    .getNid();
+                                if (tupleLangId == langId) {
+                                    matchedList.add(d);
+                                    if (matchedList.size() == 2) {
+                                        break;
+                                    }
+                                }
+                            } catch (TerminologyException e) {
+                                throw new ToIoException(e);
+                            }
+                        }
+                        if (matchedList.size() > 0) {
+                            if (matchedList.size() == 1) {
+                                return matchedList.get(0);
+                            }
+                            return getTypePreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
+                                positionSet, typeSet);
+                        }
+                    }
+                }
+                return descriptions.iterator().next();
+            } else {
+                return descriptions.iterator().next();
+            }
+        }
+        return null;
+    }
+
+    private I_DescriptionTuple getTypePreferredDesc(Collection<I_DescriptionTuple> descriptions,
+            I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, PositionSetReadOnly positionSet,
+            I_IntSet typeSet) throws IOException, ToIoException {
+        if (descriptions.size() > 0) {
+            if (descriptions.size() > 1) {
+                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+                for (int typeId : typePrefOrder.getListValues()) {
+                    for (I_DescriptionTuple d : descriptions) {
+                        if (d.getTypeId() == typeId) {
+                            matchedList.add(d);
+                            if (matchedList.size() == 2) {
+                                break;
+                            }
+                        }
+                    }
+                    if (matchedList.size() > 0) {
+                        if (matchedList.size() == 1) {
+                            return matchedList.get(0);
+                        }
+                        return getLangPreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
+                            positionSet, typeSet);
+                    }
+                }
+                return descriptions.iterator().next();
+            } else {
+                return descriptions.iterator().next();
+            }
+        }
+        return null;
+    }
 
 	@Override
 	public Description.Version getDescTuple(I_IntList descTypePreferenceList,
 			I_ConfigAceFrame config) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return (Version) getDescTuple(descTypePreferenceList, config.getLanguagePreferenceList(), config.getAllowedStatus(),
+                config.getViewPositionSetReadOnly(), config.getLanguageSortPref());
 	}
 
-	public List<DescriptionRevision> getDescriptionTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions)
+	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, PositionSetReadOnly positions)
 			throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
 	}
 
-	public List<DescriptionRevision> getDescriptionTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
+	public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, PositionSetReadOnly positions,
 			boolean returnConflictResolvedLatestState) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+        List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
+        for (Description desc : getDescriptions()) {
+            desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions,
+                returnConflictResolvedLatestState);
+        }
+        return returnDescriptions;
 	}
 
-	public List<Description.Version> getDescriptionTuples(
+	public List<I_DescriptionTuple> getDescriptionTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
 
-	public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-	public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getDescriptionTuples(config.getAllowedStatus(), 
+        		config.getDescTypes(), 
+        		config.getViewPositionSetReadOnly(),
+            returnConflictResolvedLatestState);
 	}
 
 	public Set<Concept> getDestRelOrigins(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
 
-	public List<RelationshipRevision> getDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-	public List<RelationshipRevision> getDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
+            returnConflictResolvedLatestState);
 	}
 
 	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
+        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
+            returnConflictResolvedLatestState);
 	}
 
 	public List<Relationship> getDestRels() throws IOException {
@@ -382,26 +478,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getRefsetMembers();
 	}
 
-	public List<ImageRevision> getImageTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions)
-			throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public List<ImageRevision> getImageTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
+	public List<I_ImageTuple> getImageTuples(
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-	public List<Image.Version> getImageTuples(
-			boolean returnConflictResolvedLatestState) throws IOException,
-			TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getImageTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(),
+            returnConflictResolvedLatestState);
 	}
 
 	public List<Image> getImages() throws IOException {
@@ -409,8 +492,73 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public String getInitialText() throws IOException {
-		return getDescriptions().iterator().next().getText();
+        try {
+            if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
+                I_DescriptionTuple tuple = this.getDescTuple(AceConfig.config.aceFrames.get(0)
+                    .getShortLabelDescPreferenceList(), AceConfig.config.getAceFrames().get(0));
+                if (tuple != null) {
+                    return tuple.getText();
+                }
+            }
+            return getText();
+        } catch (IndexOutOfBoundsException e) {
+            try {
+                return getText();
+            } catch (IndexOutOfBoundsException e2) {
+                return nid + " has no desc";
+            }
+        }
 	}
+
+    private String getText() {
+        try {
+            if (getDescriptions().size() > 0) {
+                return getDescriptions().get(0).getFirstTuple().getText();
+            }
+        } catch (IOException ex) {
+            AceLog.getAppLog().nonModalAlertAndLogException(ex);
+        }
+
+        List<I_DescriptionVersioned> localDesc = getUncommittedDescriptions();
+        if (localDesc.size() == 0) {
+            try {
+                if (fsDescNid == Integer.MIN_VALUE) {
+                    fsDescNid = Terms.get().uuidToNative(
+                        ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids());
+                    fsDescNid = Terms.get().uuidToNative(
+                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+                }
+                if (getDescriptions().size() > 0) {
+                    I_DescriptionVersioned desc = getDescriptions().get(0);
+                    for (I_DescriptionVersioned d : getDescriptions()) {
+                        for (I_DescriptionPart part : d.getMutableParts()) {
+                            if ((part.getTypeId() == fsDescNid) || (part.getTypeId() == fsXmlDescNid)) {
+                                return part.getText();
+                            }
+                        }
+                    }
+                    return desc.getMutableParts().get(0).getText();
+                } else {
+                    StringBuffer errorBuffer = new StringBuffer();
+                    errorBuffer.append("No descriptions for concept. uuids: "
+                        + AceConfig.getVodb().getUids(nid).toString() + " nid: "
+                        + AceConfig.getVodb().uuidToNative(getUids()));
+
+                    int sequence = nid + Integer.MIN_VALUE;
+                    String errString = nid + " (" + sequence + ") " + " has no descriptions " + getUids();
+                    getDescriptions();
+                    return errString;
+                }
+
+            } catch (Exception ex) {
+                AceLog.getAppLog().nonModalAlertAndLogException(ex);
+            }
+        }
+        I_DescriptionVersioned tdv = localDesc.get(0);
+        List<? extends I_DescriptionPart> versions = tdv.getMutableParts();
+        I_DescriptionPart first = versions.get(0);
+        return first.getText();
+    }
 
 	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config)
 			throws IOException {
@@ -418,41 +566,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 		throw new UnsupportedOperationException();
 	}
 
-	public Set<Concept> getSourceRelTargets(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public Set<Concept> getSourceRelTargets(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
+	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
-		return getSourceRelTargets(allowedStatus, allowedTypes, positions,
-				addUncommitted, returnConflictResolvedLatestState);
-	}
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-	public Set<Concept> getSourceRelTargets(I_IntSet allowedTypes,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public List<RelationshipRevision> getSourceRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public List<RelationshipRevision> getSourceRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
+        return getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(),
+            addUncommitted, returnConflictResolvedLatestState);
 	}
 
 	public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes,
@@ -467,63 +587,83 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public ConceptAttributes getUncommittedConceptAttributes() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<I_DescriptionVersioned>();
 	}
 
 	public List<I_Identify> getUncommittedIdVersioned() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<I_Identify>();
 	}
 
 	public I_IntSet getUncommittedIds() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IntSet();
 	}
 
 	public List<I_ImageVersioned> getUncommittedImages() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<I_ImageVersioned>();
 	}
 
 	public List<I_RelVersioned> getUncommittedSourceRels() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<I_RelVersioned>();
 	}
 
 	public UniversalAceBean getUniversalAceBean() throws IOException,
 			TerminologyException {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
 			throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isParentOf(Concept child, I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
-		//TODO
-		throw new UnsupportedOperationException();
+		I_IntSet destRelTypes = aceConfig.getDestRelTypes();
+		IntList relNidTypeNid = data.getDestRelNidTypeNidList();
+		IntList possibleChildRels = new ArrayIntList();
+		int i = 0;
+		while (i < relNidTypeNid.size()) {
+			int relNid = relNidTypeNid.get(i++);
+			int typeNid = relNidTypeNid.get(i++);
+			if (destRelTypes.contains(typeNid)) {
+				possibleChildRels.add(relNid);
+			}
+		}
+		if (possibleChildRels.size() == 0 && aceConfig.getSourceRelTypes().getSetValues().length == 0) {
+			return true;
+		}
+		IntIterator relNids = possibleChildRels.iterator();
+		while (relNids.hasNext()) {
+			int relNid = relNids.next();
+			Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(relNid);
+			List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+			try {
+				r.addTuples(destRelTypes, currentVersions, addUncommitted, false);
+			} catch (TerminologyException e) {
+				throw new IOException(e);
+			}
+			if (currentVersions.size() > 0) {
+				return false;
+			}
+		}
+		
+		I_IntSet srcRelTypes = aceConfig.getSourceRelTypes();
+		for (Relationship r: getSourceRels()) {
+			List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+			try {
+				r.addTuples(srcRelTypes, currentVersions, addUncommitted, false);
+			} catch (TerminologyException e) {
+				throw new IOException(e);
+			}
+			if (currentVersions.size() > 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isParentOf(Concept child, boolean addUncommitted)
 			throws IOException, TerminologyException {
-		//TODO
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isParentOfOrEqualTo(Concept child, I_IntSet allowedStatus,
-			I_IntSet allowedTypes, Set<I_Position> positions,
-			boolean addUncommitted) throws IOException {
 		//TODO
 		throw new UnsupportedOperationException();
 	}
@@ -551,138 +691,118 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 
-	@Override
-	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, PositionSetReadOnly positions)
-			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
 
 	@Override
-	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, PositionSetReadOnly positions,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, PositionSetReadOnly positions,
-			boolean addUncommitted) throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, I_IntSet allowedStatus,
-			PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref)
-			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public List<? extends I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions) throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public List<? extends I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions,
-			boolean returnConflictResolvedLatestState) throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Set<? extends I_GetConceptData> getDestRelOrigins(
+	public Set<Concept> getDestRelOrigins(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean addUncommitted)
 			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        Set<Concept> returnValues = new HashSet<Concept>();
+        for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
+            returnValues.add(Bdb.getConceptDb().getConcept(rel.getC1Id()));
+        }
+        return returnValues;
 	}
 
 
 	@Override
-	public Set<? extends I_GetConceptData> getDestRelOrigins(
+	public Set<Concept> getDestRelOrigins(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
+            returnConflictResolvedLatestState);
 	}
 
 
 	@Override
-	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
+	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
 			boolean addUncommitted) throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		return getDestRelTuples(allowedStatus,
+				allowedTypes, positions,
+				addUncommitted, false);
 	}
 
 
 	@Override
-	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
+	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws IOException, TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+			throws IOException {
+		try {
+			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+			IntList relNidTypeNidlist = data.getDestRelNidTypeNidList();
+			int i = 0;
+			while (i < relNidTypeNidlist.size()) {
+				int relNid = relNidTypeNidlist.get(i++);
+				int typeNid = relNidTypeNidlist.get(i++);
+				if (allowedTypes.contains(typeNid)) {
+					Concept relSource = Bdb.getConceptForComponent(relNid);
+					Relationship r = relSource.getRelationship(relNid);
+					r.addTuples(allowedStatus, allowedTypes, positions, 
+							returnRels, addUncommitted, returnConflictResolvedLatestState);
+				}
+			}
+			return returnRels;
+		} catch (TerminologyException e) {
+			throw new IOException(e);
+		}
 	}
 
 
 	@Override
-	public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
+	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions)
 			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
+        for (I_ImageVersioned img : getImages()) {
+            img.addTuples(allowedStatus, allowedTypes, positions, returnTuples);
+        }
+        return returnTuples;
 	}
 
 
 	@Override
-	public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
+	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+
+        List<I_ImageTuple> returnTuples = getImageTuples(allowedStatus, allowedTypes, positions);
+        return Terms.get()
+            .getActiveAceFrameConfig()
+            .getConflictResolutionStrategy()
+            .resolveTuples(returnTuples);
 	}
 
 	@Override
-	public Set<? extends I_GetConceptData> getSourceRelTargets(
+	public Set<I_GetConceptData> getSourceRelTargets(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean addUncommitted)
 			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+        for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted)) {
+            returnValues.add(ConceptBean.get(rel.getC2Id()));
+        }
+        return returnValues;
 	}
 
 
 	@Override
-	public Set<? extends I_GetConceptData> getSourceRelTargets(
+	public Set<I_GetConceptData> getSourceRelTargets(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+        for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, addUncommitted,
+            returnConflictResolvedLatestState)) {
+            returnValues.add(ConceptBean.get(rel.getC2Id()));
+        }
+        return returnValues;
 	}
 
 
@@ -691,8 +811,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean addUncommitted)
 			throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+        for (Relationship rel : getSourceRels()) {
+            rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
+        }
+        return returnRels;
 	}
 
 
@@ -702,8 +825,12 @@ public class Concept implements I_Transact, I_GetConceptData {
 			PositionSetReadOnly positions, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState) throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+        for (I_RelVersioned rel : getSourceRels()) {
+            rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted,
+                returnConflictResolvedLatestState);
+        }
+        return returnRels;
 	}
 
 
@@ -745,15 +872,18 @@ public class Concept implements I_Transact, I_GetConceptData {
 	@Override
 	public Object getDenotation(int authorityNid) throws IOException,
 			TerminologyException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		for (I_IdVersion part: getIdentifier().getIdVersions()) {
+			if (part.getAuthorityNid() == authorityNid) {
+				return part.getDenotation();
+			}
+		}
+		return null;
 	}
 
 
 	@Override
 	public I_Identify getIdentifier() throws IOException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		return getConceptAttributes();
 	}
 
 	public I_ManageConceptData getData() {
@@ -791,6 +921,15 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}	
 	
 	public String toString() {
+        try {
+            return getInitialText();
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+            return ex.toString();
+        }
+	}
+
+	public String toLongString() {
 		StringBuffer buff = new StringBuffer();
 		try {
 			buff.append("\nConcept: \n attributes: ");
@@ -863,5 +1002,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
 		return data.getRefsetMember(memberNid);
+	}
+
+	public Relationship getDestRel(int relNid) throws IOException {
+		return Bdb.getConceptForComponent(relNid).getRelationship(relNid);
+	}
+
+	public Relationship getSourceRel(int relNid) throws IOException {
+		return getRelationship(relNid);
 	}
 }

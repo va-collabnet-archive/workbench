@@ -31,9 +31,9 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		floatValue = refsetMember.getFloatValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidFloatRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidFloatRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidFloatVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidFloatRevision(eVersion, this));
+				revisions.add(new CidFloatRevision(eVersion, this));
 			}
 		}
 	}
@@ -56,15 +56,15 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidFloatRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidFloatRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidFloatRevision(input, this));
+			revisions.add(new CidFloatRevision(input, this));
 		}
 	}
 	@Override

@@ -2,6 +2,8 @@ package org.ihtsdo.db.bdb;
 
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 
+import cern.colt.list.IntArrayList;
+
 public class SapToIntHashMap {
 	
 	private UuidToIntHashMap map;
@@ -76,5 +78,9 @@ public class SapToIntHashMap {
 
 	public boolean containsKey(long time, int statusNid, int pathNid) {
 		return map.containsKey(TimeStatusPosition.timeStatusPositionToUuid(time, statusNid, pathNid));
+	}
+
+	public IntArrayList values() {
+		return map.values();
 	}
 }

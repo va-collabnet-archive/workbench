@@ -77,7 +77,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	}
 	
 	public List<V> getVersions() {
-		return primordialComponent.additionalVersions;
+		return primordialComponent.revisions;
 	}
 
 	@Override

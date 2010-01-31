@@ -30,8 +30,6 @@ public class GetNidData implements Callable<byte[]> {
 		try {
 			if (db.get(null, key, data, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				nidData = data.getData().clone();
-				assert nidData != data.getData();
-				assert Arrays.equals(nidData, data.getData());
 			} else {
 				nidData = new byte[0];
 			}

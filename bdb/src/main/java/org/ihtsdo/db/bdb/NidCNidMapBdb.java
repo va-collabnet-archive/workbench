@@ -1,7 +1,9 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.dwfa.ace.log.AceLog;
@@ -54,10 +56,17 @@ public class NidCNidMapBdb extends ComponentBdb {
 			OperationStatus status = readOnly.get(null, keyEntry, 
 					valueEntry, LockMode.READ_UNCOMMITTED);
 			if (status == OperationStatus.SUCCESS) {
+				List<String> maxValueEntries = new ArrayList<String>();
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				int j = 0;
 				while (ti.available() > 0) {
 					nidCNidMaps[i][j++] = ti.readInt();
+					if (nidCNidMaps[i][j-1] == Integer.MAX_VALUE) {
+						maxValueEntries.add("[" + i + "][" + (j-1) + "]");
+					}
+				}
+				if (maxValueEntries.size() > 0 && i < nidCNidMaps.length - 1) {
+					System.out.println("read-only max value entries: " + maxValueEntries);
 				}
 			} else {
 				throw new IOException("Unsuccessful operation: " + status);
@@ -77,8 +86,15 @@ public class NidCNidMapBdb extends ComponentBdb {
 			if (status == OperationStatus.SUCCESS) {
 				TupleInput ti = new TupleInput(valueEntry.getData());
 				int j = 0;
+				List<String> maxValueEntries = new ArrayList<String>();
 				while (ti.available() > 0) {
 					nidCNidMaps[index][j++] = ti.readInt();
+					if (nidCNidMaps[i][j-1] == Integer.MAX_VALUE) {
+						maxValueEntries.add("[" + i + "][" + (j-1) + "]");
+					}
+				}
+				if (maxValueEntries.size() > 0 && i < nidCNidMaps.length - 1) {
+					System.out.println("mutable max value entries: " + maxValueEntries);
 				}
 			} else {
 				throw new IOException("Unsuccessful operation: " + 
@@ -169,8 +185,15 @@ public class NidCNidMapBdb extends ComponentBdb {
 				if (mapChanged[key]) {
 					IntegerBinding.intToEntry(key, keyEntry);
 					output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
+					List<String> maxValueEntries = new ArrayList<String>();
 					for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
 						output.writeInt(nidCNidMaps[key][i]);
+						if (nidCNidMaps[key][i] == Integer.MAX_VALUE) {
+							maxValueEntries.add("[" + key + "][" + i + "]");
+						}
+					}
+					if (maxValueEntries.size() > 0 && key < nidCNidMaps.length - 1) {
+						System.out.println("writing max value entries: " + maxValueEntries);
 					}
 					valueEntry = new DatabaseEntry(output.toByteArray());
 					status = mutable.put(null, keyEntry, valueEntry);
@@ -196,6 +219,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 	
 	public void setCidForNid(int cNid, int nid) throws IOException {
 		ensureCapacity(nid);
+		assert cNid != Integer.MAX_VALUE;
 		int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 		mapChanged[mapIndex] = true;
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;

@@ -65,7 +65,7 @@ public class IdentifierVersionString extends IdentifierVersion {
             return false;
 		if (IdentifierVersionString.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersionString another = (IdentifierVersionString) obj;
-            return this.getStatusAtPositionNid() == another.getStatusAtPositionNid(); 
+            return this.getSapNid() == another.getSapNid(); 
 		}
 		return false;
 	}

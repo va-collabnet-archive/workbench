@@ -165,11 +165,11 @@ public class ConceptAttributesRevisionTest {
         vers.setDefined(true);
         obj.versions.add(vers);
         
-        obj.additionalVersions = new ArrayList<ConceptAttributesRevision>(1);
+        obj.revisions = new ArrayList<ConceptAttributesRevision>(1);
         ConceptAttributesRevision car = new ConceptAttributesRevision(1, obj); 
         car.primordialComponent = obj;
         car.sapNid = 21;
-        obj.additionalVersions.add(car);
+        obj.revisions.add(car);
         
         Concept c = Concept.get(testConcept);
         obj.enclosingConcept = c;
@@ -191,11 +191,11 @@ public class ConceptAttributesRevisionTest {
         vers.setDefined(false);
         obj.versions.add(vers);
         
-        obj.additionalVersions = new ArrayList<ConceptAttributesRevision>(1);
+        obj.revisions = new ArrayList<ConceptAttributesRevision>(1);
         ConceptAttributesRevision car = new ConceptAttributesRevision(2, obj); 
         car.primordialComponent = obj;
         car.sapNid = 22;
-        obj.additionalVersions.add(car);
+        obj.revisions.add(car);
         
         Concept c = Concept.get(test2Concept);
         obj.enclosingConcept = c;

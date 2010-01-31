@@ -34,16 +34,17 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidRevision(eVersion, this));
+				revisions.add(new CidRevision(eVersion, this));
 			}
 		}
 	}
 
-    public CidMember() {
-        super();
-    }
+	public CidMember() {
+		super();
+	}
+
 
 	@Override
 	protected boolean membersEqual(
@@ -77,15 +78,15 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
     @Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidRevision(input, this));
+			revisions.add(new CidRevision(input, this));
 		}
 	}
 	@Override

@@ -21,7 +21,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -30,7 +30,6 @@ import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
-import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.util.VersionComputer;
@@ -56,12 +55,12 @@ public class ConceptAttributes
 	}
 	
 	public ConceptAttributes() {
-        super();
-    }
+		super();
+	}
 
 	public class Version 
 		extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version 
-		implements I_ConceptAttributeTuple {
+		implements I_ConceptAttributeTuple, I_ConceptAttributePart {
 		
 		public Version() {
 			super();
@@ -74,7 +73,7 @@ public class ConceptAttributes
 		@Override
 		public boolean isDefined() {
 			if (index >= 0) {
-				return additionalVersions.get(index).isDefined();
+				return revisions.get(index).isDefined();
 			}
 			return defined;
 		}
@@ -82,7 +81,7 @@ public class ConceptAttributes
 		@Override
 		public void setDefined(boolean defined) {
 			if (index >= 0) {
-				additionalVersions.get(index).setDefined(defined);
+				revisions.get(index).setDefined(defined);
 			} else {
 				ConceptAttributes.this.defined = defined;
 			}
@@ -91,7 +90,7 @@ public class ConceptAttributes
 		@Override
 		public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
-				return additionalVersions.get(index).makeAnalog(statusNid, pathNid, time);
+				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
 			}
 			return new ConceptAttributesRevision(ConceptAttributes.this, 
 					statusNid, pathNid, time, ConceptAttributes.this);
@@ -124,10 +123,12 @@ public class ConceptAttributes
 		}
 
 
-		@Override
-		public ArrayIntList getPartComponentNids() {
-			// TODO Auto-generated method stub
-			return null;
+		public ArrayIntList getVariableVersionNids() {
+			if (index >= 0) {
+				ArrayIntList resultList = new ArrayIntList(2);
+				return resultList;
+			}
+			return ConceptAttributes.this.getVariableVersionNids();
 		}
 		
 	}
@@ -139,13 +140,13 @@ public class ConceptAttributes
 			defined = input.readBoolean();
 			int additionalVersionCount = input.readShort();
 			if (additionalVersionCount > 0) {
-				if (additionalVersions == null) {
-					additionalVersions = new ArrayList<ConceptAttributesRevision>(additionalVersionCount);
+				if (revisions == null) {
+					revisions = new ArrayList<ConceptAttributesRevision>(additionalVersionCount);
 				} else {
-					additionalVersions.ensureCapacity(additionalVersions.size() + additionalVersionCount);
+					revisions.ensureCapacity(revisions.size() + additionalVersionCount);
 				}
 				for (int i = 0; i < additionalVersionCount; i++) {
-					additionalVersions.add(new ConceptAttributesRevision(input, this));
+					revisions.add(new ConceptAttributesRevision(input, this));
 				}
 			}
 		} catch (Throwable e) {
@@ -157,8 +158,8 @@ public class ConceptAttributes
 	public void writeToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
 		List<ConceptAttributesRevision> partsToWrite = new ArrayList<ConceptAttributesRevision>();
-		if (additionalVersions != null) {
-			for (ConceptAttributesRevision p : additionalVersions) {
+		if (revisions != null) {
+			for (ConceptAttributesRevision p : revisions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
@@ -181,25 +182,33 @@ public class ConceptAttributes
 		return nid;
 	}
 
-	List<Version> versions;
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.dwfa.vodb.types.I_ConceptAttributeVersioned#getTuples()
 	 */
 	public List<Version> getTuples() {
-		if (versions == null) {
-			versions = new ArrayList<Version>();
-			versions.add(new Version());
-		}
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				versions.add(new Version(i));
-			}
-		}
-		return Collections.unmodifiableList(versions);
+		return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
 	}
 
+	List<Version> versions;
+	private List<Version> getVersions() {
+		if (versions == null) {
+			int count = 1;
+			if (revisions != null) {
+				count = count + revisions.size();
+			}
+			ArrayList<Version> list = new ArrayList<Version>(count);
+			list.add(new Version());
+			if (revisions != null) {
+				for (int i = 0; i < revisions.size(); i++) {
+					list.add(new Version(i));
+				}
+			}
+			versions = list;
+		}
+		return versions;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -233,9 +242,9 @@ public class ConceptAttributes
 
 	public void addTuples(I_IntSet allowedStatus,
 			PositionSetReadOnly positions,
-			List<Version> tuples,
+			List<Version> returnTuples,
 			boolean addUncommitted) {
-		computer.addTuples(allowedStatus, positions, tuples,
+		computer.addTuples(allowedStatus, positions, returnTuples,
 				addUncommitted, getTuples());
 	}
 
@@ -245,12 +254,12 @@ public class ConceptAttributes
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 
-		List<Version> tuples = new ArrayList<Version>();
+		List<Version> matchedTuples = new ArrayList<Version>();
 
-		addTuples(allowedStatus, positionSet, tuples, addUncommitted);
+		addTuples(allowedStatus, positionSet, matchedTuples, addUncommitted);
 
 		if (returnConflictResolvedLatestState) {
-			I_ConfigAceFrame config = AceConfig.getVodb()
+			I_ConfigAceFrame config = Terms.get()
 					.getActiveAceFrameConfig();
 			I_ManageConflict conflictResolutionStrategy;
 			if (config == null) {
@@ -259,9 +268,9 @@ public class ConceptAttributes
 				conflictResolutionStrategy = config
 						.getConflictResolutionStrategy();
 			}
-			tuples = conflictResolutionStrategy.resolveTuples(tuples);
+			matchedTuples = conflictResolutionStrategy.resolveTuples(matchedTuples);
 		}
-		returnTuples.addAll(tuples);
+		returnTuples.addAll(matchedTuples);
 	}
 
 	/*
@@ -271,10 +280,7 @@ public class ConceptAttributes
 	 * org.dwfa.vodb.types.I_ConceptAttributeVersioned#getLocalFixedConcept()
 	 */
 	public I_ConceptualizeLocally getLocalFixedConcept() {
-		boolean isDefined = additionalVersions.get(additionalVersions.size() - 1)
-				.isDefined();
-		boolean isPrimitive = !isDefined;
-		return LocalFixedConcept.get(nid, isPrimitive);
+		return LocalFixedConcept.get(nid, !defined);
 	}
 
 	@Override
@@ -304,7 +310,7 @@ public class ConceptAttributes
 			TerminologyException {
 		UniversalAceConceptAttributes conceptAttributes = new UniversalAceConceptAttributes(
 				getUids(nid), this.versionCount());
-		for (ConceptAttributesRevision part : additionalVersions) {
+		for (ConceptAttributesRevision part : revisions) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
 			universalPart.setStatusId(getUids(part.getStatusId()));
 			universalPart.setDefined(part.isDefined());
@@ -389,7 +395,7 @@ public class ConceptAttributes
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
 		this.versions = null;
-		return additionalVersions.add(new ConceptAttributesRevision(part, this));
+		return revisions.add(new ConceptAttributesRevision(part, this));
 	}
 
 	@Override
@@ -468,6 +474,9 @@ public class ConceptAttributes
 		return false;
 	}
 
-
+	@Override
+	public List<? extends I_ConceptAttributePart> getMutableParts() {
+		return getTuples();
+	}
 	
 }

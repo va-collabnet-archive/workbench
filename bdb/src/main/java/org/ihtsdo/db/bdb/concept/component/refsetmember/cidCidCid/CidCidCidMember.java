@@ -9,7 +9,6 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid.CidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -34,19 +33,19 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		c3Nid = Bdb.uuidToNid(refsetMember.getC3Uuid());
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidCidCidRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidCidCidRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidCidCidVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidCidCidRevision(eVersion, this));
+				revisions.add(new CidCidCidRevision(eVersion, this));
 			}
 		}
 	}
 
-    public CidCidCidMember() {
-        super();
-    }
-
     
-    @Override
+    public CidCidCidMember() {
+		super();
+	}
+
+	@Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -77,15 +76,15 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidCidCidRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidCidCidRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidCidCidRevision(input, this));
+			revisions.add(new CidCidCidRevision(input, this));
 		}
 	}
 	@Override

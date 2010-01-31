@@ -118,7 +118,7 @@ public class DescriptionRevisionTest {
         DescriptionRevision obj = new DescriptionRevision();
 
         Description desc = new Description();
-        desc.additionalVersions = null;
+        desc.revisions = null;
         desc.enclosingConcept = null; 
         desc.nid = 4;
         desc.primordialSapNid = 4; 
@@ -136,7 +136,7 @@ public class DescriptionRevisionTest {
         // Create an object to test... 
         DescriptionRevision obj = new DescriptionRevision();
         Description desc = new Description();
-        desc.additionalVersions = null;
+        desc.revisions = null;
         desc.enclosingConcept = null; 
         desc.nid = 5;
         desc.primordialSapNid = 5; 

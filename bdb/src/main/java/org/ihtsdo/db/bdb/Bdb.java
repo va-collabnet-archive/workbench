@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -21,6 +22,7 @@ import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.OFFSETS;
 import org.ihtsdo.etypes.EVersion;
 
+import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseException;
@@ -37,6 +39,7 @@ public class Bdb {
 	private static NidCNidMapBdb nidCidMapDb;
 	private static StatusAtPositionBdb statusAtPositionDb;
 	private static ConceptBdb conceptDb;
+	private static PropertiesBdb propDb;
 	
 	private static ExecutorService executorPool;
 	private static int executorPoolSize;
@@ -49,7 +52,7 @@ public class Bdb {
 	}
 	
 	public static void setup() {
-		setup("target");
+		setup("berkeley-db");
 	}
 
 	
@@ -60,10 +63,9 @@ public class Bdb {
 			}
 			executorPoolSize = (Runtime.getRuntime().availableProcessors() * 2);
 			executorPool = Executors.newFixedThreadPool(executorPoolSize);
-			File buildDirectory = new File(dbRoot);
-			buildDirectory.mkdirs();
-			File bdbDirectory = new File(buildDirectory, "berkeley-db");
+			File bdbDirectory = new File(dbRoot);
 			bdbDirectory.mkdirs();
+			
 			mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
 			File readOnlyDir = new File(bdbDirectory, "read-only");
 			boolean readOnlyExists = readOnlyDir.exists();
@@ -73,6 +75,7 @@ public class Bdb {
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			conceptDb = new ConceptBdb(readOnly, mutable);
+			propDb = new PropertiesBdb(readOnly, mutable);
 			BdbTermFactory tf = new BdbTermFactory();
 			Terms.set(tf);
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
@@ -92,8 +95,7 @@ public class Bdb {
 		dbConfig.setDeferredWrite(!readOnly);
 		try {
 			return bdb.bdbEnv.openDatabase(null,
-					dbName,
-					dbConfig);
+					dbName, dbConfig);
 		} catch (DatabaseException e) {
 			throw new IOException(e);
 		}
@@ -145,8 +147,8 @@ public class Bdb {
 	public static int getConceptNid(int componentNid) {
 		return nidCidMapDb.getCNid(componentNid);
 	}
-	public static Concept getConceptForComponent(int componentNid) {
-		throw new UnsupportedOperationException();
+	public static Concept getConceptForComponent(int componentNid) throws IOException {
+		return Bdb.getConceptDb().getConcept(Bdb.getConceptNid(componentNid));
 	}
 	
 	public static UuidsToNidMapBdb getUuidsToNidMap() {
@@ -173,6 +175,7 @@ public class Bdb {
 			nidCidMapDb.sync();
 			statusAtPositionDb.sync();
 			conceptDb.sync();
+			propDb.sync();
 			mutable.bdbEnv.sync();
 			if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 				readOnly.bdbEnv.sync();
@@ -196,6 +199,7 @@ public class Bdb {
 				nidCidMapDb.close();
 				statusAtPositionDb.close();
 				conceptDb.close();
+				propDb.close();
 				mutable.bdbEnv.sync();
 				mutable.bdbEnv.close();
 			} catch (DatabaseException dbe) {
@@ -214,6 +218,7 @@ public class Bdb {
 		nidCidMapDb = null;
 		statusAtPositionDb = null;
 		conceptDb = null;
+		propDb= null;
 	}
 
 	public static NidCNidMapBdb getNidCNidMap() {
@@ -253,5 +258,53 @@ public class Bdb {
 		return pathManager;
 	}
 
+	public static Map<String, String> getProperties() throws IOException {
+		return propDb.getProperties();
+	}
 
+	public static String getProperty(String key) throws IOException {
+		return propDb.getProperty(key);
+	}
+
+	public static void setProperty(String key, String value) throws IOException {
+		propDb.setProperty(key, value);
+	}
+
+	public static void compress(int utilization) throws IOException {
+        try {
+
+            String lookAheadCacheSize = mutable.bdbEnv.getConfig().getConfigParam("je.cleaner.lookAheadCacheSize");
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.lookAheadCacheSize", "81920");
+
+            String cluster = mutable.bdbEnv.getConfig().getConfigParam("je.cleaner.cluster");
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.cluster", "true");
+
+            String minFileUtilization = mutable.bdbEnv.getConfig().getConfigParam("je.cleaner.minFileUtilization");
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.minFileUtilization", Integer.toString(50));
+
+            String minUtilization = mutable.bdbEnv.getConfig().getConfigParam("je.cleaner.minUtilization");
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.minUtilization", Integer.toString(utilization));
+
+            String threads = mutable.bdbEnv.getConfig().getConfigParam("je.cleaner.threads");
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.threads", "4");
+
+            boolean anyCleaned = false;
+            while (mutable.bdbEnv.cleanLog() > 0) {
+                anyCleaned = true;
+            }
+            if (anyCleaned) {
+                CheckpointConfig force = new CheckpointConfig();
+                force.setForce(true);
+                mutable.bdbEnv.checkpoint(force);
+            }
+
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.lookAheadCacheSize", lookAheadCacheSize);
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.cluster", cluster);
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.minFileUtilization", minFileUtilization);
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.minUtilization", minUtilization);
+            mutable.bdbEnv.getConfig().setConfigParam("je.cleaner.threads", threads);
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+	}
 }

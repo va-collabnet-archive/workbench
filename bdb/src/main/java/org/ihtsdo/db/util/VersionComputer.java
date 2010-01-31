@@ -185,7 +185,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 								// combination.
 								throw new RuntimeException(
 										RELATIVE_POSITION.EQUAL
-												+ " should never happen. Data is malformed.");
+										+ " should never happen. Data is malformed. Part:\n" + 
+										part + " \n  Part to test: \n" + partToTest);
 							case UNREACHABLE:
 								// Should have failed mapper.onRoute(part)
 								// above.
@@ -224,6 +225,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 	public void addTuplesNullPositions(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, List<V> matchingTuples,
 			boolean addUncommitted, List<V> versions) {
+		if (versions == null) {
+			return;
+		}
 		HashSet<V> versionsToAdd = new HashSet<V>();
 		HashSet<V> uncommittedVersions = new HashSet<V>();
 		HashSet<V> rejectedVersions = new HashSet<V>();

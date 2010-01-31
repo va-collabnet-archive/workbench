@@ -166,7 +166,7 @@ public class RelationshipTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.additionalVersions = new ArrayList<RelationshipRevision>(1);
+        obj.revisions = new ArrayList<RelationshipRevision>(1);
 
         RelationshipRevision rev = new RelationshipRevision(); 
         rev.primordialComponent = obj; 
@@ -175,7 +175,7 @@ public class RelationshipTest {
         rev.setGroup(1);
         rev.setRefinabilityId(1);
         rev.setTypeId(1);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
@@ -201,7 +201,7 @@ public class RelationshipTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.additionalVersions = new ArrayList<RelationshipRevision>(1);
+        obj.revisions = new ArrayList<RelationshipRevision>(1);
 
         RelationshipRevision rev = new RelationshipRevision(); 
         rev.primordialComponent = obj; 
@@ -210,7 +210,7 @@ public class RelationshipTest {
         rev.setGroup(2);
         rev.setRefinabilityId(2);
         rev.setTypeId(2);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }

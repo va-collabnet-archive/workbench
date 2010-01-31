@@ -114,9 +114,9 @@ public class ConceptAttributesVersionTest {
 	}
 
 	private void testCa1(ConceptAttributes ca1) {
-		assertNotNull(ca1.additionalVersions);
-		assertEquals(ca1.additionalVersions.size(), 1);
-		ConceptAttributesRevision cav = ca1.additionalVersions.get(0);
+		assertNotNull(ca1.revisions);
+		assertEquals(ca1.revisions.size(), 1);
+		ConceptAttributesRevision cav = ca1.revisions.get(0);
 		assertEquals(ca1.getStatusId(), cav.getStatusId());
 		assertEquals(ca1.getPathId(), cav.getPathId());
 		if (ca1.primordialSapNid == cav.sapNid) {

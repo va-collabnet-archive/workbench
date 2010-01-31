@@ -110,7 +110,7 @@ public class DescriptionTest {
         
         // Create an object to test... 
         Description obj = new Description();
-        obj.additionalVersions = null;
+        obj.revisions = null;
         obj.enclosingConcept = null; 
         obj.nid = 1;
         obj.primordialSapNid = 2; 
@@ -124,7 +124,7 @@ public class DescriptionTest {
         
         // Create an object to test... 
         Description obj = new Description();
-        obj.additionalVersions = null;
+        obj.revisions = null;
         obj.enclosingConcept = null; 
         obj.nid = 4;
         obj.primordialSapNid = 4; 

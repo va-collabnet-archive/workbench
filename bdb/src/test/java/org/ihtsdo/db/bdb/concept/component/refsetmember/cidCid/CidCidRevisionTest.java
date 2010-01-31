@@ -119,7 +119,7 @@ public class CidCidRevisionTest {
         obj.setC2id(1);
 
         CidCidMember member = new CidCidMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -142,7 +142,7 @@ public class CidCidRevisionTest {
         obj.setC2id(2);
 
         CidCidMember member = new CidCidMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

@@ -120,7 +120,7 @@ public class LongRevisionTest {
         obj.sapNid = 1; 
         
         LongMember member = new LongMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -141,7 +141,7 @@ public class LongRevisionTest {
         obj.sapNid = 2; 
         
         LongMember member = new LongMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

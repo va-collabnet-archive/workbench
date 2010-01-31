@@ -111,11 +111,11 @@ public class BooleanMemberTest {
         
         // Create an object to test... 
         BooleanMember obj = new BooleanMember();
-        obj.additionalVersions = new ArrayList<BooleanRevision>(1);
+        obj.revisions = new ArrayList<BooleanRevision>(1);
         BooleanRevision rev = new BooleanRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
 
         obj.enclosingConcept = null; 
         obj.nid = 1;
@@ -129,11 +129,11 @@ public class BooleanMemberTest {
         
         // Create an object to test... 
         BooleanMember obj = new BooleanMember();
-        obj.additionalVersions = new ArrayList<BooleanRevision>(1);
+        obj.revisions = new ArrayList<BooleanRevision>(1);
         BooleanRevision rev = new BooleanRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
 
         obj.enclosingConcept = null; 
         obj.nid = 2;

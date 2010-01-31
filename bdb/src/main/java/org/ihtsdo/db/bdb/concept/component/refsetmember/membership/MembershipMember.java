@@ -25,9 +25,9 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 	public MembershipMember(ERefsetMember refsetMember, Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<MembershipRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<MembershipRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new MembershipRevision(eVersion, this));
+				revisions.add(new MembershipRevision(eVersion, this));
 			}
 		}
 	}
@@ -65,15 +65,15 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<MembershipRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<MembershipRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new MembershipRevision(input, this));
+			revisions.add(new MembershipRevision(input, this));
 		}
 	}
 	@Override

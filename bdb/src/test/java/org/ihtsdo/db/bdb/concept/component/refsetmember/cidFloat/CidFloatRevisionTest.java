@@ -120,7 +120,7 @@ public class CidFloatRevisionTest {
         obj.sapNid = 1; 
         
         CidFloatMember member = new CidFloatMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -143,7 +143,7 @@ public class CidFloatRevisionTest {
         obj.sapNid = 2; 
         
         CidFloatMember member = new CidFloatMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

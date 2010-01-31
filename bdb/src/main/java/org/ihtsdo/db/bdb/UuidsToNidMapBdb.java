@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -323,5 +324,12 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		mutableUuidsToNidMap.put(denotation, nid); 
 		w.unlock();
 		
+	}
+
+
+	public List<UUID> getUuidsForNid(int nid) {
+		List<UUID> list = readOnlyUuidsToNidMap.keysOf(nid);
+		list.addAll(mutableUuidsToNidMap.keysOf(nid));
+		return list;
 	}
 }

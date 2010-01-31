@@ -85,8 +85,8 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId) {
 				componentListToWrite.add(conceptComponent);
 			} else {
-				if (conceptComponent.additionalVersions != null) {
-					for (V part: conceptComponent.additionalVersions) {
+				if (conceptComponent.revisions != null) {
+					for (V part: conceptComponent.revisions) {
 						assert part.getStatusAtPositionNid() != Integer.MAX_VALUE;
 						if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
 							componentListToWrite.add(conceptComponent);

@@ -119,14 +119,14 @@ public class LongMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.additionalVersions = new ArrayList<LongRevision>(1);
+        obj.revisions = new ArrayList<LongRevision>(1);
 
         LongRevision rev = new LongRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
         rev.setLongValue((long) 1);
         rev.setStatusAtPositionNid(1);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
@@ -141,14 +141,14 @@ public class LongMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.additionalVersions = new ArrayList<LongRevision>(1);
+        obj.revisions = new ArrayList<LongRevision>(1);
 
         LongRevision rev = new LongRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;
         rev.setLongValue((long) 1);
         rev.setStatusAtPositionNid(2);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }

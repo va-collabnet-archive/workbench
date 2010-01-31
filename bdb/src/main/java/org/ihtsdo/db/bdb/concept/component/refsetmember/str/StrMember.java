@@ -28,9 +28,9 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
 		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<StrRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<StrRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetStrVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new StrRevision(eVersion, this));
+				revisions.add(new StrRevision(eVersion, this));
 			}
 		}
 	}
@@ -68,15 +68,15 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
     @Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<StrRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<StrRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new StrRevision(input, this));
+			revisions.add(new StrRevision(input, this));
 		}
 	}
 	@Override

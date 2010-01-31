@@ -10,19 +10,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.lucene.search.Hits;
+import org.dwfa.ace.ACE;
+import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
+import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -40,8 +55,10 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -60,16 +77,88 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.search.I_Search;
+import org.dwfa.ace.search.LuceneMatch;
+import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.app.DwfaEnv;
+import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.PathManager;
+import org.dwfa.vodb.VodbEnv.MakeNewAceFrame;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.impl.CheckAndProcessRegexMatch;
+import org.dwfa.vodb.types.IntList;
+import org.dwfa.vodb.types.IntSet;
+import org.dwfa.vodb.types.Path;
+import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
 
-public class BdbTermFactory implements I_TermFactory {
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.je.DatabaseException;
+
+public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
 	private BdbPathManager pathManager;
+
+	private I_ShowActivity activityFrame;
+
+	private File envHome;
+
+	private TupleBinding<Integer> intBinder = TupleBinding
+			.getPrimitiveBinding(Integer.class);
+
+	private boolean closed = false;
+
+	public static boolean isHeadless() {
+		return DwfaEnv.isHeadless();
+	}
+
+	public static void setHeadless(Boolean headless) {
+		DwfaEnv.setHeadless(headless);
+	}
+
+	private class ShutdownThread extends Thread {
+
+		public ShutdownThread() {
+			super("BdbTermFactory Shutdown Thread");
+		}
+
+		public void run() {
+			try {
+				if (!closed) {
+					Bdb.close();
+					closed = true;
+				}
+			} catch (InterruptedException e) {
+				AceLog.getEditLog().alertAndLogException(e);
+			} catch (ExecutionException e) {
+				AceLog.getEditLog().alertAndLogException(e);
+			}
+		}
+	}
+
+	public void close() throws IOException {
+		try {
+			Bdb.close();
+			closed = true;
+			Terms.close(this);
+		} catch (DatabaseException e) {
+			throw new IOException(e);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
 
 	@Override
 	public void addChangeSetReader(I_ReadChangeSet reader) {
@@ -162,16 +251,25 @@ public class BdbTermFactory implements I_TermFactory {
 		throw new UnsupportedOperationException();
 	}
 
+	I_ConfigAceFrame activeAceFrameConfig;
+
 	@Override
 	public I_ConfigAceFrame getActiveAceFrameConfig()
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return activeAceFrameConfig;
+	}
+
+	@Override
+	public void setActiveAceFrameConfig(I_ConfigAceFrame activeAceFrameConfig)
+			throws TerminologyException, IOException {
+		this.activeAceFrameConfig = activeAceFrameConfig;
 	}
 
 	@Override
 	public List<? extends I_ThinExtByRefVersioned> getAllExtensionsForComponent(
 			int nid) throws IOException {
-		Concept c = Bdb.getConceptDb().getConcept(Bdb.getNidCNidMap().getCNid(nid));
+		Concept c = Bdb.getConceptDb().getConcept(
+				Bdb.getNidCNidMap().getCNid(nid));
 		return c.getExtensionsForComponent(nid);
 	}
 
@@ -205,19 +303,23 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public I_GetConceptData getConcept(Collection<UUID> ids)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return Bdb.getConceptDb().getConcept(Bdb.uuidsToNid(ids));
 	}
 
 	@Override
 	public I_GetConceptData getConcept(UUID... ids)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return Bdb.getConceptDb().getConcept(Bdb.uuidToNid(ids));
 	}
 
 	@Override
 	public I_GetConceptData getConcept(int nid) throws TerminologyException,
 			IOException {
+		assert nid != Integer.MAX_VALUE;
 		int cNid = Bdb.getConceptNid(nid);
+		assert cNid != Integer.MAX_VALUE: "nid: " + nid + " cNid: " + cNid + 
+			" concept: " + Bdb.getConceptDb().getConcept(nid) + 
+			" uuid:" + Bdb.getUuidsToNidMap().getUuidsForNid(nid);
 		return Bdb.getConceptDb().getConcept(cNid);
 	}
 
@@ -237,7 +339,7 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public int getConceptCount() throws IOException {
-		throw new UnsupportedOperationException();
+		return (int) Bdb.getConceptDb().getCount();
 	}
 
 	@Override
@@ -314,18 +416,18 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public I_Identify getId(int nid) throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return Bdb.getConceptForComponent(nid).getComponent(nid);
 	}
 
 	@Override
-	public I_Identify getId(UUID uid) throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+	public I_Identify getId(UUID uuid) throws TerminologyException, IOException {
+		return getId(Bdb.uuidToNid(uuid));
 	}
 
 	@Override
 	public I_Identify getId(Collection<UUID> uids) throws TerminologyException,
 			IOException {
-		throw new UnsupportedOperationException();
+		return getId(Bdb.uuidsToNid(uids));
 	}
 
 	@Override
@@ -365,12 +467,12 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public Map<String, String> getProperties() throws IOException {
-		throw new UnsupportedOperationException();
+		return Bdb.getProperties();
 	}
 
 	@Override
 	public String getProperty(String key) throws IOException {
-		throw new UnsupportedOperationException();
+		return Bdb.getProperty(key);
 	}
 
 	@Override
@@ -401,7 +503,7 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public List<TimePathId> getTimePathList() throws Exception {
-		throw new UnsupportedOperationException();
+		return Bdb.getStatusAtPositionDb().getTimePathList();
 	}
 
 	@Override
@@ -412,7 +514,7 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public Collection<UUID> getUids(int nid) throws TerminologyException,
 			IOException {
-		throw new UnsupportedOperationException();
+		return getId(nid).getUUIDs();
 	}
 
 	@Override
@@ -439,13 +541,13 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
-	public boolean hasId(Collection<UUID> uids) throws IOException {
-		throw new UnsupportedOperationException();
+	public boolean hasId(Collection<UUID> uuids) throws IOException {
+		return Bdb.uuidsToNid(uuids) != Integer.MAX_VALUE;
 	}
 
 	@Override
-	public boolean hasId(UUID uid) throws IOException {
-		throw new UnsupportedOperationException();
+	public boolean hasId(UUID uuid) throws IOException {
+		return Bdb.uuidToNid(uuid) != Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -526,24 +628,41 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public TransferHandler makeTerminologyTransferHandler(
 			JComponent thisComponent) {
-		throw new UnsupportedOperationException();
+		return new TerminologyTransferHandler(thisComponent);
 	}
 
 	@Override
 	public void newAceFrame(I_ConfigAceFrame frameConfig) throws Exception {
-		throw new UnsupportedOperationException();
+		MakeNewAceFrame maker = new MakeNewAceFrame(frameConfig);
+		SwingUtilities.invokeAndWait(maker);
+		maker.check();
 	}
 
 	@Override
 	public I_ConfigAceFrame newAceFrameConfig() throws TerminologyException,
 			IOException {
-		throw new UnsupportedOperationException();
+		return new AceFrameConfig();
 	}
 
 	@Override
 	public I_ShowActivity newActivityPanel(boolean displayInViewer,
 			I_ConfigAceFrame aceFrameConfig) {
-		throw new UnsupportedOperationException();
+		if (isHeadless()) {
+			return new UpperInfoOnlyConsoleMonitor();
+		} else {
+			ActivityPanel ap = new ActivityPanel(true, null, aceFrameConfig);
+			ap.setIndeterminate(true);
+			ap.setProgressInfoUpper("New activity");
+			ap.setProgressInfoLower("");
+			if (displayInViewer) {
+				try {
+					ActivityViewer.addActivity(ap);
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
+			}
+			return ap;
+		}
 	}
 
 	@Override
@@ -651,12 +770,12 @@ public class BdbTermFactory implements I_TermFactory {
 
 	@Override
 	public I_IntList newIntList() {
-		throw new UnsupportedOperationException();
+		return new IntList();
 	}
 
 	@Override
 	public I_IntSet newIntSet() {
-		throw new UnsupportedOperationException();
+		return new IntSet();
 	}
 
 	@Override
@@ -682,13 +801,20 @@ public class BdbTermFactory implements I_TermFactory {
 	@Override
 	public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		ArrayList<I_Position> originList = new ArrayList<I_Position>();
+		if (origins != null) {
+			originList.addAll(origins);
+		}
+		Path newPath = new Path(pathConcept.getConceptId(), originList);
+		AceLog.getEditLog().fine("writing new path: \n" + newPath);
+		new PathManager().write(newPath);
+		return newPath;
 	}
 
 	@Override
 	public I_Position newPosition(I_Path path, int version)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return new Position(version, path);
 	}
 
 	@Override
@@ -741,14 +867,8 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
-	public void setActiveAceFrameConfig(I_ConfigAceFrame activeAceFrameConfig)
-			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void setProperty(String key, String value) throws IOException {
-		throw new UnsupportedOperationException();
+		Bdb.setProperty(key, value);
 	}
 
 	@Override
@@ -796,7 +916,7 @@ public class BdbTermFactory implements I_TermFactory {
 	}
 
 	@Override
-	@Deprecated 
+	@Deprecated
 	public void writeId(I_Identify versioned) throws IOException {
 		throw new UnsupportedOperationException();
 	}
@@ -820,4 +940,168 @@ public class BdbTermFactory implements I_TermFactory {
 		this.pathManager = pathManager;
 	}
 
+	@Override
+	public List<UUID> nativeToUuid(int nid) throws IOException {
+		return Bdb.getConceptForComponent(nid).getUidsForComponent(nid);
+	}
+
+	@Override
+	public I_ImageVersioned getImage(UUID uuid) throws IOException {
+		return getImage(Bdb.uuidToNid(uuid));
+	}
+
+	@Override
+	public I_ImageVersioned getImage(int nid) throws IOException {
+		return (I_ImageVersioned) Bdb.getConceptForComponent(nid).getComponent(
+				nid);
+	}
+
+	@Override
+	public void checkpoint() throws IOException {
+		try {
+			Bdb.sync();
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public void compress(int minUtilization) throws IOException {
+		Bdb.compress(minUtilization);
+
+	}
+
+	@Override
+	public I_ConfigAceDb newAceDbConfig() {
+		return new AceConfig(envHome, false);
+	}
+
+	@Override
+	public void setup(Object envHome, boolean readOnly, Long cacheSize)
+			throws IOException {
+		// nothing to do...
+	}
+
+	@Override
+	public void setup(Object envHome, boolean readOnly, Long cacheSize,
+			DatabaseSetupConfig databaseSetupConfig) throws IOException {
+		// nothing to do...
+	}
+
+	@Override
+	public void searchConcepts(I_TrackContinuation tracker,
+			I_RepresentIdSet matches,
+			CountDownLatch latch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException,
+			org.apache.lucene.queryParser.ParseException {
+		throw new UnsupportedOperationException();
+
+	}
+
+	@Override
+	public CountDownLatch searchLucene(I_TrackContinuation tracker,
+			String query, Collection<LuceneMatch> matches,
+			CountDownLatch latch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config, LuceneProgressUpdator updater)
+			throws DatabaseException, IOException,
+			org.apache.lucene.queryParser.ParseException {
+		throw new UnsupportedOperationException();
+	}
+
+	private static class RegexSearcher implements I_ProcessConceptData {
+
+		private CountDownLatch conceptLatch;
+		private I_TrackContinuation tracker;
+		private Semaphore checkSemaphore;
+		private List<I_TestSearchResults> checkList;
+		private I_ConfigAceFrame config;
+		private Pattern p;
+		Collection<I_DescriptionVersioned> matches;
+
+		public RegexSearcher(CountDownLatch conceptLatch,
+				I_TrackContinuation tracker, Semaphore checkSemaphore,
+				List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
+				Pattern p, Collection<I_DescriptionVersioned> matches) {
+			super();
+			this.conceptLatch = conceptLatch;
+			this.tracker = tracker;
+			this.checkSemaphore = checkSemaphore;
+			this.checkList = checkList;
+			this.config = config;
+			this.p = p;
+			this.matches = matches;
+		}
+
+		@Override
+		public void processConceptData(Concept concept) throws Exception {
+
+			if (tracker.continueWork()) {
+				List<? extends I_DescriptionVersioned> descriptions = concept
+						.getDescriptions();
+				CountDownLatch descriptionLatch = new CountDownLatch(
+						descriptions.size());
+				for (I_DescriptionVersioned descV : descriptions) {
+					try {
+						checkSemaphore.acquire();
+					} catch (InterruptedException e) {
+						AceLog.getAppLog().log(Level.WARNING,
+								e.getLocalizedMessage(), e);
+					}
+					ACE.threadPool.execute(new CheckAndProcessRegexMatch(
+							descriptionLatch, checkSemaphore, p, matches,
+							descV, checkList, config));
+				}
+				try {
+					descriptionLatch.await();
+				} catch (InterruptedException e) {
+					AceLog.getAppLog().log(Level.WARNING,
+							e.getLocalizedMessage(), e);
+				}
+				conceptLatch.countDown();
+			} else {
+				while (conceptLatch.getCount() > 0) {
+					conceptLatch.countDown();
+				}
+			}
+		}
+	}
+
+
+	@Override
+	public void searchRegex(I_TrackContinuation tracker, Pattern p,
+			Collection<I_DescriptionVersioned> matches,
+			CountDownLatch conceptLatch, List<I_TestSearchResults> checkList,
+			I_ConfigAceFrame config) throws DatabaseException, IOException {
+		Stopwatch timer = null;
+		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+			timer = new Stopwatch();
+			timer.start();
+		}
+
+		Semaphore checkSemaphore = new Semaphore(15);
+		RegexSearcher searcher = new RegexSearcher(conceptLatch,
+				tracker, checkSemaphore, checkList, config,
+				p, matches);
+		try {
+			Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
+			conceptLatch.await();
+		} catch (Exception e1) {
+			AceLog.getAppLog().log(Level.WARNING, e1.getLocalizedMessage(), e1);
+			while (conceptLatch.getCount() > 0) {
+				conceptLatch.countDown();
+			}
+		}
+		if (AceLog.getAppLog().isLoggable(Level.INFO)) {
+			if (tracker.continueWork()) {
+				AceLog.getAppLog().info(
+						"Regex Search time: " + timer.getElapsedTime());
+			} else {
+				AceLog.getAppLog().info(
+						"Canceled. Elapsed time: " + timer.getElapsedTime());
+			}
+			timer.stop();
+		}
+	}
 }

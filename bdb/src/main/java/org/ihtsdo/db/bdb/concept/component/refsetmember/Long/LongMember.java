@@ -27,9 +27,9 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		super(refsetMember, enclosingConcept);
 		longValue =refsetMember.getLongValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<LongRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<LongRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetLongVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new LongRevision(eVersion, this));
+				revisions.add(new LongRevision(eVersion, this));
 			}
 		}
 	}
@@ -67,15 +67,15 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<LongRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<LongRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new LongRevision(input, this));
+			revisions.add(new LongRevision(input, this));
 		}
 	}
 	@Override

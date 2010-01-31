@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.log.AceLog;
 
 import com.sleepycat.je.Database;
+import com.sleepycat.je.DatabaseException;
 
 /**
  * 
@@ -18,8 +19,12 @@ public abstract class ComponentBdb {
 
 	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
 			throws IOException {
-		readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(), 
-				getDbName(), readOnlyBdbEnv);
+		try {
+			readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(), 
+					getDbName(), readOnlyBdbEnv);
+		} catch (DatabaseException e) {
+			AceLog.getAppLog().warning(e.getLocalizedMessage());
+		}
 		mutable = Bdb.setupDatabase(false, getDbName(), mutableBdbEnv);
 		init();
 	}

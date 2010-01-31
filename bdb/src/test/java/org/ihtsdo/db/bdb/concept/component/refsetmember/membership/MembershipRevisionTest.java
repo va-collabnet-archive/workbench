@@ -119,7 +119,7 @@ public class MembershipRevisionTest {
         obj.sapNid = 1; 
         
         MembershipMember member = new MembershipMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -138,7 +138,7 @@ public class MembershipRevisionTest {
         obj.sapNid = 2; 
         
         MembershipMember member = new MembershipMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

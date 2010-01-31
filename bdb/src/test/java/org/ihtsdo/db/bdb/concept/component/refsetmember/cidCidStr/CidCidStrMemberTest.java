@@ -118,12 +118,12 @@ public class CidCidStrMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.additionalVersions = new ArrayList<CidCidStrRevision>(1);
+        obj.revisions = new ArrayList<CidCidStrRevision>(1);
 
         CidCidStrRevision rev = new CidCidStrRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
@@ -139,12 +139,12 @@ public class CidCidStrMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.additionalVersions = new ArrayList<CidCidStrRevision>(1);
+        obj.revisions = new ArrayList<CidCidStrRevision>(1);
 
         CidCidStrRevision rev = new CidCidStrRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }

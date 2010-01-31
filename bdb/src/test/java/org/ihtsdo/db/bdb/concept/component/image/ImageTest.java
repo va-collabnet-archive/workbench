@@ -149,11 +149,11 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.additionalVersions = new ArrayList<ImageRevision>(1);
+        obj.revisions = new ArrayList<ImageRevision>(1);
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 1;
-        obj.additionalVersions.add(ir); 
+        obj.revisions.add(ir); 
         
         Concept c = Concept.get(testConcept);
         obj.enclosingConcept = c;
@@ -170,11 +170,11 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.additionalVersions = new ArrayList<ImageRevision>(1);
+        obj.revisions = new ArrayList<ImageRevision>(1);
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 2;
-        obj.additionalVersions.add(ir); 
+        obj.revisions.add(ir); 
         
         Concept c = Concept.get(test2Concept);
         obj.enclosingConcept = c;

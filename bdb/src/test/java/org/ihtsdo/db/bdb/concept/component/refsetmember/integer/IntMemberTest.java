@@ -117,14 +117,14 @@ public class IntMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.additionalVersions = new ArrayList<IntRevision>(1);
+        obj.revisions = new ArrayList<IntRevision>(1);
 
         IntRevision rev = new IntRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
         rev.setIntValue(1);
         rev.setStatusAtPositionNid(1);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
@@ -139,14 +139,14 @@ public class IntMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.additionalVersions = new ArrayList<IntRevision>(1);
+        obj.revisions = new ArrayList<IntRevision>(1);
 
         IntRevision rev = new IntRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;
         rev.setIntValue(2);
         rev.setStatusAtPositionNid(2);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }

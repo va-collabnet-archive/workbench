@@ -1,17 +1,22 @@
 package org.ihtsdo.db.bdb.concept;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.IdentifierSetReadOnly;
+import org.dwfa.ace.list.AceListRenderer;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.NidCNidMapBdb;
@@ -48,8 +53,23 @@ public class ConceptBdb extends ComponentBdb {
 		return getConcept(cNid).getUids();
 	}
 
+	ConcurrentHashMap<Integer, SoftReference<Concept>> conceptMap;
 	public Concept getConcept(int cNid) throws IOException {
-		return Concept.get(cNid, false);
+		assert cNid != Integer.MAX_VALUE;
+		if (conceptMap == null) {
+			conceptMap = new ConcurrentHashMap<Integer, SoftReference<Concept>>(getCount());
+		}
+		SoftReference<Concept> cRef = conceptMap.get(cNid);
+		Concept c;
+		if (cRef != null) {
+			c = cRef.get();
+			if (c != null) {
+				return c;
+			}
+		}
+		c = Concept.get(cNid, false);
+		conceptMap.put(cNid, new SoftReference<Concept>(c));
+		return c;
 	}
 
 	public Concept getWritableConcept(int cNid) throws IOException {
@@ -57,6 +77,9 @@ public class ConceptBdb extends ComponentBdb {
 	}
 
 	public void writeConcept(Concept concept) throws IOException {
+		if (conceptMap != null) {
+			conceptMap.remove(concept.getNid());
+		}
 		ConceptBinder binder = new ConceptBinder();
 		DatabaseEntry key = new DatabaseEntry();
 		int cNid = concept.getNid();
@@ -72,9 +95,9 @@ public class ConceptBdb extends ComponentBdb {
 		}
 	}
 
-	public long getCount() {
+	public int getCount() {
 		long count = readOnly.count() + mutable.count();
-		return count;
+		return (int) count;
 	}
 
 	/*
@@ -84,68 +107,151 @@ public class ConceptBdb extends ComponentBdb {
 	 * org.ihtsdo.db.bdb.concept.I_ProcessAllConceptData#iterateConceptData(
 	 * org.ihtsdo.db.bdb.concept.ConceptData)
 	 */
-	public void iterateConceptDataInSequence(I_ProcessConceptData procesor)
+	public void iterateConceptDataInSequence(I_ProcessConceptData processor)
 			throws Exception {
-		IdentifierSet conceptNids = getConceptNids();
-		I_IterateIds nidItr = conceptNids.iterator();
-		while (nidItr.next()) {
-			procesor.processConceptData(getConcept(nidItr.nid()));
-		}
+		iterateConceptData(processor, 1);
 	}
 
 	public void iterateConceptDataInParallel(I_ProcessConceptData processor)
 			throws Exception {
+		iterateConceptData(processor, Bdb.getExecutorPoolSize());
+	}
+
+	private void iterateConceptData(I_ProcessConceptData processor,
+			int executors) throws IOException, InterruptedException,
+			ExecutionException {
 		IdentifierSet ids = (IdentifierSet) getReadOnlyConceptIdSet();
-		List<IdentifierSet> idPools = new ArrayList<IdentifierSet>();
-		for (int i = 0; i < Bdb.getExecutorPoolSize(); i++) {
-			idPools.add(new IdentifierSet(ids.totalBits()));
-		}
+		int cardinality = ids.cardinality();
+		int idsPerParallelConceptIterator = cardinality / executors;
 		I_IterateIds idsItr = ids.iterator();
-		boolean next = idsItr.next();
-		while (next) {
-			for (IdentifierSet set: idPools) {
-				set.setMember(idsItr.nid());
-				next = idsItr.next();
-				if (!next) {
+		List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
+		int sum = 0;
+		while (idsItr.next()) {
+			int first = idsItr.nid();
+			int last = first;
+			int count = 1;
+			while (idsItr.next()) {
+				last = idsItr.nid();
+				count++;
+				if (count == idsPerParallelConceptIterator) {
 					break;
 				}
 			}
-			if (!next) {
-				break;
-			}
-		}
-		List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(idPools.size());
-		for (IdentifierSet set: idPools) {
-			ParallelConceptIterator pci = new ParallelConceptIterator(set, processor);
+			sum = sum + count;
+			ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor);
 			Future<Boolean> f = Bdb.getExecutorPool().submit(pci);
 			futures.add(f);
 		}
-
 		for (Future<Boolean> f: futures) {
 			f.get();
 		}
 	}
 
 	public class ParallelConceptIterator implements Callable<Boolean> {
-		private IdentifierSet iterationSet;
 		private I_ProcessConceptData processor;
+		private int first;
+		private int last;
+		private int countToProcess;
+		private int processedCount = 0;
 		
-		@Override
-		public Boolean call() throws Exception {
-			I_IterateIds idsItr = iterationSet.iterator();
-			while (idsItr.next()) {
-				processor.processConceptData(getConcept(idsItr.nid()));
-			}
-			return true;
-		}
-
-		public ParallelConceptIterator(IdentifierSet iterationSet,
-				I_ProcessConceptData processor) {
+		public ParallelConceptIterator(int first, int last,
+				int count, I_ProcessConceptData processor) {
 			super();
-			this.iterationSet = iterationSet;
+			this.first = first;
+			this.last = last;
+			this.countToProcess = count;
 			this.processor = processor;
 		}
 		
+		@Override
+		public Boolean call() throws Exception {
+			CursorConfig cursorConfig = new CursorConfig();
+			cursorConfig.setReadUncommitted(true);
+			Cursor roCursor = readOnly.openCursor(null, cursorConfig);
+			Cursor mutableCursor = mutable.openCursor(null, cursorConfig);
+			int roKey = first;
+			int mutableKey = first;
+			try {
+				DatabaseEntry roFoundKey = new DatabaseEntry();
+				IntegerBinding.intToEntry(roKey, roFoundKey);
+				DatabaseEntry roFoundData = new DatabaseEntry();
+				DatabaseEntry mutableFoundKey = new DatabaseEntry();
+				IntegerBinding.intToEntry(mutableKey, mutableFoundKey);
+				DatabaseEntry mutableFoundData = new DatabaseEntry();
+				
+				roKey = setupCursor(roCursor, roFoundKey, roFoundData);
+				mutableKey = setupCursor(mutableCursor, mutableFoundKey,
+						mutableFoundData);
+
+				while (roKey <= last || mutableKey <= last) {
+					if (roKey == mutableKey) {
+						processor.processConceptData(Concept.get(roKey, false, 
+									roFoundData.getData(), mutableFoundData.getData()));
+						processedCount++;
+						if (roKey < last) {
+							roKey = advanceCursor(roCursor, roFoundKey, roFoundData);
+							mutableKey = advanceCursor(mutableCursor, mutableFoundKey,
+									mutableFoundData);
+						} else {
+							roKey = Integer.MAX_VALUE;
+							mutableKey = Integer.MAX_VALUE;
+						}
+					} else if (roKey < mutableKey) {
+						processor.processConceptData(Concept.get(roKey, false, 
+								roFoundData.getData(), new byte[0]));
+						processedCount++;
+						if (roKey < last) {
+							roKey = advanceCursor(roCursor, roFoundKey, roFoundData);
+						} else {
+							roKey = Integer.MAX_VALUE;
+						}
+					} else {
+						processor.processConceptData(Concept.get(mutableKey, false, 
+								new byte[0], mutableFoundData.getData()));
+						processedCount++;
+						if (mutableKey < last) {
+							mutableKey = advanceCursor(mutableCursor, mutableFoundKey,
+									mutableFoundData);
+						} else {
+							mutableKey = Integer.MAX_VALUE;
+						}
+					}
+				}
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+					AceLog.getAppLog().fine("Parallel concept iterator finished.\n" + 
+							" First: " + first + " last: " + last + " roKey: " + roKey + " mutableKey: " + mutableKey
+							+ " processedCount: " + processedCount + " countToProcess: " + countToProcess);
+				}
+				return true;
+			} finally {
+				roCursor.close();
+				mutableCursor.close();
+			}
+		}
+
+		private int advanceCursor(Cursor mutableCursor,
+				DatabaseEntry mutableFoundKey, DatabaseEntry mutableFoundData) {
+			int mutableKey;
+			if (mutableCursor.getNext(mutableFoundKey, mutableFoundData, 
+					LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+				mutableKey = IntegerBinding.entryToInt(mutableFoundKey);
+			} else {
+				mutableKey = Integer.MAX_VALUE;
+			}
+			return mutableKey;
+		}
+
+		private int setupCursor(Cursor mutableCursor,
+				DatabaseEntry mutableFoundKey, DatabaseEntry mutableFoundData) {
+			int mutableKey;
+			if (mutableCursor.getSearchKey(mutableFoundKey, mutableFoundData, 
+					LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+				mutableKey = IntegerBinding.entryToInt(mutableFoundKey);
+			} else {
+				mutableKey = Integer.MAX_VALUE;
+			}
+			return mutableKey;
+		}
 	}
 	
 	public void iterateWritableConceptDataInSequence(I_ProcessConceptData procesor)

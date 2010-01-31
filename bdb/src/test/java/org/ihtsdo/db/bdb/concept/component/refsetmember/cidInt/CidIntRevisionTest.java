@@ -123,7 +123,7 @@ public class CidIntRevisionTest {
         obj.sapNid = 1; 
         
         CidIntMember member = new CidIntMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 1;
         member.primordialSapNid = 1; 
@@ -148,7 +148,7 @@ public class CidIntRevisionTest {
         obj.sapNid = 2; 
         
         CidIntMember member = new CidIntMember();
-        member.additionalVersions = null;
+        member.revisions = null;
         member.enclosingConcept = null; 
         member.nid = 2;
         member.primordialSapNid = 2; 

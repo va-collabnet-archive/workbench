@@ -63,7 +63,7 @@ public class IdentifierVersionLong extends IdentifierVersion {
             return false;
 		if (IdentifierVersionLong.class.isAssignableFrom(obj.getClass())) {
 			IdentifierVersionLong another = (IdentifierVersionLong) obj;
-            return this.getStatusAtPositionNid() == another.getStatusAtPositionNid(); 
+            return this.getSapNid() == another.getSapNid(); 
 		}
 		return false;
 	}

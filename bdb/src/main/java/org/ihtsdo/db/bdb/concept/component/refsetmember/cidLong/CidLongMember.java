@@ -32,9 +32,9 @@ public class CidLongMember
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		longValue = refsetMember.getLongValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidLongRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidLongRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidLongVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidLongRevision(eVersion, this));
+				revisions.add(new CidLongRevision(eVersion, this));
 			}
 		}
 	}
@@ -72,15 +72,15 @@ public class CidLongMember
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidLongRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidLongRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidLongRevision(input, this));
+			revisions.add(new CidLongRevision(input, this));
 		}
 	}
 	@Override

@@ -27,6 +27,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
 import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageVersion;
@@ -40,7 +41,7 @@ public class Image
 	
 	public class Version 
 	extends ConceptComponent<ImageRevision, Image>.Version 
-	implements I_ImageTuple {
+	implements I_ImageTuple, I_ImagePart {
 
 		public Version() {
 			super();
@@ -73,7 +74,7 @@ public class Image
 		@Override
 		public String getTextDescription() {
 			if (index >= 0) {
-				return additionalVersions.get(index).getTextDescription();
+				return revisions.get(index).getTextDescription();
 			}
 			return textDescription;
 		}
@@ -91,7 +92,7 @@ public class Image
 		@Override
 		public int getTypeId() {
 			if (index >= 0) {
-				return additionalVersions.get(index).getTypeId();
+				return revisions.get(index).getTypeId();
 			}
 			return typeNid;
 		}
@@ -99,21 +100,24 @@ public class Image
 		@Override
 		public void setTypeId(int type) {
 			if (index >= 0) {
-				additionalVersions.get(index).setTypeId(type);
+				revisions.get(index).setTypeId(type);
 			}
 			typeNid = type;
 		}
 
-		@Override
-		public ArrayIntList getPartComponentNids() {
-			// TODO Auto-generated method stub
-			return null;
+		public ArrayIntList getVariableVersionNids() {
+			if (index >= 0) {
+				ArrayIntList resultList = new ArrayIntList(3);
+				resultList.add(getTypeId());
+				return resultList;
+			}
+			return Image.this.getVariableVersionNids();
 		}
 
 		@Override
 		public I_ImagePart makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
-				return additionalVersions.get(index).makeAnalog(statusNid, pathNid, time);
+				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
 			}
 			return Image.this.makeAnalog(statusNid, pathNid, time);
 		}
@@ -126,6 +130,14 @@ public class Image
 		@Deprecated
 		public I_ImagePart duplicate() {
 			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+
+		@Override
+		public void setTextDescription(String name) {
+			if (index >= 0) {
+				revisions.get(index).setTextDescription(name);
+			}
+			textDescription = name;
 		}
 
 	}
@@ -151,16 +163,16 @@ public class Image
 		typeNid = Bdb.uuidToNid(eImage.getPrimordialComponentUuid());
 		primordialSapNid = Bdb.getStatusAtPositionNid(eImage);
 		if (eImage.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<ImageRevision>(eImage.getExtraVersionsList().size());
+			revisions = new ArrayList<ImageRevision>(eImage.getExtraVersionsList().size());
 			for (EImageVersion eiv: eImage.getExtraVersionsList()) {
-				additionalVersions.add(new ImageRevision(eiv, this));
+				revisions.add(new ImageRevision(eiv, this));
 			}
 		}
 	}
 
-    public Image() {
-        super();
-    }
+	public Image() {
+		super();
+	}
 
 	/**
 	 * Returns a string representation of the object.
@@ -229,15 +241,15 @@ public class Image
 		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new ImageRevision(input, this));
+			revisions.add(new ImageRevision(input, this));
 		}
 	}
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		List<ImageRevision> partsToWrite = new ArrayList<ImageRevision>();
-		if (additionalVersions != null) {
-			for (ImageRevision p: additionalVersions) {
+		if (revisions != null) {
+			for (ImageRevision p: revisions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid) {
 					partsToWrite.add(p);
 				}
@@ -299,26 +311,31 @@ public class Image
 	 * @see org.dwfa.vodb.types.I_ImageVersioned#getLastTuple()
 	 */
 	public Version getLastTuple() {
-		return getTuples().get(getTuples().size() - 1);
+		List<Version> vList = getTuples();
+		return vList.get(vList.size() - 1);
 	}
 
 	List<Version> versions;
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.vodb.types.I_ImageVersioned#getTuples()
-	 */
 	public List<Version> getTuples() {
+		return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+	}
+
+	private List<Version> getVersions() {
 		if (versions == null) {
-			versions = new ArrayList<Version>();
-			versions.add(new Version());
-		}
-		if (additionalVersions != null) {
-			for (int i = 0; i < additionalVersions.size(); i++) {
-				versions.add(new Version(i));
+			int count = 1;
+			if (revisions != null) {
+				count = count + revisions.size();
 			}
+			ArrayList<Version> list = new ArrayList<Version>(count);
+			list.add(new Version());
+			if (revisions != null) {
+				for (int i = 0; i < revisions.size(); i++) {
+					list.add(new Version(i));
+				}
+			}
+			versions = list;
 		}
-		return Collections.unmodifiableList(versions);
+		return versions;
 	}
 
 	/*
@@ -348,9 +365,9 @@ public class Image
 	public UniversalAceImage getUniversal() throws IOException,
 			TerminologyException {
 		UniversalAceImage universal = new UniversalAceImage(getUids(nid),
-				getImage(), new ArrayList<UniversalAceImagePart>(additionalVersions
+				getImage(), new ArrayList<UniversalAceImagePart>(revisions
 						.size()), getFormat(), enclosingConcept.getUids());
-		for (ImageRevision part : additionalVersions) {
+		for (ImageRevision part : revisions) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
 			universalPart.setPathId(getUids(part.getPathId()));
 			universalPart.setStatusId(getUids(part.getStatusId()));
@@ -386,7 +403,7 @@ public class Image
 	@Override
 	public boolean addVersion(I_ImagePart part) {
 		this.versions = null;
-		return additionalVersions.add((ImageRevision) part);
+		return revisions.add((ImageRevision) part);
 	}
 
 	@Override
@@ -436,4 +453,9 @@ public class Image
 		throw new UnsupportedOperationException();
 	}
 	
+	@Override
+	public List<? extends I_ImagePart> getMutableParts() {
+			return getTuples();
+	}
+
 }

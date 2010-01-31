@@ -33,9 +33,9 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		strValue = refsetMember.getStrValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<CidCidStrRevision>(refsetMember.getExtraVersionsList().size());
+			revisions = new ArrayList<CidCidStrRevision>(refsetMember.getExtraVersionsList().size());
 			for (ERefsetCidCidStrVersion eVersion: refsetMember.getExtraVersionsList()) {
-				additionalVersions.add(new CidCidStrRevision(eVersion, this));
+				revisions.add(new CidCidStrRevision(eVersion, this));
 			}
 		}
 	}
@@ -76,15 +76,15 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<CidCidStrRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<CidCidStrRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new CidCidStrRevision(input, this));
+			revisions.add(new CidCidStrRevision(input, this));
 		}
 	}
 	@Override

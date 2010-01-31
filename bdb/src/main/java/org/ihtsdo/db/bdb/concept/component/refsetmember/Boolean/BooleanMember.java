@@ -28,20 +28,20 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		super(refsetMember, enclosingConcept);
 		booleanValue = refsetMember.getBooleanValue();
 		if (refsetMember.getExtraVersionsList() != null) {
-			additionalVersions = new ArrayList<BooleanRevision>(refsetMember
+			revisions = new ArrayList<BooleanRevision>(refsetMember
 					.getExtraVersionsList().size());
 			for (ERefsetBooleanVersion eVersion : refsetMember
 					.getExtraVersionsList()) {
-				additionalVersions.add(new BooleanRevision(eVersion, this));
+				revisions.add(new BooleanRevision(eVersion, this));
 			}
 		}
 	}
 
     public BooleanMember() {
-        super();
-    }
+		super();
+	}
 
-    @Override
+	@Override
 	protected boolean membersEqual(
 			ConceptComponent<BooleanRevision, BooleanMember> obj) {
 		if (BooleanMember.class.isAssignableFrom(obj.getClass())) {
@@ -54,15 +54,15 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	@Override
 	protected final void readMemberParts(TupleInput input,
 			int additionalVersionCount) {
-		if (additionalVersions == null) {
-			additionalVersions = new ArrayList<BooleanRevision>(
+		if (revisions == null) {
+			revisions = new ArrayList<BooleanRevision>(
 					additionalVersionCount);
 		} else {
-			additionalVersions.ensureCapacity(additionalVersions.size()
+			revisions.ensureCapacity(revisions.size()
 					+ additionalVersionCount);
 		}
 		for (int i = 0; i < additionalVersionCount; i++) {
-			additionalVersions.add(new BooleanRevision(input, this));
+			revisions.add(new BooleanRevision(input, this));
 		}
 	}
 	@Override

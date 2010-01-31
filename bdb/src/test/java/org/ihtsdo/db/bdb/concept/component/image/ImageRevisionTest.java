@@ -117,7 +117,7 @@ public class ImageRevisionTest {
         ImageRevision obj = new ImageRevision();
 
         Image img = new Image();
-        img.additionalVersions = null;
+        img.revisions = null;
         img.enclosingConcept = null; 
         img.nid = 1;
         img.primordialSapNid = 1; 
@@ -136,7 +136,7 @@ public class ImageRevisionTest {
         ImageRevision obj = new ImageRevision();
 
         Image img = new Image();
-        img.additionalVersions = null;
+        img.revisions = null;
         img.enclosingConcept = null; 
         img.nid = 2;
         img.primordialSapNid = 2; 

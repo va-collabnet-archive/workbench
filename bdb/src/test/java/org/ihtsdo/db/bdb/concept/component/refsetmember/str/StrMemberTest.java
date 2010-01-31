@@ -119,14 +119,14 @@ public class StrMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.additionalVersions = new ArrayList<StrRevision>(1);
+        obj.revisions = new ArrayList<StrRevision>(1);
 
         StrRevision rev = new StrRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
         rev.setStringValue("Test Object 1 - Rev 1");
         rev.setStatusAtPositionNid(1);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
@@ -141,14 +141,14 @@ public class StrMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.additionalVersions = new ArrayList<StrRevision>(1);
+        obj.revisions = new ArrayList<StrRevision>(1);
 
         StrRevision rev = new StrRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;
         rev.setStringValue("Test Object 2 - Rev 1");
         rev.setStatusAtPositionNid(2);
-        obj.additionalVersions.add(rev); 
+        obj.revisions.add(rev); 
         
         return obj; 
     }
