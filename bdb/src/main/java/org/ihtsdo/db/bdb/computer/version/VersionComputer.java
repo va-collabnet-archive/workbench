@@ -1,4 +1,4 @@
-package org.ihtsdo.db.util;
+package org.ihtsdo.db.bdb.computer.version;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,8 +14,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.PositionMapper;
-import org.ihtsdo.db.bdb.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
@@ -43,8 +42,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
 	}
 
-	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<V> matchingTuples, List<V> versions) {
+	public void addSpecifiedVersions(I_IntSet allowedStatus, I_Position viewPosition,
+			List<V> specifiedVersions, List<V> versions) {
 
 		HashSet<V> partsToAdd = new HashSet<V>();
 		List<V> partsForPosition = new LinkedList<V>();
@@ -103,13 +102,13 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 			partsToAdd.addAll(partsForPosition);
 		}
 
-		matchingTuples.addAll(partsToAdd);
+		specifiedVersions.addAll(partsToAdd);
 	}
 
-	public void addTuples(I_IntSet allowedStatus,
+	public void addSpecifiedVersions(I_IntSet allowedStatus,
 			PositionSetReadOnly positions, List<V> matchingTuples,
 			boolean addUncommitted, List<V> versions) {
-		addTuples(allowedStatus, null, positions, matchingTuples,
+		addSpecifiedVersions(allowedStatus, null, positions, matchingTuples,
 				addUncommitted, versions);
 	}
 
@@ -120,29 +119,27 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 	 * @param allowedTypes
 	 *            <code>null</code> is a wildcard.
 	 * @param positions
-	 *            <code>null</code> is a wildcard. Positions MUST be protected
-	 *            from concurrent modification externally. Synchronization
-	 *            within this call is to expensive for the environment.
-	 * @param matchingTuples
+	 *            <code>null</code> is a wildcard. 
+	 * @param specifiedVersions
 	 * @param addUncommitted
 	 * @param versions
 	 * @param core
 	 */
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<V> matchingTuples,
+	public void addSpecifiedVersions(I_IntSet allowedStatus, I_IntSet allowedTypes,
+			PositionSetReadOnly positions, List<V> specifiedVersions,
 			boolean addUncommitted, List<V> versions) {
 		if (positions == null) {
-			addTuplesNullPositions(allowedStatus, allowedTypes, matchingTuples,
+			addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes, specifiedVersions,
 					addUncommitted, versions);
 		} else {
-			addTuplesWithPositions(allowedStatus, allowedTypes, positions,
-					matchingTuples, versions);
+			addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes, positions,
+					specifiedVersions, versions);
 		}
 	}
 
-	public void addTuplesWithPositions(I_IntSet allowedStatus,
+	private void addSpecifiedVersionsWithPositions(I_IntSet allowedStatus,
 			I_IntSet allowedTypes, PositionSetReadOnly positions,
-			List<V> matchingTuples, List<V> versions) {
+			List<V> specifiedVersions, List<V> versions) {
 		HashSet<V> partsToAdd = new HashSet<V>();
 		List<V> partsForPosition = new LinkedList<V>();
 		for (I_Position p : positions) {
@@ -210,20 +207,20 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 				partsToAdd.addAll(partsForPosition);
 			}
 		}
-		matchingTuples.addAll(partsToAdd);
+		specifiedVersions.addAll(partsToAdd);
 	}
 
 	/**
 	 * 
 	 * @param allowedStatus
 	 * @param allowedTypes
-	 * @param matchingTuples
+	 * @param specifiedVersions
 	 * @param addUncommitted
 	 * @param versions
 	 * @param core
 	 */
-	public void addTuplesNullPositions(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, List<V> matchingTuples,
+	private void addSpecifiedVersionsNullPositions(I_IntSet allowedStatus,
+			I_IntSet allowedTypes, List<V> specifiedVersions,
 			boolean addUncommitted, List<V> versions) {
 		if (versions == null) {
 			return;
@@ -265,12 +262,12 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
 		SortedSet<V> sortedVersionsToAdd = new TreeSet<V>(new SortVersionsByTime());
 		sortedVersionsToAdd.addAll(versionsToAdd);
-		matchingTuples.addAll(sortedVersionsToAdd);
+		specifiedVersions.addAll(sortedVersionsToAdd);
 		for (V version : uncommittedVersions) {
 			if (allowedTypes == null
 					|| allowedTypes
 							.contains(((I_AmTypedPart) version).getTypeId()) == true) {
-				matchingTuples.add(version);
+				specifiedVersions.add(version);
 			}
 		}
 	}

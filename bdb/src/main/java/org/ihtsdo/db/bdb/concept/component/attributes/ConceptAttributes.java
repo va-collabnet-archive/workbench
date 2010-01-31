@@ -30,9 +30,9 @@ import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EConceptAttributes;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -244,7 +244,7 @@ public class ConceptAttributes
 			PositionSetReadOnly positions,
 			List<Version> returnTuples,
 			boolean addUncommitted) {
-		computer.addTuples(allowedStatus, positions, returnTuples,
+		computer.addSpecifiedVersions(allowedStatus, positions, returnTuples,
 				addUncommitted, getTuples());
 	}
 
@@ -355,7 +355,7 @@ public class ConceptAttributes
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<Version> returnTuples) {
-		computer.addTuples(allowedStatus, viewPosition, returnTuples,
+		computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples,
 				getTuples());
 	}
 

@@ -24,11 +24,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
-import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageVersion;
 
@@ -383,7 +383,7 @@ public class Image
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
 		int viewPathId = viewPosition.getPath().getConceptId();
 		List<Version> matchingTuples = new ArrayList<Version>();
-		computer.addTuples(allowedStatus, viewPosition, matchingTuples, 
+		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, 
 				getTuples());
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {

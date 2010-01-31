@@ -41,12 +41,10 @@ import org.ihtsdo.db.bdb.concept.component.refsetmember.cidInt.CidIntMember;
  * Path management.
  * 
  * Defines methods for obtaining and modifying paths. Paths are now
- * stored/defined in
- * reference sets (extension by reference).
+ * stored/defined in reference sets (extension by reference).
  * 
  * This implementation avoids the use of the redundant Path store and instead
- * marshals
- * to to the Extension store (indirectly).
+ * marshals to to the Extension store (indirectly).
  * 
  */
 public class BdbPathManager implements I_Manage<I_Path> {
@@ -107,7 +105,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
     }
 
     @SuppressWarnings("unchecked")
-	protected List<I_Position> getPathOrigins(int nid) throws TerminologyException {
+	public List<I_Position> getPathOrigins(int nid) throws TerminologyException {
         try {
             ArrayList<I_Position> result = new ArrayList<I_Position>();
             Concept pathConcept = Bdb.getConceptDb().getConcept(nid);

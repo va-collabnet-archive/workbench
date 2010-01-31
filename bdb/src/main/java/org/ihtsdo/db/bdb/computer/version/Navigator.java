@@ -1,4 +1,4 @@
-package org.ihtsdo.db.util;
+package org.ihtsdo.db.bdb.computer.version;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.PositionMapper;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 
 /**

@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.computer.version;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -12,6 +12,8 @@ import java.util.TreeSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 
 import cern.colt.bitvector.BitMatrix;

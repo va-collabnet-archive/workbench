@@ -30,9 +30,9 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionVersion;
 
@@ -446,7 +446,7 @@ public class Description
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<Description.Version> matchingTuples) {
-		computer.addTuples(allowedStatus, viewPosition,
+		computer.addSpecifiedVersions(allowedStatus, viewPosition,
 				matchingTuples, getTuples());
 	}
 
@@ -455,7 +455,7 @@ public class Description
 			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
 			boolean addUncommitted) {
 		List<Version> returnTuples = new ArrayList<Version>();
-		computer.addTuples(allowedStatus, allowedTypes, positions,
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
 				returnTuples, addUncommitted, getTuples());
 		matchingTuples.addAll(returnTuples);
 	}
@@ -466,7 +466,7 @@ public class Description
 			throws TerminologyException, IOException {
 		List<Version> returnTuples = new ArrayList<Version>();
 
-		computer.addTuples(allowedStatus, allowedTypes, positions,
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
 				returnTuples, addUncommitted, getTuples());
 
 		if (returnConflictResolvedLatestState) {

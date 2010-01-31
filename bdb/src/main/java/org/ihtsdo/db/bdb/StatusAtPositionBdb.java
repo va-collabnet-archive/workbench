@@ -17,6 +17,7 @@ import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 
 import cern.colt.list.IntArrayList;
 

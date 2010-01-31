@@ -23,9 +23,9 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.util.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipVersion;
 
@@ -330,7 +330,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
 			List<Version> matchingTuples) {
-		computer.addTuples(allowedStatus, viewPosition, matchingTuples,
+		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples,
 				getTuples());
 	}
 
@@ -482,7 +482,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			PositionSetReadOnly positions, List<I_RelTuple> relTupleList,
 			boolean addUncommitted) {
 		List<Version> tuplesToReturn = new ArrayList<Version>();
-		computer.addTuples(allowedStatus, allowedTypes, positions, tuplesToReturn,
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
 					addUncommitted, getVersions());
 		relTupleList.addAll(tuplesToReturn);
 	}
@@ -494,7 +494,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		List<Version> tuplesToReturn = new ArrayList<Version>();
-		computer.addTuples(allowedStatus, allowedTypes, positions, tuplesToReturn,
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
 					addUncommitted, getTuples());
 		relTupleList.addAll(tuplesToReturn);
 	}
