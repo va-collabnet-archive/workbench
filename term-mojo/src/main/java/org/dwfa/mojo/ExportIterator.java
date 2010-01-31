@@ -46,6 +46,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -231,7 +232,7 @@ public class ExportIterator implements I_ProcessConcepts {
             I_IdPart part = tuple.getMutableIdPart();
             I_Identify id = tuple.getIdentifier();
             if (allowedStatus.contains(part.getStatusId())
-                && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getAuthorityNid())))
+                && (!exportCohesiveSet || isExportable(Terms.get().getConcept(part.getAuthorityNid())))
                 && (!validatePositions || validPosition(part.getPathId()))) {
 
                 if (snomedSource(part) && !snomedId.equals(part.getDenotation())) {
@@ -500,9 +501,9 @@ public class ExportIterator implements I_ProcessConcepts {
             I_RelPart part = tuple.getMutablePart();
             I_RelVersioned rel = tuple.getRelVersioned();
             if (allowedStatus.contains(part.getStatusId())
-                && isExportable(ConceptBean.get(rel.getC2Id()))
-                && (!exportCohesiveSet || (isExportable(ConceptBean.get(part.getCharacteristicId()))
-                    && isExportable(ConceptBean.get(part.getRefinabilityId())) && isExportable(ConceptBean.get(part.getTypeId()))))) {
+                && isExportable(Terms.get().getConcept(rel.getC2Id()))
+                && (!exportCohesiveSet || (isExportable(Terms.get().getConcept(part.getCharacteristicId()))
+                    && isExportable(Terms.get().getConcept(part.getRefinabilityId())) && isExportable(Terms.get().getConcept(part.getTypeId()))))) {
 
                 if (relId != tuple.getRelId()) {
                     relId = tuple.getRelId();
@@ -674,7 +675,7 @@ public class ExportIterator implements I_ProcessConcepts {
 
             I_DescriptionPart part = desc.getMutablePart();
             if ((!validatePositions || validPosition(part.getPathId())) && allowedStatus.contains(part.getStatusId())
-                && (!exportCohesiveSet || isExportable(ConceptBean.get(part.getTypeId())))) {
+                && (!exportCohesiveSet || isExportable(Terms.get().getConcept(part.getTypeId())))) {
 
                 if (descId != desc.getDescId()) {
                     descId = desc.getDescId();
