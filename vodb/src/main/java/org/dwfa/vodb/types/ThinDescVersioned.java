@@ -37,8 +37,9 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
@@ -89,7 +90,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
         List<I_DescriptionPart> returnList = new ArrayList<I_DescriptionPart>(versions);
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
         }
 
@@ -222,12 +223,13 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     DescTupleAdder adder = new DescTupleAdder();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_DescriptionTuple> matchingTuples, boolean addUncommitted) {
-        adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
+        adder.addTuples(allowedStatus, allowedTypes, positions, 
+        		matchingTuples, addUncommitted, versions, this);
     }
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
             List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws TerminologyException, IOException {
 
@@ -236,7 +238,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
         addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
                 conflictResolutionStrategy = new IdentifyAllConflictStrategy();
@@ -253,9 +255,9 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
     public void addTuples(I_IntSet allowedTypes, List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 
-        I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), matchingTuples, addUncommitted,
+        addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), matchingTuples, addUncommitted,
             returnConflictResolvedLatestState);
     }
 
@@ -357,10 +359,8 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
     public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
-        Set<I_Position> positions = new HashSet<I_Position>();
-        positions.add(viewPosition);
         List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
-        addTuples(allowedStatus, null, positions, matchingTuples, false);
+        addTuples(allowedStatus, null, new PositionSetReadOnly(viewPosition), matchingTuples, false);
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
             for (I_DescriptionTuple dt : matchingTuples) {

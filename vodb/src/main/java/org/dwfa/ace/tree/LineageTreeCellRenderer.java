@@ -36,7 +36,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
 
@@ -66,7 +65,7 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
      */
     private Color focusBGColor;
 
-    private ConceptBean focusBean;
+    private I_GetConceptData focusBean;
 
     /**
 	 * 
@@ -218,11 +217,11 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
         return 0;
     }
 
-    public ConceptBean getFocusBean() {
+    public I_GetConceptData getFocusBean() {
         return focusBean;
     }
 
-    public void setFocusBean(ConceptBean focusBean) {
+    public void setFocusBean(I_GetConceptData focusBean) {
         this.focusBean = focusBean;
     }
 

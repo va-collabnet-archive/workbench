@@ -34,14 +34,15 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.VodbEnv;
 
 public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData {
 
@@ -102,12 +103,12 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
 
     public static I_GetExtensionData make(UUID uid, I_ThinExtByRefVersioned extension) throws TerminologyException,
             IOException {
-        return make(AceConfig.getVodb().uuidToNative(uid), extension);
+        return make(Terms.get().uuidToNative(uid), extension);
     }
 
     public static I_GetExtensionData makeNew(UUID uid, I_ThinExtByRefVersioned extension) throws TerminologyException,
             IOException {
-        return makeNew(AceConfig.getVodb().uuidToNative(uid), extension);
+        return makeNew(Terms.get().uuidToNative(uid), extension);
     }
 
     public static ExtensionByReferenceBean makeNew(int memberId, I_ThinExtByRefVersioned extension) {
@@ -151,11 +152,11 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
     }
 
     public static I_GetExtensionData get(UUID uid) throws TerminologyException, IOException {
-        return get(AceConfig.getVodb().uuidToNative(uid));
+        return get(Terms.get().uuidToNative(uid));
     }
 
     public static I_GetExtensionData get(Collection<UUID> uids) throws TerminologyException, IOException {
-        return get(AceConfig.getVodb().uuidToNative(uids));
+        return get(Terms.get().uuidToNative(uids));
     }
 
     public static Collection<I_GetExtensionData> getNewExtensions(int componentId) throws IOException {
@@ -253,7 +254,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
                     }
                 }
                 if (changed) {
-                    AceConfig.getVodb().writeExt(extension);
+                    ((VodbEnv) Terms.get()).writeExt(extension);
                 }
             }
         }
@@ -276,7 +277,7 @@ public class ExtensionByReferenceBean implements I_Transact, I_GetExtensionData 
      */
     public I_ThinExtByRefVersioned getExtension() throws IOException {
         if (extension == null) {
-            extension = AceConfig.getVodb().getExtension(memberId);
+            extension = Terms.get().getExtension(memberId);
         }
         return extension;
     }

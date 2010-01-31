@@ -56,7 +56,7 @@ import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
@@ -64,8 +64,8 @@ import org.dwfa.ace.refset.RefsetSpecTreeCellRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.ThinDescTuple;
@@ -156,7 +156,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         ReflexiveRefsetFieldData field;
         private IntList popupIds;
 
-        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field) {
+        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field) throws TerminologyException, IOException {
             super(new JComboBox());
             this.popupIds = popupIds;
             this.field = field;
@@ -174,21 +174,27 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 }
 
                 public Object getCellEditorValue() {
-                    return ((ConceptBean) combo.getSelectedItem()).getConceptId();
+                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
                 }
             };
             combo.addActionListener(delegate);
         }
 
-        private void populatePopup() {
+        private void populatePopup() throws TerminologyException, IOException {
             combo.removeAllItems();
             for (int id : getPopupValues()) {
-                combo.addItem(ConceptBean.get(id));
+                combo.addItem(Terms.get().getConcept(id));
             }
         }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            populatePopup();
+            try {
+				populatePopup();
+			} catch (TerminologyException e) {
+                throw new RuntimeException(e);
+			} catch (IOException e) {
+                throw new RuntimeException(e);
+			}
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
@@ -196,11 +202,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             return popupIds.getListArray();
         }
 
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) {
             StringWithExtTuple swet = (StringWithExtTuple) value;
             if (field.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
                 try {
-                    return ConceptBean.get((Integer) field.getReadMethod().invoke(swet.getTuple()));
+                    return Terms.get().getConcept((Integer) field.getReadMethod().invoke(swet.getTuple()));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -220,18 +226,18 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
     }
 
-    protected class ReferencedConceptsSwingWorker extends SwingWorker<Map<Integer, ConceptBean>> {
+    protected class ReferencedConceptsSwingWorker extends SwingWorker<Map<Integer, I_GetConceptData>> {
         private boolean stopWork = false;
 
         @Override
-        protected Map<Integer, ConceptBean> construct() throws Exception {
+        protected Map<Integer, I_GetConceptData> construct() throws Exception {
             getProgress().setActive(true);
-            Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
+            Map<Integer, I_GetConceptData> concepts = new HashMap<Integer, I_GetConceptData>();
             for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
                 if (stopWork) {
                     break;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
             }
@@ -292,7 +298,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected ArrayList<ThinExtByRefVersioned> allExtensions;
 
-    protected Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    protected Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     protected Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
@@ -359,7 +365,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         if (allTuples == null || tableComponentId == Integer.MIN_VALUE) {
             return " ";
         }
@@ -379,7 +385,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 if (columns[columnIndex].readParamaters != null) {
                     if (tf.hasConcept(id)) {
                         value =
-                                columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()),
+                                columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()),
                                     columns[columnIndex].readParamaters);
                     } else {
                         I_DescriptionVersioned desc =
@@ -390,7 +396,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     }
 
                 } else {
-                    value = columns[columnIndex].getReadMethod().invoke(ConceptBean.get(tuple.getComponentId()));
+                    value = columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()));
                 }
                 break;
             case COMPONENT:
@@ -464,7 +470,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 ext.getTuples(config.getAllowedStatus(), config.getViewPositionSet(), false);
                         if (tuples.size() > 0) {
                             I_ThinExtByRefTuple obj = tuples.iterator().next();
-                            ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
+                            I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
                             I_DescriptionTuple refsetDesc =
                                     componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(), host
                                         .getConfig());
@@ -486,7 +492,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             tuples = ext.getTuples(null, config.getViewPositionSet(), false);
                             if (tuples.size() > 0) {
                                 I_ThinExtByRefTuple obj = tuples.iterator().next();
-                                ConceptBean componentRefset = ConceptBean.get(obj.getRefsetId());
+                                I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
                                 I_DescriptionTuple refsetDesc =
                                         componentRefset.getDescTuple(host.getConfig().getTableDescPreferenceList(),
                                             host.getConfig());
@@ -537,7 +543,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     public abstract I_GetConceptData getPromotionRefsetIdentityConcept();
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = referencedConcepts.get(id);
+        I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -584,12 +590,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             I_ThinExtByRefTuple extTuple = allTuples.get(row);
             boolean changed = false;
             if (extTuple.getVersion() == Integer.MAX_VALUE) {
+                try {
                 switch (columns[col].getType()) {
                 case CONCEPT_IDENTIFIER:
                     Integer identifier = (Integer) value;
-                    referencedConcepts.put(identifier, ConceptBean.get(identifier));
+                    referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
                 default:
-                    try {
                         switch (columns[col].invokeOnObjectType) {
                         case COMPONENT:
                         case CONCEPT:
@@ -608,9 +614,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 + columns[col].invokeOnObjectType);
 
                         }
-                    } catch (Exception e) {
-                        AceLog.getAppLog().alertAndLogException(e);
-                    }
+                }
+                } catch (Exception e) {
+                    AceLog.getAppLog().alertAndLogException(e);
                 }
                 if (changed) {
                     fireTableDataChanged();

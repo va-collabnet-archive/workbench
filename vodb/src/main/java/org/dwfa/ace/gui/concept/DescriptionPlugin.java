@@ -66,6 +66,7 @@ import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class DescriptionPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
@@ -110,7 +111,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
             int lastSelectedRowCount = descTable.getRowCount();
             int lastSelectedRow = descTable.getSelectedRow();
@@ -175,7 +176,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (descPanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.DESCRIPTIONS, this, visibleExtensions)) {
             createPluginComponent(host);
@@ -183,7 +184,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         return descPanel;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) {
+    private void createPluginComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         descPanel = getDescPanel(host);
         host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
@@ -206,7 +207,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         return fields.toArray(new DESC_FIELD[fields.size()]);
     }
 
-    private JPanel getDescPanel(I_HostConceptPlugins host) {
+    private JPanel getDescPanel(I_HostConceptPlugins host) throws TerminologyException, IOException {
         descTableModel = new DescriptionsForConceptTableModel(getDescColumns(host), host);
         descTableModel.addTableModelListener(this);
         JPanel descPanel = new JPanel(new GridBagLayout());
@@ -313,7 +314,7 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         return descPanel;
     }
 
-    private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+    private void setupEditorsAndRenderers(I_HostConceptPlugins host) throws TerminologyException, IOException {
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
         descTable.setDefaultRenderer(Boolean.class, renderer);
         JComboBox comboBox = new JComboBox() {

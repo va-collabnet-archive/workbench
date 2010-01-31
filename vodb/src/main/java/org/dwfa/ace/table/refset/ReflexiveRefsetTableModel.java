@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -40,7 +41,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 
@@ -59,10 +59,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             super();
             refsetId = componentId;
 
-            I_GetConceptData refsetConcept = ConceptBean.get(refsetId);
-            IntSet promotionRefsetIds = new IntSet();
-            List<? extends I_RelTuple> promotionTuples;
             try {
+                I_GetConceptData refsetConcept = Terms.get().getConcept(refsetId);
+                IntSet promotionRefsetIds = new IntSet();
+                List<? extends I_RelTuple> promotionTuples;
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples =
                         refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), promotionRefsetIds, host
@@ -70,7 +70,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
-                    promotionRefsetIdentify = ConceptBean.get(promotionRefsetId);
+                    promotionRefsetIdentify = Terms.get().getConcept(promotionRefsetId);
                 }
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -112,14 +112,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             case CONCEPT_COMPONENT:
                                 if (col.readParamaters != null) {
                                     Object readValue =
-                                            col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()),
+                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()),
                                                 col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
                                     Object readValue =
-                                            col.getReadMethod().invoke(ConceptBean.get(extension.getComponentId()));
+                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }

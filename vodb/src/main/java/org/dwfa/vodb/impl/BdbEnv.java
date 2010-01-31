@@ -30,7 +30,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.primitives.IntList;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.DatabaseSetupConfig;
@@ -45,13 +44,13 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
@@ -848,7 +847,7 @@ public class BdbEnv implements I_StoreInBdb, I_StoreConceptAttributes, I_StoreId
         return conAttBdb.getConceptCount();
     }
 
-    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch latch,
+    public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
             ParseException {
         conAttBdb.searchConcepts(tracker, matches, latch, checkList, config);

@@ -45,14 +45,16 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class ImageTableModel extends AbstractTableModel implements PropertyChangeListener {
 
@@ -110,7 +112,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
         private static final long serialVersionUID = 1L;
 
-        public TypeFieldEditor(I_ConfigAceFrame config) {
+        public TypeFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -120,9 +122,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithImageTuple swdt = (StringWithImageTuple) value;
-            return ConceptBean.get(swdt.getTuple().getTypeId());
+            return Terms.get().getConcept(swdt.getTuple().getTypeId());
         }
 
         @Override
@@ -141,7 +143,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
         private static final long serialVersionUID = 1L;
 
-        public StatusFieldEditor(I_ConfigAceFrame config) {
+        public StatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -151,9 +153,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithImageTuple swdt = (StringWithImageTuple) value;
-            return ConceptBean.get(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusId());
         }
 
         @Override
@@ -211,12 +213,12 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
-        Map<Integer, ConceptBean> concepts;
+        Map<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, ConceptBean>();
+            concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
@@ -225,7 +227,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 if (stopWork) {
                     return false;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
 
@@ -271,11 +273,11 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
     }
 
     public class TableChangedSwingWorker extends SwingWorker<Integer> {
-        ConceptBean cb;
+    	I_GetConceptData cb;
 
         private boolean stopWork = false;
 
-        public TableChangedSwingWorker(ConceptBean cb) {
+        public TableChangedSwingWorker(I_GetConceptData cb) {
             super();
             this.cb = cb;
         }
@@ -388,11 +390,11 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
     ArrayList<I_ImageVersioned> allImages;
 
     private boolean showHistory;
-    Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
     private TableChangedSwingWorker tableChangeWorker;
     private ReferencedConceptsSwingWorker refConWorker;
-    private ConceptBean tableConcept;
+    private I_GetConceptData tableConcept;
 
     public ImageTableModel(I_HostConceptPlugins host, IMAGE_FIELD[] columns, boolean showHistory) {
         super();
@@ -431,7 +433,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
         }
     }
 
-    public Map<Integer, ConceptBean> getReferencedConcepts() {
+    public Map<Integer, I_GetConceptData> getReferencedConcepts() {
         return referencedConcepts;
 
     }
@@ -528,7 +530,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
     }
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = getReferencedConcepts().get(id);
+        I_GetConceptData cb = getReferencedConcepts().get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -558,7 +560,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
         }
         conceptsToFetch.clear();
         referencedConcepts.clear();
-        tableChangeWorker = new TableChangedSwingWorker((ConceptBean) evt.getNewValue());
+        tableChangeWorker = new TableChangedSwingWorker((I_GetConceptData) evt.getNewValue());
         tableChangeWorker.start();
         fireTableDataChanged();
     }
@@ -637,12 +639,12 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 case STATUS:
                     Integer statusId = (Integer) value;
                     image.getMutablePart().setStatusId(statusId);
-                    getReferencedConcepts().put(statusId, ConceptBean.get(statusId));
+                    getReferencedConcepts().put(statusId, Terms.get().getConcept(statusId));
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
                     image.getMutablePart().setTypeId(typeId);
-                    getReferencedConcepts().put(typeId, ConceptBean.get(typeId));
+                    getReferencedConcepts().put(typeId, Terms.get().getConcept(typeId));
                     break;
                 case VERSION:
                     break;
@@ -653,7 +655,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
             }
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
-        }
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+		}
     }
 
 }

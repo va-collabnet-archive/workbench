@@ -37,8 +37,9 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
@@ -110,7 +111,7 @@ public class ThinRelVersioned implements I_RelVersioned {
         List<I_RelPart> returnList = versions;
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             returnList = config.getConflictResolutionStrategy().resolveParts(returnList);
         }
 
@@ -300,12 +301,12 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     RelTupleAdder adder = new RelTupleAdder();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_RelTuple> matchingTuples, boolean addUncommitted) {
         adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, addUncommitted, versions, this);
     }
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_RelTuple> returnRels, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws TerminologyException, IOException {
 
@@ -314,7 +315,7 @@ public class ThinRelVersioned implements I_RelVersioned {
         addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
                 conflictResolutionStrategy = new IdentifyAllConflictStrategy();
@@ -330,9 +331,9 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
-        I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSet(), returnRels, addUncommitted,
+        addTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), returnRels, addUncommitted,
             returnConflictResolvedLatestState);
     }
 
@@ -424,10 +425,8 @@ public class ThinRelVersioned implements I_RelVersioned {
 
     public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
         int viewPathId = viewPosition.getPath().getConceptId();
-        Set<I_Position> positions = new HashSet<I_Position>();
-        positions.add(viewPosition);
         List<I_RelTuple> matchingTuples = new ArrayList<I_RelTuple>();
-        addTuples(allowedStatus, null, positions, matchingTuples, false);
+        addTuples(allowedStatus, null, new PositionSetReadOnly(viewPosition), matchingTuples, false);
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
             for (I_RelTuple rt : matchingTuples) {

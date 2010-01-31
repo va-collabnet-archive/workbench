@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
@@ -47,7 +48,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -78,7 +78,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setLeafIcon(null);
         setClosedIcon(null);
         setOpenIcon(null);
-        ConceptBean viewerImageType = ConceptBean.get(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+        I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
         viewerImageTypes.add(viewerImageType.getConceptId());
     }
 
@@ -289,8 +289,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    private void addPrefixImage(List<String> htmlParts, int prefixConceptId) throws IOException {
-        ConceptBean prefixConcept = ConceptBean.get(prefixConceptId);
+    private void addPrefixImage(List<String> htmlParts, int prefixConceptId) throws IOException, TerminologyException {
+    	I_GetConceptData prefixConcept = Terms.get().getConcept(prefixConceptId);
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
             viewerImageTypes, configAceFrame.getViewPositionSetReadOnly())) {
             htmlParts.add("<img src='ace:" + imageTuple.getImageId() + "$" + imageTuple.getConceptId()

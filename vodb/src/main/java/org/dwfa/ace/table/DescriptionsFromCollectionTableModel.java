@@ -18,19 +18,15 @@ package org.dwfa.ace.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.search.LuceneMatch;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionsFromCollectionTableModel extends DescriptionTableModel {
     public DescriptionsFromCollectionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
@@ -87,23 +83,5 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
             return scoreList.get(rowIndex).toString();
         }
         return "";
-    }
-
-    @Override
-    public Map<Integer, ConceptBean> getReferencedConcepts() {
-        Map<Integer, ConceptBean> referencedConcept = new HashMap<Integer, ConceptBean>();
-        List<I_DescriptionVersioned> descriptionListCopy;
-        synchronized (descriptionList) {
-            descriptionListCopy = new ArrayList<I_DescriptionVersioned>(descriptionList);
-        }
-        for (I_DescriptionVersioned desc : descriptionListCopy) {
-            for (I_DescriptionPart part : desc.getMutableParts()) {
-                referencedConcept.put(part.getTypeId(), ConceptBean.get(part.getTypeId()));
-                referencedConcept.put(part.getStatusId(), ConceptBean.get(part.getStatusId()));
-            }
-
-        }
-
-        return referencedConcept;
     }
 }

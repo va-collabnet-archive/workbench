@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.PrimordialId;
@@ -49,7 +50,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.VodbEnv;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinConPart;
 import org.dwfa.vodb.types.ThinConVersioned;
@@ -379,9 +379,9 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
                 // rel ok
             } else {
-                I_GetConceptData c1 = ConceptBean.get(c1id);
-                I_GetConceptData c2 = ConceptBean.get(c2id);
-                I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
+                I_GetConceptData c1 = Terms.get().getConcept(c1id);
+                I_GetConceptData c2 = Terms.get().getConcept(c2id);
+                I_GetConceptData c3 = Terms.get().getConcept(vrel.getC2Id());
 
                 throw new Exception("Duplicate rels with different c1 and c2:\n relId: " + relID + "\n c1: " + c1
                     + "\n c2: " + c2 + "\n c3: " + c3);

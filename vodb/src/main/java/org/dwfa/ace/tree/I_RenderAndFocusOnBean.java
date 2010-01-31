@@ -20,13 +20,14 @@ import java.awt.Rectangle;
 
 import javax.swing.tree.TreeCellRenderer;
 
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.ace.api.I_GetConceptData;
+
 
 public interface I_RenderAndFocusOnBean extends TreeCellRenderer {
 
-    public ConceptBean getFocusBean();
+    public I_GetConceptData getFocusBean();
 
-    public void setFocusBean(ConceptBean focusBean);
+    public void setFocusBean(I_GetConceptData focusBean);
 
     public Rectangle getIconRect(int parentDepth);
 

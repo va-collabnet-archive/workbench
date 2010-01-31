@@ -28,8 +28,9 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class ExpandPathToNodeStateListener implements ChangeListener {
 
@@ -40,7 +41,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
     private I_GetConceptData focus;
 
     public ExpandPathToNodeStateListener(JTreeWithDragImage tree, I_ConfigAceFrame config, I_GetConceptData focus)
-            throws IOException {
+            throws IOException, TerminologyException {
         super();
         this.tree = tree;
         this.focus = focus;
@@ -53,7 +54,7 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
             config.getViewPositionSetReadOnly(), true);
         while (rels.size() > 0) {
             for (I_RelTuple r : rels) {
-                ConceptBean parent = ConceptBean.get(r.getC2Id());
+                I_GetConceptData parent = Terms.get().getConcept(r.getC2Id());
                 ancestors.add(0, parent);
                 AceLog.getAppLog().info("Adding parent: " + parent);
                 rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),

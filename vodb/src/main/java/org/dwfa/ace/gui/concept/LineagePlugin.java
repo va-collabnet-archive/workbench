@@ -42,14 +42,16 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class LineagePlugin extends AbstractPlugin {
 
@@ -82,13 +84,13 @@ public class LineagePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
             updateLineageModel();
         }
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException {
         if (lineagePanel == null) {
             setHost(host);
             try {
@@ -103,7 +105,7 @@ public class LineagePlugin extends AbstractPlugin {
         return lineagePanel;
     }
 
-    private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException {
+    private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException, TerminologyException {
         setHost(host);
         JPanel lineagePanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -170,19 +172,19 @@ public class LineagePlugin extends AbstractPlugin {
         return lineagePanel;
     }
 
-    private void updateLineageModel() throws IOException {
+    private void updateLineageModel() throws IOException, TerminologyException {
         DefaultTreeModel model = (DefaultTreeModel) lineageTree.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         model.setRoot(root);
 
-        ConceptBean bean = (ConceptBean) getHost().getTermComponent();
+        I_GetConceptData bean = (I_GetConceptData) getHost().getTermComponent();
         if (bean != null) {
             lineageRenderer.setFocusBean(bean);
-            List<List<ConceptBean>> lineage = getLineage(bean, 0);
+            List<List<I_GetConceptData>> lineage = getLineage(bean, 0);
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 StringBuffer buf = new StringBuffer();
                 buf.append("Lineage for: " + bean);
-                for (List<ConceptBean> parentLine : lineage) {
+                for (List<I_GetConceptData> parentLine : lineage) {
                     buf.append("\n");
                     buf.append(parentLine);
                 }
@@ -199,21 +201,21 @@ public class LineagePlugin extends AbstractPlugin {
         }
     }
 
-    private void addLineageToNode(List<List<ConceptBean>> lineage, DefaultMutableTreeNode root) {
-        Map<ConceptBean, DefaultMutableTreeNode> childrenNodes = new HashMap<ConceptBean, DefaultMutableTreeNode>();
-        Map<ConceptBean, List<List<ConceptBean>>> childrenLineage = new HashMap<ConceptBean, List<List<ConceptBean>>>();
-        for (List<ConceptBean> parentLine : lineage) {
+    private void addLineageToNode(List<List<I_GetConceptData>> lineage, DefaultMutableTreeNode root) {
+        Map<I_GetConceptData, DefaultMutableTreeNode> childrenNodes = new HashMap<I_GetConceptData, DefaultMutableTreeNode>();
+        Map<I_GetConceptData, List<List<I_GetConceptData>>> childrenLineage = new HashMap<I_GetConceptData, List<List<I_GetConceptData>>>();
+        for (List<I_GetConceptData> parentLine : lineage) {
             childrenNodes.put(parentLine.get(0), new DefaultMutableTreeNode(parentLine.get(0)));
             if (childrenLineage.get(parentLine.get(0)) == null) {
-                childrenLineage.put(parentLine.get(0), new ArrayList<List<ConceptBean>>());
+                childrenLineage.put(parentLine.get(0), new ArrayList<List<I_GetConceptData>>());
             }
             if (parentLine.size() > 1) {
-                List<ConceptBean> shortenedLineage = new ArrayList<ConceptBean>(parentLine);
+                List<I_GetConceptData> shortenedLineage = new ArrayList<I_GetConceptData>(parentLine);
                 shortenedLineage.remove(0);
                 childrenLineage.get(parentLine.get(0)).add(shortenedLineage);
             }
         }
-        for (ConceptBean childBean : childrenNodes.keySet()) {
+        for (I_GetConceptData childBean : childrenNodes.keySet()) {
             DefaultMutableTreeNode childNode = childrenNodes.get(childBean);
             root.add(childNode);
             if (childrenLineage.get(childBean).size() > 0) {
@@ -222,10 +224,10 @@ public class LineagePlugin extends AbstractPlugin {
         }
     }
 
-    private List<List<ConceptBean>> getLineage(ConceptBean bean, int depth) throws IOException {
-        List<List<ConceptBean>> lineage = new ArrayList<List<ConceptBean>>();
+    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth) throws IOException, TerminologyException {
+        List<List<I_GetConceptData>> lineage = new ArrayList<List<I_GetConceptData>>();
 
-        List<I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
+        List<? extends I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
             getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), false);
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             if (depth > 3) {
@@ -233,15 +235,15 @@ public class LineagePlugin extends AbstractPlugin {
                 test.compareTo(test);
             }
             for (I_RelTuple rel : sourceRelTuples) {
-                ConceptBean parent = ConceptBean.get(rel.getC2Id());
-                List<List<ConceptBean>> parentLineage = getLineage(parent, depth + 1);
-                for (List<ConceptBean> parentLine : parentLineage) {
+                I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
+                List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);
+                for (List<I_GetConceptData> parentLine : parentLineage) {
                     parentLine.add(bean);
                     lineage.add(parentLine);
                 }
             }
         } else {
-            lineage.add(new ArrayList<ConceptBean>(Arrays.asList(new ConceptBean[] { bean })));
+            lineage.add(new ArrayList<I_GetConceptData>(Arrays.asList(new I_GetConceptData[] { bean })));
         }
         return lineage;
     }

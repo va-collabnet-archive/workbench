@@ -72,6 +72,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.IdentifierSetReadOnly;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -79,7 +80,6 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.search.CheckAndProcessLuceneMatch;
-import org.dwfa.ace.search.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
@@ -1745,7 +1745,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
     }
 
-    public void searchConcepts(I_TrackContinuation tracker, IntList matches, CountDownLatch conceptLatch,
+    public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch conceptLatch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws IOException {
 
         Stopwatch timer = null;
@@ -1755,7 +1755,6 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
         }
         Iterator<I_GetConceptData> conItr = getConceptIterator();
         Semaphore checkSemaphore = new Semaphore(15);
-        Semaphore addSemaphore = new Semaphore(1);
         while (conItr.hasNext()) {
             I_GetConceptData concept = conItr.next();
             if (tracker.continueWork()) {
@@ -1765,7 +1764,7 @@ public class ConDescRelBdb implements I_StoreConceptAttributes, I_StoreDescripti
                     AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
                 }
                 // Semaphore checkSemaphore, IntList matches,
-                ACE.threadPool.execute(new CheckAndProcessSearchTest(conceptLatch, checkSemaphore, addSemaphore,
+                ACE.threadPool.execute(new CheckAndProcessSearchTest(conceptLatch, checkSemaphore,
                     matches, concept, checkList, config));
             } else {
                 while (conceptLatch.getCount() > 0) {

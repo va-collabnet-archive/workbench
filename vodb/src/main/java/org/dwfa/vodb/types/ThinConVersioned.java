@@ -35,8 +35,8 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
@@ -193,7 +193,7 @@ public class ThinConVersioned implements I_ConceptAttributeVersioned {
         addTuples(allowedStatus, positionSet, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
                 conflictResolutionStrategy = new IdentifyAllConflictStrategy();

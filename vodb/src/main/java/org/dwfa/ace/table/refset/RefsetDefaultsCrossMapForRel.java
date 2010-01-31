@@ -22,28 +22,28 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsCrossMapForRel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsCrossMapForRel extends RefsetDefaults implements I_RefsetDefaultsCrossMapForRel {
 
     public RefsetDefaultsCrossMapForRel() throws TerminologyException, IOException {
         super();
-        refineFlag = ConceptBean.get(RefsetAuxiliary.Concept.MANDATORY_REFINABILITY_FLAG.getUids());
+        refineFlag = Terms.get().getConcept(RefsetAuxiliary.Concept.MANDATORY_REFINABILITY_FLAG.getUids());
         refineFlagPopupIds.add(refineFlag.getConceptId());
-        refineFlagPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.COMPLETE_REFINABILITY_FLAG.getUids())
+        refineFlagPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.COMPLETE_REFINABILITY_FLAG.getUids())
             .getConceptId());
-        refineFlagPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.POSSIBLE_REFINABILITY_FLAG.getUids())
+        refineFlagPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.POSSIBLE_REFINABILITY_FLAG.getUids())
             .getConceptId());
 
-        additionalCode = ConceptBean.get(RefsetAuxiliary.Concept.MANDATORY_ADDITIONAL_CODE_FLAG.getUids());
+        additionalCode = Terms.get().getConcept(RefsetAuxiliary.Concept.MANDATORY_ADDITIONAL_CODE_FLAG.getUids());
         additionalCodePopupIds.add(additionalCode.getConceptId());
-        additionalCodePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.COMPLETE_ADDITIONAL_CODE_FLAG.getUids())
+        additionalCodePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.COMPLETE_ADDITIONAL_CODE_FLAG.getUids())
             .getConceptId());
-        additionalCodePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.POSSIBLE_ADDITIONAL_CODE_FLAG.getUids())
+        additionalCodePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.POSSIBLE_ADDITIONAL_CODE_FLAG.getUids())
             .getConceptId());
 
     }

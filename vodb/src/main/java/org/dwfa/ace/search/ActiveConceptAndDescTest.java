@@ -24,21 +24,21 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class ActiveConceptAndDescTest implements I_TestSearchResults {
 
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
-        ThinDescVersioned descV = (ThinDescVersioned) component;
-        ConceptBean concept = ConceptBean.get(descV.getConceptId());
-        try {
-            List<I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
+		try {
+			I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
+			I_GetConceptData concept = Terms.get().getConcept(descV.getConceptId());
+            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
                 frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), true, false);
             if (attributes == null || attributes.size() == 0) {
                 return false;
@@ -48,17 +48,16 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
             if (frameConfig.searchWithDescTypeFilter()) {
                 allowedTypes = frameConfig.getDescTypes();
             }
-
-            descV.addTuples(allowedTypes, matchingTuples, true, false);
+            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
+            		frameConfig.getViewPositionSetReadOnly(), matchingTuples, true);
             if (matchingTuples.size() == 0) {
                 return false;
             }
-
+            return true;
         } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            throw new TaskFailedException(e);
         } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            throw new TaskFailedException(e);
         }
-        return true;
     }
 }

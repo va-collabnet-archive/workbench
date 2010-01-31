@@ -22,10 +22,10 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguageScoped;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage implements I_RefsetDefaultsLanguageScoped {
@@ -73,10 +73,10 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
 
     public RefsetDefaultsLanguageScoped() throws TerminologyException, IOException {
         super();
-        defaultScopeForScopedLanguageRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+        defaultScopeForScopedLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         scopePopupIds.add(defaultScopeForScopedLanguageRefset.getConceptId());
 
-        defaultTagForScopedLanguageRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+        defaultTagForScopedLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         tagPopupIds.add(defaultTagForScopedLanguageRefset.getConceptId());
 
         defaultPriorityForScopedLanguageRefset = 1;

@@ -69,7 +69,7 @@ public class IntList implements ListDataListener, I_IntList {
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : list.getListValues()) {
             try {
-                outList.add(AceConfig.getVodb().nativeToUuid(i));
+                outList.add(Terms.get().nativeToUuid(i));
             } catch (DatabaseException e) {
                 AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
             }
@@ -104,7 +104,7 @@ public class IntList implements ListDataListener, I_IntList {
                     try {
                         Object uuidObj = in.readObject();
                         if (List.class.isAssignableFrom(uuidObj.getClass())) {
-                            list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) uuidObj);
+                            list[i] = Terms.get().uuidToNative((List<UUID>) uuidObj);
                         } else {
                             AceLog.getAppLog().alertAndLogException(
                                 new Exception("<html>Expecting List<UUID>. Found:<br>" + uuidObj));
@@ -116,7 +116,7 @@ public class IntList implements ListDataListener, I_IntList {
                     }
 
                 } else {
-                    list[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+                    list[i] = Terms.get().uuidToNative((List<UUID>) in.readObject());
                 }
             } catch (TerminologyException e) {
                 IOException newEx = new IOException();

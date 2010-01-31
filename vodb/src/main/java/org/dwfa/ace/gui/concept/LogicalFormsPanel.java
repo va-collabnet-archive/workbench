@@ -43,7 +43,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Position;
 
 /**
@@ -57,7 +56,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
     // ** WORKBENCH PARTICULARS **
     private I_TermFactory tf;
     private I_ConfigAceFrame config;
-    private ConceptBean theCBean;
+    private I_GetConceptData theCBean;
 
     private List<I_Position> cEditPathPos;
     private List<I_Position> cClassPathPos;
@@ -148,7 +147,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
      * @param config
      * @throws IOException
      */
-    public void setConcept(ConceptBean conceptIn, I_ConfigAceFrame config) throws IOException {
+    public void setConcept(I_GetConceptData conceptIn, I_ConfigAceFrame config) throws IOException {
         this.theCBean = conceptIn;
         this.config = config;
 

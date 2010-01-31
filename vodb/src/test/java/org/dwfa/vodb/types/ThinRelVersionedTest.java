@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.PositionSetReadOnly;
 
 public class ThinRelVersionedTest extends TestCase {
 
@@ -93,7 +94,7 @@ public class ThinRelVersionedTest extends TestCase {
 
         I_IntSet allowedStatus = null;
         I_IntSet allowedTypes = null;
-        Set<I_Position> positions = null;
+        PositionSetReadOnly positions = null;
         List<I_RelTuple> returnRels = null;
 
         boolean addUncommitted = false;
@@ -129,7 +130,7 @@ public class ThinRelVersionedTest extends TestCase {
         latestOnOriginSet.add(latestOnOrigin);
 
         returnRels.clear();
-        positions = latestOnOriginSet;
+        positions = new PositionSetReadOnly(latestOnOriginSet);
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
 
@@ -137,7 +138,7 @@ public class ThinRelVersionedTest extends TestCase {
         Position latestOnP1 = new Position(Integer.MAX_VALUE, p1);
         Set<I_Position> latestOnP1Set = new HashSet<I_Position>();
         latestOnP1Set.add(latestOnP1);
-        positions = latestOnP1Set;
+        positions = new PositionSetReadOnly(latestOnP1Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
@@ -146,7 +147,7 @@ public class ThinRelVersionedTest extends TestCase {
         Position latestOnP2 = new Position(Integer.MAX_VALUE, p2);
         Set<I_Position> latestOnP2Set = new HashSet<I_Position>();
         latestOnP2Set.add(latestOnP2);
-        positions = latestOnP2Set;
+        positions = new PositionSetReadOnly(latestOnP2Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
@@ -154,7 +155,7 @@ public class ThinRelVersionedTest extends TestCase {
         Set<I_Position> latestOnP1andP2Set = new HashSet<I_Position>();
         latestOnP1andP2Set.add(latestOnP1);
         latestOnP1andP2Set.add(latestOnP2);
-        positions = latestOnP1andP2Set;
+        positions = new PositionSetReadOnly(latestOnP1andP2Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(2, returnRels.size());
@@ -234,7 +235,7 @@ public class ThinRelVersionedTest extends TestCase {
 
         I_IntSet allowedStatus = null;
         I_IntSet allowedTypes = null;
-        Set<I_Position> positions = null;
+        PositionSetReadOnly positions = null;
         List<I_RelTuple> returnRels = null;
 
         boolean addUncommitted = false;
@@ -270,7 +271,7 @@ public class ThinRelVersionedTest extends TestCase {
         latestOnOriginSet.add(latestOnOrigin);
 
         returnRels.clear();
-        positions = latestOnOriginSet;
+        positions = new PositionSetReadOnly(latestOnOriginSet);
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
 
@@ -278,7 +279,7 @@ public class ThinRelVersionedTest extends TestCase {
         Position latestOnP1 = new Position(Integer.MAX_VALUE, p1);
         Set<I_Position> latestOnP1Set = new HashSet<I_Position>();
         latestOnP1Set.add(latestOnP1);
-        positions = latestOnP1Set;
+        positions = new PositionSetReadOnly(latestOnP1Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
@@ -287,7 +288,7 @@ public class ThinRelVersionedTest extends TestCase {
         Position latestOnP2 = new Position(Integer.MAX_VALUE, p2);
         Set<I_Position> latestOnP2Set = new HashSet<I_Position>();
         latestOnP2Set.add(latestOnP2);
-        positions = latestOnP2Set;
+        positions = new PositionSetReadOnly(latestOnP2Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());
@@ -295,7 +296,7 @@ public class ThinRelVersionedTest extends TestCase {
         Set<I_Position> latestOnP1andP2Set = new HashSet<I_Position>();
         latestOnP1andP2Set.add(latestOnP1);
         latestOnP1andP2Set.add(latestOnP2);
-        positions = latestOnP1andP2Set;
+        positions = new PositionSetReadOnly(latestOnP1andP2Set);
         returnRels.clear();
         rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, addUncommitted);
         assertEquals(1, returnRels.size());

@@ -22,24 +22,24 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsCrossMap;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel implements I_RefsetDefaultsCrossMap {
 
     public RefsetDefaultsCrossMap() throws TerminologyException, IOException {
         super();
-        mapStatus = ConceptBean.get(RefsetAuxiliary.Concept.UNMAPPABLE_MAP_STATUS.getUids());
+        mapStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.UNMAPPABLE_MAP_STATUS.getUids());
         mapStatusPopupIds.add(mapStatus.getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.REQUIRES_CHECKING_MAP_STATUS.getUids())
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.REQUIRES_CHECKING_MAP_STATUS.getUids())
             .getConceptId());
-        mapStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids()).getConceptId());
     }
 
     /**

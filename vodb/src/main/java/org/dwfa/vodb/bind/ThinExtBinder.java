@@ -19,6 +19,7 @@ package org.dwfa.vodb.bind;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -33,7 +34,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.vodb.I_MapIds;
 import org.dwfa.vodb.types.ThinExtByRefPartBoolean;
@@ -425,99 +425,94 @@ public class ThinExtBinder extends TupleBinding {
             switch (type) {
             case BOOLEAN:
                 if (booleanNid == null) {
-                    booleanNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids());
+                    booleanNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getUids());
                 }
                 return booleanNid;
             case STRING:
                 if (stringNid == null) {
-                    stringNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids());
+                    stringNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.STRING_EXTENSION.getUids());
                 }
                 return stringNid;
             case CONCEPT:
                 if (conceptNid == null) {
-                    conceptNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
+                    conceptNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids());
                 }
                 return conceptNid;
             case INTEGER:
                 if (integerNid == null) {
-                    integerNid = AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
+                    integerNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.INT_EXTENSION.getUids());
                 }
                 return integerNid;
             case CON_INT:
                 if (conIntNid == null) {
-                    conIntNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
+                    conIntNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getUids());
                 }
                 return conIntNid;
             case LANGUAGE:
                 if (languageNid == null) {
-                    languageNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
+                    languageNid = Terms.get()
+                        .uuidToNative(RefsetAuxiliary.Concept.LANGUAGE_EXTENSION.getUids());
                 }
                 return languageNid;
             case SCOPED_LANGUAGE:
                 if (scopedLanguageNid == null) {
-                    scopedLanguageNid =
-                            AceConfig.getVodb().uuidToNative(
-                                RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
+                    scopedLanguageNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids());
                 }
                 return scopedLanguageNid;
             case MEASUREMENT:
                 if (measurementNid == null) {
-                    measurementNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
+                    measurementNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids());
                 }
                 return measurementNid;
             case CROSS_MAP:
                 if (crossMapNid == null) {
-                    crossMapNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
+                    crossMapNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
                 }
                 return crossMapNid;
             case CROSS_MAP_FOR_REL:
                 if (crossMapForRelNid == null) {
-                    crossMapForRelNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids());
+                    crossMapForRelNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids());
                 }
                 return crossMapForRelNid;
             case TEMPLATE:
                 if (templateNid == null) {
-                    templateNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids());
+                    templateNid = Terms.get()
+                        .uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_EXTENSION.getUids());
                 }
                 return templateNid;
             case TEMPLATE_FOR_REL:
                 if (templateForRelNid == null) {
-                    templateForRelNid =
-                            AceConfig.getVodb().uuidToNative(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
+                    templateForRelNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids());
                 }
                 return templateForRelNid;
             case CONCEPT_CONCEPT:
                 if (conceptConceptNid == null) {
-                    conceptConceptNid =
-                            AceConfig.getVodb().uuidToNative(
-                                RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids());
+                    conceptConceptNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids());
                 }
                 return conceptConceptNid;
             case CONCEPT_CONCEPT_CONCEPT:
                 if (conceptConceptConceptNid == null) {
-                    conceptConceptConceptNid =
-                            AceConfig.getVodb().uuidToNative(
-                                RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids());
+                    conceptConceptConceptNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids());
                 }
                 return conceptConceptConceptNid;
             case CONCEPT_CONCEPT_STRING:
                 if (conceptConceptStringNid == null) {
-                    conceptConceptStringNid =
-                            AceConfig.getVodb().uuidToNative(
-                                RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids());
+                    conceptConceptStringNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids());
                 }
                 return conceptConceptStringNid;
             case CONCEPT_STRING:
                 if (conceptStringNid == null) {
-                    conceptStringNid =
-                            AceConfig.getVodb()
-                                .uuidToNative(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids());
+                    conceptStringNid = Terms.get().uuidToNative(
+                        RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids());
                 }
                 return conceptStringNid;
             default:
@@ -563,14 +558,14 @@ public class ThinExtBinder extends TupleBinding {
                 return languageNid;
             case SCOPED_LANGUAGE:
                 if (scopedLanguageNid == null) {
-                    scopedLanguageNid =
-                            map.getIntId(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids(), idPath, version);
+                    scopedLanguageNid = map.getIntId(RefsetAuxiliary.Concept.SCOPED_LANGUAGE_EXTENSION.getUids(),
+                        idPath, version);
                 }
                 return scopedLanguageNid;
             case MEASUREMENT:
                 if (measurementNid == null) {
-                    measurementNid =
-                            map.getIntId(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids(), idPath, version);
+                    measurementNid = map.getIntId(RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return measurementNid;
             case CROSS_MAP:
@@ -580,8 +575,8 @@ public class ThinExtBinder extends TupleBinding {
                 return crossMapNid;
             case CROSS_MAP_FOR_REL:
                 if (crossMapForRelNid == null) {
-                    crossMapForRelNid =
-                            map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids(), idPath, version);
+                    crossMapForRelNid = map.getIntId(RefsetAuxiliary.Concept.CROSS_MAP_REL_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return crossMapForRelNid;
             case TEMPLATE:
@@ -591,34 +586,32 @@ public class ThinExtBinder extends TupleBinding {
                 return templateNid;
             case TEMPLATE_FOR_REL:
                 if (templateForRelNid == null) {
-                    templateForRelNid =
-                            map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath, version);
+                    templateForRelNid = map.getIntId(RefsetAuxiliary.Concept.TEMPLATE_REL_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return templateForRelNid;
             case CONCEPT_CONCEPT:
                 if (conceptConceptNid == null) {
-                    conceptConceptNid =
-                            map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
+                    conceptConceptNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.getUids(),
+                        idPath, version);
                 }
                 return conceptConceptNid;
             case CONCEPT_CONCEPT_CONCEPT:
                 if (conceptConceptConceptNid == null) {
-                    conceptConceptConceptNid =
-                            map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids(), idPath,
-                                version);
+                    conceptConceptConceptNid = map.getIntId(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.getUids(), idPath, version);
                 }
                 return conceptConceptConceptNid;
             case CONCEPT_CONCEPT_STRING:
                 if (conceptConceptStringNid == null) {
-                    conceptConceptStringNid =
-                            map.getIntId(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids(), idPath,
-                                version);
+                    conceptConceptStringNid = map.getIntId(
+                        RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
                 }
                 return conceptConceptStringNid;
             case CONCEPT_STRING:
                 if (conceptStringNid == null) {
-                    conceptStringNid =
-                            map.getIntId(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids(), idPath, version);
+                    conceptStringNid = map.getIntId(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.getUids(), idPath,
+                        version);
                 }
                 return conceptStringNid;
             default:

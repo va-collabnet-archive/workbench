@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -53,7 +54,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntSet;
 
@@ -70,13 +70,21 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 
     public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            makeAndShowPopup(e);
+            try {
+				makeAndShowPopup(e);
+			} catch (TerminologyException ex) {
+				throw new RuntimeException(ex);
+			}
         }
     }
 
     public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) {
-            makeAndShowPopup(e);
+            try {
+				makeAndShowPopup(e);
+			} catch (TerminologyException ex) {
+				throw new RuntimeException(ex);
+			}
         }
     }
 
@@ -92,7 +100,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         // TODO Auto-generated method stub
     }
 
-    private void makeAndShowPopup(MouseEvent e) {
+    private void makeAndShowPopup(MouseEvent e) throws TerminologyException {
         JPopupMenu popup = null;
         if (e.isPopupTrigger()) {
             try {
@@ -144,7 +152,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
     }
 
     private JPopupMenu makePopup(MouseEvent e, File directory, I_ThinExtByRefVersioned specPart)
-            throws FileNotFoundException, IOException, ClassNotFoundException {
+            throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem noActionItem = new JMenuItem("");
         popup.add(noActionItem);
@@ -169,7 +177,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 
                 if (tuples.iterator().hasNext()) {
                     I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
-                    ConceptBean refsetConcept = ConceptBean.get(firstTuple.getRefsetId());
+                    I_GetConceptData refsetConcept = Terms.get().getConcept(firstTuple.getRefsetId());
                     I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(),
                         aceConfig);
                     String prompt = "Add comment for '" + refsetDesc.getText() + "'";

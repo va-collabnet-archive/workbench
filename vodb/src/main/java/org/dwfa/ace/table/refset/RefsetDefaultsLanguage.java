@@ -22,10 +22,10 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsLanguage;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDefaultsLanguage {
@@ -73,18 +73,18 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
 
     public RefsetDefaultsLanguage() throws TerminologyException, IOException {
         super();
-        defaultAcceptabilityForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+        defaultAcceptabilityForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
         acceptabilityPopupIds.add(defaultAcceptabilityForLanguageRefset.getConceptId());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_SPECIFIED.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.INVALID.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_RECOMMENDED.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.localize().getNid());
 
-        defaultCorrectnessForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.RECOMMENDED.getUids());
+        defaultCorrectnessForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RECOMMENDED.getUids());
         correctnessPopupIds.add(defaultCorrectnessForLanguageRefset.getConceptId());
         correctnessPopupIds.add(ArchitectonicAuxiliary.Concept.INCORRECT.localize().getNid());
 
-        defaultDegreeOfSynonymyForLanguageRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.SYNONYMOUS.getUids());
+        defaultDegreeOfSynonymyForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SYNONYMOUS.getUids());
         degreeOfSynonymyPopupIds.add(defaultDegreeOfSynonymyForLanguageRefset.getConceptId());
         degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NEAR_SYNONYMOUS.localize().getNid());
         degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NON_SYNONYMOUS.localize().getNid());

@@ -41,10 +41,13 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 
 public abstract class DescriptionTableModel extends AbstractTableModel {
 
@@ -119,8 +122,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         return columns.length;
     }
 
-    private String getPrefText(int id) throws IOException {
-        ConceptBean cb = getReferencedConcepts().get(id);
+    private String getPrefText(int id) throws IOException, TerminologyException {
+        I_GetConceptData cb = Terms.get().getConcept(id);
         I_DescriptionTuple desc = cb.getDescTuple(config.getTableDescPreferenceList(), config);
         if (desc != null) {
             return desc.getText();
@@ -161,30 +164,21 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
                     inConflict);
             case STATUS:
-                if (getReferencedConcepts().containsKey(desc.getStatusId())) {
-                    return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false, inConflict);
-                }
-                return new StringWithDescTuple(Integer.toString(desc.getStatusId()), desc, false, inConflict);
-            case TYPE:
-                if (getReferencedConcepts().containsKey(desc.getTypeId())) {
-                    return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false, inConflict);
-                }
-                return new StringWithDescTuple(Integer.toString(desc.getTypeId()), desc, false, inConflict);
+                     return new StringWithDescTuple(getPrefText(desc.getStatusId()), desc, false, inConflict);
+             case TYPE:
+                   return new StringWithDescTuple(getPrefText(desc.getTypeId()), desc, false, inConflict);
             case VERSION:
                 if (desc.getVersion() == Integer.MAX_VALUE) {
                     return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false, inConflict);
                 }
                 return new StringWithDescTuple(ThinVersionHelper.format(desc.getVersion()), desc, false, inConflict);
             case PATH:
-                if (getReferencedConcepts().containsKey(desc.getPathId())) {
-                    try {
-                        return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false, inConflict);
-                    } catch (Exception e) {
-                        return new StringWithDescTuple(Integer.toString(desc.getPathId()) + " no pref desc...", desc,
-                            false, inConflict);
-                    }
+                try {
+                    return new StringWithDescTuple(getPrefText(desc.getPathId()), desc, false, inConflict);
+                } catch (Exception e) {
+                    return new StringWithDescTuple(Integer.toString(desc.getPathId()) + " no pref desc...", desc,
+                        false, inConflict);
                 }
-                return new StringWithDescTuple(Integer.toString(desc.getPathId()), desc, false, inConflict);
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -240,13 +234,11 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 case STATUS:
                     Integer statusId = (Integer) value;
                     desc.setStatusId(statusId);
-                    getReferencedConcepts().put(statusId, ConceptBean.get(statusId));
                     changed = true;
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
                     desc.setTypeId(typeId);
-                    getReferencedConcepts().put(typeId, ConceptBean.get(typeId));
                     changed = true;
                     break;
                 case VERSION:
@@ -283,11 +275,13 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                             try {
                                 I_DescriptionTuple desc = getDescription(row);
                                 if (desc != null) {
-                                    ACE.addUncommitted(ConceptBean.get(desc.getConceptId()));
+                                    ACE.addUncommitted((I_Transact) Terms.get().getConcept(desc.getConceptId()));
                                 }
                             } catch (IOException e) {
                                 AceLog.getAppLog().alertAndLogException(e);
-                            }
+                            } catch (TerminologyException e) {
+                                AceLog.getAppLog().alertAndLogException(e);
+							}
                         }
                     }
                 });
@@ -314,8 +308,6 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         UpdateAlertsTimer.schedule(alertUpdater, 2000);
 
     }
-
-    public abstract Map<Integer, ConceptBean> getReferencedConcepts();
 
     public Class<?> getColumnClass(int c) {
         switch (columns[c]) {
@@ -449,7 +441,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
         private static final long serialVersionUID = 1L;
 
-        public DescTypeFieldEditor(I_ConfigAceFrame config) {
+        public DescTypeFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -459,9 +451,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithDescTuple swdt = (StringWithDescTuple) value;
-            return ConceptBean.get(swdt.getTuple().getTypeId());
+            return Terms.get().getConcept(swdt.getTuple().getTypeId());
         }
 
         @Override
@@ -480,7 +472,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
         private static final long serialVersionUID = 1L;
 
-        public DescStatusFieldEditor(I_ConfigAceFrame config) {
+        public DescStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -490,9 +482,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithDescTuple swdt = (StringWithDescTuple) value;
-            return ConceptBean.get(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusId());
         }
 
         @Override

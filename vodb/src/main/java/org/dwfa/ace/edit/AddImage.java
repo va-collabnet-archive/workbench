@@ -30,10 +30,12 @@ import java.util.logging.Level;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
@@ -43,7 +45,6 @@ import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.VodbEnv;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.ThinImagePart;
 import org.dwfa.vodb.types.ThinImageVersioned;
@@ -60,7 +61,7 @@ public class AddImage extends AddComponent {
             throws Exception {
         final File imageFile = FileDialogUtil.getExistingFile("Select image file to associate with concept", null,
             null, ((AceFrameConfig) config).getAceFrame());
-        ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
+        I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
         int dotLoc = imageFile.getName().lastIndexOf('.');
         String format = imageFile.getName().substring(dotLoc + 1);
         if (format.length() > 5) {
@@ -93,7 +94,7 @@ public class AddImage extends AddComponent {
 
         cb.getUncommittedImages().add(imageCore);
         cb.getUncommittedIds().add(imageCore.getImageId());
-        ACE.addUncommitted(cb);
+        ACE.addUncommitted((I_Transact) cb);
         termContainer.setTermComponent(cb);
     }
 

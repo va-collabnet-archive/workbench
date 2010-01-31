@@ -47,6 +47,7 @@ import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConceptPanel, PropertyChangeListener,
         ListSelectionListener {
@@ -127,7 +128,9 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
                 update();
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+			}
             for (ActionListener l : showComponentListeners) {
                 l.actionPerformed(e);
             }
@@ -146,14 +149,16 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
             update();
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
-        }
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+		}
     }
 
     public final List<JComponent> getToggleBarComponents() {
         return Arrays.asList(new JComponent[] { getToggleButton() });
     }
 
-    public abstract void update() throws IOException;
+    public abstract void update() throws IOException, TerminologyException;
 
     public final void addShowComponentListener(ActionListener l) {
         showComponentListeners.add(l);
@@ -186,7 +191,10 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
                     e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
+                        e1);
+			}
         }
 
     }
@@ -210,7 +218,10 @@ public abstract class AbstractPlugin implements org.dwfa.ace.api.I_PluginToConce
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
                     e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(),
+                        e1);
+			}
             JOptionPane.showMessageDialog(getToggleButton(), "Move Right");
         }
 

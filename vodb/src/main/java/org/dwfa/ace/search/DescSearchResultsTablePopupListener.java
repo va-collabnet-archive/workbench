@@ -36,10 +36,11 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
@@ -48,12 +49,11 @@ import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class DescSearchResultsTablePopupListener implements MouseListener, ActionListener {
 
     private I_DescriptionTuple descTuple;
-    private ConceptBean descConcept;
+    private I_GetConceptData descConcept;
     private int selectedRow;
     private I_ConfigAceFrame config;
     private JTable descTable;
@@ -115,8 +115,8 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
             selectedRow = descTable.getSelectedRow();
             StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
-            UUID descUuid = AceConfig.getVodb().getId(descTuple.getDescId()).getUUIDs().iterator().next();
-            descConcept = ConceptBean.get(descTuple.getConceptId());
+            UUID descUuid = Terms.get().getId(descTuple.getDescId()).getUUIDs().iterator().next();
+            descConcept = Terms.get().getConcept(descTuple.getConceptId());
 
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem = new JMenuItem(" ");
@@ -187,7 +187,9 @@ public class DescSearchResultsTablePopupListener implements MouseListener, Actio
                 config.setHierarchySelection(descConcept);
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+			}
         } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
             I_HostConceptPlugins viewer = config.getConceptViewer(5);
             viewer.setTermComponent(descConcept);

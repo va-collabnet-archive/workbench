@@ -24,9 +24,9 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 
 public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataForTree> {
@@ -166,8 +166,8 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
         // and this node
         // or based on the node and this node. Need to get extensions on the rel
         // and on the concept.
-        List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(cb1.getConceptId());
-        extensions.addAll(AceConfig.getVodb().getExtensionsForComponent(cb1.getRelId()));
+        List<I_GetExtensionData> extensions = Terms.get().getExtensionsForComponent(cb1.getConceptId());
+        extensions.addAll(Terms.get().getExtensionsForComponent(cb1.getRelId()));
         return extensions;
     }
 

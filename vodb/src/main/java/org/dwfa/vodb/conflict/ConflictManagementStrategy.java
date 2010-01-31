@@ -161,7 +161,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         I_IntSet srcTypes = config.getSourceRelTypes();
         relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes,
-            config.getViewPositionSet(), matchingTuples, true);
+            config.getViewPositionSetReadOnly(), matchingTuples, true);
 
         return doesConflictExist(matchingTuples);
     }
@@ -177,7 +177,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         I_IntSet descTypes = config.getDescTypes();
         description.addTuples(config.getAllowedStatus(), descTypes.getSetValues().length == 0 ? null : descTypes,
-            config.getViewPositionSet(), matchingTuples, true);
+            config.getViewPositionSetReadOnly(), matchingTuples, true);
 
         return doesConflictExist(matchingTuples);
     }

@@ -28,7 +28,6 @@ import javax.swing.event.ListSelectionListener;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class TermComponentListSelectionListener implements ListSelectionListener {
 
@@ -43,7 +42,7 @@ public class TermComponentListSelectionListener implements ListSelectionListener
 
     public void valueChanged(ListSelectionEvent e) {
         try {
-            ConceptBean currentBean = (ConceptBean) linkedComponent.getTermComponent();
+        	I_GetConceptData currentBean = (I_GetConceptData) linkedComponent.getTermComponent();
             if (currentBean != null) {
                 if (currentBean.isUncommitted()) {
                     if (warnForUncommitted) {

@@ -83,7 +83,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -94,7 +94,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
@@ -129,7 +128,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 List<I_GetConceptData> historyToRemove = new ArrayList<I_GetConceptData>();
                 for (I_GetConceptData historyItem : tabHistoryList) {
                     try {
-                        if (LocalVersionedTerminology.get().getUids(historyItem.getConceptId()) != null) {
+                        if (Terms.get().getUids(historyItem.getConceptId()) != null) {
                             JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
                             popup.add(menuItem);
                         } else {
@@ -180,7 +179,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     } catch (DatabaseException e) {
                         AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                             "Database Exception: " + e.getLocalizedMessage(), e);
-                    }
+                    } catch (TerminologyException e) {
+                        AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+                                "Database Exception: " + e.getLocalizedMessage(), e);
+					} catch (IOException e) {
+                        AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+                                "Database Exception: " + e.getLocalizedMessage(), e);
+					}
                 }
             });
         }
@@ -209,7 +214,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             } catch (DatabaseException e1) {
                 AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                     "Database Exception: " + e1.getLocalizedMessage(), e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+                        "Database Exception: " + e1.getLocalizedMessage(), e1);
+			} catch (IOException e1) {
+	               AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+	                       "Database Exception: " + e1.getLocalizedMessage(), e1);
+			}
         }
 
         public void propertyChange(PropertyChangeEvent arg0) {
@@ -392,17 +403,17 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     }
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
-            IOException, ClassNotFoundException, NoSuchAlgorithmException {
+            IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, null, panelId);
     }
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, null, enableListLink, panelId);
     }
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, conceptTabs, false, panelId);
     }
 
@@ -411,7 +422,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     private HOST_ENUM host_enum;
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, boolean enableListLink,
-            Integer panelId) throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+            Integer panelId) throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
         this.panelId = panelId;
@@ -492,7 +503,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         }
     }
 
-    public JComponent getContentPane() throws DatabaseException {
+    public JComponent getContentPane() throws DatabaseException, TerminologyException, IOException {
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -773,7 +784,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             int index = conceptTabs.indexOfComponent(this);
             if (index >= 0) {
                 if (termComponent != null) {
-                    ConceptBean cb = (ConceptBean) termComponent;
+                    I_GetConceptData cb = (I_GetConceptData) termComponent;
                     String desc;
                     try {
                         I_DescriptionTuple tdt = cb.getDescTuple(getConfig().getShortLabelDescPreferenceList(),
@@ -881,7 +892,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (propertyName.equals("commit")) {
             if (label.getTermComponent() != null) {
-                ConceptBean cb = (ConceptBean) label.getTermComponent();
+            	I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
                     if (cb.getConceptAttributes() == null) {
                         label.setTermComponent(null);
@@ -920,11 +931,11 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     }
 
     public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException {
-        return ConceptBean.get(ids);
+        return Terms.get().getConcept(ids);
     }
 
     public I_GetConceptData getConcept(UUID[] ids) throws TerminologyException, IOException {
-        return ConceptBean.get(Arrays.asList(ids));
+        return Terms.get().getConcept(Arrays.asList(ids));
     }
 
     public I_Position newPosition(I_Path path, int version) {

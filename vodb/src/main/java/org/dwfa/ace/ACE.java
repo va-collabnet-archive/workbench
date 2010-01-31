@@ -127,7 +127,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
@@ -203,7 +203,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
 
         public void actionPerformed(ActionEvent e) {
-            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_TermFactory tf = Terms.get();
             ;
             try {
                 I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString("6fd32c1f-8096-40a1-9053-1cc204bc61e3"));
@@ -353,7 +353,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                     AceLog.getAppLog().alertAndLogException(e);
                                 } catch (NoSuchAlgorithmException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
-                                }
+                                } catch (TerminologyException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+								}
                             }
                             conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
                                 "Data Checks Linked");
@@ -548,7 +550,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (aceConfig != null) {
             for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
                 frameConfig.setCommitEnabled(true);
-                if (ConceptBean.class.isAssignableFrom(to.getClass())) {
+                if (I_GetConceptData.class.isAssignableFrom(to.getClass())) {
                     frameConfig.addImported((I_GetConceptData) to);
                 }
             }
@@ -605,7 +607,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             new ArrayList<AlertToDataConstraintFailure>();
                     dataCheckMap.put(uncommittedBean, warningsAndErrors);
                     addUncommitted(uncommittedBean);
-                    for (I_ThinExtByRefVersioned ext : LocalVersionedTerminology.get().getAllExtensionsForComponent(
+                    for (I_ThinExtByRefVersioned ext : Terms.get().getAllExtensionsForComponent(
                         uncommittedBean.getConceptId(), true)) {
                         for (I_ThinExtByRefPart part : ext.getMutableParts()) {
                             if (part.getVersion() == Integer.MAX_VALUE) {
@@ -857,7 +859,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
                     try {
                         if (VodbEnv.isTransactional()) {
-                            AceConfig.getVodb().startTransaction();
+                            Terms.get().startTransaction();
                         }
 
                         for (I_Transact cb : uncommitted) {
@@ -866,17 +868,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         for (I_Transact cb : uncommittedNoChecks) {
                             cb.commit(version, values);
                         }
-                        AceConfig.getVodb().addPositions(values);
+                        ((VodbEnv) Terms.get()).addPositions(values);
                         if (VodbEnv.isTransactional()) {
-                            AceConfig.getVodb().commitTransaction();
+                            Terms.get().commitTransaction();
                         }
-                        AceConfig.getVodb().sync();
+                        Terms.get().commit();
                     } catch (DatabaseException e) {
                         if (VodbEnv.isTransactional()) {
-                            AceConfig.getVodb().cancelTransaction();
+                            Terms.get().cancelTransaction();
                         }
-                        throw new ToIoException(e);
-                    }
+                        throw new IOException(e);
+                    } catch (Exception e) {
+                        throw new IOException(e);
+					}
                     if (writeChangeSets) {
                         for (I_WriteChangeSet writer : csWriters) {
                             AceLog.getEditLog().info("Committing writer: " + writer.toString());
@@ -916,8 +920,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (I_GetConceptData.class.isAssignableFrom(cb.getClass())) {
             I_GetConceptData igcd = (I_GetConceptData) cb;
             for (int nid : igcd.getUncommittedIds().getSetValues()) {
-                I_Identify idv = AceConfig.getVodb().getId(nid);
                 try {
+                    I_Identify idv = Terms.get().getId(nid);
                     uncommittedIds.getUncommittedIds().add(idv.getUniversalId());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
@@ -926,8 +930,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } else if (ExtensionByReferenceBean.class.isAssignableFrom(cb.getClass())) {
             ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) cb;
             if (ebrBean.isFirstCommit()) {
-                I_Identify idv = AceConfig.getVodb().getId(ebrBean.getMemberId());
                 try {
+                    I_Identify idv = Terms.get().getId(ebrBean.getMemberId());
                     uncommittedIds.getUncommittedIds().add(idv.getUniversalId());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
@@ -1824,7 +1828,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     CollectionEditorContainer conceptListEditor;
 
     private Component getConceptListEditor() throws DatabaseException, IOException, ClassNotFoundException,
-            NoSuchAlgorithmException {
+            NoSuchAlgorithmException, TerminologyException {
         if (conceptListEditor == null) {
             if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
                 aceFrameConfig.getTabHistoryMap().put("batchList", new ArrayList<I_GetConceptData>());
@@ -2137,11 +2141,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return conflictConfigPanel;
     }
 
-    private JComponent makeTypeFilterPanel() {
+    private JComponent makeTypeFilterPanel() throws TerminologyException, IOException {
 
         TerminologyListModel descTypeTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getDescTypes().getSetValues()) {
-            descTypeTableModel.addElement(ConceptBean.get(id));
+            descTypeTableModel.addElement(Terms.get().getConcept(id));
         }
         descTypeTableModel.addListDataListener(aceFrameConfig.getDescTypes());
         TerminologyList descList = new TerminologyList(descTypeTableModel, aceFrameConfig);
@@ -2152,7 +2156,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TerminologyListModel relTypeTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getPrefFilterTypesForRel().getSetValues()) {
-            relTypeTableModel.addElement(ConceptBean.get(id));
+            relTypeTableModel.addElement(Terms.get().getConcept(id));
         }
         relTypeTableModel.addListDataListener(aceFrameConfig.getPrefFilterTypesForRel());
         TerminologyList relTypeList = new TerminologyList(relTypeTableModel, aceFrameConfig);
@@ -2163,7 +2167,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return typeFilterPanel;
     }
 
-    private JComponent makeDescPanel() {
+    private JComponent makeDescPanel() throws TerminologyException, IOException {
         JPanel langPrefPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 0;
@@ -2204,7 +2208,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         gbc.gridy++;
         TerminologyListModel shortLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getShortLabelDescPreferenceList().getListValues()) {
-            shortLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+            shortLabelPrefOrderTableModel.addElement(Terms.get().getConcept(id));
         }
         shortLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getShortLabelDescPreferenceList());
         TerminologyList shortLabelOrderList = new TerminologyList(shortLabelPrefOrderTableModel, aceFrameConfig);
@@ -2215,7 +2219,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TerminologyListModel longLabelPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getLongLabelDescPreferenceList().getListValues()) {
-            longLabelPrefOrderTableModel.addElement(ConceptBean.get(id));
+            longLabelPrefOrderTableModel.addElement(Terms.get().getConcept(id));
         }
         longLabelPrefOrderTableModel.addListDataListener(aceFrameConfig.getLongLabelDescPreferenceList());
         TerminologyList longLabelOrderList = new TerminologyList(longLabelPrefOrderTableModel, aceFrameConfig);
@@ -2226,7 +2230,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TerminologyListModel treeDescPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getTreeDescPreferenceList().getListValues()) {
-            treeDescPrefOrderTableModel.addElement(ConceptBean.get(id));
+            treeDescPrefOrderTableModel.addElement(Terms.get().getConcept(id));
         }
         treeDescPrefOrderTableModel.addListDataListener(aceFrameConfig.getTreeDescPreferenceList());
         TerminologyList treePrefOrderList = new TerminologyList(treeDescPrefOrderTableModel, aceFrameConfig);
@@ -2237,7 +2241,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TerminologyListModel descPrefOrderTableModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getTableDescPreferenceList().getListValues()) {
-            descPrefOrderTableModel.addElement(ConceptBean.get(id));
+            descPrefOrderTableModel.addElement(Terms.get().getConcept(id));
         }
         descPrefOrderTableModel.addListDataListener(aceFrameConfig.getTableDescPreferenceList());
         TerminologyList prefOrderList = new TerminologyList(descPrefOrderTableModel, aceFrameConfig);
@@ -2250,12 +2254,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     }
 
-    private JComponent makeTaxonomyPrefPanel() {
+    private JComponent makeTaxonomyPrefPanel() throws TerminologyException, IOException {
         JPanel relPrefPanel = new JPanel(new GridLayout(0, 1));
 
         TerminologyListModel rootModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getRoots().getSetValues()) {
-            rootModel.addElement(ConceptBean.get(id));
+            rootModel.addElement(Terms.get().getConcept(id));
         }
         rootModel.addListDataListener(aceFrameConfig.getRoots());
         TerminologyList rootList = new TerminologyList(rootModel, aceFrameConfig);
@@ -2331,10 +2335,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return checkBoxEditor.getCustomEditor();
     }
 
-    private TerminologyList makeTermList(String title, I_IntSet set) {
+    private TerminologyList makeTermList(String title, I_IntSet set) throws TerminologyException, IOException {
         TerminologyListModel termListModel = new TerminologyListModel();
         for (int id : set.getSetValues()) {
-            termListModel.addElement(ConceptBean.get(id));
+            termListModel.addElement(Terms.get().getConcept(id));
         }
         termListModel.addListDataListener(set);
         TerminologyList terminologyList = new TerminologyList(termListModel, aceFrameConfig);
@@ -2349,10 +2353,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return terminologyList;
     }
 
-    private JComponent makeStatusPrefPanel() {
+    private JComponent makeStatusPrefPanel() throws TerminologyException, IOException {
         TerminologyListModel statusValuesModel = new TerminologyListModel();
         for (int id : aceFrameConfig.getAllowedStatus().getSetValues()) {
-            statusValuesModel.addElement(ConceptBean.get(id));
+            statusValuesModel.addElement(Terms.get().getConcept(id));
         }
         statusValuesModel.addListDataListener(aceFrameConfig.getAllowedStatus());
         TerminologyList statusList = new TerminologyList(statusValuesModel, aceFrameConfig);
@@ -3224,7 +3228,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 cancelButton.setEnabled(aceFrameConfig.isCommitEnabled());
             }
         } else if (evt.getPropertyName().equals("lastViewed")) {
-            viewerHistoryTableModel.addElement(0, (ConceptBean) evt.getNewValue());
+            viewerHistoryTableModel.addElement(0, (I_GetConceptData) evt.getNewValue());
             while (viewerHistoryTableModel.getSize() > maxHistoryListSize) {
                 viewerHistoryTableModel.removeElement(viewerHistoryTableModel.getSize() - 1);
             }
@@ -3233,8 +3237,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 uncommittedTableModel.clear();
                 for (I_Transact t : uncommitted) {
                     if (t != null) {
-                        if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                            uncommittedTableModel.addElement((ConceptBean) t);
+                        if (I_GetConceptData.class.isAssignableFrom(t.getClass())) {
+                            uncommittedTableModel.addElement((I_GetConceptData) t);
                         }
                     }
                 }
@@ -3242,8 +3246,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         } else if (evt.getPropertyName().equals("imported")) {
             importHistoryTableModel.clear();
             for (I_Transact t : imported) {
-                if (ConceptBean.class.isAssignableFrom(t.getClass())) {
-                    importHistoryTableModel.addElement((ConceptBean) t);
+                if (I_GetConceptData.class.isAssignableFrom(t.getClass())) {
+                    importHistoryTableModel.addElement((I_GetConceptData) t);
                 }
             }
         } else if (evt.getPropertyName().equals("roots")) {

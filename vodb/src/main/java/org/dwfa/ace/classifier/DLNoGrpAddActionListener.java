@@ -24,8 +24,8 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class DLNoGrpAddActionListener implements ActionListener {
     private I_ContainTermComponent termContainer; // :!!!:
@@ -51,7 +51,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
     }
 
     void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config) {
-        ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
+    	I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
 
         int parentId = Integer.MAX_VALUE;
         if (config.getHierarchySelection() != null) {

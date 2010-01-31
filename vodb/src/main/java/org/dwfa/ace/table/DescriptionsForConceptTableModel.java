@@ -37,12 +37,12 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel implements PropertyChangeListener {
 
@@ -50,12 +50,12 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
-        private HashMap<Integer, ConceptBean> concepts;
+        private HashMap<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, ConceptBean>();
+            concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
@@ -64,7 +64,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                 if (stopWork) {
                     return false;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
 
@@ -199,7 +199,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
 
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
-    Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     I_HostConceptPlugins host;
 
@@ -213,7 +213,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         List<I_DescriptionTuple> selectedTuples = new ArrayList<I_DescriptionTuple>();
         I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
         I_IntSet allowedTypes = null;
-        Set<I_Position> positions = host.getConfig().getViewPositionSet();
+        PositionSetReadOnly positions = host.getConfig().getViewPositionSetReadOnly();
         if (host.getUsePrefs()) {
             if (host.getConfig().getDescTypes().getSetValues().length == 0) {
                 allowedTypes = null;
@@ -291,7 +291,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         fireTableDataChanged();
     }
 
-    public Map<Integer, ConceptBean> getReferencedConcepts() {
+    public Map<Integer, I_GetConceptData> getReferencedConcepts() {
         return referencedConcepts;
     }
 

@@ -22,10 +22,10 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsMeasurement;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_RefsetDefaultsMeasurement {
@@ -66,7 +66,7 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
 
     public RefsetDefaultsMeasurement() throws TerminologyException, IOException {
         super();
-        defaultUnitsOfMeasureForMeasurementRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+        defaultUnitsOfMeasureForMeasurementRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         unitsOfMeasurePopupIds.add(defaultUnitsOfMeasureForMeasurementRefset.getConceptId());
 
         defaultMeasurementValueForMeasurementRefset = 1.0;

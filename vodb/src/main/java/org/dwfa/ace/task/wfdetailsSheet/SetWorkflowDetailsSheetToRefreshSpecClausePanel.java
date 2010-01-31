@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.bpa.process.Condition;
@@ -166,7 +167,7 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
            List<Collection<UUID>> clausesToUpdate = (List<Collection<UUID>>) process.getProperty(clausesToUpdateMemberUuidPropName);
 
            
-           I_GetConceptData refsetSpec = LocalVersionedTerminology.get().getConcept(refsetSpecUuid);
+           I_GetConceptData refsetSpec = Terms.get().getConcept(refsetSpecUuid);
            workflowDetailsSheet.add(new RefreshSpecClausePanel(refsetSpec,
                                                                 refsetSpecVersionSet, 
                                                                 sourceTerminologyVersionSet,

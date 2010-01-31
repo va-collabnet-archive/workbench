@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -44,12 +45,10 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 
@@ -71,7 +70,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(),
                         		p.getConceptId(), Long.MAX_VALUE);
                         setProperStatus(newPart);
-                        model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                        model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().addVersion(newPart);
                     }
                     ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
@@ -132,29 +131,29 @@ public class RefsetPopupListener extends MouseAdapter {
                     setProperStatus(newPart);
                     switch (field) {
                     case STATUS:
-                        newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
-                        model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                        newPart.setStatusId((Terms.get().uuidToNative(ids)));
+                        model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         break;
                     case CONCEPT_ID:
-                        ((I_ThinExtByRefPartConcept) newPart).setConceptId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartConcept) newPart).setConceptId((Terms.get().uuidToNative(ids)));
                         break;
                     case ACCEPTABILITY:
-                        ((I_ThinExtByRefPartLanguage) newPart).setAcceptabilityId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartLanguage) newPart).setAcceptabilityId((Terms.get().uuidToNative(ids)));
                         break;
                     case CORRECTNESS:
-                        ((I_ThinExtByRefPartLanguage) newPart).setCorrectnessId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartLanguage) newPart).setCorrectnessId((Terms.get().uuidToNative(ids)));
                         break;
                     case DEGREE_OF_SYNONYMY:
-                        ((I_ThinExtByRefPartLanguage) newPart).setDegreeOfSynonymyId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartLanguage) newPart).setDegreeOfSynonymyId((Terms.get().uuidToNative(ids)));
                         break;
                     case TAG:
-                        ((I_ThinExtByRefPartLanguageScoped) newPart).setTagId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartLanguageScoped) newPart).setTagId((Terms.get().uuidToNative(ids)));
                         break;
                     case SCOPE:
-                        ((I_ThinExtByRefPartLanguageScoped) newPart).setScopeId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartLanguageScoped) newPart).setScopeId((Terms.get().uuidToNative(ids)));
                         break;
                     case MEASUREMENT_UNITS_ID:
-                        ((I_ThinExtByRefPartMeasurement) newPart).setUnitsOfMeasureId((AceConfig.getVodb().uuidToNative(ids)));
+                        ((I_ThinExtByRefPartMeasurement) newPart).setUnitsOfMeasureId((Terms.get().uuidToNative(ids)));
                         break;
 
                     case INTEGER_VALUE:
@@ -166,9 +165,9 @@ public class RefsetPopupListener extends MouseAdapter {
                         throw new Exception("Don't know how to handle: " + field);
                     }
 
-                    model.referencedConcepts.put(AceConfig.getVodb().uuidToNative(ids),
-                        ConceptBean.get((AceConfig.getVodb().uuidToNative(ids))));
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(Terms.get().uuidToNative(ids),
+                        Terms.get().getConcept((Terms.get().uuidToNative(ids))));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                     if (selectedObject.getTuple().getMutablePart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
@@ -228,7 +227,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     default:
                         throw new Exception("Don't know how to handle: " + field);
                     }
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                     if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
@@ -287,7 +286,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     default:
                         throw new Exception("Don't know how to handle: " + field);
                     }
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
 
                     if (selectedObject.getTuple().getMutablePart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
@@ -349,7 +348,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     default:
                         throw new Exception("Don't know how to handle: " + field);
                     }
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
 
                     if (selectedObject.getTuple().getMutablePart().getVersion() != Integer.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);

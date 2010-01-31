@@ -31,10 +31,10 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -218,7 +218,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
     }
 
     public static ThinExtByRefPart makePart(UniversalAceExtByRefPart part) throws TerminologyException, IOException {
-        VodbEnv vodb = AceConfig.getVodb();
+        VodbEnv vodb = (VodbEnv) Terms.get();
         if (UniversalAceExtByRefPartBoolean.class.equals(part.getClass())) {
             ThinExtByRefPartBoolean thinPart = new ThinExtByRefPartBoolean();
             setStandardFields(part, vodb, thinPart);
@@ -367,7 +367,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         addTuples(allowedStatus, positions, returnTuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
-            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_ManageConflict conflictResolutionStrategy;
             if (config == null) {
                 conflictResolutionStrategy = new IdentifyAllConflictStrategy();
@@ -384,7 +384,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
     public void addTuples(List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws TerminologyException, IOException {
 
-        I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         addTuples(config.getAllowedStatus(), config.getViewPositionSet(), returnTuples, addUncommitted,
             returnConflictResolvedLatestState);
     }

@@ -34,7 +34,6 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
@@ -243,7 +242,7 @@ public class IntSet implements ListDataListener, I_IntSet {
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : set.getSetValues()) {
             try {
-                outList.add(AceConfig.getVodb().nativeToUuid(i));
+                outList.add(Terms.get().nativeToUuid(i));
             } catch (DatabaseException e) {
                 AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
             }
@@ -275,7 +274,7 @@ public class IntSet implements ListDataListener, I_IntSet {
             try {
                 if (ignore) {
                     try {
-                        set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+                        set[i] = Terms.get().uuidToNative((List<UUID>) in.readObject());
                     } catch (NoMappingException e) {
                         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                             AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
@@ -287,7 +286,7 @@ public class IntSet implements ListDataListener, I_IntSet {
                     }
 
                 } else {
-                    set[i] = AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject());
+                    set[i] = Terms.get().uuidToNative((List<UUID>) in.readObject());
                 }
             } catch (Exception e) {
                 IOException newEx = new IOException();

@@ -39,6 +39,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.config.AceConfig;
@@ -171,7 +172,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
             reader.read();
 
             lowerProgressMessage = "Starting sync ";
-            AceConfig.getVodb().sync();
+            Terms.get().commit();
             upperProgressMessage = "Import complete";
             lowerProgressMessage = "Finished sync. Components imported: ";
 

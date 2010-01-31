@@ -27,7 +27,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
