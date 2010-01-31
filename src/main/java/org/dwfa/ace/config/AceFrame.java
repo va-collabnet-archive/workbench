@@ -48,6 +48,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.WizardPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.svn.SvnPrompter;
@@ -180,7 +181,7 @@ public class AceFrame extends ComponentFrame {
 
     private void doWindowActivation() {
         try {
-            AceConfig.getVodb().setActiveAceFrameConfig(getCdePanel().getAceFrameConfig());
+            Terms.get().setActiveAceFrameConfig(getCdePanel().getAceFrameConfig());
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {

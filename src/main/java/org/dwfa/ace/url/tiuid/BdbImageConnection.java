@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
@@ -60,12 +60,12 @@ public class BdbImageConnection extends URLConnection {
                     }
                     Collection<UUID> imageIdCollection = collectionFromString(imageIdPart);
                     // int conceptId =
-                    // AceConfig.getVodb().getConceptNid(conceptIdCollection);
+                    // Terms.get().getConceptNid(conceptIdCollection);
                     // int imageId =
-                    // AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection,
+                    // Terms.get().getSubordinateUuidToNative(imageIdCollection,
                     // conceptId);
-                    // image = AceConfig.getVodb().getImage(imageId, conceptId);
-                    image = AceConfig.getVodb().getImage(AceConfig.getVodb().uuidToNative(imageIdCollection));
+                    // image = Terms.get().getImage(imageId, conceptId);
+                    image = Terms.get().getImage(Terms.get().uuidToNative(imageIdCollection));
                     if (image == null) {
                         AceLog.getAppLog().warning(
                             "Image is null for queryString:" + queryString + "\n imageIdCollection: "
@@ -86,12 +86,12 @@ public class BdbImageConnection extends URLConnection {
                         AceLog.getAppLog().warning("Query string with $ only has one part: " + queryString);
                     }
                     // int conceptId =
-                    // AceConfig.getVodb().getConceptNid(conceptIdCollection);
+                    // Terms.get().getConceptNid(conceptIdCollection);
                     // int imageId =
-                    // AceConfig.getVodb().getSubordinateUuidToNative(imageIdCollection,
+                    // Terms.get().getSubordinateUuidToNative(imageIdCollection,
                     // conceptId);
-                    // image = AceConfig.getVodb().getImage(imageId, conceptId);
-                    image = AceConfig.getVodb().getImage(Integer.parseInt(imageIdPart));
+                    // image = Terms.get().getImage(imageId, conceptId);
+                    image = Terms.get().getImage(Integer.parseInt(imageIdPart));
                     if (image == null) {
                         AceLog.getAppLog().warning(
                             "Image is null for queryString:" + queryString + "\n imageIdCollection: " + imageIdPart
@@ -112,7 +112,7 @@ public class BdbImageConnection extends URLConnection {
                         String[] ids = queryString.split(",");
                         for (String id : ids) {
                             try {
-                                image = AceConfig.getVodb().getImage(UUID.fromString(id));
+                                image = Terms.get().getImage(UUID.fromString(id));
                                 if (image != null) {
                                     return;
                                 }
@@ -121,14 +121,14 @@ public class BdbImageConnection extends URLConnection {
                             }
                         }
                     } else {
-                        image = AceConfig.getVodb().getImage(UUID.fromString(queryString));
+                        image = Terms.get().getImage(UUID.fromString(queryString));
                     }
                 } else {
                     String id = url.getQuery();
                     if (id.length() == 36) {
-                        image = AceConfig.getVodb().getImage(UUID.fromString(url.getQuery()));
+                        image = Terms.get().getImage(UUID.fromString(url.getQuery()));
                     } else {
-                        image = AceConfig.getVodb().getImage(Integer.parseInt(id));
+                        image = Terms.get().getImage(Integer.parseInt(id));
                     }
                 }
             }

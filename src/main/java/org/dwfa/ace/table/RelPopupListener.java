@@ -38,13 +38,14 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.RelTableModel.FieldToChange;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 public class RelPopupListener extends MouseAdapter {
@@ -59,8 +60,8 @@ public class RelPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
-                ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+                I_GetConceptData destBean = Terms.get().getConcept(selectedObject.getTuple().getC2Id());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                     I_RelPart newPart =
@@ -78,13 +79,15 @@ public class RelPopupListener extends MouseAdapter {
                             new Exception("srcRel: " + srcRel + " destRel: " + destRel + " cannot be null"));
                     }
                 }
-                ACE.addUncommitted(sourceBean);
-                ACE.addUncommitted(destBean);
+                ACE.addUncommitted((I_Transact) sourceBean);
+                ACE.addUncommitted((I_Transact) destBean);
                 model.allTuples = null;
                 model.fireTableDataChanged();
             } catch (IOException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
-            }
+            } catch (TerminologyException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+			}
         }
     }
 
@@ -95,11 +98,18 @@ public class RelPopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
+            I_GetConceptData sourceBean;
+			try {
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+			} catch (TerminologyException e1) {
+				throw new RuntimeException(e1);
+			} catch (IOException e1) {
+				throw new RuntimeException(e1);
+			}
             I_RelTuple tuple = selectedObject.getTuple();
             ThinRelVersioned versioned = (ThinRelVersioned) tuple.getRelVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted(sourceBean);
+            ACE.addUncommitted((I_Transact) sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -118,8 +128,8 @@ public class RelPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getC1Id());
-                ConceptBean destBean = ConceptBean.get(selectedObject.getTuple().getC2Id());
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+                I_GetConceptData destBean = Terms.get().getConcept(selectedObject.getTuple().getC2Id());
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getMutablePart();
@@ -152,12 +162,12 @@ public class RelPopupListener extends MouseAdapter {
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getCharacteristicId(), ConceptBean.get(newPart
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(newPart
                         .getCharacteristicId()));
-                    model.referencedConcepts.put(newPart.getRefinabilityId(), ConceptBean.get(newPart
+                    model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(newPart
                         .getRefinabilityId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), ConceptBean.get(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
 
                     I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
 
@@ -166,8 +176,8 @@ public class RelPopupListener extends MouseAdapter {
                         destRel.addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted(sourceBean);
-                ACE.addUncommitted(destBean);
+                ACE.addUncommitted((I_Transact) sourceBean);
+                ACE.addUncommitted((I_Transact) destBean);
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.updateTable(model.tableBean);

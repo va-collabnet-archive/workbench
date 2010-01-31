@@ -128,7 +128,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
             PropertyChangeEvent evt = new PropertyChangeEvent(getHost(), "termComponent", null,
                 getHost().getTermComponent());
@@ -161,7 +161,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         return fields.toArray(new DESC_FIELD[fields.size()]);
     }
 
-    private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+    private void setupEditorsAndRenderers(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(host.getConfig());
         languageRefsetTable.setDefaultRenderer(Boolean.class, renderer);
@@ -201,7 +201,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         languageRefsetTable.setDefaultRenderer(String.class, renderer);
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException {
         if (pluginComponent == null) {
             try {
                 createPluginComponent(host);
@@ -212,7 +212,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         return pluginComponent;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) throws IOException {
+    private void createPluginComponent(I_HostConceptPlugins host) throws IOException, TerminologyException {
         I_DescriptionTuple descTuple = languageConcept.getDescTuple(host.getConfig().getTableDescPreferenceList(),
             host.getConfig());
         setHost(host);
@@ -221,7 +221,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         host.addPropertyChangeListener("commit", this);
     }
 
-    private JPanel getDescPanel(I_HostConceptPlugins host, String DialectName) {
+    private JPanel getDescPanel(I_HostConceptPlugins host, String DialectName) throws TerminologyException, IOException {
         descTableModel = new DescriptionsForConceptTableModel(getDescColumns(host), host);
         descTableModel.addTableModelListener(this);
         JPanel descPanel = new JPanel(new GridBagLayout());

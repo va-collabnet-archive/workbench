@@ -56,6 +56,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -63,7 +64,6 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
@@ -74,7 +74,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.tigris.subversion.javahl.PromptUserPassword3;
@@ -426,7 +425,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         try {
             I_IntList refsets = getRefsetsToShowInTaxonomy();
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
-                ConceptBean rootBean = ConceptBean.get(rootNid);
+                I_GetConceptData rootBean = Terms.get().getConcept(rootNid);
                 for (I_ThinExtByRefVersioned ext : rootBean.getExtensions()) {
                     if (refsets.contains(ext.getRefsetId())) {
                         List<I_ThinExtByRefTuple> tuples =
@@ -501,7 +500,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : srcRels) {
-                ConceptBean child = ConceptBean.get(rt.getC2Id());
+                I_GetConceptData child = Terms.get().getConcept(rt.getC2Id());
                 if (notMarkedParent(child)) {
                     relsToRemove.add(rt);
                 }
@@ -510,7 +509,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
             relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : destRels) {
-                ConceptBean child = ConceptBean.get(rt.getC1Id());
+            	I_GetConceptData child = Terms.get().getConcept(rt.getC1Id());
                 if (notMarkedParent(child)) {
                     relsToRemove.add(rt);
                 }
@@ -519,12 +518,12 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
         }
 
-        private boolean notMarkedParent(ConceptBean child) throws IOException, TerminologyException {
+        private boolean notMarkedParent(I_GetConceptData child) throws IOException, TerminologyException {
             List<? extends I_DescriptionVersioned> descriptions = child.getDescriptions();
             List<I_ThinExtByRefVersioned> extensions = new ArrayList<I_ThinExtByRefVersioned>();
             for (I_DescriptionVersioned desc : descriptions) {
                 // extensions on the description(s)
-                extensions.addAll(AceConfig.getVodb().getAllExtensionsForComponent(desc.getDescId()));
+                extensions.addAll(Terms.get().getAllExtensionsForComponent(desc.getDescId()));
             }
 
             extensions.addAll(child.getExtensions()); // extensions on the concept

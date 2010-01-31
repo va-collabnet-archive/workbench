@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -32,7 +33,8 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.I_TrackContinuation;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -274,23 +276,23 @@ public class SearchStringWorker extends SwingWorker<I_UpdateProgress> implements
             updater = new LuceneProgressUpdator();
             completeLatch = new CountDownLatch(1);
             new MatchUpdator();
-            completeLatch = AceConfig.getVodb().searchLucene(this, patternString, luceneMatches, completeLatch,
+            completeLatch = ((I_Search) Terms.get()).searchLucene(this, patternString, luceneMatches, completeLatch,
                 searchPanel.getExtraCriterion(), config, (LuceneProgressUpdator) updater);
         } else {
-            regexMatches = Collections.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
-                new ThinDescVersionedComparator()));
+            regexMatches = new ConcurrentSkipListSet<I_DescriptionVersioned>(
+                new ThinDescVersionedComparator());
             updater = new RegexProgressUpdator();
             try {
                 completeLatch = new CountDownLatch(0);
                 Pattern p = Pattern.compile(patternString);
                 conceptCount = Integer.MAX_VALUE;
-                conceptCount = AceConfig.getVodb().getConceptCount();
+                conceptCount = Terms.get().getConceptCount();
                 AceLog.getAppLog().info("Desc count 3: " + conceptCount);
                 if (conceptCount > 0) {
                     completeLatch = new CountDownLatch(conceptCount);
                 }
                 new MatchUpdator();
-                AceConfig.getVodb().searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(),
+                ((I_Search) Terms.get()).searchRegex(this, p, regexMatches, completeLatch, searchPanel.getExtraCriterion(),
                     config);
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);

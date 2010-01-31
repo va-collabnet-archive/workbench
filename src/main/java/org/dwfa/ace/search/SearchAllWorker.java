@@ -31,7 +31,8 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.I_TrackContinuation;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -176,7 +177,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements I_
         regexMatches = Collections.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
             new ThinDescVersionedComparator()));
         conceptCount = Integer.MAX_VALUE;
-        conceptCount = AceConfig.getVodb().getConceptCount();
+        conceptCount = Terms.get().getConceptCount();
         I_UpdateProgress updater;
         if (conceptCount != Integer.MIN_VALUE) {
             AceLog.getAppLog().info("Concept count sa: " + conceptCount);
@@ -184,7 +185,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements I_
             completeLatch = new CountDownLatch(conceptCount);
             new MatchUpdator();
             updater = new RegexProgressUpdator();
-            AceConfig.getVodb().searchRegex(this, null, regexMatches, completeLatch, searchPanel.getExtraCriterion(),
+            ((I_Search) Terms.get()).searchRegex(this, null, regexMatches, completeLatch, searchPanel.getExtraCriterion(),
                 config);
 
             completeLatch.await();

@@ -56,6 +56,7 @@ import org.dwfa.ace.table.RelTableModel.RelGroupFieldEditor;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
@@ -88,7 +89,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
     }
 
     protected JPanel getRelPanel(I_HostConceptPlugins host, RelTableModel model, String labelText, boolean enableEdit,
-            TOGGLES toggle) {
+            TOGGLES toggle) throws TerminologyException, IOException {
         model.addTableModelListener(this);
         if (ACE.editMode == false) {
             enableEdit = false;
@@ -195,7 +196,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
         return relPanel;
     }
 
-    protected void setupEditors(I_HostConceptPlugins host) {
+    protected void setupEditors(I_HostConceptPlugins host) throws TerminologyException, IOException {
         relTable.setDragEnabled(true);
         relTable.setTransferHandler(new TerminologyTransferHandler(relTable));
         relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

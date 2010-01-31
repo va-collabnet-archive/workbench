@@ -22,11 +22,12 @@ import java.util.UUID;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
@@ -39,10 +40,10 @@ public class AddRelationship extends AddComponent {
     @Override
     protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config)
             throws Exception {
-        ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
+    	I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
         UUID newRelUid = UUID.randomUUID();
-        int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        int relId = AceConfig.getVodb().uuidToNativeWithGeneration(newRelUid, idSource, config.getEditingPathSet(),
+        int idSource = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+        int relId = Terms.get().uuidToNativeWithGeneration(newRelUid, idSource, config.getEditingPathSet(),
             Integer.MAX_VALUE);
         int parentId = Integer.MAX_VALUE;
 
@@ -67,7 +68,7 @@ public class AddRelationship extends AddComponent {
             }
             cb.getUncommittedSourceRels().add(rel);
             cb.getUncommittedIds().add(relId);
-            ACE.addUncommitted(cb);
+            ACE.addUncommitted((I_Transact) cb);
             termContainer.setTermComponent(cb);
         } else {
             AceLog.getAppLog().alertAndLogException(

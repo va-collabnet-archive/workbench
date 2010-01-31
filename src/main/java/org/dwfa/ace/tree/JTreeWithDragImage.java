@@ -65,10 +65,11 @@ import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -133,8 +134,8 @@ public class JTreeWithDragImage extends JTree {
             }
         }
 
-        private Transferable getTransferable(I_GetConceptData obj) throws DatabaseException {
-            return new ConceptTransferable(ConceptBean.get(obj.getConceptId()));
+        private Transferable getTransferable(I_GetConceptData obj) throws DatabaseException, TerminologyException, IOException {
+            return new ConceptTransferable(Terms.get().getConcept(obj.getConceptId()));
         }
 
         public Image getDragImage(I_GetConceptData obj) throws IOException {

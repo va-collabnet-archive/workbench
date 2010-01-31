@@ -49,6 +49,7 @@ import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.IdTableModel.ID_FIELD;
 import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 
 public class IdPlugin extends AbstractPlugin {
 
@@ -110,7 +111,7 @@ public class IdPlugin extends AbstractPlugin {
         }
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         if (idPanel == null) {
             setHost(host);
             idPanel = getIdPanel(host, showNids);
@@ -138,7 +139,7 @@ public class IdPlugin extends AbstractPlugin {
         return fields.toArray(new ID_FIELD[fields.size()]);
     }
 
-    private JPanel getIdPanel(I_HostConceptPlugins host, boolean showNatives) {
+    private JPanel getIdPanel(I_HostConceptPlugins host, boolean showNatives) throws TerminologyException, IOException {
         setHost(host);
         idTableModel = new IdTableModel(getIdColumns(host, showNatives), host);
         JPanel idPanel = new JPanel(new GridBagLayout());

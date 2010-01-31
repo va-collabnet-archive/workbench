@@ -28,13 +28,13 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaults implements I_RefsetDefaults, Serializable {
@@ -82,10 +82,10 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
             ToIoException {
         Collection<UUID> uids = (Collection<UUID>) in.readObject();
         try {
-            return ConceptBean.get(uids);
+            return Terms.get().getConcept(uids);
         } catch (NoMappingException e) {
             try {
-                return ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+                return Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
             } catch (TerminologyException e1) {
                 throw new ToIoException(e1);
             }
@@ -95,10 +95,10 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
     }
 
     public RefsetDefaults() throws TerminologyException, IOException {
-        defaultRefset = ConceptBean.get(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+        defaultRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         refsetPopupIds.add(defaultRefset.getConceptId());
 
-        defaultStatusForRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+        defaultStatusForRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
         statusPopupIds.add(defaultStatusForRefset.getConceptId());
     }
 

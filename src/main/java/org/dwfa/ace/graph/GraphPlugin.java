@@ -35,6 +35,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.gui.concept.AbstractPlugin;
+import org.dwfa.tapi.TerminologyException;
 
 public class GraphPlugin extends AbstractPlugin {
 
@@ -88,7 +89,7 @@ public class GraphPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
             if (fillerPanel != null) {
                 graphWrapperPanel.remove(fillerPanel);

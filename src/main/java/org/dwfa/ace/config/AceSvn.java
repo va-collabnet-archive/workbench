@@ -34,8 +34,8 @@ import javax.swing.JOptionPane;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.log.AceLog;
@@ -54,7 +54,7 @@ import org.tigris.subversion.javahl.Revision;
  * 
  * @author ean dungey
  */
-class AceSvn {
+public class AceSvn {
     /**
      * The jini configuration provider
      */
@@ -64,10 +64,10 @@ class AceSvn {
     private String[] svnUpdateOnStart = null;
     private String[] csImportOnStart = null;
     private List<File> changeLocations = new ArrayList<File>();
-    private Class jiniClass;
+    private Class<?> jiniClass;
     private static boolean connectToSubversion = false;
 
-    public AceSvn(Class jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
+    public AceSvn(Class<?> jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
         jiniClass = jiniClassToSet;
         jiniConfig = jiniConfigToSet;
         if (jiniConfig != null) {
@@ -128,7 +128,7 @@ class AceSvn {
         }
     }
 
-    void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
+    public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
             FileNotFoundException, IOException, TaskFailedException, ClientException {
 
         Properties aceProperties = new Properties();
@@ -287,10 +287,9 @@ class AceSvn {
             File dbFolder = (File) jiniConfig.getEntry(jiniClass.getName(), "dbFolder", File.class, new File(
                 "target/berkeley-db"));
 
-            final VodbEnv stealthVodb = new VodbEnv(true);
-            AceConfig.stealthVodb = stealthVodb;
-            LocalVersionedTerminology.setStealthfactory(stealthVodb);
-            stealthVodb.setup(dbFolder, false);
+            final VodbEnv vodb = new VodbEnv(true);
+            Terms.set(vodb);
+            vodb.setup(dbFolder, false);
 
             ChangeSetImporter jcsImporter = new ChangeSetImporter() {
 
@@ -298,7 +297,7 @@ class AceSvn {
                 public I_ReadChangeSet getChangeSetReader(File csf) {
                     BinaryChangeSetReader csr = new BinaryChangeSetReader();
                     csr.setChangeSetFile(csf);
-                    csr.setVodb(stealthVodb);
+                    csr.setVodb(vodb);
                     return csr;
                 }
 
@@ -314,7 +313,7 @@ class AceSvn {
                     checkoutLocation.getAbsolutePath(), false, ".jcs");
             }
 
-            stealthVodb.close();
+            vodb.close();
             AceLog.getAppLog().info("Finished stealth import");
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -322,7 +321,6 @@ class AceSvn {
         VodbEnv.setTransactional(transactional);
         VodbEnv.setDeferredWrite(deferredWrite);
         VodbEnv.setTxnNoSync(txnNoSync);
-        AceConfig.stealthVodb = null;
-        LocalVersionedTerminology.setStealthfactory(null);
+        Terms.set(null);
     }
 }

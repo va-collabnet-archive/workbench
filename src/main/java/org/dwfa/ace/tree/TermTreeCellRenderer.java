@@ -40,11 +40,13 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -52,7 +54,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -61,7 +62,6 @@ import org.dwfa.vodb.PathManager;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.ThinVersionHelper.MAX_VALUE_TYPE;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener,
@@ -95,7 +95,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
      */
     private Color focusBGColor;
 
-    private ConceptBean focusBean;
+    private I_GetConceptData focusBean;
 
     private boolean showRefsetInfoInTaxonomy;
 
@@ -132,7 +132,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         setOpenIcon(null);
         Object value = UIManager.get("Tree.drawDashedFocusIndicator");
         drawDashedFocusIndicator = (value != null && ((Boolean) value).booleanValue());
-        ConceptBean viewerImageType = ConceptBean.get(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+        I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
         viewerImageTypes.add(viewerImageType.getConceptId());
     }
 
@@ -229,12 +229,12 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 new ArrayList<I_DescriptionVersioned>();
                         if (showRefsetInfoInTaxonomy) {
                             List<I_GetExtensionData> extensions =
-                                    AceConfig.getVodb().getExtensionsForComponent(cb.getConceptId());
+                                    Terms.get().getExtensionsForComponent(cb.getConceptId());
                             List<? extends I_DescriptionVersioned> descriptions = cb.getDescriptions();
                             List<I_GetExtensionData> descriptionExtensions = new ArrayList<I_GetExtensionData>();
                             for (I_DescriptionVersioned desc : descriptions) {
                                 List<I_GetExtensionData> descExts =
-                                        AceConfig.getVodb().getExtensionsForComponent(desc.getDescId());
+                                        Terms.get().getExtensionsForComponent(desc.getDescId());
                                 descriptionExtensions.addAll(descExts);
                                 if (descExts.size() > 0) {
                                     descriptionsWithExtensions.add(desc);
@@ -256,14 +256,12 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                 boolean extValue = ((I_ThinExtByRefPartBoolean) t.getMutablePart()).getBooleanValue();
 
                                                 try {
-                                                    ConceptBean booleanImageBean =
-                                                            ConceptBean
-                                                                .get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE
+                                                	I_GetConceptData booleanImageBean =
+                                                		Terms.get().getConcept(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE
                                                                     .getUids());
                                                     if (extValue) {
                                                         booleanImageBean =
-                                                                ConceptBean
-                                                                    .get(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE
+                                                        	Terms.get().getConcept(RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE
                                                                         .getUids());
                                                     }
                                                     for (I_ImageTuple imageTuple : booleanImageBean.getImageTuples(
@@ -281,8 +279,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
                                                 returnTuples, false);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                ConceptBean ebrCb =
-                                                        ConceptBean.get(((I_ThinExtByRefPartConcept) t.getMutablePart())
+                                            	I_GetConceptData ebrCb =
+                                                        Terms.get().getConcept(((I_ThinExtByRefPartConcept) t.getMutablePart())
                                                             .getConceptId());
                                                 for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig
                                                     .getAllowedStatus(), viewerImageTypes, aceConfig
@@ -504,11 +502,11 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         return 0;
     }
 
-    public ConceptBean getFocusBean() {
+    public I_GetConceptData getFocusBean() {
         return focusBean;
     }
 
-    public void setFocusBean(ConceptBean focusBean) {
+    public void setFocusBean(I_GetConceptData focusBean) {
         this.focusBean = focusBean;
     }
 

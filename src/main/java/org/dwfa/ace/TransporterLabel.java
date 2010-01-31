@@ -63,7 +63,7 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class TransporterLabel extends JLabel implements I_ContainTermComponent, ActionListener {
 
@@ -122,7 +122,7 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
             dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
-                (ConceptBean) termComponent), dsl);
+                (I_GetConceptData) termComponent), dsl);
         }
     }
 
@@ -259,7 +259,9 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
                 this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
-            }
+            } catch (TerminologyException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+			}
         } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
             I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
             viewer.setTermComponent(termComponent);

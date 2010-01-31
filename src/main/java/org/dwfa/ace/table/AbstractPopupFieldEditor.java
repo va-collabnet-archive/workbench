@@ -17,20 +17,23 @@
 package org.dwfa.ace.table;
 
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractPopupFieldEditor extends DefaultCellEditor {
     private static final long serialVersionUID = 1L;
     private JComboBox combo;
     I_ConfigAceFrame config;
 
-    public AbstractPopupFieldEditor(I_ConfigAceFrame config) {
+    public AbstractPopupFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
         super(new JComboBox());
         combo = new JComboBox();
         combo.setMaximumRowCount(20);
@@ -42,29 +45,41 @@ public abstract class AbstractPopupFieldEditor extends DefaultCellEditor {
             private static final long serialVersionUID = 1L;
 
             public void setValue(Object value) {
-                combo.setSelectedItem(getSelectedItem(value));
+                try {
+					combo.setSelectedItem(getSelectedItem(value));
+				} catch (TerminologyException e) {
+					throw new RuntimeException(e);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
             }
 
             public Object getCellEditorValue() {
-                return ((ConceptBean) combo.getSelectedItem()).getConceptId();
+                return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
             }
         };
         combo.addActionListener(delegate);
     }
 
-    public abstract ConceptBean getSelectedItem(Object value);
+    public abstract I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException;
 
-    private void populatePopup() {
+    private void populatePopup() throws TerminologyException, IOException {
         combo.removeAllItems();
         for (int id : getPopupValues()) {
-            combo.addItem(ConceptBean.get(id));
+            combo.addItem(Terms.get().getConcept(id));
         }
     }
 
     public abstract int[] getPopupValues();
 
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        populatePopup();
+        try {
+			populatePopup();
+		} catch (TerminologyException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
         return super.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
 

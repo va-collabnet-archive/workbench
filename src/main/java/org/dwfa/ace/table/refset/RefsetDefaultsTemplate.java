@@ -22,10 +22,10 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsTemplate extends RefsetDefaultsTemplateForRel implements I_RefsetDefaultsTemplate {
@@ -58,11 +58,11 @@ public class RefsetDefaultsTemplate extends RefsetDefaultsTemplateForRel impleme
 
     public RefsetDefaultsTemplate() throws TerminologyException, IOException {
         super();
-        attribute = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
+        attribute = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
         attributePopupIds.add(attribute.getConceptId());
-        attributePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
+        attributePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
             .getConceptId());
-        attributePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
+        attributePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
             .getConceptId());
     }
 

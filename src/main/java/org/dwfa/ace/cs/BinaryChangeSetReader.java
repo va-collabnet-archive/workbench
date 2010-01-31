@@ -38,12 +38,12 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.ace.utypes.UniversalAceBean;
@@ -937,7 +937,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
     public VodbEnv getVodb() {
         if (vodb == null) {
-            vodb = AceConfig.getVodb();
+            vodb = (VodbEnv) Terms.get();
         }
         return vodb;
     }

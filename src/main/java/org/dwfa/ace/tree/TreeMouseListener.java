@@ -63,7 +63,9 @@ public class TreeMouseListener implements MouseListener {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (IllegalAccessException e) {
                 AceLog.getAppLog().alertAndLogException(e);
-            }
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+			}
         }
     }
 
@@ -75,39 +77,43 @@ public class TreeMouseListener implements MouseListener {
     }
 
     public void mousePressed(MouseEvent e) {
-        JTree tree = (JTree) e.getSource();
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-        int selRow = tree.getRowForLocation(e.getX(), e.getY());
-        // AceLog.getLog().info("Selected row: " + selRow);
-        TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-        if (selPath != null) {
-            if (selRow != -1) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-                if (e.isPopupTrigger()) {
-                    makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
-                } else {
-                    I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
-                    I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node.getUserObject();
-                    renderer = (TermTreeCellRenderer) renderer.getTreeCellRendererComponent(tree, node, true,
-                        tree.isExpanded(selRow), node.isLeaf(), selRow, true);
-                    Rectangle bounds = tree.getRowBounds(selRow);
-                    if (e.getClickCount() == 1) {
-                        Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
+        try {
+			JTree tree = (JTree) e.getSource();
+			DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+			int selRow = tree.getRowForLocation(e.getX(), e.getY());
+			// AceLog.getLog().info("Selected row: " + selRow);
+			TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+			if (selPath != null) {
+			    if (selRow != -1) {
+			        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+			        if (e.isPopupTrigger()) {
+			            makeAndShowPopup(e, (I_GetConceptData) node.getUserObject());
+			        } else {
+			            I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
+			            I_GetConceptDataForTree treeBean = (I_GetConceptDataForTree) node.getUserObject();
+			            renderer = (TermTreeCellRenderer) renderer.getTreeCellRendererComponent(tree, node, true,
+			                tree.isExpanded(selRow), node.isLeaf(), selRow, true);
+			            Rectangle bounds = tree.getRowBounds(selRow);
+			            if (e.getClickCount() == 1) {
+			                Rectangle iconBounds = renderer.getIconRect(treeBean.getParentDepth());
 
-                        if ((e.getPoint().x > bounds.x + iconBounds.x)
-                            && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
-                            openOrCloseParent(tree, model, node, treeBean, bounds);
-                        }
-                    } else if (e.getClickCount() == 2) {
-                        openOrCloseParent(tree, model, node, treeBean, bounds);
-                    }
-                    // tree.setSelectionPath(new TreePath(selPath.getPath()));
-                    int newRow = tree.getRowForPath(selPath);
-                    // AceLog.getLog().info("New row: " + newRow);
-                    tree.setSelectionInterval(newRow, newRow);
-                }
-            }
-        }
+			                if ((e.getPoint().x > bounds.x + iconBounds.x)
+			                    && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
+			                    openOrCloseParent(tree, model, node, treeBean, bounds);
+			                }
+			            } else if (e.getClickCount() == 2) {
+			                openOrCloseParent(tree, model, node, treeBean, bounds);
+			            }
+			            // tree.setSelectionPath(new TreePath(selPath.getPath()));
+			            int newRow = tree.getRowForPath(selPath);
+			            // AceLog.getLog().info("New row: " + newRow);
+			            tree.setSelectionInterval(newRow, newRow);
+			        }
+			    }
+			}
+		} catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+		}
     }
 
     private void makeAndShowPopup(MouseEvent e, I_GetConceptData selectedConcept) {
@@ -176,7 +182,7 @@ public class TreeMouseListener implements MouseListener {
     }
 
     private void openOrCloseParent(JTree tree, DefaultTreeModel model, DefaultMutableTreeNode node,
-            I_GetConceptDataForTree treeBean, Rectangle bounds) {
+            I_GetConceptDataForTree treeBean, Rectangle bounds) throws TerminologyException {
         boolean addNodes = !treeBean.isParentOpened();
 
         treeBean.setParentOpened(addNodes);

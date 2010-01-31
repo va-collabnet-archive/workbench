@@ -104,7 +104,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
@@ -905,7 +904,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (evt.getPropertyName().equals("commit")) {
             if (label.getTermComponent() != null) {
-                ConceptBean cb = (ConceptBean) label.getTermComponent();
+            	I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
                     if (cb.getConceptAttributes() == null) {
                         label.setTermComponent(null);
@@ -971,7 +970,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         private IntSet childrenExpandedNodes = new IntSet();
         private int selectedNodeId = Integer.MAX_VALUE;
         private RefsetSpecTreeNode newSelectedNode;
-        private ConceptBean localRefsetSpecConcept;
+        private I_GetConceptData localRefsetSpecConcept;
         private JTableWithDragImage commentTable;
 
         private void addChildrenExpandedNodes(RefsetSpecTreeNode node) {
@@ -1028,8 +1027,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), relTypes, ace
                             .getAceFrameConfig().getViewPositionSetReadOnly(), true);
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
-                    refsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
-                    localRefsetSpecConcept = ConceptBean.get(refsetSpecTuples.get(0).getC1Id());
+                    refsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
+                    localRefsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
                 }
             }
             if (cancel) {

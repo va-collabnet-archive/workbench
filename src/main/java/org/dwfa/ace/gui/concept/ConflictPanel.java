@@ -61,12 +61,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -417,7 +417,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-            ACE.addUncommitted(cb);
+            ACE.addUncommitted((I_Transact) cb);
 
         } else {
             JOptionPane.showMessageDialog(this, "You must select at least one path to edit on...");

@@ -54,6 +54,7 @@ import org.dwfa.ace.table.ConceptAttributeTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ConceptAttributePlugin extends AbstractPlugin implements TableModelListener {
@@ -89,7 +90,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
 
             if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
@@ -112,14 +113,14 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         }
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         if (conceptAttributes == null || RefsetUtil.refSetsChanged(host, TOGGLES.ATTRIBUTES, this, visibleExtensions)) {
             createPluginComponent(host);
         }
         return conceptAttributes;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) {
+    private void createPluginComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         conceptAttributes = getConceptAttributesPanel(host);
         host.addPropertyChangeListener(I_HostConceptPlugins.SHOW_HISTORY, this);
@@ -139,7 +140,7 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         return fields.toArray(new CONCEPT_FIELD[fields.size()]);
     }
 
-    private JPanel getConceptAttributesPanel(I_HostConceptPlugins host) {
+    private JPanel getConceptAttributesPanel(I_HostConceptPlugins host) throws TerminologyException, IOException {
         if (conceptTableModel != null) {
             conceptTableModel.removeTableModelListener(this);
         }

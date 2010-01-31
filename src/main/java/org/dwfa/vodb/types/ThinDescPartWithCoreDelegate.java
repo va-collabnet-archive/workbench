@@ -23,6 +23,9 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
@@ -183,30 +186,35 @@ public class ThinDescPartWithCoreDelegate implements I_DescriptionPart {
 
     public String toString() {
         StringBuffer buff = new StringBuffer();
-        buff.append(" statusId: ");
-        buff.append(nidToString(core.getStatusId()));
-        buff.append(" text: ");
-        buff.append(text);
-        buff.append(" typeId: ");
-        buff.append(nidToString(core.getTypeId()));
-        buff.append(" init case sig: ");
-        buff.append(core.getInitialCaseSignificant());
-        buff.append(" lang: ");
-        buff.append(core.getLang());
-        buff.append(" pathId: ");
-        buff.append(nidToString(core.getPathId()));
-        buff.append(" version: ");
-        buff.append(core.getVersion());
-        buff.append(" (");
-        buff.append(new Date(ThinVersionHelper.convert(core.getVersion())));
-        buff.append(")");
+        try {
+			buff.append(" statusId: ");
+			buff.append(nidToString(core.getStatusId()));
+			buff.append(" text: ");
+			buff.append(text);
+			buff.append(" typeId: ");
+			buff.append(nidToString(core.getTypeId()));
+			buff.append(" init case sig: ");
+			buff.append(core.getInitialCaseSignificant());
+			buff.append(" lang: ");
+			buff.append(core.getLang());
+			buff.append(" pathId: ");
+			buff.append(nidToString(core.getPathId()));
+			buff.append(" version: ");
+			buff.append(core.getVersion());
+			buff.append(" (");
+			buff.append(new Date(ThinVersionHelper.convert(core.getVersion())));
+			buff.append(")");
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			buff.append(e.getLocalizedMessage());
+		}
 
         return buff.toString();
     }
 
-    private String nidToString(int nid) {
+    private String nidToString(int nid) throws TerminologyException {
         try {
-            return ConceptBean.get(nid).getInitialText();
+            return Terms.get().getConcept(nid).getInitialText();
         } catch (IOException e) {
             return Integer.toString(nid);
         }

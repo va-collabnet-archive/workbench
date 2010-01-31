@@ -22,9 +22,9 @@ import java.util.Set;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntSet;
 
 public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel {
@@ -50,10 +50,10 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
             getProgress().getProgressBar().setIndeterminate(true);
         }
         if (host.getTermComponent() != null) {
-            this.tableComponentId = Integer.MIN_VALUE;
-            I_GetConceptData refsetConcept = ConceptBean.get(host.getTermComponent().getNid());
-            I_IntSet allowedTypes = new IntSet();
             try {
+                this.tableComponentId = Integer.MIN_VALUE;
+                I_GetConceptData refsetConcept = Terms.get().getConcept(host.getTermComponent().getNid());
+                I_IntSet allowedTypes = new IntSet();
                 allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
                 Set<? extends I_GetConceptData> commentRefsets = refsetConcept.getSourceRelTargets(host.getConfig()
                     .getAllowedStatus(), allowedTypes, host.getConfig().getViewPositionSetReadOnly(), false);

@@ -26,15 +26,16 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.search.RelSubsumptionMatch;
 import org.dwfa.jini.TermEntry;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class SimilarConceptQuery {
 
-    public static QueryBean make(I_GetConceptData concept, I_ConfigAceFrame config) throws IOException {
+    public static QueryBean make(I_GetConceptData concept, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
         List<I_TestSearchResults> extraCriterion = new ArrayList<I_TestSearchResults>();
         // Get text, all unique words...
@@ -74,13 +75,13 @@ public class SimilarConceptQuery {
             // Get "is-a" relationships for is-child-of queries...
             if (config.getSourceRelTypes().contains(rel.getTypeId())) {
                 IsKindOf ico = new IsKindOf();
-                ico.setParentTerm(new TermEntry(ConceptBean.get(rel.getC2Id()).getUids()));
+                ico.setParentTerm(new TermEntry(Terms.get().getConcept(rel.getC2Id()).getUids()));
                 extraCriterion.add(ico);
             } else {
                 // Other rels for rel-type queries...
                 RelSubsumptionMatch rsm = new RelSubsumptionMatch();
-                rsm.setRelRestrictionTerm(new TermEntry(ConceptBean.get(rel.getC2Id()).getUids()));
-                rsm.setRelTypeTerm(new TermEntry(ConceptBean.get(rel.getTypeId()).getUids()));
+                rsm.setRelRestrictionTerm(new TermEntry(Terms.get().getConcept(rel.getC2Id()).getUids()));
+                rsm.setRelTypeTerm(new TermEntry(Terms.get().getConcept(rel.getTypeId()).getUids()));
                 extraCriterion.add(rsm);
             }
         }

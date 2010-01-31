@@ -33,18 +33,17 @@ import javax.swing.JTextField;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
-import org.dwfa.vodb.types.ThinConPart;
-import org.dwfa.vodb.types.ThinConVersioned;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 import org.dwfa.vodb.types.ThinRelPart;
@@ -141,13 +140,13 @@ public class CreatePathPanel extends JPanel implements ActionListener {
                     "You must select at least one origin for path.");
                 return;
             }
-            ConceptBean selectedParent = (ConceptBean) parent.getTermComponent();
+            I_GetConceptData selectedParent =  (I_GetConceptData) parent.getTermComponent();
             if (selectedParent == null) {
                 JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "You must designate one parent for path.");
                 return;
             }
 
-            I_TermFactory termFactory = AceConfig.getVodb();
+            I_TermFactory termFactory = Terms.get();
             I_Path workbenchPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
             int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -156,27 +155,14 @@ public class CreatePathPanel extends JPanel implements ActionListener {
 
             // Create a concept for the path
 
-            int newNativeId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedSourceId,
-                workbenchPath, presentTime);
-            ConceptBean cb = ConceptBean.get(newNativeId);
-            cb.getUncommittedIds().add(newNativeId);
+            I_GetConceptData cb = Terms.get().newConcept(UUID.randomUUID(), false, Terms.get().getActiveAceFrameConfig());
 
             // Needs a concept record...
-            I_ConceptAttributeVersioned con = new ThinConVersioned(newNativeId, 1);
-            ThinConPart part = new ThinConPart();
-            part.setPathId(workbenchPath.getConceptId());
-            part.setVersion(Integer.MAX_VALUE);
-
-            part.setStatusId(currentStatusId);
-            part.setDefined(false);
-            con.addVersion(part);
-            cb.setUncommittedConceptAttributes(con);
-            cb.getUncommittedIds().add(con.getConId());
-
+ 
             // Needs a description record...
             int nativeDescId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedSourceId,
                 workbenchPath, presentTime);
-            ThinDescVersioned descV = new ThinDescVersioned(nativeDescId, newNativeId, 1);
+            ThinDescVersioned descV = new ThinDescVersioned(nativeDescId, cb.getNid(), 1);
             ThinDescPart descPart = new ThinDescPart();
             descPart.setPathId(workbenchPath.getConceptId());
             descPart.setVersion(Integer.MAX_VALUE);
@@ -192,7 +178,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             // Needs a relationship record...
             int nativeRelId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedSourceId,
                 workbenchPath, presentTime);
-            ThinRelVersioned relV = new ThinRelVersioned(nativeRelId, newNativeId, selectedParent.getConceptId(), 1);
+            ThinRelVersioned relV = new ThinRelVersioned(nativeRelId, cb.getNid(), selectedParent.getConceptId(), 1);
             ThinRelPart relPart = new ThinRelPart();
             relPart.setPathId(workbenchPath.getConceptId());
             relPart.setVersion(Integer.MAX_VALUE);
@@ -205,7 +191,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             cb.getUncommittedSourceRels().add(relV);
             cb.getUncommittedIds().add(relV.getRelId());
 
-            ACE.addUncommitted(cb);
+            ACE.addUncommitted((I_Transact) cb);
             ACE.commit();
 
             // Now make the concept a path

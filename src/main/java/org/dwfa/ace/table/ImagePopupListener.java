@@ -39,12 +39,13 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinImageVersioned;
 
 public class ImagePopupListener extends MouseAdapter {
@@ -63,7 +64,14 @@ public class ImagePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+            I_GetConceptData sourceBean;
+			try {
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+			} catch (TerminologyException e1) {
+				throw new RuntimeException(e1);
+			} catch (IOException e1) {
+				throw new RuntimeException(e1);
+			}
             for (I_Path p : config.getEditingPathSet()) {
                 I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
                 I_ImagePart newPart =
@@ -72,7 +80,7 @@ public class ImagePopupListener extends MouseAdapter {
 
                 selectedObject.getTuple().getVersioned().addVersion(newPart);
             }
-            ACE.addUncommitted(sourceBean);
+            ACE.addUncommitted((I_Transact) sourceBean);
             model.allImageTuples = null;
             model.allImages = null;
             model.fireTableDataChanged();
@@ -86,11 +94,18 @@ public class ImagePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+            I_GetConceptData sourceBean;
+			try {
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+			} catch (TerminologyException e1) {
+				throw new RuntimeException(e1);
+			} catch (IOException e1) {
+				throw new RuntimeException(e1);
+			}
             I_ImageTuple tuple = selectedObject.getTuple();
             ThinImageVersioned versioned = (ThinImageVersioned) tuple.getVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted(sourceBean);
+            ACE.addUncommitted((I_Transact) sourceBean);
             model.propertyChange(new PropertyChangeEvent(this, "undo", sourceBean, sourceBean));
         }
     }
@@ -108,7 +123,7 @@ public class ImagePopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConceptId());
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
                     I_ImagePart newPart =
@@ -126,11 +141,11 @@ public class ImagePopupListener extends MouseAdapter {
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), ConceptBean.get(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
                     selectedObject.getTuple().getVersioned().addVersion(newPart);
                 }
-                ACE.addUncommitted(sourceBean);
+                ACE.addUncommitted((I_Transact) sourceBean);
                 model.allImageTuples = null;
                 model.allImages = null;
 

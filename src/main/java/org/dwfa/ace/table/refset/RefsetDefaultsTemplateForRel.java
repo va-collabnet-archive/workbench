@@ -22,52 +22,52 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplateForRel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_RefsetDefaultsTemplateForRel {
 
     public RefsetDefaultsTemplateForRel() throws TerminologyException, IOException {
         super();
-        valueType = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
+        valueType = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
         valueTypePopupIds.add(valueType.getConceptId());
-        valueTypePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
+        valueTypePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
             .getConceptId());
-        valueTypePopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
+        valueTypePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
             .getConceptId());
 
-        semanticStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_FINAL_SEMANTIC_STATUS.getUids());
+        semanticStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_FINAL_SEMANTIC_STATUS.getUids());
         semanticStatusPopupIds.add(semanticStatus.getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
+        semanticStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
             .getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_REFINABLE_SEMANTIC_STATUS.getUids())
+        semanticStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_REFINABLE_SEMANTIC_STATUS.getUids())
             .getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(
+        semanticStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(
+        semanticStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(
+        semanticStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_CHILD_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(
+        semanticStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
-        semanticStatusPopupIds.add(ConceptBean.get(
+        semanticStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_UNSPECIFIED_SEMANTIC_STATUS.getUids()).getConceptId());
 
-        attributeDisplayStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_DISPLAYED.getUids());
+        attributeDisplayStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_DISPLAYED.getUids());
         attributeDisplayStatusPopupIds.add(attributeDisplayStatus.getConceptId());
-        attributeDisplayStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_HIDDEN.getUids())
+        attributeDisplayStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_HIDDEN.getUids())
             .getConceptId());
-        attributeDisplayStatusPopupIds.add(ConceptBean.get(
+        attributeDisplayStatusPopupIds.add(Terms.get().getConcept(
             RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_UNSPECIFIED.getUids()).getConceptId());
 
-        characteristicStatus = ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_QUALIFIER.getUids());
+        characteristicStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_QUALIFIER.getUids());
         characteristicStatusPopupIds.add(characteristicStatus.getConceptId());
-        characteristicStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_ATOM.getUids())
+        characteristicStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_ATOM.getUids())
             .getConceptId());
-        characteristicStatusPopupIds.add(ConceptBean.get(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_FACT.getUids())
+        characteristicStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_FACT.getUids())
             .getConceptId());
 
     }

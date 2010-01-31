@@ -53,12 +53,14 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
@@ -73,7 +75,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.refset.RefsetHelper;
@@ -85,7 +86,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.ThinExtByRefPart;
@@ -194,7 +194,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         REFSET_FIELDS field;
         private IntList popupIds;
 
-        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, REFSET_FIELDS field) {
+        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, REFSET_FIELDS field) throws TerminologyException, IOException {
             super(new JComboBox());
             this.popupIds = popupIds;
             this.field = field;
@@ -212,21 +212,27 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 }
 
                 public Object getCellEditorValue() {
-                    return ((ConceptBean) combo.getSelectedItem()).getConceptId();
+                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
                 }
             };
             combo.addActionListener(delegate);
         }
 
-        private void populatePopup() {
+        private void populatePopup() throws TerminologyException, IOException {
             combo.removeAllItems();
             for (int id : getPopupValues()) {
-                combo.addItem(ConceptBean.get(id));
+                combo.addItem(Terms.get().getConcept(id));
             }
         }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            populatePopup();
+            try {
+				populatePopup();
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
@@ -234,47 +240,53 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             return popupIds.getListArray();
         }
 
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) {
             StringWithExtTuple swet = (StringWithExtTuple) value;
 
-            switch (field) {
-            case REFSET_ID:
-                return ConceptBean.get(swet.getTuple().getRefsetId());
-            case MEMBER_ID:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case COMPONENT_ID:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case STATUS:
-                return ConceptBean.get(swet.getTuple().getStatusId());
-            case VERSION:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case PATH:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case BOOLEAN_VALUE:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case CONCEPT_ID:
-                return ConceptBean.get(((I_ThinExtByRefPartConcept) swet.getTuple().getMutablePart()).getConceptId());
-            case INTEGER_VALUE:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case ACCEPTABILITY:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getAcceptabilityId());
-            case CORRECTNESS:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getCorrectnessId());
-            case DEGREE_OF_SYNONYMY:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getDegreeOfSynonymyId());
-            case TAG:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutablePart()).getTagId());
-            case SCOPE:
-                return ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutablePart()).getScopeId());
-            case PRIORITY:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-            case MEASUREMENT_UNITS_ID:
-                return ConceptBean.get(((I_ThinExtByRefPartMeasurement) swet.getTuple().getMutablePart()).getUnitsOfMeasureId());
-            case MEASUREMENT_VALUE:
-            default:
-                throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+            try {
+				switch (field) {
+				case REFSET_ID:
+				    return Terms.get().getConcept(swet.getTuple().getRefsetId());
+				case MEMBER_ID:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case COMPONENT_ID:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case STATUS:
+				    return Terms.get().getConcept(swet.getTuple().getStatusId());
+				case VERSION:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case PATH:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case BOOLEAN_VALUE:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case CONCEPT_ID:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartConcept) swet.getTuple().getMutablePart()).getConceptId());
+				case INTEGER_VALUE:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case ACCEPTABILITY:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getAcceptabilityId());
+				case CORRECTNESS:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getCorrectnessId());
+				case DEGREE_OF_SYNONYMY:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swet.getTuple().getMutablePart()).getDegreeOfSynonymyId());
+				case TAG:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutablePart()).getTagId());
+				case SCOPE:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartLanguageScoped) swet.getTuple().getMutablePart()).getScopeId());
+				case PRIORITY:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+				case MEASUREMENT_UNITS_ID:
+				    return Terms.get().getConcept(((I_ThinExtByRefPartMeasurement) swet.getTuple().getMutablePart()).getUnitsOfMeasureId());
+				case MEASUREMENT_VALUE:
+				default:
+				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
 
-            }
+				}
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
         }
 
         @Override
@@ -706,7 +718,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     ArrayList<ThinExtByRefVersioned> allExtensions;
 
-    Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
@@ -755,18 +767,18 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         }
     }
 
-    public class ReferencedConceptsSwingWorker extends SwingWorker<Map<Integer, ConceptBean>> {
+    public class ReferencedConceptsSwingWorker extends SwingWorker<Map<Integer, I_GetConceptData>> {
         private boolean stopWork = false;
 
         @Override
-        protected Map<Integer, ConceptBean> construct() throws Exception {
+        protected Map<Integer, I_GetConceptData> construct() throws Exception {
             getProgress().setActive(true);
-            Map<Integer, ConceptBean> concepts = new HashMap<Integer, ConceptBean>();
+            Map<Integer, I_GetConceptData> concepts = new HashMap<Integer, I_GetConceptData>();
             for (Integer id : new HashSet<Integer>(conceptsToFetch)) {
                 if (stopWork) {
                     break;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
             }
@@ -826,7 +838,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             if (componentId == null || componentId == Integer.MIN_VALUE) {
                 return true;
             }
-            List<I_GetExtensionData> extensions = AceConfig.getVodb().getExtensionsForComponent(componentId);
+            List<I_GetExtensionData> extensions = Terms.get().getExtensionsForComponent(componentId);
             extensions.addAll(ExtensionByReferenceBean.getNewExtensions(componentId));
             I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
             for (I_GetExtensionData ebrBean : extensions) {
@@ -1218,7 +1230,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     }
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = referencedConcepts.get(id);
+    	I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -1534,108 +1546,114 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         I_ThinExtByRefTuple extTuple = allTuples.get(row);
         boolean changed = false;
         if (extTuple.getVersion() == Integer.MAX_VALUE) {
-            switch (columns[col]) {
-            case REFSET_ID:
-                Integer refsetId = (Integer) value;
-                if (refsetId != extTuple.getCore().getRefsetId()) {
-                    extTuple.getCore().setRefsetId(refsetId);
-                    referencedConcepts.put(refsetId, ConceptBean.get(refsetId));
-                    changed = true;
-                }
-                break;
-            case MEMBER_ID:
-                break;
-            case COMPONENT_ID:
-                break;
-            case STATUS:
-                Integer statusId = (Integer) value;
-                if (statusId != extTuple.getStatusId()) {
-                    extTuple.setStatusId(statusId);
-                    referencedConcepts.put(statusId, ConceptBean.get(statusId));
-                    changed = true;
-                }
-                break;
-            case VERSION:
-                break;
-            case PATH:
-                break;
-            case BOOLEAN_VALUE:
-                Boolean booleanValue = (Boolean) value;
-                if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).getBooleanValue()) {
-                    ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).setBooleanValue(booleanValue);
-                    changed = true;
-                }
-                break;
-            case STRING_VALUE:
-                String stringValue = (String) value;
-                if (stringValue.equals(((I_ThinExtByRefPartString) extTuple.getMutablePart()).getStringValue()) == false) {
-                    ((I_ThinExtByRefPartString) extTuple.getMutablePart()).setStringValue(stringValue);
-                    changed = true;
-                }
-                break;
-            case CONCEPT_ID:
-                Integer conceptId = (Integer) value;
-                ((I_ThinExtByRefPartConcept) extTuple.getMutablePart()).setConceptId(conceptId);
-                referencedConcepts.put(conceptId, ConceptBean.get(conceptId));
-                changed = true;
-                break;
-            case INTEGER_VALUE:
-                Integer intValue = (Integer) value;
-                if (I_ThinExtByRefPartConceptInt.class.isAssignableFrom(extTuple.getMutablePart().getClass())) {
-                    ((I_ThinExtByRefPartConceptInt) extTuple.getMutablePart()).setIntValue(intValue);
-                } else {
-                    ((I_ThinExtByRefPartInteger) extTuple.getMutablePart()).setValue(intValue);
-                }
-                changed = true;
-                break;
-            case ACCEPTABILITY:
-                Integer acceptabilityId = (Integer) value;
-                // TODO finish the conditional tests...
-                ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setAcceptabilityId(acceptabilityId);
-                referencedConcepts.put(acceptabilityId, ConceptBean.get(acceptabilityId));
-                changed = true;
-                break;
-            case CORRECTNESS:
-                Integer correctnessId = (Integer) value;
-                ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setCorrectnessId(correctnessId);
-                referencedConcepts.put(correctnessId, ConceptBean.get(correctnessId));
-                changed = true;
-                break;
-            case DEGREE_OF_SYNONYMY:
-                Integer dosId = (Integer) value;
-                ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setDegreeOfSynonymyId(dosId);
-                referencedConcepts.put(dosId, ConceptBean.get(dosId));
-                changed = true;
-                break;
-            case TAG:
-                Integer tagId = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setTagId(tagId);
-                referencedConcepts.put(tagId, ConceptBean.get(tagId));
-                changed = true;
-                break;
-            case SCOPE:
-                Integer scopeId = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setScopeId(scopeId);
-                referencedConcepts.put(scopeId, ConceptBean.get(scopeId));
-                changed = true;
-                break;
-            case PRIORITY:
-                Integer priority = (Integer) value;
-                ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setPriority(priority);
-                changed = true;
-                break;
-            case MEASUREMENT_UNITS_ID:
-                Integer unitsId = (Integer) value;
-                ((I_ThinExtByRefPartMeasurement) extTuple.getMutablePart()).setUnitsOfMeasureId(unitsId);
-                referencedConcepts.put(unitsId, ConceptBean.get(unitsId));
-                changed = true;
-                break;
-            case MEASUREMENT_VALUE:
-                Double measurementValue = (Double) value;
-                ((I_ThinExtByRefPartMeasurement) extTuple.getMutablePart()).setMeasurementValue(measurementValue);
-                changed = true;
-                break;
-            }
+            try {
+				switch (columns[col]) {
+				case REFSET_ID:
+				    Integer refsetId = (Integer) value;
+				    if (refsetId != extTuple.getCore().getRefsetId()) {
+				        extTuple.getCore().setRefsetId(refsetId);
+				        referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
+				        changed = true;
+				    }
+				    break;
+				case MEMBER_ID:
+				    break;
+				case COMPONENT_ID:
+				    break;
+				case STATUS:
+				    Integer statusId = (Integer) value;
+				    if (statusId != extTuple.getStatusId()) {
+				        extTuple.setStatusId(statusId);
+				        referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
+				        changed = true;
+				    }
+				    break;
+				case VERSION:
+				    break;
+				case PATH:
+				    break;
+				case BOOLEAN_VALUE:
+				    Boolean booleanValue = (Boolean) value;
+				    if (booleanValue != ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).getBooleanValue()) {
+				        ((I_ThinExtByRefPartBoolean) extTuple.getMutablePart()).setBooleanValue(booleanValue);
+				        changed = true;
+				    }
+				    break;
+				case STRING_VALUE:
+				    String stringValue = (String) value;
+				    if (stringValue.equals(((I_ThinExtByRefPartString) extTuple.getMutablePart()).getStringValue()) == false) {
+				        ((I_ThinExtByRefPartString) extTuple.getMutablePart()).setStringValue(stringValue);
+				        changed = true;
+				    }
+				    break;
+				case CONCEPT_ID:
+				    Integer conceptId = (Integer) value;
+				    ((I_ThinExtByRefPartConcept) extTuple.getMutablePart()).setConceptId(conceptId);
+				    referencedConcepts.put(conceptId, Terms.get().getConcept(conceptId));
+				    changed = true;
+				    break;
+				case INTEGER_VALUE:
+				    Integer intValue = (Integer) value;
+				    if (I_ThinExtByRefPartConceptInt.class.isAssignableFrom(extTuple.getMutablePart().getClass())) {
+				        ((I_ThinExtByRefPartConceptInt) extTuple.getMutablePart()).setIntValue(intValue);
+				    } else {
+				        ((I_ThinExtByRefPartInteger) extTuple.getMutablePart()).setValue(intValue);
+				    }
+				    changed = true;
+				    break;
+				case ACCEPTABILITY:
+				    Integer acceptabilityId = (Integer) value;
+				    // TODO finish the conditional tests...
+				    ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setAcceptabilityId(acceptabilityId);
+				    referencedConcepts.put(acceptabilityId, Terms.get().getConcept(acceptabilityId));
+				    changed = true;
+				    break;
+				case CORRECTNESS:
+				    Integer correctnessId = (Integer) value;
+				    ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setCorrectnessId(correctnessId);
+				    referencedConcepts.put(correctnessId, Terms.get().getConcept(correctnessId));
+				    changed = true;
+				    break;
+				case DEGREE_OF_SYNONYMY:
+				    Integer dosId = (Integer) value;
+				    ((I_ThinExtByRefPartLanguage) extTuple.getMutablePart()).setDegreeOfSynonymyId(dosId);
+				    referencedConcepts.put(dosId, Terms.get().getConcept(dosId));
+				    changed = true;
+				    break;
+				case TAG:
+				    Integer tagId = (Integer) value;
+				    ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setTagId(tagId);
+				    referencedConcepts.put(tagId, Terms.get().getConcept(tagId));
+				    changed = true;
+				    break;
+				case SCOPE:
+				    Integer scopeId = (Integer) value;
+				    ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setScopeId(scopeId);
+				    referencedConcepts.put(scopeId, Terms.get().getConcept(scopeId));
+				    changed = true;
+				    break;
+				case PRIORITY:
+				    Integer priority = (Integer) value;
+				    ((I_ThinExtByRefPartLanguageScoped) extTuple.getMutablePart()).setPriority(priority);
+				    changed = true;
+				    break;
+				case MEASUREMENT_UNITS_ID:
+				    Integer unitsId = (Integer) value;
+				    ((I_ThinExtByRefPartMeasurement) extTuple.getMutablePart()).setUnitsOfMeasureId(unitsId);
+				    referencedConcepts.put(unitsId, Terms.get().getConcept(unitsId));
+				    changed = true;
+				    break;
+				case MEASUREMENT_VALUE:
+				    Double measurementValue = (Double) value;
+				    ((I_ThinExtByRefPartMeasurement) extTuple.getMutablePart()).setMeasurementValue(measurementValue);
+				    changed = true;
+				    break;
+				}
+			} catch (TerminologyException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
             if (changed) {
                 fireTableDataChanged();
                 AceLog.getAppLog().info("refset table changed");

@@ -21,8 +21,9 @@ import java.awt.event.ActionEvent;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.vodb.types.ThinConPart;
 
 public class AddConceptPart extends AddComponent {
@@ -34,7 +35,7 @@ public class AddConceptPart extends AddComponent {
     @Override
     protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config)
             throws Exception {
-        ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
+    	I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
         for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
             ThinConPart part = new ThinConPart();
             part.setVersion(Integer.MAX_VALUE);
@@ -43,7 +44,7 @@ public class AddConceptPart extends AddComponent {
             part.setConceptStatus(config.getDefaultStatus().getConceptId());
             cb.getConceptAttributes().addVersion(part);
         }
-        ACE.addUncommitted(cb);
+        ACE.addUncommitted((I_Transact) cb);
         termContainer.setTermComponent(cb);
     }
 }

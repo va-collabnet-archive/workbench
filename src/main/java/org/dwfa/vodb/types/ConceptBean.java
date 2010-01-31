@@ -356,7 +356,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnRels;
     }
 
-    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
+    public List<I_RelTuple> getSourceRelTuples(
+    		I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -373,7 +374,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
      * IntSet,
      * org.dwfa.ace.IntSet, java.util.Set)
      */
-    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<I_RelTuple> getSourceRelTuples(
+    		I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positionSet, boolean addUncommitted) throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {

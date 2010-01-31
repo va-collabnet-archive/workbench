@@ -21,17 +21,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
-import org.apache.commons.collections.primitives.IntList;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 
 public class CheckAndProcessSearchTest implements Runnable {
 
-    IntList matches;
+	I_RepresentIdSet matches;
 
     I_GetConceptData conceptToTest;
 
@@ -41,12 +41,10 @@ public class CheckAndProcessSearchTest implements Runnable {
 
     Semaphore checkSemaphore;
 
-    Semaphore addSemaphore;
-
     CountDownLatch conceptLatch;
 
-    public CheckAndProcessSearchTest(CountDownLatch conceptLatch, Semaphore checkSemaphore, Semaphore addSemaphore,
-            IntList matches, I_GetConceptData conceptToTest, List<I_TestSearchResults> checkList,
+    public CheckAndProcessSearchTest(CountDownLatch conceptLatch, Semaphore checkSemaphore,
+    		I_RepresentIdSet matches, I_GetConceptData conceptToTest, List<I_TestSearchResults> checkList,
             I_ConfigAceFrame config) {
         super();
         this.matches = matches;
@@ -54,19 +52,12 @@ public class CheckAndProcessSearchTest implements Runnable {
         this.checkList = checkList;
         this.config = config;
         this.checkSemaphore = checkSemaphore;
-        this.addSemaphore = addSemaphore;
         this.conceptLatch = conceptLatch;
     }
 
     public void run() {
         if (checkList == null || checkList.size() == 0) {
-            try {
-                addSemaphore.acquire();
-                matches.add(conceptToTest.getConceptId());
-                addSemaphore.release();
-            } catch (InterruptedException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
+                matches.setMember(conceptToTest.getConceptId());
         } else {
             try {
                 boolean failed = false;
@@ -78,9 +69,7 @@ public class CheckAndProcessSearchTest implements Runnable {
                 }
 
                 if (failed == false) {
-                    addSemaphore.acquire();
-                    matches.add(conceptToTest.getConceptId());
-                    addSemaphore.release();
+                    matches.setMember(conceptToTest.getConceptId());
                 }
             } catch (TaskFailedException e) {
                 if (ACE.editMode) {
@@ -88,8 +77,6 @@ public class CheckAndProcessSearchTest implements Runnable {
                 } else {
                     AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
                 }
-            } catch (InterruptedException e) {
-                AceLog.getAppLog().alertAndLogException(e);
             }
         }
         checkSemaphore.release();

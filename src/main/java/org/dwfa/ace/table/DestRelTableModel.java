@@ -19,15 +19,14 @@ package org.dwfa.ace.table;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 
@@ -48,7 +47,7 @@ public class DestRelTableModel extends RelTableModel {
         List<I_RelTuple> selectedTuples = new ArrayList<I_RelTuple>();
         I_IntSet allowedStatus = host.getConfig().getAllowedStatus();
         I_IntSet allowedTypes = null;
-        Set<I_Position> positions = host.getConfig().getViewPositionSet();
+        PositionSetReadOnly positions = host.getConfig().getViewPositionSetReadOnly();
         if (usePrefs) {
             if (host.getConfig().getPrefFilterTypesForRel().getSetValues().length == 0) {
                 allowedTypes = null;

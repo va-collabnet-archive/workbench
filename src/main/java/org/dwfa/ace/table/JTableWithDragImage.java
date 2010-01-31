@@ -49,11 +49,11 @@ import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.DescriptionTransferable;
@@ -72,10 +72,8 @@ import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
-
-import com.sleepycat.je.DatabaseException;
 
 public class JTableWithDragImage extends JTable {
     /**
@@ -136,7 +134,7 @@ public class JTableWithDragImage extends JTable {
             }
         }
 
-        private Transferable getTransferable(Object obj, int column) throws IOException {
+        private Transferable getTransferable(Object obj, int column) throws IOException, TerminologyException {
             if (I_CellTextWithTuple.class.isAssignableFrom(obj.getClass())) {
                 if (StringWithConceptTuple.class.isAssignableFrom(obj.getClass())) {
                     return TransferableFromSWCT(obj, column);
@@ -160,7 +158,7 @@ public class JTableWithDragImage extends JTable {
             return null;
         }
 
-        private Transferable transferableFromSWExtT(Object obj, int column) {
+        private Transferable transferableFromSWExtT(Object obj, int column) throws TerminologyException, IOException {
             StringWithExtTuple swextt = (StringWithExtTuple) obj;
             Object columnIdentifier = getColumnModel().getColumn(column).getIdentifier();
             if (ReflexiveRefsetFieldData.class.isAssignableFrom(columnIdentifier.getClass())) {
@@ -169,7 +167,7 @@ public class JTableWithDragImage extends JTable {
                 case COMPONENT_IDENTIFIER:
                     throw new UnsupportedOperationException();
                 case CONCEPT_IDENTIFIER:
-                    return new ConceptTransferable(ConceptBean.get(swextt.getId()));
+                    return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
                 case STRING:
                     return new StringSelection(swextt.getCellText());
                 case VERSION:
@@ -183,45 +181,45 @@ public class JTableWithDragImage extends JTable {
                 switch (field) {
                 // All extensions
                 case REFSET_ID:
-                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getRefsetId()));
+                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getRefsetId()));
                 case MEMBER_ID:
                     throw new UnsupportedOperationException();
                 case COMPONENT_ID:
                     throw new UnsupportedOperationException();
                 case STATUS:
-                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getStatusId()));
+                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getStatusId()));
                 case VERSION:
                     return new StringSelection(swextt.getCellText());
                 case PATH:
-                    return new ConceptTransferable(ConceptBean.get(swextt.getTuple().getPathId()));
+                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getPathId()));
                 case BOOLEAN_VALUE:
                     return new StringSelection(swextt.getCellText());
                 case CONCEPT_ID:
-                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartConcept) swextt.getTuple()
+                    return new ConceptTransferable(Terms.get().getConcept(((I_ThinExtByRefPartConcept) swextt.getTuple()
                         .getMutablePart()).getConceptId()));
                 case INTEGER_VALUE:
                     return new StringSelection(swextt.getCellText());
                 case ACCEPTABILITY:
-                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
+                    return new ConceptTransferable(Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swextt.getTuple()
                         .getMutablePart()).getAcceptabilityId()));
                 case CORRECTNESS:
-                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
+                    return new ConceptTransferable(Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swextt.getTuple()
                         .getMutablePart()).getCorrectnessId()));
                 case DEGREE_OF_SYNONYMY:
-                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartLanguage) swextt.getTuple()
+                    return new ConceptTransferable(Terms.get().getConcept(((I_ThinExtByRefPartLanguage) swextt.getTuple()
                         .getMutablePart()).getDegreeOfSynonymyId()));
                 case TAG:
                     return new ConceptTransferable(
-                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getTagId()));
+                        Terms.get().getConcept(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getTagId()));
                 case SCOPE:
                     return new ConceptTransferable(
-                        ConceptBean.get(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getScopeId()));
+                        Terms.get().getConcept(((I_ThinExtByRefPartLanguageScoped) swextt.getTuple().getMutablePart()).getScopeId()));
                 case PRIORITY:
                     return new StringSelection(swextt.getCellText());
                 case MEASUREMENT_VALUE:
                     return new StringSelection(swextt.getCellText());
                 case MEASUREMENT_UNITS_ID:
-                    return new ConceptTransferable(ConceptBean.get(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
+                    return new ConceptTransferable(Terms.get().getConcept(((I_ThinExtByRefPartMeasurement) swextt.getTuple()
                         .getMutablePart()).getUnitsOfMeasureId()));
                 case STRING_VALUE:
                     return new StringSelection(swextt.getCellText());
@@ -233,7 +231,7 @@ public class JTableWithDragImage extends JTable {
 
         }
 
-        private Transferable TransferableFromSWIdT(Object obj, int column) {
+        private Transferable TransferableFromSWIdT(Object obj, int column) throws TerminologyException, IOException {
             StringWithIdTuple seidt = (StringWithIdTuple) obj;
 
             ID_FIELD field = (ID_FIELD) getColumnModel().getColumn(column).getIdentifier();
@@ -243,17 +241,17 @@ public class JTableWithDragImage extends JTable {
             case EXT_ID:
                 return new StringSelection(seidt.getTuple().getDenotation().toString());
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(seidt.getTuple().getStatusId()));
+                return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getStatusId()));
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(seidt.getTuple().getVersion()));
             case PATH:
-                return new ConceptTransferable(ConceptBean.get(seidt.getTuple().getPathId()));
+                return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getPathId()));
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
-        private Transferable TransferableFromSWRT(Object obj, int column) {
+        private Transferable TransferableFromSWRT(Object obj, int column) throws TerminologyException, IOException {
             StringWithRelTuple swrt = (StringWithRelTuple) obj;
 
             REL_FIELD field = (REL_FIELD) getColumnModel().getColumn(column).getIdentifier();
@@ -261,29 +259,29 @@ public class JTableWithDragImage extends JTable {
             case REL_ID:
                 throw new UnsupportedOperationException();
             case SOURCE_ID:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getC1Id()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC1Id()));
             case REL_TYPE:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getTypeId()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getTypeId()));
             case DEST_ID:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getC2Id()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC2Id()));
             case GROUP:
                 return new StringSelection(Integer.toString(swrt.tuple.getGroup()));
             case REFINABILITY:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getRefinabilityId()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getRefinabilityId()));
             case CHARACTERISTIC:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getCharacteristicId()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getCharacteristicId()));
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getStatusId()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getStatusId()));
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(swrt.getTuple().getVersion()));
             case PATH:
-                return new ConceptTransferable(ConceptBean.get(swrt.getTuple().getPathId()));
+                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getPathId()));
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
-        private Transferable TransferableFromSWDT(Object obj, int column) {
+        private Transferable TransferableFromSWDT(Object obj, int column) throws TerminologyException, IOException {
             StringWithDescTuple swdt = (StringWithDescTuple) obj;
 
             DESC_FIELD field = (DESC_FIELD) getColumnModel().getColumn(column).getIdentifier();
@@ -291,7 +289,7 @@ public class JTableWithDragImage extends JTable {
             case DESC_ID:
                 throw new UnsupportedOperationException();
             case CON_ID:
-                return new ConceptTransferable(ConceptBean.get(swdt.getTuple().getConceptId()));
+                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptId()));
             case TEXT:
                 return new DescriptionTransferable(swdt.tuple);
             case LANG:
@@ -299,32 +297,32 @@ public class JTableWithDragImage extends JTable {
             case CASE_FIXED:
                 return new StringSelection(swdt.getCellText());
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swdt.getTuple().getStatusId()));
+                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getStatusId()));
             case TYPE:
-                return new ConceptTransferable(ConceptBean.get(swdt.getTuple().getTypeId()));
+                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getTypeId()));
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(swdt.getTuple().getVersion()));
             case PATH:
-                return new ConceptTransferable(ConceptBean.get(swdt.getTuple().getPathId()));
+                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getPathId()));
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
-        private Transferable TransferableFromSWCT(Object obj, int column) {
+        private Transferable TransferableFromSWCT(Object obj, int column) throws TerminologyException, IOException {
             StringWithConceptTuple swct = (StringWithConceptTuple) obj;
             CONCEPT_FIELD field = (CONCEPT_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
             case CON_ID:
-                return new ConceptTransferable(ConceptBean.get(swct.getTuple().getConId()));
+                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getConId()));
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swct.getTuple().getConceptStatus()));
+                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getConceptStatus()));
             case DEFINED:
                 return new StringSelection(swct.getCellText());
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(swct.getTuple().getVersion()));
             case PATH:
-                return new ConceptTransferable(ConceptBean.get(swct.getTuple().getPathId()));
+                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getPathId()));
             default:
                 throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
@@ -332,36 +330,36 @@ public class JTableWithDragImage extends JTable {
 
         private Transferable transferableFromIWImgT(Object obj) throws IOException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
-            return new StringSelection("<img src='ace:" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getImageId())
-                + "$" + AceConfig.getVodb().nativeToUuid(iwit.tuple.getConceptId()) + "'>");
+            return new StringSelection("<img src='ace:" + Terms.get().nativeToUuid(iwit.tuple.getImageId())
+                + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptId()) + "'>");
         }
 
-        private Transferable transferableFromSWImgT(Object obj, int column) throws IOException {
+        private Transferable transferableFromSWImgT(Object obj, int column) throws IOException, TerminologyException {
             StringWithImageTuple swit = (StringWithImageTuple) obj;
             IMAGE_FIELD field = (IMAGE_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
             case IMAGE_ID:
                 return new StringSelection("<img src='ace:"
-                    + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId()) + "$"
-                    + AceConfig.getVodb().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
+                    + Terms.get().nativeToUuid(swit.getTuple().getImageId()) + "$"
+                    + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
             case CON_ID:
-                return new ConceptTransferable(ConceptBean.get(swit.getTuple().getConceptId()));
+                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptId()));
             case DESC:
                 return new StringSelection(swit.getTuple().getTextDescription());
             case IMAGE:
                 return new StringSelection("<img src='ace:"
-                    + AceConfig.getVodb().nativeToUuid(swit.getTuple().getImageId()) + "$"
-                    + AceConfig.getVodb().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
+                    + Terms.get().nativeToUuid(swit.getTuple().getImageId()) + "$"
+                    + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
             case FORMAT:
                 return new StringSelection(swit.getTuple().getFormat());
             case STATUS:
-                return new ConceptTransferable(ConceptBean.get(swit.getTuple().getStatusId()));
+                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getStatusId()));
             case TYPE:
-                return new ConceptTransferable(ConceptBean.get(swit.getTuple().getTypeId()));
+                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getTypeId()));
             case VERSION:
                 return new StringSelection(ThinVersionHelper.format(swit.getTuple().getVersion()));
             case PATH:
-                return new ConceptTransferable(ConceptBean.get(swit.getTuple().getPathId()));
+                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getPathId()));
             default:
                 throw new UnsupportedOperationException("Can't handle field: " + field);
             }

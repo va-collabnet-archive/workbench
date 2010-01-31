@@ -39,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
@@ -77,8 +78,10 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_SupportClassifier;
+import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
@@ -107,7 +110,7 @@ import org.dwfa.ace.cs.BinaryChangeSetReader;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.search.I_TrackContinuation;
+import org.dwfa.ace.search.I_Search;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
@@ -171,7 +174,7 @@ import com.sleepycat.je.Transaction;
  * @author kec
  * 
  */
-public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_WriteDirectToDb {
+public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_WriteDirectToDb, I_Search {
     private static Logger logger = Logger.getLogger(VodbEnv.class.getName());
 
     private static boolean readOnly;
@@ -504,16 +507,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return bdbEnv.hasSrcRel(conceptId, srcRelTypeIds);
     }
 
-    /**
-     * This method is multithreaded hot.
-     * 
-     * @param continueWork
-     * @param p
-     * @param matches
-     * @param latch
-     * @throws DatabaseException
-     * @throws IOException
-     */
+    /* (non-Javadoc)
+	 * @see org.dwfa.vodb.I_Search#searchRegex(org.dwfa.ace.api.I_TrackContinuation, java.util.regex.Pattern, java.util.Collection, java.util.concurrent.CountDownLatch, java.util.List, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
     public void searchRegex(I_TrackContinuation tracker, Pattern p, Collection<I_DescriptionVersioned> matches,
             CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
             throws DatabaseException, IOException {
@@ -526,6 +522,9 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
      * html#a6743189
      */
 
+    /* (non-Javadoc)
+	 * @see org.dwfa.vodb.I_Search#searchLucene(org.dwfa.ace.api.I_TrackContinuation, java.lang.String, java.util.Collection, java.util.concurrent.CountDownLatch, java.util.List, org.dwfa.ace.api.I_ConfigAceFrame, org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator)
+	 */
     public CountDownLatch searchLucene(I_TrackContinuation tracker, String query, Collection<LuceneMatch> matches,
             CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config,
             LuceneProgressUpdator updater) throws DatabaseException, IOException, ParseException {
@@ -706,8 +705,12 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         }
     }
 
-    public I_ImageVersioned getImage(UUID uid) throws TerminologyException, IOException, DatabaseException {
-        return getImage(uuidToNative(uid));
+    public I_ImageVersioned getImage(UUID uid) throws IOException {
+        try {
+			return getImage(uuidToNative(uid));
+		} catch (TerminologyException e) {
+			throw new IOException(e);
+		}
     }
 
     public boolean hasImage(int imageId) throws IOException {
@@ -1849,7 +1852,10 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return false;
     }
 
-    public void searchConcepts(I_TrackContinuation tracker, org.apache.commons.collections.primitives.IntList matches,
+    /* (non-Javadoc)
+	 * @see org.dwfa.vodb.I_Search#searchConcepts(org.dwfa.ace.api.I_TrackContinuation, org.apache.commons.collections.primitives.IntList, java.util.concurrent.CountDownLatch, java.util.List, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
+    public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches,
             CountDownLatch latch, List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
             throws DatabaseException, IOException, ParseException {
         bdbEnv.searchConcepts(tracker, matches, latch, checkList, config);

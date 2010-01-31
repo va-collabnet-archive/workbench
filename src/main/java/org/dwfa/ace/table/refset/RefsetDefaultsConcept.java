@@ -22,10 +22,10 @@ import java.io.ObjectOutputStream;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDefaultsConcept {
@@ -60,7 +60,7 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDef
 
     public RefsetDefaultsConcept() throws TerminologyException, IOException {
         super();
-        defaultForConceptRefset = ConceptBean.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+        defaultForConceptRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
         conceptPopupIds.add(defaultForConceptRefset.getConceptId());
     }
 

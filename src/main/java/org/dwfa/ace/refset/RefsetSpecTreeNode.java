@@ -25,13 +25,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Comparable<RefsetSpecTreeNode> {
 
@@ -42,9 +44,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     private String clauseDesc;
     private String constraintDesc;
 
-    public String getConstraintDesc() {
+    public String getConstraintDesc() throws TerminologyException, IOException {
         if (constraintDesc == null) {
-            ConceptBean thisConstraint = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) getExtension().getMutablePart()).getC3id());
+            I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) getExtension().getMutablePart()).getC3id());
             try {
                 I_DescriptionTuple thisConstraintDesc = thisConstraint.getDescTuple(
                     aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -57,9 +59,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return constraintDesc;
     }
 
-    public String getClauseDesc() {
+    public String getClauseDesc() throws TerminologyException, IOException {
         if (clauseDesc == null) {
-            ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConcept) getExtension().getMutablePart()).getC2id());
+        	I_GetConceptData thisClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConcept) getExtension().getMutablePart()).getC2id());
             try {
                 I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(),
                     aceConfig);
@@ -78,9 +80,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return truthId;
     }
 
-    public String getTruthDesc() {
+    public String getTruthDesc() throws TerminologyException, IOException {
         if (truthDesc == null) {
-            ConceptBean thisTruth = ConceptBean.get(truthId);
+        	I_GetConceptData thisTruth = Terms.get().getConcept(truthId);
             I_DescriptionTuple thisTruthDesc;
             try {
                 thisTruthDesc = thisTruth.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -128,71 +130,75 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                 if (otherExt == null) {
                     return -1;
                 }
-                switch (ThinExtBinder.getExtensionType(thisExt.getCore())) {
-                case CONCEPT_CONCEPT:
+                try {
+					switch (ThinExtBinder.getExtensionType(thisExt.getCore())) {
+					case CONCEPT_CONCEPT:
 
-                    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-                    case CONCEPT_CONCEPT:
-                        int comparison = compareTruth(o);
-                        if (comparison != 0) {
-                            return comparison;
-                        }
-                        return compareClause(o);
-                    case CONCEPT_CONCEPT_CONCEPT:
-                        return 1;
-                    case CONCEPT_CONCEPT_STRING:
-                        return 1;
-                    default:
-                        break;
-                    }
+					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+					    case CONCEPT_CONCEPT:
+					        int comparison = compareTruth(o);
+					        if (comparison != 0) {
+					            return comparison;
+					        }
+					        return compareClause(o);
+					    case CONCEPT_CONCEPT_CONCEPT:
+					        return 1;
+					    case CONCEPT_CONCEPT_STRING:
+					        return 1;
+					    default:
+					        break;
+					    }
 
-                    break;
+					    break;
 
-                case CONCEPT_CONCEPT_CONCEPT:
-                    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-                    case CONCEPT_CONCEPT:
-                        return -1;
-                    case CONCEPT_CONCEPT_CONCEPT:
-                        int comparison = compareTruth(o);
-                        if (comparison != 0) {
-                            return comparison;
-                        }
-                        comparison = compareClause(o);
-                        if (comparison != 0) {
-                            return comparison;
-                        }
-                        return compareConstraint(thisExt, otherExt);
-                    case CONCEPT_CONCEPT_STRING:
-                        return -1;
-                    default:
-                        break;
-                    }
+					case CONCEPT_CONCEPT_CONCEPT:
+					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+					    case CONCEPT_CONCEPT:
+					        return -1;
+					    case CONCEPT_CONCEPT_CONCEPT:
+					        int comparison = compareTruth(o);
+					        if (comparison != 0) {
+					            return comparison;
+					        }
+					        comparison = compareClause(o);
+					        if (comparison != 0) {
+					            return comparison;
+					        }
+					        return compareConstraint(thisExt, otherExt);
+					    case CONCEPT_CONCEPT_STRING:
+					        return -1;
+					    default:
+					        break;
+					    }
 
-                    break;
-                case CONCEPT_CONCEPT_STRING:
-                    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-                    case CONCEPT_CONCEPT:
-                        return -1;
-                    case CONCEPT_CONCEPT_CONCEPT:
-                        return 1;
-                    case CONCEPT_CONCEPT_STRING:
-                        int comparison = compareTruth(o);
-                        if (comparison != 0) {
-                            return comparison;
-                        }
-                        comparison = compareClause(o);
-                        if (comparison != 0) {
-                            return comparison;
-                        }
-                        return compareString(thisExt, otherExt);
-                    default:
-                        break;
-                    }
+					    break;
+					case CONCEPT_CONCEPT_STRING:
+					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+					    case CONCEPT_CONCEPT:
+					        return -1;
+					    case CONCEPT_CONCEPT_CONCEPT:
+					        return 1;
+					    case CONCEPT_CONCEPT_STRING:
+					        int comparison = compareTruth(o);
+					        if (comparison != 0) {
+					            return comparison;
+					        }
+					        comparison = compareClause(o);
+					        if (comparison != 0) {
+					            return comparison;
+					        }
+					        return compareString(thisExt, otherExt);
+					    default:
+					        break;
+					    }
 
-                    break;
-                default:
-                    break;
-                }
+					    break;
+					default:
+					    break;
+					}
+				} catch (TerminologyException e) {
+					throw new RuntimeException(e);
+				}
 
             }
             return this.userObject.toString().compareTo(o.userObject.toString());
@@ -207,9 +213,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
 
-    private int compareConstraint(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException {
-        ConceptBean thisClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getMutablePart()).getC3id());
-        ConceptBean otherClause = ConceptBean.get(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getMutablePart()).getC3id());
+    private int compareConstraint(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException, TerminologyException {
+    	I_GetConceptData thisClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getMutablePart()).getC3id());
+    	I_GetConceptData otherClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getMutablePart()).getC3id());
         I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         if (thisClauseDesc == null || otherClauseDesc == null) {
@@ -225,11 +231,11 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return thisClauseDesc.getText().toLowerCase().compareTo(otherClauseDesc.getText().toLowerCase());
     }
 
-    private int compareClause(RefsetSpecTreeNode o) throws IOException {
+    private int compareClause(RefsetSpecTreeNode o) throws IOException, TerminologyException {
         return getClauseDesc().compareTo(o.getClauseDesc());
     }
 
-    private int compareTruth(RefsetSpecTreeNode o) throws IOException {
+    private int compareTruth(RefsetSpecTreeNode o) throws IOException, TerminologyException {
         if (getTruthId() != o.getTruthId()) {
             if (getTruthDesc().contains("true") && o.getTruthDesc().contains("true") == false) {
                 return -1;

@@ -53,10 +53,12 @@ import javax.swing.text.View;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.graph.GraphPlugin.GRAPH_LAYOUTS;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -136,7 +138,9 @@ public class GraphPanel extends JPanel {
                 parentPlugin.update();
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
-            }
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+			}
         }
 
     }
@@ -301,9 +305,10 @@ public class GraphPanel extends JPanel {
      * hyperbolic features.
      * 
      * @throws IOException
+     * @throws TerminologyException 
      * 
      */
-    public GraphPanel(GraphPlugin.GRAPH_LAYOUTS layout, GraphPlugin parentPlugin, Dimension size) throws IOException {
+    public GraphPanel(GraphPlugin.GRAPH_LAYOUTS layout, GraphPlugin parentPlugin, Dimension size) throws IOException, TerminologyException {
         super();
         this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         this.parentPlugin = parentPlugin;
@@ -438,9 +443,9 @@ public class GraphPanel extends JPanel {
         return zoomControls;
     }
 
-    private DirectedSparseGraph getLineageGraph(PluggableRenderer r) throws IOException {
+    private DirectedSparseGraph getLineageGraph(PluggableRenderer r) throws IOException, TerminologyException {
 
-        ConceptBean bean = (ConceptBean) parentPlugin.getHost().getTermComponent();
+    	I_GetConceptData bean = (I_GetConceptData) parentPlugin.getHost().getTermComponent();
         if (bean != null) {
             DirectedSparseGraph dag = new DirectedSparseGraph();
             HashSet<VertexRec> vertexRecs = new HashSet<VertexRec>();
@@ -502,24 +507,24 @@ public class GraphPanel extends JPanel {
         }
     }
 
-    private String getBeanLabelText(ConceptBean bean) throws IOException {
+    private String getBeanLabelText(I_GetConceptData bean) throws IOException {
         return bean.getInitialText();
     }
 
-    private void addLineageToNode(DirectedGraph dag, Vertex childVertex, ConceptBean child,
+    private void addLineageToNode(DirectedGraph dag, Vertex childVertex, I_GetConceptData child,
             HashMap<Integer, Vertex> vertexMap, HashSet<VertexRec> vertexRecs, StringLabeller sl, int depth)
-            throws IOException {
+            throws IOException, TerminologyException {
         if (depth > 100) {
             return;
         }
         I_ConfigAceFrame config = parentPlugin.getHost().getConfig();
-        List<I_RelTuple> sourceRelTuples = child.getSourceRelTuples(config.getAllowedStatus(),
+        List<? extends I_RelTuple> sourceRelTuples = child.getSourceRelTuples(config.getAllowedStatus(),
             config.getDestRelTypes(), config.getViewPositionSetReadOnly(), false);
         try {
             boolean root = true;
             for (I_RelTuple srcRelTuple : sourceRelTuples) {
                 root = false;
-                ConceptBean parent = ConceptBean.get(srcRelTuple.getC2Id());
+                I_GetConceptData parent = Terms.get().getConcept(srcRelTuple.getC2Id());
                 Vertex parentVertex = vertexMap.get(srcRelTuple.getC2Id());
                 if (parentVertex == null) {
                     parentVertex = dag.addVertex(new SparseVertex());

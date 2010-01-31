@@ -50,15 +50,15 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class IdTableModel extends AbstractTableModel implements PropertyChangeListener {
     /**
@@ -92,17 +92,17 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
-    private Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    private Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
 
-        Map<Integer, ConceptBean> concepts;
+        Map<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, ConceptBean>();
+            concepts = new HashMap<Integer, I_GetConceptData>();
             HashSet<Integer> idSetToFetch = null;
             synchronized (conceptsToFetch) {
                 idSetToFetch = new HashSet<Integer>(conceptsToFetch);
@@ -111,7 +111,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 if (stopWork) {
                     return false;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
 
@@ -178,7 +178,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             }
             int nid = getNidFromTermComponent(tc);
 
-            I_Identify id = LocalVersionedTerminology.get().getId(nid);
+            I_Identify id = Terms.get().getId(nid);
             for (I_IdPart part : id.getMutableIdParts()) {
                 if (workStopped) {
                     return false;
@@ -305,7 +305,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             tableChangeWorker.stop();
         }
         conceptsToFetch = new HashSet<Integer>();
-        referencedConcepts = new HashMap<Integer, ConceptBean>();
+        referencedConcepts = new HashMap<Integer, I_GetConceptData>();
         if (getProgress() != null) {
             getProgress().setVisible(true);
             getProgress().getProgressBar().setValue(0);
@@ -354,13 +354,13 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = referencedConcepts.get(id);
-        I_DescriptionTuple statusDesc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
-        if (statusDesc != null) {
-            String text = statusDesc.getText();
+    	I_GetConceptData cb = referencedConcepts.get(id);
+        I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
+        if (desc != null) {
+            String text = desc.getText();
             return text;
         }
-        return "null stat for " + id;
+        return "null desc for " + id;
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -456,15 +456,21 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             }
 
             public void actionPerformed(ActionEvent e) {
-                for (I_Path p : config.getEditingPathSet()) {
-                    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-                    newPart.setPathId(p.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
-                    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
-                }
-                ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
-                allTuples = null;
-                IdTableModel.this.fireTableDataChanged();
+                try {
+					for (I_Path p : config.getEditingPathSet()) {
+					    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
+					    newPart.setPathId(p.getConceptId());
+					    newPart.setVersion(Integer.MAX_VALUE);
+					    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
+					}
+					ACE.addUncommitted((I_Transact) Terms.get().getConcept(selectedObject.getTuple().getNid()));
+					allTuples = null;
+					IdTableModel.this.fireTableDataChanged();
+				} catch (TerminologyException e1) {
+					throw new RuntimeException(e1);
+				} catch (IOException e1) {
+					throw new RuntimeException(e1);
+				}
             }
         }
 
@@ -480,12 +486,12 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
                         newPart.setPathId(p.getConceptId());
                         newPart.setVersion(Integer.MAX_VALUE);
-                        newPart.setStatusId(AceConfig.getVodb().uuidToNative(
+                        newPart.setStatusId(Terms.get().uuidToNative(
                             ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
-                        referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                        referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
                     }
-                    ACE.addUncommitted(ConceptBean.get(selectedObject.getTuple().getNid()));
+                    ACE.addUncommitted((I_Transact) Terms.get().getConcept(selectedObject.getTuple().getNid()));
                     allTuples = null;
                     IdTableModel.this.fireTableDataChanged();
                 } catch (Exception ex) {
@@ -559,7 +565,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
         private static final long serialVersionUID = 1L;
 
-        public IdStatusFieldEditor(I_ConfigAceFrame config) {
+        public IdStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -569,9 +575,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithIdTuple swdt = (StringWithIdTuple) value;
-            return ConceptBean.get(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusId());
         }
     }
 

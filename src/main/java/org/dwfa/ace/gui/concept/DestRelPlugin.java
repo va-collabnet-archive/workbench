@@ -35,6 +35,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DestRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.refset.RefsetUtil;
+import org.dwfa.tapi.TerminologyException;
 
 public class DestRelPlugin extends RelPlugin {
 
@@ -65,14 +66,14 @@ public class DestRelPlugin extends RelPlugin {
         return I_HostConceptPlugins.TOGGLES.DEST_RELS.getPluginId();
     }
 
-    public JPanel getComponent(I_HostConceptPlugins host) {
+    public JPanel getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
             createPluginComponent(host);
         }
         return pluginPanel;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) {
+    private void createPluginComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("creating dest rel plugin component...");
@@ -105,7 +106,7 @@ public class DestRelPlugin extends RelPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
 
             if (idPlugin != null) {

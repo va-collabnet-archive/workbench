@@ -71,7 +71,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -84,9 +86,7 @@ import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.bpa.util.TableSorter;
-import org.dwfa.bpa.util.TableSorter.SortOrder;
-import org.dwfa.vodb.types.ConceptBean;
+import org.dwfa.tapi.TerminologyException;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
@@ -132,7 +132,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     I_DescriptionTuple desc = model.getDescription(i);
                     if (conceptsAdded.contains(desc.getConceptId()) == false) {
                         conceptsAdded.add(desc.getConceptId());
-                        ConceptBean cb = ConceptBean.get(desc.getConceptId());
+                        I_GetConceptData cb = Terms.get().getConcept(desc.getConceptId());
                         conceptListModel.addElement(cb);
                     }
                 }
@@ -208,32 +208,38 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private class SearchSelectionListener implements ListSelectionListener {
 
         public void valueChanged(ListSelectionEvent e) {
-            // Ignore extra messages.
-            if (e.getValueIsAdjusting())
-                return;
+            try {
+				// Ignore extra messages.
+				if (e.getValueIsAdjusting())
+				    return;
 
-            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-            if (lsm.isSelectionEmpty()) {
-                // no rows are selected
-            } else {
-                int selectedRow = lsm.getMinSelectionIndex();
-                lastSelectedRow = selectedRow;
-                int modelRow = sortingTable.modelIndex(selectedRow);
-                I_DescriptionTuple tuple = model.getDescription(modelRow);
-                ConceptBean cb = ConceptBean.get(tuple.getConceptId());
-                for (I_ContainTermComponent l : linkedComponents) {
-                    l.setTermComponent(cb);
-                }
-                if (linkType == LINK_TYPE.TREE_LINK) {
-                    try {
-                        new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
-                            cb);
-                        config.setHierarchySelection(cb);
-                    } catch (IOException e1) {
-                        AceLog.getAppLog().alertAndLogException(e1);
-                    }
-                }
-            }
+				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+				if (lsm.isSelectionEmpty()) {
+				    // no rows are selected
+				} else {
+				    int viewRowIndex = lsm.getMinSelectionIndex();
+				    lastSelectedRow = viewRowIndex;
+				    int modelRow = descTable.convertRowIndexToModel(viewRowIndex);
+				    I_DescriptionTuple tuple = model.getDescription(modelRow);
+				    I_GetConceptData cb = Terms.get().getConcept(tuple.getConceptId());
+				    for (I_ContainTermComponent l : linkedComponents) {
+				        l.setTermComponent(cb);
+				    }
+				    if (linkType == LINK_TYPE.TREE_LINK) {
+				        try {
+				            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
+				                cb);
+				            config.setHierarchySelection(cb);
+				        } catch (IOException e1) {
+				            AceLog.getAppLog().alertAndLogException(e1);
+				        }
+				    }
+				}
+			} catch (TerminologyException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
         }
 
     }
@@ -363,8 +369,6 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JProgressBar progressBar;
 
     private JTableWithDragImage descTable;
-
-    private TableSorter sortingTable;
 
     private Set<I_ContainTermComponent> linkedComponents = new HashSet<I_ContainTermComponent>();
 
@@ -588,8 +592,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         model = new DescriptionsFromCollectionTableModel(new DESC_FIELD[] { DESC_FIELD.SCORE, DESC_FIELD.STATUS,
                                                                            DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
-        sortingTable = new TableSorter(model);
-        descTable = new JTableWithDragImage(sortingTable);
+        descTable = new JTableWithDragImage(model);
+        descTable.setAutoCreateColumnsFromModel(true);
+        descTable.setAutoCreateRowSorter(true);
         descTable.setDragEnabled(true);
         descTable.setTransferHandler(new TerminologyTransferHandler(this));
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(config, true);
@@ -598,8 +603,6 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         descTable.setDefaultRenderer(String.class, renderer);
         descTable.setDefaultRenderer(Boolean.class, renderer);
         descTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace));
-
-        sortingTable.setTableHeader(descTable.getTableHeader());
 
         DESC_FIELD[] columnEnums = model.getColumnEnums();
 
@@ -613,9 +616,6 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
-        sortingTable.setSortingStatus(0, SortOrder.DESCENDING);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 13;

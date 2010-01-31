@@ -51,6 +51,7 @@ import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 
 public class ImagePlugin extends AbstractPlugin {
@@ -90,7 +91,7 @@ public class ImagePlugin extends AbstractPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
 
             if (RefsetUtil.refSetsChanged(getHost(), TOGGLES.IMAGE, this, visibleExtensions)) {
@@ -114,7 +115,7 @@ public class ImagePlugin extends AbstractPlugin {
         }
     }
 
-    public JComponent getComponent(I_HostConceptPlugins host) {
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (imagePanel == null || RefsetUtil.refSetsChanged(host, TOGGLES.IMAGE, this, visibleExtensions)) {
             createPluginComponent(host);
@@ -122,7 +123,7 @@ public class ImagePlugin extends AbstractPlugin {
         return imagePanel;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) {
+    private void createPluginComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         imageTableModel = new ImageTableModel(host, getImageColumns(host), host.getShowHistory());
         imagePanel = getImagePanel(host);
@@ -146,7 +147,7 @@ public class ImagePlugin extends AbstractPlugin {
         return fields.toArray(new IMAGE_FIELD[fields.size()]);
     }
 
-    private JPanel getImagePanel(I_HostConceptPlugins host) {
+    private JPanel getImagePanel(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         JPanel imagePanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -240,7 +241,7 @@ public class ImagePlugin extends AbstractPlugin {
         return swit.getTuple().getImageId();
     }
 
-    private void setupEditorsAndRenderers(I_HostConceptPlugins host) {
+    private void setupEditorsAndRenderers(I_HostConceptPlugins host) throws TerminologyException, IOException {
         ImageTableRenderer renderer = new ImageTableRenderer();
         if (ACE.editMode) {
             imageTable.setDefaultEditor(StringWithImageTuple.class, new ImageTableModel.TextFieldEditor());

@@ -42,14 +42,15 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class ConceptAttributeTableModel extends AbstractTableModel implements PropertyChangeListener {
 
@@ -61,7 +62,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
         private static final long serialVersionUID = 1L;
 
-        public ConceptStatusFieldEditor(I_ConfigAceFrame config) {
+        public ConceptStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -71,9 +72,9 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithConceptTuple swdt = (StringWithConceptTuple) value;
-            return ConceptBean.get(swdt.getTuple().getConceptStatus());
+            return Terms.get().getConcept(swdt.getTuple().getConceptStatus());
         }
 
         @Override
@@ -101,16 +102,16 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
-    Map<Integer, ConceptBean> referencedConcepts = new HashMap<Integer, ConceptBean>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
-        private HashMap<Integer, ConceptBean> concepts;
+        private HashMap<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, ConceptBean>();
+            concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
@@ -119,7 +120,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                 if (stopWork) {
                     return false;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 concepts.put(id, b);
             }
@@ -342,7 +343,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
     }
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = getReferencedConcepts().get(id);
+        I_GetConceptData cb = getReferencedConcepts().get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -419,7 +420,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             case STATUS:
                 Integer statusId = (Integer) value;
                 getConceptTuple(row).setStatusId(statusId);
-                getReferencedConcepts().put(statusId, ConceptBean.get(statusId));
+                getReferencedConcepts().put(statusId, Terms.get().getConcept(statusId));
                 changed = true;
                 break;
             case DEFINED:
@@ -457,7 +458,13 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                     public void run() {
                         if (active) {
                             I_ConceptAttributeTuple tuple = allTuples.get(row);
-                            ACE.addUncommitted(ConceptBean.get(tuple.getConId()));
+                            try {
+								ACE.addUncommitted((I_Transact) Terms.get().getConcept(tuple.getConId()));
+							} catch (TerminologyException e) {
+								throw new RuntimeException(e);
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
                         }
                     }
                 });
@@ -502,7 +509,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         fireTableDataChanged();
     }
 
-    public Map<Integer, ConceptBean> getReferencedConcepts() {
+    public Map<Integer, I_GetConceptData> getReferencedConcepts() {
         return referencedConcepts;
     }
 

@@ -58,11 +58,13 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ConceptBean;
 
 public abstract class RelTableModel extends AbstractTableModel implements PropertyChangeListener, I_DoConceptDrop {
     enum FieldToChange {
@@ -77,7 +79,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
     private Set<Integer> conceptsToFetch = Collections.synchronizedSet(new HashSet<Integer>());
 
-    Map<Integer, ConceptBean> referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, ConceptBean>());
+    Map<Integer, I_GetConceptData> referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, I_GetConceptData>());
 
     private TableChangedSwingWorker tableChangeWorker;
 
@@ -127,7 +129,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         protected Boolean construct() throws Exception {
-            referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, ConceptBean>());
+            referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, I_GetConceptData>());
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
                 fetchSet = new HashSet<Integer>(conceptsToFetch);
@@ -136,7 +138,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                 if (stopWork) {
                     return false;
                 }
-                ConceptBean b = ConceptBean.get(id);
+                I_GetConceptData b = Terms.get().getConcept(id);
                 b.getDescriptions();
                 referencedConcepts.put(id, b);
             }
@@ -401,7 +403,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     }
 
     private String getPrefText(int id) throws IOException {
-        ConceptBean cb = referencedConcepts.get(id);
+    	I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -469,55 +471,63 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         I_RelTuple rel = allTuples.get(row);
         REL_FIELD field = columns[col];
         boolean changed = false;
-        switch (field) {
-        case REL_ID:
-            break;
-        case SOURCE_ID:
-            break;
-        case REL_TYPE:
-            Integer typeId = (Integer) value;
-            rel.setTypeId(typeId);
-            referencedConcepts.put(typeId, ConceptBean.get(typeId));
-            changed = true;
-            break;
-        case DEST_ID:
-            Integer destId = (Integer) value;
-            rel.getFixedPart().setC2Id(destId);
-            referencedConcepts.put(destId, ConceptBean.get(destId));
-            changed = true;
-            break;
-        case GROUP:
-            if (String.class.isAssignableFrom(value.getClass())) {
-                String valueStr = (String) value;
-                rel.setGroup(Integer.parseInt(valueStr));
-            } else {
-                rel.setGroup((Integer) value);
-            }
-            changed = true;
-            break;
-        case REFINABILITY:
-            Integer refinabilityId = (Integer) value;
-            rel.setRefinabilityId(refinabilityId);
-            referencedConcepts.put(refinabilityId, ConceptBean.get(refinabilityId));
-            changed = true;
-            break;
-        case CHARACTERISTIC:
-            Integer characteristicId = (Integer) value;
-            rel.setCharacteristicId(characteristicId);
-            referencedConcepts.put(characteristicId, ConceptBean.get(characteristicId));
-            changed = true;
-            break;
-        case STATUS:
-            Integer statusId = (Integer) value;
-            rel.setStatusId(statusId);
-            referencedConcepts.put(statusId, ConceptBean.get(statusId));
-            changed = true;
-            break;
-        case VERSION:
-            break;
-        case PATH:
-            break;
-        }
+        try {
+			switch (field) {
+			case REL_ID:
+			    break;
+			case SOURCE_ID:
+			    break;
+			case REL_TYPE:
+			    Integer typeId = (Integer) value;
+			    rel.setTypeId(typeId);
+			    referencedConcepts.put(typeId, Terms.get().getConcept(typeId));
+			    changed = true;
+			    break;
+			case DEST_ID:
+			    Integer destId = (Integer) value;
+			    rel.getFixedPart().setC2Id(destId);
+			    referencedConcepts.put(destId, Terms.get().getConcept(destId));
+			    changed = true;
+			    break;
+			case GROUP:
+			    if (String.class.isAssignableFrom(value.getClass())) {
+			        String valueStr = (String) value;
+			        rel.setGroup(Integer.parseInt(valueStr));
+			    } else {
+			        rel.setGroup((Integer) value);
+			    }
+			    changed = true;
+			    break;
+			case REFINABILITY:
+			    Integer refinabilityId = (Integer) value;
+			    rel.setRefinabilityId(refinabilityId);
+			    referencedConcepts.put(refinabilityId, Terms.get().getConcept(refinabilityId));
+			    changed = true;
+			    break;
+			case CHARACTERISTIC:
+			    Integer characteristicId = (Integer) value;
+			    rel.setCharacteristicId(characteristicId);
+			    referencedConcepts.put(characteristicId, Terms.get().getConcept(characteristicId));
+			    changed = true;
+			    break;
+			case STATUS:
+			    Integer statusId = (Integer) value;
+			    rel.setStatusId(statusId);
+			    referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
+			    changed = true;
+			    break;
+			case VERSION:
+			    break;
+			case PATH:
+			    break;
+			}
+		} catch (NumberFormatException e) {
+			throw new RuntimeException(e);
+		} catch (TerminologyException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
         fireTableDataChanged();
         if (changed) {
             AceLog.getAppLog().info("Rel table changed");
@@ -541,7 +551,13 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                     public void run() {
                         if (active) {
                             I_RelTuple rel = allTuples.get(row);
-                            ACE.addUncommitted(ConceptBean.get(rel.getC1Id()));
+                            try {
+								ACE.addUncommitted((I_Transact) Terms.get().getConcept(rel.getC1Id()));
+							} catch (TerminologyException e) {
+								AceLog.getAppLog().alertAndLogException(e);
+							} catch (IOException e) {
+								AceLog.getAppLog().alertAndLogException(e);
+							}
                         }
                     }
                 });
@@ -636,7 +652,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         private static final long serialVersionUID = 1L;
 
-        public RelStatusFieldEditor(I_ConfigAceFrame config) {
+        public RelStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -646,9 +662,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return ConceptBean.get(swdt.getTuple().getStatusId());
+            return Terms.get().getConcept(swdt.getTuple().getStatusId());
         }
 
         @Override
@@ -667,7 +683,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         private static final long serialVersionUID = 1L;
 
-        public RelRefinabilityFieldEditor(I_ConfigAceFrame config) {
+        public RelRefinabilityFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -677,9 +693,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return ConceptBean.get(swdt.getTuple().getRefinabilityId());
+            return Terms.get().getConcept(swdt.getTuple().getRefinabilityId());
         }
 
         @Override
@@ -762,7 +778,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         private static final long serialVersionUID = 1L;
 
-        public RelCharactisticFieldEditor(I_ConfigAceFrame config) {
+        public RelCharactisticFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -772,9 +788,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return ConceptBean.get(swdt.getTuple().getCharacteristicId());
+            return Terms.get().getConcept(swdt.getTuple().getCharacteristicId());
         }
 
         @Override
@@ -793,7 +809,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         private static final long serialVersionUID = 1L;
 
-        public RelTypeFieldEditor(I_ConfigAceFrame config) {
+        public RelTypeFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
             super(config);
         }
 
@@ -803,9 +819,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         }
 
         @Override
-        public ConceptBean getSelectedItem(Object value) {
+        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
             StringWithRelTuple swdt = (StringWithRelTuple) value;
-            return ConceptBean.get(swdt.getTuple().getTypeId());
+            return Terms.get().getConcept(swdt.getTuple().getTypeId());
         }
 
         @Override

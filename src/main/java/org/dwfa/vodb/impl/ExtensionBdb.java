@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_StoreExtensions;
 import org.dwfa.vodb.I_StoreInBdb;
 import org.dwfa.vodb.ToIoException;
@@ -290,7 +292,7 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
                         ExtensionByReferenceBean extBean = ExtensionByReferenceBean.make(
                             extFromComponentId.getMemberId(), extFromComponentId);
                         if (extBean == null) {
-                            AceLog.getAppLog().severe("extBean is null for component: " + ConceptBean.get(componentId));
+                            AceLog.getAppLog().severe("extBean is null for component: " + Terms.get().getConcept(componentId));
                             AceLog.getAppLog().severe("extFromComponentId: " + extFromComponentId);
                             AceLog.getAppLog().severe(
                                 "extFromComponentId.getMemberId(): " + extFromComponentId.getMemberId());
@@ -311,19 +313,15 @@ public class ExtensionBdb implements I_StoreInBdb, I_StoreExtensions {
                 }
                 return matches;
             } catch (DeadlockException ex) {
-                mySecCursor.close();
                 ex.printStackTrace();
                 return getAllExtensionsForComponent(componentId);
-            }
+            } catch (TerminologyException ex) {
+                throw new IOException(ex);
+			}
         } catch (DatabaseException ex) {
-            if (mySecCursor != null) {
-                try {
-                    mySecCursor.close();
-                } catch (DatabaseException e) {
-                    throw new IOException(e);
-                }
-            }
             throw new IOException(ex);
+        } finally {
+            mySecCursor.close();
         }
     }
 

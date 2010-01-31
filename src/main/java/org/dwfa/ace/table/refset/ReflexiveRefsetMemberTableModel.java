@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
@@ -33,7 +34,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 
@@ -86,10 +86,10 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                         case CONCEPT_COMPONENT:
                             if (col.readParamaters != null) {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-                                    ConceptBean.get(extension.getComponentId()), col.readParamaters));
+                                    Terms.get().getConcept(extension.getComponentId()), col.readParamaters));
                             } else {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-                                    ConceptBean.get(extension.getComponentId())));
+                                		Terms.get().getConcept(extension.getComponentId())));
                             }
                             break;
                         case COMPONENT:

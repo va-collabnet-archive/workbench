@@ -25,10 +25,10 @@ import javax.swing.ImageIcon;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.types.ConceptBean;
 
 public class StatedAndNormalFormsPlugin extends AbstractPlugin {
 
@@ -64,7 +64,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
             host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
             host.addPropertyChangeListener("commit", this);
             try {
-                formsPanel.setConcept((ConceptBean) host.getTermComponent(), host.getConfig());
+                formsPanel.setConcept((I_GetConceptData) host.getTermComponent(), host.getConfig());
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -80,7 +80,7 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
     @Override
     public void update() throws IOException {
         if (showComponent() && formsPanel != null) {
-            formsPanel.setConcept((ConceptBean) getHost().getTermComponent(), getHost().getConfig());
+            formsPanel.setConcept((I_GetConceptData) getHost().getTermComponent(), getHost().getConfig());
         }
 
     }

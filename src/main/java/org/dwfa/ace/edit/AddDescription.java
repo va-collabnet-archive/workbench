@@ -22,11 +22,12 @@ import java.util.UUID;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinDescPart;
 import org.dwfa.vodb.types.ThinDescVersioned;
 
@@ -39,14 +40,14 @@ public class AddDescription extends AddComponent {
     @Override
     protected void doEdit(I_ContainTermComponent termContainer, ActionEvent e, I_ConfigAceFrame config)
             throws Exception {
-        ConceptBean cb = (ConceptBean) termContainer.getTermComponent();
+    	I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
         if (cb == null) {
             AceLog.getAppLog().alertAndLogException(
                 new Exception("Cannot add a description while the component viewer is empty..."));
         } else {
             UUID newDescUid = UUID.randomUUID();
-            int idSource = AceConfig.getVodb().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-            int descId = AceConfig.getVodb().uuidToNativeWithGeneration(newDescUid, idSource,
+            int idSource = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+            int descId = Terms.get().uuidToNativeWithGeneration(newDescUid, idSource,
                 config.getEditingPathSet(), Integer.MAX_VALUE);
             ThinDescVersioned desc = new ThinDescVersioned(descId, cb.getConceptId(), 1);
             ThinDescPart descPart = new ThinDescPart();
@@ -54,7 +55,7 @@ public class AddDescription extends AddComponent {
             boolean capStatus = false;
             String lang = "en";
             int status = config.getDefaultStatus().getConceptId();
-            int typeId = AceConfig.getVodb().uuidToNative(
+            int typeId = Terms.get().uuidToNative(
                 ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
             String text = "New Description";
             for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
@@ -68,7 +69,7 @@ public class AddDescription extends AddComponent {
             }
             cb.getUncommittedDescriptions().add(desc);
             cb.getUncommittedIds().add(descId);
-            ACE.addUncommitted(cb);
+            ACE.addUncommitted((I_Transact) cb);
             termContainer.setTermComponent(cb);
         }
     }

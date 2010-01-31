@@ -49,6 +49,7 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -1051,7 +1052,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         tLabel.setMinimumSize(size);
     }
 
-    private I_ConceptAttributeTuple findSelf(ConceptBean cBean, List<I_Position> posList) {
+    private I_ConceptAttributeTuple findSelf(I_GetConceptData cBean, List<I_Position> posList) {
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
             List<? extends I_ConceptAttributePart> cvList = cv.getMutableParts();

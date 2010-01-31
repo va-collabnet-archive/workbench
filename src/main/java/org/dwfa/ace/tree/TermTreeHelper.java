@@ -169,7 +169,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         }
     }
 
-    public DefaultTreeModel setRoots() {
+    public DefaultTreeModel setRoots() throws TerminologyException, IOException {
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(null, true);
@@ -340,7 +340,13 @@ public class TermTreeHelper implements PropertyChangeListener {
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        setRoots();
+        try {
+			setRoots();
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
         updateHierarchyView(evt.getPropertyName());
     }
 

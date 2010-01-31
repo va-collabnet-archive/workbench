@@ -44,7 +44,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
 import org.dwfa.ace.log.AceLog;
@@ -55,7 +55,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.JarExtractor;
 import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.VodbEnv;
-import org.dwfa.vodb.types.ConceptBean;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -148,13 +147,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(properties);
         try {
             if (userConcept == null) {
-                userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+                userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             }
             if (userPath == null) {
-                userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
             }
-            out.writeObject(AceConfig.getVodb().nativeToUuid(userConcept.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(userPath.getConceptId()));
+            out.writeObject(Terms.get().nativeToUuid(userConcept.getConceptId()));
+            out.writeObject(Terms.get().nativeToUuid(userPath.getConceptId()));
             out.writeObject(fullName);
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
@@ -190,12 +189,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 }
                 try {
                     VodbEnv vodbEnv;
-                    if (AceConfig.getVodb() == null) {
-                        vodbEnv = new VodbEnv();
-                    } else {
-                        vodbEnv = AceConfig.getVodb();
+                    if (Terms.get() == null) {
+                        if (AceConfig.getVodb() == null) {
+                            vodbEnv = new VodbEnv();
+                        } else {
+                            vodbEnv = AceConfig.getVodb();
+                        }
+                        vodbEnv.setup(dbFolder, readOnly);
                     }
-                    vodbEnv.setup(dbFolder, readOnly);
                 } catch (IOException e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 } catch (Exception e) {
@@ -243,15 +244,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             }
             try {
                 if (objDataVersion >= 8) {
-                    userConcept = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    userConcept = Terms.get().getConcept(Terms.get().uuidToNative((List<UUID>) in.readObject()));
                 } else {
-                    userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+                    userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
                 }
                 if (objDataVersion >= 9) {
-                    userPath = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    userPath = Terms.get().getConcept(Terms.get().uuidToNative((List<UUID>) in.readObject()));
                     fullName = (String) in.readObject();
                 } else {
-                    userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                    userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
                     fullName = username;
                 }
             } catch (Exception e) {
@@ -273,14 +274,16 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize, boolean includeSnomed)
             throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
         try {
-            VodbEnv vodbEnv = new VodbEnv();
-            vodbEnv.setup(config.dbFolder, config.readOnly, cacheSize);
-            LocalVersionedTerminology.set(vodbEnv);
+        	if (Terms.get() == null) {
+                VodbEnv vodbEnv = new VodbEnv();
+                vodbEnv.setup(config.dbFolder, config.readOnly, cacheSize);
+                Terms.set(vodbEnv);
+        	}
             if (config.userConcept == null) {
-                config.userConcept = ConceptBean.get(ArchitectonicAuxiliary.Concept.USER.getUids());
+                config.userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             }
             if (config.userPath == null) {
-                config.userPath = ConceptBean.get(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                config.userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
             }
 
         } catch (Exception e) {
@@ -424,13 +427,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.changeSupport.firePropertyChange("username", old, username);
     }
 
-    public static VodbEnv stealthVodb;
-
     public static VodbEnv getVodb() {
-        if (stealthVodb != null) {
-            return stealthVodb;
-        }
-        return (VodbEnv) LocalVersionedTerminology.get();
+        return (VodbEnv) Terms.get();
     }
 
     public List<I_ConfigAceFrame> getAceFrames() {

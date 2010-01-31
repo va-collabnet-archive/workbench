@@ -35,7 +35,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
@@ -196,10 +195,10 @@ public class Path implements I_Transact, I_Path {
         return null;
     }
 
-    public static String toHtmlString(I_Path path) throws IOException {
+    public static String toHtmlString(I_Path path) throws IOException, TerminologyException {
         StringBuffer buff = new StringBuffer();
         buff.append("<html><font color='blue' size='+1'><u>");
-        ConceptBean cb = ConceptBean.get(path.getConceptId());
+        I_GetConceptData cb = Terms.get().getConcept(path.getConceptId());
         buff.append(cb.getInitialText());
         buff.append("</u></font>");
         if (path != null) {
@@ -226,7 +225,7 @@ public class Path implements I_Transact, I_Path {
      * @see org.dwfa.vodb.types.I_Path#commit(int, java.util.Set)
      */
     public void commit(int version, Set<TimePathId> values) throws IOException {
-        AceConfig.getVodb().writePath(this);
+        Terms.get().writePath(this);
     }
 
     /*
@@ -252,10 +251,10 @@ public class Path implements I_Transact, I_Path {
         try {
             List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
             for (I_Position position : origins) {
-                universalOrigins.add(new UniversalAcePosition(AceConfig.getVodb().nativeToUuid(
+                universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
                     position.getPath().getConceptId()), ThinVersionHelper.convert(position.getVersion())));
             }
-            return new UniversalAcePath(AceConfig.getVodb().nativeToUuid(conceptId), universalOrigins);
+            return new UniversalAcePath(Terms.get().nativeToUuid(conceptId), universalOrigins);
         } catch (DatabaseException e) {
             throw new ToIoException(e);
         }
@@ -263,7 +262,7 @@ public class Path implements I_Transact, I_Path {
 
     public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
         try {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(p.getConceptId()));
+            out.writeObject(Terms.get().nativeToUuid(p.getConceptId()));
         } catch (DatabaseException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -280,8 +279,8 @@ public class Path implements I_Transact, I_Path {
         int pathId;
         try {
             List<UUID> pathIdList = (List<UUID>) in.readObject();
-            if (AceConfig.getVodb().hasId(pathIdList)) {
-                pathId = AceConfig.getVodb().uuidToNative(pathIdList);
+            if (Terms.get().hasId(pathIdList)) {
+                pathId = Terms.get().uuidToNative(pathIdList);
             } else {
                 pathId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
             }
@@ -338,11 +337,11 @@ public class Path implements I_Transact, I_Path {
         return buff.toString();
     }
 
-    public String toHtmlString() throws IOException {
+    public String toHtmlString() throws IOException, TerminologyException {
         return Path.toHtmlString(this);
     }
 
     public void addOrigin(I_Position position) throws TerminologyException {
-        AceConfig.getVodb().writePathOrigin(this, position);
+        Terms.get().writePathOrigin(this, position);
     }
 }

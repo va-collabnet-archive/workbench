@@ -73,10 +73,10 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -116,7 +116,6 @@ import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.conflict.LastCommitWinsConflictResolutionStrategy;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
@@ -627,15 +626,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 8) {
                 try {
-                    defaultStatus = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultStatus = Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultDescriptionType =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipType =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipCharacteristic =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipRefinability =
-                            ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -644,19 +643,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 try {
                     defaultStatus =
-                            ConceptBean.get(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
+                    	Terms.get().getConcept(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
                                 .getNid());
                     defaultDescriptionType =
-                            ConceptBean.get(AceConfig.getVodb().getId(
+                    	Terms.get().getConcept(AceConfig.getVodb().getId(
                                 ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNid());
                     defaultRelationshipType =
-                            ConceptBean.get(AceConfig.getVodb()
+                    	Terms.get().getConcept(AceConfig.getVodb()
                                 .getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNid());
                     defaultRelationshipCharacteristic =
-                            ConceptBean.get(AceConfig.getVodb().getId(
+                    	Terms.get().getConcept(AceConfig.getVodb().getId(
                                 ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNid());
                     defaultRelationshipRefinability =
-                            ConceptBean.get(AceConfig.getVodb().getId(
+                    	Terms.get().getConcept(AceConfig.getVodb().getId(
                                 ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNid());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
@@ -688,7 +687,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 try {
                     if (uuidList != null) {
                         try {
-                            hierarchySelection = ConceptBean.get(AceConfig.getVodb().uuidToNative(uuidList));
+                            hierarchySelection = Terms.get().getConcept(AceConfig.getVodb().uuidToNative(uuidList));
                         } catch (NoMappingException e) {
                             AceLog.getAppLog().info("No mapping for hierarchySelection: " + uuidList);
                         }
@@ -758,7 +757,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 21) {
                 try {
-                    defaultImageType = ConceptBean.get(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultImageType = Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -861,7 +860,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     List<I_GetConceptData> tabHistoryList = new LinkedList<I_GetConceptData>();
                     for (int nid : il.getListArray()) {
                         try {
-                            tabHistoryList.add(ConceptBean.get(nid));
+                            tabHistoryList.add(Terms.get().getConcept(nid));
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
@@ -887,7 +886,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     context = null;
                 } else {
                     try {
-                        context = LocalVersionedTerminology.get().getConcept(contextIntList.getListArray()[0]);
+                        context = Terms.get().getConcept(contextIntList.getListArray()[0]);
                     } catch (TerminologyException e) {
                         throw new ToIoException(e);
                     }
@@ -1017,8 +1016,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (obj == null) {
             return null;
         } else {
-            if (LocalVersionedTerminology.get().hasId((List<UUID>) obj)) {
-                return LocalVersionedTerminology.get().getConcept((List<UUID>) obj);
+            if (Terms.get().hasId((List<UUID>) obj)) {
+                return Terms.get().getConcept((List<UUID>) obj);
             }
             return null;
         }
@@ -1584,12 +1583,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return defaultDescriptionType;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultDescriptionType(org.dwfa
-     * .vodb.types.ConceptBean)
-     */
     public void setDefaultDescriptionType(I_GetConceptData defaultDescriptionType) {
         Object old = this.defaultDescriptionType;
         this.defaultDescriptionType = defaultDescriptionType;
@@ -1607,12 +1600,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return defaultRelationshipCharacteristic;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipCharacteristic
-     * (org.dwfa.vodb.types.ConceptBean)
-     */
     public void setDefaultRelationshipCharacteristic(I_GetConceptData defaultRelationshipCharacteristic) {
         Object old = this.defaultRelationshipCharacteristic;
         this.defaultRelationshipCharacteristic = defaultRelationshipCharacteristic;
@@ -1628,12 +1615,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return defaultRelationshipRefinability;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipRefinability
-     * (org.dwfa.vodb.types.ConceptBean)
-     */
     public void setDefaultRelationshipRefinability(I_GetConceptData defaultRelationshipRefinability) {
         Object old = this.defaultRelationshipRefinability;
         this.defaultRelationshipRefinability = defaultRelationshipRefinability;
@@ -1648,12 +1629,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return defaultRelationshipType;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultRelationshipType(org.dwfa
-     * .vodb.types.ConceptBean)
-     */
     public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
         Object old = this.defaultRelationshipType;
         this.defaultRelationshipType = defaultRelationshipType;
@@ -1668,12 +1643,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return defaultStatus;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setDefaultStatus(org.dwfa.vodb.types
-     * .ConceptBean)
-     */
     public void setDefaultStatus(I_GetConceptData defaultStatus) {
         Object old = this.defaultStatus;
         this.defaultStatus = defaultStatus;
@@ -1738,12 +1707,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return hierarchySelection;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.dwfa.ace.config.I_ConfigAceFrame#setHierarchySelection(org.dwfa.vodb
-     * .types.ConceptBean)
-     */
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
         Object old = this.hierarchySelection;
         this.hierarchySelection = hierarchySelection;
@@ -2660,7 +2623,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     private void alertAndLog(String message, Exception e) {
-        LocalVersionedTerminology.get().getEditLog().alertAndLog(Level.WARNING, message, e);
+        Terms.get().getEditLog().alertAndLog(Level.WARNING, message, e);
     }
 
     public Boolean getHighlightConflictsInTaxonomyView() {
@@ -2860,16 +2823,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {
@@ -2898,16 +2861,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, LocalVersionedTerminology
-                .get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
+            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {

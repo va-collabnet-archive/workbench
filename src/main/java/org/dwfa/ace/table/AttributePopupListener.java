@@ -39,13 +39,14 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ConceptAttributeTableModel.FieldToChange;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ThinConVersioned;
 
 public class AttributePopupListener extends MouseAdapter {
@@ -60,7 +61,14 @@ public class AttributePopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
 
-            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
+            I_GetConceptData sourceBean;
+			try {
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConId());
+			} catch (TerminologyException e1) {
+				throw new RuntimeException(e1);
+			} catch (IOException e1) {
+				throw new RuntimeException(e1);
+			}
             for (I_Path p : config.getEditingPathSet()) {
                 I_ConceptAttributePart currentPart =
                         (I_ConceptAttributePart) selectedObject.getTuple().getMutablePart();
@@ -69,7 +77,7 @@ public class AttributePopupListener extends MouseAdapter {
                             Long.MAX_VALUE);
                 selectedObject.getTuple().getConVersioned().addVersion(newPart);
             }
-            ACE.addUncommitted(sourceBean);
+            ACE.addUncommitted((I_Transact) sourceBean);
 
             model.allTuples = null;
             model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
@@ -84,11 +92,18 @@ public class AttributePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
+            I_GetConceptData sourceBean;
+			try {
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConId());
+			} catch (TerminologyException e1) {
+				throw new RuntimeException(e1);
+			} catch (IOException e1) {
+				throw new RuntimeException(e1);
+			}
             I_ConceptAttributeTuple tuple = selectedObject.getTuple();
             ThinConVersioned versioned = (ThinConVersioned) tuple.getConVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted(sourceBean);
+            ACE.addUncommitted((I_Transact) sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -108,7 +123,7 @@ public class AttributePopupListener extends MouseAdapter {
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent e) {
             try {
-                ConceptBean sourceBean = ConceptBean.get(selectedObject.getTuple().getConId());
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ConceptAttributePart newPart = selectedObject.getTuple().getMutablePart();
                     if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
@@ -135,9 +150,9 @@ public class AttributePopupListener extends MouseAdapter {
 
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), ConceptBean.get(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                 }
-                ACE.addUncommitted(sourceBean);
+                ACE.addUncommitted((I_Transact) sourceBean);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }

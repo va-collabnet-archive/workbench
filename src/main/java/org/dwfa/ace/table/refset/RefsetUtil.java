@@ -19,6 +19,7 @@ package org.dwfa.ace.table.refset;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +45,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.ConceptFieldEditor;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinExtBinder.EXT_TYPE;
 import org.dwfa.vodb.types.IntList;
 
@@ -375,7 +377,7 @@ public class RefsetUtil {
     }
 
     private static void setComboForField(I_HostConceptPlugins host, JTableWithDragImage extTable,
-            REFSET_FIELDS comboField, IntList comboIntList) {
+            REFSET_FIELDS comboField, IntList comboIntList) throws TerminologyException, IOException {
         ConceptFieldEditor conceptCombo = new RefsetMemberTableModel.ConceptFieldEditor(host.getConfig(), comboIntList,
             comboField);
         extTable.getColumn(comboField).setCellEditor(conceptCombo);

@@ -35,6 +35,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.refset.RefsetUtil;
+import org.dwfa.tapi.TerminologyException;
 
 public class SrcRelPlugin extends RelPlugin {
 
@@ -65,7 +66,7 @@ public class SrcRelPlugin extends RelPlugin {
         return TOGGLES.SOURCE_RELS.getPluginId();
     }
 
-    public JPanel getComponent(I_HostConceptPlugins host) {
+    public JPanel getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (pluginPanel == null || RefsetUtil.refSetsChanged(host, toggleType, this, visibleExtensions)) {
             createPluginComponent(host);
@@ -73,7 +74,7 @@ public class SrcRelPlugin extends RelPlugin {
         return pluginPanel;
     }
 
-    private void createPluginComponent(I_HostConceptPlugins host) {
+    private void createPluginComponent(I_HostConceptPlugins host) throws TerminologyException, IOException {
         setHost(host);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("creating src rel plugin component...");
@@ -107,7 +108,7 @@ public class SrcRelPlugin extends RelPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
 
             if (idPlugin != null) {

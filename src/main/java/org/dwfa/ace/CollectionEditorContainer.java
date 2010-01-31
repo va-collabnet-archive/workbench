@@ -69,6 +69,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
 import org.dwfa.gui.toggle.Toggle32x32;
+import org.dwfa.tapi.TerminologyException;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -222,7 +223,7 @@ public class CollectionEditorContainer extends JPanel {
     }
 
     public CollectionEditorContainer(TerminologyList list, ACE ace, JPanel descListProcessBuilderPanel)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
         this.list = list;

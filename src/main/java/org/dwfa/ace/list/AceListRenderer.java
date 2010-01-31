@@ -63,11 +63,17 @@ public class AceListRenderer extends DefaultListCellRenderer {
                             public void run() {
                                 I_GetConceptData concept = (I_GetConceptData) value;
                                 I_ModelTerminologyList listModel = (I_ModelTerminologyList) list.getModel();
-                                I_GetConceptData another = listModel.getElementAt(index);
-                                if (another != null && another.getConceptId() == concept.getConceptId()) {
-                                    listModel.removeElement(index);
+                                if (index < list.getModel().getSize()) {
+                                    I_GetConceptData another = listModel.getElementAt(index);
+                                    if (another != null && another.getConceptId() == concept.getConceptId()) {
+                                        listModel.removeElement(index);
+                                        AceLog.getAppLog().info(
+                                            "element " + another + " with index " + index + " removed.");
+                                    }
+                                } else {
                                     AceLog.getAppLog().info(
-                                        "element " + concept.getConceptId() + " with index " + index + " removed.");
+                                            "element " + value + " with index " + index + 
+                                            " >= list model size: " + list.getModel().getSize());
                                 }
                             }
                         });
