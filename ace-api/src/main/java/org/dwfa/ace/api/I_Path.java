@@ -63,7 +63,7 @@ public interface I_Path {
 
     public UniversalAcePath getUniversal() throws IOException, TerminologyException;
 
-    public String toHtmlString() throws IOException;
+    public String toHtmlString() throws IOException, TerminologyException;
 
     /**
      * Add an origin position to a path.

@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -74,7 +74,7 @@ public class NewDefaultProfile extends NewProfile {
     public static I_ConfigAceFrame newProfile(String fullName, String username, String password, String adminUsername,
             String adminPassword) throws TerminologyException, IOException {
 
-        I_ImplementTermFactory tf = (I_ImplementTermFactory) LocalVersionedTerminology.get();
+        I_ImplementTermFactory tf = (I_ImplementTermFactory) Terms.get();
         I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
 
         for (HOST_ENUM h : HOST_ENUM.values()) {
@@ -192,8 +192,8 @@ public class NewDefaultProfile extends NewProfile {
         addIfNotNull(allowedStatus, Concept.CURRENT_UNREVIEWED, tf);
         addIfNotNull(allowedStatus, Concept.FLAGGED_FOR_DUAL_REVIEW, tf);
         addIfNotNull(allowedStatus, Concept.INTERNAL_USE_ONLY, tf);
-        allowedStatus.add(tf.uuidToNative(Concept.LIMITED.getUids()));
-        allowedStatus.add(tf.uuidToNative(Concept.PENDING_MOVE.getUids()));
+        addIfNotNull(allowedStatus, Concept.LIMITED, tf);
+        addIfNotNull(allowedStatus, Concept.PENDING_MOVE, tf);
         addIfNotNull(allowedStatus, Concept.PROCESSED, tf);
         addIfNotNull(allowedStatus, Concept.RESOLVED_IN_DUAL, tf);
         addIfNotNull(allowedStatus, Concept.PROMOTED, tf);
@@ -217,13 +217,13 @@ public class NewDefaultProfile extends NewProfile {
         activeConfig.setSourceRelTypes(sourceRelTypes);
 
         I_IntSet descTypes = tf.newIntSet();
-        addIfNotNull(allowedStatus, Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.PREFERRED_DESCRIPTION_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.SYNONYM_DESCRIPTION_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.DESCRIPTION_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.XHTML_PREFERRED_DESC_TYPE, tf);
-        addIfNotNull(allowedStatus, Concept.XHTML_DEF, tf);
+        addIfNotNull(descTypes, Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE, tf);
+        addIfNotNull(descTypes, Concept.PREFERRED_DESCRIPTION_TYPE, tf);
+        addIfNotNull(descTypes, Concept.SYNONYM_DESCRIPTION_TYPE, tf);
+        addIfNotNull(descTypes, Concept.DESCRIPTION_TYPE, tf);
+        addIfNotNull(descTypes, Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE, tf);
+        addIfNotNull(descTypes, Concept.XHTML_PREFERRED_DESC_TYPE, tf);
+        addIfNotNull(descTypes, Concept.XHTML_DEF, tf);
         activeConfig.setDescTypes(descTypes);
 
         activeConfig.setDefaultDescriptionType(tf.getConcept(Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
