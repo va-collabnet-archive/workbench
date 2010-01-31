@@ -29,6 +29,12 @@ public class PathSetReadOnly implements Set<I_Path> {
 		this.paths = paths.toArray(this.paths);
 	}
 
+	public PathSetReadOnly(I_Path path) {
+		super();
+		this.paths = new I_Path[1];
+		this.paths[0] = path;
+	}
+
 	@Override
 	public boolean add(I_Path e) {
 		throw new UnsupportedOperationException();

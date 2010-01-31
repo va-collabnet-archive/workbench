@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
@@ -48,6 +49,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -687,5 +689,16 @@ public interface I_TermFactory {
      * Add or update an origin position to a path
      */
     public void writePathOrigin(I_Path path, I_Position origin) throws TerminologyException;
+
+	public List<UUID> nativeToUuid(int nid) throws IOException;
+
+	public I_ImageVersioned getImage(UUID fromString) throws IOException;
+
+	public I_ImageVersioned getImage(int parseInt) throws IOException;
+
+	public void searchConcepts(I_TrackContinuation iTrackContinuation,
+			I_RepresentIdSet matches, CountDownLatch conceptLatch,
+			List<I_TestSearchResults> criterion,
+			I_ConfigAceFrame differenceSearchConfig) throws IOException, ParseException;
 
 }

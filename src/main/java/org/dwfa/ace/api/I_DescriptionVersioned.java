@@ -65,7 +65,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public I_DescriptionTuple getLastTuple();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
             List<I_DescriptionTuple> matchingTuples, boolean addUncommitted);
 
     /**
@@ -90,7 +90,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positionSet,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
             List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws TerminologyException, IOException;
 

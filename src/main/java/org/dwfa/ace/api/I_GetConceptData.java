@@ -503,6 +503,10 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public List<? extends I_RelVersioned> getDestRels() throws IOException;
 
+    public I_RelVersioned getDestRel(int relNid) throws IOException;
+
+    public I_RelVersioned getSourceRel(int relNid) throws IOException;
+
     /**
      * 
      * @return all relationships originating at this concept, regardless of type

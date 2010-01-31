@@ -139,10 +139,10 @@ public abstract class NewProfile extends AbstractTask {
         this.profilePropName = address;
     }
 
-    public static void addIfNotNull(I_IntSet roots, I_ConceptualizeUniversally concept, I_TermFactory tf)
+    public static void addIfNotNull(I_IntSet intSet, I_ConceptualizeUniversally concept, I_TermFactory tf)
             throws TerminologyException, IOException {
         try {
-            roots.add(tf.uuidToNative(concept.getUids()));
+        	intSet.add(tf.uuidToNative(concept.getUids()));
         } catch (NoMappingException e) {
             // nothing to do...
         }

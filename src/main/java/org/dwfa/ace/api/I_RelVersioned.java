@@ -83,7 +83,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
      * 
-     * @see #addTuples(I_IntSet, I_IntSet, Set, List, boolean, boolean)
+     * @see #addTuples(I_IntSet, I_IntSet, PositionSetReadOnly, List, boolean, boolean)
      * 
      * @param allowedStatus
      *            statuses tuples must match to be returned
@@ -100,7 +100,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      */
     @Deprecated
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_RelTuple> returnRels, boolean addUncommitted);
 
     /**
@@ -125,7 +125,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
             List<I_RelTuple> returnRels, boolean addUncommitted, boolean returnConflictResolvedLatestState)
             throws TerminologyException, IOException;
 

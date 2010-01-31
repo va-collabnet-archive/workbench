@@ -17,11 +17,14 @@
 package org.dwfa.ace.api;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JComponent;
+
+import org.dwfa.tapi.TerminologyException;
 
 public interface I_PluginToConceptPanel extends Comparable<I_PluginToConceptPanel>, Serializable {
 
@@ -41,8 +44,10 @@ public interface I_PluginToConceptPanel extends Comparable<I_PluginToConceptPane
      * 
      * @param host
      * @return
+     * @throws IOException 
+     * @throws TerminologyException 
      */
-    public JComponent getComponent(I_HostConceptPlugins host);
+    public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException, IOException;
 
     /**
      * @param l A listener that wants to be notified when the component should
