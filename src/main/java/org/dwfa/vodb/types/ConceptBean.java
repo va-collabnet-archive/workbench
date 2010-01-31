@@ -111,7 +111,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
             }
             ConceptBean cb = new ConceptBean(conceptId);
-            AceConfig.getVodb().setupBean(cb);
+            ((VodbEnv) AceConfig.getVodb()).setupBean(cb);
             if (refType == REF_TYPE.SOFT) {
                 cbeans.put(conceptId, new SoftReference<ConceptBean>(cb));
             } else {
@@ -213,7 +213,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             return uncommittedConceptAttributes;
         }
         if (conceptAttributes == null) {
-            conceptAttributes = AceConfig.getVodb().getConceptAttributes(conceptId);
+            conceptAttributes = ((VodbEnv) AceConfig.getVodb()).getConceptAttributes(conceptId);
         }
         if (conceptAttributes == null) {
             if (uncommittedConceptAttributes != null) {
@@ -441,7 +441,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
         if (descriptions == null) {
             try {
-                descriptions = AceConfig.getVodb().getDescriptions(conceptId);
+                descriptions = ((VodbEnv) AceConfig.getVodb()).getDescriptions(conceptId);
             } catch (DatabaseException e) {
                 throw new ToIoException(e);
             }
@@ -457,7 +457,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public List<I_RelVersioned> getDestRels() throws IOException {
         if (destRels == null) {
             try {
-                destRels = AceConfig.getVodb().getDestRels(conceptId);
+                destRels = ((VodbEnv) AceConfig.getVodb()).getDestRels(conceptId);
             } catch (DatabaseException e) {
                 throw new ToIoException(e);
             }
@@ -476,7 +476,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         }
         if (sourceRels == null) {
             try {
-                sourceRels = AceConfig.getVodb().getSrcRels(conceptId);
+                sourceRels = ((VodbEnv) AceConfig.getVodb()).getSrcRels(conceptId);
             } catch (DatabaseException e) {
                 throw new ToIoException(e);
             }
@@ -552,8 +552,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 } else {
                     StringBuffer errorBuffer = new StringBuffer();
                     errorBuffer.append("No descriptions for concept. uuids: "
-                        + AceConfig.getVodb().getUids(conceptId).toString() + " nid: "
-                        + AceConfig.getVodb().uuidToNative(getUids()));
+                        + ((VodbEnv) AceConfig.getVodb()).getUids(conceptId).toString() + " nid: "
+                        + ((VodbEnv) AceConfig.getVodb()).uuidToNative(getUids()));
 
                     int sequence = conceptId + Integer.MIN_VALUE;
                     String errString = conceptId + " (" + sequence + ") " + " has no descriptions " + getUids();
@@ -594,7 +594,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                         return false;
                     }
                 } else {
-                    if (AceConfig.getVodb().hasDestRels(conceptId)) {
+                    if (((VodbEnv) AceConfig.getVodb()).hasDestRels(conceptId)) {
                         return false;
                     }
                 }
@@ -603,7 +603,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                         return false;
                     }
                 } else {
-                    if (AceConfig.getVodb().hasSrcRels(conceptId)) {
+                    if (((VodbEnv) AceConfig.getVodb()).hasSrcRels(conceptId)) {
                         return false;
                     }
                 }
@@ -627,7 +627,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
             } else {
                 try {
-                    return AceConfig.getVodb().hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
+                    return ((VodbEnv) AceConfig.getVodb()).hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
                 } catch (DatabaseException e) {
                     throw new ToIoException(e);
                 }
@@ -649,7 +649,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
             } else {
                 try {
-                    return AceConfig.getVodb().hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
+                    return ((VodbEnv) AceConfig.getVodb()).hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
                 } catch (DatabaseException e) {
                     throw new ToIoException(e);
                 }
@@ -666,7 +666,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public List<I_ImageVersioned> getImages() throws IOException {
         if (images == null) {
             try {
-                images = AceConfig.getVodb().getImages(conceptId);
+                images = ((VodbEnv) AceConfig.getVodb()).getImages(conceptId);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine("Retrieved images: " + images + " for: " + conceptId);
                 }
@@ -744,7 +744,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             if (uncommittedIds != null) {
                 boolean delete = true;
                 for (int id : uncommittedIds.getSetValues()) {
-                    I_Identify idv = AceConfig.getVodb().getId(id);
+                    I_Identify idv = ((VodbEnv) AceConfig.getVodb()).getId(id);
                     for (ListIterator<? extends I_IdPart> itr = idv.getMutableIdParts().listIterator(); itr.hasNext();) {
                         I_IdPart p = itr.next();
                         if (p.getVersion() == Integer.MAX_VALUE) {
@@ -754,9 +754,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                         }
                     }
                     if (delete) {
-                        AceConfig.getVodb().deleteId(idv);
+                        ((VodbEnv) AceConfig.getVodb()).deleteId(idv);
                     } else {
-                        AceConfig.getVodb().writeId(idv);
+                        ((VodbEnv) AceConfig.getVodb()).writeId(idv);
                     }
                 }
                 uncommittedIds = null;
@@ -773,9 +773,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                         }
                     }
                     if (delete) {
-                        AceConfig.getVodb().deleteId(idv);
+                        ((VodbEnv) AceConfig.getVodb()).deleteId(idv);
                     } else {
-                        AceConfig.getVodb().writeId(idv);
+                        ((VodbEnv) AceConfig.getVodb()).writeId(idv);
                     }
                 }
                 uncommittedIdVersioned = null;
@@ -836,7 +836,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public List<UUID> getUids() throws IOException {
         if (uids == null) {
             try {
-                uids = AceConfig.getVodb().nativeToUuid(conceptId);
+                uids = ((VodbEnv) AceConfig.getVodb()).nativeToUuid(conceptId);
             } catch (DatabaseException e) {
                 throw new ToIoException(e);
             }
@@ -932,7 +932,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     public I_Identify getIdentifier() throws IOException {
         if (id == null) {
-            id = AceConfig.getVodb().getId(conceptId);
+            id = ((VodbEnv) AceConfig.getVodb()).getId(conceptId);
         }
         return id;
     }
@@ -1133,7 +1133,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (uncommittedIds != null) {
             for (int id : uncommittedIds.getSetValues()) {
                 I_Identify idv;
-                idv = AceConfig.getVodb().getId(id);
+                idv = ((VodbEnv) AceConfig.getVodb()).getId(id);
                 for (I_IdPart p : idv.getMutableIdParts()) {
                     if (p.getVersion() == Integer.MAX_VALUE) {
                         return true;

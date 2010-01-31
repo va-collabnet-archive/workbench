@@ -357,8 +357,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             }
             conceptsToFetch.clear();
             referencedConcepts.clear();
-            tableChangeWorker = getTableChangedSwingWorker(tableComponentId, promotionFilterId);
-            tableChangeWorker.start();
+            if (tableComponentId != Integer.MIN_VALUE) {
+                tableChangeWorker = getTableChangedSwingWorker(tableComponentId, promotionFilterId);
+                tableChangeWorker.start();
+            }
             return 0;
         }
         return allTuples.size();
