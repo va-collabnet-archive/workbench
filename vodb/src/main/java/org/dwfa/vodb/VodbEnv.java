@@ -39,7 +39,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
@@ -81,7 +80,6 @@ import org.dwfa.ace.api.I_SupportClassifier;
 import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
-import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.TimePathId;
@@ -128,7 +126,6 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinExtBinder;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.impl.BdbEnv;
-import org.dwfa.vodb.jar.TimePathCollector;
 import org.dwfa.vodb.types.ConceptBean;
 import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.I_ProcessConceptAttributeEntries;
@@ -165,6 +162,8 @@ import org.dwfa.vodb.types.ThinRelPart;
 import org.dwfa.vodb.types.ThinRelVersioned;
 
 import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.JEVersion;
@@ -728,7 +727,48 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
     public List<I_ImageVersioned> getImages(int conceptId) throws DatabaseException {
         return bdbEnv.getImages(conceptId);
     }
+    public class TimePathIdBinder extends TupleBinding<TimePathId> {
 
+        @Override
+        public TimePathId entryToObject(TupleInput ti) {
+            int time = ti.readInt();
+            int pathId = ti.readInt();
+            return new TimePathId(time, pathId);
+        }
+
+        @Override
+        public void objectToEntry(TimePathId obj, TupleOutput to) {
+            TimePathId tb = (TimePathId) obj;
+            to.writeInt(tb.getTime());
+            to.writeInt(tb.getPathId());
+        }
+
+    }
+
+    public class TimePathCollector implements I_ProcessTimeBranchEntries {
+    	List<TimePathId> timePathList = new ArrayList<TimePathId>();
+    	TimePathIdBinder binder = new TimePathIdBinder();
+    	public TimePathCollector() {
+
+    	}
+
+    	public List<TimePathId> getTimePathIdList() {
+    		return timePathList;
+    	}
+
+    	public DatabaseEntry getDataEntry() {
+    		return new DatabaseEntry(); 
+    	}
+
+    	public DatabaseEntry getKeyEntry() {
+    		return new DatabaseEntry();
+    	}
+
+    	public void processTimeBranch(DatabaseEntry key, DatabaseEntry value) throws Exception {
+    		TimePathId timePathId = (TimePathId) binder.entryToObject(value);
+    		timePathList.add(timePathId);
+    	}
+    }
     public List<TimePathId> getTimePathList() throws Exception {
         TimePathCollector tpCollector = new TimePathCollector();
         iterateTimeBranch(tpCollector);

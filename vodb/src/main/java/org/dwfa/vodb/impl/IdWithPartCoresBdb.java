@@ -753,7 +753,12 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
     public void commit(ConceptBean bean, int version, Set<TimePathId> values) throws DatabaseException, IOException {
         if (bean.uncommittedIds != null) {
             for (int id : bean.uncommittedIds.getSetValues()) {
-                I_Identify idv = AceConfig.getVodb().getId(id);
+                I_Identify idv;
+				try {
+					idv = AceConfig.getVodb().getId(id);
+				} catch (TerminologyException e) {
+					throw new IOException(e);
+				}
                 List<I_IdPart> partsToRemove = new ArrayList<I_IdPart>();
                 List<I_IdPart> partsToAdd = new ArrayList<I_IdPart>();
                 for (I_IdPart p : idv.getMutableIdParts()) {

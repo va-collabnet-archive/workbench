@@ -239,7 +239,7 @@ public class ImageBdb implements I_StoreInBdb, I_StoreImages {
                     }
                 }
                 if (changed) {
-                    AceConfig.getVodb().writeImage(image);
+                    ((VodbEnv) AceConfig.getVodb()).writeImage(image);
                 }
             }
         }

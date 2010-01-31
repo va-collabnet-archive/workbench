@@ -44,6 +44,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.cs.BinaryChangeSetWriter;
@@ -193,7 +194,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                         if (AceConfig.getVodb() == null) {
                             vodbEnv = new VodbEnv();
                         } else {
-                            vodbEnv = AceConfig.getVodb();
+                            vodbEnv = (VodbEnv) AceConfig.getVodb();
                         }
                         vodbEnv.setup(dbFolder, readOnly);
                     }
@@ -427,8 +428,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.changeSupport.firePropertyChange("username", old, username);
     }
 
-    public static VodbEnv getVodb() {
-        return (VodbEnv) Terms.get();
+    public static I_TermFactory getVodb() {
+        return Terms.get();
     }
 
     public List<I_ConfigAceFrame> getAceFrames() {
