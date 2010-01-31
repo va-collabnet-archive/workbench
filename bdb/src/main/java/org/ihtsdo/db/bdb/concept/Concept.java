@@ -539,11 +539,6 @@ public class Concept implements I_Transact, I_GetConceptData {
                     }
                     return desc.getMutableParts().get(0).getText();
                 } else {
-                    StringBuffer errorBuffer = new StringBuffer();
-                    errorBuffer.append("No descriptions for concept. uuids: "
-                        + AceConfig.getVodb().getUids(nid).toString() + " nid: "
-                        + AceConfig.getVodb().uuidToNative(getUids()));
-
                     int sequence = nid + Integer.MIN_VALUE;
                     String errString = nid + " (" + sequence + ") " + " has no descriptions " + getUids();
                     getDescriptions();
