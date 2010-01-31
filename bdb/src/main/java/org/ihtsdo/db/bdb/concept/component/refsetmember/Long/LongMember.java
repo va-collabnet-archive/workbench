@@ -110,7 +110,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 	@Override
 	protected String getTypeFieldsString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append(" longValue: ");
+		buf.append(" longValue:");
 		buf.append(longValue);
 		return buf.toString();
 	}
@@ -121,15 +121,15 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		return REFSET_TYPES.LONG.getTypeNid();
 	}
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" longValue:" + this.longValue);
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

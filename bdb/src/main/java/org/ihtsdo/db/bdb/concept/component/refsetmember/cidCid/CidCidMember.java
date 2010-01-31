@@ -98,9 +98,9 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 	@Override
 	protected String getTypeFieldsString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("c1Nid: ");
+		buf.append("c1Nid:");
 		addNidToBuffer(buf, c1Nid);
-		buf.append(" c2Nid: ");
+		buf.append(" c2Nid:");
 		addNidToBuffer(buf, c2Nid);
 		return buf.toString();
 	}
@@ -137,16 +137,16 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
 		return REFSET_TYPES.CID_CID.getTypeNid();
 	}
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid:" + this.c1Nid);
         buf.append(" c2Nid:" + this.c2Nid);
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

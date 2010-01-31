@@ -328,9 +328,9 @@ public class ConceptAttributes
     public String toString() {
         StringBuffer buf = new StringBuffer();
         
-        buf.append(this.getClass().getSimpleName() + ": {");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" defined:" + this.defined);
-        buf.append(" } => ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();    
     }

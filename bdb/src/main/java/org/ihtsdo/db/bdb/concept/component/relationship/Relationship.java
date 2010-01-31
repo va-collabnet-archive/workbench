@@ -217,14 +217,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         super();
     }
     
-   /**
-     * Returns a string representation of the object.
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
      */
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ": ");
-        buf.append(" computer:" + Relationship.computer);
+        buf.append(this.getClass().getSimpleName() + ":{");
 		buf.append(" c2Nid:");
 		ConceptComponent.addNidToBuffer(buf, c2Nid);
         buf.append(" characteristicNid:");
@@ -234,7 +233,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		ConceptComponent.addNidToBuffer(buf, refinabilityNid);
 		buf.append(" typeNid:");
 		ConceptComponent.addNidToBuffer(buf, typeNid);
-		buf.append("; ");
+		buf.append(" }=> ");
 		buf.append(super.toString());
 		return buf.toString();
 	}

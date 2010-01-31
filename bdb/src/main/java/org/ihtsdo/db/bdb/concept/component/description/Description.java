@@ -208,20 +208,20 @@ public class Description
 		super();
 	}
 
-	/**
-     * Returns a string representation of the object.
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" computer:" + Description.computer);
         buf.append(" text:" + "'" + this.getText() + "'");
         buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
         buf.append(" typeNid:");
         ConceptComponent.addNidToBuffer(buf, typeNid);
         buf.append(" lang:" + this.getLang());
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

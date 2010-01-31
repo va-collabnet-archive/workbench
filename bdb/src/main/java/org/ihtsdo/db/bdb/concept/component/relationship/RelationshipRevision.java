@@ -23,19 +23,19 @@ public class RelationshipRevision
 	private int typeNid;
 
 	
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" relationship:" + this.relationship);
         buf.append(" characteristicNid:" + this.characteristicNid);
         buf.append(" group:" + this.group);
         buf.append(" refinabilityNid:" + this.refinabilityNid);
         buf.append(" typeNid:" + this.typeNid);
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

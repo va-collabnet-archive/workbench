@@ -165,13 +165,16 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	}
 
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
 		buf.append(" refset:");
 		try {
-			buf.append(enclosingConcept.getInitialText());
+			buf.append("'" + enclosingConcept.getInitialText() + "'");
 		} catch (IOException e1) {
 			buf.append(e1.getLocalizedMessage());
 		}
@@ -187,7 +190,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		addNidToBuffer(buf, referencedComponentNid);
 		buf.append(" ");
 		buf.append(getTypeFieldsString());
-		buf.append("; ");
+		buf.append(" }=> ");
 		buf.append(super.toString());
 		return buf.toString();
 	}

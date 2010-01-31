@@ -388,21 +388,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 	
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("pUuid: ");
+	    buf.append("ConceptComponent:{");
+		buf.append(" pUuid:");
 		buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
-		buf.append(" xtraIds: ");
+		buf.append(" xtraIds:");
 		buf.append(additionalIdentifierParts);
 		buf.append(" xtraVersions: ");
 		buf.append(revisions);
-		buf.append(" sap: ");
+		buf.append(" sap:");
 		buf.append(primordialSapNid);
-		buf.append(" (path: ");
+		buf.append(" path:");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
-		buf.append(" tm: ");
+		buf.append(" tm:");
 		buf.append(Revision.fileDateFormat.format(new Date(getTime())));
-		buf.append(" status: ");
+		buf.append(" status:");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
-		buf.append(")");
+		buf.append(" };");
 		return buf.toString();
 	}
 	

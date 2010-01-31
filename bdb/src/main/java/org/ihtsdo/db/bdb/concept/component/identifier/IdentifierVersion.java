@@ -182,24 +182,24 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 	}
 
 	
-	/**
-	 * Returns a string representation of the object.
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 	    StringBuffer buf = new StringBuffer();
 	    
-	    buf.append(this.getClass().getSimpleName() + ": ");
+	    buf.append(this.getClass().getSimpleName() + ":{");
 	    buf.append(" sapBdb:" + IdentifierVersion.sapBdb);
         buf.append(" conceptComponent:" + conceptComponent);
 		buf.append(" authority:");
 		ConceptComponent.addNidToBuffer(buf, authorityNid);
-		buf.append(" (path:");
+		buf.append(" path:");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
 		buf.append(" tm:");
 		buf.append(Revision.fileDateFormat.format(new Date(getTime())));
 		buf.append(" status:");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
-	    buf.append("); ");
+	    buf.append(" };");
 		return buf.toString();
 	}
 

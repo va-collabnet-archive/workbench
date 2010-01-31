@@ -915,6 +915,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return buff.toString();
 	}	
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
         try {
             return getInitialText();
@@ -924,6 +927,10 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
 	}
 
+	/**
+	 * Returns a longer - more complete - string representation of the object.
+	 * @return
+	 */
 	public String toLongString() {
 		StringBuffer buff = new StringBuffer();
 		try {

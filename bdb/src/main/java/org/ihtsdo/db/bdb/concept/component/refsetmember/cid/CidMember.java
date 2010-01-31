@@ -102,7 +102,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	@Override
 	protected String getTypeFieldsString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("cNid: ");
+		buf.append("cNid:");
 		addNidToBuffer(buf, c1Nid);
 		return buf.toString();
 	}
@@ -175,15 +175,15 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		throw new UnsupportedOperationException();
 	}
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid:" + this.c1Nid);
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

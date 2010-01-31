@@ -18,15 +18,15 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
 	private String stringValue;
 	
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" stringValue:" + "'" + this.stringValue + "'");
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

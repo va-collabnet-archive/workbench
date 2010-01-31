@@ -116,14 +116,14 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
 	@Override
 	protected String getTypeFieldsString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append(" stringValue: ");
-		buf.append(stringValue);
+		buf.append(" stringValue:");
+		buf.append("'" + stringValue + "'");
 		return buf.toString();
 	}
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  

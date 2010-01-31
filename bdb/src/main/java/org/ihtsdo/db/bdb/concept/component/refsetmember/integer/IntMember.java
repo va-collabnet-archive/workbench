@@ -107,7 +107,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 	@Override
 	protected String getTypeFieldsString() {
 		StringBuffer buf = new StringBuffer();
-		buf.append(" intValue: ");
+		buf.append(" intValue:");
 		buf.append(intValue);
 		return buf.toString();
 	}
@@ -120,15 +120,15 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
 		return REFSET_TYPES.INT.getTypeNid();
 	}
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" intValue:" + this.intValue);
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

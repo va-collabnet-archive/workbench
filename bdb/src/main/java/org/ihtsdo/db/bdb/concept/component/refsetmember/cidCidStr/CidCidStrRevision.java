@@ -22,17 +22,17 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 	private String strValue;
 	
 	
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid:" + this.c1Nid);
         buf.append(" c2Nid:" + this.c2Nid);
         buf.append(" strValue:" + "'" + this.strValue + "'");
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

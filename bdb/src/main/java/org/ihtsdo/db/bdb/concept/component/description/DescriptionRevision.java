@@ -27,21 +27,21 @@ public class DescriptionRevision
 	private int typeNid; 
 	private String lang;
 
-    /**
-     * Returns a string representation of the object.
-     */
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" utf8:" + DescriptionRevision.utf8);
         buf.append(" description:" + this.description);
         buf.append(" text:" + "'" + this.getText() + "'");
         buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
         buf.append(" typeNid:" + this.getTypeId());
         buf.append(" lang:" + this.getLang());
-        buf.append("; ");
+        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

@@ -155,19 +155,19 @@ public abstract class Revision<V extends Revision<V, C>,
 		throw new UnsupportedOperationException();
 	}
 	
-    /**
-     * Returns a string representation of the object.
-     */ 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ": ");
-        buf.append(" (path:");
+        buf.append("Revision:{");
+        buf.append(" path:");
         ConceptComponent.addNidToBuffer(buf, getPathId());
         buf.append(" tm:");
         buf.append(fileDateFormat.format(new Date(getTime())));
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
-        buf.append("); ");
+        buf.append(" };");
         return buf.toString();
     }
 
