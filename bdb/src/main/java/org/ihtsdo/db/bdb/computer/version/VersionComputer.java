@@ -180,10 +180,16 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 							case EQUAL:
 								// Can only have one part per time/path
 								// combination.
-								throw new RuntimeException(
-										RELATIVE_POSITION.EQUAL
-										+ " should never happen. Data is malformed. Part:\n" + 
-										part + " \n  Part to test: \n" + partToTest);
+								if (partToTest.equals(part)) {
+									// part already added from another position. 
+									// No need to add again. 
+									break;
+								} else {
+									throw new RuntimeException(
+											RELATIVE_POSITION.EQUAL
+											+ " should never happen. Data is malformed. Part:\n" + 
+											part + " \n  Part to test: \n" + partToTest);
+								}
 							case UNREACHABLE:
 								// Should have failed mapper.onRoute(part)
 								// above.

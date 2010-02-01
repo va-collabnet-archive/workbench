@@ -215,7 +215,6 @@ public class Description
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" computer:" + Description.computer);
         buf.append(" text:" + "'" + this.getText() + "'");
         buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
         buf.append(" typeNid:");

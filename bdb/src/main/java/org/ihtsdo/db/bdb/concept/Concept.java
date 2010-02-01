@@ -457,8 +457,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
-            returnConflictResolvedLatestState);
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, 
+        		config.getViewPositionSetReadOnly(), addUncommitted,
+        		returnConflictResolvedLatestState);
 	}
 
 	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes,

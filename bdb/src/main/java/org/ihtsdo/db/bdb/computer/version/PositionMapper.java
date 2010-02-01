@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Formatter;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -15,6 +17,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.Revision;
 
 import cern.colt.bitvector.BitMatrix;
 
@@ -30,6 +33,8 @@ import cern.colt.bitvector.BitMatrix;
  * 
  */
 public class PositionMapper {
+	
+	public static final BigInteger BIG_MINUS_ONE = BigInteger.valueOf(-1); 
 
 	/**
 	 * Possible results when comparing two positions with respect to a
@@ -59,12 +64,9 @@ public class PositionMapper {
 
 	/**
 	 * 
-	 * @param <T>
-	 *            the type of part being tested.
-	 * @param v1
-	 *            the first part of the comparison.
-	 * @param v2
-	 *            the second part of the comparison.
+	 * @param <T> the type of part being tested.
+	 * @param v1 the first part of the comparison.
+	 * @param v2 the second part of the comparison.
 	 * @return the <code>RELATIVE_POSITION</code> of part1 compared to part2
 	 *         with respect to the destination position of the class's instance.
 	 * @throws IOException
@@ -136,8 +138,11 @@ public class PositionMapper {
 
 	private void setup() throws IOException, PathNotExistsException,
 			TerminologyException {
-		pathManager = new BdbPathManager();
-		Collection<I_Position> origins = pathManager.getPathOrigins(destination.getPath().getConceptId());
+		if (pathManager == null) {
+			pathManager = new BdbPathManager();
+		}
+		Collection<I_Position> origins = 
+			pathManager.getPathOrigins(destination.getPath().getConceptId());
 		origins.add(this.destination);
 
 		// Map of the origin position's path id, to the origin position... See
@@ -159,13 +164,13 @@ public class PositionMapper {
 					getPreceedingPathSet(o));
 		}
 
-		BigInteger timeUpperBound = BigInteger.valueOf(
-				System.currentTimeMillis()).multiply(BigInteger.valueOf(2));
+		BigInteger timeUpperBound = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.TEN);
 
 		int positionCount = Bdb.getStatusAtPositionDb().getPositionCount();
 		positionDistance = new int[positionCount];
-		BigInteger[] positionComputedDistance = new BigInteger[positionCount];
 		Arrays.fill(positionDistance, Integer.MIN_VALUE);
+		BigInteger[] positionComputedDistance = new BigInteger[positionCount];
+		Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
 		conflictMatrix = new BitMatrix(positionCount, positionCount);
 		for (int p1index = 0; p1index < positionCount; p1index++) {
 			I_Position p1 = Bdb.getStatusAtPositionDb().getPosition(p1index);
@@ -194,7 +199,7 @@ public class PositionMapper {
 					// On a different path than the destination
 					// compute the distance to the destination
 					positionComputedDistance[p1index] = BigInteger.valueOf(
-							destination.getTime() - p1.getTime()).add(
+							p1.getTime()).add(
 							timeUpperBound.multiply(pathDepth));
 
 					// iterate to compute conflicts...
@@ -255,9 +260,6 @@ public class PositionMapper {
 	 */
 	private void positionNotReachable(BigInteger[] positionComputedDistance,
 			int positionIndex) {
-		// Path is not on any route to the destination
-		// No distance can lead to destination
-		positionComputedDistance[positionIndex] = BigInteger.valueOf(-1);
 		for (int p2index = 0; p2index < positionComputedDistance.length; p2index++) {
 			// No conflicts can arise from an unreachable path
 			conflictMatrix.putQuick(positionIndex, p2index, false);
@@ -307,18 +309,15 @@ public class PositionMapper {
 			int depthSeed) {
 		if (testPath.getPath().getConceptId() == depthFinder.getPath()
 				.getConceptId()) {
-			if (testPath.getTime() <= depthFinder.getTime()) {
-				return BigInteger.valueOf(depthSeed);
-			}
-			return BigInteger.valueOf(-1);
+			return BigInteger.valueOf(depthSeed);
 		}
-		for (I_Position child : testPath.getPath().getOrigins()) {
-			BigInteger depth = getDepth(child, depthFinder, depthSeed + 1);
+		for (I_Position child : depthFinder.getPath().getOrigins()) {
+			BigInteger depth = getDepth(testPath, child, depthSeed + 1);
 			if (depth.compareTo(BigInteger.ZERO) > 0) {
 				return depth;
 			}
 		}
-		return BigInteger.valueOf(-1);
+		return BIG_MINUS_ONE;
 	}
 
 	/**
@@ -346,4 +345,55 @@ public class PositionMapper {
 	public I_Position getDestination() {
 		return destination;
 	}
+
+	int lengthToPrint = 100;
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		Formatter f = new Formatter(buf);
+        buf.append(this.getClass().getSimpleName() + ": ");
+		buf.append(" destination:");
+		buf.append(destination);
+		buf.append("\nsapNid|distance|time|path|status\n");
+		for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+			f.format("%1$2d|", i); // sapNid
+			f.format("%1$2d|", positionDistance[i]); // distance
+			try {
+				buf.append(Revision.fileDateFormat.format( // time
+						new Date(Bdb.getStatusAtPositionDb().getPosition(i).getTime())));
+				buf.append("|");
+				buf.append(Bdb.getConceptDb().getConcept( // path
+						Bdb.getStatusAtPositionDb().getPathId(i)));
+				buf.append("|");
+				buf.append(Bdb.getConceptDb().getConcept( // status
+						Bdb.getStatusAtPositionDb().getStatusId(i)));
+			} catch (PathNotExistsException e) {
+				buf.append(e.getLocalizedMessage());
+			} catch (IOException e) {
+				buf.append(e.getLocalizedMessage());
+			} catch (TerminologyException e) {
+				buf.append(e.getLocalizedMessage());
+			}
+			buf.append("\n");
+		}
+		buf.append("\nconflict matrix: \n");
+		buf.append("   ");
+
+		for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+			f.format("%1$2d ", i);
+		}
+		buf.append("\n");
+		for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+			f.format("%1$2d ", i);
+			for (int j = 0; j < lengthToPrint && j < positionDistance.length; j++) {
+				buf.append(" ");
+				buf.append(Boolean.toString(conflictMatrix.get(i, j)).charAt(0));
+				buf.append(" ");
+			}
+			buf.append("\n");
+		}
+		return buf.toString();
+	}
+	
+	
 }

@@ -239,6 +239,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		}
 	}
 
+	public void clearMapperCache() {
+		mapperCache.clear();
+	}
 	public PositionMapper getMapper(I_Position position) {
 		for (PositionMapper pm: mapperCache) {
 			if (pm.getDestination().equals(position)) {
