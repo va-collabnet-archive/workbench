@@ -135,6 +135,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             	CROSS_MAP_EXTENSION(new String[] { "cross map extension", "cross map" }, REFSET_TYPE), 
             	TEMPLATE_REL_EXTENSION(new String[] { "template relationship extension", "template for rel" }, REFSET_TYPE), 
             	TEMPLATE_EXTENSION(new String[] {"template extension", "template" }, REFSET_TYPE),
+            	LANGUAGE_ENUMERATION_EXTENSION(new String[] {"language enumeration refset", "language enumeratrion refset" }, REFSET_TYPE),
+            	LANGUAGE_SPEC_EXTENSION(new String[] {"language spec refset", "language spec refset" }, REFSET_TYPE),
 
         BOOLEAN_CIRCLE_ICONS(new String[] { "boolean with circle icon", "boolean with circle" }, REFSET_AUXILIARY), BOOLEAN_CIRCLE_ICONS_TRUE(new String[] {
             "true with circle check icon", "true" }, BOOLEAN_CIRCLE_ICONS), BOOLEAN_CIRCLE_ICONS_FALSE(new String[] {
@@ -232,6 +234,9 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "promotion rel", "promotion rel" }, REFSET_RELATIONSHIP), COMMENTS_REL(new String[] { "comments rel",
             "comments rel" }, REFSET_RELATIONSHIP),
             REFSET_COMPUTE_TYPE_REL(new String[] { "refset compute type rel", "refset compute type rel" }, REFSET_RELATIONSHIP),
+            LANGUAGE_ENUMERATION_ORIGIN_REL(new String[] { "language enumeration origin rel", "language enumeration origin rel" }, REFSET_RELATIONSHIP),
+            LANGUAGE_SPEC_PREF_ORDER_REL(new String[] { "language spec pref order rel", "language spec pref order rel" }, REFSET_RELATIONSHIP),
+            ATTRIBUTE_VALUE_REFSET_REL(new String[] { "attribute value refset rel", "attribute value refset rel" }, REFSET_RELATIONSHIP),
             
 
         SUPPORTING_REFSETS(new String[] { "supporting refsets", "supporting refsets" }, REFSET_AUXILIARY),
