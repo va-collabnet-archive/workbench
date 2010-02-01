@@ -130,6 +130,10 @@ public class EDescription extends EComponent<EDescriptionVersion> implements I_D
         return typeUuid;
     }
 
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
+    }
+
     /**
      * Returns a string representation of the object.
      */
