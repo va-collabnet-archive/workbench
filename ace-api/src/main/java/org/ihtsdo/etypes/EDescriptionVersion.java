@@ -35,7 +35,7 @@ public class EDescriptionVersion extends EVersion implements I_DescribeExternall
         time = part.getTime();
     }
 
-    protected EDescriptionVersion() {
+    public EDescriptionVersion() {
         super();
     }
 
