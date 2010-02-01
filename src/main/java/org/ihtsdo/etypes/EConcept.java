@@ -371,14 +371,26 @@ public class EConcept {
         return descriptions;
     }
 
+    public void setDescriptions(List<EDescription> descriptions) {
+        this.descriptions = descriptions;
+    }
+
     public List<ERelationship> getRelationships() {
         return relationships;
+    }
+
+    public void setRelationships(List<ERelationship> relationships) {
+        this.relationships = relationships;
     }
 
     public List<ERefset<?>> getRefsetMembers() {
         return refsetMembers;
     }
 
+    public void setRefsetMembers(List<ERefset<?>> refsetMembers) {
+        this.refsetMembers = refsetMembers;
+    }
+    
     public EConceptAttributes getConceptAttributes() {
         return conceptAttributes;
     }
@@ -546,6 +558,10 @@ public class EConcept {
 
     public List<EImage> getImages() {
         return images;
+    }
+
+    public void setImages(List<EImage> images) {
+        this.images = images;
     }
 
     public List<EVersion> getExtraVersionsList() {
@@ -752,5 +768,7 @@ public class EConcept {
 			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
 		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
 	}
+
+
 
 }
