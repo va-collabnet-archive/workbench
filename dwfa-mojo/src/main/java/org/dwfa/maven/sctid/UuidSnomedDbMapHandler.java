@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,13 +30,13 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 /**
  * Manages the maps for the UUIDs and sctIds.
- * 
+ *
  * Given a UUID NAMESPACE and TYPE this class will return a matching SctId. The
  * SctId may require generation, in this case the new SctId is generated and
  * stored in a map.
- * 
+ *
  * The same UUID will result in the same SctId over the life of the DB.
- * 
+ *
  * @author Ean Dungey
  */
 public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
@@ -53,18 +53,18 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * Create or reads the database.
-     * 
+     *
      * Sets up the <code>nextSctSequenceMap</code> and
      * <code>memoryUuidSctidMap</code>
-     * 
-     * @param databaseFile File
+     *
+     * @param databaseDirectory File
      * @throws IOException Reading the DB file
      * @throws SQLException Running and setting setup SQL statements
      * @throws ClassNotFoundException error creating the DB.
      */
-    public UuidSnomedDbMapHandler(File databaseFile) throws IOException, SQLException, ClassNotFoundException {
+    public UuidSnomedDbMapHandler(File databaseDirectory) throws IOException, SQLException, ClassNotFoundException {
         uuidSctidMapDb = UuidSctidMapDb.getInstance();
-        uuidSctidMapDb.openDb(databaseFile);
+        uuidSctidMapDb.openDb(databaseDirectory);
         uuidSctidMapDb.setValidate(true);
 
         nextSctSequenceMap = new HashMap<String, Long>();
@@ -80,10 +80,10 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * If no mapping is found generate a new SctId and store in the memory map.
-     * 
+     *
      * Once the memory map is greater than <code>MAX_CACHE_SIZE</code> the map
      * is written to the DB.
-     * 
+     *
      * @see org.dwfa.maven.sctid.UuidSnomedHandler#getWithGeneration(java.util.UUID,
      *      org.dwfa.maven.transform.SctIdGenerator.NAMESPACE,
      *      org.dwfa.maven.transform.SctIdGenerator.TYPE)
@@ -106,7 +106,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * Adds the UUID to sctid mapping to the memory map
-     * 
+     *
      * @param uuid UUID
      * @param sctID Long
      * @param namespace NAMESPACE
@@ -127,7 +127,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     /**
      * If the UUID has not been mapped null is returned. Checks both the DB and
      * memory maps.
-     * 
+     *
      * @see org.dwfa.maven.sctid.UuidSnomedHandler#getWithoutGeneration(java.util.UUID,
      *      org.dwfa.maven.transform.SctIdGenerator.NAMESPACE,
      *      org.dwfa.maven.transform.SctIdGenerator.TYPE)
@@ -152,7 +152,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * Write the mapped UUIDs to the <code>uuidSctidMapDb</code>.
-     * 
+     *
      * @throws Exception if cannot write maps to the DB.
      */
     public void writeMaps() throws Exception {
@@ -165,7 +165,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * Closes the DB
-     * 
+     *
      * @throws Exception on close error
      */
     public void close() throws Exception {
@@ -174,7 +174,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
     /**
      * Gets the sequence part of the sctid using the namespace and type.
-     * 
+     *
      * @param sctId Long
      * @param namespace NAMESPACE
      * @param type TYPE
@@ -191,7 +191,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     /**
      * Help function to get the map key. Simply concats the NAMESPACE and TYPE
      * codes.
-     * 
+     *
      * @param namespace NAMESPACE
      * @param type TYPE
      * @return String

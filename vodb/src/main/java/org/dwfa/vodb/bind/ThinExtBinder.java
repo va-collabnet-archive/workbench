@@ -806,7 +806,7 @@ public class ThinExtBinder extends TupleBinding {
                 to.writeInt(part.getStatusId());
                 to.writeInt(part.getC1id());
                 to.writeInt(part.getC2id());
-                to.writeString(part.getStringValue().replaceAll("\t", " "));
+                to.writeString(part.getStringValue());
             }
             break;
         case CONCEPT_STRING:

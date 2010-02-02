@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
  */
 /**
  * Apache License.
- * 
+ *
  * Mojo to convert Ace file to rf2 file.
  */
 package org.dwfa.mojo.file;
@@ -52,10 +52,14 @@ import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.mojo.file.AceConceptReader.AceConceptRow;
 import org.dwfa.mojo.file.AceDescriptionReader.AceDescriptionRow;
 import org.dwfa.mojo.file.AceRelationshipReader.AceRelationshipRow;
-import org.dwfa.mojo.file.Rf2ConceptWriter.Rf2ConceptRow;
-import org.dwfa.mojo.file.Rf2DescriptionWriter.Rf2DescriptionRow;
-import org.dwfa.mojo.file.Rf2IdentifierWriter.Rf2IdentifierRow;
-import org.dwfa.mojo.file.Rf2RelationshipWriter.Rf2RelationshipRow;
+import org.dwfa.mojo.file.rf2.Rf2ConceptRow;
+import org.dwfa.mojo.file.rf2.Rf2ConceptWriter;
+import org.dwfa.mojo.file.rf2.Rf2DescriptionRow;
+import org.dwfa.mojo.file.rf2.Rf2DescriptionWriter;
+import org.dwfa.mojo.file.rf2.Rf2IdentifierWriter;
+import org.dwfa.mojo.file.rf2.Rf2RelationshipRow;
+import org.dwfa.mojo.file.rf2.Rf2RelationshipWriter;
+import org.dwfa.mojo.file.rf2.Rf2IdentifierWriter.Rf2IdentifierRow;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.util.AceDateFormat;
@@ -214,14 +218,14 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Parameter to allow translation of more than one identifier file
-     * 
+     *
      * @parameter
      */
     private IdentifierFile[] additionalIdentifierFiles;
 
     /**
      * Convert ace file to rf2.
-     * 
+     *
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -286,9 +290,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * THIS IS A HACK REMOVE.
-     * 
+     *
      * Get the namespace for the I_Path.
-     * 
+     *
      * @param forPath I_path
      * @return NAMESPACE
      */
@@ -321,9 +325,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace id file to rf2 format.
-     * 
+     *
      * Invalid rows will be skipped and logged.
-     * 
+     *
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertIdFile(IdentifierFile idFile) throws MojoExecutionException {
@@ -396,10 +400,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the identifier row to file.
-     * 
+     *
      * @param rf2IdentifierWriter
      * @param rf2IdentifierRow
-     * 
+     *
      * @throws MojoExecutionException on write errors.
      */
     private void writeIdentifierRow(Rf2IdentifierWriter rf2IdentifierWriter, Rf2IdentifierRow rf2IdentifierRow)
@@ -417,9 +421,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace concept file to rf2 format.
-     * 
+     *
      * Invalid rows will be skipped and logged.
-     * 
+     *
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertConceptFile() throws MojoExecutionException {
@@ -445,7 +449,7 @@ public class Ace2Rf2 extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage());
         }
 
-        rf2ConceptRow = rf2ConceptWriter.new Rf2ConceptRow();
+        rf2ConceptRow = new Rf2ConceptRow();
         do {
             try {
                 lineCount++;
@@ -484,10 +488,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the concept row to file.
-     * 
+     *
      * @param rf2ConceptWriter file writer.
      * @param rf2ConceptRowList concept row to write.
-     * 
+     *
      * @throws MojoExecutionException on write errors.
      */
     private void writeConceptsRow(Rf2ConceptWriter rf2ConceptWriter, Rf2ConceptRow rf2ConceptRow)
@@ -505,9 +509,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace description file to rf2 format.
-     * 
+     *
      * Invalid rows will be skipped (logged).
-     * 
+     *
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertDescriptionFile() throws MojoExecutionException {
@@ -535,7 +539,7 @@ public class Ace2Rf2 extends AbstractMojo {
         AceDescriptionRow aceDescriptionRow;
         Rf2DescriptionRow rf2DescriptionRow;
 
-        rf2DescriptionRow = rf2DescriptionWriter.new Rf2DescriptionRow();
+        rf2DescriptionRow = new Rf2DescriptionRow();
         do {
             try {
                 lineCount++;
@@ -581,10 +585,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Writes the description row to file.
-     * 
+     *
      * @param rf2DescriptionWriter file writer.
      * @param Rf2DescriptionRow row.
-     * 
+     *
      * @throws MojoExecutionException on write errors.
      */
     private void writeDescriptionRow(Rf2DescriptionWriter rf2DescriptionWriter, Rf2DescriptionRow rf2DescriptionRow)
@@ -602,9 +606,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the ace relationship file to rf2 format.
-     * 
+     *
      * Invalid rows will be skipped (logged).
-     * 
+     *
      * @throws MojoExecutionException on file open and write errors.
      */
     private void convertRelationshipFile() throws MojoExecutionException {
@@ -630,7 +634,7 @@ public class Ace2Rf2 extends AbstractMojo {
         AceRelationshipRow aceRelationshipRow;
         Rf2RelationshipRow rf2RelationshipRow;
 
-        rf2RelationshipRow = rf2RelationshipWriter.new Rf2RelationshipRow();
+        rf2RelationshipRow = new Rf2RelationshipRow();
         do {
             try {
                 lineCount++;
@@ -683,10 +687,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * writes the relationship row to file.
-     * 
+     *
      * @param rf2RelationshipWriter file writer.
      * @param Rf2RelationshipRow relationship to write to file.
-     * 
+     *
      * @throws MojoExecutionException on write errors.
      */
     private void writeRelationshipRow(Rf2RelationshipWriter rf2RelationshipWriter, Rf2RelationshipRow rf2RelationshipRow)
@@ -705,7 +709,7 @@ public class Ace2Rf2 extends AbstractMojo {
     /**
      * Checks is the uuidStatus equals the Concept.ACTIVE uuid.
      * or is a child of Concept.ACTIVE
-     * 
+     *
      * @param uuid String
      * @return String 1 if the uuidStatus is active otherwise 0;
      * @throws TerminologyException DB error
@@ -725,9 +729,9 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Gets the sct id for the definition Uuid
-     * 
+     *
      * @param definitionInt String 0 = well defined 1 = primative
-     * 
+     *
      * @return sctid String
      */
     private String getDefinitionSctId(String definitionInt) {
@@ -744,10 +748,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Convert the description type to a valid RF2 type
-     * 
+     *
      * Only FSN and Synonyms are allowed in RF2. If not a FSN the synonym type
      * is returned.
-     * 
+     *
      * @param descriptionTypeUuid String
      * @return String SctId FSN or Synonym.
      */
@@ -783,10 +787,10 @@ public class Ace2Rf2 extends AbstractMojo {
 
     /**
      * Attempts to return a valid RF2 time stamp from the parameter.
-     * 
+     *
      * @param timeStamp String
      * @return RF2 time stamp.
-     * 
+     *
      * @throws ParseException If a RF2 time stamp cannot be created.
      */
     public String getRf2Time(final String timeStamp) throws ParseException {
@@ -806,7 +810,7 @@ public class Ace2Rf2 extends AbstractMojo {
     }
 
     /**
-     * 
+     *
      * @param uuid
      * @param namespace
      * @param idWithGeneration
