@@ -163,10 +163,14 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
                 size = 0;
                 reader = new BufferedReader(new FileReader(sourceFile));
 
-                for (; reader.readLine() != null; size++) {
+                while (reader.readLine() != null) {
+                    size++;
                 }
+                
             } finally {
-                reader.close();
+                if (reader != null) {
+                    reader.close();
+                }
             }
         }
 
