@@ -19,8 +19,7 @@ package org.dwfa.ace.task.commit;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 
 public class AbortDescriptionPart implements I_Fixup {
@@ -36,9 +35,12 @@ public class AbortDescriptionPart implements I_Fixup {
     }
 
     public void fix() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
-        desc.getMutableParts().remove(part);
-        tf.addUncommitted(concept);
+    	if (desc.getMutableParts().size() == 0) {
+    		concept.getUncommittedDescriptions().remove(desc);
+    	} else {
+            desc.getMutableParts().remove(part);
+    	}
+        Terms.get().addUncommitted(concept);
         AceLog.getAppLog().info("Aborted add desc part: " + part);
     }
 
