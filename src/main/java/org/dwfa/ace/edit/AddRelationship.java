@@ -19,12 +19,10 @@ package org.dwfa.ace.edit;
 import java.awt.event.ActionEvent;
 import java.util.UUID;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -68,7 +66,7 @@ public class AddRelationship extends AddComponent {
             }
             cb.getUncommittedSourceRels().add(rel);
             cb.getUncommittedIds().add(relId);
-            ACE.addUncommitted((I_Transact) cb);
+            Terms.get().addUncommitted(cb);
             termContainer.setTermComponent(cb);
         } else {
             AceLog.getAppLog().alertAndLogException(

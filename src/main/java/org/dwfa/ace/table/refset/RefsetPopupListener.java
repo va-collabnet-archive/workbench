@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
@@ -73,7 +72,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().addVersion(newPart);
                     }
-                    ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
+                    Terms.get().addUncommitted(selectedObject.getTuple().getCore());
                     model.allTuples = null;
                     model.fireTableDataChanged();
                     model.propertyChange(null);
@@ -91,14 +90,13 @@ public class RefsetPopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            ExtensionByReferenceBean sourceBean = ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId());
             I_ThinExtByRefTuple tuple = selectedObject.getTuple();
             ThinExtByRefVersioned versioned = (ThinExtByRefVersioned) tuple.getCore();
             versioned.getMutableParts().remove(tuple.getMutablePart());
             if (versioned.getMutableParts().size() == 0) {
 
             }
-            ACE.addUncommitted(sourceBean);
+            Terms.get().addUncommitted(tuple.getCore());
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -172,7 +170,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
+                Terms.get().addUncommitted(selectedObject.getTuple().getCore());
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
@@ -232,7 +230,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
+                Terms.get().addUncommitted(selectedObject.getTuple().getCore());
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
@@ -292,7 +290,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
+                Terms.get().addUncommitted(selectedObject.getTuple().getCore());
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
@@ -354,7 +352,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted(ExtensionByReferenceBean.get(selectedObject.getTuple().getMemberId()));
+                Terms.get().addUncommitted(selectedObject.getTuple().getCore());
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);

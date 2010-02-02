@@ -645,7 +645,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     public void run() {
                         if (active) {
                             ThinExtByRefTuple tuple = allTuples.get(row);
-                            ACE.addUncommitted(ExtensionByReferenceBean.get(tuple.getMemberId()));
+                            Terms.get().addUncommitted(tuple.getCore());
                         }
                     }
                 });

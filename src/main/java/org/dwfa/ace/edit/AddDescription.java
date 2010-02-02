@@ -19,19 +19,16 @@ package org.dwfa.ace.edit;
 import java.awt.event.ActionEvent;
 import java.util.UUID;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.vodb.types.ThinDescPart;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class AddDescription extends AddComponent {
+	
+	private static I_GetConceptData synonymDescType;
 
     public AddDescription(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
         super(termContainer, config);
@@ -45,31 +42,15 @@ public class AddDescription extends AddComponent {
             AceLog.getAppLog().alertAndLogException(
                 new Exception("Cannot add a description while the component viewer is empty..."));
         } else {
-            UUID newDescUid = UUID.randomUUID();
-            int idSource = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-            int descId = Terms.get().uuidToNativeWithGeneration(newDescUid, idSource,
-                config.getEditingPathSet(), Integer.MAX_VALUE);
-            ThinDescVersioned desc = new ThinDescVersioned(descId, cb.getConceptId(), 1);
-            ThinDescPart descPart = new ThinDescPart();
-            desc.addVersion(descPart);
-            boolean capStatus = false;
-            String lang = "en";
-            int status = config.getDefaultStatus().getConceptId();
-            int typeId = Terms.get().uuidToNative(
-                ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-            String text = "New Description";
-            for (I_Path p : termContainer.getConfig().getEditingPathSet()) {
-                descPart.setVersion(Integer.MAX_VALUE);
-                descPart.setPathId(p.getConceptId());
-                descPart.setInitialCaseSignificant(capStatus);
-                descPart.setLang(lang);
-                descPart.setStatusId(status);
-                descPart.setText(text);
-                descPart.setTypeId(typeId);
+            if (synonymDescType == null) {
+                int typeId = Terms.get().uuidToNative(
+                        ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+                synonymDescType = Terms.get().getConcept(typeId);
             }
-            cb.getUncommittedDescriptions().add(desc);
-            cb.getUncommittedIds().add(descId);
-            ACE.addUncommitted((I_Transact) cb);
+            
+            Terms.get().newDescription(UUID.randomUUID(), 
+            		cb, "en", "New Description", synonymDescType, config);
+            Terms.get().addUncommitted(cb);
             termContainer.setTermComponent(cb);
         }
     }

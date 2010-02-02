@@ -82,7 +82,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
@@ -947,7 +946,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     }
 
     public void addUncommitted(I_GetConceptData concept) {
-        ACE.addUncommitted((I_Transact) concept);
+        Terms.get().addUncommitted(concept);
     }
 
     public void setAllTogglesToState(final boolean state) {

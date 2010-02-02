@@ -77,7 +77,7 @@ public class AttributePopupListener extends MouseAdapter {
                             Long.MAX_VALUE);
                 selectedObject.getTuple().getConVersioned().addVersion(newPart);
             }
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
 
             model.allTuples = null;
             model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
@@ -103,7 +103,7 @@ public class AttributePopupListener extends MouseAdapter {
             I_ConceptAttributeTuple tuple = selectedObject.getTuple();
             ThinConVersioned versioned = (ThinConVersioned) tuple.getConVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -152,7 +152,7 @@ public class AttributePopupListener extends MouseAdapter {
 
                     model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                 }
-                ACE.addUncommitted((I_Transact) sourceBean);
+                Terms.get().addUncommitted(sourceBean);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }

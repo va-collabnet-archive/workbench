@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -35,8 +34,8 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -94,7 +93,7 @@ public class AddImage extends AddComponent {
 
         cb.getUncommittedImages().add(imageCore);
         cb.getUncommittedIds().add(imageCore.getImageId());
-        ACE.addUncommitted((I_Transact) cb);
+        Terms.get().addUncommitted(cb);
         termContainer.setTermComponent(cb);
     }
 

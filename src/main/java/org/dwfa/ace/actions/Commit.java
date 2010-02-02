@@ -19,12 +19,17 @@ package org.dwfa.ace.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 
 public class Commit implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
-        ACE.commit();
+        try {
+			Terms.get().commit();
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
     }
 
 }

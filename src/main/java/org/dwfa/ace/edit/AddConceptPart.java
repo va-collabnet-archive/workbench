@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.vodb.types.ThinConPart;
 
 public class AddConceptPart extends AddComponent {
@@ -44,7 +45,7 @@ public class AddConceptPart extends AddComponent {
             part.setConceptStatus(config.getDefaultStatus().getConceptId());
             cb.getConceptAttributes().addVersion(part);
         }
-        ACE.addUncommitted((I_Transact) cb);
+        Terms.get().addUncommitted(cb);
         termContainer.setTermComponent(cb);
     }
 }

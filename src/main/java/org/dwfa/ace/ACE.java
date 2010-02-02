@@ -320,7 +320,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         c.weightx = 1;
                         c.weighty = 0;
 
-                        int dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                        int dataCheckIndex = leftTabs.indexOfTab(DATA_CHECK_TAB_LABEL);
                         int taxonomyIndex = leftTabs.indexOfTab(taxonomyTabLabel);
                         if (dataCheckListModel.size() > 0) {
 
@@ -334,8 +334,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             c.gridy++;
                             dataCheckListPanel.add(new JPanel(), c);
                             if (dataCheckIndex == -1) {
-                                leftTabs.addTab(dataCheckTabLabel, getDataCheckListScroller());
-                                dataCheckIndex = leftTabs.indexOfTab(dataCheckTabLabel);
+                                leftTabs.addTab(DATA_CHECK_TAB_LABEL, getDataCheckListScroller());
+                                dataCheckIndex = leftTabs.indexOfTab(DATA_CHECK_TAB_LABEL);
                             }
 
                             leftTabs.setSelectedIndex(dataCheckIndex);
@@ -666,7 +666,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 doUpdate(frameConfig);
             }
@@ -685,7 +684,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
                 if (aceInstance.getUncommittedListModel().size() > 0) {
                     for (int i = 0; i < aceInstance.leftTabs.getTabCount(); i++) {
-                        if (aceInstance.leftTabs.getTitleAt(i).equals(dataCheckTabLabel)) {
+                        if (aceInstance.leftTabs.getTitleAt(i).equals(DATA_CHECK_TAB_LABEL)) {
                             aceInstance.leftTabs.setSelectedIndex(i);
                             break;
                         }
@@ -1391,7 +1390,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private UncommittedListModel dataCheckListModel;
     private ConceptPanel dataCheckPanel;
 
-    private static String dataCheckTabLabel = "data checks";
+    public static final String DATA_CHECK_TAB_LABEL = "data checks";
     private static String taxonomyTabLabel = "taxonomy";
 
     /**
@@ -1815,7 +1814,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return content;
     }
 
-    private JComponent getDataCheckListScroller() {
+    public JComponent getDataCheckListScroller() {
         if (dataCheckListScroller == null) {
             dataCheckListModel = new UncommittedListModel();
             dataCheckListPanel = new JPanel(new GridBagLayout());
@@ -3759,4 +3758,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setShowPromotionCheckBoxes(Boolean show) {
         refsetSpecPanel.setShowPromotionCheckBoxes(show);
     }
+
+	public JTabbedPane getLeftTabs() {
+		return leftTabs;
+	}
+
+	public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
+		return dataCheckListeners;
+	}
 }

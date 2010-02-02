@@ -78,7 +78,7 @@ public class DescPopupListener extends MouseAdapter {
                         (I_DescriptionPart) current.makeAnalog(current.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
                 selectedObject.getTuple().getDescVersioned().addVersion(newPart);
             }
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -102,7 +102,7 @@ public class DescPopupListener extends MouseAdapter {
             I_DescriptionTuple tuple = selectedObject.getTuple();
             ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -148,7 +148,7 @@ public class DescPopupListener extends MouseAdapter {
                     model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                     model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
                 }
-                ACE.addUncommitted((I_Transact) sourceBean);
+                Terms.get().addUncommitted(sourceBean);
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,

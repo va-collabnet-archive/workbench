@@ -191,7 +191,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             cb.getUncommittedSourceRels().add(relV);
             cb.getUncommittedIds().add(relV.getRelId());
 
-            ACE.addUncommitted((I_Transact) cb);
+            Terms.get().addUncommitted(cb);
             ACE.commit();
 
             // Now make the concept a path

@@ -1513,7 +1513,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
             ExtensionByReferenceBean ebrBean = ExtensionByReferenceBean.makeNew(extension.getMemberId(), extension);
-            ACE.addUncommitted(ebrBean);
+            Terms.get().addUncommitted(ebrBean.getExtension());
             propertyChange(null);
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -1678,7 +1678,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     public void run() {
                         if (active) {
                             ThinExtByRefTuple tuple = allTuples.get(row);
-                            ACE.addUncommitted(ExtensionByReferenceBean.get(tuple.getMemberId()));
+                            Terms.get().addUncommitted(tuple.getCore());
                         }
                     }
                 });
