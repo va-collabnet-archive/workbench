@@ -114,6 +114,7 @@ public class InstructAndWait extends AbstractTask {
         config.setBuilderToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
+        config.showWizardPanel();
         try {
 
             final JPanel workflowPanel = config.getWorkflowPanel();
@@ -174,7 +175,6 @@ public class InstructAndWait extends AbstractTask {
                         cont = cont.getParent();
                     }
                     workflowPanel.repaint();
-                    workflowPanel.setVisible(false);
                 }
 
             });
