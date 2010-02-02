@@ -112,7 +112,7 @@ public class ImportRefsetFromFile extends AbstractTask {
 
             ConceptListReader reader = new ConceptListReader();
             reader.setSourceFile(new File(filename));
-            reader.setHasHeader(true);
+            reader.setHasHeader(false);
 
             // Load in all concepts from the import file
             HashMap<Integer, I_GetConceptData> importConcepts = new HashMap<Integer, I_GetConceptData>();

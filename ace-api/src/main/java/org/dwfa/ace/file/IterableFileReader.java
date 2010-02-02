@@ -87,6 +87,14 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
         return getFileReaderIterator().getSize();
     }
 
+    public long getLineNumber() {
+        if (fileReaderIterator != null) {
+            return fileReaderIterator.getLineNumber();
+        } else {
+            return 0;
+        }
+    }
+    
     public Iterator<T> iterator() {
         try {
             return getFileReaderIterator();
@@ -121,13 +129,16 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
         private long size;
 
         protected BufferedReader reader;
-
+        
+        protected long lineNumber = 0;
+        
         protected FileReaderIterator(File sourceFile) throws IOException {
             setSize(sourceFile);
             reader = new BufferedReader(new FileReader(sourceFile));
 
             if (hasHeader) {
                 headerLine = reader.readLine();
+                lineNumber++;
             }
 
             currentLine = getNextLine();
@@ -135,7 +146,7 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
 
         protected String getNextLine() {
             try {
-                String nextLine = reader.readLine();
+                String nextLine = reader.readLine();                
                 if (nextLine == null) {
                     reader.close();
                 }
@@ -152,6 +163,7 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
         public T next() {
             String result = currentLine;
             currentLine = getNextLine();
+            lineNumber++;
             return processLine(result);
         }
 
@@ -177,6 +189,11 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
         public long getSize() {
             return size;
         }
+        
+        protected long getLineNumber() {
+            return lineNumber;
+        }
+
     }
 
     public boolean isTransactional() {

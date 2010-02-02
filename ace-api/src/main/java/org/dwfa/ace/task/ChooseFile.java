@@ -28,6 +28,9 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
+
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -109,34 +112,21 @@ public class ChooseFile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            // prompt for location of file
-            FileDialog dialog = new FileDialog(new Frame(), message, mode);
-            dialog.setVisible(true);
-            fileName = dialog.getDirectory() + dialog.getFile();
-            if (mode == FileDialog.LOAD) {
-                fileName = new File(fileName).toURI().toURL().toExternalForm();
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+              File selectedFile = fileChooser.getSelectedFile();
+              if (worker.getLogger().isLoggable(Level.INFO)) {
+                  worker.getLogger().info(("Selected file: " + fileName));
+              }
+              process.setProperty(this.fileKey, selectedFile.getAbsolutePath());
+            } else {
+                throw new TaskFailedException("User failed to select a file.");   
             }
-
-            if (fileName == null) {
-                throw new TaskFailedException("User failed to select a file.");
-            }
-
-            if (worker.getLogger().isLoggable(Level.INFO)) {
-                worker.getLogger().info(("Selected file: " + fileName));
-            }
-
-            process.setProperty(this.fileKey, fileName);
-
+            
             return Condition.CONTINUE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (MalformedURLException e) {
+            
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }

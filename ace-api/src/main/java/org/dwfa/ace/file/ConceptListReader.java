@@ -44,9 +44,11 @@ public class ConceptListReader extends IterableFileReader<I_GetConceptData> {
     @Override
     protected I_GetConceptData processLine(String line) {
 
+        String conceptId = "'unknown'";
+        
         try {
             String[] columns = line.split("\t");
-            String conceptId = columns[0];
+            conceptId = columns[0];
             String description = columns[1];
 
             if (conceptId.length() == 0 || description.length() == 0) {
@@ -60,13 +62,14 @@ public class ConceptListReader extends IterableFileReader<I_GetConceptData> {
                 }
             }
 
-            throw new TerminologyException("Cannot find a concept with ID " + conceptId + " and the description '"
-                + description + "'");
+            throw new TerminologyException(
+                "Cannot find a concept with ID " + conceptId + " and the description '" + description + "'");
 
         } catch (IndexOutOfBoundsException ex) {
             throw new TerminologyRuntimeException("Invalid file format");
         } catch (Exception ex) {
-            throw new TerminologyRuntimeException(ex);
+            throw new TerminologyRuntimeException(
+                "Unable to process concept id " + conceptId + " at line " + getLineNumber() + " of file " + getSourceFile().getName(), ex);
         }
     }
 
