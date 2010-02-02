@@ -769,6 +769,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	 *
 	 */
     public static void commit() {
+    	AceLog.getAppLog().info("commit(): " + commitInProgress);
         if (commitInProgress) {
             AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
             return;
@@ -871,7 +872,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         if (VodbEnv.isTransactional()) {
                             Terms.get().commitTransaction();
                         }
-                        Terms.get().commit();
+                        ((VodbEnv) Terms.get()).sync();
                     } catch (DatabaseException e) {
                         if (VodbEnv.isTransactional()) {
                             Terms.get().cancelTransaction();
