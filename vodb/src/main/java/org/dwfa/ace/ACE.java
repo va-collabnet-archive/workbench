@@ -3856,6 +3856,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
             public void run() {
                 workflowDetailsSheet.setVisible(visible);
+                if (!visible) {
+                    Component[] components = workflowDetailsSheet.getComponents();
+                    for (int i = 0; i < components.length; i++) {
+                        workflowDetailsSheet.remove(components[i]);
+                    }
+                    workflowDetailsSheet.validate();
+                    Container cont = workflowDetailsSheet;
+                    while (cont != null) {
+                        cont.validate();
+                        cont = cont.getParent();
+                    }
+                    workflowDetailsSheet.repaint();                    
+                }
             }
         });
     }
