@@ -114,6 +114,20 @@ public interface I_TermFactory {
 
     Collection<UUID> getUids(int nid) throws TerminologyException, IOException;
 
+    /**
+     * 
+     * @param newDescriptionId
+     * @param concept
+     * @param lang
+     * @param text
+     * @param descType
+     * @param aceFrameConfig
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     * @deprecated use alternate newDescription method that uses I_GetConceptData instead of I_ConceptualizeLocally
+     */
+    @Deprecated
     I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
             I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 
