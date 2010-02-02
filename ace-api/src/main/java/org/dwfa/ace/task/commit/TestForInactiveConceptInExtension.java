@@ -28,6 +28,7 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -59,6 +60,7 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
         List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
         try {
             I_ConfigAceFrame activeProfile = LocalVersionedTerminology.get().getActiveAceFrameConfig();
+
             for (I_ThinExtByRefPart part : extension.getMutableParts()) {
                 testPart(part, activeProfile, alerts, forCommit);
             }
@@ -77,7 +79,8 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
 
     private void testPart(I_ThinExtByRefPart part, I_ConfigAceFrame activeProfile,
             List<AlertToDataConstraintFailure> alerts2, boolean forCommit) throws IOException, TerminologyException {
-        if (part.getVersion() == Integer.MAX_VALUE) {
+        if (part.getVersion() == Integer.MAX_VALUE
+            && part.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
             for (int nid : part.getPartComponentNids().toArray()) {
                 if (LocalVersionedTerminology.get().hasConcept(nid)) {
                     checkForInactive(activeProfile, alerts2, nid);
@@ -89,15 +92,18 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
     private void checkForInactive(I_ConfigAceFrame activeProfile, List<AlertToDataConstraintFailure> alerts2, int nid)
             throws TerminologyException, IOException {
         I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(nid);
-        List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
-            activeProfile.getViewPositionSetReadOnly());
+        List<? extends I_ConceptAttributeTuple> attributes =
+                concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(), activeProfile
+                    .getViewPositionSetReadOnly());
         if (attributes == null || attributes.size() == 0) {
-            String alertString = "<html>Inactive concept in refset:<br> <font color='blue'>" + concept.toString()
-                + "</font><br>If appropriate, please change prior to commit...";
+            String alertString =
+                    "<html>Inactive concept in refset:<br> <font color='blue'>" + concept.toString()
+                        + "</font><br>If appropriate, please change prior to commit...";
             if (concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile) != null) {
-                alertString = "<html>Inactive concept in refset:<br> <font color='blue'>"
-                    + concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile).getText()
-                    + "</font><br>If appropriate, please<br>change prior to commit...";
+                alertString =
+                        "<html>Inactive concept in refset:<br> <font color='blue'>"
+                            + concept.getDescTuple(activeProfile.getLongLabelDescPreferenceList(), activeProfile)
+                                .getText() + "</font><br>If appropriate, please<br>change prior to commit...";
             }
             AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
             AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType, alertString, concept);
