@@ -87,7 +87,13 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "REL REFINABILITY IS", "rel refinability is" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_CHILD_OF(new String[] {
             "REL REFINABILITY IS CHILD OF", "rel refinability is child of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_DESCENDENT_OF(new String[] {
             "REL REFINABILITY IS DESCENDENT OF", "rel refinability is descendent of" }, SPEC_QUERY_TOKEN), REL_REFINABILITY_IS_KIND_OF(new String[] {
-            "REL REFINABILITY IS KIND OF", "rel refinability is kind of" }, SPEC_QUERY_TOKEN), DIFFERENCE_QUERY(new String[] {
+            "REL REFINABILITY IS KIND OF", "rel refinability is kind of" }, SPEC_QUERY_TOKEN),
+            REL_DESTINATION_IS(new String[] { "REL DESTINATION IS", "rel destination is" }, SPEC_QUERY_TOKEN),
+            REL_DESTINATION_IS_CHILD_OF(new String[] { "REL DESTINATION IS CHILD OF", "rel destination is child of" }, SPEC_QUERY_TOKEN), 
+            REL_DESTINATION_IS_DESCENDENT_OF(new String[] { "REL DESTINATION IS DESCENDENT OF", "rel destination is descendent of" }, SPEC_QUERY_TOKEN), 
+            REL_DESTINATION_IS_KIND_OF(new String[] { "REL DESTINATION IS KIND OF", "rel destination is kind of" }, SPEC_QUERY_TOKEN),
+            
+            DIFFERENCE_QUERY(new String[] {
             "Difference Query", "difference query" }, SPEC_QUERY_TOKEN), DIFFERENCE_CONFIGURATION(new String[] {
             "DIFFERENCE CONFIGURATION", "difference configuration" }, DIFFERENCE_QUERY), DIFFERENCE_STATISTICS(new String[] {
             "DIFFERENCE STATISTICS", "difference statistics" }, DIFFERENCE_QUERY), ADDED_CONCEPT(new String[] {
