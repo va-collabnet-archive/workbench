@@ -33,7 +33,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	}
 
 	public Revision(int statusNid, int pathNid, long time, C primordialComponent) {
-		this.sapNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
+		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
 		assert primordialComponent != null;
 		assert sapNid != Integer.MAX_VALUE;
@@ -101,21 +101,21 @@ public abstract class Revision<V extends Revision<V, C>,
 	
 	@Override
 	public int getPathId() {
-		return Bdb.getStatusAtPositionDb().getPathId(sapNid);
+		return Bdb.getSapDb().getPathId(sapNid);
 	}
 
 	@Override
 	public int getStatusId() {
-		return Bdb.getStatusAtPositionDb().getStatusId(sapNid);
+		return Bdb.getSapDb().getStatusId(sapNid);
 	}
 
 	@Override
 	public int getVersion() {
-		return Bdb.getStatusAtPositionDb().getVersion(sapNid);
+		return Bdb.getSapDb().getVersion(sapNid);
 	}
 
 	public long getTime() {
-		return Bdb.getStatusAtPositionDb().getTime(sapNid);
+		return Bdb.getSapDb().getTime(sapNid);
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
 	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
-		this.sapNid = Bdb.getStatusAtPositionDb().getSapNid(statusNid, pathNid, time);
+		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
 	}
 
 	@Override

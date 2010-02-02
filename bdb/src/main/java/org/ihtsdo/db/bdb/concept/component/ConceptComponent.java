@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb.concept.component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +66,93 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 
 	private static List<UUID> getUuids(int conceptNid) throws IOException {
 		return Bdb.getConceptDb().getUuidsForConcept(conceptNid);
+	}
+	
+	protected class EditableVersionList<V extends Version> extends ArrayList<V> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public EditableVersionList(Collection<V> c) {
+			super(c);
+		}
+
+		@Override
+		public void add(int index, V element) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean add(V e) {
+			if (Revision.class.isAssignableFrom(e.getClass())) {
+				if (revisions == null) {
+					throw new RuntimeException(
+					"Use makeAnalog to generate revisions. They will be automatically added.");
+				}
+				if (revisions.contains(e)) {
+					return false;
+				}
+				throw new RuntimeException(
+				"Use makeAnalog to generate revisions. They will be automatically added.");
+			}
+			if (e.index == -1) {
+				return false;
+			}
+			if (revisions == null) {
+				throw new RuntimeException(
+						"Use makeAnalog to generate revisions. They will be automatically added.");
+			}
+			if (e.index < revisions.size()) {
+				return false;
+			}
+			throw new RuntimeException(
+					"Use makeAnalog to generate revisions. They will be automatically added.");
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends V> c) {
+			boolean addedAnything = false;
+			for (V v: c) {
+				if (add(v)) {
+					addedAnything = true;
+				}
+			}
+			return addedAnything;
+		}
+
+		@Override
+		public boolean addAll(int index, Collection<? extends V> c) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object clone() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public V remove(int index) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			// TODO Auto-generated method stub
+			return super.remove(o);
+		}
+
+		@Override
+		public V set(int index, V element) {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 
 	public enum IDENTIFIER_PART_TYPES {
@@ -138,7 +226,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutablePart().getPathId();
 			}
-			return Bdb.getStatusAtPositionDb().getPathId(primordialSapNid);
+			return Bdb.getSapDb().getPathId(primordialSapNid);
 		}
 
 		@Override
@@ -146,7 +234,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutablePart().getStatusId();
 			}
-			return Bdb.getStatusAtPositionDb().getStatusId(primordialSapNid);
+			return Bdb.getSapDb().getStatusId(primordialSapNid);
 		}
 
 		@Override
@@ -154,7 +242,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutablePart().getTime();
 			}
-			return Bdb.getStatusAtPositionDb().getTime(primordialSapNid);
+			return Bdb.getSapDb().getTime(primordialSapNid);
 		}
 
 		@Override
@@ -162,7 +250,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutablePart().getVersion();
 			}
-			return Bdb.getStatusAtPositionDb().getVersion(primordialSapNid);
+			return Bdb.getSapDb().getVersion(primordialSapNid);
 		}
 
 		@Override
@@ -234,7 +322,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutableIdPart().getPathId();
 			}
-			return Bdb.getStatusAtPositionDb().getPathId(primordialSapNid);
+			return Bdb.getSapDb().getPathId(primordialSapNid);
 		}
 
 		@Override
@@ -242,7 +330,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutableIdPart().getStatusId();
 			}
-			return Bdb.getStatusAtPositionDb().getStatusId(primordialSapNid);
+			return Bdb.getSapDb().getStatusId(primordialSapNid);
 		}
 
 		@Override
@@ -250,7 +338,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutableIdPart().getTime();
 			}
-			return Bdb.getStatusAtPositionDb().getTime(primordialSapNid);
+			return Bdb.getSapDb().getTime(primordialSapNid);
 		}
 
 		@Override
@@ -258,7 +346,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 			if (index >= 0) {
 				return getMutableIdPart().getVersion();
 			}
-			return Bdb.getStatusAtPositionDb().getVersion(primordialSapNid);
+			return Bdb.getSapDb().getVersion(primordialSapNid);
 		}
 
 		@Override
@@ -765,17 +853,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 
 	@Override
 	public final int getPathId() {
-		return Bdb.getStatusAtPositionDb().getPathId(primordialSapNid);
+		return Bdb.getSapDb().getPathId(primordialSapNid);
 	}
 
 	@Override
 	public final int getStatusId() {
-		return Bdb.getStatusAtPositionDb().getStatusId(primordialSapNid);
+		return Bdb.getSapDb().getStatusId(primordialSapNid);
 	}
 
 	@Override
 	public final long getTime() {
-		return Bdb.getStatusAtPositionDb().getTime(primordialSapNid);
+		return Bdb.getSapDb().getTime(primordialSapNid);
 	}
 
 	@Override
@@ -907,6 +995,27 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 	@Deprecated
 	public void setStatus(int idStatus) {
 		setStatusId(idStatus);
+	}
+
+	public boolean isUncommitted() {
+		if (this.getTime() == Long.MAX_VALUE) {
+			return true;
+		}
+		if (additionalIdentifierParts != null) {
+			for (IdentifierVersion idv: additionalIdentifierParts) {
+				if (idv.getTime() == Long.MAX_VALUE) {
+					return true;
+				}
+			}
+		}
+		if (revisions != null) {
+			for (R r: revisions) {
+				if (r.getTime() == Long.MAX_VALUE) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

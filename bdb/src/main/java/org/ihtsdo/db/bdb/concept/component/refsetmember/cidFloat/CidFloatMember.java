@@ -10,6 +10,7 @@ import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr.CidCidStrRevision;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
 import org.ihtsdo.etypes.ERefsetCidFloatVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -96,8 +97,12 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (enclosingConcept.isEditable()) {
+			CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	public int getC1Nid() {

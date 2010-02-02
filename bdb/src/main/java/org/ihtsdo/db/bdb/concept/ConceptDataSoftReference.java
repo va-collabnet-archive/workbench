@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -32,6 +33,7 @@ import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipBinder;
+import org.ihtsdo.db.util.ConcurrentSet;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.je.DatabaseEntry;
@@ -66,13 +68,13 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	 * If the concept is editable, add all changes to the strongReferences to
 	 * ensure they don't get garbage collected inappropriately.
 	 */
-	private ArrayList<Object> strongReferences;
+	private ConcurrentSet<Object> strongReferences;
 
 	ConceptDataSoftReference(Concept enclosingConcept) throws IOException {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
-			strongReferences = new ArrayList<Object>();
+			strongReferences = new ConcurrentSet<Object>(5);
 		}
 		nidData = new NidDataFromBdb(enclosingConcept.getNid(), Bdb
 				.getConceptDb().getReadOnly(), Bdb.getConceptDb()
@@ -84,7 +86,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
-			strongReferences = new ArrayList<Object>();
+			strongReferences = new ConcurrentSet<Object>(5);
 		}
 		nidData = new NidDataInMemory(new byte[] {}, data.getData());
 	}
@@ -94,7 +96,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
-			strongReferences = new ArrayList<Object>();
+			strongReferences = new ConcurrentSet<Object>(5);
 		}
 		nidData = new NidDataInMemory(roBytes, mutableBytes);
 	}
@@ -130,6 +132,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (srcRelsRef != null) {
 			rels = srcRelsRef.get();
 			if (rels != null) {
+				if (enclosingConcept.isEditable()) {
+					strongReferences.add(rels);
+				}
 				return rels;
 			}
 		}
@@ -158,6 +163,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (descriptionsRef != null) {
 			descList = descriptionsRef.get();
 			if (descList != null) {
+				if (enclosingConcept.isEditable()) {
+					strongReferences.add(descList);
+				}
 				return descList;
 			}
 		}
@@ -269,6 +277,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (attributesRef != null) {
 			attr = attributesRef.get();
 			if (attr != null) {
+				if (enclosingConcept.isEditable()) {
+					strongReferences.add(attr);
+				}
 				return attr;
 			}
 		}
@@ -322,6 +333,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (refsetMembersRef != null) {
 			refsetMemberList = refsetMembersRef.get();
 			if (refsetMemberList != null) {
+				if (enclosingConcept.isEditable()) {
+					strongReferences.add(refsetMemberList);
+				}
 				return refsetMemberList;
 			}
 		}
@@ -351,6 +365,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 		if (imagesRef != null) {
 			imgList = imagesRef.get();
 			if (imgList != null) {
+				if (enclosingConcept.isEditable()) {
+					strongReferences.add(imgList);
+				}
 				return imgList;
 			}
 		}
@@ -978,6 +995,38 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 				new SoftReference<HashMap<Integer,RefsetMember<?,?>>>(memberMap);
 		}
 		return memberMap.get(memberNid);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean isUncommitted() {
+		if (strongReferences == null || strongReferences.size() == 0) {
+			return false;
+		}
+		for (Object o: strongReferences) {
+			if (Collection.class.isAssignableFrom(o.getClass())) {
+				Collection<ConceptComponent<?,?>>  coll = 
+					(Collection<ConceptComponent<?,?>>) o;
+				for (ConceptComponent<?,?> component: coll) {
+					if (component.isUncommitted() == true) {
+						return true;
+					}
+				}
+			} else if (ConceptComponent.class.isAssignableFrom(o.getClass())) {
+				ConceptComponent<?,?> component = (ConceptComponent<?,?>) o;
+				if (component.isUncommitted() == true) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void makeWritable() {
+		if (strongReferences == null) {
+			strongReferences = new ConcurrentSet<Object>(5);
+		}
 	}
 
 }

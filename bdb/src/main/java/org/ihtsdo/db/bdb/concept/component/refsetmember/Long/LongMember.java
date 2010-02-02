@@ -8,7 +8,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -95,8 +94,12 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (enclosingConcept.isEditable()) {
+			LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	protected long getLongValue() {

@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.id;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class UuidsToNidMapBdb extends ComponentBdb {
     private final Lock w = rwl.writeLock();
 
 
-	protected UuidsToNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
+	public UuidsToNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, mutableBdbEnv);
 	}
 

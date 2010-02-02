@@ -20,7 +20,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.lucene.search.Hits;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -101,17 +100,28 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
+import org.ihtsdo.db.bdb.concept.component.description.Description;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.DatabaseException;
 
-public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
+public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
+		I_Search {
 
 	private BdbPathManager pathManager;
 
 	private I_ShowActivity activityFrame;
 
 	private File envHome;
+
+	public static void canEdit(I_ConfigAceFrame aceFrameConfig)
+			throws TerminologyException {
+		if (aceFrameConfig.getEditingPathSet().size() == 0) {
+			throw new TerminologyException(
+					"<br><br>You must select an editing path before editing...<br><br>No editing path selected.");
+		}
+	}
 
 	private TupleBinding<Integer> intBinder = TupleBinding
 			.getPrimitiveBinding(Integer.class);
@@ -172,27 +182,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 	@Override
 	public void addUncommitted(I_GetConceptData concept) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.addUncommitted(concept);
 	}
 
 	@Override
 	public void addUncommitted(I_ThinExtByRefVersioned extension) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.addUncommitted(extension);
 	}
 
 	@Override
 	public void addUncommittedNoChecks(I_GetConceptData concept) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.addUncommittedNoChecks(concept);
 	}
 
 	@Override
 	public void addUncommittedNoChecks(I_ThinExtByRefVersioned extension) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.addUncommittedNoChecks(extension);
 	}
 
 	@Override
 	public void cancel() throws IOException {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.cancel();
 	}
 
 	@Override
@@ -207,7 +217,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 	@Override
 	public void commit() throws Exception {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.commit();
 	}
 
 	@Override
@@ -238,17 +248,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 	@Override
 	public void forget(I_GetConceptData concept) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.forget(concept);
 	}
 
 	@Override
 	public void forget(I_DescriptionVersioned desc) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.forget(desc);
 	}
 
 	@Override
 	public void forget(I_RelVersioned rel) {
-		throw new UnsupportedOperationException();
+		BdbCommitManager.forget(rel);
 	}
 
 	I_ConfigAceFrame activeAceFrameConfig;
@@ -317,9 +327,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 			IOException {
 		assert nid != Integer.MAX_VALUE;
 		int cNid = Bdb.getConceptNid(nid);
-		assert cNid != Integer.MAX_VALUE: "nid: " + nid + " cNid: " + cNid + 
-			" concept: " + Bdb.getConceptDb().getConcept(nid) + 
-			" uuid:" + Bdb.getUuidsToNidMap().getUuidsForNid(nid);
+		assert cNid != Integer.MAX_VALUE : "nid: " + nid + " cNid: " + cNid
+				+ " concept: " + Bdb.getConceptDb().getConcept(nid) + " uuid:"
+				+ Bdb.getUuidsToNidMap().getUuidsForNid(nid);
 		return Bdb.getConceptDb().getConcept(cNid);
 	}
 
@@ -503,7 +513,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 	@Override
 	public List<TimePathId> getTimePathList() throws Exception {
-		return Bdb.getStatusAtPositionDb().getTimePathList();
+		return Bdb.getSapDb().getTimePathList();
 	}
 
 	@Override
@@ -725,19 +735,48 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 	}
 
 	@Override
-	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
+	public Description newDescription(UUID newDescriptionId,
 			I_GetConceptData concept, String lang, String text,
 			I_ConceptualizeLocally descType, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return newDescription(newDescriptionId, concept, lang, text, Terms
+				.get().getConcept(descType.getNid()), aceFrameConfig);
 	}
 
 	@Override
-	public I_DescriptionVersioned newDescription(UUID newDescriptionId,
+	public Description newDescription(UUID newDescriptionId,
 			I_GetConceptData concept, String lang, String text,
 			I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		canEdit(aceFrameConfig);
+		Concept c = (Concept) concept;
+		c.makeWritable();
+		Description d = new Description();
+		d.enclosingConcept = c;
+		d.nid = Bdb.uuidToNid(newDescriptionId);
+		d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newDescriptionId);
+		d.setLang(lang);
+		d.setText(text);
+		d.setInitialCaseSignificant(false);
+		d.setTypeId(descType.getNid());
+		d.primordialSapNid = Integer.MIN_VALUE;
+		int statusNid = aceFrameConfig.getDefaultStatus().getNid();
+		for (I_Path p: aceFrameConfig.getEditingPathSet()) {
+			if (d.primordialSapNid == Integer.MIN_VALUE) {
+				d.primordialSapNid = 
+					Bdb.getSapDb().getSapNid(statusNid, 
+							p.getConceptId(), Long.MAX_VALUE);
+			} else {
+				if (d.revisions == null) {
+					d.revisions = new ArrayList<DescriptionRevision>(
+							aceFrameConfig.getEditingPathSet().size() - 1);
+				}
+				d.revisions.add(d.makeAnalog(statusNid, 
+						p.getConceptId(), Long.MAX_VALUE));
+			}
+		}
+		c.getDescriptions().add(d);
+		return d;
 	}
 
 	@Override
@@ -992,9 +1031,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 	@Override
 	public void searchConcepts(I_TrackContinuation tracker,
-			I_RepresentIdSet matches,
-			CountDownLatch latch, List<I_TestSearchResults> checkList,
-			I_ConfigAceFrame config) throws DatabaseException, IOException,
+			I_RepresentIdSet matches, CountDownLatch latch,
+			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
+			throws DatabaseException, IOException,
 			org.apache.lucene.queryParser.ParseException {
 		throw new UnsupportedOperationException();
 
@@ -1068,7 +1107,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 		}
 	}
 
-
 	@Override
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
 			Collection<I_DescriptionVersioned> matches,
@@ -1081,9 +1119,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 		}
 
 		Semaphore checkSemaphore = new Semaphore(15);
-		RegexSearcher searcher = new RegexSearcher(conceptLatch,
-				tracker, checkSemaphore, checkList, config,
-				p, matches);
+		RegexSearcher searcher = new RegexSearcher(conceptLatch, tracker,
+				checkSemaphore, checkList, config, p, matches);
 		try {
 			Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
 			conceptLatch.await();

@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.id;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.uuidmap.UuidArrayList;
 import org.ihtsdo.db.uuidmap.UuidUtil;
 

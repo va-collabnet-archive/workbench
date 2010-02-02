@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 
 public class SecondaryLoad {

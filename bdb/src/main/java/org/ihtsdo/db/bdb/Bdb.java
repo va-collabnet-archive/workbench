@@ -20,6 +20,10 @@ import org.ihtsdo.db.bdb.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.ConceptBdb;
 import org.ihtsdo.db.bdb.concept.OFFSETS;
+import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
+import org.ihtsdo.db.bdb.id.UuidBdb;
+import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
+import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.etypes.EVersion;
 
 import com.sleepycat.je.CheckpointConfig;
@@ -130,7 +134,7 @@ public class Bdb {
 				version.getTime());
 	}
 
-	public static StatusAtPositionBdb getStatusAtPositionDb() {
+	public static StatusAtPositionBdb getSapDb() {
 		assert statusAtPositionDb != null;
 		return statusAtPositionDb;
 	}

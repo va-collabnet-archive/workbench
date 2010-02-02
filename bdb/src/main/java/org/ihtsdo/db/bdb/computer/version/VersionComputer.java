@@ -47,7 +47,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
 		HashSet<V> partsToAdd = new HashSet<V>();
 		List<V> partsForPosition = new LinkedList<V>();
-		PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(
+		PositionMapper mapper = Bdb.getSapDb().getMapper(
 				viewPosition);
 		for (V version : versions) {
 			if (mapper.onRoute(version)) {
@@ -143,7 +143,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 		HashSet<V> partsToAdd = new HashSet<V>();
 		List<V> partsForPosition = new LinkedList<V>();
 		for (I_Position p : positions) {
-			PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(p);
+			PositionMapper mapper = Bdb.getSapDb().getMapper(p);
 			for (V part : versions) {
 				if (allowedTypes != null) {
 					if (allowedTypes.contains(((I_AmTypedPart) part)

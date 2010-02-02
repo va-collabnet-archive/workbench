@@ -29,7 +29,7 @@ public abstract class Navigator {
 		V latest = null;
 		OpenBitSet resultsPartSet = new OpenBitSet(parts.size());
 		for (I_Position pos : config.getViewPositionSetReadOnly()) {
-			PositionMapper mapper = Bdb.getStatusAtPositionDb().getMapper(pos);
+			PositionMapper mapper = Bdb.getSapDb().getMapper(pos);
 			OpenBitSet iteratorPartSet = new OpenBitSet(parts.size());
 			for (int i = 0; i < parts.size(); i++) {
 				V part = parts.get(i);

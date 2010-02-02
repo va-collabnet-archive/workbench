@@ -33,6 +33,7 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
 import org.ihtsdo.etypes.EConceptAttributes;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -395,7 +396,7 @@ public class ConceptAttributes
 	@Override
 	public boolean addVersion(I_ConceptAttributePart part) {
 		this.versions = null;
-		return revisions.add(new ConceptAttributesRevision(part, this));
+		return super.addVersion(new ConceptAttributesRevision(part, this));
 	}
 
 	@Override
@@ -445,7 +446,12 @@ public class ConceptAttributes
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new ConceptAttributesRevision(this, statusNid, pathNid, time, this);
+		if (enclosingConcept.isEditable()) {
+			ConceptAttributesRevision newR = new ConceptAttributesRevision(this, statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	@Override

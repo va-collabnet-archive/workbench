@@ -28,6 +28,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageVersion;
@@ -402,7 +403,7 @@ public class Image
 	@Override
 	public boolean addVersion(I_ImagePart part) {
 		this.versions = null;
-		return revisions.add((ImageRevision) part);
+		return super.addVersion((ImageRevision) part);
 	}
 
 	@Override
@@ -439,7 +440,12 @@ public class Image
 
 	@Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-		return new ImageRevision(this, statusNid, pathNid, time, this);
+		if (enclosingConcept.isEditable()) {
+			ImageRevision newR = new ImageRevision(this, statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	@Override

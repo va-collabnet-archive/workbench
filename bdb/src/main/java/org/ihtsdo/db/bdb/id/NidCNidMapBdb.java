@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.id;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.ComponentBdb;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleInput;

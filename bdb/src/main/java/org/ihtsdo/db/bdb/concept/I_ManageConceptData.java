@@ -126,4 +126,8 @@ public interface I_ManageConceptData {
 
 	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
 
+	public boolean isUncommitted();
+
+	public void makeWritable();
+
 }

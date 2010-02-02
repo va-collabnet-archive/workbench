@@ -9,6 +9,7 @@ import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refsetmember.Long.LongMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -94,8 +95,12 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (enclosingConcept.isEditable()) {
+			MembershipRevision newR = new MembershipRevision(statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 	
 	@Override

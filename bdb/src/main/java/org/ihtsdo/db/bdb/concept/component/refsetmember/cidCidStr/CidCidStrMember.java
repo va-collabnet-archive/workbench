@@ -9,7 +9,6 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
-import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -119,8 +118,12 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (enclosingConcept.isEditable()) {
+			CidCidStrRevision newR = new CidCidStrRevision(statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	public int getC1Nid() {

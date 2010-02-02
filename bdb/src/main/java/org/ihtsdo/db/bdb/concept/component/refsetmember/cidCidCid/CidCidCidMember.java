@@ -120,8 +120,12 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (enclosingConcept.isEditable()) {
+			CidCidCidRevision newR = new CidCidCidRevision(statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	public int getC1Nid() {

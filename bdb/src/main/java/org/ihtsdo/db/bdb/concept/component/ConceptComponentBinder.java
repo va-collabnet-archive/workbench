@@ -20,7 +20,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	implements I_BindConceptComponents {
 
 
-    private static final int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
+    private static final int maxReadOnlyStatusAtPositionId = Bdb.getSapDb().getReadOnlyMax();
 	private Concept enclosingConcept;
 	private ArrayList<C> readOnlyConceptComponentList;
 	private ComponentFactory<V, C> factory;

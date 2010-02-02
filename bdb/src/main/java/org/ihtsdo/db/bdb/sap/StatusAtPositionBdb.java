@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.sap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +20,6 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-import org.ihtsdo.db.bdb.sap.SapToIntHashMap;
-import org.ihtsdo.db.bdb.sap.TimeStatusPosition;
-import org.ihtsdo.db.bdb.sap.UncommittedStatusForPath;
 
 import cern.colt.list.IntArrayList;
 
@@ -305,7 +302,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		return "positionDb";
 	}
 	
-	protected void commit(long time) throws IOException {
+	public void commit(long time) throws IOException {
 		int[] indexes = new int[uncomittedStatusPathEntries.size()];
 		int i = 0;
 		for (int index: uncomittedStatusPathEntries.values()) {

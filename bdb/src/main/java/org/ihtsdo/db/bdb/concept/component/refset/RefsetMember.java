@@ -60,8 +60,11 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 
 		@Override
 		public void addVersion(I_ThinExtByRefPart part) {
+			if (!enclosingConcept.isEditable()) {
+				throw new UnsupportedOperationException("enclosing concept is not editable");
+			}
 			versions = null;
-			revisions.add((V) part);
+			RefsetMember.this.addVersion((V) part);
 		}
 
 		@Override
@@ -261,7 +264,8 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addVersion(I_ThinExtByRefPart part) {
-		revisions.add((V) part);
+		versions = null;
+		super.addVersion((V) part);
 	}
 
 

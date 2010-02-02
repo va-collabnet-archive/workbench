@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb.concept;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -587,11 +588,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_DescriptionVersioned> getUncommittedDescriptions() {
-		return new ArrayList<I_DescriptionVersioned>();
+		return Collections.unmodifiableList(new ArrayList<I_DescriptionVersioned>());
 	}
 
 	public List<I_Identify> getUncommittedIdVersioned() {
-		return new ArrayList<I_Identify>();
+		return Collections.unmodifiableList(new ArrayList<I_Identify>());
 	}
 
 	public I_IntSet getUncommittedIds() {
@@ -599,11 +600,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_ImageVersioned> getUncommittedImages() {
-		return new ArrayList<I_ImageVersioned>();
+		return Collections.unmodifiableList(new ArrayList<I_ImageVersioned>());
 	}
 
 	public List<I_RelVersioned> getUncommittedSourceRels() {
-		return new ArrayList<I_RelVersioned>();
+		return Collections.unmodifiableList(new ArrayList<I_RelVersioned>());
 	}
 
 	public UniversalAceBean getUniversalAceBean() throws IOException,
@@ -1013,5 +1014,19 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public Relationship getSourceRel(int relNid) throws IOException {
 		return getRelationship(relNid);
+	}
+
+	public boolean isUncommitted() {
+		if (editable == false) {
+			return false;
+		}
+		return data.isUncommitted();
+	}
+
+	public void makeWritable() {
+		if (editable == false) {
+			editable = true;
+			data.makeWritable();
+		}
 	}
 }

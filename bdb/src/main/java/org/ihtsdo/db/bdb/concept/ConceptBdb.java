@@ -19,7 +19,7 @@ import org.dwfa.ace.list.AceListRenderer;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
-import org.ihtsdo.db.bdb.NidCNidMapBdb;
+import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 
 import cern.colt.map.OpenIntIntHashMap;
 

@@ -1,4 +1,4 @@
-package org.ihtsdo.db.bdb;
+package org.ihtsdo.db.bdb.sap;
 
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 

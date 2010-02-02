@@ -164,7 +164,7 @@ public class Description
 			return (I_DescriptionPart) super.getMutablePart();
 		}
 		@Override
-		public I_DescriptionPart makeAnalog(int statusNid, int pathNid, long time) {
+		public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
 				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
 			} else {
@@ -402,7 +402,7 @@ public class Description
 	@Override
 	public boolean addVersion(I_DescriptionPart newPart) {
 		this.versions = null;
-		return revisions.add((DescriptionRevision) newPart);
+		return super.addVersion((DescriptionRevision) newPart);
 	}
 
 	@Override
@@ -527,8 +527,13 @@ public class Description
 	}
 
 	@Override
-	public I_DescriptionPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new DescriptionRevision(this, statusNid, pathNid, time, this);
+	public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
+		if (enclosingConcept.isEditable()) {
+			DescriptionRevision newR = new DescriptionRevision(this, statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 	
 	@Override
@@ -543,6 +548,9 @@ public class Description
 
 	@Override
 	public List<? extends I_DescriptionPart> getMutableParts() {
+		if (enclosingConcept.isEditable()) {
+			return new EditableVersionList(getVersions());
+		}
 		return Collections.unmodifiableList(new ArrayList<I_DescriptionPart>(getVersions()));
 	}
     @Override

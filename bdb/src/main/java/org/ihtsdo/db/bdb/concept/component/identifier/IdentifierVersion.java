@@ -13,10 +13,10 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
 import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.etypes.EIdentifierVersion;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -24,7 +24,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 	
-	private static StatusAtPositionBdb sapBdb = Bdb.getStatusAtPositionDb();
+	private static StatusAtPositionBdb sapBdb = Bdb.getSapDb();
 
 	private transient ConceptComponent<?, ?> conceptComponent;
 	private int statusAtPositionNid;

@@ -59,6 +59,9 @@ public class PositionMapper {
 	 * @throws IOException
 	 */
 	public <V extends ConceptComponent<?, ?>.Version> boolean onRoute(V version) {
+		if (version.getTime() == Long.MAX_VALUE) {
+			return true;
+		}
 		return positionDistance[version.getSapNid()] >= 0;
 	}
 
@@ -74,6 +77,14 @@ public class PositionMapper {
 	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
 		relativePosition(V v1, V v2)
 			throws IOException {
+		if (v1.getTime() == Long.MAX_VALUE) {
+			if (v2.getTime() == Long.MAX_VALUE) {
+				return RELATIVE_POSITION.EQUAL;
+			}
+			return RELATIVE_POSITION.AFTER;
+		} else if (v2.getTime() == Long.MAX_VALUE) {
+			return RELATIVE_POSITION.BEFORE;
+		}
 		if (onRoute(v1) && onRoute(v2)) {
 			if (conflictMatrix.get(v1.getSapNid(), v2.getSapNid())) {
 				return RELATIVE_POSITION.CONFLICTING;
@@ -166,14 +177,14 @@ public class PositionMapper {
 
 		BigInteger timeUpperBound = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.TEN);
 
-		int positionCount = Bdb.getStatusAtPositionDb().getPositionCount();
+		int positionCount = Bdb.getSapDb().getPositionCount();
 		positionDistance = new int[positionCount];
 		Arrays.fill(positionDistance, Integer.MIN_VALUE);
 		BigInteger[] positionComputedDistance = new BigInteger[positionCount];
 		Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
 		conflictMatrix = new BitMatrix(positionCount, positionCount);
 		for (int p1index = 0; p1index < positionCount; p1index++) {
-			I_Position p1 = Bdb.getStatusAtPositionDb().getPosition(p1index);
+			I_Position p1 = Bdb.getSapDb().getPosition(p1index);
 			Integer p1pathId = p1.getPath().getConceptId();
 			Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
 			// see if position may be in route to the destination
@@ -204,7 +215,7 @@ public class PositionMapper {
 
 					// iterate to compute conflicts...
 					for (int p2index = 0; p2index < positionCount; p2index++) {
-						I_Position p2 = Bdb.getStatusAtPositionDb()
+						I_Position p2 = Bdb.getSapDb()
 								.getPosition(p2index);
 						Integer p2pathId = p2.getPath().getConceptId();
 						if (originMap.containsKey(p2pathId)
@@ -360,13 +371,13 @@ public class PositionMapper {
 			f.format("%1$2d|", positionDistance[i]); // distance
 			try {
 				buf.append(Revision.fileDateFormat.format( // time
-						new Date(Bdb.getStatusAtPositionDb().getPosition(i).getTime())));
+						new Date(Bdb.getSapDb().getPosition(i).getTime())));
 				buf.append("|");
 				buf.append(Bdb.getConceptDb().getConcept( // path
-						Bdb.getStatusAtPositionDb().getPathId(i)));
+						Bdb.getSapDb().getPathId(i)));
 				buf.append("|");
 				buf.append(Bdb.getConceptDb().getConcept( // status
-						Bdb.getStatusAtPositionDb().getStatusId(i)));
+						Bdb.getSapDb().getStatusId(i)));
 			} catch (PathNotExistsException e) {
 				buf.append(e.getLocalizedMessage());
 			} catch (IOException e) {

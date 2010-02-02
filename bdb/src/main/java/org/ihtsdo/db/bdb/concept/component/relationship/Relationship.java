@@ -345,7 +345,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	public boolean addVersion(I_RelPart part) {
 		this.versions = null;
-		return revisions.add((RelationshipRevision) part);
+		return super.addVersion((RelationshipRevision) part);
 	}
 
 	public boolean addPart(RelationshipRevision part) {
@@ -566,7 +566,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-		return new RelationshipRevision(this, statusNid, pathNid, time, this);
+		if (enclosingConcept.isEditable()) {
+			RelationshipRevision newR = new RelationshipRevision(this, statusNid, pathNid, time, this);
+			addVersion(newR);
+			return newR;
+		}
+		throw new UnsupportedOperationException("enclosingConcept is not editable");
 	}
 
 	@Override

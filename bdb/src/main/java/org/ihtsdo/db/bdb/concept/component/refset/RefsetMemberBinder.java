@@ -20,7 +20,7 @@ public class RefsetMemberBinder extends TupleBinding<ArrayList<RefsetMember<?, ?
 	public static AtomicInteger encountered = new AtomicInteger();
 	public static AtomicInteger written = new AtomicInteger();
 
-	private static int maxReadOnlyStatusAtPositionId = Bdb.getStatusAtPositionDb().getReadOnlyMax();
+	private static int maxReadOnlyStatusAtPositionId = Bdb.getSapDb().getReadOnlyMax();
 
 	RefsetMemberFactory factory = new RefsetMemberFactory();
 
