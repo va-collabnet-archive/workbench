@@ -463,7 +463,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 					    newPart.setVersion(Integer.MAX_VALUE);
 					    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
 					}
-					ACE.addUncommitted((I_Transact) Terms.get().getConcept(selectedObject.getTuple().getNid()));
+					Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
 					allTuples = null;
 					IdTableModel.this.fireTableDataChanged();
 				} catch (TerminologyException e1) {
@@ -491,7 +491,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
                     }
-                    ACE.addUncommitted((I_Transact) Terms.get().getConcept(selectedObject.getTuple().getNid()));
+                    Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
                     allTuples = null;
                     IdTableModel.this.fireTableDataChanged();
                 } catch (Exception ex) {

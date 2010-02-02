@@ -79,8 +79,8 @@ public class RelPopupListener extends MouseAdapter {
                             new Exception("srcRel: " + srcRel + " destRel: " + destRel + " cannot be null"));
                     }
                 }
-                ACE.addUncommitted((I_Transact) sourceBean);
-                ACE.addUncommitted((I_Transact) destBean);
+                Terms.get().addUncommitted(sourceBean);
+                Terms.get().addUncommitted(destBean);
                 model.allTuples = null;
                 model.fireTableDataChanged();
             } catch (IOException ex) {
@@ -109,7 +109,7 @@ public class RelPopupListener extends MouseAdapter {
             I_RelTuple tuple = selectedObject.getTuple();
             ThinRelVersioned versioned = (ThinRelVersioned) tuple.getRelVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.allTuples = null;
             model.fireTableDataChanged();
         }
@@ -176,8 +176,8 @@ public class RelPopupListener extends MouseAdapter {
                         destRel.addVersion(newPart);
                     }
                 }
-                ACE.addUncommitted((I_Transact) sourceBean);
-                ACE.addUncommitted((I_Transact) destBean);
+                Terms.get().addUncommitted(sourceBean);
+                Terms.get().addUncommitted(destBean);
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.updateTable(model.tableBean);

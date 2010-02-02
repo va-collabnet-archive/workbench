@@ -552,7 +552,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                         if (active) {
                             I_RelTuple rel = allTuples.get(row);
                             try {
-								ACE.addUncommitted((I_Transact) Terms.get().getConcept(rel.getC1Id()));
+								Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
 							} catch (TerminologyException e) {
 								AceLog.getAppLog().alertAndLogException(e);
 							} catch (IOException e) {

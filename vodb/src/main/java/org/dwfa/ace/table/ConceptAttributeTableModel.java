@@ -42,7 +42,6 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -459,7 +458,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                         if (active) {
                             I_ConceptAttributeTuple tuple = allTuples.get(row);
                             try {
-								ACE.addUncommitted((I_Transact) Terms.get().getConcept(tuple.getConId()));
+								Terms.get().addUncommitted(Terms.get().getConcept(tuple.getConId()));
 							} catch (TerminologyException e) {
 								throw new RuntimeException(e);
 							} catch (IOException e) {

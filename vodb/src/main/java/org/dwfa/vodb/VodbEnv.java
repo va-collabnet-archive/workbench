@@ -844,6 +844,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         return newBean;
     }
 
+    @Deprecated
     public I_DescriptionVersioned newDescriptionBypassCommit(int descriptionNid, int conceptNid) throws IOException {
         return new ThinDescVersioned(descriptionNid, conceptNid, 1);
     }
@@ -1832,7 +1833,7 @@ public class VodbEnv implements I_ImplementTermFactory, I_SupportClassifier, I_W
         if (isDataChecksSuppressed()) {
             ACE.addUncommittedNoChecks(to);
         } else {
-            ACE.addUncommitted(to);
+        	ACE.addUncommitted(to);
         }
     }
 

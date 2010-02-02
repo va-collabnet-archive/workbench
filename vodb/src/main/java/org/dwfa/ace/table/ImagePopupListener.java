@@ -80,7 +80,7 @@ public class ImagePopupListener extends MouseAdapter {
 
                 selectedObject.getTuple().getVersioned().addVersion(newPart);
             }
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.allImageTuples = null;
             model.allImages = null;
             model.fireTableDataChanged();
@@ -105,7 +105,7 @@ public class ImagePopupListener extends MouseAdapter {
             I_ImageTuple tuple = selectedObject.getTuple();
             ThinImageVersioned versioned = (ThinImageVersioned) tuple.getVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
-            ACE.addUncommitted((I_Transact) sourceBean);
+            Terms.get().addUncommitted(sourceBean);
             model.propertyChange(new PropertyChangeEvent(this, "undo", sourceBean, sourceBean));
         }
     }
@@ -145,7 +145,7 @@ public class ImagePopupListener extends MouseAdapter {
                     model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
                     selectedObject.getTuple().getVersioned().addVersion(newPart);
                 }
-                ACE.addUncommitted((I_Transact) sourceBean);
+                Terms.get().addUncommitted(sourceBean);
                 model.allImageTuples = null;
                 model.allImages = null;
 
