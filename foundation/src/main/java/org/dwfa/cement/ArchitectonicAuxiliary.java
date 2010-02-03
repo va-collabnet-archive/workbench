@@ -1158,8 +1158,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
          * <li>-1 Not-yet created.
          * <li>0 Current The Description and its associated Concept are in
          * current use.
-         * <li>1 Non-Current The Description has been withdrawn without a
-         * specified reason.
+         * <li>1 Retired The Description has been retired
          * <li>2 Duplicate The Description has been withdrawn from current use
          * because it duplicates another description containing the same term
          * (or a very similar term) associated with the same Concept.
