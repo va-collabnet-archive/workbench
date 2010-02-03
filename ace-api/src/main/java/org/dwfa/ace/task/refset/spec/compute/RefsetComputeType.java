@@ -98,6 +98,10 @@ public enum RefsetComputeType {
         case REL_REFINABILITY_IS_KIND_OF:
         case REL_REFINABILITY_IS_CHILD_OF:
         case REL_REFINABILITY_IS_DESCENDENT_OF:
+        case REL_DESTINATION_IS:
+        case REL_DESTINATION_IS_KIND_OF:
+        case REL_DESTINATION_IS_CHILD_OF:
+        case REL_DESTINATION_IS_DESCENDENT_OF:
             return RELATIONSHIP;
         default:
             throw new RuntimeException("Can't handle queryToken: " + groupingToken);

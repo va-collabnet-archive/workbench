@@ -113,6 +113,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return relRefinabilityIsChildOf(relTuple);
         case REL_REFINABILITY_IS_DESCENDENT_OF:
             return relRefinabilityIsDescendentOf(relTuple);
+        case REL_DESTINATION_IS:
+            return relDestinationIs(relTuple);
+        case REL_DESTINATION_IS_KIND_OF:
+            return relDestinationIsKindOf(relTuple);
+        case REL_DESTINATION_IS_CHILD_OF:
+            return relDestinationIsChildOf(relTuple);
+        case REL_DESTINATION_IS_DESCENDENT_OF:
+            return relDestinationIsDescendentOf(relTuple);
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -123,7 +131,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throws TerminologyException, IOException {
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
-            parentPossibleConcepts = termFactory.getRelationshipIdSet();
+            parentPossibleConcepts = termFactory.getConceptIdSet();
         }
 
         switch (tokenEnum) {
@@ -162,6 +170,10 @@ public class RelationshipStatement extends RefsetSpecStatement {
         case REL_CHARACTERISTIC_IS_KIND_OF:
         case REL_CHARACTERISTIC_IS_CHILD_OF:
         case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
+        case REL_DESTINATION_IS:
+        case REL_DESTINATION_IS_KIND_OF:
+        case REL_DESTINATION_IS_CHILD_OF:
+        case REL_DESTINATION_IS_DESCENDENT_OF:
         case REL_REFINABILITY_IS:
         case REL_REFINABILITY_IS_KIND_OF:
         case REL_REFINABILITY_IS_CHILD_OF:
@@ -500,6 +512,76 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relLogicalQuantifierIs(I_RelTuple relTuple) throws TerminologyException {
         throw new TerminologyException("Unimplemented query : rel logical quantifier is");
         // unimplemented TODO
+    }
+
+    private boolean relDestinationIs(I_RelTuple relTuple) {
+        return relDestinationIs((I_GetConceptData) queryConstraint, relTuple);
+    }
+
+    private boolean relDestinationIs(I_GetConceptData requiredDestination, I_RelTuple relTuple) {
+        return relTuple.getC2Id() == requiredDestination.getConceptId();
+    }
+
+    private boolean relDestinationIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+
+        if (relDestinationIs(relTuple)) {
+            return true;
+        }
+
+        return relDestinationIsDescendentOf(relTuple);
+    }
+
+    private boolean relDestinationIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+
+            Set<? extends I_GetConceptData> children =
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+
+            for (I_GetConceptData child : children) {
+                if (relDestinationIs(child, relTuple)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
+    }
+
+    private boolean relDestinationIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+        return relDestinationIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
+    }
+
+    private boolean relDestinationIsDescendentOf(I_GetConceptData requiredDestination, I_RelTuple relTuple)
+            throws IOException, TerminologyException {
+        try {
+            I_IntSet allowedTypes = getIsAIds();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+
+            Set<? extends I_GetConceptData> children =
+                    requiredDestination.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+
+            for (I_GetConceptData child : children) {
+                if (relDestinationIs(child, relTuple)) {
+                    return true;
+                } else if (relDestinationIsDescendentOf(child, relTuple)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new TerminologyException(e.getMessage());
+        }
     }
 
 }

@@ -91,7 +91,11 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         REL_REFINABILITY_IS(RefsetAuxiliary.Concept.REL_REFINABILITY_IS),
         REL_REFINABILITY_IS_KIND_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF),
         REL_REFINABILITY_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_CHILD_OF),
-        REL_REFINABILITY_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF);
+        REL_REFINABILITY_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF),
+        REL_DESTINATION_IS(RefsetAuxiliary.Concept.REL_DESTINATION_IS),
+        REL_DESTINATION_IS_KIND_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_KIND_OF),
+        REL_DESTINATION_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_CHILD_OF),
+        REL_DESTINATION_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_DESCENDENT_OF);
 
         protected int nid;
 
