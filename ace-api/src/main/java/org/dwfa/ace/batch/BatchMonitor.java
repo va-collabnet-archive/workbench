@@ -163,7 +163,7 @@ public class BatchMonitor {
         activity.setProgressInfoLower("Commencing...");
         activity.setMaximum((int) totalEvents);
         activity.setValue(0);
-        activity.setIndeterminate(false);
+        activity.setIndeterminate((totalEvents == 0));
 
         startTime = new Date().getTime();
         lastReportTime = startTime;
@@ -177,6 +177,12 @@ public class BatchMonitor {
         timer.start();
     }
 
+    public void setTotalEvents(long totalEvents) {
+        if (timer != null) {
+            timer.getActivity().setMaximum((int) totalEvents);
+        }
+    }
+    
     /**
      * Add a JEditorPane to the bottom on the dialog.
      */
@@ -368,6 +374,10 @@ public class BatchMonitor {
             dialog.setSize((int) (1.25 * dialog.getWidth()), (int) (1.5 * dialog.getHeight()));
 
             dialog.setVisible(true);
+        }
+        
+        protected I_ShowActivity getActivity() {
+            return this.activity;
         }
     }
 

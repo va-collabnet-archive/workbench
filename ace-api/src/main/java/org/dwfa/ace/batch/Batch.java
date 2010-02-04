@@ -38,15 +38,18 @@ public class Batch<T> implements Runnable {
     }
 
     public void run() {
-        if (items.size() == 0)
+        if (items != null && (items.size() == 0)) {
             return;
+        }
         try {
             try {
                 if (useMonitor) {
-                    monitor = new BatchMonitor(description, items.size(), reportIterval);
+                    int size = (items != null) ? items.size() : 0;
+                    monitor = new BatchMonitor(description, size, reportIterval);
                     monitor.start();
                 }
 
+                prepare();
                 process();
                 onComplete();
 
@@ -70,6 +73,9 @@ public class Batch<T> implements Runnable {
     }
 
     protected void process() throws Exception {
+        if (items == null) {
+            return;
+        }
         for (T item : items) {
             processItem(item);
             if (useMonitor) {
@@ -78,6 +84,9 @@ public class Batch<T> implements Runnable {
         }
     }
 
+    protected void prepare() throws Exception {
+    };
+    
     protected void processItem(T item) throws Exception {
     };
 
@@ -87,7 +96,15 @@ public class Batch<T> implements Runnable {
     protected void onComplete() throws Exception {
     };
 
+    protected void setItems(Collection<T> items) {
+        this.items = items;
+        if (useMonitor && monitor != null) {
+            monitor.setTotalEvents(items.size());
+        }
+    }
+    
     public void setReportIterval(int reportIterval) {
         this.reportIterval = reportIterval;
     }
+    
 }
