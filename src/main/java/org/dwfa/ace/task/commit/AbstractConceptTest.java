@@ -31,8 +31,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -98,7 +98,7 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
     }
 
     public I_IntSet getActiveStatus(I_TermFactory termFactory) throws Exception {
-        I_IntSet activeSet = LocalVersionedTerminology.get().newIntSet();
+        I_IntSet activeSet = Terms.get().newIntSet();
         I_ConfigAceFrame config = getFrameConfig();
         if (config == null) {
             config = NewDefaultProfile.newProfile("fullname", "username", "password", "adminUsername", "adminPassword");

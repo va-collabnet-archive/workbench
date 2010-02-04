@@ -40,9 +40,7 @@ public interface I_AmPart {
 	/**
 	 * 
 	 * @param pathId
-	 * @deprecated use makeAnalog
 	 */
-	@Deprecated 
 	public void setPathId(int pathId);
 	/**
 	 * 
@@ -53,7 +51,6 @@ public interface I_AmPart {
 	public void setVersion(int version);
 	
 	
-	@Deprecated 
 	public void setStatusId(int statusId);
 	
 	@Deprecated 
