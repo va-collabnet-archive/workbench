@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
+import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
@@ -30,7 +31,7 @@ import com.sleepycat.je.OperationStatus;
 
 public class ConceptBdb extends ComponentBdb {
 
-	private IdentifierSet readOnlyConceptIdSet;
+	private IdentifierSetReadOnly readOnlyConceptIdSet;
 
 	public ConceptBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
 		super(readOnlyBdbEnv, mutableBdbEnv);
@@ -103,7 +104,8 @@ public class ConceptBdb extends ComponentBdb {
 		int cardinality = ids.cardinality();
 		int idsPerParallelConceptIterator = cardinality / executors;
 		I_IterateIds idsItr = ids.iterator();
-		List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
+		List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(
+				executors + 1);
 		int sum = 0;
 		while (idsItr.next()) {
 			int first = idsItr.nid();
@@ -117,11 +119,12 @@ public class ConceptBdb extends ComponentBdb {
 				}
 			}
 			sum = sum + count;
-			ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor);
+			ParallelConceptIterator pci = new ParallelConceptIterator(first,
+					last, count, processor);
 			Future<Boolean> f = Bdb.getExecutorPool().submit(pci);
 			futures.add(f);
 		}
-		for (Future<Boolean> f: futures) {
+		for (Future<Boolean> f : futures) {
 			f.get();
 		}
 	}
@@ -132,16 +135,16 @@ public class ConceptBdb extends ComponentBdb {
 		private int last;
 		private int countToProcess;
 		private int processedCount = 0;
-		
-		public ParallelConceptIterator(int first, int last,
-				int count, I_ProcessConceptData processor) {
+
+		public ParallelConceptIterator(int first, int last, int count,
+				I_ProcessConceptData processor) {
 			super();
 			this.first = first;
 			this.last = last;
 			this.countToProcess = count;
 			this.processor = processor;
 		}
-		
+
 		@Override
 		public Boolean call() throws Exception {
 			CursorConfig cursorConfig = new CursorConfig();
@@ -157,49 +160,56 @@ public class ConceptBdb extends ComponentBdb {
 				DatabaseEntry mutableFoundKey = new DatabaseEntry();
 				IntegerBinding.intToEntry(mutableKey, mutableFoundKey);
 				DatabaseEntry mutableFoundData = new DatabaseEntry();
-				
+
 				roKey = setupCursor(roCursor, roFoundKey, roFoundData);
 				mutableKey = setupCursor(mutableCursor, mutableFoundKey,
 						mutableFoundData);
 
 				while (roKey <= last || mutableKey <= last) {
 					if (roKey == mutableKey) {
-						processor.processConceptData(Concept.get(roKey, 
-									roFoundData.getData(), mutableFoundData.getData()));
+						processor.processConceptData(Concept.get(roKey,
+								roFoundData.getData(), mutableFoundData
+										.getData()));
 						processedCount++;
 						if (roKey < last) {
-							roKey = advanceCursor(roCursor, roFoundKey, roFoundData);
-							mutableKey = advanceCursor(mutableCursor, mutableFoundKey,
-									mutableFoundData);
+							roKey = advanceCursor(roCursor, roFoundKey,
+									roFoundData);
+							mutableKey = advanceCursor(mutableCursor,
+									mutableFoundKey, mutableFoundData);
 						} else {
 							roKey = Integer.MAX_VALUE;
 							mutableKey = Integer.MAX_VALUE;
 						}
 					} else if (roKey < mutableKey) {
-						processor.processConceptData(Concept.get(roKey, 
+						processor.processConceptData(Concept.get(roKey,
 								roFoundData.getData(), new byte[0]));
 						processedCount++;
 						if (roKey < last) {
-							roKey = advanceCursor(roCursor, roFoundKey, roFoundData);
+							roKey = advanceCursor(roCursor, roFoundKey,
+									roFoundData);
 						} else {
 							roKey = Integer.MAX_VALUE;
 						}
 					} else {
-						processor.processConceptData(Concept.get(mutableKey, 
+						processor.processConceptData(Concept.get(mutableKey,
 								new byte[0], mutableFoundData.getData()));
 						processedCount++;
 						if (mutableKey < last) {
-							mutableKey = advanceCursor(mutableCursor, mutableFoundKey,
-									mutableFoundData);
+							mutableKey = advanceCursor(mutableCursor,
+									mutableFoundKey, mutableFoundData);
 						} else {
 							mutableKey = Integer.MAX_VALUE;
 						}
 					}
 				}
 				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-					AceLog.getAppLog().fine("Parallel concept iterator finished.\n" + 
-							" First: " + first + " last: " + last + " roKey: " + roKey + " mutableKey: " + mutableKey
-							+ " processedCount: " + processedCount + " countToProcess: " + countToProcess);
+					AceLog.getAppLog().fine(
+							"Parallel concept iterator finished.\n"
+									+ " First: " + first + " last: " + last
+									+ " roKey: " + roKey + " mutableKey: "
+									+ mutableKey + " processedCount: "
+									+ processedCount + " countToProcess: "
+									+ countToProcess);
 				}
 				return true;
 			} finally {
@@ -211,7 +221,7 @@ public class ConceptBdb extends ComponentBdb {
 		private int advanceCursor(Cursor mutableCursor,
 				DatabaseEntry mutableFoundKey, DatabaseEntry mutableFoundData) {
 			int mutableKey;
-			if (mutableCursor.getNext(mutableFoundKey, mutableFoundData, 
+			if (mutableCursor.getNext(mutableFoundKey, mutableFoundData,
 					LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				mutableKey = IntegerBinding.entryToInt(mutableFoundKey);
 			} else {
@@ -223,22 +233,13 @@ public class ConceptBdb extends ComponentBdb {
 		private int setupCursor(Cursor mutableCursor,
 				DatabaseEntry mutableFoundKey, DatabaseEntry mutableFoundData) {
 			int mutableKey;
-			if (mutableCursor.getSearchKey(mutableFoundKey, mutableFoundData, 
+			if (mutableCursor.getSearchKey(mutableFoundKey, mutableFoundData,
 					LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
 				mutableKey = IntegerBinding.entryToInt(mutableFoundKey);
 			} else {
 				mutableKey = Integer.MAX_VALUE;
 			}
 			return mutableKey;
-		}
-	}
-	
-	public void iterateWritableConceptDataInSequence(I_ProcessConceptData procesor)
-			throws Exception {
-		IdentifierSet conceptNids = getConceptNids();
-		I_IterateIds nidItr = conceptNids.iterator();
-		while (nidItr.next()) {
-			procesor.processConceptData(getWritableConcept(nidItr.nid()));
 		}
 	}
 
@@ -283,10 +284,22 @@ public class ConceptBdb extends ComponentBdb {
 	 * @return a read-only bit set, with all concept identifiers set to true.
 	 * @throws IOException
 	 */
-	public I_RepresentIdSet getReadOnlyConceptIdSet() throws IOException {
+	public IdentifierSetReadOnly getReadOnlyConceptIdSet() throws IOException {
 		if (readOnlyConceptIdSet == null) {
-			IdentifierSet set = getConceptNids();
-			readOnlyConceptIdSet = new IdentifierSetReadOnly(set);
+			Future<OpenIntIntHashMap> readOnlyFuture = Bdb.getExecutorPool()
+					.submit(new GetCNids(readOnly));
+			Future<OpenIntIntHashMap> mutableFuture = Bdb.getExecutorPool()
+					.submit(new GetCNids(mutable));
+			try {
+				OpenIntIntHashMap readOnlyMap = readOnlyFuture.get();
+				OpenIntIntHashMap mutableMap = mutableFuture.get();
+				readOnlyConceptIdSet = new IdentifierSetReadOnly(
+						mergeIntoIdSet(readOnlyMap, mutableMap));
+			} catch (InterruptedException e) {
+				throw new IOException(e);
+			} catch (ExecutionException e) {
+				throw new IOException(e);
+			}
 		}
 		return readOnlyConceptIdSet;
 	}
@@ -297,30 +310,9 @@ public class ConceptBdb extends ComponentBdb {
 	 * @throws IOException
 	 */
 	public I_RepresentIdSet getConceptIdSet() throws IOException {
-		if (readOnlyConceptIdSet == null) {
-			IdentifierSet set = getConceptNids();
-			readOnlyConceptIdSet = new IdentifierSetReadOnly(set);
-			return set;
-		}
-		return new IdentifierSet(readOnlyConceptIdSet);
-
+		return new IdentifierSet(getReadOnlyConceptIdSet());
 	}
 
-	private IdentifierSet getConceptNids() throws IOException {
-		Future<OpenIntIntHashMap> readOnlyFuture = Bdb.getExecutorPool()
-				.submit(new GetCNids(readOnly));
-		Future<OpenIntIntHashMap> mutableFuture = Bdb.getExecutorPool().submit(
-				new GetCNids(mutable));
-		try {
-			OpenIntIntHashMap readOnlyMap = readOnlyFuture.get();
-			OpenIntIntHashMap mutableMap = mutableFuture.get();
-			return mergeIntoIdSet(readOnlyMap, mutableMap);
-		} catch (InterruptedException e) {
-			throw new IOException(e);
-		} catch (ExecutionException e) {
-			throw new IOException(e);
-		}
-	}
 
 	private IdentifierSet mergeIntoIdSet(OpenIntIntHashMap map1,
 			OpenIntIntHashMap map2) {
