@@ -167,9 +167,14 @@ public class ConceptBdb extends ComponentBdb {
 
 				while (roKey <= last || mutableKey <= last) {
 					if (roKey == mutableKey) {
-						processor.processConceptData(Concept.get(roKey,
-								roFoundData.getData(), mutableFoundData
-										.getData()));
+						Concept c = Concept.concepts.get(roKey);
+						if (c != null) {
+							processor.processConceptData(c);
+						} else {
+							processor.processConceptData(Concept.get(roKey,
+									roFoundData.getData(), mutableFoundData
+											.getData()));
+						}
 						processedCount++;
 						if (roKey < last) {
 							roKey = advanceCursor(roCursor, roFoundKey,
@@ -181,8 +186,13 @@ public class ConceptBdb extends ComponentBdb {
 							mutableKey = Integer.MAX_VALUE;
 						}
 					} else if (roKey < mutableKey) {
-						processor.processConceptData(Concept.get(roKey,
+						Concept c = Concept.concepts.get(roKey);
+						if (c != null) {
+							processor.processConceptData(c);
+						} else {
+							processor.processConceptData(Concept.get(roKey,
 								roFoundData.getData(), new byte[0]));
+						}
 						processedCount++;
 						if (roKey < last) {
 							roKey = advanceCursor(roCursor, roFoundKey,
@@ -191,8 +201,13 @@ public class ConceptBdb extends ComponentBdb {
 							roKey = Integer.MAX_VALUE;
 						}
 					} else {
-						processor.processConceptData(Concept.get(mutableKey,
+						Concept c = Concept.concepts.get(mutableKey);
+						if (c != null) {
+							processor.processConceptData(c);
+						} else {
+							processor.processConceptData(Concept.get(mutableKey,
 								new byte[0], mutableFoundData.getData()));
+						}
 						processedCount++;
 						if (mutableKey < last) {
 							mutableKey = advanceCursor(mutableCursor,

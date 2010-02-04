@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -56,6 +55,7 @@ import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
+import org.ihtsdo.db.util.WeakValueConceptMap;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
@@ -66,8 +66,8 @@ import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
 public class Concept implements I_Transact, I_GetConceptData {
 	
-	private static ConcurrentHashMap<Integer, Concept> concepts 
-		= new ConcurrentHashMap<Integer, Concept>();
+	public static WeakValueConceptMap concepts 
+		= new WeakValueConceptMap();
 
 	public static Concept get(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidToNid(
