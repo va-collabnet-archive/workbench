@@ -276,12 +276,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			throw new IOException(e);
 		}
 	}
-	
-	
+		
 	private void commit(int[] indexes, long time) throws IOException {
 		for (int i: indexes) {
-			assert readWriteArray.commitTimes[i] == Long.MAX_VALUE;
-			readWriteArray.commitTimes[i] = time;
+			if (readWriteArray.commitTimes[i] == Long.MAX_VALUE) {
+				readWriteArray.commitTimes[i] = time;
+			}
 		}
 		DatabaseEntry theKey = new DatabaseEntry();
 		IntegerBinding.intToEntry(0, theKey);
@@ -303,14 +303,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 	
 	public void commit(long time) throws IOException {
-		int[] indexes = new int[uncomittedStatusPathEntries.size()];
-		int i = 0;
 		for (int index: uncomittedStatusPathEntries.values()) {
-			indexes[i] = index;
-			i++;
+			changedSinceSync = true;
+			readWriteArray.commitTimes[getReadWriteIndex(index)] = time;
 		}
-		commit(indexes, time);
 		uncomittedStatusPathEntries.clear();
+		mapperCache.clear();
 	}
 	
 	private int getReadOnlyIndex(int index) {

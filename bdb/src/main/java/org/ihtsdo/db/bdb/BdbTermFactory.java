@@ -752,6 +752,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 		Concept c = (Concept) concept;
 		c.makeWritable();
 		Description d = new Description();
+		Bdb.gVersion.incrementAndGet();
 		d.enclosingConcept = c;
 		d.nid = Bdb.uuidToNid(newDescriptionId);
 		d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newDescriptionId);

@@ -155,7 +155,7 @@ public class ImageTest {
         ir.sapNid = 1;
         obj.revisions.add(ir); 
         
-        Concept c = Concept.get(testConcept);
+        Concept c = Concept.getTempConcept(testConcept);
         obj.enclosingConcept = c;
 
         obj.nid = 1;
@@ -176,7 +176,7 @@ public class ImageTest {
         ir.sapNid = 2;
         obj.revisions.add(ir); 
         
-        Concept c = Concept.get(test2Concept);
+        Concept c = Concept.getTempConcept(test2Concept);
         obj.enclosingConcept = c;
 
         obj.nid = 2;

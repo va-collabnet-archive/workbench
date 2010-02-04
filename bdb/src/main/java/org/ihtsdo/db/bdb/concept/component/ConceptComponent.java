@@ -488,7 +488,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 		buf.append(" path:");
 		ConceptComponent.addNidToBuffer(buf, getPathId());
 		buf.append(" tm:");
-		buf.append(Revision.fileDateFormat.format(new Date(getTime())));
+		if (getTime() == Long.MAX_VALUE) {
+			buf.append(" uncommitted");
+		} else {
+			buf.append(Revision.fileDateFormat.format(new Date(getTime())));
+		}
 		buf.append(" status:");
 		ConceptComponent.addNidToBuffer(buf, getStatusId());
 		buf.append(" };");
@@ -514,7 +518,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 		this.nid = Bdb.uuidToNid(eComponent.primordialComponentUuid);
 		assert this.nid != Integer.MAX_VALUE: "Processing nid: " + enclosingConcept.getNid();
 		this.enclosingConcept = enclosingConcept;
-		this.primordialSapNid = Bdb.getStatusAtPositionNid(eComponent);
+		this.primordialSapNid = Bdb.getSapNid(eComponent);
 		if (eComponent.getVersionCount() > 1) {
 			this.revisions = new ArrayList<R>(eComponent.getVersionCount() - 1);
 		}
@@ -526,6 +530,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 	}
 	
 	public ConceptComponent() {
+		Bdb.gVersion.incrementAndGet();
 	}
 
 	public void convertId(List<EIdentifierVersion> list)  {
@@ -873,17 +878,29 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 
 	@Override
 	public final void setPathId(int pathId) {
-		throw new UnsupportedOperationException();
+		if (getTime() != Long.MAX_VALUE) {
+			throw new UnsupportedOperationException(
+					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+		}
+		if (pathId != getStatusId()) {
+			this.primordialSapNid = Bdb.getSapNid(getStatusId(), pathId, Long.MAX_VALUE);
+		}
 	}
 
 	@Override
 	public final void setStatusId(int statusId) {
-		throw new UnsupportedOperationException();
+		if (getTime() != Long.MAX_VALUE) {
+			throw new UnsupportedOperationException(
+					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+		}
+		if (statusId != this.getStatusId()) {
+			this.primordialSapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
+		}
 	}
 
 	@Override
 	public final void setVersion(int version) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Use makeAnalog instead.");
 	}
 	
 	public final ArrayIntList getPartComponentNids() {

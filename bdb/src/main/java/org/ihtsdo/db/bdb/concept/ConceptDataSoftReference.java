@@ -47,7 +47,13 @@ import com.sleepycat.je.DatabaseEntry;
 public class ConceptDataSoftReference implements I_ManageConceptData {
 
 	private Concept enclosingConcept;
+	private Long version;
 	protected I_GetNidData nidData;
+
+	public static I_ManageConceptData get(Concept concept) throws IOException {
+		return new ConceptDataSoftReference(concept);
+	}
+
 
 	protected SoftReference<ConceptAttributes> attributesRef;
 	protected SoftReference<ArrayList<Relationship>> srcRelsRef;
@@ -70,8 +76,9 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	 */
 	private ConcurrentSet<Object> strongReferences;
 
-	ConceptDataSoftReference(Concept enclosingConcept) throws IOException {
+	private ConceptDataSoftReference(Concept enclosingConcept) throws IOException {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
+		version = Bdb.gVersion.get();
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
 			strongReferences = new ConcurrentSet<Object>(5);
@@ -84,6 +91,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	ConceptDataSoftReference(Concept enclosingConcept, DatabaseEntry data)
 			throws IOException {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
+		version = Bdb.gVersion.get();
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
 			strongReferences = new ConcurrentSet<Object>(5);
@@ -94,6 +102,7 @@ public class ConceptDataSoftReference implements I_ManageConceptData {
 	public ConceptDataSoftReference(Concept enclosingConcept, byte[] roBytes,
 			byte[] mutableBytes) {
 		assert enclosingConcept != null : "enclosing concept cannot be null.";
+		version = Bdb.gVersion.get();
 		this.enclosingConcept = enclosingConcept;
 		if (enclosingConcept.isEditable()) {
 			strongReferences = new ConcurrentSet<Object>(5);

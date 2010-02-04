@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.Terms;
@@ -36,6 +37,8 @@ import com.sleepycat.je.EnvironmentLockedException;
 
 public class Bdb {
 
+	private static final String G_VERSION = "gVersion";
+	public static AtomicLong gVersion = new AtomicLong();
 	private static Bdb readOnly;
 	private static Bdb mutable;
 	private static UuidBdb uuidDb;
@@ -80,6 +83,12 @@ public class Bdb {
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			conceptDb = new ConceptBdb(readOnly, mutable);
 			propDb = new PropertiesBdb(readOnly, mutable);
+			
+			String versionString = getProperty(G_VERSION);
+			if (versionString != null) {
+				gVersion.set(Long.parseLong(versionString));
+			}
+			
 			BdbTermFactory tf = new BdbTermFactory();
 			Terms.set(tf);
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
@@ -123,7 +132,7 @@ public class Bdb {
 	}
 
 	
-	public static int getStatusAtPositionNid(EVersion version) {
+	public static int getSapNid(EVersion version) {
 		assert version.getTime() != 0: "Time is 0; was it initialized?";
 		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
@@ -132,6 +141,14 @@ public class Bdb {
 				uuidToNid(version.getStatusUuid()), 
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
+	}
+
+	public static int getSapNid(int statusNid, int pathNid, long time) {
+		assert time != 0: "Time is 0; was it initialized?";
+		assert time != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
+		assert statusNid != Integer.MIN_VALUE: "Status is Integer.MIN_VALUE; was it initialized?";
+		assert pathNid != Integer.MIN_VALUE: "Path is Integer.MIN_VALUE; was it initialized?";
+		return statusAtPositionDb.getSapNid(statusNid, pathNid, time);
 	}
 
 	public static StatusAtPositionBdb getSapDb() {
@@ -160,7 +177,8 @@ public class Bdb {
 	}
 
 	private static Future<Boolean> syncFuture;
-	public static Future<Boolean> sync() throws InterruptedException, ExecutionException {
+	public static Future<Boolean> sync() 
+		throws InterruptedException, ExecutionException {
 		if (syncFuture != null) {
 			if (syncFuture.isDone() != true) {
 				syncFuture.get();
@@ -174,6 +192,7 @@ public class Bdb {
 
 		@Override
 		public Boolean call() throws Exception {
+			setProperty(G_VERSION, Long.toString(gVersion.get()));
 			uuidDb.sync();
 			uuidsToNidMapDb.sync();
 			nidCidMapDb.sync();

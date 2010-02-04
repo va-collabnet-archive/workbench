@@ -117,7 +117,7 @@ public class DescriptionRevision
 		lang = edv.getLang();
 		text = edv.getText();
 		typeNid = Bdb.uuidToNid(edv.getTypeUuid());
-		sapNid = Bdb.getStatusAtPositionNid(edv);
+		sapNid = Bdb.getSapNid(edv);
 	}
 
     public DescriptionRevision() {

@@ -229,7 +229,8 @@ public class NidCNidMapBdb extends ComponentBdb {
 			throw new ArrayIndexOutOfBoundsException(" cNid: " + cNid + " nid: " + nid  + 
 					" mapIndex: " + mapIndex + " indexInMap: " + indexInMap);
 		}
-		assert nidCNidMaps[mapIndex][indexInMap] == Integer.MAX_VALUE: "processing cNid: " + cNid + 
+		assert nidCNidMaps[mapIndex][indexInMap] == Integer.MAX_VALUE ||
+		nidCNidMaps[mapIndex][indexInMap] == cNid: "processing cNid: " + cNid + 
 					" nid: " + nid + " found: " + nidCNidMaps[mapIndex][indexInMap];
 		nidCNidMaps[mapIndex][indexInMap] = cNid;
 	}

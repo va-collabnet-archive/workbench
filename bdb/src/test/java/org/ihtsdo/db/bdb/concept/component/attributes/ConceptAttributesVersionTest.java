@@ -81,7 +81,7 @@ public class ConceptAttributesVersionTest {
 	@Test
 	public void testConceptAttributesVersionTupleInputConceptAttributes() {
 		try {
-			Concept c = Concept.get(testConcept);
+			Concept c = Concept.getTempConcept(testConcept);
 			assertNotNull(c.getConceptAttributes());
 			ConceptComponentBinder<ConceptAttributesRevision, ConceptAttributes> cab = 
 				new ConceptAttributesBinder();
@@ -92,7 +92,7 @@ public class ConceptAttributesVersionTest {
 			ArrayList<ConceptAttributes> newList = cab.entryToObject(entry);
 			assertEquals(origList, newList);
 
-			Concept c2 = Concept.get(test2Concept);
+			Concept c2 = Concept.getTempConcept(test2Concept);
 			ArrayList<ConceptAttributes> c2List = c2.getConceptAttributesList();
 			cab.objectToEntry(c2List, entry);
 			ArrayList<ConceptAttributes> c2NewList = cab.entryToObject(entry);
@@ -103,7 +103,7 @@ public class ConceptAttributesVersionTest {
 			ConceptAttributes ca1 = origList.get(0);
 			testCa1(ca1);
 			
-			Concept c3 = Concept.get(testConcept);
+			Concept c3 = Concept.getTempConcept(testConcept);
 			Bdb.getConceptDb().writeConcept(c3);
 			Concept c4 = Bdb.getConceptDb().getConcept(c3.getNid());
 			testCa1(c4.getConceptAttributes());

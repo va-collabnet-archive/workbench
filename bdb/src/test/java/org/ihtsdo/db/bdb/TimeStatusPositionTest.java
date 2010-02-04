@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 import static org.junit.Assert.assertTrue;
 
+import org.ihtsdo.db.bdb.sap.TimeStatusPosition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

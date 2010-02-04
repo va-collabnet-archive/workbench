@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -63,29 +64,20 @@ import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;
 
 public class Concept implements I_Transact, I_GetConceptData {
-
-	private static class TransactionHandler implements I_Transact {
-
-		@Override
-		public void abort() throws IOException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void commit(int version, Set<TimePathId> values)
-				throws IOException {
-			// TODO Auto-generated method stub
-
-		}
-
-	}
+	
+	private static ConcurrentHashMap<Integer, Concept> concepts 
+		= new ConcurrentHashMap<Integer, Concept>();
 
 	public static Concept get(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidToNid(
 				eConcept.getConceptAttributes().getPrimordialComponentUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
-		Concept c = get(conceptNid, true);
+		Concept c = get(conceptNid);
+		return populateFromEConcept(eConcept, c);
+	}
+
+	private static Concept populateFromEConcept(EConcept eConcept, Concept c)
+			throws IOException {
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		
 		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
@@ -175,34 +167,44 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return c;
 	}	
 	
-	public static Concept get(int nid, boolean editable) throws IOException {
-		return new Concept(nid, editable);
+	public static Concept get(int nid) throws IOException {
+		Concept c = concepts.get(nid);
+		if (c == null) {
+			Concept newC = new Concept(nid);
+			c = concepts.putIfAbsent(nid, newC);
+			if (c == null) {
+				c = newC;
+			}
+		}
+		return c;
 	}
 
-	public static Concept get(int nid, boolean editable,
-			byte[] roBytes, byte[] mutableBytes) throws IOException {
-		return new Concept(nid, editable, roBytes, mutableBytes);
+	public static Concept get(int nid, byte[] roBytes, byte[] mutableBytes) throws IOException {
+		return new Concept(nid, roBytes, mutableBytes);
 	}
-
-	private static I_Transact transactionHandler = new TransactionHandler();
 
 	private int nid;
-	private boolean editable;
 	private I_ManageConceptData data;
     private int fsDescNid = Integer.MIN_VALUE;
     private int fsXmlDescNid = Integer.MIN_VALUE;
 
-	protected Concept(int nid, boolean editable) throws IOException {
+	private Concept(int nid) throws IOException {
 		super();
 		this.nid = nid;
-		this.editable = editable;
-		data = new ConceptDataSoftReference(this);
+		data = ConceptDataSoftReference.get(this);
 	}
 
-	public Concept(int nid, boolean editable, byte[] roBytes,
+	/**
+	 * For use in testing/test cases only. 
+	 * @param nid
+	 * @param editable
+	 * @param roBytes
+	 * @param mutableBytes
+	 * @throws IOException
+	 */
+	protected Concept(int nid, byte[] roBytes,
 			byte[] mutableBytes) throws IOException {
 		this.nid = nid;
-		this.editable = editable;
 		data = new ConceptDataSoftReference(this, roBytes, mutableBytes);
 	}
 
@@ -222,32 +224,26 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public boolean isEditable() {
-		return editable;
+		return true;
 	}
 
 	@Override
 	public void abort() throws IOException {
-		editable = false;
+		//TODO...
 	}
 
 	@Override
 	public void commit(int version, Set<TimePathId> values) throws IOException {
-		if (editable) {
-			try {
-				if (ReadWriteDataVersion.get(nid) == data
-						.getReadWriteDataVersion()) {
+		try {
+			if (ReadWriteDataVersion.get(nid) == data.getReadWriteDataVersion()) {
 
-				} else {
+			} else {
 
-				}
-			} catch (InterruptedException e) {
-				throw new IOException(e);
-			} catch (ExecutionException e) {
-				throw new IOException(e);
 			}
-		} else {
-			throw new UnsupportedOperationException(
-					"Concept is not editable. nid: " + nid);
+		} catch (InterruptedException e) {
+			throw new IOException(e);
+		} catch (ExecutionException e) {
+			throw new IOException(e);
 		}
 	}
 
@@ -1017,16 +1013,24 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public boolean isUncommitted() {
-		if (editable == false) {
-			return false;
-		}
 		return data.isUncommitted();
 	}
 
 	public void makeWritable() {
-		if (editable == false) {
-			editable = true;
-			data.makeWritable();
-		}
+		data.makeWritable();
+	}
+
+	/**
+	 * This method is for creating temporary concepts for 
+	 * unit testing only... 
+	 * @param eConcept
+	 * @return
+	 * @throws IOException
+	 */
+	public static Concept getTempConcept(EConcept eConcept) throws IOException {
+		int conceptNid = Bdb.uuidToNid(
+				eConcept.getConceptAttributes().getPrimordialComponentUuid());
+		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
+		return populateFromEConcept(eConcept, new Concept(conceptNid));
 	}
 }

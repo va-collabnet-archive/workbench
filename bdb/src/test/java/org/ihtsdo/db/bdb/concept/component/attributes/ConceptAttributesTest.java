@@ -170,7 +170,7 @@ public class ConceptAttributesTest {
         car.sapNid = 21;
         obj.revisions.add(car);
         
-        Concept c = Concept.get(testConcept);
+        Concept c = Concept.getTempConcept(testConcept);
         obj.enclosingConcept = c;
         
         return obj;
@@ -196,7 +196,7 @@ public class ConceptAttributesTest {
         car.sapNid = 22;
         obj.revisions.add(car);
         
-        Concept c = Concept.get(test2Concept);
+        Concept c = Concept.getTempConcept(test2Concept);
         obj.enclosingConcept = c;
            
         return obj;

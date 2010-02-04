@@ -162,7 +162,7 @@ public class Image
 		format = eImage.getFormat();
 		textDescription = eImage.getTextDescription();
 		typeNid = Bdb.uuidToNid(eImage.getPrimordialComponentUuid());
-		primordialSapNid = Bdb.getStatusAtPositionNid(eImage);
+		primordialSapNid = Bdb.getSapNid(eImage);
 		if (eImage.getExtraVersionsList() != null) {
 			revisions = new ArrayList<ImageRevision>(eImage.getExtraVersionsList().size());
 			for (EImageVersion eiv: eImage.getExtraVersionsList()) {

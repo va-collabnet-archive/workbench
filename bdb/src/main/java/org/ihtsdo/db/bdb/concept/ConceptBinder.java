@@ -259,12 +259,16 @@ public class ConceptBinder extends TupleBinding<Concept> {
 		byte[] output;
 		TupleInput readWriteInput = conceptData.getReadWriteTupleInput();
 		byte[] bufferBytes = readWriteInput.getBufferBytes();
-		int offset = start.getOffset(bufferBytes);
-		int byteCount = end.getOffset(bufferBytes) - offset;
-		readWriteInput.skipFast(offset);
-		output = new byte[byteCount];
-		System.arraycopy(readWriteInput.getBufferBytes(), offset, output, 0,
-				byteCount);
+		if (bufferBytes.length > OFFSETS.getHeaderSize()) {
+			int offset = start.getOffset(bufferBytes);
+			int byteCount = end.getOffset(bufferBytes) - offset;
+			readWriteInput.skipFast(offset);
+			output = new byte[byteCount];
+			System.arraycopy(readWriteInput.getBufferBytes(), offset, output, 0,
+					byteCount);
+		} else {
+			output = zeroOutputArray;
+		}
 		return output;
 	}
 }

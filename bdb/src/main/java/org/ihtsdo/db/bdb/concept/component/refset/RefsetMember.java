@@ -158,7 +158,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 			Concept enclosingConcept) {
 		super(refsetMember, enclosingConcept);
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
-		primordialSapNid = Bdb.getStatusAtPositionNid(refsetMember);
+		primordialSapNid = Bdb.getSapNid(refsetMember);
 		assert primordialSapNid != Integer.MAX_VALUE;
 	}
 	

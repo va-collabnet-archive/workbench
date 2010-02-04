@@ -95,7 +95,7 @@ public class RelationshipRevision
 		this.group = erv.getGroup();
 		this.refinabilityNid = Bdb.uuidToNid(erv.getRefinabilityUuid());
 		this.typeNid = Bdb.uuidToNid(erv.getTypeUuid());
-		this.sapNid = Bdb.getStatusAtPositionNid(erv);
+		this.sapNid = Bdb.getSapNid(erv);
 	}
 
     public RelationshipRevision() {

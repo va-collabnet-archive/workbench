@@ -148,4 +148,8 @@ public class ConcurrentSet<E> implements Set<E> {
 		setMap = new ConcurrentHashMap<E, E>(i);
 		addAll(old.keySet());
 	}
+	
+	public String toString() {
+		return setMap.keySet().toString();
+	}
 }

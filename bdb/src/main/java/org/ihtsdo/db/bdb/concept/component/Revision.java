@@ -137,22 +137,28 @@ public abstract class Revision<V extends Revision<V, C>,
 		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
 	}
 
+
 	@Override
-	@Deprecated
-	public void setPathId(int pathId) {
-		throw new UnsupportedOperationException();
+	public final void setPathId(int pathId) {
+		if (getTime() != Long.MAX_VALUE) {
+			throw new UnsupportedOperationException(
+					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+		}
+		this.sapNid = Bdb.getSapNid(getStatusId(), pathId, Long.MAX_VALUE);
 	}
 
 	@Override
-	@Deprecated
-	public void setStatusId(int statusId) {
-		throw new UnsupportedOperationException();
+	public final void setStatusId(int statusId) {
+		if (getTime() != Long.MAX_VALUE) {
+			throw new UnsupportedOperationException(
+					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+		}
+		this.sapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
 	}
 
 	@Override
-	@Deprecated
-	public void setVersion(int version) {
-		throw new UnsupportedOperationException();
+	public final void setVersion(int version) {
+		throw new UnsupportedOperationException("Use makeAnalog instead.");
 	}
 	
 	/* (non-Javadoc)

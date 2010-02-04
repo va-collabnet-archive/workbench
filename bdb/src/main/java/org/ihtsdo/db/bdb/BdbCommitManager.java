@@ -213,7 +213,7 @@ public class BdbCommitManager {
 			for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
 					.getAceFrames()) {
 				frameConfig.setCommitEnabled(true);
-				updateAlerts(frameConfig);
+				updateAlerts();
 				if (concept.isUncommitted()) {
 					frameConfig.addUncommitted(concept);
 				} else {
@@ -235,27 +235,39 @@ public class BdbCommitManager {
 	}
 
 	public static void commit() {
-		synchronized (unwrittenConcepts) {
-			uncommittedCNids.clear();
-			for (Concept c: unwrittenConcepts) {
-				Future<Boolean> f = Bdb.getExecutorPool().submit(new ConceptWriter(c));
-				try {
-					writeConceptFutures.put(f);
-				} catch (InterruptedException e) {
-					throw new RuntimeException("Should never happen");
+		//TODO add commit tests...
+		long commitTime = System.currentTimeMillis();
+		try {
+			Bdb.getSapDb().commit(commitTime);
+			synchronized (unwrittenConcepts) {
+				uncommittedCNids.clear();
+				for (Concept c: unwrittenConcepts) {
+					Future<Boolean> f = Bdb.getExecutorPool().submit(new ConceptWriter(c));
+					try {
+						writeConceptFutures.put(f);
+					} catch (InterruptedException e) {
+						throw new RuntimeException("Should never happen");
+					}
 				}
+				unwrittenConcepts.clear();
+				uncommittedCNids.setCapacity(10);
 			}
-			unwrittenConcepts.clear();
-			uncommittedCNids.setCapacity(10);
+		} catch (IOException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
+		updateFrames();
 	}
 
 	public static void cancel() {
 		// TODO Auto-generated method stub
 		uncommittedCNids.clear();
 		uncommittedCNids.setCapacity(10);
-		// MORE TODO...
-
+		try {
+			Bdb.getSapDb().commit(Long.MIN_VALUE);
+		} catch (IOException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+		updateFrames();
 	}
 
 	public static void forget(I_RelVersioned rel) {
@@ -330,22 +342,41 @@ public class BdbCommitManager {
 					}
 					// hide data checks tab...
 				}
+				if (uncommittedCNids.size() == 0) {
+					frameConfig.setCommitEnabled(false);
+					frameConfig.fireCommit();
+				} else {
+					frameConfig.setCommitEnabled(true);
+				}
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().warning(e.toString());
 		}
 	}
 
-	public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				doUpdate(frameConfig);
-			}
-		});
+	public static void updateFrames() {
+		if (getActiveFrame() != null) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					doUpdate(getActiveFrame());
+				}
+			});
+		}
+	}
+
+	public static void updateAlerts() {
+		if (getActiveFrame() != null) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					doUpdate(getActiveFrame());
+				}
+			});
+		}
 	}
 
 	public static void removeUncommitted(final Concept concept) {
 		uncommittedCNids.remove(concept.getNid());
+		unwrittenConcepts.remove(concept);
 		if (uncommittedCNids.size() == 0) {
 			dataCheckMap.clear();
 		}
@@ -363,7 +394,7 @@ public class BdbCommitManager {
 				getActiveFrame().getDbConfig().getAceFrames()) {
 			try {
 				frameConfig.removeUncommitted(concept);
-				updateAlerts(frameConfig);
+				updateAlerts();
 				if (uncommittedCNids.size() == 0) {
 					frameConfig.setCommitEnabled(false);
 				}

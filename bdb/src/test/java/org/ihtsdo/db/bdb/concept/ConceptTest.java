@@ -1,8 +1,8 @@
 package org.ihtsdo.db.bdb.concept;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesVersion;
@@ -187,7 +186,7 @@ public class ConceptTest {
         Concept obj = null;
         EConcept ec = makeConcept1();  
         try {
-            obj = Concept.get(ec);
+            obj = Concept.getTempConcept(ec);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -201,7 +200,7 @@ public class ConceptTest {
         Concept obj = null;
         EConcept ec = makeConcept2();  
         try {
-            obj = Concept.get(ec);
+            obj = Concept.getTempConcept(ec);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

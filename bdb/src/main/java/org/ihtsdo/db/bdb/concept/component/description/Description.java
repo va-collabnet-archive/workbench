@@ -195,7 +195,7 @@ public class Description
 		lang = eDesc.getLang();
 		text = eDesc.getText();
 		typeNid = Bdb.uuidToNid(eDesc.getTypeUuid());
-		primordialSapNid = Bdb.getStatusAtPositionNid(eDesc);
+		primordialSapNid = Bdb.getSapNid(eDesc);
 		if (eDesc.getExtraVersionsList() != null) {
 			revisions = new ArrayList<DescriptionRevision>(eDesc.getExtraVersionsList().size());
 			for (EDescriptionVersion edv: eDesc.getExtraVersionsList()) {

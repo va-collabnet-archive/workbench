@@ -156,7 +156,7 @@ public class RelationshipTest {
         obj.setStatusAtPositionNid(1);
         try {
             Concept c;
-            c = Concept.get(testConcept);
+            c = Concept.getTempConcept(testConcept);
             obj.enclosingConcept = c; 
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -192,7 +192,7 @@ public class RelationshipTest {
         obj.setStatusAtPositionNid(2);
         try {
             Concept c;
-            c = Concept.get(test2Concept);
+            c = Concept.getTempConcept(test2Concept);
             obj.enclosingConcept = c; 
         } catch (IOException e) {
             // TODO Auto-generated catch block

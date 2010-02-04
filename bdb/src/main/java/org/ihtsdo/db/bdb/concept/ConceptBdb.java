@@ -1,12 +1,10 @@
 package org.ihtsdo.db.bdb.concept;
 
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -15,7 +13,6 @@ import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.IdentifierSetReadOnly;
-import org.dwfa.ace.list.AceListRenderer;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
@@ -53,33 +50,16 @@ public class ConceptBdb extends ComponentBdb {
 		return getConcept(cNid).getUids();
 	}
 
-	ConcurrentHashMap<Integer, SoftReference<Concept>> conceptMap;
 	public Concept getConcept(int cNid) throws IOException {
 		assert cNid != Integer.MAX_VALUE;
-		if (conceptMap == null) {
-			conceptMap = new ConcurrentHashMap<Integer, SoftReference<Concept>>(getCount());
-		}
-		SoftReference<Concept> cRef = conceptMap.get(cNid);
-		Concept c;
-		if (cRef != null) {
-			c = cRef.get();
-			if (c != null) {
-				return c;
-			}
-		}
-		c = Concept.get(cNid, false);
-		conceptMap.put(cNid, new SoftReference<Concept>(c));
-		return c;
+		return Concept.get(cNid);
 	}
 
 	public Concept getWritableConcept(int cNid) throws IOException {
-		return Concept.get(cNid, true);
+		return Concept.get(cNid);
 	}
 
 	public void writeConcept(Concept concept) throws IOException {
-		if (conceptMap != null) {
-			conceptMap.remove(concept.getNid());
-		}
 		ConceptBinder binder = new ConceptBinder();
 		DatabaseEntry key = new DatabaseEntry();
 		int cNid = concept.getNid();
@@ -95,9 +75,8 @@ public class ConceptBdb extends ComponentBdb {
 		}
 	}
 
-	public int getCount() {
-		long count = readOnly.count() + mutable.count();
-		return (int) count;
+	public int getCount() throws IOException {
+		return (int) getReadOnlyConceptIdSet().cardinality();
 	}
 
 	/*
@@ -185,7 +164,7 @@ public class ConceptBdb extends ComponentBdb {
 
 				while (roKey <= last || mutableKey <= last) {
 					if (roKey == mutableKey) {
-						processor.processConceptData(Concept.get(roKey, false, 
+						processor.processConceptData(Concept.get(roKey, 
 									roFoundData.getData(), mutableFoundData.getData()));
 						processedCount++;
 						if (roKey < last) {
@@ -197,7 +176,7 @@ public class ConceptBdb extends ComponentBdb {
 							mutableKey = Integer.MAX_VALUE;
 						}
 					} else if (roKey < mutableKey) {
-						processor.processConceptData(Concept.get(roKey, false, 
+						processor.processConceptData(Concept.get(roKey, 
 								roFoundData.getData(), new byte[0]));
 						processedCount++;
 						if (roKey < last) {
@@ -206,7 +185,7 @@ public class ConceptBdb extends ComponentBdb {
 							roKey = Integer.MAX_VALUE;
 						}
 					} else {
-						processor.processConceptData(Concept.get(mutableKey, false, 
+						processor.processConceptData(Concept.get(mutableKey, 
 								new byte[0], mutableFoundData.getData()));
 						processedCount++;
 						if (mutableKey < last) {
