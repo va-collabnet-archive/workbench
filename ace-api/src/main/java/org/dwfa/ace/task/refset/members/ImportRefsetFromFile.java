@@ -134,6 +134,10 @@ public class ImportRefsetFromFile extends AbstractTask {
             refsetHelper.addAllToRefset(importConcepts.values(), "Importing new refset members from file");
             refsetHelper.removeAllFromRefset(membersToRemove, "Removing existing members absent from file");
 
+            JOptionPane.showMessageDialog(null, 
+                "Completed import of " + importConcepts.values().size() + " refset member concepts.", 
+                "Refset Import", JOptionPane.INFORMATION_MESSAGE);
+            
             return Condition.CONTINUE;
 
         } catch (Exception e) {
