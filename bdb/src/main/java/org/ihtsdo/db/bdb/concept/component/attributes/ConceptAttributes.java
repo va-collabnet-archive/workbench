@@ -480,7 +480,32 @@ public class ConceptAttributes
 		return false;
 	}
 
-	@Override
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(ConceptAttributes another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        // Compare defined
+        if (this.defined != another.defined) {
+            buf.append("ConceptAttributes.defined not equal: \n" + 
+                "\tthis.defined = " + this.defined + "\n" + 
+                "\tanother.defined = " + another.defined + "\n");
+        }
+        
+        // Compare the parents 
+        buf.append(super.validate(another));
+        
+        return buf.toString();
+    }
+        
+
+    @Override
 	public List<? extends I_ConceptAttributePart> getMutableParts() {
 		return getTuples();
 	}

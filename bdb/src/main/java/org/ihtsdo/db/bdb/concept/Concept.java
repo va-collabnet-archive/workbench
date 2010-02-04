@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
+import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
@@ -887,7 +888,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getAllNids();
 	}
 
-	/**
+    
+    /**
 	 * Test method to check to see if two concepts are equal in all respects. 
 	 * @param another
 	 * @return either a zero length String, or a String containing a description of the
@@ -896,22 +898,139 @@ public class Concept implements I_Transact, I_GetConceptData {
 	 */
 	public String validate(Concept another) throws IOException {
 		assert another != null;
-		StringBuffer buff = new StringBuffer();
-		if (nid != another.nid) {
-			buff.append("Nids not equal: " + nid + " " + another.nid + "\n");
+		StringBuffer buf = new StringBuffer();
+		String validationResult = null; 
+		String spaces = "   "; 
+		
+		// Compare nids 
+		if (this.nid != another.nid) {
+		    buf.append(spaces + "Concept.nid not equal: \n" + 
+                "\tthis.nid = " + this.nid + "\n" + 
+                "\tanother.nid = " + another.nid + "\n");
 		}
+        
+        // Compare fsDescNid 
+        if (this.fsDescNid != another.fsDescNid) {
+            buf.append(spaces + "Concept.fsDescNid not equal: \n" + 
+                "\tthis.fsDescNid = " + this.fsDescNid + "\n" + 
+                "\tanother.fsDescNid = " + another.fsDescNid + "\n");
+        }
+        
+        // Compare fsXmlDescNid 
+        if (this.fsXmlDescNid != another.fsXmlDescNid) {
+            buf.append(spaces + "Concept.fsXmlDescNid not equal: \n" + 
+                "\tthis.fsXmlDescNid = " + this.fsXmlDescNid + "\n" + 
+                "\tanother.fsXmlDescNid = " + another.fsXmlDescNid + "\n");
+        }
+        
+		// Compare Attributes 
 		ConceptAttributes attributes = getConceptAttributes();
 		assert attributes != null: "validating: " + nid;
 		ConceptAttributes anotherAttributes = another.getConceptAttributes();
 		assert anotherAttributes != null: "validating: " + nid;
-		if (attributes.equals(anotherAttributes) == false) {
-			buff.append("Concept attributes are not equal:\n" + 
-					getConceptAttributes() + "\n" + 
-					another.getConceptAttributes() + "\n");
+		validationResult = attributes.validate(anotherAttributes);
+		if (validationResult.length() != 0) {
+		    buf.append(spaces + validationResult + "\n");
 		}
 		
-		return buff.toString();
+        // Compare Descriptions 
+        List<Description> descriptionList = this.getDescriptions();
+        assert descriptionList != null: "validating: " + nid;
+        List<Description> anotherDescriptionList = another.getDescriptions();
+        assert anotherDescriptionList != null: "validating: " + nid;
+        for (int i = 0; i < descriptionList.size(); i++) {
+            // make sure there are elements in both arrays to compare
+            if (anotherDescriptionList.size() > i) {
+                Description thisDescription = descriptionList.get(i); 
+                Description anotherDescription = anotherDescriptionList.get(i);            
+                validationResult = thisDescription.validate(anotherDescription);
+                if (validationResult.length() != 0) {
+                    buf.append(spaces + "Concept.Descriptions[" + i + "] not equal: \n");
+                    buf.append(validationResult + "\n");
+                }
+            } else {
+                buf.append(spaces + "Concept.Descriptions[" + i + "] not equal: \n");
+                buf.append(spaces + "\tThere is no corresponding Description in another to compare it to.\n");
+            }
+        }
+        
+
+        // Compare Relationships 
+        List<Relationship> relationshipList = this.getSourceRels();
+        assert relationshipList != null: "validating: " + nid;
+        List<Relationship> anotherRelationshipList = another.getSourceRels();
+        assert anotherRelationshipList != null: "validating: " + nid;
+        for (int i = 0; i < relationshipList.size(); i++) {
+            // make sure there are elements in both arrays to compare
+            if (anotherRelationshipList.size() > i) {
+                Relationship thisRelationship = relationshipList.get(i); 
+                Relationship anotherRelationship = anotherRelationshipList.get(i);            
+                validationResult = thisRelationship.validate(anotherRelationship);
+                if (validationResult.length() != 0) {
+                    buf.append(spaces + "Concept.Relationships[" + i + "] not equal: \n");
+                    buf.append(validationResult + "\n");
+                }
+            } else {
+                buf.append(spaces + "Concept.Relationships[" + i + "] not equal: \n");
+                buf.append(spaces + "\tThere is no corresponding Relationship in another to compare it to.\n");
+            }
+        }
+
+
+        // Compare images 
+        List<Image> imagesList = this.getImages();
+        assert imagesList != null: "validating: " + nid;
+        List<Image> anotherImagesList = another.getImages();
+        assert anotherImagesList != null: "validating: " + nid;
+        for (int i = 0; i < imagesList.size(); i++) {
+            // make sure there are elements in both arrays to compare
+            if (anotherImagesList.size() > i) {
+                Image thisImage = imagesList.get(i); 
+                Image anotherImage = anotherImagesList.get(i);            
+                validationResult = thisImage.validate(anotherImage);
+                if (validationResult.length() != 0) {
+                    buf.append(spaces + "Concept.Images[" + i + "] not equal: \n");
+                    buf.append(validationResult + "\n");
+                }
+            } else {
+                buf.append(spaces + "Concept.Images[" + i + "] not equal: \n");
+                buf.append(spaces + "\tThere is no corresponding Image in another to compare it to.\n");
+            }
+        }
+   
+
+        // Compare Refset Members 
+        List<RefsetMember<?, ?>> refsetMembersList = this.getExtensions();
+        assert refsetMembersList != null: "validating: " + nid;
+        List<RefsetMember<?, ?>> anotherRefsetMembersList = another.getExtensions();
+        assert anotherRefsetMembersList != null: "validating: " + nid;
+        for (int i = 0; i < refsetMembersList.size(); i++) {
+            // make sure there are elements in both arrays to compare
+            if (anotherRefsetMembersList.size() > i) {
+                RefsetMember<?, ?> thisRefsetMember = refsetMembersList.get(i); 
+                RefsetMember<?, ?> anotherRefsetMember = anotherRefsetMembersList.get(i);            
+                if (thisRefsetMember.equals(anotherRefsetMember) == false) {
+                    buf.append(spaces + "Concept.RefsetMember[" + i + "] not equal: \n");
+                    buf.append(spaces + "this.refsetMember = " + thisRefsetMember.toString() + "\n");
+                    buf.append(spaces + "another.refsetMember = " + anotherRefsetMember.toString() + "\n");
+                }
+            } else {
+                buf.append(spaces + "Concept.RefsetMember[" + i + "] not equal: \n");
+                buf.append(spaces + "\tThere is no corresponding RefsetMember in another to compare it to.\n");
+            }
+        }
+        
+//        
+//        
+//        if (refsetMembers.equals(anotherRefsetMembers) == false) {
+//            buff.append("Concept refset members are not equal:\n" + 
+//                    "\t this: " + refsetMembers + "\n" + 
+//                    "\t another: " + anotherRefsetMembers + "\n");
+//        }
+
+        return buf.toString();
 	}	
+	
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

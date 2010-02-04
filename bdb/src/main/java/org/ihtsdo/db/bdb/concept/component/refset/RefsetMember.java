@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb.concept.component.refset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.description.Description.Version;
+import org.ihtsdo.db.bdb.concept.component.image.Image;
 import org.ihtsdo.etypes.ERefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -214,6 +216,32 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		return false;
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(RefsetMember<V, C> another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";
+        
+        if (this.referencedComponentNid != another.referencedComponentNid) {
+            buf.append(spaces + "RefsetMember.referencedComponentNid not equal: \n" + 
+                "\tthis.referencedComponentNid = " + this.referencedComponentNid + "\n" + 
+                "\tanother.referencedComponentNid = " + another.referencedComponentNid + "\n");
+        }
+        
+        
+        
+        // Compare the parents 
+        buf.append(super.validate(another));
+        
+        return buf.toString();
+    }
+	
 	protected abstract boolean membersEqual(ConceptComponent<V, C> obj);
 
 	public void readFromBdb(TupleInput input)  {

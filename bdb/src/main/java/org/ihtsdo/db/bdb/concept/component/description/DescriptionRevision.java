@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.description;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -57,6 +58,45 @@ public class DescriptionRevision
         return false;
     }
 
+
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(DescriptionRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";
+        
+        if (this.initialCaseSignificant != another.initialCaseSignificant) {
+            buf.append(spaces + "DescriptionRevision.initialCaseSignificant not equal: \n" + 
+                "\tthis.initialCaseSignificant = " + this.initialCaseSignificant + "\n" + 
+                "\tanother.initialCaseSignificant = " + another.initialCaseSignificant + "\n");
+        }
+        if (!this.text.equals(another.text)) {
+            buf.append(spaces + "DescriptionRevision.text not equal: \n" + 
+                "\tthis.text = " + this.text + "\n" + 
+                "\tanother.text = " + another.text + "\n");
+        }
+        if (!this.lang.equals(another.lang)) {
+            buf.append(spaces + "DescriptionRevision.lang not equal: \n" + 
+                "\tthis.lang = " + this.lang + "\n" + 
+                "\tanother.lang = " + another.lang + "\n");
+        }
+        if (this.typeNid != another.typeNid) {
+            buf.append(spaces + "DescriptionRevision.typeNid not equal: \n" + 
+                "\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\tanother.typeNid = " + another.typeNid + "\n");
+        }
+
+        // Compare the parents 
+        buf.append(super.validate(another));
+        
+        return buf.toString();
+    }
     
 	public DescriptionRevision(int statusAtPositionNid, 
 			Description primoridalMember) {

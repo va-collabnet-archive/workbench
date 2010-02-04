@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -192,4 +194,32 @@ public abstract class Revision<V extends Revision<V, C>,
 		return false;
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    @SuppressWarnings("unchecked")
+    public String validate(Revision<?, ?> another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";
+        
+        if (this.sapNid != another.sapNid) {
+            buf.append(spaces + "Revision.sapNid not equal: \n" + 
+                "\tthis.sapNid = " + this.sapNid + "\n" + 
+                "\tanother.sapNid = " + another.sapNid + "\n");
+        }
+        if (!this.primordialComponent.equals(another.primordialComponent)) {
+            buf.append(spaces + "Revision.primordialComponent not equal: \n" + 
+                "\tthis.primordialComponent = " + this.primordialComponent + "\n" + 
+                "\tanother.primordialComponent = " + another.primordialComponent + "\n");
+        }
+        
+        return buf.toString();
+    }
+    
+    
 }

@@ -33,6 +33,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionVersion;
 
@@ -246,7 +247,47 @@ public class Description
         return false;
     }
 
-	@Override
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(Description another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";
+        
+        if (this.initialCaseSignificant != another.initialCaseSignificant) {
+            buf.append(spaces + "Description.initialCaseSignificant not equal: \n" + 
+                "\tthis.initialCaseSignificant = " + this.initialCaseSignificant + "\n" + 
+                "\tanother.initialCaseSignificant = " + another.initialCaseSignificant + "\n");
+        }
+        if (!this.text.equals(another.text)) {
+            buf.append(spaces + "Description.text not equal: \n" + 
+                "\tthis.text = " + this.text + "\n" + 
+                "\tanother.text = " + another.text + "\n");
+        }
+        if (!this.lang.equals(another.lang)) {
+            buf.append(spaces + "Description.lang not equal: \n" + 
+                "\tthis.lang = " + this.lang + "\n" + 
+                "\tanother.lang = " + another.lang + "\n");
+        }
+        if (this.typeNid != another.typeNid) {
+            buf.append(spaces + "Description.typeNid not equal: \n" + 
+                "\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\tanother.typeNid = " + another.typeNid + "\n");
+        }
+
+        // Compare the parents 
+        buf.append(super.validate(another));
+        
+        return buf.toString();
+    }
+
+    
+    @Override
 	public void readFromBdb(TupleInput input) {
 		initialCaseSignificant = input.readBoolean();
 		lang = input.readString();

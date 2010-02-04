@@ -26,6 +26,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
+import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipVersion;
 
@@ -262,6 +263,49 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return false;
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(Relationship another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";
+        
+        if (this.c2Nid != another.c2Nid) {
+            buf.append(spaces + "Relationship.initialCaseSignificant not equal: \n" + 
+                "\tthis.c2Nid = " + this.c2Nid + "\n" + 
+                "\tanother.c2Nid = " + another.c2Nid + "\n");
+        }
+        if (this.characteristicNid != another.characteristicNid) {
+            buf.append(spaces + "Relationship.characteristicNid not equal: \n" + 
+                "\tthis.characteristicNid = " + this.characteristicNid + "\n" + 
+                "\tanother.characteristicNid = " + another.characteristicNid + "\n");
+        }
+        if (this.group != another.group) {
+            buf.append(spaces + "Relationship.group not equal: \n" + 
+                "\tthis.group = " + this.group + "\n" + 
+                "\tanother.group = " + another.group + "\n");
+        }
+        if (this.refinabilityNid != another.refinabilityNid) {
+            buf.append(spaces + "Relationship.refinabilityNid not equal: \n" + 
+                "\tthis.refinabilityNid = " + this.refinabilityNid + "\n" + 
+                "\tanother.refinabilityNid = " + another.refinabilityNid + "\n");
+        }
+        if (this.typeNid != another.typeNid) {
+            buf.append(spaces + "Relationship.typeNid not equal: \n" + 
+                "\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\tanother.typeNid = " + another.typeNid + "\n");
+        }
+
+        // Compare the parents 
+        buf.append(super.validate(another));
+        
+        return buf.toString();
+    }
 
 	@Override
 	public void readFromBdb(TupleInput input) {

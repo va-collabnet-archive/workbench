@@ -30,10 +30,12 @@ import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.db.bdb.concept.component.identifier.IdentifierVersionUuid;
+import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
 import org.ihtsdo.etypes.EComponent;
 import org.ihtsdo.etypes.EIdentifierVersion;
 import org.ihtsdo.etypes.EIdentifierVersionLong;
@@ -986,6 +988,67 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 		return true;
 	}
 
+
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */ 
+    public String validate(ConceptComponent<R, C> another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        String spaces = "   ";        
+        String validationResults = null;        
+
+        if (this.nid != another.nid) {
+            buf.append(spaces + "ConceptComponent.nid not equal: \n" + 
+                "\tthis.nid = " + this.nid + "\n" + 
+                "\tanother.nid = " + another.nid + "\n");
+        }
+        if (this.primordialSapNid != another.primordialSapNid) {
+            buf.append(spaces + "ConceptComponent.primordialSapNid not equal: \n" + 
+                "\tthis.primordialSapNid = " + this.primordialSapNid + "\n" + 
+                "\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
+        }
+        
+        if (this.primordialUNid != another.primordialUNid) {
+            buf.append(spaces + "ConceptComponent.primordialUNid not equal: \n" + 
+                "\tthis.primordialUNid = " + this.primordialUNid + "\n" + 
+                "\tanother.primordialUNid = " + another.primordialUNid + "\n");
+        }
+            
+        if (this.additionalIdentifierParts != null) {
+            if (this.additionalIdentifierParts.equals(another.additionalIdentifierParts) == false) {
+                buf.append(spaces + "ConceptComponent.additionalIdentifierParts not equal: \n" + 
+                    "\tthis.additionalIdentifierParts = " + this.additionalIdentifierParts + "\n" + 
+                    "\tanother.additionalIdentifierParts = " + another.additionalIdentifierParts + "\n");
+            }
+        }
+        
+        if (this.revisions != null) {
+            if (this.revisions.equals(another.revisions) == false) {
+                for (int i = 0; i < this.revisions.size(); i++) {
+                    // make sure there are elements in both arrays to compare
+                    if (another.revisions.size() > i) {
+                        Revision<R,C> thisRevision = this.revisions.get(i); 
+                        Revision<R,C> anotherRevision = another.revisions.get(i);            
+                        validationResults = thisRevision.validate(anotherRevision);
+                        if (validationResults.length() != 0) {
+                            buf.append(spaces + "Revision[" + i + "] not equal: \n");
+                            buf.append(validationResults + "\n");
+                        }
+                    } else {
+                        buf.append(spaces + "ConceptComponent.revision[" + i + "] not equal: \n");
+                        buf.append(spaces + "\tThere is no corresponding Revision in another to compare it to.\n");
+                    }
+                }
+            }
+        }
+        
+        return buf.toString();
+    }
 
 
     @Override
