@@ -25,12 +25,15 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 
 public abstract class AbstractDataConstraintTest extends AbstractTask implements I_TestDataConstraints {
 
@@ -65,6 +68,15 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
     private transient I_ConfigAceFrame frameConfig;
 
     public I_ConfigAceFrame getFrameConfig() {
+    	if (frameConfig == null) {
+    		try {
+				frameConfig = Terms.get().getActiveAceFrameConfig();
+			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+    	}
         return frameConfig;
     }
 
@@ -91,9 +103,13 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
     public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
         try {
-            I_Transact component = (I_Transact) process.readProperty(componentPropName);
+            I_Transact component = (I_Transact) process.getProperty(componentPropName);
+            frameConfig = (I_ConfigAceFrame) process.getProperty(profilePropName);
+            if (frameConfig == null) {
+            	frameConfig = Terms.get().getActiveAceFrameConfig();
+            }
+
             List<AlertToDataConstraintFailure> alerts = test(component, forCommit);
-            frameConfig = (I_ConfigAceFrame) process.readProperty(profilePropName);
 
             boolean noFailures = true;
             for (AlertToDataConstraintFailure failure : alerts) {

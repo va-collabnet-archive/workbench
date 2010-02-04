@@ -32,9 +32,8 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
@@ -66,14 +65,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
         try {
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
-
-            I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-
-            Set<I_Position> allPositions = getPositions(termFactory);
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, activeProfile);
+            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
@@ -100,12 +94,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     private List<AlertToDataConstraintFailure> testDescriptions(I_GetConceptData concept,
             ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit) throws Exception {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        I_GetConceptData fsn_type = getConceptSafe(termFactory,
+        I_GetConceptData fsn_type = getConceptSafe(Terms.get(),
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
-        I_IntSet actives = getActiveStatus(termFactory);
+        I_IntSet actives = getActiveStatus(Terms.get());
         HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
@@ -135,7 +128,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         langs.put(lang, dl);
                     }
 
-                    Hits hits = termFactory.doLuceneSearch("\""
+                    Hits hits = Terms.get().doLuceneSearch("\""
                         + part.getText().replace("(", "\\(").replace(")", "\\)") + "\"");
                     // System.out.println("Found " + hits.length());
                     search: for (int i = 0; i < hits.length(); i++) {
@@ -146,7 +139,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         int dnid = Integer.parseInt(doc.get("dnid"));
                         if (cnid == concept.getConceptId())
                             continue;
-                        I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
+                        I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
                         for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                             // System.out.println("Hit: "
                             // + part_search.getVersion() + "\t"
