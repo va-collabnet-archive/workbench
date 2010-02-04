@@ -30,10 +30,12 @@ import org.dwfa.ace.select.DescriptionSelector.LanguagePreference;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRef;
 import org.dwfa.ace.task.refset.members.CleanableProcessExtByRefBuilder;
 import org.dwfa.ace.task.refset.members.ForTesting;
-import org.dwfa.ace.task.refset.members.WriteRefsetDescriptionsProcessExtByRefBuilder;
 import org.dwfa.ace.task.util.Logger;
+import org.dwfa.mojo.refset.members.export.WriteRefsetDescriptionsProcessExtByRefBuilder;
 
 /**
+ * FIXME: This should use the ConceptListWriter
+ * 
  * Mojo that exports all reference sets.
  * 
  * @goal write-refset-descriptions

@@ -28,7 +28,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -42,8 +41,7 @@ public class ConceptTupleFileUtil {
 
         String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(concept.getUids().iterator().next()));
 
-        RefsetUtilImpl refsetUtil = new RefsetUtilImpl();
-        I_ConceptAttributePart part = refsetUtil.getLastestAttributePart(concept);
+        I_ConceptAttributePart part = getLastestAttributePart(concept);
 
         UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next();
         UUID conceptUuid = termFactory.getUids(concept.getConceptId()).iterator().next();
@@ -220,4 +218,15 @@ public class ConceptTupleFileUtil {
     public static I_GetConceptData getLastConcept() {
         return lastConcept;
     }
+    
+    protected static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
+        List<I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getVersions();
+        I_ConceptAttributePart latestAttributePart = null;
+        for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
+            if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
+                latestAttributePart = attributePart;
+            }
+        }
+        return latestAttributePart;
+    }    
 }
