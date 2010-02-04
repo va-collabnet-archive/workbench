@@ -36,10 +36,15 @@ public class ConceptTest {
     EConcept test2Concept;
     String dbTarget;
 
-    
+    // myTime is used to make sure all time properties use 
+    // the same time value
+    protected long myTime = Long.MIN_VALUE;
     
     @Before
     public void setUp() throws Exception {
+        
+        this.myTime = System.currentTimeMillis(); 
+
         dbTarget = "target/" + UUID.randomUUID();
         Bdb.setup(dbTarget);
         testConcept = new EConcept();
@@ -47,7 +52,7 @@ public class ConceptTest {
         eca1.primordialComponentUuid = UUID.randomUUID();
         eca1.setStatusUuid(UUID.randomUUID());
         eca1.setPathUuid(UUID.randomUUID());
-        eca1.setTime(System.currentTimeMillis());
+        eca1.setTime(this.myTime);
         eca1.setDefined(true);
         
         EConceptAttributesVersion ecav = new EConceptAttributesVersion();
@@ -78,19 +83,45 @@ public class ConceptTest {
         // Make all the test objects be the same 
         testObj1 = makeTestObject1();
         testObj2 = makeTestObject1();
+        testObj3 = makeTestObject2();
         
         System.out.println("TEST OBJ 1: " + testObj1.toLongString());
-        System.out.println("TEST OBJ 2: " + testObj2.toLongString());
+        System.out.println("TEST OBJ 3: " + testObj3.toLongString());
         
+        // Object 1 and Object 2 are the same so they should validate 
+        // and be considered equivalent 
         try {
             String result = testObj1.validate(testObj2);
+            if (result.length() == 0) {
+                System.out.println("Validating Obj1 and Obj2: VALID!");
+            } else {
+                System.out.println("Validating Obj1 and Obj2: NOT VALID!  " + 
+                    "(differences listed below):\n" + result.toString());
+            }           
             assertTrue(result.length() == 0); 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             fail("Concepts are not valid"); 
         }
-        
+
+        // Object 1 and Object 3 are the different so they should not validate 
+        // and be considered unequal 
+        try {
+            String result = testObj1.validate(testObj3);
+            assertFalse(result.length() == 0); 
+            if (result.length() == 0) {
+                System.out.println("Validating Obj1 and Obj3: VALID!");
+            } else {
+                System.out.println("Validating Obj1 and Obj3: NOT VALID!  " + 
+                    "(differences listed below):\n" + result.toString());
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            fail("Concepts are not valid"); 
+        }
+
     }
 
     @Test
@@ -220,7 +251,7 @@ public class ConceptTest {
         ca.additionalIdComponents = null;
         ca.setPathUuid(new UUID(4, 5));
         ca.setStatusUuid(new UUID(8, 9));
-        ca.setTime(System.currentTimeMillis());
+        ca.setTime(this.myTime);
 
         testConcept.setConceptAttributes(ca);
 
@@ -236,7 +267,7 @@ public class ConceptTest {
         desc.setStatusUuid(new UUID(8, 9));
         desc.setTypeUuid(new UUID(4, 7));
         desc.setText("hello world");
-        desc.setTime(System.currentTimeMillis());
+        desc.setTime(this.myTime);
         desc.extraVersions = new ArrayList<EDescriptionVersion>(2);
         // add an EDescriptionVersion version
         EDescriptionVersion edv = new EDescriptionVersion();
@@ -245,7 +276,7 @@ public class ConceptTest {
         edv.setPathUuid(new UUID(4, 5));
         edv.setStatusUuid(new UUID(8, 9));
         edv.setText("hello world 2");
-        edv.setTime(System.currentTimeMillis());
+        edv.setTime(this.myTime);
         edv.setTypeUuid(new UUID(13, 14));
         desc.extraVersions.add(edv);
         // add another EDescriptionVersion
@@ -255,12 +286,44 @@ public class ConceptTest {
         edv.setPathUuid(new UUID(24, 25));
         edv.setStatusUuid(new UUID(28, 29));
         edv.setText("hello world 3");
-        edv.setTime(System.currentTimeMillis());
+        edv.setTime(this.myTime);
         edv.setTypeUuid(new UUID(23, 24));
         desc.extraVersions.add(edv);
         descriptionList.add(desc);
+
+        // Add another Description
+        desc = new EDescription();
+        desc.additionalIdComponents = null;
+        desc.primordialComponentUuid = new UUID(200, 300);
+        desc.setConceptUuid(new UUID(110, 120));
+        desc.setInitialCaseSignificant(false);
+        desc.setLang("en");
+        desc.setPathUuid(new UUID(40, 50));
+        desc.setStatusUuid(new UUID(80, 90));
+        desc.setTypeUuid(new UUID(40, 70));
+        desc.setText("Aloha World");
+        desc.setTime(this.myTime);
+        desc.extraVersions = null;
+        descriptionList.add(desc);
+
+        // Add another Description
+        desc = new EDescription();
+        desc.additionalIdComponents = null;
+        desc.primordialComponentUuid = new UUID(201, 301);
+        desc.setConceptUuid(new UUID(112, 122));
+        desc.setInitialCaseSignificant(false);
+        desc.setLang("gr");
+        desc.setPathUuid(new UUID(43, 53));
+        desc.setStatusUuid(new UUID(84, 94));
+        desc.setTypeUuid(new UUID(45, 75));
+        desc.setText("Danke shane");
+        desc.setTime(this.myTime);
+        desc.extraVersions = null;
+        descriptionList.add(desc);
+
         testConcept.setDescriptions(descriptionList);
 
+        
         // Add Relationships
         List<ERelationship> relList =  new ArrayList<ERelationship>(1);
 
@@ -275,7 +338,7 @@ public class ConceptTest {
         rel.setRefinabilityUuid(new UUID(43, 54));
         rel.setRelGroup(22);
         rel.setStatusUuid(new UUID(86, 97));
-        rel.setTime(System.currentTimeMillis());
+        rel.setTime(this.myTime);
         rel.setTypeUuid(new UUID(44, 55));
         rel.extraVersions = new ArrayList<ERelationshipVersion>(2);
         // Add relationship versions
@@ -285,7 +348,7 @@ public class ConceptTest {
         erv.setRefinabilityUuid(new UUID(586, 937));
         erv.setRelGroup(3);
         erv.setStatusUuid(new UUID(846, 967));
-        erv.setTime(System.currentTimeMillis());
+        erv.setTime(this.myTime);
         erv.setTypeUuid(new UUID(846, 957));
         rel.extraVersions.add(erv);
         // add another relationship version
@@ -295,9 +358,26 @@ public class ConceptTest {
         erv.setRefinabilityUuid(new UUID(686, 637));
         erv.setRelGroup(3);
         erv.setStatusUuid(new UUID(646, 667));
-        erv.setTime(System.currentTimeMillis());
+        erv.setTime(this.myTime);
         erv.setTypeUuid(new UUID(646, 657));
         rel.extraVersions.add(erv);
+        relList.add(rel);
+        
+        // Add another Relationship
+        rel = new ERelationship();
+        rel.additionalIdComponents = null;
+        rel.setAdditionalIdComponents(null);
+        rel.setC1Uuid(new UUID(45, 55));
+        rel.setC2Uuid(new UUID(49, 59));
+        rel.setCharacteristicUuid(new UUID(46, 56));
+        rel.setPathUuid(new UUID(41, 51)); 
+        rel.setPrimordialComponentUuid(new UUID(21, 31));
+        rel.setRefinabilityUuid(new UUID(48, 58));
+        rel.setRelGroup(16);
+        rel.setStatusUuid(new UUID(88, 98));
+        rel.setTime(this.myTime);
+        rel.setTypeUuid(new UUID(49, 59));
+        rel.extraVersions = null;
         relList.add(rel);
         testConcept.setRelationships(relList);
 
@@ -312,7 +392,7 @@ public class ConceptTest {
         img.setPrimordialComponentUuid(new UUID(206, 305));
         img.setStatusUuid(new UUID(868, 977));
         img.setTextDescription("interesting image");
-        img.setTime(System.currentTimeMillis());
+        img.setTime(this.myTime);
         img.setTypeUuid(new UUID(121, 132));
         img.extraVersions = new ArrayList<EImageVersion>(2);
         // Image Versions
@@ -320,7 +400,7 @@ public class ConceptTest {
         iv.setPathUuid(new UUID(24450, 5469));
         iv.setStatusUuid(new UUID(8668, 9757));
         iv.setTextDescription("interesting image e");
-        iv.setTime(System.currentTimeMillis());
+        iv.setTime(this.myTime);
         iv.setTypeUuid(new UUID(1231, 1532));
         img.extraVersions.add(iv);
         // Add another Image Version
@@ -328,7 +408,7 @@ public class ConceptTest {
         iv.setPathUuid(new UUID(34450, 3469));
         iv.setStatusUuid(new UUID(4668, 4757));
         iv.setTextDescription("boring image e");
-        iv.setTime(System.currentTimeMillis());
+        iv.setTime(this.myTime);
         iv.setTypeUuid(new UUID(2231, 2532));
         img.extraVersions.add(iv);
         imageList.add(img);
@@ -347,7 +427,7 @@ public class ConceptTest {
         cidIntMember.setPrimordialComponentUuid(new UUID(320, 230));
         cidIntMember.setRefsetUuid(new UUID(14386, 65497));
         cidIntMember.setStatusUuid(new UUID(5386, 4497));
-        cidIntMember.setTime(System.currentTimeMillis());
+        cidIntMember.setTime(this.myTime);
         cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
@@ -355,7 +435,7 @@ public class ConceptTest {
         rciv.setIntValue(99);
         rciv.setPathUuid(new UUID(4350, 5469));
         rciv.setStatusUuid(new UUID(5386, 4497));
-        rciv.setTime(System.currentTimeMillis()); 
+        rciv.setTime(this.myTime); 
         cidIntMember.extraVersions.add(rciv);
         // add another Refset Members version 
         rciv = new ERefsetCidIntVersion();
@@ -363,7 +443,7 @@ public class ConceptTest {
         rciv.setIntValue(54);
         rciv.setPathUuid(new UUID(4350, 4469));
         rciv.setStatusUuid(new UUID(4386, 4497));
-        rciv.setTime(System.currentTimeMillis()); 
+        rciv.setTime(this.myTime); 
         cidIntMember.extraVersions.add(rciv);
         refsetList.add(cidIntMember);
         testConcept.setRefsetMembers(refsetList);
@@ -383,7 +463,7 @@ public class ConceptTest {
         ca.additionalIdComponents = null;
         ca.setPathUuid(new UUID(2, 2));
         ca.setStatusUuid(new UUID(3, 3));
-        ca.setTime(System.currentTimeMillis());
+        ca.setTime(this.myTime);
 
         testConcept.setConceptAttributes(ca);
 
@@ -399,7 +479,7 @@ public class ConceptTest {
         desc.setStatusUuid(new UUID(24, 24));
         desc.setTypeUuid(new UUID(25, 25));
         desc.setText("good morning");
-        desc.setTime(System.currentTimeMillis());
+        desc.setTime(this.myTime);
         desc.extraVersions = new ArrayList<EDescriptionVersion>(2);
         // add an EDescriptionVersion version
         EDescriptionVersion edv = new EDescriptionVersion();
@@ -408,7 +488,7 @@ public class ConceptTest {
         edv.setPathUuid(new UUID(26, 26));
         edv.setStatusUuid(new UUID(27, 27));
         edv.setText("adios");
-        edv.setTime(System.currentTimeMillis());
+        edv.setTime(this.myTime);
         edv.setTypeUuid(new UUID(28, 28));
         desc.extraVersions.add(edv);
         // add another EDescriptionVersion
@@ -418,7 +498,7 @@ public class ConceptTest {
         edv.setPathUuid(new UUID(29, 29));
         edv.setStatusUuid(new UUID(30, 30));
         edv.setText("extreme hello");
-        edv.setTime(System.currentTimeMillis());
+        edv.setTime(this.myTime);
         edv.setTypeUuid(new UUID(31, 31));
         desc.extraVersions.add(edv);
         descriptionList.add(desc);
@@ -438,7 +518,7 @@ public class ConceptTest {
         rel.setRefinabilityUuid(new UUID(56, 56));
         rel.setRelGroup(16);
         rel.setStatusUuid(new UUID(57, 57));
-        rel.setTime(System.currentTimeMillis());
+        rel.setTime(this.myTime);
         rel.setTypeUuid(new UUID(58, 58));
         rel.extraVersions = new ArrayList<ERelationshipVersion>(2);
         // Add relationship versions
@@ -448,7 +528,7 @@ public class ConceptTest {
         erv.setRefinabilityUuid(new UUID(61, 61));
         erv.setRelGroup(10);
         erv.setStatusUuid(new UUID(62, 62));
-        erv.setTime(System.currentTimeMillis());
+        erv.setTime(this.myTime);
         erv.setTypeUuid(new UUID(63, 63));
         rel.extraVersions.add(erv);
         // add another relationship version
@@ -458,7 +538,7 @@ public class ConceptTest {
         erv.setRefinabilityUuid(new UUID(66, 66));
         erv.setRelGroup(59);
         erv.setStatusUuid(new UUID(67, 67));
-        erv.setTime(System.currentTimeMillis());
+        erv.setTime(this.myTime);
         erv.setTypeUuid(new UUID(68, 68));
         rel.extraVersions.add(erv);
         relList.add(rel);
@@ -475,7 +555,7 @@ public class ConceptTest {
         img.setPrimordialComponentUuid(new UUID(72, 72));
         img.setStatusUuid(new UUID(73, 73));
         img.setTextDescription("an amazing image!");
-        img.setTime(System.currentTimeMillis());
+        img.setTime(this.myTime);
         img.setTypeUuid(new UUID(74, 74));
         img.extraVersions = new ArrayList<EImageVersion>(2);
         // Image Versions
@@ -483,7 +563,7 @@ public class ConceptTest {
         iv.setPathUuid(new UUID(75, 75));
         iv.setStatusUuid(new UUID(75, 75));
         iv.setTextDescription("ugly duck");
-        iv.setTime(System.currentTimeMillis());
+        iv.setTime(this.myTime);
         iv.setTypeUuid(new UUID(77, 77));
         img.extraVersions.add(iv);
         // Add another Image Version
@@ -491,7 +571,7 @@ public class ConceptTest {
         iv.setPathUuid(new UUID(78, 78));
         iv.setStatusUuid(new UUID(79, 79));
         iv.setTextDescription("wow!");
-        iv.setTime(System.currentTimeMillis());
+        iv.setTime(this.myTime);
         iv.setTypeUuid(new UUID(80, 80));
         img.extraVersions.add(iv);
         imageList.add(img);
@@ -510,7 +590,7 @@ public class ConceptTest {
         cidIntMember.setPrimordialComponentUuid(new UUID(93, 93));
         cidIntMember.setRefsetUuid(new UUID(94, 94));
         cidIntMember.setStatusUuid(new UUID(95, 95));
-        cidIntMember.setTime(System.currentTimeMillis());
+        cidIntMember.setTime(this.myTime);
         cidIntMember.extraVersions = new ArrayList<ERefsetCidIntVersion>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntVersion rciv = new ERefsetCidIntVersion();
@@ -518,7 +598,7 @@ public class ConceptTest {
         rciv.setIntValue(21);
         rciv.setPathUuid(new UUID(97, 97));
         rciv.setStatusUuid(new UUID(98, 98));
-        rciv.setTime(System.currentTimeMillis()); 
+        rciv.setTime(this.myTime); 
         cidIntMember.extraVersions.add(rciv);
         // add another Refset Members version 
         rciv = new ERefsetCidIntVersion();
@@ -526,7 +606,7 @@ public class ConceptTest {
         rciv.setIntValue(61);
         rciv.setPathUuid(new UUID(100, 100));
         rciv.setStatusUuid(new UUID(101, 101));
-        rciv.setTime(System.currentTimeMillis()); 
+        rciv.setTime(this.myTime); 
         cidIntMember.extraVersions.add(rciv);
         refsetList.add(cidIntMember);
         testConcept.setRefsetMembers(refsetList);
