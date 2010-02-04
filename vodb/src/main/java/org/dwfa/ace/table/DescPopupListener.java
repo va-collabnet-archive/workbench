@@ -31,22 +31,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.types.ThinDescVersioned;
 
 public class DescPopupListener extends MouseAdapter {
 
@@ -100,7 +97,7 @@ public class DescPopupListener extends MouseAdapter {
 				throw new RuntimeException(e1);
 			}
             I_DescriptionTuple tuple = selectedObject.getTuple();
-            ThinDescVersioned versioned = (ThinDescVersioned) tuple.getDescVersioned();
+            I_DescriptionVersioned versioned = tuple.getDescVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
             Terms.get().addUncommitted(sourceBean);
             model.allTuples = null;
@@ -109,50 +106,50 @@ public class DescPopupListener extends MouseAdapter {
     }
 
     private class ChangeFieldActionListener implements ActionListener {
-        private Collection<UUID> ids;
+        private int nid = Integer.MIN_VALUE;
+        
 
         private FieldToChange field;
 
-        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) {
+        public ChangeFieldActionListener(Collection<UUID> ids, FieldToChange field) throws TerminologyException, IOException {
             super();
-            this.ids = ids;
+            this.nid = AceConfig.getVodb().uuidToNative(ids);
             this.field = field;
         }
 
         public void actionPerformed(ActionEvent e) {
             try {
-                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+                I_GetConceptData concept = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_DescriptionPart newPart = selectedObject.getTuple().getMutablePart();
-                    if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
-                        I_DescriptionPart currentPart = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
-                        newPart =
-                                (I_DescriptionPart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart
-                                    .getPathId(), Long.MAX_VALUE);
+                    if (newPart.getTime() != Long.MAX_VALUE) {
+                        I_DescriptionPart currentPart = (I_DescriptionPart) 
+                    			selectedObject.getTuple().getMutablePart();
+                        newPart = (I_DescriptionPart) 
+                    		currentPart.makeAnalog(nid, p.getConceptId(), Long.MAX_VALUE);
                         selectedObject.getTuple().getDescVersioned().addVersion(newPart);
-                    }
-                    newPart.setPathId(p.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
+                	}
                     switch (field) {
                     case STATUS:
-                        newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
+                		newPart.setStatusId(nid);
                         break;
                     case TYPE:
-                        newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setTypeId(nid);
                         break;
-
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getStatusId(), 
+                    		Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getTypeId(), 
+                    		Terms.get().getConcept(newPart.getTypeId()));
                 }
-                Terms.get().addUncommitted(sourceBean);
+                Terms.get().addUncommitted(concept);
                 model.allTuples = null;
                 model.fireTableDataChanged();
-                model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
-                    model.host.getTermComponent()));
+                model.propertyChange(new PropertyChangeEvent(this, 
+                		I_ContainTermComponent.TERM_COMPONENT, null,
+                		model.host.getTermComponent()));
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -219,7 +216,7 @@ public class DescPopupListener extends MouseAdapter {
     private void addSubmenuItems(JMenu menu, FieldToChange field, I_IntList possibleValues)
             throws TerminologyException, IOException {
         for (int id : possibleValues.getListValues()) {
-            I_GetConceptData possibleValue = LocalVersionedTerminology.get().getConcept(id);
+            I_GetConceptData possibleValue = Terms.get().getConcept(id);
             JMenuItem changeStatusItem = new JMenuItem(possibleValue.toString());
             changeStatusItem.addActionListener(new ChangeFieldActionListener(possibleValue.getUids(), field));
             menu.add(changeStatusItem);
