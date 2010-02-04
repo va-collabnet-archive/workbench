@@ -40,6 +40,11 @@ import org.dwfa.tapi.TerminologyException;
 public class GenericFileWriter<T> {
 
     /**
+     * The file to be written to
+     */
+    private File outputFile;
+    
+    /**
      * Buffered file writer.
      */
     private BufferedWriter writer;
@@ -63,6 +68,7 @@ public class GenericFileWriter<T> {
      * @throws IOException
      */
     public void open(File outputFile, boolean append) throws IOException {
+        this.outputFile = outputFile;
         writer = new BufferedWriter(new FileWriter(outputFile, append));
     }
 
@@ -110,6 +116,7 @@ public class GenericFileWriter<T> {
      * @throws IOException
      */
     public void close() throws IOException {
+        writer.flush();
         writer.close();
         writer = null;
     }
@@ -123,5 +130,10 @@ public class GenericFileWriter<T> {
     protected void writeHeader(String header) throws IOException {
         writer.append(header);
         writer.append(newLineChars);
+    }
+    
+    public void abort() throws IOException {        
+        close();
+        outputFile.delete();
     }
 }
