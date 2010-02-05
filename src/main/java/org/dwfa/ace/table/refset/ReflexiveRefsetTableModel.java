@@ -112,14 +112,15 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             case CONCEPT_COMPONENT:
                                 if (col.readParamaters != null) {
                                     Object readValue =
-                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()),
-                                                col.readParamaters);
+                                            col.getReadMethod().invoke(
+                                                Terms.get().getConcept(extension.getComponentId()), col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
                                     Object readValue =
-                                            col.getReadMethod().invoke(Terms.get().getConcept(extension.getComponentId()));
+                                            col.getReadMethod().invoke(
+                                                Terms.get().getConcept(extension.getComponentId()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
@@ -310,6 +311,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
     public Set<Integer> getSelectedTuples() {
         return new HashSet<Integer>();
+    }
+
+    public void clearSelectedTuples() {
+        // nothing to do
+    }
+
+    public void selectAllTuples() {
+        // nothing to do
     }
 
     public void setShowPromotionCheckBoxes(boolean show) {

@@ -17,6 +17,7 @@
 package org.dwfa.ace.table.refset;
 
 import java.awt.Component;
+import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
@@ -38,6 +39,11 @@ public class CheckBoxCellRenderer implements TableCellRenderer {
     public CheckBoxCellRenderer() {
         checkBox = new JCheckBox();
         checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    public CheckBoxCellRenderer(ItemListener itemListener) {
+        super();
+        checkBox.addItemListener(itemListener);
     }
 
     public int getPreferredWidth() {

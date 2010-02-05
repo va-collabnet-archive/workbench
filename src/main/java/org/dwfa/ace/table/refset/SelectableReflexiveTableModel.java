@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
 
@@ -74,5 +75,16 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
 
     public void removeRow(int rowIndex) {
         super.removeRow(rowIndex);
+    }
+
+    public void clearSelectedTuples() {
+        selectedTuplesMap.clear();
+    }
+
+    public void selectAllTuples() {
+        for (ThinExtByRefTuple tuple : allTuples) {
+            int tupleId = tuple.getMemberId();
+            selectedTuplesMap.put(tupleId, Boolean.TRUE);
+        }
     }
 }
