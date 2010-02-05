@@ -21,6 +21,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +34,7 @@ import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,6 +59,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.CheckBoxCellRenderer;
+import org.dwfa.ace.table.refset.CheckBoxHeaderRenderer;
 import org.dwfa.ace.table.refset.ExtTableRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
@@ -120,6 +126,9 @@ public class RefsetSpecPanel extends JPanel {
     private JTableWithDragImage refsetTable;
     private TableColumn checkBoxColumn;
     private Set<Object> promotionTypes = new HashSet<Object>();
+    private JCheckBox selectAllCheckBox;
+    private CheckBoxHeaderRenderer checkBoxHeaderRenderer;
+    private SelectAllCheckBoxListener selectAllCheckBoxListener;
 
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
@@ -406,19 +415,29 @@ public class RefsetSpecPanel extends JPanel {
         // set renderer and editor for checkbox column
         // get the last column
         int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
-        CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
-        checkBoxColumn = refsetTable.getColumnModel().getColumn(columnIndex);
-        checkBoxColumn.setResizable(false);
-        checkBoxColumn.setMaxWidth(checkBoxRenderer.getPreferredWidth());
-        checkBoxColumn.setMaxWidth(checkBoxRenderer.getPreferredWidth());
-        checkBoxColumn.setPreferredWidth(checkBoxRenderer.getPreferredWidth());
-        checkBoxColumn.setCellRenderer(checkBoxRenderer);
-        // hide column as default (should only be visible during promotions BP)
-        refsetTable.getColumnModel().removeColumn(checkBoxColumn);
 
+        CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
         sortingTable.setTableHeader(refsetTable.getTableHeader());
         sortingTable.getTableHeader().setToolTipText(
             "Click to specify sorting; Control-Click to specify secondary sorting");
+
+        selectAllCheckBoxListener = new SelectAllCheckBoxListener();
+        checkBoxHeaderRenderer =
+                new CheckBoxHeaderRenderer(selectAllCheckBoxListener, this, refsetTable.getTableHeader());
+        // refsetTable.getTableHeader();
+
+        checkBoxColumn = refsetTable.getColumnModel().getColumn(columnIndex);
+        checkBoxColumn.setHeaderRenderer(checkBoxHeaderRenderer);
+        checkBoxColumn.setResizable(false);
+
+        checkBoxColumn.setMaxWidth(checkBoxHeaderRenderer.getPreferredWidth());
+        checkBoxColumn.setMinWidth(checkBoxHeaderRenderer.getPreferredWidth());
+        checkBoxColumn.setPreferredWidth(checkBoxHeaderRenderer.getPreferredWidth());
+        checkBoxColumn.setCellRenderer(checkBoxRenderer);
+
+        // hide column as default (should only be visible during promotions BP)
+        refsetTable.getColumnModel().removeColumn(checkBoxColumn);
+        refsetTable.addMouseListener(new MouseClickListener());
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -602,6 +621,10 @@ public class RefsetSpecPanel extends JPanel {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
+
+            refsetTableModel.clearSelectedTuples();
+            selectAllCheckBox.setSelected(false);
+            refsetTable.getTableHeader().repaint();
         }
     }
 
@@ -687,6 +710,10 @@ public class RefsetSpecPanel extends JPanel {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
+
+            refsetTableModel.clearSelectedTuples();
+            selectAllCheckBox.setSelected(false);
+            refsetTable.getTableHeader().repaint();
         }
     }
 
@@ -752,5 +779,57 @@ public class RefsetSpecPanel extends JPanel {
             editor.getLabel().setTermComponent(editor.getTermComponent());
         }
 
+    }
+
+    private class SelectAllCheckBoxListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+
+            boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+
+            if (selected) {
+                refsetTableModel.selectAllTuples();
+            } else {
+                refsetTableModel.clearSelectedTuples();
+            }
+
+            refsetTable.repaint();
+        }
+    }
+
+    private class MouseClickListener extends MouseAdapter {
+        public void mouseClicked(MouseEvent mouseEvent) {
+            if (getShowPromotionCheckBoxes()) {
+                int checkedCount = 0;
+                int checkBoxColumnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
+                selectAllCheckBox.removeItemListener(selectAllCheckBoxListener);
+
+                boolean[] flags = new boolean[refsetTable.getRowCount()];
+                for (int i = 0; i < refsetTable.getRowCount(); i++) {
+                    flags[i] = ((Boolean) refsetTable.getValueAt(i, checkBoxColumnIndex)).booleanValue();
+                    if (flags[i]) {
+                        checkedCount++;
+                    }
+                }
+                if (checkedCount == refsetTable.getRowCount()) {
+                    selectAllCheckBox.setSelected(true);
+                }
+                if (checkedCount != refsetTable.getRowCount()) {
+                    selectAllCheckBox.setSelected(false);
+                }
+
+                selectAllCheckBox.addItemListener(selectAllCheckBoxListener);
+                refsetTable.getTableHeader().repaint();
+            }
+        }
+    }
+
+    public JCheckBox getRendererComponent() {
+        return selectAllCheckBox;
+    }
+
+    public void setRendererComponent(JCheckBox rendererComponent) {
+        this.selectAllCheckBox = rendererComponent;
     }
 }
