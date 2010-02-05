@@ -78,7 +78,8 @@ import com.sleepycat.je.DatabaseException;
 public class ConceptBean implements I_GetConceptData, I_Transact {
 
     public static enum REF_TYPE {
-        SOFT, WEAK
+        SOFT,
+        WEAK
     };
 
     private static REF_TYPE refType = REF_TYPE.SOFT;
@@ -205,7 +206,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getConcept()
      */
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
@@ -225,7 +225,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getConceptId()
      */
     public int getConceptId() {
@@ -238,27 +237,30 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet
      * ,
      * java.util.Set)
      */
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet)
-            throws IOException {
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
+            PositionSetReadOnly positionSet) throws IOException {
         return getConceptAttributeTuples(allowedStatus, positionSet, true);
     }
 
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-            boolean addUncommitted) throws IOException {
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
+            PositionSetReadOnly positionSet, boolean addUncommitted) throws IOException {
 
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-        getConceptAttributes().addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
+        I_ConceptAttributeVersioned attr = getConceptAttributes();
+        if (attr != null) {
+            attr.addTuples(allowedStatus, positionSet, returnTuples, addUncommitted);
+        }
         return returnTuples;
     }
 
-    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
+            PositionSetReadOnly positionSet, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
         List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
         I_ConceptAttributeVersioned attr = getConceptAttributes();
         if (attr != null) {
@@ -282,8 +284,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-            true, returnConflictResolvedLatestState);
+        return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config
+            .getViewPositionSetReadOnly(), true, returnConflictResolvedLatestState);
     }
 
     public List<I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
@@ -312,18 +314,17 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnDescriptions;
     }
 
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws IOException,
+            TerminologyException {
 
         List<I_ImageTuple> returnTuples = getImageTuples(allowedStatus, allowedTypes, positions);
-        return AceConfig.getVodb()
-            .getActiveAceFrameConfig()
-            .getConflictResolutionStrategy()
+        return AceConfig.getVodb().getActiveAceFrameConfig().getConflictResolutionStrategy()
             .resolveTuples(returnTuples);
     }
 
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
-            throws IOException {
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions) throws IOException {
         List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
         for (I_ImageVersioned img : getImages()) {
             img.addTuples(allowedStatus, allowedTypes, positions, returnTuples);
@@ -356,26 +357,23 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnRels;
     }
 
-    public List<I_RelTuple> getSourceRelTuples(
-    		I_IntSet allowedTypes, boolean addUncommitted,
+    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
-            returnConflictResolvedLatestState);
+        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(),
+            addUncommitted, returnConflictResolvedLatestState);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.
      * IntSet,
      * org.dwfa.ace.IntSet, java.util.Set)
      */
-    public List<I_RelTuple> getSourceRelTuples(
-    		I_IntSet allowedStatus, I_IntSet allowedTypes,
+    public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positionSet, boolean addUncommitted) throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {
@@ -389,8 +387,9 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         return returnRels;
     }
 
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            throws IOException, TerminologyException {
 
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getDestRels()) {
@@ -405,21 +404,20 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
-            returnConflictResolvedLatestState);
+        return getSourceRelTuples(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(),
+            addUncommitted, returnConflictResolvedLatestState);
 
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getDestRelTuples(org.dwfa.ace.IntSet
      * ,
      * org.dwfa.ace.IntSet, java.util.Set)
      */
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean addUncommitted) throws IOException {
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, boolean addUncommitted) throws IOException {
 
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getDestRels()) {
@@ -430,7 +428,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptions()
      */
     public List<I_DescriptionVersioned> getDescriptions() throws IOException {
@@ -451,7 +448,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getDestRels()
      */
     public List<I_RelVersioned> getDestRels() throws IOException {
@@ -467,7 +463,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRels()
      */
     public List<I_RelVersioned> getSourceRels() throws IOException {
@@ -495,14 +490,14 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getInitialText()
      */
     public String getInitialText() throws IOException {
         try {
             if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
-                I_DescriptionTuple tuple = this.getDescTuple(AceConfig.config.aceFrames.get(0)
-                    .getShortLabelDescPreferenceList(), AceConfig.config.getAceFrames().get(0));
+                I_DescriptionTuple tuple =
+                        this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
+                            AceConfig.config.getAceFrames().get(0));
                 if (tuple != null) {
                     return tuple.getText();
                 }
@@ -534,10 +529,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (localDesc.size() == 0) {
             try {
                 if (fsDescNid == Integer.MIN_VALUE) {
-                    fsDescNid = LocalVersionedTerminology.get().uuidToNative(
-                        ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids());
-                    fsDescNid = LocalVersionedTerminology.get().uuidToNative(
-                        ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+                    fsDescNid =
+                            LocalVersionedTerminology.get().uuidToNative(
+                                ArchitectonicAuxiliary.Concept.XHTML_FULLY_SPECIFIED_DESC_TYPE.getUids());
+                    fsDescNid =
+                            LocalVersionedTerminology.get().uuidToNative(
+                                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
                 }
                 if (getDescriptions().size() > 0) {
                     I_DescriptionVersioned desc = getDescriptions().get(0);
@@ -573,19 +570,18 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @seeorg.dwfa.vodb.types.I_GetConceptData#isLeaf(org.dwfa.ace.config.
      * AceFrameConfig)
      */
     public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
         try {
             if (aceConfig != null) {
-                if (hasDestRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
-                    aceConfig.getViewPositionSetReadOnly(), addUncommitted)) {
+                if (hasDestRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(), aceConfig
+                    .getViewPositionSetReadOnly(), addUncommitted)) {
                     return false;
                 }
-                if (hasSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getSourceRelTypes(),
-                    aceConfig.getViewPositionSetReadOnly(), addUncommitted)) {
+                if (hasSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getSourceRelTypes(), aceConfig
+                    .getViewPositionSetReadOnly(), addUncommitted)) {
                     return false;
                 }
             } else {
@@ -627,7 +623,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
             } else {
                 try {
-                    return ((VodbEnv) AceConfig.getVodb()).hasDestRelTuple(conceptId, allowedStatus, destRelTypes, positions);
+                    return ((VodbEnv) AceConfig.getVodb()).hasDestRelTuple(conceptId, allowedStatus, destRelTypes,
+                        positions);
                 } catch (DatabaseException e) {
                     throw new ToIoException(e);
                 }
@@ -649,7 +646,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                 }
             } else {
                 try {
-                    return ((VodbEnv) AceConfig.getVodb()).hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes, positions);
+                    return ((VodbEnv) AceConfig.getVodb()).hasSrcRelTuple(conceptId, allowedStatus, sourceRelTypes,
+                        positions);
                 } catch (DatabaseException e) {
                     throw new ToIoException(e);
                 }
@@ -660,7 +658,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getImages()
      */
     public List<I_ImageVersioned> getImages() throws IOException {
@@ -729,7 +726,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_Transact#abort()
      */
     public void abort() throws IOException {
@@ -783,7 +779,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             // remove uncommitted parts...
             if (conceptAttributes != null) {
-                for (ListIterator<? extends I_ConceptAttributePart> partItr = conceptAttributes.getMutableParts().listIterator(); partItr.hasNext();) {
+                for (ListIterator<? extends I_ConceptAttributePart> partItr =
+                        conceptAttributes.getMutableParts().listIterator(); partItr.hasNext();) {
                     I_ConceptAttributePart part = partItr.next();
                     if (part.getVersion() == Integer.MAX_VALUE) {
                         partItr.remove();
@@ -792,7 +789,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             }
             if (descriptions != null) {
                 for (I_DescriptionVersioned desc : descriptions) {
-                    for (ListIterator<? extends I_DescriptionPart> partItr = desc.getMutableParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_DescriptionPart> partItr = desc.getMutableParts().listIterator(); partItr
+                        .hasNext();) {
                         I_DescriptionPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -803,7 +801,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (sourceRels != null) {
                 for (I_RelVersioned srcRel : sourceRels) {
-                    for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_RelPart> partItr = srcRel.getMutableParts().listIterator(); partItr
+                        .hasNext();) {
                         I_RelPart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -814,7 +813,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
             if (images != null) {
                 for (I_ImageVersioned img : images) {
-                    for (ListIterator<? extends I_ImagePart> partItr = img.getMutableParts().listIterator(); partItr.hasNext();) {
+                    for (ListIterator<? extends I_ImagePart> partItr = img.getMutableParts().listIterator(); partItr
+                        .hasNext();) {
                         I_ImagePart part = partItr.next();
                         if (part.getVersion() == Integer.MAX_VALUE) {
                             partItr.remove();
@@ -830,7 +830,6 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_GetConceptData#getUid()
      */
     public List<UUID> getUids() throws IOException {
@@ -945,8 +944,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_ConfigAceFrame config) throws IOException {
-        return getDescTuple(typePrefOrder, config.getLanguagePreferenceList(), config.getAllowedStatus(),
-            config.getViewPositionSetReadOnly(), config.getLanguageSortPref());
+        return getDescTuple(typePrefOrder, config.getLanguagePreferenceList(), config.getAllowedStatus(), config
+            .getViewPositionSetReadOnly(), config.getLanguageSortPref());
     }
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
@@ -1012,9 +1011,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                     for (int langId : langPrefOrder.getListValues()) {
                         for (I_DescriptionTuple d : descriptions) {
                             try {
-                                int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang())
-                                    .localize()
-                                    .getNid();
+                                int tupleLangId =
+                                        ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
                                 if (tupleLangId == langId) {
                                     matchedList.add(d);
                                     if (matchedList.size() == 2) {
@@ -1242,8 +1240,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), addUncommitted,
-            returnConflictResolvedLatestState);
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(),
+            addUncommitted, returnConflictResolvedLatestState);
     }
 
     public Set<I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
@@ -1288,8 +1286,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             TerminologyException {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return isParentOfOrEqualTo(child, config.getAllowedStatus(), config.getDestRelTypes(),
-            config.getViewPositionSetReadOnly(), addUncommitted);
+        return isParentOfOrEqualTo(child, config.getAllowedStatus(), config.getDestRelTypes(), config
+            .getViewPositionSetReadOnly(), addUncommitted);
     }
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
@@ -1303,8 +1301,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException {
         I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
 
-        return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(),
-            addUncommitted);
+        return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config
+            .getViewPositionSetReadOnly(), addUncommitted);
     }
 
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
@@ -1315,7 +1313,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     private transient Map<List<Integer>, SoftReference<Map<Integer, Boolean>>> isParentCacheMap;
     private transient int isParentCacheMapCommitSequence = 0;
 
-    private List<Integer> getParentCriterion(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions) {
+    private List<Integer> getParentCriterion(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions) {
         List<Integer> intList = new ArrayList<Integer>();
 
         if (allowedStatus != null) {
@@ -1367,8 +1366,8 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
         if (isParentCache.containsKey(child.getConceptId())) {
             return isParentCache.get(child.getConceptId());
         }
-        Set<? extends I_GetConceptData> parents = child.getSourceRelTargets(allowedStatus, allowedTypes, positions,
-            addUncommitted);
+        Set<? extends I_GetConceptData> parents =
+                child.getSourceRelTargets(allowedStatus, allowedTypes, positions, addUncommitted);
         if (depth == 90) {
             AceLog.getAppLog().log(
                 Level.SEVERE,
