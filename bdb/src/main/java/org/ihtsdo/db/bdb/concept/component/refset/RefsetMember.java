@@ -223,22 +223,17 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
      * validation failures. 
      * @throws IOException 
      */
-    public String validate(RefsetMember<V, C> another) throws IOException {
+    public String validate(RefsetMember<?, ?> another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";
         
         if (this.referencedComponentNid != another.referencedComponentNid) {
-            buf.append(spaces + "RefsetMember.referencedComponentNid not equal: \n" + 
-                "\tthis.referencedComponentNid = " + this.referencedComponentNid + "\n" + 
-                "\tanother.referencedComponentNid = " + another.referencedComponentNid + "\n");
+            buf.append("\tRefsetMember.referencedComponentNid not equal: \n" + 
+                "\t\tthis.referencedComponentNid = " + this.referencedComponentNid + "\n" + 
+                "\t\tanother.referencedComponentNid = " + another.referencedComponentNid + "\n");
         }
-        
-        
-        
         // Compare the parents 
         buf.append(super.validate(another));
-        
         return buf.toString();
     }
 	

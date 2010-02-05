@@ -273,32 +273,31 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public String validate(Relationship another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";
         
         if (this.c2Nid != another.c2Nid) {
-            buf.append(spaces + "Relationship.initialCaseSignificant not equal: \n" + 
-                "\tthis.c2Nid = " + this.c2Nid + "\n" + 
-                "\tanother.c2Nid = " + another.c2Nid + "\n");
+            buf.append("\tRelationship.initialCaseSignificant not equal: \n" + 
+                "\t\tthis.c2Nid = " + this.c2Nid + "\n" + 
+                "\t\tanother.c2Nid = " + another.c2Nid + "\n");
         }
         if (this.characteristicNid != another.characteristicNid) {
-            buf.append(spaces + "Relationship.characteristicNid not equal: \n" + 
-                "\tthis.characteristicNid = " + this.characteristicNid + "\n" + 
-                "\tanother.characteristicNid = " + another.characteristicNid + "\n");
+            buf.append("\tRelationship.characteristicNid not equal: \n" + 
+                "\t\tthis.characteristicNid = " + this.characteristicNid + "\n" + 
+                "\t\tanother.characteristicNid = " + another.characteristicNid + "\n");
         }
         if (this.group != another.group) {
-            buf.append(spaces + "Relationship.group not equal: \n" + 
-                "\tthis.group = " + this.group + "\n" + 
-                "\tanother.group = " + another.group + "\n");
+            buf.append("\tRelationship.group not equal: \n" + 
+                "\t\tthis.group = " + this.group + "\n" + 
+                "\t\tanother.group = " + another.group + "\n");
         }
         if (this.refinabilityNid != another.refinabilityNid) {
-            buf.append(spaces + "Relationship.refinabilityNid not equal: \n" + 
-                "\tthis.refinabilityNid = " + this.refinabilityNid + "\n" + 
-                "\tanother.refinabilityNid = " + another.refinabilityNid + "\n");
+            buf.append("\tRelationship.refinabilityNid not equal: \n" + 
+                "\t\tthis.refinabilityNid = " + this.refinabilityNid + "\n" + 
+                "\t\tanother.refinabilityNid = " + another.refinabilityNid + "\n");
         }
         if (this.typeNid != another.typeNid) {
-            buf.append(spaces + "Relationship.typeNid not equal: \n" + 
-                "\tthis.typeNid = " + this.typeNid + "\n" + 
-                "\tanother.typeNid = " + another.typeNid + "\n");
+            buf.append("\tRelationship.typeNid not equal: \n" + 
+                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\t\tanother.typeNid = " + another.typeNid + "\n");
         }
 
         // Compare the parents 

@@ -996,34 +996,34 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
      * validation failures. 
      * @throws IOException 
      */ 
-    public String validate(ConceptComponent<R, C> another) throws IOException {
+    @SuppressWarnings("unchecked")
+    public String validate(ConceptComponent<?, ?> another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";        
         String validationResults = null;        
 
         if (this.nid != another.nid) {
-            buf.append(spaces + "ConceptComponent.nid not equal: \n" + 
-                "\tthis.nid = " + this.nid + "\n" + 
-                "\tanother.nid = " + another.nid + "\n");
+            buf.append("\tConceptComponent.nid not equal: \n" + 
+                "\t\tthis.nid = " + this.nid + "\n" + 
+                "\t\tanother.nid = " + another.nid + "\n");
         }
         if (this.primordialSapNid != another.primordialSapNid) {
-            buf.append(spaces + "ConceptComponent.primordialSapNid not equal: \n" + 
-                "\tthis.primordialSapNid = " + this.primordialSapNid + "\n" + 
-                "\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
+            buf.append("\tConceptComponent.primordialSapNid not equal: \n" + 
+                "\t\tthis.primordialSapNid = " + this.primordialSapNid + "\n" + 
+                "\t\tanother.primordialSapNid = " + another.primordialSapNid + "\n");
         }
         
         if (this.primordialUNid != another.primordialUNid) {
-            buf.append(spaces + "ConceptComponent.primordialUNid not equal: \n" + 
-                "\tthis.primordialUNid = " + this.primordialUNid + "\n" + 
-                "\tanother.primordialUNid = " + another.primordialUNid + "\n");
+            buf.append("\tConceptComponent.primordialUNid not equal: \n" + 
+                "\t\tthis.primordialUNid = " + this.primordialUNid + "\n" + 
+                "\t\tanother.primordialUNid = " + another.primordialUNid + "\n");
         }
             
         if (this.additionalIdentifierParts != null) {
             if (this.additionalIdentifierParts.equals(another.additionalIdentifierParts) == false) {
-                buf.append(spaces + "ConceptComponent.additionalIdentifierParts not equal: \n" + 
-                    "\tthis.additionalIdentifierParts = " + this.additionalIdentifierParts + "\n" + 
-                    "\tanother.additionalIdentifierParts = " + another.additionalIdentifierParts + "\n");
+                buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n" + 
+                    "\t\tthis.additionalIdentifierParts = " + this.additionalIdentifierParts + "\n" + 
+                    "\t\tanother.additionalIdentifierParts = " + another.additionalIdentifierParts + "\n");
             }
         }
         
@@ -1032,21 +1032,25 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
                 for (int i = 0; i < this.revisions.size(); i++) {
                     // make sure there are elements in both arrays to compare
                     if (another.revisions.size() > i) {
-                        Revision<R,C> thisRevision = this.revisions.get(i); 
-                        Revision<R,C> anotherRevision = another.revisions.get(i);            
+                        Revision<R,C> thisRevision = (Revision<R, C>) this.revisions.get(i); 
+                        Revision<R,C> anotherRevision = (Revision<R, C>) another.revisions.get(i);            
                         validationResults = thisRevision.validate(anotherRevision);
                         if (validationResults.length() != 0) {
-                            buf.append(spaces + "Revision[" + i + "] not equal: \n");
-                            buf.append(validationResults + "\n");
+                            buf.append("\tRevision[" + i + "] not equal: \n");
+                            buf.append(validationResults);
                         }
                     } else {
-                        buf.append(spaces + "ConceptComponent.revision[" + i + "] not equal: \n");
-                        buf.append(spaces + "\tThere is no corresponding Revision in another to compare it to.\n");
+                        buf.append("\tConceptComponent.revision[" + i + "] not equal: \n");
+                        buf.append("\t\tThere is no corresponding Revision in another to compare it to.\n");
                     }
                 }
             }
         }
         
+        if (buf.length() != 0) {
+            // Add a sentinal mark to indicate we reach the top of the hierarchy
+            buf.append("\t----------------------------\n");
+        }
         return buf.toString();
     }
 

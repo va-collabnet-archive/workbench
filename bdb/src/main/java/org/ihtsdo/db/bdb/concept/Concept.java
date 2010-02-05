@@ -900,27 +900,26 @@ public class Concept implements I_Transact, I_GetConceptData {
 		assert another != null;
 		StringBuffer buf = new StringBuffer();
 		String validationResult = null; 
-		String spaces = "   "; 
 		
 		// Compare nids 
 		if (this.nid != another.nid) {
-		    buf.append(spaces + "Concept.nid not equal: \n" + 
-                "\tthis.nid = " + this.nid + "\n" + 
-                "\tanother.nid = " + another.nid + "\n");
+		    buf.append("\tConcept.nid not equal: \n" + 
+                "\t\tthis.nid = " + this.nid + "\n" + 
+                "\t\tanother.nid = " + another.nid + "\n");
 		}
         
         // Compare fsDescNid 
         if (this.fsDescNid != another.fsDescNid) {
-            buf.append(spaces + "Concept.fsDescNid not equal: \n" + 
-                "\tthis.fsDescNid = " + this.fsDescNid + "\n" + 
-                "\tanother.fsDescNid = " + another.fsDescNid + "\n");
+            buf.append("\tConcept.fsDescNid not equal: \n" + 
+                "\t\tthis.fsDescNid = " + this.fsDescNid + "\n" + 
+                "\t\tanother.fsDescNid = " + another.fsDescNid + "\n");
         }
         
         // Compare fsXmlDescNid 
         if (this.fsXmlDescNid != another.fsXmlDescNid) {
-            buf.append(spaces + "Concept.fsXmlDescNid not equal: \n" + 
-                "\tthis.fsXmlDescNid = " + this.fsXmlDescNid + "\n" + 
-                "\tanother.fsXmlDescNid = " + another.fsXmlDescNid + "\n");
+            buf.append("\tConcept.fsXmlDescNid not equal: \n" + 
+                "\t\tthis.fsXmlDescNid = " + this.fsXmlDescNid + "\n" + 
+                "\t\tanother.fsXmlDescNid = " + another.fsXmlDescNid + "\n");
         }
         
 		// Compare Attributes 
@@ -930,7 +929,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		assert anotherAttributes != null: "validating: " + nid;
 		validationResult = attributes.validate(anotherAttributes);
 		if (validationResult.length() != 0) {
-		    buf.append(spaces + validationResult + "\n");
+		    buf.append(validationResult);
 		}
 		
         // Compare Descriptions 
@@ -945,12 +944,12 @@ public class Concept implements I_Transact, I_GetConceptData {
                 Description anotherDescription = anotherDescriptionList.get(i);            
                 validationResult = thisDescription.validate(anotherDescription);
                 if (validationResult.length() != 0) {
-                    buf.append(spaces + "Concept.Descriptions[" + i + "] not equal: \n");
-                    buf.append(validationResult + "\n");
+                    buf.append("\tConcept.Descriptions[" + i + "] not equal: \n");
+                    buf.append(validationResult);
                 }
             } else {
-                buf.append(spaces + "Concept.Descriptions[" + i + "] not equal: \n");
-                buf.append(spaces + "\tThere is no corresponding Description in another to compare it to.\n");
+                buf.append("\tConcept.Descriptions[" + i + "] not equal: \n");
+                buf.append("\t\tThere is no corresponding Description in another to compare it to.\n");
             }
         }
         
@@ -967,12 +966,12 @@ public class Concept implements I_Transact, I_GetConceptData {
                 Relationship anotherRelationship = anotherRelationshipList.get(i);            
                 validationResult = thisRelationship.validate(anotherRelationship);
                 if (validationResult.length() != 0) {
-                    buf.append(spaces + "Concept.Relationships[" + i + "] not equal: \n");
-                    buf.append(validationResult + "\n");
+                    buf.append("\tConcept.Relationships[" + i + "] not equal: \n");
+                    buf.append(validationResult);
                 }
             } else {
-                buf.append(spaces + "Concept.Relationships[" + i + "] not equal: \n");
-                buf.append(spaces + "\tThere is no corresponding Relationship in another to compare it to.\n");
+                buf.append("\tConcept.Relationships[" + i + "] not equal: \n");
+                buf.append("\t\tThere is no corresponding Relationship in another to compare it to.\n");
             }
         }
 
@@ -989,12 +988,12 @@ public class Concept implements I_Transact, I_GetConceptData {
                 Image anotherImage = anotherImagesList.get(i);            
                 validationResult = thisImage.validate(anotherImage);
                 if (validationResult.length() != 0) {
-                    buf.append(spaces + "Concept.Images[" + i + "] not equal: \n");
-                    buf.append(validationResult + "\n");
+                    buf.append("\tConcept.Images[" + i + "] not equal: \n");
+                    buf.append(validationResult);
                 }
             } else {
-                buf.append(spaces + "Concept.Images[" + i + "] not equal: \n");
-                buf.append(spaces + "\tThere is no corresponding Image in another to compare it to.\n");
+                buf.append("\tConcept.Images[" + i + "] not equal: \n");
+                buf.append("\t\tThere is no corresponding Image in another to compare it to.\n");
             }
         }
    
@@ -1008,26 +1007,18 @@ public class Concept implements I_Transact, I_GetConceptData {
             // make sure there are elements in both arrays to compare
             if (anotherRefsetMembersList.size() > i) {
                 RefsetMember<?, ?> thisRefsetMember = refsetMembersList.get(i); 
-                RefsetMember<?, ?> anotherRefsetMember = anotherRefsetMembersList.get(i);            
-                if (thisRefsetMember.equals(anotherRefsetMember) == false) {
-                    buf.append(spaces + "Concept.RefsetMember[" + i + "] not equal: \n");
-                    buf.append(spaces + "this.refsetMember = " + thisRefsetMember.toString() + "\n");
-                    buf.append(spaces + "another.refsetMember = " + anotherRefsetMember.toString() + "\n");
+                RefsetMember<?, ?> anotherRefsetMember = anotherRefsetMembersList.get(i);    
+                validationResult = thisRefsetMember.validate(anotherRefsetMember);
+                if (validationResult.length() != 0) {
+                    buf.append("\tConcept.RefsetMember[" + i + "] not equal: \n");
+                    buf.append(validationResult);
                 }
             } else {
-                buf.append(spaces + "Concept.RefsetMember[" + i + "] not equal: \n");
-                buf.append(spaces + "\tThere is no corresponding RefsetMember in another to compare it to.\n");
+                buf.append("\tConcept.RefsetMember[" + i + "] not equal: \n");
+                buf.append("\t\tThere is no corresponding RefsetMember in another to compare it to.\n");
             }
         }
         
-//        
-//        
-//        if (refsetMembers.equals(anotherRefsetMembers) == false) {
-//            buff.append("Concept refset members are not equal:\n" + 
-//                    "\t this: " + refsetMembers + "\n" + 
-//                    "\t another: " + anotherRefsetMembers + "\n");
-//        }
-
         return buf.toString();
 	}	
 	

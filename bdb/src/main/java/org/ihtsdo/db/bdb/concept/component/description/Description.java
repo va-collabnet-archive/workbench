@@ -257,27 +257,26 @@ public class Description
     public String validate(Description another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";
         
         if (this.initialCaseSignificant != another.initialCaseSignificant) {
-            buf.append(spaces + "Description.initialCaseSignificant not equal: \n" + 
-                "\tthis.initialCaseSignificant = " + this.initialCaseSignificant + "\n" + 
-                "\tanother.initialCaseSignificant = " + another.initialCaseSignificant + "\n");
+            buf.append("\tDescription.initialCaseSignificant not equal: \n" + 
+                "\t\tthis.initialCaseSignificant = " + this.initialCaseSignificant + "\n" + 
+                "\t\tanother.initialCaseSignificant = " + another.initialCaseSignificant + "\n");
         }
         if (!this.text.equals(another.text)) {
-            buf.append(spaces + "Description.text not equal: \n" + 
-                "\tthis.text = " + this.text + "\n" + 
-                "\tanother.text = " + another.text + "\n");
+            buf.append("\tDescription.text not equal: \n" + 
+                "\t\tthis.text = " + this.text + "\n" + 
+                "\t\tanother.text = " + another.text + "\n");
         }
         if (!this.lang.equals(another.lang)) {
-            buf.append(spaces + "Description.lang not equal: \n" + 
-                "\tthis.lang = " + this.lang + "\n" + 
-                "\tanother.lang = " + another.lang + "\n");
+            buf.append("\tDescription.lang not equal: \n" + 
+                "\t\tthis.lang = " + this.lang + "\n" + 
+                "\t\tanother.lang = " + another.lang + "\n");
         }
         if (this.typeNid != another.typeNid) {
-            buf.append(spaces + "Description.typeNid not equal: \n" + 
-                "\tthis.typeNid = " + this.typeNid + "\n" + 
-                "\tanother.typeNid = " + another.typeNid + "\n");
+            buf.append("\tDescription.typeNid not equal: \n" + 
+                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\t\tanother.typeNid = " + another.typeNid + "\n");
         }
 
         // Compare the parents 

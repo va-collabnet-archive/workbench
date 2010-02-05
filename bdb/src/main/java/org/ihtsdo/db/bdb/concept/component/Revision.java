@@ -205,19 +205,17 @@ public abstract class Revision<V extends Revision<V, C>,
     public String validate(Revision<?, ?> another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";
         
         if (this.sapNid != another.sapNid) {
-            buf.append(spaces + "Revision.sapNid not equal: \n" + 
-                "\tthis.sapNid = " + this.sapNid + "\n" + 
-                "\tanother.sapNid = " + another.sapNid + "\n");
+            buf.append("\t\tRevision.sapNid not equal: \n" + 
+                "\t\t\tthis.sapNid = " + this.sapNid + "\n" + 
+                "\t\t\tanother.sapNid = " + another.sapNid + "\n");
         }
         if (!this.primordialComponent.equals(another.primordialComponent)) {
-            buf.append(spaces + "Revision.primordialComponent not equal: \n" + 
-                "\tthis.primordialComponent = " + this.primordialComponent + "\n" + 
-                "\tanother.primordialComponent = " + another.primordialComponent + "\n");
+            buf.append("\t\tRevision.primordialComponent not equal: \n" + 
+                "\t\t\tthis.primordialComponent = " + this.primordialComponent + "\n" + 
+                "\t\t\tanother.primordialComponent = " + another.primordialComponent + "\n");
         }
-        
         return buf.toString();
     }
     

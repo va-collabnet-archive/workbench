@@ -242,22 +242,21 @@ public class Image
     public String validate(Image another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();
-        String spaces = "   ";
         
         if (!this.format.equals(another.format)) {
-            buf.append(spaces + "Image.format not equal: \n" + 
-                "\tthis.format = " + this.format + "\n" + 
-                "\tanother.format = " + another.format + "\n");
+            buf.append("\tImage.format not equal: \n" + 
+                "\t\tthis.format = " + this.format + "\n" + 
+                "\t\tanother.format = " + another.format + "\n");
         }
         if (!Arrays.equals(this.image, another.image)) {
-            buf.append(spaces + "Image.image not equal: \n" + 
-                "\tthis.image = " + this.image + "\n" + 
-                "\tanother.image = " + another.image + "\n");
+            buf.append("\tImage.image not equal: \n" + 
+                "\t\tthis.image = " + this.image + "\n" + 
+                "\t\tanother.image = " + another.image + "\n");
         }
         if (this.typeNid != another.typeNid) {
-            buf.append(spaces + "Image.typeNid not equal: \n" + 
-                "\tthis.typeNid = " + this.typeNid + "\n" + 
-                "\tanother.typeNid = " + another.typeNid + "\n");
+            buf.append("\tImage.typeNid not equal: \n" + 
+                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\t\tanother.typeNid = " + another.typeNid + "\n");
         }
         
         // Compare the parents 

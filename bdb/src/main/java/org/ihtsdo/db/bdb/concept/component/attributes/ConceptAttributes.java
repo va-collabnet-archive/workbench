@@ -493,9 +493,9 @@ public class ConceptAttributes
         
         // Compare defined
         if (this.defined != another.defined) {
-            buf.append("ConceptAttributes.defined not equal: \n" + 
-                "\tthis.defined = " + this.defined + "\n" + 
-                "\tanother.defined = " + another.defined + "\n");
+            buf.append("\tConceptAttributes.defined not equal: \n" + 
+                "\t\tthis.defined = " + this.defined + "\n" + 
+                "\t\tanother.defined = " + another.defined + "\n");
         }
         
         // Compare the parents 
