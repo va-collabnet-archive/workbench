@@ -45,26 +45,32 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     private String constraintDesc;
 
     public String getConstraintDesc() throws TerminologyException, IOException {
+
         if (constraintDesc == null) {
-            I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) getExtension().getMutablePart()).getC3id());
+            I_GetConceptData thisConstraint =
+                    Terms.get().getConcept(
+                        ((I_ThinExtByRefPartConceptConceptConcept) getExtension().getMutablePart()).getC3id());
             try {
-                I_DescriptionTuple thisConstraintDesc = thisConstraint.getDescTuple(
-                    aceConfig.getTreeDescPreferenceList(), aceConfig);
+                I_DescriptionTuple thisConstraintDesc =
+                        thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
                 constraintDesc = thisConstraintDesc.getText().toLowerCase();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
         }
+
         return constraintDesc;
     }
 
     public String getClauseDesc() throws TerminologyException, IOException {
         if (clauseDesc == null) {
-        	I_GetConceptData thisClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConcept) getExtension().getMutablePart()).getC2id());
+            I_GetConceptData thisClause =
+                    Terms.get().getConcept(
+                        ((I_ThinExtByRefPartConceptConcept) getExtension().getMutablePart()).getC2id());
             try {
-                I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(),
-                    aceConfig);
+                I_DescriptionTuple thisClauseDesc =
+                        thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
                 clauseDesc = thisClauseDesc.getText().toLowerCase();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -82,7 +88,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public String getTruthDesc() throws TerminologyException, IOException {
         if (truthDesc == null) {
-        	I_GetConceptData thisTruth = Terms.get().getConcept(truthId);
+            I_GetConceptData thisTruth = Terms.get().getConcept(truthId);
             I_DescriptionTuple thisTruthDesc;
             try {
                 thisTruthDesc = thisTruth.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -96,13 +102,15 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public I_ThinExtByRefTuple getExtension() {
         if (extension == null) {
-            List<I_ThinExtByRefTuple> tupleList = ((I_ThinExtByRefVersioned) this.userObject).getTuples(
-                aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
+            List<I_ThinExtByRefTuple> tupleList =
+                    ((I_ThinExtByRefVersioned) this.userObject).getTuples(aceConfig.getAllowedStatus(), aceConfig
+                        .getViewPositionSet(), true);
             if (tupleList.size() > 0) {
                 extension = tupleList.get(tupleList.size() - 1);
             } else {
-                tupleList = ((I_ThinExtByRefVersioned) this.userObject).getTuples(null, aceConfig.getViewPositionSet(),
-                    true);
+                tupleList =
+                        ((I_ThinExtByRefVersioned) this.userObject).getTuples(null, aceConfig.getViewPositionSet(),
+                            true);
                 if (tupleList.size() > 0) {
                     extension = tupleList.get(tupleList.size() - 1);
                 }
@@ -131,74 +139,74 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                     return -1;
                 }
                 try {
-					switch (ThinExtBinder.getExtensionType(thisExt.getCore())) {
-					case CONCEPT_CONCEPT:
+                    switch (ThinExtBinder.getExtensionType(thisExt.getCore())) {
+                    case CONCEPT_CONCEPT:
 
-					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-					    case CONCEPT_CONCEPT:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return compareClause(o);
-					    case CONCEPT_CONCEPT_CONCEPT:
-					        return 1;
-					    case CONCEPT_CONCEPT_STRING:
-					        return 1;
-					    default:
-					        break;
-					    }
+                        switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+                        case CONCEPT_CONCEPT:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return compareClause(o);
+                        case CONCEPT_CONCEPT_CONCEPT:
+                            return 1;
+                        case CONCEPT_CONCEPT_STRING:
+                            return 1;
+                        default:
+                            break;
+                        }
 
-					    break;
+                        break;
 
-					case CONCEPT_CONCEPT_CONCEPT:
-					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-					    case CONCEPT_CONCEPT:
-					        return -1;
-					    case CONCEPT_CONCEPT_CONCEPT:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        comparison = compareClause(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return compareConstraint(thisExt, otherExt);
-					    case CONCEPT_CONCEPT_STRING:
-					        return -1;
-					    default:
-					        break;
-					    }
+                    case CONCEPT_CONCEPT_CONCEPT:
+                        switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+                        case CONCEPT_CONCEPT:
+                            return -1;
+                        case CONCEPT_CONCEPT_CONCEPT:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            comparison = compareClause(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return compareConstraint(thisExt, otherExt);
+                        case CONCEPT_CONCEPT_STRING:
+                            return -1;
+                        default:
+                            break;
+                        }
 
-					    break;
-					case CONCEPT_CONCEPT_STRING:
-					    switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
-					    case CONCEPT_CONCEPT:
-					        return -1;
-					    case CONCEPT_CONCEPT_CONCEPT:
-					        return 1;
-					    case CONCEPT_CONCEPT_STRING:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        comparison = compareClause(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return compareString(thisExt, otherExt);
-					    default:
-					        break;
-					    }
+                        break;
+                    case CONCEPT_CONCEPT_STRING:
+                        switch (ThinExtBinder.getExtensionType(otherExt.getCore())) {
+                        case CONCEPT_CONCEPT:
+                            return -1;
+                        case CONCEPT_CONCEPT_CONCEPT:
+                            return 1;
+                        case CONCEPT_CONCEPT_STRING:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            comparison = compareClause(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return compareString(thisExt, otherExt);
+                        default:
+                            break;
+                        }
 
-					    break;
-					default:
-					    break;
-					}
-				} catch (TerminologyException e) {
-					throw new RuntimeException(e);
-				}
+                        break;
+                    default:
+                        break;
+                    }
+                } catch (TerminologyException e) {
+                    throw new RuntimeException(e);
+                }
 
             }
             return this.userObject.toString().compareTo(o.userObject.toString());
@@ -213,9 +221,12 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
 
-    private int compareConstraint(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException, TerminologyException {
-    	I_GetConceptData thisClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getMutablePart()).getC3id());
-    	I_GetConceptData otherClause = Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getMutablePart()).getC3id());
+    private int compareConstraint(I_ThinExtByRefTuple thisExt, I_ThinExtByRefTuple otherExt) throws IOException,
+            TerminologyException {
+        I_GetConceptData thisClause =
+                Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) thisExt.getMutablePart()).getC3id());
+        I_GetConceptData otherClause =
+                Terms.get().getConcept(((I_ThinExtByRefPartConceptConceptConcept) otherExt.getMutablePart()).getC3id());
         I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         if (thisClauseDesc == null || otherClauseDesc == null) {
