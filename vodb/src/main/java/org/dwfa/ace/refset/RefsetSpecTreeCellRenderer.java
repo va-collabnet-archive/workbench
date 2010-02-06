@@ -78,7 +78,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setLeafIcon(null);
         setClosedIcon(null);
         setOpenIcon(null);
-        I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+        I_GetConceptData viewerImageType =
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
         viewerImageTypes.add(viewerImageType.getConceptId());
     }
 
@@ -100,8 +101,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
     private void generateHtmlRendering(Object value) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
         if (node.getUserObject() != null
-            && (I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass()) || I_ThinExtByRefTuple.class.isAssignableFrom(node.getUserObject()
-                .getClass()))) {
+            && (I_ThinExtByRefVersioned.class.isAssignableFrom(node.getUserObject().getClass()) || I_ThinExtByRefTuple.class
+                .isAssignableFrom(node.getUserObject().getClass()))) {
             I_ThinExtByRefTuple firstTuple = null;
             I_ThinExtByRefTuple lastTuple = null;
             EXT_TYPE extType = null;
@@ -207,9 +208,11 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         }
     }
 
-    private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
+    private void renderTextQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException,
+            TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptString ccsPart = (I_ThinExtByRefPartConceptConceptString) firstTuple.getMutablePart();
+        I_ThinExtByRefPartConceptConceptString ccsPart =
+                (I_ThinExtByRefPartConceptConceptString) firstTuple.getMutablePart();
 
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
@@ -228,9 +231,11 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
+    private void renderStructuralQueryClause(I_ThinExtByRefTuple firstTuple, boolean indent) throws IOException,
+            TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ThinExtByRefPartConceptConceptConcept cccPart = (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getMutablePart();
+        I_ThinExtByRefPartConceptConceptConcept cccPart =
+                (I_ThinExtByRefPartConceptConceptConcept) firstTuple.getMutablePart();
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
         }
@@ -243,7 +248,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException, TerminologyException, ParseException {
+    private void renderBranchingClause(I_ThinExtByRefTuple firstTuple) throws IOException, TerminologyException,
+            ParseException {
         List<String> htmlParts = new ArrayList<String>();
         I_ThinExtByRefPartConceptConcept ccPart = (I_ThinExtByRefPartConceptConcept) firstTuple.getMutablePart();
         htmlParts.add("&nbsp;&nbsp;&nbsp;");
@@ -254,13 +260,15 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException, TerminologyException, ParseException {
+    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException,
+            TerminologyException, ParseException {
         htmlParts.add("<font color='" + color + "'>");
         addConceptDescription(htmlParts, cid);
         htmlParts.add("</font>");
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException, TerminologyException, ParseException {
+    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException, TerminologyException,
+            ParseException {
         I_TermFactory tf = LocalVersionedTerminology.get();
         if (tf.hasConcept(cid)) {
             I_GetConceptData cb = tf.getConcept(cid);
@@ -276,21 +284,25 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                 htmlParts.add(cb.toString());
             }
         } else {
-            I_DescriptionVersioned desc = tf.getDescription(tf.getId(cid).getUUIDs().iterator().next().toString());
-            if (desc != null) {
-                String text = desc.getLastTuple().getText();
-                if (text.toLowerCase().startsWith("<html>")) {
-                    htmlParts.add(text.substring(5));
-                } else {
-                    htmlParts.add(text);
+            try {
+                I_DescriptionVersioned desc = tf.getDescription(tf.getId(cid).getUUIDs().iterator().next().toString());
+                if (desc != null) {
+                    String text = desc.getLastTuple().getText();
+                    if (text.toLowerCase().startsWith("<html>")) {
+                        htmlParts.add(text.substring(5));
+                    } else {
+                        htmlParts.add(text);
+                    }
                 }
+            } catch (TerminologyException e) {
+                htmlParts.add("No description available.");
             }
-            
+
         }
     }
 
     private void addPrefixImage(List<String> htmlParts, int prefixConceptId) throws IOException, TerminologyException {
-    	I_GetConceptData prefixConcept = Terms.get().getConcept(prefixConceptId);
+        I_GetConceptData prefixConcept = Terms.get().getConcept(prefixConceptId);
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
             viewerImageTypes, configAceFrame.getViewPositionSetReadOnly())) {
             htmlParts.add("<img src='ace:" + imageTuple.getImageId() + "$" + imageTuple.getConceptId()

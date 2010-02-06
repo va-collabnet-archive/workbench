@@ -54,7 +54,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -66,7 +65,6 @@ import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.types.ExtensionByReferenceBean;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.ThinDescTuple;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
@@ -156,7 +154,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         ReflexiveRefsetFieldData field;
         private IntList popupIds;
 
-        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field) throws TerminologyException, IOException {
+        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field)
+                throws TerminologyException, IOException {
             super(new JComboBox());
             this.popupIds = popupIds;
             this.field = field;
@@ -189,12 +188,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             try {
-				populatePopup();
-			} catch (TerminologyException e) {
+                populatePopup();
+            } catch (TerminologyException e) {
                 throw new RuntimeException(e);
-			} catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
-			}
+            }
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
@@ -387,13 +386,18 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 if (columns[columnIndex].readParamaters != null) {
                     if (tf.hasConcept(id)) {
                         value =
-                                columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()),
-                                    columns[columnIndex].readParamaters);
+                                columns[columnIndex].getReadMethod()
+                                    .invoke(Terms.get().getConcept(tuple.getComponentId()),
+                                        columns[columnIndex].readParamaters);
                     } else {
-                        I_DescriptionVersioned desc =
-                                tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
-                        if (desc != null) {
-                            value = desc.getLastTuple().getText();
+                        try {
+                            I_DescriptionVersioned desc =
+                                    tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
+                            if (desc != null) {
+                                value = desc.getLastTuple().getText();
+                            }
+                        } catch (Exception e) {
+                            value = "No description available.";
                         }
                     }
 
@@ -456,14 +460,14 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 if (Integer.class.isAssignableFrom(value.getClass())) {
                     id = (Integer) value;
                     if (tf.hasConcept(id)) {
-                        I_GetConceptData concept = tf.getConcept(id);
-                        I_DescriptionTuple obj =
-                                concept.getDescTuple((I_IntList) columns[columnIndex].readParamaters[0],
-                                    (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
-                        if (obj != null) {
-                            return new StringWithExtTuple(obj.getText(), tuple, id);
+
+                        I_DescriptionTuple desc =
+                                tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
+                                    host.getConfig());
+                        if (desc != null) {
+                            return new StringWithExtTuple(desc.getText(), tuple, id);
                         }
-                        return new StringWithExtTuple("null obj", tuple, id);
+                        return new StringWithExtTuple(Integer.toString(id), tuple, id);
 
                     } else if (tf.hasExtension(id)) {
                         I_ThinExtByRefVersioned ext = tf.getExtension(id);
@@ -516,7 +520,17 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             }
                         }
                     } else {
-                        throw new UnsupportedOperationException("Can't find component for id: " + id);
+                        try {
+                            I_DescriptionVersioned desc =
+                                    tf.getDescription(tf.getId(id).getUUIDs().iterator().next().toString());
+                            if (desc != null) {
+                                String text = desc.getLastTuple().getText();
+                                return new StringWithExtTuple(text, tuple, id);
+                            }
+                        } catch (TerminologyException e) {
+                            return new StringWithExtTuple("No description available for id:" + id, tuple, id);
+                        }
+
                     }
                 }
                 return value;
@@ -593,11 +607,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             boolean changed = false;
             if (extTuple.getVersion() == Integer.MAX_VALUE) {
                 try {
-                switch (columns[col].getType()) {
-                case CONCEPT_IDENTIFIER:
-                    Integer identifier = (Integer) value;
-                    referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
-                default:
+                    switch (columns[col].getType()) {
+                    case CONCEPT_IDENTIFIER:
+                        Integer identifier = (Integer) value;
+                        referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
+                    default:
                         switch (columns[col].invokeOnObjectType) {
                         case COMPONENT:
                         case CONCEPT:
@@ -616,7 +630,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 + columns[col].invokeOnObjectType);
 
                         }
-                }
+                    }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }

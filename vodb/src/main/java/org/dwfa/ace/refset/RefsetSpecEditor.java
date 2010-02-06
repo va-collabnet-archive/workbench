@@ -214,7 +214,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
                         column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
                         column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
-                        column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+                        column3.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
                         columns.add(column3);
 
                     } else if (extType == EXT_TYPE.CONCEPT_CONCEPT_STRING) {
@@ -904,7 +904,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (evt.getPropertyName().equals("commit")) {
             if (label.getTermComponent() != null) {
-            	I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
+                I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
                     if (cb.getConceptAttributes() == null) {
                         label.setTermComponent(null);
