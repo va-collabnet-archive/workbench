@@ -407,7 +407,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 
 	@Override
 	public int hashCode() {
-		throw new UnsupportedOperationException("Set values may change, so we cannot compute a hashcode.");
+		return super.hashCode();
 	}
 	
 	
