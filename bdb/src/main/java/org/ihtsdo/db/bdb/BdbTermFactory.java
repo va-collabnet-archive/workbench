@@ -77,6 +77,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
@@ -87,11 +88,11 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.PathManager;
-import org.dwfa.vodb.VodbEnv.MakeNewAceFrame;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.impl.CheckAndProcessRegexMatch;
 import org.dwfa.vodb.types.IntList;
@@ -100,8 +101,13 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.I_ProcessConceptData;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.db.bdb.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.db.bdb.concept.component.description.DescriptionRevision;
+import org.ihtsdo.db.bdb.concept.component.relationship.Relationship;
+import org.ihtsdo.db.bdb.concept.component.relationship.RelationshipRevision;
+import org.ihtsdo.db.runner.WorkbenchRunner;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.DatabaseException;
@@ -528,8 +534,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	}
 
 	@Override
-	public Set<I_Transact> getUncommitted() {
-		throw new UnsupportedOperationException();
+	public Set<? extends I_Transact> getUncommitted() {
+		return BdbCommitManager.getUncommitted();
 	}
 
 	@Override
@@ -641,6 +647,34 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 		return new TerminologyTransferHandler(thisComponent);
 	}
 
+    public static class MakeNewAceFrame implements Runnable {
+        I_ConfigAceFrame frameConfig;
+        Exception ex;
+
+        public MakeNewAceFrame(I_ConfigAceFrame frameConfig) {
+            super();
+            this.frameConfig = frameConfig;
+        }
+
+        public void run() {
+            try {
+                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, 
+                		WorkbenchRunner.lc, frameConfig, false);
+                newFrame.setVisible(true);
+                AceFrameConfig nativeConfig = (AceFrameConfig) frameConfig;
+                nativeConfig.setAceFrame(newFrame);
+            } catch (Exception e) {
+                ex = e;
+            }
+        }
+
+        public void check() throws Exception {
+            if (ex != null) {
+                throw ex;
+            }
+        }
+    }
+
 	@Override
 	public void newAceFrame(I_ConfigAceFrame frameConfig) throws Exception {
 		MakeNewAceFrame maker = new MakeNewAceFrame(frameConfig);
@@ -693,10 +727,34 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	}
 
 	@Override
-	public I_GetConceptData newConcept(UUID newConceptId, boolean defined,
+	public I_GetConceptData newConcept(UUID newConceptUuid, boolean defined,
 			I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
 			IOException {
-		throw new UnsupportedOperationException();
+        canEdit(aceFrameConfig);
+        int cNid = Bdb.uuidToNid(newConceptUuid);
+        Concept newC = Concept.get(cNid);
+        ConceptAttributes a = new ConceptAttributes();
+        a.enclosingConcept = newC;
+        newC.setConceptAttributes(a);
+        a.setDefined(defined);
+        a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
+        a.primordialSapNid = Integer.MIN_VALUE;
+		int statusNid = aceFrameConfig.getDefaultStatus().getNid();
+		for (I_Path p: aceFrameConfig.getEditingPathSet()) {
+			if (a.primordialSapNid == Integer.MIN_VALUE) {
+				a.primordialSapNid = 
+					Bdb.getSapDb().getSapNid(statusNid, 
+							p.getConceptId(), Long.MAX_VALUE);
+			} else {
+				if (a.revisions == null) {
+					a.revisions = new ArrayList<ConceptAttributesRevision>(
+							aceFrameConfig.getEditingPathSet().size() - 1);
+				}
+				a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, 
+						p.getConceptId(), Long.MAX_VALUE));
+			}
+		}
+        return newC;
 	}
 
 	@Override
@@ -866,18 +924,68 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	public I_RelVersioned newRelationship(UUID newRelUid,
 			I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		return newRelationship(newRelUid, concept, 
+				aceFrameConfig.getDefaultRelationshipType(), 
+				Terms.get().getConcept(aceFrameConfig.getRoots().getSetValues()[0]), 
+				aceFrameConfig.getDefaultRelationshipCharacteristic(), 
+				aceFrameConfig.getDefaultRelationshipRefinability(), 
+				aceFrameConfig.getDefaultStatus(), 
+				0, 
+				aceFrameConfig);
 	}
 
 	@Override
 	public I_RelVersioned newRelationship(UUID newRelUid,
-			I_GetConceptData concept, I_GetConceptData relType,
+			I_GetConceptData concept, 
+			I_GetConceptData relType,
 			I_GetConceptData relDestination,
 			I_GetConceptData relCharacteristic,
 			I_GetConceptData relRefinability, I_GetConceptData relStatus,
 			int relGroup, I_ConfigAceFrame aceFrameConfig)
 			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
+		canEdit(aceFrameConfig);
+        if (concept == null) {
+            AceLog.getAppLog().alertAndLogException(
+                    new Exception("Cannot add a relationship while the component viewer is empty..."));
+            return null;
+        }
+		Concept c = (Concept) concept;
+		c.makeWritable();
+		Relationship r = new Relationship();
+		Bdb.gVersion.incrementAndGet();
+		r.enclosingConcept = c;
+		r.nid = Bdb.uuidToNid(newRelUid);
+		r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newRelUid);
+		int parentId = Integer.MIN_VALUE;
+        if (aceFrameConfig.getHierarchySelection() != null) {
+            parentId = aceFrameConfig.getHierarchySelection().getConceptId();
+        } else {
+            parentId = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.localize().getNid();
+        }
+        r.setC2Id(parentId);
+        r.setTypeId(relType.getNid());
+        r.setRefinabilityId(relRefinability.getNid());
+        r.setCharacteristicId(relCharacteristic.getNid());
+		r.primordialSapNid = Integer.MIN_VALUE;
+		r.setGroup(0);
+		int statusNid = relStatus.getNid();
+		for (I_Path p: aceFrameConfig.getEditingPathSet()) {
+			if (r.primordialSapNid == Integer.MIN_VALUE) {
+				r.primordialSapNid = 
+					Bdb.getSapDb().getSapNid(statusNid, 
+							p.getConceptId(), Long.MAX_VALUE);
+			} else {
+				if (r.revisions == null) {
+					r.revisions = new ArrayList<RelationshipRevision>(
+							aceFrameConfig.getEditingPathSet().size() - 1);
+				}
+				r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, 
+						p.getConceptId(), Long.MAX_VALUE));
+			}
+		}
+		c.getSourceRels().add(r);
+		Terms.get().addUncommitted(c);
+		return r;
 	}
 
 	@Override

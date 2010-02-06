@@ -23,10 +23,10 @@ import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.concept.component.description.Description;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipVersion;
 
@@ -636,5 +636,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public List<? extends I_RelPart> getMutableParts() {
 		return getVersions();
+	}
+
+
+	public ArrayList<Relationship.Version> getMatches(KindOfSpec spec) {
+		ArrayList<Relationship.Version> versionsToReturn = 
+			new ArrayList<Version>();
+		computer.addSpecifiedVersions(spec.allowedStatusNids, 
+				spec.relTypeNids, spec.getViewPositionSet(), versionsToReturn,
+				false, getVersions());
+		return versionsToReturn;
 	}
 }

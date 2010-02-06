@@ -9,8 +9,11 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -32,6 +35,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.util.ConcurrentSet;
@@ -236,6 +240,7 @@ public class BdbCommitManager {
 
 	public static void commit() {
 		//TODO add commit tests...
+		KindOfComputer.reset();
 		long commitTime = System.currentTimeMillis();
 		try {
 			Bdb.getSapDb().commit(commitTime);
@@ -260,6 +265,7 @@ public class BdbCommitManager {
 
 	public static void cancel() {
 		// TODO Auto-generated method stub
+		KindOfComputer.reset();
 		uncommittedCNids.clear();
 		uncommittedCNids.setCapacity(10);
 		try {
@@ -402,6 +408,19 @@ public class BdbCommitManager {
 				AceLog.getAppLog().warning(e.toString());
 			}
 		}
+	}
+
+	public static Set<Concept> getUncommitted() {
+		Set<Concept> returnSet = new HashSet<Concept>();
+		Iterator<Integer> cNidItr = uncommittedCNids.iterator();
+		while (cNidItr.hasNext()) {
+			try {
+				returnSet.add(Concept.get(cNidItr.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return returnSet;
 	}
 
 }
