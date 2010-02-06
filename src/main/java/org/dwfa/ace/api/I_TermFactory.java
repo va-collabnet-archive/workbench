@@ -223,7 +223,7 @@ public interface I_TermFactory {
      * 
      * @return An unmodifiable set of uncommitted items.
      */
-    Set<I_Transact> getUncommitted();
+    Set<? extends I_Transact> getUncommitted();
 
     /**
      * Method to call prior to commit that will list all commit failures that

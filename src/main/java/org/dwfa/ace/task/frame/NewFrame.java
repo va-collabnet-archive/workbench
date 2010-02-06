@@ -22,7 +22,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -66,11 +66,11 @@ public class NewFrame extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.readProperty(profilePropName);
+            I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
             if (profile == null) {
                 profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
-            LocalVersionedTerminology.get().newAceFrame(profile);
+            Terms.get().newAceFrame(profile);
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
