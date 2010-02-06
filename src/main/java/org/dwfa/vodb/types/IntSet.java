@@ -388,4 +388,28 @@ public class IntSet implements ListDataListener, I_IntSet {
         return listeners.remove(o);
     }
 
+	@Override
+	public boolean equals(Object obj) {
+		if (IntSet.class.isAssignableFrom(obj.getClass())) {
+			IntSet another = (IntSet) obj;
+			if (setValues.length != another.setValues.length) {
+				return false;
+			}
+			for (int i = 0; i < setValues.length; i++) {
+				if (setValues[i] != another.setValues[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		throw new UnsupportedOperationException("Set values may change, so we cannot compute a hashcode.");
+	}
+	
+	
+
 }
