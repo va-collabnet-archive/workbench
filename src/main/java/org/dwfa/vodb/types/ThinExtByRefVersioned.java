@@ -95,7 +95,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getMemberId()
      */
     public int getMemberId() {
@@ -108,7 +107,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getComponentId()
      */
     public int getComponentId() {
@@ -117,7 +115,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getTypeId()
      */
     public int getTypeId() {
@@ -126,7 +123,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getVersions()
      */
     public List<? extends I_ThinExtByRefPart> getMutableParts() {
@@ -135,7 +131,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#getRefsetId()
      */
     public int getRefsetId() {
@@ -173,20 +168,19 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
             buff.append(" type: ");
             buff.append(LocalVersionedTerminology.get().getConcept(typeId).toString());
             buff.append(" versions: ");
-            synchronized (versions) {
-                buff.append(versions);
-            }
+            List v = new ArrayList(getMutableParts());
+            buff.append(v);
+
             return buff.toString();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
         return "ThinExtByRefVersioned refsetId: " + refsetId + " memberId: " + memberId + " componentId: "
-            + componentId + " typeId: " + typeId + " versions: " + versions;
+            + componentId + " typeId: " + typeId + " versions: " + getMutableParts();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.dwfa.vodb.types.I_ThinExtByRefVersioned#addVersion(org.dwfa.vodb.
      * types.ThinExtByRefPart)
@@ -201,7 +195,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setRefsetId(int)
      */
     public void setRefsetId(int refsetId) {
@@ -210,7 +203,6 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.dwfa.vodb.types.I_ThinExtByRefVersioned#setTypeId(int)
      */
     public void setTypeId(int typeId) {
@@ -315,7 +307,8 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
             ThinExtByRefPartConceptConceptConcept thinPart = new ThinExtByRefPartConceptConceptConcept();
             setStandardFields(part, vodb, thinPart);
 
-            UniversalAceExtByRefPartConceptConceptConcept cccPart = (UniversalAceExtByRefPartConceptConceptConcept) part;
+            UniversalAceExtByRefPartConceptConceptConcept cccPart =
+                    (UniversalAceExtByRefPartConceptConceptConcept) part;
             thinPart.setC1id(vodb.uuidToNative(cccPart.getC1UuidCollection()));
             thinPart.setC2id(vodb.uuidToNative(cccPart.getC2UuidCollection()));
             thinPart.setC3id(vodb.uuidToNative(cccPart.getC3UuidCollection()));
@@ -423,7 +416,9 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
         for (I_Path promotionPath : pomotionPaths) {
             for (I_ThinExtByRefTuple it : matchingTuples) {
                 if (it.getPathId() == viewPathId) {
-                    I_ThinExtByRefPart promotionPart = (I_ThinExtByRefPart) it.getMutablePart().makeAnalog(it.getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
+                    I_ThinExtByRefPart promotionPart =
+                            (I_ThinExtByRefPart) it.getMutablePart().makeAnalog(it.getStatusId(),
+                                promotionPath.getConceptId(), Long.MAX_VALUE);
                     it.addVersion(promotionPart);
                     promotedAnything = true;
                 }
