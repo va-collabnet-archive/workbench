@@ -23,5 +23,5 @@ import java.io.File;
 
 public interface SQLFileWriter {
 
-    void writer(File file, Table table, String outputDirectory, LineToSQLConverter lineToSQLConverter);
+    void writer(File file, Table table, String outputDirectory, LineToSQLConverter lineToSQLConverter, boolean concat);
 }

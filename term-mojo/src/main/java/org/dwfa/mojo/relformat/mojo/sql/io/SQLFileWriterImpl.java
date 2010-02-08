@@ -25,7 +25,9 @@ import org.dwfa.mojo.relformat.mojo.sql.parser.Table;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 
 public final class SQLFileWriterImpl implements SQLFileWriter {
@@ -39,14 +41,14 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
     }
 
     public void writer(final File file, final Table table, final String outputDirectory,
-            final LineToSQLConverter lineToSQLConverter) {
+            final LineToSQLConverter lineToSQLConverter, final boolean concat) {
         BufferedReader reader = null;
         PrintWriter writer = null;
 
         try {
             fileUtil.createDirectoriesIfNeeded(new Directory(outputDirectory));
             reader = openReader(file);
-            writer = openWriter(table, file, outputDirectory);
+            writer = openWriter(table, file, outputDirectory, concat);
 
             String line = reader.readLine();// skip the header line.
 
@@ -60,10 +62,19 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
         }
     }
 
-    private PrintWriter openWriter(final Table table, final File file, final String outputDirectory)
-            throws FileNotFoundException {
-        String fileName = resolveFileName(table, file, outputDirectory);
-        return new PrintWriter(fileName);
+    private PrintWriter openWriter(final Table table, final File file, final String outputDirectory, boolean concat)
+            throws FileNotFoundException, IOException {
+        String fileName;
+        PrintWriter printWriter = null;
+        if (concat) {
+            fileName = fileUtil.createPath(outputDirectory, table.getName()) + ".txt";
+            printWriter = new PrintWriter(new FileWriter(new File(fileName), true));
+        } else {
+            fileName = resolveFileName(table, file, outputDirectory);
+            printWriter = new PrintWriter(fileName);
+        }
+
+        return printWriter;
     }
 
     private BufferedReader openReader(final File file) throws FileNotFoundException {

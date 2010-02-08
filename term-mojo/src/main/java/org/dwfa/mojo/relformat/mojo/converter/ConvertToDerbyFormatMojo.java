@@ -78,6 +78,13 @@ public final class ConvertToDerbyFormatMojo extends AbstractMojo {
     private boolean verbose;
 
     /**
+     * Tells SQL Write to concatenate files into 1 file
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean concatfiles;
+
+    /**
      * The location of the ReleaseConfig.xml file. Mappings between release
      * format files and exported sql
      * files are done through the pom.xml and the ReleaseConfig.xml.
@@ -123,7 +130,7 @@ public final class ConvertToDerbyFormatMojo extends AbstractMojo {
 
                 for (File aFile : matchingFiles) {
                     logInfo("processing file", aFile);
-                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToDerbyLineConverter);
+                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToDerbyLineConverter, concatfiles);
                 }
             } catch (Exception e) {
                 getLog().error(e); // if a format fails, log and keep going to
