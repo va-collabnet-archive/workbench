@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -38,6 +39,9 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.log.HtmlHandler;
 
 public class SvnPanel extends JPanel {
+
+    private JCheckBox svnConnectCheckBox;
+
     private class PreferredReadOnlyListener implements ActionListener {
         SubversionData svd;
 
@@ -330,6 +334,16 @@ public class SvnPanel extends JPanel {
         c.weightx = 0;
         c.fill = GridBagConstraints.BOTH;
 
+        // check box for whether or not to SVN
+        svnConnectCheckBox = new JCheckBox();
+        svnConnectCheckBox.setSelected(true);
+        svnConnectCheckBox.setText("Connect to subversion");
+        svnConnectCheckBox.addActionListener(new SvnConnectCheckBoxListener());
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy++;
+        this.add(svnConnectCheckBox, c);
+
         JEditorPane logOut = new JEditorPane("text/html", "<html>");
         HtmlHandler logHandler = new HtmlHandler(logOut, "svn");
         logHandler.setLevel(Level.INFO);
@@ -341,4 +355,19 @@ public class SvnPanel extends JPanel {
 
     }
 
+    /**
+     * True if the user is connecting to SVN
+     * 
+     * @return boolean
+     */
+    public boolean isConnectedToSvn() {
+        return svnConnectCheckBox.getModel().isSelected();
+    }
+
+    public class SvnConnectCheckBoxListener implements ActionListener {
+        public void actionPerformed(ActionEvent arg0) {
+            Svn.setConnectedToSvn(isConnectedToSvn());
+        }
+
+    }
 }

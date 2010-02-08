@@ -71,15 +71,18 @@ public class AceSvn {
         jiniClass = jiniClassToSet;
         jiniConfig = jiniConfigToSet;
         if (jiniConfig != null) {
-            svnCheckoutProfileOnStart = (String) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutProfileOnStart",
-                String.class, "");
+            svnCheckoutProfileOnStart =
+                    (String) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutProfileOnStart", String.class, "");
 
-            svnCheckoutOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart",
-                String[].class, new String[] {});
-            svnUpdateOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class,
-                new String[] {});
-            csImportOnStart = (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class,
-                new String[] {});
+            svnCheckoutOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart", String[].class,
+                        new String[] {});
+            svnUpdateOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class,
+                        new String[] {});
+            csImportOnStart =
+                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class,
+                        new String[] {});
             if (csImportOnStart != null) {
                 for (String importLoc : csImportOnStart) {
                     changeLocations.add(new File(importLoc));
@@ -128,7 +131,7 @@ public class AceSvn {
         }
     }
 
-    public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
+    public boolean initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
             FileNotFoundException, IOException, TaskFailedException, ClientException {
 
         Properties aceProperties = new Properties();
@@ -137,11 +140,13 @@ public class AceSvn {
         if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
             || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
             || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-            if (connectToSubversion == false) {
-                connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                    LogWithAlerts.getActiveFrame(null), "Would you like to connect over the network to Subversion?",
-                    "Confirm network operation", JOptionPane.YES_NO_OPTION));
+            if (!connectToSubversion) {
+                connectToSubversion =
+                        (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
+                            "Would you like to connect over the network to Subversion?", "Confirm network operation",
+                            JOptionPane.YES_NO_OPTION));
             }
+            Svn.setConnectedToSvn(connectToSubversion);
             if (connectToSubversion) {
                 if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
                     handleSvnProfileCheckout(aceProperties);
@@ -165,12 +170,18 @@ public class AceSvn {
                 aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
             } else {
                 if (new File("profiles").exists() == false) {
-                    throw new TaskFailedException("User did not want to connect to Subversion.");
+                    JOptionPane.showMessageDialog(null,
+                        "You must connect to SVN to initialize profiles. Subsequent builds may occur offline "
+                            + "but the initial build needs SVN access.", "Not connected to SVN",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
                 }
             }
         } else if (changeLocations.size() > 0) {
             doStealthChangeSetImport(changeLocations);
         }
+
+        return connectToSubversion;
     }
 
     void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
@@ -184,8 +195,9 @@ public class AceSvn {
         }
         SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
         JFrame emptyFrame = new JFrame();
-        String selectedProfile = (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame,
-            "Select profile to checkout:", "Checkout profile:", sortedProfiles.toArray(), null, null);
+        String selectedProfile =
+                (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
+                    "Checkout profile:", sortedProfiles.toArray(), null, null);
         String selectedPath = profileMap.get(selectedProfile);
         if (selectedPath.startsWith("/")) {
             selectedPath = selectedPath.substring(1);
@@ -230,8 +242,9 @@ public class AceSvn {
     private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
             ClientException {
         AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
-        String[] specParts = new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
-                                           svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
+        String[] specParts =
+                new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
+                              svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
         int server = 0;
         int local = 1;
         specParts[local] = specParts[local].replace('/', File.separatorChar);
@@ -284,8 +297,9 @@ public class AceSvn {
             VodbEnv.setTransactional(false);
             VodbEnv.setTxnNoSync(false);
             VodbEnv.setDeferredWrite(true);
-            File dbFolder = (File) jiniConfig.getEntry(jiniClass.getName(), "dbFolder", File.class, new File(
-                "target/berkeley-db"));
+            File dbFolder =
+                    (File) jiniConfig.getEntry(jiniClass.getName(), "dbFolder", File.class, new File(
+                        "target/berkeley-db"));
 
             final VodbEnv vodb = new VodbEnv(true);
             Terms.set(vodb);
@@ -304,13 +318,13 @@ public class AceSvn {
             };
 
             for (File checkoutLocation : changeLocations) {
-                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null,
-                    checkoutLocation.getAbsolutePath(), false, ".jcs", "bootstrap.init");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
+                    .getAbsolutePath(), false, ".jcs", "bootstrap.init");
             }
 
             for (File checkoutLocation : changeLocations) {
-                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null,
-                    checkoutLocation.getAbsolutePath(), false, ".jcs");
+                jcsImporter.importAllChangeSets(AceLog.getAppLog().getLogger(), null, checkoutLocation
+                    .getAbsolutePath(), false, ".jcs");
             }
 
             vodb.close();

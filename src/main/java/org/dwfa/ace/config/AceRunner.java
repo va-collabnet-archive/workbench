@@ -59,6 +59,7 @@ import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.svn.Svn;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
@@ -122,20 +123,19 @@ public class AceRunner {
                 jiniConfig = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             }
 
-        	System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
+            System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
             String trustStore = System.getProperty("javax.net.ssl.trustStore");
 
-        	if (trustStore == null) {
-            	AceLog.getAppLog().info("javax.net.ssl.trustStore is not defined");
-            	System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
-            	System.setProperty("javax.net.ssl.keyStorePassword","visit.bend");
+            if (trustStore == null) {
+                AceLog.getAppLog().info("javax.net.ssl.trustStore is not defined");
+                System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
+                System.setProperty("javax.net.ssl.keyStorePassword", "visit.bend");
             } else {
-            	AceLog.getAppLog().info("javax.net.ssl.trustStore = " + trustStore);
-            	AceLog.getAppLog().info("javax.net.ssl.keyStorePassword = " + 
-            			System.getProperty("javax.net.ssl.keyStorePassword"));
+                AceLog.getAppLog().info("javax.net.ssl.trustStore = " + trustStore);
+                AceLog.getAppLog().info(
+                    "javax.net.ssl.keyStorePassword = " + System.getProperty("javax.net.ssl.keyStorePassword"));
             }
-            
-            
+
             setupLookAndFeel();
             setupSwingExpansionTimerLogging();
             setupIpChangeListener();
@@ -152,7 +152,8 @@ public class AceRunner {
             }
             if (acePropertiesFileExists == false || initialized == false) {
                 try {
-                    new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
+                    new AceSvn(AceRunner.class, jiniConfig)
+                        .initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                     System.exit(0);
@@ -162,21 +163,30 @@ public class AceRunner {
             aceProperties.put("initialized", "true");
 
             if (jiniConfig != null) {
-                aceConfigFile = (File) jiniConfig.getEntry(this.getClass().getName(), "aceConfigFile", File.class,
-                    new File("config/config.ace"));
-                initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                    "initFromSubversion", Boolean.class, Boolean.FALSE);
-                svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
-                    String[].class, null);
+                aceConfigFile =
+                        (File) jiniConfig.getEntry(this.getClass().getName(), "aceConfigFile", File.class, new File(
+                            "config/config.ace"));
+                initializeFromSubversion =
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "initFromSubversion", Boolean.class,
+                            Boolean.FALSE);
+                svnUpdateOnStart =
+                        (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart", String[].class,
+                            null);
             } else {
                 aceConfigFile = new File("config/config.ace");
             }
 
             SvnPrompter prompter = new SvnPrompter();
             File profileDir = new File("profiles");
-            if ((profileDir.exists() == false && initializeFromSubversion) || (svnUpdateOnStart != null)) {
-                new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(new File(
-                    "config", "ace.properties"));
+
+            if ((!profileDir.exists() && initializeFromSubversion) || (svnUpdateOnStart != null)) {
+                boolean initalized =
+                        new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(new File(
+                            "config", "ace.properties"));
+                // if (!initalized) {
+                // // program exits if the user doesn't want to connect to SVN and there are no usable profiles
+                // System.exit(0);
+                // }
             } else if (profileDir.exists()) {
                 ArrayList<File> profileLoc = new ArrayList<File>();
                 profileLoc.add(profileDir);
@@ -223,8 +233,8 @@ public class AceRunner {
 
                 aceConfigFile = profiler.aceConfigFile;
 
-                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-                    new FileInputStream(aceConfigFile)));
+                ObjectInputStream ois =
+                        new ObjectInputStream(new BufferedInputStream(new FileInputStream(aceConfigFile)));
                 AceConfig.config = (AceConfig) ois.readObject();
                 AceConfig.config.setProfileFile(aceConfigFile);
                 setupDatabase(AceConfig.config, aceConfigFile);
@@ -239,8 +249,9 @@ public class AceRunner {
                 } else {
                     File dbFolder = new File("berkeley-db");
                     if (jiniConfig != null) {
-                        dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
-                            new File("target/berkeley-db"));
+                        dbFolder =
+                                (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class, new File(
+                                    "target/berkeley-db"));
                     }
                     AceConfig.config = new AceConfig(dbFolder);
                     AceConfig.config.setProfileFile(aceConfigFile);
@@ -278,8 +289,9 @@ public class AceRunner {
                             }
                         } else {
                             login = false;
-                            int n = JOptionPane.showConfirmDialog(null, "Would you like to try again?", "Login failed",
-                                JOptionPane.YES_NO_OPTION);
+                            int n =
+                                    JOptionPane.showConfirmDialog(null, "Would you like to try again?", "Login failed",
+                                        JOptionPane.YES_NO_OPTION);
                             if (n == JOptionPane.YES_OPTION) {
                                 login = true;
                             }
@@ -307,7 +319,7 @@ public class AceRunner {
             // Startup other queues here...
             List<String> queuesToRemove = new ArrayList<String>();
             for (String queue : AceConfig.config.getQueues()) {
-            	queue = queue.replace('\\', '/');
+                queue = queue.replace('\\', '/');
                 File queueFile = new File(queue);
                 if (queueFile.exists()) {
                     AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
@@ -384,6 +396,7 @@ public class AceRunner {
                 }
             }
             aceLoginDialog = new AceLoginDialog(parentFrame);
+
             aceLoginDialog.setLocation((d.width / 2) - (aceLoginDialog.getWidth() / 2), (d.height / 2)
                 - (aceLoginDialog.getHeight() / 2));
             this.aceConfigFile = aceConfigFile;
@@ -436,6 +449,7 @@ public class AceRunner {
                 // shows the AceLoginDialog
                 aceConfigFile = aceLoginDialog.getUserProfile(lastProfileDir);
                 password = new String(aceLoginDialog.getPassword());
+                Svn.setConnectedToSvn(aceLoginDialog.connectToSvn());
 
                 aceProperties.setProperty("last-profile-dir", FileIO.getRelativePath(aceConfigFile));
 
@@ -522,8 +536,9 @@ public class AceRunner {
                 tryAgain = false;
                 prompter.setPassword("");
             } else {
-                int n = JOptionPane.showConfirmDialog(null, "Would you like to try again?",
-                    "Administrative authentication failed", JOptionPane.YES_NO_OPTION);
+                int n =
+                        JOptionPane.showConfirmDialog(null, "Would you like to try again?",
+                            "Administrative authentication failed", JOptionPane.YES_NO_OPTION);
                 if (n == JOptionPane.YES_OPTION) {
                     tryAgain = true;
                 } else {
@@ -538,8 +553,9 @@ public class AceRunner {
     private void setupLookAndFeel() throws ConfigurationException, ClassNotFoundException, InstantiationException,
             IllegalAccessException, UnsupportedLookAndFeelException {
         if (jiniConfig != null) {
-            String lookAndFeelClassName = (String) jiniConfig.getEntry(this.getClass().getName(),
-                "lookAndFeelClassName", String.class, UIManager.getSystemLookAndFeelClassName());
+            String lookAndFeelClassName =
+                    (String) jiniConfig.getEntry(this.getClass().getName(), "lookAndFeelClassName", String.class,
+                        UIManager.getSystemLookAndFeelClassName());
 
             UIManager.setLookAndFeel(lookAndFeelClassName);
         } else {
@@ -555,8 +571,8 @@ public class AceRunner {
 
     private void setupIpChangeListener() throws ConfigurationException, UnknownHostException {
         if (jiniConfig != null) {
-            Boolean listenForIpChanges = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "listenForIpChanges",
-                Boolean.class, null);
+            Boolean listenForIpChanges =
+                    (Boolean) jiniConfig.getEntry(this.getClass().getName(), "listenForIpChanges", Boolean.class, null);
             if (listenForIpChanges != null) {
                 if (listenForIpChanges) {
                     Timer ipChangeTimer = new Timer(2 * 60 * 1000, new CheckIpAddressForChanges());
@@ -568,8 +584,8 @@ public class AceRunner {
 
     private void setupSwingExpansionTimerLogging() throws ConfigurationException {
         if (jiniConfig != null) {
-            Boolean logTimingInfo = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "logTimingInfo",
-                Boolean.class, null);
+            Boolean logTimingInfo =
+                    (Boolean) jiniConfig.getEntry(this.getClass().getName(), "logTimingInfo", Boolean.class, null);
             if (logTimingInfo != null) {
                 ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
             }
@@ -589,9 +605,10 @@ public class AceRunner {
 
     private void setupDatabase(AceConfig aceConfig, File configFileFile) throws IOException {
         if (aceConfig.isDbCreated() == false) {
-            int n = JOptionPane.showConfirmDialog(new JFrame(),
-                "Would you like to extract the db from your maven repository?", "DB does not exist",
-                JOptionPane.YES_NO_OPTION);
+            int n =
+                    JOptionPane.showConfirmDialog(new JFrame(),
+                        "Would you like to extract the db from your maven repository?", "DB does not exist",
+                        JOptionPane.YES_NO_OPTION);
             if (n == JOptionPane.YES_OPTION) {
                 AceConfig.extractMavenLib(aceConfig);
             } else {
