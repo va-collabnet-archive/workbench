@@ -151,13 +151,8 @@ public class AceRunner {
                 initialized = Boolean.parseBoolean((String) aceProperties.get("initialized"));
             }
             if (acePropertiesFileExists == false || initialized == false) {
-                try {
-                    new AceSvn(AceRunner.class, jiniConfig)
-                        .initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
-                } catch (Exception ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                    System.exit(0);
-                }
+                new AceSvn(AceRunner.class, jiniConfig)
+                    .initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
             }
 
             aceProperties.put("initialized", "true");
@@ -180,13 +175,8 @@ public class AceRunner {
             File profileDir = new File("profiles");
 
             if ((!profileDir.exists() && initializeFromSubversion) || (svnUpdateOnStart != null)) {
-                boolean initalized =
-                        new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(new File(
-                            "config", "ace.properties"));
-                // if (!initalized) {
-                // // program exits if the user doesn't want to connect to SVN and there are no usable profiles
-                // System.exit(0);
-                // }
+                new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(new File(
+                    "config", "ace.properties"));
             } else if (profileDir.exists()) {
                 ArrayList<File> profileLoc = new ArrayList<File>();
                 profileLoc.add(profileDir);
@@ -243,9 +233,12 @@ public class AceRunner {
                 prompter.setUsername(AceConfig.config.getUsername());
                 prompter.setPassword(profiler.getPassword());
             } else {
-                if (initializeFromSubversion) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Unable to initialize from subversion. Is the network connected?");
+                if (!Svn.isConnectedToSvn()) {
+                    JOptionPane.showMessageDialog(null,
+                        "You must connect to SVN to initialize profiles. Subsequent builds may occur offline "
+                            + "but the initial build needs SVN access. Please check network connection.",
+                        "Not connected to SVN", JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
                 } else {
                     File dbFolder = new File("berkeley-db");
                     if (jiniConfig != null) {
@@ -264,36 +257,38 @@ public class AceRunner {
             int successCount = 0;
             int frameCount = 0;
 
-            for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
-                frameCount++;
-                if (ace.isActive()) {
-                    AceFrameConfig afc = (AceFrameConfig) ace;
-                    afc.setMasterConfig(AceConfig.config);
-                    boolean login = true;
-                    while (login) {
-                        if (ace.getUsername().equals(prompter.getUsername()) == false
-                            || ace.getPassword().equals(prompter.getPassword()) == false) {
-                            prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
-                        }
-                        if (ace.getUsername().equals(prompter.getUsername())
-                            && ace.getPassword().equals(prompter.getPassword())) {
-                            if (ace.isAdministrative()) {
-                                login = false;
-                                successCount++;
-                                handleAdministrativeFrame(prompter, ace);
+            if (Svn.isConnectedToSvn()) {
+                for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
+                    frameCount++;
+                    if (ace.isActive()) {
+                        AceFrameConfig afc = (AceFrameConfig) ace;
+                        afc.setMasterConfig(AceConfig.config);
+                        boolean login = true;
+                        while (login) {
+                            if (ace.getUsername().equals(prompter.getUsername()) == false
+                                || ace.getPassword().equals(prompter.getPassword()) == false) {
+                                prompter.prompt("Please authenticate for: " + ace.getFrameName(), ace.getUsername());
+                            }
+                            if (ace.getUsername().equals(prompter.getUsername())
+                                && ace.getPassword().equals(prompter.getPassword())) {
+                                if (ace.isAdministrative()) {
+                                    login = false;
+                                    successCount++;
+                                    handleAdministrativeFrame(prompter, ace);
 
+                                } else {
+                                    login = false;
+                                    successCount++;
+                                    handleNormalFrame(ace);
+                                }
                             } else {
                                 login = false;
-                                successCount++;
-                                handleNormalFrame(ace);
-                            }
-                        } else {
-                            login = false;
-                            int n =
-                                    JOptionPane.showConfirmDialog(null, "Would you like to try again?", "Login failed",
-                                        JOptionPane.YES_NO_OPTION);
-                            if (n == JOptionPane.YES_OPTION) {
-                                login = true;
+                                int n =
+                                        JOptionPane.showConfirmDialog(null, "Would you like to try again?",
+                                            "Login failed", JOptionPane.YES_NO_OPTION);
+                                if (n == JOptionPane.YES_OPTION) {
+                                    login = true;
+                                }
                             }
                         }
                     }

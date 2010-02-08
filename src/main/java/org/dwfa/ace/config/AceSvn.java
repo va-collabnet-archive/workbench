@@ -48,6 +48,7 @@ import org.dwfa.vodb.VodbEnv;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
+import org.tigris.subversion.javahl.SVNClientInterface;
 
 /**
  * Common SVN helper methods used by the Ace Runner and AceLoginDialog.
@@ -92,47 +93,7 @@ public class AceSvn {
     }
 
     void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion)
-            throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
-        Properties aceProperties = new Properties();
-        aceProperties.setProperty("initial-svn-checkout", "true");
-
-        if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
-            || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
-            || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-
-            if (connectToSubversion) {
-                if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-                    handleSvnProfileCheckout(aceProperties);
-                }
-
-                if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
-                    for (String svnSpec : svnCheckoutOnStart) {
-                        handleSvnCheckout(changeLocations, svnSpec);
-                    }
-                }
-
-                if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
-                    for (String svnSpec : svnUpdateOnStart) {
-                        handleSvnUpdate(changeLocations, svnSpec);
-                    }
-                }
-
-                if (changeLocations.size() > 0) {
-                    doStealthChangeSetImport(changeLocations);
-                }
-                aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
-            } else {
-                if (new File("profiles").exists() == false) {
-                    throw new TaskFailedException("User did not want to connect to Subversion.");
-                }
-            }
-        } else if (changeLocations.size() > 0) {
-            doStealthChangeSetImport(changeLocations);
-        }
-    }
-
-    public boolean initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
-            FileNotFoundException, IOException, TaskFailedException, ClientException {
+            throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException {
 
         Properties aceProperties = new Properties();
         aceProperties.setProperty("initial-svn-checkout", "true");
@@ -140,13 +101,7 @@ public class AceSvn {
         if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
             || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
             || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-            if (!connectToSubversion) {
-                connectToSubversion =
-                        (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
-                            "Would you like to connect over the network to Subversion?", "Confirm network operation",
-                            JOptionPane.YES_NO_OPTION));
-            }
-            Svn.setConnectedToSvn(connectToSubversion);
+
             if (connectToSubversion) {
                 if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
                     handleSvnProfileCheckout(aceProperties);
@@ -180,96 +135,166 @@ public class AceSvn {
         } else if (changeLocations.size() > 0) {
             doStealthChangeSetImport(changeLocations);
         }
+    }
+
+    public boolean initialSubversionOperationsAndChangeSetImport(File acePropertiesFile) throws ConfigurationException,
+            FileNotFoundException, IOException, TaskFailedException {
+
+        Properties aceProperties = new Properties();
+        aceProperties.setProperty("initial-svn-checkout", "true");
+
+        if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
+            || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
+            || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
+            if (!connectToSubversion) {
+                connectToSubversion =
+                        (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
+                            "Would you like to connect over the network to Subversion?", "Confirm network operation",
+                            JOptionPane.YES_NO_OPTION));
+            }
+            Svn.setConnectedToSvn(connectToSubversion);
+            if (Svn.isConnectedToSvn()) {
+                if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
+                    handleSvnProfileCheckout(aceProperties);
+                }
+            }
+            if (Svn.isConnectedToSvn()) {
+                if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
+                    for (String svnSpec : svnCheckoutOnStart) {
+                        handleSvnCheckout(changeLocations, svnSpec);
+                    }
+                }
+            }
+            if (Svn.isConnectedToSvn()) {
+                if (svnUpdateOnStart != null && svnUpdateOnStart.length > 0) {
+                    for (String svnSpec : svnUpdateOnStart) {
+                        handleSvnUpdate(changeLocations, svnSpec);
+                    }
+                }
+            }
+            if (Svn.isConnectedToSvn()) {
+                if (changeLocations.size() > 0) {
+                    doStealthChangeSetImport(changeLocations);
+                }
+                aceProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
+            }
+            if (!Svn.isConnectedToSvn()) {
+                if (new File("profiles").exists() == false) {
+                    JOptionPane.showMessageDialog(null,
+                        "You must connect to SVN to initialize profiles. Subsequent builds may occur offline "
+                            + "but the initial build needs SVN access.", "Not connected to SVN",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
+                }
+            }
+        } else if (changeLocations.size() > 0) {
+            doStealthChangeSetImport(changeLocations);
+        }
 
         return connectToSubversion;
+
     }
 
-    void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
-        SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
-        List<String> listing = Svn.list(svd);
-        Map<String, String> profileMap = new HashMap<String, String>();
-        for (String item : listing) {
-            if (item.endsWith(".ace")) {
-                profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
+    void handleSvnProfileCheckout(Properties aceProperties) throws TaskFailedException {
+        try {
+            SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
+            List<String> listing = Svn.list(svd);
+            Map<String, String> profileMap = new HashMap<String, String>();
+            for (String item : listing) {
+                if (item.endsWith(".ace")) {
+                    profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
+                }
             }
-        }
-        SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
-        JFrame emptyFrame = new JFrame();
-        String selectedProfile =
-                (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
-                    "Checkout profile:", sortedProfiles.toArray(), null, null);
-        String selectedPath = profileMap.get(selectedProfile);
-        if (selectedPath.startsWith("/")) {
-            selectedPath = selectedPath.substring(1);
-        }
-        String[] pathParts = selectedPath.split("/");
-        String[] specParts = svnCheckoutProfileOnStart.split("/");
-        int matchStart = 0;
-        for (int i = 0; i < specParts.length; i++) {
-            if (specParts[i].equals(pathParts[i - matchStart])) {
-
-            } else {
-                matchStart = i + 1;
+            SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
+            JFrame emptyFrame = new JFrame();
+            String selectedProfile =
+                    (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
+                        "Checkout profile:", sortedProfiles.toArray(), null, null);
+            String selectedPath = profileMap.get(selectedProfile);
+            if (selectedPath.startsWith("/")) {
+                selectedPath = selectedPath.substring(1);
             }
-        }
-        List<String> specList = new ArrayList<String>();
-        for (int i = 0; i < matchStart; i++) {
-            specList.add(specParts[i]);
-        }
-        for (String pathPart : pathParts) {
-            specList.add(pathPart);
-        }
-        StringBuffer checkoutBuffer = new StringBuffer();
-        for (int i = 0; i < specList.size() - 1; i++) {
-            checkoutBuffer.append(specList.get(i));
-            checkoutBuffer.append("/");
-        }
-        String svnProfilePath = checkoutBuffer.toString();
-        SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
-        aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
-        String moduleName = svnCheckoutData.getRepositoryUrlStr();
-        String destPath = svnCheckoutData.getWorkingCopyStr();
-        Revision revision = Revision.HEAD;
-        Revision pegRevision = Revision.HEAD;
-        int depth = Depth.infinity;
-        boolean ignoreExternals = false;
-        boolean allowUnverObstructions = false;
-        Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
-            allowUnverObstructions);
-        changeLocations.add(new File(destPath));
-    }
+            String[] pathParts = selectedPath.split("/");
+            String[] specParts = svnCheckoutProfileOnStart.split("/");
+            int matchStart = 0;
+            for (int i = 0; i < specParts.length; i++) {
+                if (specParts[i].equals(pathParts[i - matchStart])) {
 
-    private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
-            ClientException {
-        AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
-        String[] specParts =
-                new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
-                              svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
-        int server = 0;
-        int local = 1;
-        specParts[local] = specParts[local].replace('/', File.separatorChar);
-        File checkoutLocation = new File(specParts[local]);
-        if (checkoutLocation.exists()) {
-            // already checked out
-            AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
-        } else {
-
-            // do the checkout...
-            AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
-            String moduleName = specParts[server];
-            String destPath = specParts[local];
+                } else {
+                    matchStart = i + 1;
+                }
+            }
+            List<String> specList = new ArrayList<String>();
+            for (int i = 0; i < matchStart; i++) {
+                specList.add(specParts[i]);
+            }
+            for (String pathPart : pathParts) {
+                specList.add(pathPart);
+            }
+            StringBuffer checkoutBuffer = new StringBuffer();
+            for (int i = 0; i < specList.size() - 1; i++) {
+                checkoutBuffer.append(specList.get(i));
+                checkoutBuffer.append("/");
+            }
+            String svnProfilePath = checkoutBuffer.toString();
+            SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
+            aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
+            String moduleName = svnCheckoutData.getRepositoryUrlStr();
+            String destPath = svnCheckoutData.getWorkingCopyStr();
             Revision revision = Revision.HEAD;
             Revision pegRevision = Revision.HEAD;
             int depth = Depth.infinity;
             boolean ignoreExternals = false;
             boolean allowUnverObstructions = false;
-            Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
-                allowUnverObstructions);
-            changeLocations.add(checkoutLocation);
+            SVNClientInterface svnClient = Svn.getSvnClient();
+            if (svnClient != null) {
+                svnClient.checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
+                    allowUnverObstructions);
+            }
+            changeLocations.add(new File(destPath));
+        } catch (ClientException e) {
+            Svn.setConnectedToSvn(false);
+        }
+    }
+
+    private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException {
+        try {
+            AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
+            String[] specParts =
+                    new String[] { svnSpec.substring(0, svnSpec.lastIndexOf("|")),
+                                  svnSpec.substring(svnSpec.lastIndexOf("|") + 1) };
+            int server = 0;
+            int local = 1;
+            specParts[local] = specParts[local].replace('/', File.separatorChar);
+            File checkoutLocation = new File(specParts[local]);
+            if (checkoutLocation.exists()) {
+                // already checked out
+                AceLog.getAppLog().info(specParts[server] + " already checked out to: " + specParts[local]);
+            } else {
+
+                // do the checkout...
+                AceLog.getAppLog().info("svn checkout " + specParts[server] + " to: " + specParts[local]);
+                String moduleName = specParts[server];
+                String destPath = specParts[local];
+                Revision revision = Revision.HEAD;
+                Revision pegRevision = Revision.HEAD;
+                int depth = Depth.infinity;
+                boolean ignoreExternals = false;
+                boolean allowUnverObstructions = false;
+                SVNClientInterface svnClient = Svn.getSvnClient();
+                if (svnClient != null) {
+                    svnClient.checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
+                        allowUnverObstructions);
+                }
+                changeLocations.add(checkoutLocation);
+            }
+        } catch (ClientException e) {
+            Svn.setConnectedToSvn(false);
         }
     }
 
     private void handleSvnUpdate(List<File> changeLocations, String path) {
+
         AceLog.getAppLog().info("Got svn update spec: " + path);
         try {
             Revision revision = Revision.HEAD;
@@ -278,9 +303,14 @@ public class AceSvn {
             boolean ignoreExternals = false;
             boolean allowUnverObstructions = false;
             AceLog.getAppLog().info("Starting svn update for: " + path);
-            Svn.getSvnClient().update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
+            SVNClientInterface svnClient = Svn.getSvnClient();
+            if (svnClient != null) {
+                svnClient.update(path, revision, depth, depthIsSticky, ignoreExternals, allowUnverObstructions);
+            }
             AceLog.getAppLog().info("Finished svn update for: " + path);
             changeLocations.add(new File(path));
+        } catch (ClientException e) {
+            Svn.setConnectedToSvn(false);
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
@@ -329,6 +359,8 @@ public class AceSvn {
 
             vodb.close();
             AceLog.getAppLog().info("Finished stealth import");
+        } catch (ClientException e) {
+            // no message since it was a stealth import
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
