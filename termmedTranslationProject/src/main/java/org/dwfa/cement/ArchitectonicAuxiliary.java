@@ -695,7 +695,24 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 READ_4B("Read 4Byte ID", null,
                         new I_ConceptualizeUniversally[] { ID_SOURCE }),
         CPT("CPT ID", null,
-                new I_ConceptualizeUniversally[] { ID_SOURCE });
+                new I_ConceptualizeUniversally[] { ID_SOURCE }),
+                
+    PROJECTS_ROOT_HIERARCHY("Terminology Project Auxiliary concept",
+            new I_ConceptualizeUniversally[] { }),
+        PROJECTS_ROOT("projects",
+                    new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        PROJECT_EXTENSION_REFSET("project extension refset",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        WORKSETS_ROOT("worksets",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        WORKSET_EXTENSION_REFSET("workset extension refset",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        WORKLISTS_ROOT("worklists",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        WORKLISTS_EXTENSION_REFSET("worklists extension refset",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        INCLUDES_FROM_ATTRIBUTE("includes concepts from",
+                new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY });
        ;
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
