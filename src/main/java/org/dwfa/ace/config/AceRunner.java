@@ -235,9 +235,9 @@ public class AceRunner {
             } else {
                 if (!Svn.isConnectedToSvn()) {
                     JOptionPane.showMessageDialog(null,
-                        "You must connect to SVN to initialize profiles. Subsequent launches may occur offline "
+                        "You must connect to subversion to initialize profiles. Subsequent launches may occur offline "
                             + "but the initial launch requires subversion and network access. Please check network connection.",
-                        "Not connected to SVN", JOptionPane.INFORMATION_MESSAGE);
+                        "Not connected to subversion", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 } else {
                     File dbFolder = new File("berkeley-db");
