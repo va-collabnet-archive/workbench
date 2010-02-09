@@ -32,6 +32,28 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
     }
 
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidRevision.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

@@ -32,6 +32,27 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     }
 
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(LongRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.longValue != another.longValue) {
+            buf.append("\tLongRevision.longValue not equal: \n" + 
+                "\t\tthis.longValue = " + this.longValue + "\n" + 
+                "\t\tanother.longValue = " + another.longValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

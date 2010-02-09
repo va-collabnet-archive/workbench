@@ -299,10 +299,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                 "\t\tthis.typeNid = " + this.typeNid + "\n" + 
                 "\t\tanother.typeNid = " + another.typeNid + "\n");
         }
-
         // Compare the parents 
         buf.append(super.validate(another));
-        
         return buf.toString();
     }
 

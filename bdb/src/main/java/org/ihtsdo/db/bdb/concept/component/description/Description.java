@@ -278,10 +278,8 @@ public class Description
                 "\t\tthis.typeNid = " + this.typeNid + "\n" + 
                 "\t\tanother.typeNid = " + another.typeNid + "\n");
         }
-
         // Compare the parents 
         buf.append(super.validate(another));
-        
         return buf.toString();
     }
 

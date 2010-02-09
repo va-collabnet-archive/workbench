@@ -32,6 +32,28 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
     }
 
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(IntRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.intValue != another.intValue) {
+            buf.append("\tIntRevision.intValue not equal: \n" + 
+                "\t\tthis.intValue = " + this.intValue + "\n" + 
+                "\t\tanother.intValue = " + another.intValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

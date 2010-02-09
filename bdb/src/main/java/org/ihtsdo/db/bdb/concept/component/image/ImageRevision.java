@@ -1,5 +1,8 @@
 package org.ihtsdo.db.bdb.concept.component.image;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -30,6 +33,32 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	    return buf.toString();
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(ImageRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (!this.textDescription.equals(another.textDescription)) {
+            buf.append("\tImageRevision.textDescription not equal: \n" + 
+                "\t\tthis.textDescription = '" + this.textDescription + "'\n" + 
+                "\t\tanother.textDescription = '" + another.textDescription + "'\n");
+        }
+        if (this.typeNid != another.typeNid) {
+            buf.append("\tImageRevision.typeNid not equal: \n" + 
+                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\t\tanother.typeNid = " + another.typeNid + "\n");
+        }       
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
 	@Override
 	public boolean equals(Object obj) {
         if (obj == null)

@@ -1,5 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
+import java.io.IOException;
+
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.etypes.EIdentifierVersionString;
 
@@ -58,6 +60,26 @@ public class IdentifierVersionString extends IdentifierVersion {
 	    return buf.toString();
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(IdentifierVersionString another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (!this.stringDenotation.equals(another.stringDenotation)) {
+            buf.append("\tIdentifierVersionString.stringDenotation not equal: \n" + 
+                "\t\tthis.stringDenotation = '" + this.stringDenotation + "'\n" + 
+                "\t\tanother.stringDenotation = '" + another.stringDenotation + "'\n");
+        }       
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
 	
 	@Override
 	public boolean equals(Object obj) {

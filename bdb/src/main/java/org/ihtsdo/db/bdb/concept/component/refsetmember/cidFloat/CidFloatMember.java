@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidFloat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -140,6 +141,32 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
         return buf.toString();
     }
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidFloatMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidFloatMember.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.floatValue != another.floatValue) {
+            buf.append("\tCidFloatMember.floatValue not equal: \n" + 
+                "\t\tthis.floatValue = " + this.floatValue + "\n" + 
+                "\t\tanother.floatValue = " + another.floatValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

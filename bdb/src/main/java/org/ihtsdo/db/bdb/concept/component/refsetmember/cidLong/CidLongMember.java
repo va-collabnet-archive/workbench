@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidLong;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -153,6 +154,32 @@ public class CidLongMember
         buf.append(" longValue:" + this.longValue);
         buf.append(" }=> ");
         buf.append(super.toString());
+        return buf.toString();
+    }
+
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidLongMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidLongMember.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.longValue != another.longValue) {
+            buf.append("\tCidLongMember.intValue not equal: \n" + 
+                "\t\tthis.longValue = " + this.longValue + "\n" + 
+                "\t\tanother.longValue = " + another.longValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
         return buf.toString();
     }
 

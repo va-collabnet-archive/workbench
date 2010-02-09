@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.integer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -138,4 +139,25 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> {
         return buf.toString();
     }
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(IntMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.intValue != another.intValue) {
+            buf.append("\tIntMember.intValue not equal: \n" + 
+                "\t\tthis.intValue = " + this.intValue + "\n" + 
+                "\t\tanother.intValue = " + another.intValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
 }

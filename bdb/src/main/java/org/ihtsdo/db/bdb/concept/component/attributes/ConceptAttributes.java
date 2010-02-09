@@ -496,11 +496,9 @@ public class ConceptAttributes
             buf.append("\tConceptAttributes.defined not equal: \n" + 
                 "\t\tthis.defined = " + this.defined + "\n" + 
                 "\t\tanother.defined = " + another.defined + "\n");
-        }
-        
+        }       
         // Compare the parents 
-        buf.append(super.validate(another));
-        
+        buf.append(super.validate(another));       
         return buf.toString();
     }
         

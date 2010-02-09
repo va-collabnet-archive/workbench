@@ -38,6 +38,38 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
     }
     
     
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidCidCidRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidCidCidRevision.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.c2Nid != another.c2Nid) {
+            buf.append("\tCidCidCidRevision.c2Nid not equal: \n" + 
+                "\t\tthis.c2Nid = " + this.c2Nid + "\n" + 
+                "\t\tanother.c2Nid = " + another.c2Nid + "\n");
+        }
+        if (this.c3Nid != another.c3Nid) {
+            buf.append("\tCidCidCidRevision.c3Nid not equal: \n" + 
+                "\t\tthis.c3Nid = " + this.c3Nid + "\n" + 
+                "\t\tanother.c3Nid = " + another.c3Nid + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

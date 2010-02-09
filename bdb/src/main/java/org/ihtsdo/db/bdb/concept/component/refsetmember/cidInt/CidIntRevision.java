@@ -35,7 +35,32 @@ public class CidIntRevision
         return buf.toString();
     }
 
-
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidIntRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidIntRevision.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.intValue != another.intValue) {
+            buf.append("\tCidIntRevision.intValue not equal: \n" + 
+                "\t\tthis.intValue = " + this.intValue + "\n" + 
+                "\t\tanother.intValue = " + another.intValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

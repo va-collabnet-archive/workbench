@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.I_HandleFutureStatusAtPositionSetup;
 import org.ihtsdo.db.bdb.concept.component.Revision;
+import org.ihtsdo.db.bdb.concept.component.image.ImageRevision;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.etypes.EIdentifierVersion;
 
@@ -203,6 +205,38 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 		return buf.toString();
 	}
 
+	
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(IdentifierVersion another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.authorityNid != another.authorityNid) {
+            buf.append("\tIdentifierVersion.authorityNid not equal: \n" + 
+                "\t\tthis.authorityNid = " + this.authorityNid + "\n" + 
+                "\t\tanother.authorityNid = " + another.authorityNid + "\n");
+        }       
+        if (!this.conceptComponent.equals(another.conceptComponent)) {
+            buf.append("\tIdentifierVersion.conceptComponent not equal: \n" + 
+                "\t\tthis.conceptComponent = " + this.conceptComponent + "\n" + 
+                "\t\tanother.conceptComponent = " + another.conceptComponent + "\n");
+        }       
+        if (this.statusAtPositionNid != another.statusAtPositionNid) {
+            buf.append("\tIdentifierVersion.statusAtPositionNid not equal: \n" + 
+                "\t\tthis.statusAtPositionNid = " + this.statusAtPositionNid + "\n" + 
+                "\t\tanother.statusAtPositionNid = " + another.statusAtPositionNid + "\n");
+        }       
+
+        return buf.toString();
+    }
+    
+    
 	@Override
 	public boolean equals(Object obj) {
         if (obj == null)

@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.Boolean;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -122,7 +123,28 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	    return buf.toString();
 	}
 
-	@Override
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(BooleanMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.booleanValue != another.booleanValue) {
+            buf.append("\tBooleanMember.booleanValue not equal: \n" + 
+                "\t\tthis.booleanValue = " + this.booleanValue + "\n" + 
+                "\t\tanother.booleanValue = " + another.booleanValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

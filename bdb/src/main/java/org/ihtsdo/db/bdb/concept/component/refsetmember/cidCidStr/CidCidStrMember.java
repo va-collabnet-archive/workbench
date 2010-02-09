@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidStr;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -9,6 +10,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidCidCid.CidCidCidRevision;
 import org.ihtsdo.etypes.ERefsetCidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -170,4 +172,34 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         return buf.toString();
     }
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidCidStrMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidCidStrMember.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.c2Nid != another.c2Nid) {
+            buf.append("\tCidCidStrMember.c2Nid not equal: \n" + 
+                "\t\tthis.c2Nid = " + this.c2Nid + "\n" + 
+                "\t\tanother.c2Nid = " + another.c2Nid + "\n");
+        }
+        if (!this.strValue.equals(another.strValue)) {
+            buf.append("\tCidCidStrMember.strValue not equal: \n" + 
+                "\t\tthis.strValue = '" + this.strValue + "'\n" + 
+                "\t\tanother.strValue = '" + another.strValue + "'\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
 }

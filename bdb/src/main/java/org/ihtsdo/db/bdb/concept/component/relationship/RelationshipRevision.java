@@ -1,5 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.relationship;
 
+import java.io.IOException;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
@@ -40,6 +42,44 @@ public class RelationshipRevision
         return buf.toString();
     }
 
+    
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(RelationshipRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.characteristicNid != another.characteristicNid) {
+            buf.append("\tRelationshipRevision.characteristicNid not equal: \n" + 
+                "\t\tthis.characteristicNid = " + this.characteristicNid + "\n" + 
+                "\t\tanother.characteristicNid = " + another.characteristicNid + "\n");
+        }
+        if (this.group != another.group) {
+            buf.append("\tRelationshipRevision.group not equal: \n" + 
+                "\t\tthis.group = " + this.group + "\n" + 
+                "\t\tanother.group = " + another.group + "\n");
+        }
+        if (this.refinabilityNid != another.refinabilityNid) {
+            buf.append("\tRelationshipRevision.refinabilityNid not equal: \n" + 
+                "\t\tthis.refinabilityNid = " + this.refinabilityNid + "\n" + 
+                "\t\tanother.refinabilityNid = " + another.refinabilityNid + "\n");
+        }
+        if (this.typeNid != another.typeNid) {
+            buf.append("\tRelationshipRevision.typeNid not equal: \n" + 
+                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
+                "\t\tanother.typeNid = " + another.typeNid + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
+    
 
     @Override
     public boolean equals(Object obj) {

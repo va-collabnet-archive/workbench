@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.identifier;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.ihtsdo.db.bdb.Bdb;
@@ -64,6 +65,27 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 	    return buf.toString();
 	}
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(IdentifierVersionUuid another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.uNid != another.uNid) {
+            buf.append("\tIdentifierVersionUuid.uNid not equal: \n" + 
+                "\t\tthis.uNid = " + this.uNid + "\n" + 
+                "\t\tanother.uNid = " + another.uNid + "\n");
+        }       
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
 	@Override
 	public boolean equals(Object obj) {
         if (obj == null)

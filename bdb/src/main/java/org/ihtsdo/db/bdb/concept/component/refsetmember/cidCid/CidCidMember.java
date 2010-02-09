@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.cidCid;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -9,6 +10,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -151,6 +153,32 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember> {
         buf.append(" c2Nid:" + this.c2Nid);
         buf.append(" }=> ");
         buf.append(super.toString());
+        return buf.toString();
+    }
+    
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(CidCidMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.c1Nid != another.c1Nid) {
+            buf.append("\tCidCidMember.c1Nid not equal: \n" + 
+                "\t\tthis.c1Nid = " + this.c1Nid + "\n" + 
+                "\t\tanother.c1Nid = " + another.c1Nid + "\n");
+        }
+        if (this.c2Nid != another.c2Nid) {
+            buf.append("\tCidCidMember.c2Nid not equal: \n" + 
+                "\t\tthis.c2Nid = " + this.c2Nid + "\n" + 
+                "\t\tanother.c2Nid = " + another.c2Nid + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
         return buf.toString();
     }
 

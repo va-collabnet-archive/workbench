@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.str;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -8,6 +9,8 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.cidStr.CidStrMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.membership.MembershipRevision;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -137,4 +140,25 @@ public class StrMember extends RefsetMember<StrRevision, StrMember> {
         return buf.toString();
     }
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(StrMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (!this.stringValue.equals(another.stringValue)) {
+            buf.append("\tStrMember.stringValue not equal: \n" + 
+                "\t\tthis.stringValue = '" + this.stringValue + "'\n" + 
+                "\t\tanother.stringValue = '" + another.stringValue + "'\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
+    
 }

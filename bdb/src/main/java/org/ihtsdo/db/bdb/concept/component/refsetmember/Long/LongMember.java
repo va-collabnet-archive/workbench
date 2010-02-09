@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.concept.component.refsetmember.Long;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -8,6 +9,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.concept.Concept;
 import org.ihtsdo.db.bdb.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.concept.component.refset.RefsetMember;
+import org.ihtsdo.db.bdb.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongVersion;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -137,4 +139,24 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
         return buf.toString();
     }
 
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(LongMember another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        if (this.longValue != another.longValue) {
+            buf.append("\tLongMember.longValue not equal: \n" + 
+                "\t\tthis.longValue = " + this.longValue + "\n" + 
+                "\t\tanother.longValue = " + another.longValue + "\n");
+        }
+        // Compare the parents 
+        buf.append(super.validate(another));
+        return buf.toString();
+    }
 }

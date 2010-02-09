@@ -1,5 +1,7 @@
 package org.ihtsdo.db.bdb.concept.component.attributes;
 
+import java.io.IOException;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.ihtsdo.db.bdb.Bdb;
@@ -89,6 +91,28 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         buf.append(" defined:" + this.defined);
         buf.append(" }=> ");
         buf.append(super.toString());
+        return buf.toString();
+    }
+    
+    /**
+     * Test method to check to see if two objects are equal in all respects. 
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures. 
+     * @throws IOException 
+     */
+    public String validate(ConceptAttributesRevision another) throws IOException {
+        assert another != null;
+        StringBuffer buf = new StringBuffer();
+        
+        // Compare defined
+        if (this.defined != another.defined) {
+            buf.append("\tConceptAttributesRevision.defined not equal: \n" + 
+                "\t\tthis.defined = " + this.defined + "\n" + 
+                "\t\tanother.defined = " + another.defined + "\n");
+        }       
+        // Compare the parents 
+        buf.append(super.validate(another));       
         return buf.toString();
     }
     
