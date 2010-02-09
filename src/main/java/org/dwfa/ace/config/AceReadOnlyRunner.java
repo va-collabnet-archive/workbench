@@ -140,7 +140,7 @@ public class AceReadOnlyRunner {
 
             if (successCount == 0) {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "No frames where opened. Now exiting.", "No successful logins...", JOptionPane.ERROR_MESSAGE);
+                    "No frames were opened. Now exiting.", "No successful logins...", JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
         } catch (Exception e) {
