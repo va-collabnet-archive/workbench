@@ -18,7 +18,6 @@ package org.dwfa.ace.task.svn;
 
 import java.awt.Container;
 
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,8 +39,6 @@ public class SvnPrompter implements PromptUserPassword3 {
 
     private String password;
 
-    boolean userAllowedSave = false;
-
     public String askQuestion(String realm, String question, boolean showAnswer, boolean maySave) {
         JPanel promptPane = new JPanel(new SpringLayout());
         promptPane.add(new JLabel(question, JLabel.RIGHT));
@@ -52,14 +49,7 @@ public class SvnPrompter implements PromptUserPassword3 {
         final JTextField userTextField = userTextFieldMaybe;
         userTextField.setText("");
         promptPane.add(userTextField);
-        JCheckBox save = new JCheckBox("");
-        if (maySave) {
-            promptPane.add(new JLabel("save answer", JLabel.RIGHT));
-            promptPane.add(save);
-        } else {
-            promptPane.add(new JLabel(" "));
-            promptPane.add(new JLabel(" "));
-        }
+
         promptPane.add(new JLabel(" "));
         promptPane.add(new JLabel(" "));
         SpringUtilities.makeCompactGrid(promptPane, 3, 2, 6, 6, 6, 6);
@@ -78,14 +68,14 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-        int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+        int action =
+                JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         if (action == JOptionPane.CANCEL_OPTION) {
-            userAllowedSave = false;
             return null;
         }
-        userAllowedSave = save.isSelected();
+
         return userTextField.getText();
     }
 
@@ -98,14 +88,9 @@ public class SvnPrompter implements PromptUserPassword3 {
         promptPane.add(new JLabel("password:", JLabel.RIGHT));
         JPasswordField pwd = new JPasswordField(15);
         promptPane.add(pwd);
-        JCheckBox save = new JCheckBox("");
-        if (maySave) {
-            promptPane.add(new JLabel("save password", JLabel.RIGHT));
-            promptPane.add(save);
-        } else {
-            promptPane.add(new JLabel(""));
-            promptPane.add(new JLabel(""));
-        }
+        promptPane.add(new JLabel(""));
+        promptPane.add(new JLabel(""));
+
         SpringUtilities.makeCompactGrid(promptPane, 3, 2, 6, 6, 6, 6);
         userTextField.requestFocusInWindow();
         userTextField.setSelectionStart(0);
@@ -122,24 +107,19 @@ public class SvnPrompter implements PromptUserPassword3 {
             public void ancestorRemoved(AncestorEvent arg0) {
             }
         });
-        int action = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
+        int action =
+                JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), promptPane, realm,
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, userTextField);
         if (parentContainer != null) {
             LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         }
         if (action == JOptionPane.CANCEL_OPTION) {
-            userAllowedSave = false;
             return false;
         } else {
-            userAllowedSave = save.isSelected();
             this.username = userTextField.getText();
-            password = new String(pwd.getPassword());
+            this.password = new String(pwd.getPassword());
         }
         return true;
-    }
-
-    public boolean userAllowedSave() {
-        return userAllowedSave;
     }
 
     public int askTrustSSLServer(String info, boolean allowPermanently) {
@@ -149,8 +129,9 @@ public class SvnPrompter implements PromptUserPassword3 {
             options = new Object[] { "Reject", "Accept Temporary", "Accept Permanently" };
             optionType = JOptionPane.YES_NO_CANCEL_OPTION;
         }
-        int returnValue = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), info,
-            "Trust SSL Server", optionType, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int returnValue =
+                JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), info, "Trust SSL Server",
+                    optionType, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         return returnValue;
     }
@@ -172,8 +153,9 @@ public class SvnPrompter implements PromptUserPassword3 {
         if (yesIsDefault) {
             initialValue = JOptionPane.YES_OPTION;
         }
-        int n = JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, initialValue);
+        int n =
+                JOptionPane.showOptionDialog(LogWithAlerts.getActiveFrame(parentContainer), question, realm,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, initialValue);
         LogWithAlerts.getActiveFrame(parentContainer).requestFocus();
         return n == JOptionPane.YES_OPTION;
     }
@@ -232,5 +214,9 @@ public class SvnPrompter implements PromptUserPassword3 {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean userAllowedSave() {
+        return false;
     }
 }

@@ -61,10 +61,12 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             if (worker.getLogger().isLoggable(Level.INFO)) {
                 worker.getLogger().info("java.library.path: " + System.getProperty("java.library.path"));
             }
+
             for (String key : config.getSubversionMap().keySet()) {
                 SubversionData svd = config.getSubversionMap().get(key);
                 worker.getLogger().info(" processing: " + key);
