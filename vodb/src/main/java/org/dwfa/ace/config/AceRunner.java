@@ -235,8 +235,8 @@ public class AceRunner {
             } else {
                 if (!Svn.isConnectedToSvn()) {
                     JOptionPane.showMessageDialog(null,
-                        "You must connect to SVN to initialize profiles. Subsequent builds may occur offline "
-                            + "but the initial build needs SVN access. Please check network connection.",
+                        "You must connect to SVN to initialize profiles. Subsequent launches may occur offline "
+                            + "but the initial launch needs SVN access. Please check network connection.",
                         "Not connected to SVN", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 } else {
@@ -372,7 +372,7 @@ public class AceRunner {
                     SwingUtilities.invokeAndWait(new Runnable() {
 
                         public void run() {
-                            parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
+                            parentFrame.setContentPane(new JLabel("The Terminology Editor is starting..."));
                             parentFrame.pack();
 
                             parentFrame.setVisible(true);
@@ -422,7 +422,7 @@ public class AceRunner {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
                     public void run() {
-                        parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
+                        parentFrame.setContentPane(new JLabel("The Terminology Editor is starting..."));
                         parentFrame.pack();
                         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
                         parentFrame.setLocation(d.width / 2, d.height / 2);
