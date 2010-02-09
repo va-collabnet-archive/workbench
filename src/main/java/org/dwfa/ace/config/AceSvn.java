@@ -126,8 +126,8 @@ public class AceSvn {
             } else {
                 if (new File("profiles").exists() == false) {
                     JOptionPane.showMessageDialog(null,
-                        "You must connect to SVN to initialize profiles. Subsequent builds may occur offline "
-                            + "but the initial build needs SVN access.", "Not connected to SVN",
+                        "You must connect to SVN to initialize profiles. Subsequent launches may occur offline "
+                            + "but the initial launch requires SVN access.", "Not connected to SVN",
                         JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
