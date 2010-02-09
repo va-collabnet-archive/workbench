@@ -127,8 +127,8 @@ public class AceSvn {
                 if (new File("profiles").exists() == false) {
                     JOptionPane.showMessageDialog(null,
                         "You must connect to subversion to initialize profiles. Subsequent launches may occur offline "
-                            + "but the initial launch requires subversion and network access.", "Not connected to subversion",
-                        JOptionPane.INFORMATION_MESSAGE);
+                            + "but the initial launch requires subversion and network access.",
+                        "Not connected to subversion", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
             }
@@ -182,8 +182,8 @@ public class AceSvn {
                 if (new File("profiles").exists() == false) {
                     JOptionPane.showMessageDialog(null,
                         "You must connect to subversion to initialize profiles. Subsequent launches may occur offline "
-                            + "but the initial launch requires subversion and network access.", "Not connected to subversion",
-                        JOptionPane.INFORMATION_MESSAGE);
+                            + "but the initial launch requires subversion and network access.",
+                        "Not connected to subversion", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
             }
@@ -282,6 +282,7 @@ public class AceSvn {
                 boolean ignoreExternals = false;
                 boolean allowUnverObstructions = false;
                 SVNClientInterface svnClient = Svn.getSvnClient();
+
                 if (svnClient != null) {
                     svnClient.checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
                         allowUnverObstructions);

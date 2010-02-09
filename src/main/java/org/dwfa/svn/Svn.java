@@ -52,6 +52,7 @@ import org.tigris.subversion.javahl.SVNClientInterface;
 import org.tigris.subversion.javahl.Status;
 import org.tigris.subversion.javahl.StatusCallback;
 import org.tigris.subversion.javahl.StatusKind;
+import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.javahl.SVNClientImpl;
 
 public class Svn implements I_HandleSubversion {
@@ -76,6 +77,7 @@ public class Svn implements I_HandleSubversion {
             return null;
         }
         if (client == null) {
+
             switch (impl) {
             case NATIVE:
                 client = new SVNClient();
@@ -83,7 +85,13 @@ public class Svn implements I_HandleSubversion {
                 break;
 
             case SVN_KIT:
-                client = SVNClientImpl.newInstance();
+                SVNClientImpl c = SVNClientImpl.newInstance();
+                SVNClientImpl.setRuntimeCredentialsStorage(null);
+                c.setClientCredentialsStorage(null);
+                client = c;
+                client.password("");
+                client.username("");
+
                 AceLog.getAppLog().info("Created Svnkit pure java svn client: " + client.getVersion());
                 break;
 
@@ -145,6 +153,7 @@ public class Svn implements I_HandleSubversion {
 
     public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+
         if (!isConnectedToSvn()) {
             JOptionPane.showMessageDialog(null, "Working offline; skipping subversion update", "Working offline",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -174,10 +183,12 @@ public class Svn implements I_HandleSubversion {
             }
             status = statusHandler.statusList.toArray(new Status[statusHandler.statusList.size()]);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished status for working copy: " + workingCopy);
         return status;
@@ -195,10 +206,12 @@ public class Svn implements I_HandleSubversion {
         try {
             Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished cleanup for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished cleanup for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished cleanup");
         ObjectServerCore.refreshServers();
@@ -270,10 +283,12 @@ public class Svn implements I_HandleSubversion {
             }
 
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished commit");
     }
@@ -325,10 +340,12 @@ public class Svn implements I_HandleSubversion {
                 }
             }
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished purge for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished purge for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished purge");
         ObjectServerCore.refreshServers();
@@ -379,10 +396,12 @@ public class Svn implements I_HandleSubversion {
                 }
             }
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         } catch (IOException e) {
             SvnLog.alertAndLog(e);
             SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
@@ -425,10 +444,12 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, depth, depthIsSticky, ignoreExternals,
                 allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished update");
         ObjectServerCore.refreshServers();
@@ -458,10 +479,12 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, depth, depthIsSticky, ignoreExternals,
                 allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished database update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished database update for working copy: " + svd.getWorkingCopyStr()
+                    + "with exception: " + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished database update");
     }
@@ -488,10 +511,12 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().checkout(svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(), revision, pegRevision,
                 depth, ignoreExternals, allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished checkout for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished checkout for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished checkout");
         ObjectServerCore.refreshServers();
@@ -570,8 +595,10 @@ public class Svn implements I_HandleSubversion {
             switchToReadOnlyMirror(svd);
             Svn.getSvnClient().list(url, revision, pegRevision, depth, direntFields, fetchLocks, callback);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                throw new TaskFailedException(e);
+            }
         }
         return callback.dirList;
     }
@@ -710,10 +737,12 @@ public class Svn implements I_HandleSubversion {
             }
             Svn.getSvnClient().lock(new String[] { toUnlock.getAbsolutePath() }, svd.getUsername(), false);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished unlock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished unlock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished unlock");
     }
@@ -744,10 +773,12 @@ public class Svn implements I_HandleSubversion {
             }
             Svn.getSvnClient().lock(new String[] { toLock.getAbsolutePath() }, svd.getUsername(), false);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished lock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished lock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished lock");
     }
@@ -778,10 +809,12 @@ public class Svn implements I_HandleSubversion {
             Map<?, ?> revpropTable = null;
             Svn.getSvnClient().doImport(path, url, message, depth, noIgnore, ignoreUnknownNodeTypes, revpropTable);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished import for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished import for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished import");
     }
@@ -827,10 +860,12 @@ public class Svn implements I_HandleSubversion {
                 }
 
             } catch (ClientException e) {
-                SvnLog.alertAndLog(e);
-                SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr()
-                    + "with exception: " + e.getLocalizedMessage());
-                throw new TaskFailedException(e);
+                if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                    SvnLog.alertAndLog(e);
+                    SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr()
+                        + "with exception: " + e.getLocalizedMessage());
+                    throw new TaskFailedException(e);
+                }
             }
         }
     }
