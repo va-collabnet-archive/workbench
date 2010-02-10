@@ -23,7 +23,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>ace-api</artifactId>
-  <version>1.31</version>
+  <version>1.31.6</version>
   <packaging>jar</packaging>
   <name>ACE API</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
