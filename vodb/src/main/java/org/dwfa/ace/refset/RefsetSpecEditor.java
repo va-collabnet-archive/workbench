@@ -1000,6 +1000,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 return null;
             }
             commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), RefsetSpecEditor.this);
+            refsetSpecPanel.getRefsetTable().repaint();
             specScrollHorizValue = specTreeScroller.getHorizontalScrollBar().getValue();
             specScrollVertValue = specTreeScroller.getVerticalScrollBar().getValue();
             commentScrollHorizValue = commentScroller.getHorizontalScrollBar().getValue();
@@ -1239,6 +1240,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public RefsetSpecPanel getRefsetSpecPanel() {
         return refsetSpecPanel;
+    }
+
+    public JToggleButton getHistoryButton() {
+        return historyButton;
     }
 
 }
