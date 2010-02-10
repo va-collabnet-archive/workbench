@@ -727,6 +727,11 @@ public class RefsetSpecPanel extends JPanel {
             refsetTableModel.setShowPromotionCheckBoxes(show);
             setShowButtons(show);
         }
+        if (show) {
+            if (!editor.getHistoryButton().isSelected()) {
+                editor.getHistoryButton().doClick();
+            }
+        }
     }
 
     public void setShowButtons(boolean show) {
@@ -831,5 +836,13 @@ public class RefsetSpecPanel extends JPanel {
 
     public void setRendererComponent(JCheckBox rendererComponent) {
         this.selectAllCheckBox = rendererComponent;
+    }
+
+    public JTableWithDragImage getRefsetTable() {
+        return refsetTable;
+    }
+
+    public void setRefsetTable(JTableWithDragImage refsetTable) {
+        this.refsetTable = refsetTable;
     }
 }
