@@ -16,16 +16,17 @@
  */
 package org.dwfa.mojo.refset;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.file.IterableFileReader;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Imports the contents of refset files from a directory
@@ -38,6 +39,13 @@ import java.util.List;
  * @requiresDependencyResolution compile
  */
 public class ImportRefsetFromDirectory extends AbstractMojo {
+
+    /**
+     * Ignore errors
+     *
+     * @parameter
+     */
+    boolean ignoreErrors = false;
 
     /**
      * Directory the files are to read from
@@ -98,9 +106,18 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
                         handler.setHasHeader(hasHeader);
 
                         int i = 0;
-                        for (I_ThinExtByRefPart thinExtByRefPart : handler) {
-                            if (++i % 1000 == 0) {
-                                getLog().info("Imported " + i + " extensions from file " + file);
+                        Iterator<I_ThinExtByRefPart> memebrIterator = handler.iterator();
+                        while (memebrIterator.hasNext()) {
+                            try {
+                                memebrIterator.next();
+                                if (++i % 1000 == 0) {
+                                    getLog().info("Imported " + i + " extensions from file " + file);
+                                }
+                            } catch (Exception ignor) {
+                                getLog().error("Error on line  " + i + " : " + ignor.getMessage());
+                                if (!ignoreErrors) {
+                                    throw ignor;
+                                }
                             }
                         }
                         getLog().info("Completed importing " + i + " extensions from file " + file);
