@@ -344,6 +344,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 .isSelected());
             try {
                 updateSpecTree(false);
+                if (refsetSpecPanel != null && refsetSpecPanel.getRefsetTable() != null) {
+                    refsetSpecPanel.getRefsetTable().repaint();
+                }
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLog(contentPanel, Level.SEVERE,
                     "Database Exception: " + e1.getLocalizedMessage(), e1);
@@ -1000,7 +1003,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 return null;
             }
             commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), RefsetSpecEditor.this);
-            refsetSpecPanel.getRefsetTable().repaint();
             specScrollHorizValue = specTreeScroller.getHorizontalScrollBar().getValue();
             specScrollVertValue = specTreeScroller.getVerticalScrollBar().getValue();
             commentScrollHorizValue = commentScroller.getHorizontalScrollBar().getValue();
