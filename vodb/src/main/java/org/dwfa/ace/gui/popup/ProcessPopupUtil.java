@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -236,14 +237,19 @@ public class ProcessPopupUtil {
                                 }
                             }
 
-                            ActionListener processMenuListener = new ProcessMenuActionListener(f, worker);
-                            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-                                new FileInputStream(f)));
-                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                            ois.close();
-                            JMenuItem processMenuItem = new JMenuItem(process.getName());
-                            processMenuItem.addActionListener(processMenuListener);
-                            menuItems.add(processMenuItem);
+                            try {
+                                ActionListener processMenuListener = new ProcessMenuActionListener(f, worker);
+                                ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+                                    new FileInputStream(f)));
+                                I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                                ois.close();
+                                JMenuItem processMenuItem = new JMenuItem(process.getName());
+                                processMenuItem.addActionListener(processMenuListener);
+                                menuItems.add(processMenuItem);
+                            } catch (StreamCorruptedException sce) {
+                                AceLog.getAppLog().warning("Error reading: " + f.getCanonicalPath());
+                                AceLog.getAppLog().warning(sce.getMessage());
+                            }
                         }
                     }
                 }
@@ -263,5 +269,5 @@ public class ProcessPopupUtil {
             return o1.getText().compareTo(o2.getText());
         }
     }
-    
+
 }
