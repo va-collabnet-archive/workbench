@@ -701,6 +701,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             new I_ConceptualizeUniversally[] { }),
         PROJECTS_ROOT("projects",
                     new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
+        TRANSLATION_PROJECTS_ROOT("translation projects",
+        		new I_ConceptualizeUniversally[] { PROJECTS_ROOT }),
         PROJECT_EXTENSION_REFSET("project extension refset",
                 new I_ConceptualizeUniversally[] { PROJECTS_ROOT_HIERARCHY }),
         WORKSETS_ROOT("worksets",
