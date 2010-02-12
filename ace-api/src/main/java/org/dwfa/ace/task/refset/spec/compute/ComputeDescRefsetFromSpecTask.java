@@ -195,19 +195,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
-            if (query.getTotalStatementCount() == 0) {
-                if (showActivityPanel) {
-                    progressReportHtmlGenerator.setComplete(true);
-                    computeRefsetActivityPanel.complete();
-                    computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
-                }
-
-                getLogger().info("Refset spec is empty - skipping execution.");
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Refset spec is empty - skipping execution.", "", JOptionPane.ERROR_MESSAGE);
-                return Condition.ITEM_CANCELED;
-            }
-            if (!query.isValidQuery()) {
+            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
                 if (showActivityPanel) {
                     progressReportHtmlGenerator.setComplete(true);
                     computeRefsetActivityPanel.complete();
@@ -259,76 +247,82 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                         normalMemberConcept.getConceptId());
 
             // Compute the possible concepts to iterate over here...
-            I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null);
-            possibleDescriptions.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
+            if (query.getTotalStatementCount() != 0) {
+                I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null);
+                possibleDescriptions.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
-            getLogger().info("************* Search space: " + possibleDescriptions.size() + " descriptions *******");
+                getLogger()
+                    .info("************* Search space: " + possibleDescriptions.size() + " descriptions *******");
 
-            if (showActivityPanel) {
-                computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
-                computeRefsetActivityPanel.setIndeterminate(false);
-            }
-
-            I_IterateIds nidIterator = possibleDescriptions.iterator();
-            while (nidIterator.next()) {
-                int nid = nidIterator.nid();
-                if (possibleDescriptions.isMember(nid)) {
-                    UUID uuid = termFactory.getId(nid).getUUIDs().iterator().next();
-                    currentDescription = termFactory.getDescription(uuid.toString());
-                    descriptionsProcessed++;
-
-                    boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
-
-                    if (query.execute(currentDescription)) {
-                        if (!containsCurrentMember) {
-                            newMembers.add(currentDescription.getDescId());
-                        }
-                    } else {
-                        if (containsCurrentMember) {
-                            retiredMembers.add(currentDescription.getDescId());
-                        }
-                    }
-
-                    if (descriptionsProcessed % 10000 == 0) {
-                        if (showActivityPanel) {
-                            progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                            progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                            computeRefsetActivityPanel.setValue(descriptionsProcessed);
-                        }
-
-                        getLogger().info(
-                            "Concepts processed: " + descriptionsProcessed + " / " + termFactory.getConceptCount());
-                        getLogger().info("New members: " + newMembers.size());
-                        getLogger().info("Retired members: " + retiredMembers.size());
-                    }
-                    if (cancelComputation) {
-                        break;
-                    }
-                }
-            }
-
-            if (showActivityPanel) {
-                progressReportHtmlGenerator.setStep2Complete(true);
-                progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                computeRefsetActivityPanel.setIndeterminate(true);
-                computeRefsetActivityPanel.setStringPainted(false);
-            }
-
-            if (cancelComputation) {
-                termFactory.cancel();
                 if (showActivityPanel) {
-                    computeRefsetActivityPanel.getStopButton().setEnabled(false);
-                    computeRefsetActivityPanel.getStopButton().setVisible(false);
-                    progressReportHtmlGenerator.setComplete(true);
-                    computeRefsetActivityPanel.complete();
-                    computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                    computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
+                    computeRefsetActivityPanel.setIndeterminate(false);
                 }
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
-                    JOptionPane.ERROR_MESSAGE);
-                return Condition.ITEM_CANCELED;
+
+                I_IterateIds nidIterator = possibleDescriptions.iterator();
+                while (nidIterator.next()) {
+                    int nid = nidIterator.nid();
+                    if (possibleDescriptions.isMember(nid)) {
+                        UUID uuid = termFactory.getId(nid).getUUIDs().iterator().next();
+                        currentDescription = termFactory.getDescription(uuid.toString());
+                        descriptionsProcessed++;
+
+                        boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
+
+                        if (query.execute(currentDescription)) {
+                            if (!containsCurrentMember) {
+                                newMembers.add(currentDescription.getDescId());
+                            }
+                        } else {
+                            if (containsCurrentMember) {
+                                retiredMembers.add(currentDescription.getDescId());
+                            }
+                        }
+
+                        if (descriptionsProcessed % 10000 == 0) {
+                            if (showActivityPanel) {
+                                progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                                progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                                computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                                computeRefsetActivityPanel.setValue(descriptionsProcessed);
+                            }
+
+                            getLogger().info(
+                                "Concepts processed: " + descriptionsProcessed + " / " + termFactory.getConceptCount());
+                            getLogger().info("New members: " + newMembers.size());
+                            getLogger().info("Retired members: " + retiredMembers.size());
+                        }
+                        if (cancelComputation) {
+                            break;
+                        }
+                    }
+                }
+
+                if (showActivityPanel) {
+                    progressReportHtmlGenerator.setStep2Complete(true);
+                    progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                    progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                    computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                    computeRefsetActivityPanel.setIndeterminate(true);
+                    computeRefsetActivityPanel.setStringPainted(false);
+                }
+
+                if (cancelComputation) {
+                    termFactory.cancel();
+                    if (showActivityPanel) {
+                        computeRefsetActivityPanel.getStopButton().setEnabled(false);
+                        computeRefsetActivityPanel.getStopButton().setVisible(false);
+                        progressReportHtmlGenerator.setComplete(true);
+                        computeRefsetActivityPanel.complete();
+                        computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                    }
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
+                        JOptionPane.ERROR_MESSAGE);
+                    return Condition.ITEM_CANCELED;
+                }
+
+            } else { // empty refset, so we need to retire all the previous members
+                retiredMembers.addAll(currentRefsetMemberIds);
             }
 
             // Step 3 : create new member refsets
