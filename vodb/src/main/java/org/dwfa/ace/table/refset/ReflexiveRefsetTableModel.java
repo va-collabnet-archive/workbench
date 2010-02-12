@@ -37,6 +37,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
@@ -97,13 +98,42 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 return false;
             }
             for (I_ThinExtByRefVersioned extension : refsetMembers) {
+
                 I_IntSet statusSet = host.getConfig().getAllowedStatus();
                 Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
-                if (host.getShowHistory() == true) {
+                if (host instanceof RefsetSpecEditor) {
+                    if (((RefsetSpecEditor) host).getRefsetSpecPanel().getShowPromotionCheckBoxes()) {
+                        // include retired statuses
+                        statusSet = null;
+                        positionSet = null;
+                    }
+                }
+                if (host.getShowHistory()) {
                     statusSet = null;
                     positionSet = null;
                 }
-                for (I_ThinExtByRefPart part : extension.getTuples(statusSet, positionSet, true, false)) {
+
+                List<I_ThinExtByRefTuple> allParts = extension.getTuples(statusSet, positionSet, true, false);
+                if (!host.getShowHistory()) {
+                    if (host instanceof RefsetSpecEditor) {
+                        if (((RefsetSpecEditor) host).getRefsetSpecPanel().getShowPromotionCheckBoxes()) {
+                            // need to remove all except for the latest
+                            I_ThinExtByRefTuple latestTuple = null;
+                            for (I_ThinExtByRefTuple tuple : allParts) {
+                                if (latestTuple == null || tuple.getVersion() >= latestTuple.getVersion()) {
+                                    latestTuple = tuple;
+                                }
+                            }
+
+                            allParts.clear();
+                            if (latestTuple != null) {
+                                allParts.add(latestTuple);
+                            }
+                        }
+                    }
+                }
+
+                for (I_ThinExtByRefPart part : allParts) {
                     ThinExtByRefTuple ebrTuple = (ThinExtByRefTuple) part;
                     boolean addPart = true;
                     for (ReflexiveRefsetFieldData col : columns) {
