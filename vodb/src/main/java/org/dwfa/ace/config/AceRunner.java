@@ -243,6 +243,12 @@ public class AceRunner {
                             String username = profileSubversionMap.values().iterator().next().getUsername();
                             String password = profileSubversionMap.values().iterator().next().getPassword();
 
+                            do{
+                                prompter.prompt("", username);
+                                password = prompter.getPassword();
+                                username = prompter.getUsername();
+                            } while  ("".equals(username) || "".equals(password));
+
                             Map<String, SubversionData> relativeSubversionMap = new HashMap<String, SubversionData>();
                             Enumeration<String> propertyNames = (Enumeration<String>) aceProperties.propertyNames();
                             for (; propertyNames.hasMoreElements();) {
