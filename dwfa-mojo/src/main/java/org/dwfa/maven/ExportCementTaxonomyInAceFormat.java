@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.maven;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -39,12 +31,20 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.spec.TaxonomySpec;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize
  * Terminology) taxonomies in
  * the ACE format (with branch ids and effective dates for standard
  * components--concepts, descriptions, relationships).
- * 
+ *
  * @goal export-cement-taxonomy
  * @phase process-resources
  */
@@ -54,9 +54,9 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
     /**
      * An enumeration of the taxonomies that can be exported via this maven
      * plugin goal.
-     * 
+     *
      * @author kec
-     * 
+     *
      */
     public enum TAXONOMIES {
         /**
@@ -88,7 +88,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
     /**
      * Taxonomies to export. Must be one or more of the Taxonomies provided in
      * the <code>TAXONOMIES enum</code> in this class.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -96,7 +96,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -104,21 +104,21 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter
      */
     private String output;
 
     /**
      * Effective date for exported content - defaults to now if not set
-     * 
+     *
      * @parameter
      */
     private Date effectiveDate;
 
     /**
      * The maven session
-     * 
+     *
      * @parameter expression="${session}"
      * @required
      */
@@ -126,7 +126,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
 
     /**
      * Specification of the concepts to exclude from this export
-     * 
+     *
      * @parameter
      */
     private TaxonomySpec[] exclusions;
@@ -136,7 +136,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
      * This will prevent unexpected execution of plugins when
      * other goals are executed such as eclipse:eclipse or
      * site:site.
-     * 
+     *
      * There may be better ways to do this... If you find one,
      * please let us know :-)
      */
@@ -146,7 +146,7 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
     /**
      * Specifies whether to create new files (default) or append to existing
      * files.
-     * 
+     *
      * @parameter default-value=false
      * @required
      */
@@ -244,6 +244,8 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
                     mts.writeExtension(extensionType, extensionWriter, altIdWriter, MemoryTermServer.FILE_FORMAT.ACE);
                     extensionWriter.close();
                 }
+
+                LocalFixedTerminology.setStore(null);
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }

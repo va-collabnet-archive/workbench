@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 package org.dwfa.ace.path;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -48,6 +38,16 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *
@@ -128,54 +128,63 @@ public class CopyPathToPath implements I_ProcessConcepts {
 
     public void processConcept(I_GetConceptData concept) throws Exception {
 
-        if (versionTime == Integer.MAX_VALUE) {
-            setVersionTime(tf.convertToThinVersion(System.currentTimeMillis()));
-        }
-
-        if (++conceptCount % 1000 == 0) {
-            logger.info("processed concept " + conceptCount);
-        }
-
-        duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
-        duplicateRelTuples = new ArrayList<I_RelTuple>();
-
-        if (validate || (concept.getConceptAttributes() != null && concept.getConceptAttributes().versionCount() > 0)) {
-            processConceptAttributes(concept.getConceptAttributes());
-        }
-        processDescription(concept.getDescriptions());
-        processExtensions(concept.getConceptId());
-        processId(concept.getId());
-        processImages(concept.getImages());
-        processRelationship(concept.getSourceRels());
-
-        // Log all Duplicate-versioned descriptions and relationships on the
-        // same path and timestamp here
-        if (!duplicateDescTuples.isEmpty()) {
-            duplicateVersionDescriptions = Boolean.TRUE;
-            logger.severe("***** Duplicate-versioned description tuple(s) in concept: " + concept.getUids().get(0));
-            for (I_DescriptionTuple tuple : duplicateDescTuples) {
-                logger.severe("Desc id: " + tuple.getDescId() + ", Path id: " + tuple.getPathId() + ", Version: "
-                    + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
+        try {
+            if (versionTime == Integer.MAX_VALUE) {
+                setVersionTime(tf.convertToThinVersion(System.currentTimeMillis()));
             }
-        }
-        if (!duplicateRelTuples.isEmpty()) {
-            duplicateVersionRelationships = Boolean.TRUE;
-            logger.severe("***** Duplicate-versioned relationship tuple(s) in concept: " + concept.getUids().get(0));
-            for (I_RelTuple tuple : duplicateRelTuples) {
-                logger.severe("Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: "
-                    + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
+
+            if (++conceptCount % 1000 == 0) {
+                logger.info("processed concept " + conceptCount);
             }
+
+            duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
+            duplicateRelTuples = new ArrayList<I_RelTuple>();
+
+            if (validate && hasAttributes(concept) || hasAttributes(concept)) {
+                processConceptAttributes(concept.getConceptAttributes());
+            }
+
+            processDescription(concept.getDescriptions());
+            processExtensions(concept.getConceptId());
+            processId(concept.getId());
+            processImages(concept.getImages());
+            processRelationship(concept.getSourceRels());
+
+            // Log all Duplicate-versioned descriptions and relationships on the
+            // same path and timestamp here
+            if (!duplicateDescTuples.isEmpty()) {
+                duplicateVersionDescriptions = Boolean.TRUE;
+                logger.severe("***** Duplicate-versioned description tuple(s) in concept: " + concept.getUids().get(0));
+                for (I_DescriptionTuple tuple : duplicateDescTuples) {
+                    logger.severe("Desc id: " + tuple.getDescId() + ", Path id: " + tuple.getPathId() + ", Version: "
+                        + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
+                }
+            }
+            if (!duplicateRelTuples.isEmpty()) {
+                duplicateVersionRelationships = Boolean.TRUE;
+                logger.severe("***** Duplicate-versioned relationship tuple(s) in concept: " + concept.getUids().get(0));
+                for (I_RelTuple tuple : duplicateRelTuples) {
+                    logger.severe("Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: "
+                        + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("exception on processing concept " + concept);
+            throw e;
         }
     }
 
-    private void processExtensions(int id) throws IOException, Exception {
+    private boolean hasAttributes(final I_GetConceptData concept) throws IOException {
+        return concept.getConceptAttributes() != null && concept.getConceptAttributes().versionCount() > 0;
+    }
+
+    private void processExtensions(int id) throws Exception {
         for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(id)) {
             processExtensionByReference(extension);
         }
     }
 
     private void processConceptAttributes(I_ConceptAttributeVersioned conceptAttributeVersioned) throws Exception {
-
         if (++conceptAttributeCount % 1000 == 0) {
             logger.info("processed concept attribute " + conceptAttributeCount);
         }
@@ -466,7 +475,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
      * Gets the latest tuples for the given pathid - if the pathid is null the
      * latest
      * tuples will be returned for all paths
-     * 
+     *
      * @param <T> tuple type
      * @param tuples list of tuples to examine
      * @param pathid path

@@ -1288,7 +1288,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 extensionWriter.close();
             }
 
-
+            LocalFixedTerminology.setStore(null);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
