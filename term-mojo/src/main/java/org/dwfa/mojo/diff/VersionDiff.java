@@ -145,6 +145,13 @@ import org.dwfa.vodb.process.ProcessQueue;
 public class VersionDiff extends AbstractMojo {
 
     /**
+     * Number of threads to use
+     *
+     * @parameter
+     */
+    private int threadsToUse = 1;
+
+    /**
      * The name to identify this comparison
      *
      * @parameter
@@ -1279,7 +1286,7 @@ public class VersionDiff extends AbstractMojo {
 
         I_ProcessQueue workQueue;
         List<I_GetConceptData> currentBatch = new ArrayList<I_GetConceptData>();
-        workQueue = new ProcessQueue(3);
+        workQueue = new ProcessQueue(threadsToUse);
 
         listRoots(path);
         v1_isa_desc = new HashSet<Integer>();
