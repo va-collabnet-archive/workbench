@@ -59,7 +59,7 @@ public class CheckBoxCellRenderer implements TableCellRenderer {
     }
 
     protected void setBackground(boolean isSelected, int row, JCheckBox renderComponent) {
-        if (isSelected == false) {
+        if (!isSelected) {
             renderComponent.setBackground(AceTableRenderer.colorForRow(row));
             renderComponent.setForeground(UIManager.getColor("Table.foreground"));
         } else {

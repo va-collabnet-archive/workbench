@@ -9,6 +9,10 @@ import org.dwfa.vodb.types.ThinExtByRefTuple;
 
 public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private HashMap<Integer, Boolean> selectedTuplesMap = new HashMap<Integer, Boolean>();
 
     public SelectableReflexiveTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {

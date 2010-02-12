@@ -654,10 +654,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         @Override
         public void run() {
-            if (active) {
+            if (isActive()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (active) {
+                        if (isActive()) {
                             ThinExtByRefTuple tuple = allTuples.get(row);
                             Terms.get().addUncommitted(tuple.getCore());
                         }
