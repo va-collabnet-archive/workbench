@@ -189,19 +189,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                     new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
-            if (query.getTotalStatementCount() == 0) {
-                if (showActivityPanel) {
-                    progressReportHtmlGenerator.setComplete(true);
-                    computeRefsetActivityPanel.complete();
-                    computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
-                }
-
-                getLogger().info("Refset spec is empty - skipping execution.");
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Refset spec is empty - skipping execution.", "", JOptionPane.ERROR_MESSAGE);
-                return Condition.ITEM_CANCELED;
-            }
-            if (!query.isValidQuery()) {
+            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
                 if (showActivityPanel) {
                     progressReportHtmlGenerator.setComplete(true);
                     computeRefsetActivityPanel.complete();
@@ -251,74 +239,81 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             HashSet<Integer> currentRefsetMemberIds =
                     filterNonCurrentRefsetMembers(allRefsetMembers, memberRefsetHelper, refset.getConceptId(),
                         normalMemberConcept.getConceptId());
+
             // Compute the possible concepts to iterate over here...
-            I_RepresentIdSet possibleConcepts = query.getPossibleConcepts(configFrame, null);
-            possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
+            I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
+            if (query.getTotalStatementCount() != 0) {
+                possibleConcepts = query.getPossibleConcepts(configFrame, null);
+                possibleConcepts.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
-            getLogger().info("************* Search space: " + possibleConcepts.size() + " concepts *******");
+                getLogger().info("************* Search space: " + possibleConcepts.size() + " concepts *******");
 
-            if (showActivityPanel) {
-                computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
-                computeRefsetActivityPanel.setIndeterminate(false);
-            }
-
-            I_IterateIds nidIterator = possibleConcepts.iterator();
-            while (nidIterator.next()) {
-                int nid = nidIterator.nid();
-                if (possibleConcepts.isMember(nid)) {
-                    currentConcept = termFactory.getConcept(nid);
-                    conceptsProcessed++;
-
-                    boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
-
-                    if (query.execute(currentConcept)) {
-                        if (!containsCurrentMember) {
-                            newMembers.add(currentConcept.getConceptId());
-                        }
-                    } else {
-                        if (containsCurrentMember) {
-                            retiredMembers.add(currentConcept.getConceptId());
-                        }
-                    }
-
-                    if (conceptsProcessed % 10000 == 0) {
-                        if (showActivityPanel) {
-                            progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                            progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                            computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                            computeRefsetActivityPanel.setValue(conceptsProcessed);
-                        }
-
-                        getLogger().info(
-                            "Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
-                        getLogger().info("New members: " + newMembers.size());
-                        getLogger().info("Retired members: " + retiredMembers.size());
-                    }
-                    if (cancelComputation) {
-                        break;
-                    }
-                }
-            }
-
-            if (showActivityPanel) {
-                progressReportHtmlGenerator.setStep2Complete(true);
-                progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
-                progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
-                computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
-                computeRefsetActivityPanel.setIndeterminate(true);
-                computeRefsetActivityPanel.setStringPainted(false);
-            }
-
-            if (cancelComputation) {
-                termFactory.cancel();
                 if (showActivityPanel) {
-                    computeRefsetActivityPanel.getStopButton().setEnabled(false);
-                    computeRefsetActivityPanel.getStopButton().setVisible(false);
-                    progressReportHtmlGenerator.setComplete(true);
-                    computeRefsetActivityPanel.complete();
-                    computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                    computeRefsetActivityPanel.setMaximum(termFactory.getConceptCount());
+                    computeRefsetActivityPanel.setIndeterminate(false);
                 }
-                return Condition.ITEM_CANCELED;
+
+                I_IterateIds nidIterator = possibleConcepts.iterator();
+                while (nidIterator.next()) {
+                    int nid = nidIterator.nid();
+                    if (possibleConcepts.isMember(nid)) {
+                        currentConcept = termFactory.getConcept(nid);
+                        conceptsProcessed++;
+
+                        boolean containsCurrentMember = currentRefsetMemberIds.contains(currentConcept.getConceptId());
+
+                        if (query.execute(currentConcept)) {
+                            if (!containsCurrentMember) {
+                                newMembers.add(currentConcept.getConceptId());
+                            }
+                        } else {
+                            if (containsCurrentMember) {
+                                retiredMembers.add(currentConcept.getConceptId());
+                            }
+                        }
+
+                        if (conceptsProcessed % 10000 == 0) {
+                            if (showActivityPanel) {
+                                progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                                progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                                computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                                computeRefsetActivityPanel.setValue(conceptsProcessed);
+                            }
+
+                            getLogger().info(
+                                "Concepts processed: " + conceptsProcessed + " / " + termFactory.getConceptCount());
+                            getLogger().info("New members: " + newMembers.size());
+                            getLogger().info("Retired members: " + retiredMembers.size());
+                        }
+                        if (cancelComputation) {
+                            break;
+                        }
+                    }
+                }
+
+                if (showActivityPanel) {
+                    progressReportHtmlGenerator.setStep2Complete(true);
+                    progressReportHtmlGenerator.setNewMembersCount(newMembers.size());
+                    progressReportHtmlGenerator.setToBeRetiredMembersCount(retiredMembers.size());
+                    computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
+                    computeRefsetActivityPanel.setIndeterminate(true);
+                    computeRefsetActivityPanel.setStringPainted(false);
+                }
+
+                if (cancelComputation) {
+                    termFactory.cancel();
+                    if (showActivityPanel) {
+                        computeRefsetActivityPanel.getStopButton().setEnabled(false);
+                        computeRefsetActivityPanel.getStopButton().setVisible(false);
+                        progressReportHtmlGenerator.setComplete(true);
+                        computeRefsetActivityPanel.complete();
+                        computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
+                    }
+                    return Condition.ITEM_CANCELED;
+                }
+
+            } else { // empty refset, so we need to retire all the previous members
+                retiredMembers.addAll(currentRefsetMemberIds);
             }
 
             long createComponentsStartTime = System.currentTimeMillis();
