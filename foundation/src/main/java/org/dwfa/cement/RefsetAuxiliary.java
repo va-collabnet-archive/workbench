@@ -249,52 +249,62 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         REFSET_IDENTITY(new String[] { "refset identity", "refset" }, REFSET_AUXILIARY),
 
-        CAB(new String[] { "CAB", "CAB", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), CAB_SNOMED_FULL(new String[] {
-            "SNOMED Full", "SNOMED Full", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] { CAB,
-            ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), CAB_SNOMED_LITE(new String[] {
-            "SNOMED Lite", "SNOMED Lite", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] { CAB,
-            ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), CAB_OTHER(new String[] {
-            "CAB Other", "CAB Other", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] { CAB,
-            ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        CAB(new String[] { "CAB", "CAB" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
+            
+            CAB_SNOMED_FULL(new String[] {
+            "SNOMED Full", "SNOMED Full" }, new I_ConceptualizeUniversally[] { CAB,
+            ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
+            
+            CAB_SNOMED_LITE(new String[] {
+            "SNOMED Lite", "SNOMED Lite" }, new I_ConceptualizeUniversally[] { CAB,
+            ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }), 
+            
+            CAB_OTHER(new String[] {
+            "CAB Other", "CAB Other" }, new I_ConceptualizeUniversally[] { CAB,
+            ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        DSP_CLINICAL(new String[] { "DSP Clinical", "DSP Clinical", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        DSP_CLINICAL(new String[] { "DSP Clinical", "DSP Clinical" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        DSP_PHARMACY(new String[] { "DSP Pharmacy", "DSP Pharmacy", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), DSP_PHARMACY_EPRESCRIBING(new String[] {
-            "DSP ePrescribing", "DSP ePrescribing", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            DSP_PHARMACY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        DSP_PHARMACY(new String[] { "DSP Pharmacy", "DSP Pharmacy" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }), 
+            
+            DSP_PHARMACY_EPRESCRIBING(new String[] {
+            "DSP ePrescribing", "DSP ePrescribing"}, new I_ConceptualizeUniversally[] {
+            DSP_PHARMACY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        SSERP(new String[] { "SSERP", "SSERP", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        SSERP(new String[] { "SSERP", "SSERP" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        LONDON_IT(new String[] { "London IT Programme", "London IT Programme", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        LONDON_IT(new String[] { "London IT Programme", "London IT Programme" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        CLINICAL_MESSAGING(new String[] { "Clinical Messaging", "Clinical Messaging", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        CLINICAL_MESSAGING(new String[] { "Clinical Messaging", "Clinical Messaging" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        SCG(new String[] { "SCG", "SCG", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), SCG_RELIGIONS(new String[] {
-            "SCG Religions", "SCG Religions", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] { SCG,
-            ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        SCG(new String[] { "SCG", "SCG" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }), 
+            
+            SCG_RELIGIONS(new String[] {
+            "SCG Religions", "SCG Religions" }, new I_ConceptualizeUniversally[] { SCG,
+            ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
-        TECHNICAL(new String[] { "Technical", "Technical", "ORG_DWFA_CTV3_CROSS_MAP" }, new I_ConceptualizeUniversally[] {
-            REFSET_IDENTITY, ANCILLARY_DATA, CROSS_MAP_EXTENSION }, new I_ConceptualizeUniversally[] {
-            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+        TECHNICAL(new String[] { "Technical", "Technical" }, new I_ConceptualizeUniversally[] {
+            REFSET_IDENTITY, ANCILLARY_DATA }, new I_ConceptualizeUniversally[] {
+            ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL }),
 
         PATHOLOGY_INCLUSION_SPEC(new String[] { "pathology inclusion specification",
             "pathology inclusion specification", "ORG_DWFA_PATHOLOGY_INCLUSION_SPEC" }, new I_ConceptualizeUniversally[] {
