@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,9 +47,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
 /**
- * 
+ *
  * @goal vodb-create-new-path
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
@@ -57,14 +57,14 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Path origins
-     * 
+     *
      * @parameter
      */
     SimpleUniversalAcePosition[] origins;
 
     /**
      * Path UUID
-     * 
+     *
      * @parameter
      * @required
      */
@@ -72,7 +72,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Parent of the new path.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -80,14 +80,14 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Parent of the new path.
-     * 
+     *
      * @parameter
      */
     private ConceptDescriptor status;
 
     /**
      * Path Description
-     * 
+     *
      * @parameter
      * @required
      */
@@ -95,7 +95,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Path Description
-     * 
+     *
      * @parameter
      * @required
      */
@@ -103,7 +103,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -113,10 +113,10 @@ public class VodbCreateNewPath extends AbstractMojo {
      * If true, set version timestamps (commit time) to the beginning of SNOMED
      * time to ensure it
      * preceeds all other changes.
-     * 
+     *
      * @parameter
      */
-    boolean setVersionAsBeginningOfTime = false;
+    boolean setVersionAsBeginningOfTime = true;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         // Use the architectonic branch for all path editing.
