@@ -185,7 +185,7 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                     commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
                     popup.add(commentActionItem);
                     popup.addSeparator();
-                    JMenuItem retireActionItem = new JMenuItem("Retire");
+                    JMenuItem retireActionItem = new JMenuItem("Retire clause...");
                     retireActionItem.addActionListener(new RetireSpecAction(firstTuple));
                     popup.add(retireActionItem);
 
