@@ -46,11 +46,7 @@ public class FileContent implements Serializable {
      */
     public FileContent(File file) throws IOException {
         filename = file.getName();
-        System.out.println("********* FILE NAME: " + file.getName());
-        System.out.println("********* FILE PATH: " + file.getPath());
-        System.out.println("********* FILE exists? " + file.exists());
-        System.out.println("********* FILE canonical path: " + file.getCanonicalPath());
-        System.out.println("********* FILE absolute path: " + file.getAbsolutePath());
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStream is = new BufferedInputStream(new FileInputStream(file));
         FileIO.copyFile(is, baos, true);
