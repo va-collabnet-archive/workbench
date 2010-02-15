@@ -421,7 +421,10 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" }, 
 	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
 		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
-        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;		
+        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
+        		
+		LANGUAGE_REFSET(new String[] { "language refset", "language refset" }, 
+	    		new I_ConceptualizeUniversally[] {REFSET_IDENTITY}),;		
 
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
