@@ -21,7 +21,10 @@
 
 package org.dwfa.maven.importer;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.Writer;
 
 public class ImportFileWriters {
@@ -476,8 +479,28 @@ public class ImportFileWriters {
 	public void setEffectiveDate(String effectiveDate) {
 		this.effectiveDate = effectiveDate;
 	}
+	/**
+	 * A debug method for counting the number of lines in a file (e.g. doing a before and after debug method)
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	
+	public int getLineCount(File file)throws Exception{
+		int count = 0;
+		if (file.exists()){
+	        FileReader fr = new FileReader(file);
+	     LineNumberReader ln = new LineNumberReader(fr);
+	        while (ln.readLine() != null){
+	          count++;
+	   }	 
+	        ln.close();
+	 	      }
+	      else{
+	       throw new Exception("File does not exist!");
+	     }
+		return count;
+	}
 
-	
-	
 	
 }
