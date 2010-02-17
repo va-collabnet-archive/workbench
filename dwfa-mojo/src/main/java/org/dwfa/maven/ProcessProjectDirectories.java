@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,15 @@
  * limitations under the License.
  */
 package org.dwfa.maven;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.maven.ExtractAndProcessSpec.SubstutionSpec;
+import org.dwfa.util.io.FileIO;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -37,18 +46,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.maven.ExtractAndProcessSpec.SubstutionSpec;
-import org.dwfa.util.io.FileIO;
-
 /**
  * Goal which writes configuration files to the output directory.
- * 
+ *
  * @goal process-project-dirs
  * @requiresDependencyResolution compile
  * @deprecated use the maven assembly plugin filesets instead.
@@ -57,7 +57,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
@@ -71,18 +71,25 @@ public class ProcessProjectDirectories extends AbstractMojo {
 
     /**
      * The execution information for this commit operation.
-     * 
+     *
      * @parameter expression="${mojoExecution}"
      */
     private MojoExecution execution;
 
     /**
      * Location of the build directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private File targetDirectory;
+
+    /**
+     * Location of the project.
+     * @parameter expression="${basedir}"
+     * @required
+     */
+    private File currentDirectory;
 
     private void addFileMatches(File root, Pattern filePattern, List<File> matches) throws IOException {
         if (root.isDirectory() && (root.getName().equals("target") == false)
@@ -117,7 +124,7 @@ public class ProcessProjectDirectories extends AbstractMojo {
                 File rootDir = new File(outputDirectory, spec.getDestDir());
                 List<RegexReplace> replacers = null;
                 List<File> matches = new ArrayList<File>();
-                addFileMatches(new File("."), filePattern, matches);
+                addFileMatches(currentDirectory, filePattern, matches);
                 for (File f : matches) {
                     if (f.isHidden() || f.getName().startsWith(".")) {
                         // ignore hidden files...;
