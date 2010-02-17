@@ -144,10 +144,12 @@ public class VodbCreateNewPath extends AbstractMojo {
             activeConfig.setHierarchySelection(parent);
 
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
+            getLog().error("VodbCreateNewPath pathUUID= "+pathUUID);	
 
             I_GetConceptData pathConcept;
 
             if (tf.hasId(pathUUID)) {
+            	 getLog().error("VodbCreateNewPath tf has pathUUID ");
                 pathConcept = tf.getConcept(new UUID[] { pathUUID });
 
                 /**
@@ -159,9 +161,11 @@ public class VodbCreateNewPath extends AbstractMojo {
                  * anyway... as the existing concept is not complete/usable
                  */
                 if (pathConcept.getDescriptions() == null || pathConcept.getDescriptions().isEmpty()) {
+                	getLog().error("VodbCreateNewPath tf has pathUUID but no desc");
                     pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
                 }
             } else {
+            	getLog().error("VodbCreateNewPath tf has NO pathUUID So creating NEW");
                 pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
             }
 
