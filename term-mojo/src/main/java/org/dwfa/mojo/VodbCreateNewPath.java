@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -184,6 +185,7 @@ public class VodbCreateNewPath extends AbstractMojo {
     private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
             throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
 
+    	getLog().error("VodbCreateNewPath entering createNewPathConcept");
         List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
 
         I_GetConceptData pathConcept = tf.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
@@ -221,6 +223,18 @@ public class VodbCreateNewPath extends AbstractMojo {
 
         // need to do an immediate commit so that new concept will be available
         // to path when read from changeset
+        
+        getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
+        //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
+        for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
+        	getLog().error("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
+        	for (I_DescriptionPart desl : desc.getMutableParts()) {
+        		getLog().error("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());
+        	}
+        	
+        }
+        
+        
         tf.commit();
         return pathConcept;
     }
