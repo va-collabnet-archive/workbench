@@ -23,14 +23,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
     <artifactId>ace-api</artifactId>
-    <version>1.33</version>
+    <version>1.34-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ACE API</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/ace-api-1.33</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/ace-api-1.33</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/ace-api-1.33</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <dependencies>
         <dependency>
