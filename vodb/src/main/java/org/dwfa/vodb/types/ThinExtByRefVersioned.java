@@ -349,7 +349,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
     public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions, List<I_ThinExtByRefTuple> matchingTuples,
             boolean addUncommitted) {
-        adder.addTuples(allowedStatus, null, positions, matchingTuples, addUncommitted, versions, this);
+        adder.addTuples(allowedStatus, null, positions, matchingTuples, addUncommitted, getMutableParts(), this);
     }
 
     public void addTuples(I_IntSet allowedStatus, Set<I_Position> positions, List<I_ThinExtByRefTuple> returnTuples,
