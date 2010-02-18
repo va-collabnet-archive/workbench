@@ -168,6 +168,7 @@ public class VodbCreateNewPath extends AbstractMojo {
             } else {
             	getLog().error("VodbCreateNewPath tf has NO pathUUID So creating NEW");
                 pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
+                getLog().error("VodbCreateNewPath createNewPathConcept called new concept ID = "+pathConcept.getConceptId());
             }
 
             tf.newPath(pathOrigins, pathConcept);
@@ -184,8 +185,8 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
             throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
-
     	getLog().error("VodbCreateNewPath entering createNewPathConcept");
+    	
         List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
 
         I_GetConceptData pathConcept = tf.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
