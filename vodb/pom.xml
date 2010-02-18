@@ -23,16 +23,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
     <artifactId>vodb</artifactId>
-    <version>1.39-SNAPSHOT</version>
+    <version>1.39</version>
     <packaging>jar</packaging>
     <name>Versioned Object Database</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html </url>
     <inceptionYear>2005</inceptionYear>
     <description>ACE editor toolkit and version-oriented database </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/vodb</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/vodb</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/vodb-1.39</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/vodb-1.39</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/vodb-1.39</url>
     </scm>
     <licenses>
         <license>
