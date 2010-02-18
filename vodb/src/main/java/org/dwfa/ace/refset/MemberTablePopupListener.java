@@ -35,7 +35,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.log.AceLog;
@@ -55,26 +55,28 @@ public class MemberTablePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            String commentText = (String) JOptionPane.showInputDialog(config.getTreeInSpecEditor().getRootPane(), "",
-                prompt + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
+            String commentText =
+                    (String) JOptionPane.showInputDialog(config.getTreeInSpecEditor().getRootPane(), "", prompt
+                        + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = config.getRefsetInSpecEditor();
-                    I_TermFactory tf = LocalVersionedTerminology.get();
-                    Set<? extends I_GetConceptData> commentRefsets = RefsetHelper.getCommentsRefsetForRefset(
-                        refsetIdentityConcept, config);
-                    int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
-                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-                        config.getEditingPathSet(), Integer.MAX_VALUE);
+                    I_TermFactory tf = Terms.get();
+                    Set<? extends I_GetConceptData> commentRefsets =
+                            RefsetHelper.getCommentsRefsetForRefset(refsetIdentityConcept, config);
+                    int newMemberId =
+                            tf.uuidToNativeWithGeneration(UUID.randomUUID(),
+                                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), config
+                                    .getEditingPathSet(), Integer.MAX_VALUE);
                     if (commentRefsets.size() > 0) {
 
                         I_GetConceptData commentRefsetIdentityConcept = commentRefsets.iterator().next();
-                        I_ThinExtByRefVersioned commentExt = tf.newExtension(
-                            commentRefsetIdentityConcept.getConceptId(), newMemberId, selectedObject.getTuple()
-                                .getComponentId(), RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
+                        I_ThinExtByRefVersioned commentExt =
+                                tf.newExtension(commentRefsetIdentityConcept.getConceptId(), newMemberId,
+                                    selectedObject.getTuple().getComponentId(),
+                                    RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
                         for (I_Path p : config.getEditingPathSet()) {
-                            I_ThinExtByRefPartString commentPart = LocalVersionedTerminology.get()
-                                .newStringExtensionPart();
+                            I_ThinExtByRefPartString commentPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
                             commentPart.setStringValue(commentText);
                             commentPart.setPathId(p.getConceptId());
                             commentPart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());

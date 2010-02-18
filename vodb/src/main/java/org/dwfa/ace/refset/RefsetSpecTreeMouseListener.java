@@ -71,20 +71,20 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
             try {
-				makeAndShowPopup(e);
-			} catch (TerminologyException ex) {
-				throw new RuntimeException(ex);
-			}
+                makeAndShowPopup(e);
+            } catch (TerminologyException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
     public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) {
             try {
-				makeAndShowPopup(e);
-			} catch (TerminologyException ex) {
-				throw new RuntimeException(ex);
-			}
+                makeAndShowPopup(e);
+            } catch (TerminologyException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -118,17 +118,21 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                             I_ThinExtByRefVersioned specPart = (I_ThinExtByRefVersioned) node.getUserObject();
                             switch (ThinExtBinder.getExtensionType(specPart)) {
                             case CONCEPT_CONCEPT:
-                                popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
+                                popup =
+                                        makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
                                 break;
 
                             case CONCEPT_CONCEPT_CONCEPT:
-                                popup = makePopup(e,
-                                    new File(AceFrame.pluginRoot, "refsetspec/structural-query-popup"), specPart);
+                                popup =
+                                        makePopup(e,
+                                            new File(AceFrame.pluginRoot, "refsetspec/structural-query-popup"),
+                                            specPart);
                                 break;
 
                             case CONCEPT_CONCEPT_STRING:
-                                popup = makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/text-query-popup"),
-                                    specPart);
+                                popup =
+                                        makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/text-query-popup"),
+                                            specPart);
                                 break;
                             default:
                                 popup = null;
@@ -172,14 +176,14 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                 cancelActionItem.addActionListener(new CancelChangeAction(specPart));
                 popup.add(cancelActionItem);
             } else {
-                List<I_ThinExtByRefTuple> tuples = specPart.getTuples(aceConfig.getAllowedStatus(),
-                    aceConfig.getViewPositionSet(), true);
+                List<I_ThinExtByRefTuple> tuples =
+                        specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), true);
 
                 if (tuples.iterator().hasNext()) {
                     I_ThinExtByRefTuple firstTuple = tuples.iterator().next();
                     I_GetConceptData refsetConcept = Terms.get().getConcept(firstTuple.getRefsetId());
-                    I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(),
-                        aceConfig);
+                    I_DescriptionTuple refsetDesc =
+                            refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(), aceConfig);
                     String prompt = "Add comment for '" + refsetDesc.getText() + "'";
                     JMenuItem commentActionItem = new JMenuItem(prompt + "...");
                     commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
@@ -213,28 +217,29 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            String commentText = (String) JOptionPane.showInputDialog(aceConfig.getTreeInSpecEditor().getRootPane(),
-                "", prompt + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
+            String commentText =
+                    (String) JOptionPane.showInputDialog(aceConfig.getTreeInSpecEditor().getRootPane(), "", prompt
+                        + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-                    I_TermFactory tf = LocalVersionedTerminology.get();
+                    I_TermFactory tf = Terms.get();
                     I_IntSet allowedTypes = new IntSet();
                     allowedTypes.add(RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
-                    Set<? extends I_GetConceptData> commentRefsets = refsetIdentityConcept.getSourceRelTargets(
-                        aceConfig.getAllowedStatus(), allowedTypes, aceConfig.getViewPositionSetReadOnly(), false);
-                    int newMemberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
-                        ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(),
-                        aceConfig.getEditingPathSet(), Integer.MAX_VALUE);
+                    Set<? extends I_GetConceptData> commentRefsets =
+                            RefsetHelper.getCommentsRefsetForRefset(refsetIdentityConcept, aceConfig);
+                    int newMemberId =
+                            tf.uuidToNativeWithGeneration(UUID.randomUUID(),
+                                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), aceConfig
+                                    .getEditingPathSet(), Integer.MAX_VALUE);
                     if (commentRefsets.size() > 0) {
                         I_GetConceptData commentRefsetIdentityConcept = commentRefsets.iterator().next();
-                        I_ThinExtByRefVersioned commentExt = tf.newExtension(
-                            commentRefsetIdentityConcept.getConceptId(), newMemberId, thinExtByRefTuple.getMemberId(),
-                            RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
-                        LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
+                        I_ThinExtByRefVersioned commentExt =
+                                tf.newExtension(commentRefsetIdentityConcept.getConceptId(), newMemberId,
+                                    thinExtByRefTuple.getMemberId(), RefsetAuxiliary.Concept.STRING_EXTENSION
+                                        .localize().getNid());
                         for (I_Path p : aceConfig.getEditingPathSet()) {
-                            I_ThinExtByRefPartString commentPart = LocalVersionedTerminology.get()
-                                .newStringExtensionPart();
+                            I_ThinExtByRefPartString commentPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
                             commentPart.setStringValue(commentText);
                             commentPart.setPathId(p.getConceptId());
                             commentPart.setStatusId(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
@@ -260,8 +265,10 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
 
         public void actionPerformed(ActionEvent arg0) {
             try {
-            	I_ThinExtByRefPart currentPart = thinExtByRefTuple.getMutablePart();
-                I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), currentPart.getPathId(), Long.MAX_VALUE);
+                I_ThinExtByRefPart currentPart = thinExtByRefTuple.getMutablePart();
+                I_ThinExtByRefPart newPart =
+                        (I_ThinExtByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize()
+                            .getNid(), currentPart.getPathId(), Long.MAX_VALUE);
                 thinExtByRefTuple.getCore().addVersion(newPart);
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -289,8 +296,9 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
                         partsToRemove.add(part);
                     }
                 }
-                ExtensionByReferenceBean ebrBean = (ExtensionByReferenceBean) LocalVersionedTerminology.get()
-                    .getExtensionWrapper(specPart.getMemberId());
+                ExtensionByReferenceBean ebrBean =
+                        (ExtensionByReferenceBean) LocalVersionedTerminology.get().getExtensionWrapper(
+                            specPart.getMemberId());
                 specPart.getMutableParts().removeAll(partsToRemove);
                 if (specPart.getMutableParts().size() == 0) {
                     ebrBean.discard();
@@ -315,10 +323,11 @@ public class RefsetSpecTreeMouseListener implements MouseListener {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-        	
-        	I_ThinExtByRefPart current = thinExtByRefTuple.getMutablePart();
-            I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) current.makeAnalog(current.getStatusId(), current.getPathId(), Long.MAX_VALUE);
-       
+
+            I_ThinExtByRefPart current = thinExtByRefTuple.getMutablePart();
+            I_ThinExtByRefPart newPart =
+                    (I_ThinExtByRefPart) current.makeAnalog(current.getStatusId(), current.getPathId(), Long.MAX_VALUE);
+
             thinExtByRefTuple.getCore().addVersion(newPart);
             LocalVersionedTerminology.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
