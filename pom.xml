@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
-        <version>2.30-SNAPSHOT</version>
+        <version>2.30</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
@@ -51,12 +51,12 @@
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>dwfa-mojo</artifactId>
-            <version>2.0.30-SNAPSHOT</version>
+            <version>2.0.30</version>
         </dependency>
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>vodb</artifactId>
-            <version>1.39-SNAPSHOT</version>
+            <version>1.39</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -113,15 +113,6 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.dwfa</groupId>
-                <artifactId>pbl-mojo</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <cubitProject>cubitci</cubitProject>
-                    <siteRoot>ace-mojo</siteRoot>
                 </configuration>
             </plugin>
         </plugins>
