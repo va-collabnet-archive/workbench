@@ -539,11 +539,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
                     OPTIONAL("optional (active status type)",
                              new I_ConceptualizeUniversally[] { ACTIVE }),
-                    DEVELOPMENTAL("optional (active status type)",
+                    DEVELOPMENTAL("developmental (active status type)",
                                      new I_ConceptualizeUniversally[] { ACTIVE }),
-                    EXPERIMENTAL("optional (active status type)",
+                    EXPERIMENTAL("experimental (active status type)",
                                              new I_ConceptualizeUniversally[] { ACTIVE }),
-                    FROM_SNOMED("optional (active status type)",
+                    FROM_SNOMED("from snomed (active status type)",
                                                      new I_ConceptualizeUniversally[] { ACTIVE }),
 
 
