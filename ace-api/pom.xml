@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
-        <version>2.30</version>
+        <version>2.31-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>core</artifactId>
-            <version>2.0.21</version>
+            <version>2.0.22-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-primitives</groupId>
@@ -101,14 +101,14 @@
         <dependency>
         	<groupId>au.csiro</groupId>
         	<artifactId>snorocket</artifactId>
-        	<version>1.1.12</version>
+        	<version>1.1.13-SNAPSHOT</version>
         	<type>jar</type>
         	<scope>compile</scope>
         </dependency>
         <dependency>
         	<groupId>au.csiro</groupId>
         	<artifactId>snorocket-bridge</artifactId>
-        	<version>1.1.12</version>
+        	<version>1.1.13-SNAPSHOT</version>
         	<type>jar</type>
         	<scope>compile</scope>
         </dependency>
