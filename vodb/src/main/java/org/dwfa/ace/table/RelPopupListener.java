@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
@@ -38,7 +37,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
@@ -87,7 +85,7 @@ public class RelPopupListener extends MouseAdapter {
                 AceLog.getAppLog().alertAndLogException(ex);
             } catch (TerminologyException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
-			}
+            }
         }
     }
 
@@ -99,13 +97,13 @@ public class RelPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             I_GetConceptData sourceBean;
-			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
-			} catch (TerminologyException e1) {
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				throw new RuntimeException(e1);
-			}
+            try {
+                sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+            } catch (TerminologyException e1) {
+                throw new RuntimeException(e1);
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
             I_RelTuple tuple = selectedObject.getTuple();
             ThinRelVersioned versioned = (ThinRelVersioned) tuple.getRelVersioned();
             versioned.getMutableParts().remove(tuple.getMutablePart());
@@ -133,7 +131,7 @@ public class RelPopupListener extends MouseAdapter {
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getMutablePart();
-                    if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
+                    if (newPart.getTime() != Long.MAX_VALUE) {
                         I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                         newPart =
                                 (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart.getPathId(),
@@ -141,7 +139,7 @@ public class RelPopupListener extends MouseAdapter {
                         srcRel.addVersion(newPart);
                     }
                     newPart.setPathId(p.getConceptId());
-                    newPart.setVersion(Integer.MAX_VALUE);
+
                     switch (field) {
                     case STATUS:
                         newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
@@ -163,10 +161,10 @@ public class RelPopupListener extends MouseAdapter {
                     }
 
                     model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(newPart
-                        .getCharacteristicId()));
-                    model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(newPart
-                        .getRefinabilityId()));
+                    model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(
+                        newPart.getCharacteristicId()));
+                    model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(
+                        newPart.getRefinabilityId()));
                     model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
 
                     I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
