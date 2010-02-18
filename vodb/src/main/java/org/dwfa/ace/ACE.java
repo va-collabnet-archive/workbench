@@ -179,6 +179,7 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
+import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -355,7 +356,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                     AceLog.getAppLog().alertAndLogException(e);
                                 } catch (TerminologyException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
-								}
+                                }
                             }
                             conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
                                 "Data Checks Linked");
@@ -769,7 +770,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	 *
 	 */
     public static void commit() {
-    	AceLog.getAppLog().info("commit(): " + commitInProgress);
+        AceLog.getAppLog().info("commit(): " + commitInProgress);
         if (commitInProgress) {
             AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
             return;
@@ -880,7 +881,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         throw new IOException(e);
                     } catch (Exception e) {
                         throw new IOException(e);
-					}
+                    }
                     if (writeChangeSets) {
                         for (I_WriteChangeSet writer : csWriters) {
                             AceLog.getEditLog().info("Committing writer: " + writer.toString());
@@ -1329,6 +1330,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JToggleButton showTreeButton;
 
     private JToggleButton showSubversionButton;
+
+    private static JButton synchronizeButton;
 
     private JToggleButton showQueuesButton;
 
@@ -2965,6 +2968,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     c.gridx++;
                     topPanel.add(pluginButton, c);
                     AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                    if (bp.getName().equals("Synchronize with Subversion")) {
+                        synchronizeButton = pluginButton;
+                        synchronizeButton.setEnabled(Svn.isConnectedToSvn());
+                    }
                 } else {
                     JButton pluginButton = new JButton(bp.getName());
                     pluginButton.setToolTipText(bp.getSubject());
@@ -2972,6 +2979,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     c.gridx++;
                     topPanel.add(pluginButton, c);
                     AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                    if (bp.getName().equals("Synchronize with Subversion")) {
+                        synchronizeButton = pluginButton;
+                        synchronizeButton.setEnabled(Svn.isConnectedToSvn());
+                    }
                 }
             }
         }
@@ -3760,11 +3771,17 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetSpecPanel.setShowPromotionCheckBoxes(show);
     }
 
-	public JTabbedPane getLeftTabs() {
-		return leftTabs;
-	}
+    public JTabbedPane getLeftTabs() {
+        return leftTabs;
+    }
 
-	public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
-		return dataCheckListeners;
-	}
+    public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
+        return dataCheckListeners;
+    }
+
+    public static void setSynchronizeButtonIsEnabled(boolean enabled) {
+        if (synchronizeButton != null) {
+            synchronizeButton.setEnabled(enabled);
+        }
+    }
 }

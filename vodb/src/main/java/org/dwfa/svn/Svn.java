@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
@@ -883,5 +884,6 @@ public class Svn implements I_HandleSubversion {
 
     public static void setConnectedToSvn(boolean connectedToSvn) {
         Svn.connectedToSvn = connectedToSvn;
+        ACE.setSynchronizeButtonIsEnabled(connectedToSvn);
     }
 }
