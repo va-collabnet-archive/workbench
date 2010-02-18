@@ -33,6 +33,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class NewClassifier extends AbstractTask {
     /**

@@ -34,6 +34,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /**
  * 
  * SnoPathProcess object is passed to TermFactory.iterateConcepts() to retrieve

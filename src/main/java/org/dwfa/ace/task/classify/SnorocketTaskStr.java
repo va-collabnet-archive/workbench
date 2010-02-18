@@ -58,6 +58,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /**
  * 
  * SnorocketTask retrieves concepts and relationship from the stated edit path

@@ -37,6 +37,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /**
  * @author Ming Zhang
  * 

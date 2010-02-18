@@ -37,6 +37,8 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 class ClassifierUtil {
 
     final private Logger logger;

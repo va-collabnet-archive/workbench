@@ -33,6 +33,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /**
  * Returns a new classifier extension instance keyed off filename.
  * 

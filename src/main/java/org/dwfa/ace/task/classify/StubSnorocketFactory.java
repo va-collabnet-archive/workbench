@@ -19,6 +19,8 @@ package org.dwfa.ace.task.classify;
 import java.io.IOException;
 import java.io.InputStream;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /* !!! OBSOLETE */
 public class StubSnorocketFactory implements I_SnorocketFactory {
 
