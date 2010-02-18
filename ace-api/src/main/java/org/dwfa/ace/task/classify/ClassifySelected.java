@@ -31,7 +31,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.classify.I_SnorocketFactory.I_Callback;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -44,6 +43,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+import au.csiro.snorocket.ace.I_SnorocketFactory.I_Callback;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class ClassifySelected extends AbstractTask {

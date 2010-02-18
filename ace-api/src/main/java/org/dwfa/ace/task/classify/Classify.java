@@ -51,6 +51,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.id.Type3UuidFactory;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /*
  * EKM - Use LoadClassifyWrite instead
  * <br>

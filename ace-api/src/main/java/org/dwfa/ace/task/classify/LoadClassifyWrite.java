@@ -48,6 +48,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+import au.csiro.snorocket.ace.I_SnorocketFactory;
+
 /**
  * This class is an experiment to improve load, classify, and write performance
  * over what is provided in FasterLoad, which loads quickly, but has horrible
