@@ -26,15 +26,20 @@
         </site>
         <snapshotRepository>
             <id>archiva04.snapshots</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.snapshots/</url>
             <name>Archiva04 Snapshots Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.snapshots</url>
         </snapshotRepository>
         <repository>
             <id>archiva04.releases</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.releases/</url>
             <name>Archiva04 Releases Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
         </repository>
     </distributionManagement>
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
+    </scm>
     <issueManagement>
         <system>Tracker</system>
         <url>https://csfe.aceworkspace.net/sf/tracker/do/listTrackers/projects.dwfa/tracker</url>
@@ -110,11 +115,6 @@
             <properties />
         </developer>
     </developers>
-    <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-pom/trunk/dev</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/dwfa-pom/trunk/dev</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
-    </scm>
     <repositories>
         <repository>
             <id>archiva04.snapshots</id>
@@ -332,6 +332,23 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+		  	</plugin>
+			<plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-release-plugin</artifactId>
+                 <version>2.0-beta-9</version>
+                 <configuration>
+                     <tagBase>${scm.tagbase}</tagBase>
+                     <preparationGoals>clean validate</preparationGoals>
+                     <goals>deploy</goals>
+                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                     <remoteTagging>true</remoteTagging>
+                 </configuration>
+             </plugin>
         </plugins>
     </build>
     <reporting>
