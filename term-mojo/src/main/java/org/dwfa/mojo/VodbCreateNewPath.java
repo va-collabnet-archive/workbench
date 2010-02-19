@@ -197,15 +197,18 @@ public class VodbCreateNewPath extends AbstractMojo {
         UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
             + ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids() + pathFsDesc);
 
+        I_GetConceptData descTypeConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        
         I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
-            ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize(), activeConfig);
+        		descTypeConcept, activeConfig);
+        getLog().error("VodbCreateNewPath.createNewPathConcept should be adding a desc of "+pathFsDesc);
         newTuples.addAll(idv.getTuples());
 
         UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
             + ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + pathPrefDesc);
 
         I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), activeConfig);
+        		descTypeConcept, activeConfig);
         newTuples.addAll(idvpt.getTuples());
 
         UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString() + fsDescUuid
