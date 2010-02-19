@@ -22,6 +22,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.maven.MojoUtil;
 
 /**
@@ -86,7 +87,7 @@ public class GenerateBerkeleyVodbFromDir extends AbstractMojo {
                 if (MojoUtil.alreadyRun(getLog(), dataDirectory.getCanonicalPath(), this.getClass(), targetDirectory)) {
                     return;
                 }
-                LocalVersionedTerminology.get().loadFromDirectory(dataDirectory, fileEncoding);
+                Terms.get().loadFromDirectory(dataDirectory, fileEncoding);
             } catch (Exception ex) {
                 throw new MojoExecutionException("Error processing dependency. Reason: " + ex.getMessage(), ex);
             }
