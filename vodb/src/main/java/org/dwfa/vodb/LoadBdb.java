@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.edit.AddImage;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
@@ -51,12 +51,12 @@ public class LoadBdb {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
-        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
+        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) Terms.get());
         AceLog.getAppLog().info("Starting to process " + dataDir);
         loadConstants.executeFromDir(dataDir, encoding);
-        Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+        Path.writeBasePaths((VodbEnv) Terms.get());
         try {
-            AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
+            AddImage.addStockImages((VodbEnv) Terms.get());
         } catch (NoMappingException e) {
             AceLog.getAppLog().info(e.getLocalizedMessage());
         }
@@ -64,10 +64,10 @@ public class LoadBdb {
         printElapsedTime();
         // Update the history records for the relationships...
         AceLog.getAppLog().info("Starting populateTimeBranchDb()");
-        ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
+        ((VodbEnv) Terms.get()).populatePositions();
         printElapsedTime();
         AceLog.getAppLog().info("Starting createLuceneDescriptionIndex()");
-        ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
+        ((VodbEnv) Terms.get()).createLuceneDescriptionIndex();
         printElapsedTime();
     }
 
@@ -75,12 +75,12 @@ public class LoadBdb {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
-        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
+        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) Terms.get());
         AceLog.getAppLog().info("Starting to process " + jarFile + ": " + dataPrefix);
         loadConstants.execute(new File(jarFile), dataPrefix, FORMAT.ACE);
-        Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
+        Path.writeBasePaths((VodbEnv) Terms.get());
         try {
-            AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
+            AddImage.addStockImages((VodbEnv) Terms.get());
         } catch (NoMappingException e) {
             AceLog.getAppLog().info(e.getLocalizedMessage());
         }
@@ -88,14 +88,14 @@ public class LoadBdb {
         printElapsedTime();
         AceLog.getAppLog().info("Starting populateTimeBranchDb()");
         // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
-        ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
+        ((VodbEnv) Terms.get()).populatePositions();
         printElapsedTime();
         // AceConfig.monitor.setProgressInfoUpper("Starting
         // makeLuceneIndex().");
-        ((VodbEnv) LocalVersionedTerminology.get()).createLuceneDescriptionIndex();
+        ((VodbEnv) Terms.get()).createLuceneDescriptionIndex();
         // AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
         printElapsedTime();
-        // ((VodbEnv) LocalVersionedTerminology.get()).close();
+        // ((VodbEnv) Terms.get()).close();
         // printElapsedTime();
     }
 
@@ -103,7 +103,7 @@ public class LoadBdb {
         ProcessAceFormatSourcesBerkeley loadConstants = null;
         timer = new Stopwatch();
         timer.start();
-        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) LocalVersionedTerminology.get());
+        loadConstants = new ProcessAceFormatSourcesBerkeley((VodbEnv) Terms.get());
         AceLog.getAppLog().info("Starting to process AceAuxillary: " + Arrays.asList(args));
 
         Set<String> argSet = new HashSet<String>(Arrays.asList(args));
@@ -121,11 +121,11 @@ public class LoadBdb {
         argSet.remove(processed);
         AceLog.getAppLog().info("Finished loading constants. Elapsed time: " + timer.getElapsedTime());
         loadConstants.flushIdBuffer();
-        Path.writeBasePaths((VodbEnv) LocalVersionedTerminology.get());
-        AddImage.addStockImages((VodbEnv) LocalVersionedTerminology.get());
+        Path.writeBasePaths((VodbEnv) Terms.get());
+        AddImage.addStockImages((VodbEnv) Terms.get());
         I_IntSet releaseDates = loadConstants.getReleaseDates();
         for (String arg : argSet) {
-            ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley((VodbEnv) LocalVersionedTerminology.get(),
+            ProcessSnomedBerkeley loadSnomed = new ProcessSnomedBerkeley((VodbEnv) Terms.get(),
                 releaseDates.getSetValues()[0]);
             AceLog.getAppLog().info("(1) Starting to process SNOMED: " + arg);
             loadSnomed.execute(new JarFile(arg));
