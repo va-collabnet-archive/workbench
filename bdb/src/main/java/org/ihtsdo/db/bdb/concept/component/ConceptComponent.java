@@ -460,12 +460,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>,
 	public Concept enclosingConcept;
 
 	/**
-	 * priámorádiáal:  first created or developed
+	 * primordial:  first created or developed
 	 * Sap = Status At Position
 	 */
 	public int primordialSapNid = Integer.MAX_VALUE;
 	/**
-	 * priámorádiáal:  first created or developed
+	 * primordial:  first created or developed
 	 * 
 	 */
 	public int primordialUNid = Integer.MIN_VALUE;
