@@ -1537,13 +1537,13 @@ public class Sct2AceMojo extends AbstractMojo {
         // :NYI: (Maybe) Additional checks if last directory branch is a date
         // @@@ (Maybe just use the directory branch for UUID)
         if (f.getAbsolutePath().contains(SPANISH_FILE_PATH)) {
-            // SNOMED_CORE Path UUID
-            puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString();
-            getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
-        } if (f.getAbsolutePath().contains(SNOMED_FILE_PATH)) {
-            // SNOMED_CORE Path UUID
-            puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString();
-            getLog().info("  PATH UUID: " + "SNOMED_CORE " + puuid);
+            // SNOMED_LANGUAGE_ES_PATH Path UUID
+            puuid = ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_ES_PATH.getUids().iterator().next().toString();
+            getLog().info("  PATH UUID: " + "SNOMED_LANGUAGE_ES_PATH " + puuid);
+        } if (f.getAbsolutePath().contains(SWEDISH_FILE_PATH)) {
+            // SNOMED_LANGUAGE_ES_PATH
+            puuid = ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_SE_PATH.getUids().iterator().next().toString();
+            getLog().info("  PATH UUID: " + "SNOMED_LANGUAGE_SE_PATH " + puuid);
         } if (f.getAbsolutePath().contains(SNOMED_FILE_PATH)) {
             // SNOMED_CORE Path UUID
             puuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator().next().toString();
