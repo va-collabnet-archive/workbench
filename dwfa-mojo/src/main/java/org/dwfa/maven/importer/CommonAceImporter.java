@@ -307,7 +307,7 @@ public class CommonAceImporter extends AbstractMojo {
 		Writer bw = null;
 		if (writerStore.get(key) == null) {
 			try {
-				bw = new BufferedWriter(new FileWriter(new File(targetDir, key)));
+				bw = new BufferedWriter(new FileWriter(new File(targetDir, key),true));
 				writerStore.put(key, bw);
 				getLog().error("getWriter Creating Writer using "+key +" Current writerStore size = "+writerStore.size());
 			} catch (IOException e) {
