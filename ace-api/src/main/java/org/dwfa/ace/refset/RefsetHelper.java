@@ -495,9 +495,9 @@ public class RefsetHelper extends LineageHelper {
         
         I_GetConceptData newRefsetConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
         termFactory.newDescription(
-            UUID.randomUUID(), newRefsetConcept, "en", description.concat(" (refset)"), fullySpecifiedName, config);
+            UUID.randomUUID(), newRefsetConcept, "en-AU", description.concat(" (refset)"), fullySpecifiedName, config);
         termFactory.newDescription(
-            UUID.randomUUID(), newRefsetConcept, "en", description, preferredTerm, config);
+            UUID.randomUUID(), newRefsetConcept, "en-AU", description, preferredTerm, config);
         termFactory.newRelationship(
             UUID.randomUUID(), newRefsetConcept, isARel, refsetIdentity, 
             definingCharacteristic, optionalRefinability, currentStatus, 0, config);
