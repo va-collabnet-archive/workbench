@@ -17,12 +17,19 @@
 package org.dwfa.mojo.epicexport;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.mojo.epicexport.kp.EpicSoftDeleteWriter;
+import org.dwfa.mojo.epicexport.kp.RegionalHibernationBuilder;
 
 /**
  * Class used to store values to be written to a load file, and write to that
@@ -133,6 +140,31 @@ public class EpicExportWriter implements I_EpicExportRecordWriter {
         if (this.filename != null)
             ret = ret.concat(" to " + this.filename);
         return ret;
+    }
+
+    public static void writeSoftDeleteFile(EpicExportManager em, String writerName, 
+    		String cid, String masterfile) throws IOException {
+    	I_EpicExportRecordWriter w;
+    	HashMap<String, I_EpicExportRecordWriter> writers = em.getWriters();
+    	if ((w = writers.get(writerName)) == null) {
+            StringBuffer filename = new StringBuffer(em.getBaseDir());
+            filename.append(writerName);
+            filename.append(".txt");
+            System.out.println("Creating " + filename.toString());
+            File fw = new File(filename.toString());
+            fw.mkdirs();
+            if (fw.exists())
+                fw.delete();
+
+        	BufferedWriter bw = new BufferedWriter(new FileWriter(fw));
+        	w = new EpicSoftDeleteWriter(bw, writerName);
+        	AceLog.getAppLog().info("Creating " + filename);
+        	em.getWriters().put(writerName, w);
+    	}
+    	w.newRecord();
+    	w.addItemValue("11", cid);
+    	w.addItemValue("ini", masterfile.toUpperCase().substring(0, 3));
+    	w.saveRecord();
     }
 
     private class EpicItem {

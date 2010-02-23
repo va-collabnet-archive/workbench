@@ -26,6 +26,7 @@ import org.dwfa.tapi.TerminologyException;
  *
  */
 public class ExternalTermRecord {
+	public static enum status {CURRENT, RETIRED, LIMITED};
 	private static int nidVersion = Integer.MAX_VALUE;
 	private static int nidRetired = Integer.MIN_VALUE;
 	private static int nidCurrent = Integer.MIN_VALUE;
@@ -37,6 +38,8 @@ public class ExternalTermRecord {
 	private I_GetConceptData owningConcept;
 	private I_GetConceptData rootConcept;
 	private I_ExportFactory creatingFactory;
+	private ExternalTermRecord.status termStatus;
+	private ExternalTermRecord.status previousStatus;
 	
 	public ExternalTermRecord(String name) {
 		this.setMasterFileName(name);
@@ -247,6 +250,22 @@ public class ExternalTermRecord {
 		return ret;
 	}
 	
+	public ExternalTermRecord.status getTermStatus() {
+		return termStatus;
+	}
+
+	public void setTermStatus(ExternalTermRecord.status termStatus) {
+		this.termStatus = termStatus;
+	}
+
+	public ExternalTermRecord.status getPreviousStatus() {
+		return previousStatus;
+	}
+
+	public void setPreviousStatus(ExternalTermRecord.status previousStatus) {
+		this.previousStatus = previousStatus;
+	}
+
 	public String toString() {
 		StringBuffer ret = new StringBuffer("external record: masterfile=");
 		ret.append(this.masterFileName);
@@ -385,7 +404,6 @@ public class ExternalTermRecord {
 		public void setPreviousValue(Object previousValue) {
 			this.previousValue = previousValue;
 		}
-		
 		
 		public I_ThinExtByRefTuple getExtensionTuple() {
 			return sourceExtensionTuple;

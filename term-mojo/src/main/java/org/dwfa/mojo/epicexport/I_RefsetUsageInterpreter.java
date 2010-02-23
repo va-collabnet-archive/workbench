@@ -32,6 +32,14 @@ import org.dwfa.tapi.TerminologyException;
  */
 public interface I_RefsetUsageInterpreter {
 
+	/**
+	 * This method is called from ExternalTermPublisher when an extension (refset) is encountered.  This
+	 * method should return a list of refset applications, which is a class the describes which
+	 * master file, which item, and optionally any regions or localities the refset is used for.
+	 * 
+	 * @param refsetName - The name of the refset (or extension).
+	 * @return List<I_RefsetApplication>, a list of applications for the refset.
+	 */
 	public List<I_RefsetApplication> getApplications(String refsetName);
 	
 	public I_GetConceptData getRefsetForItem(String masterfile, String item) throws TerminologyException;

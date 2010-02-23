@@ -68,11 +68,14 @@ public class RefsetUsageInterpreter implements I_RefsetUsageInterpreter{
     		applications.add(new RefsetApplication(
     				EpicLoadFileFactory.EPIC_MASTERFILE_NAME_WILDCARD, "300002"));
     	}
+		//TODO: Remove the startsWith("susan") when not needed
     	else if (refsetName.equals("ICD10-CM Code Mapping Status") ||
     			refsetName.equals("ICD9-CM Code Mapping") ||
     			refsetName.equals("Path reference set") || 
     			refsetName.equals("Refset Auxiliary Concept") ||
-    			refsetName.equals("Path origin reference set")) {
+    			refsetName.equals("Path origin reference set") ||
+    			refsetName.startsWith("susan")
+    			) {
     		// Ignore
     	}
     		
