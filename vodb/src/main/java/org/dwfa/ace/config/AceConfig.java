@@ -61,7 +61,14 @@ import com.sleepycat.je.DatabaseException;
 
 public class AceConfig implements I_ConfigAceDb, Serializable {
 
-    private static File dbFolderOverride = null;
+    private static File dbFolderOverride;
+    
+    static {
+        String property = System.getProperty("db.folder.override"); 
+        if (property != null) {
+            dbFolderOverride = new File(property);
+        }
+    }
 
     public static AceConfig config;
 
