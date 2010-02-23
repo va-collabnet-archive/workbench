@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -105,7 +106,7 @@ public class ConceptTupleFileUtil {
                 return false;
             }
 
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = Terms.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
 
@@ -147,14 +148,10 @@ public class ConceptTupleFileUtil {
                 boolean returnConflictResolvedLatestState = true;
 
                 // check if the part exists
-                List<? extends I_ConceptAttributeTuple> parts = concept.getConceptAttributeTuples(allowedStatus, null,
-                    addUncommitted, returnConflictResolvedLatestState);
-                /*
-                 * List<I_ConceptAttributeTuple> parts =
-                 * concept.getConceptAttributeTuples(allowedStatus, positions,
-                 * addUncommitted,
-                 * returnConflictResolvedLatestState);
-                 */
+                List<? extends I_ConceptAttributeTuple> parts =
+                        concept.getConceptAttributeTuples(allowedStatus, null, addUncommitted,
+                            returnConflictResolvedLatestState);
+
                 I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {
                     if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -165,15 +162,18 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(), Long.MAX_VALUE);
+                    I_ConceptAttributePart newPart =
+                            (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
+                                termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(),
+                                Long.MAX_VALUE);
                     newPart.setDefined(isDefined);
                     latestTuple.getConVersioned().addVersion(newPart);
                     termFactory.addUncommittedNoChecks(concept);
                 }
             } else {
                 // need to create concept + part
-                I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, isDefined,
-                    termFactory.getActiveAceFrameConfig());
+                I_GetConceptData newConcept =
+                        termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
                 I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
 
                 lastConcept = newConcept;
@@ -182,14 +182,16 @@ public class ConceptTupleFileUtil {
                 int index = v.getMutableParts().size() - 1;
                 I_ConceptAttributePart part;
                 if (index >= 0) {
-                    part = (I_ConceptAttributePart) v.getMutableParts().get(index);
-                    part.setVersion(effectiveDate);
+                    part =
+                            (I_ConceptAttributePart) v.getMutableParts().get(index).makeAnalog(
+                                termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(),
+                                IDTupleFileUtil.convert(effectiveDate));
                 } else {
                     part = termFactory.newConceptAttributePart();
-                    part.setStatusId(termFactory.getId(statusUuid).getNid());
-                    part.setDefined(isDefined);
-                    part.setVersion(Integer.MAX_VALUE);
+                    part.setVersion(effectiveDate);
                 }
+                part.setStatusId(termFactory.getId(statusUuid).getNid());
+                part.setDefined(isDefined);
                 part.setPathId(termFactory.getId(pathUuid).getNid());
                 v.addVersion(part);
                 termFactory.addUncommittedNoChecks(newConcept);
@@ -197,8 +199,8 @@ public class ConceptTupleFileUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing concept tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing concept tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

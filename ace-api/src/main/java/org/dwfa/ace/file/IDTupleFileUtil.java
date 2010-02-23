@@ -24,7 +24,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -40,7 +40,7 @@ public class IDTupleFileUtil {
             }
         }
 
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
 
         UUID tupleUuid = ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next();
         UUID primaryUuid = termFactory.getUids(iIdVersioned.getNid()).iterator().next();
@@ -61,7 +61,7 @@ public class IDTupleFileUtil {
 
         try {
 
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = Terms.get();
             String[] lineParts = inputLine.split("\t");
 
             UUID primaryUuid = UUID.fromString(lineParts[1]);
@@ -98,31 +98,30 @@ public class IDTupleFileUtil {
 
             if (!termFactory.hasId(primaryUuid)) {
                 termFactory.uuidToNativeWithGeneration(primaryUuid, termFactory.getId(
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
-                    termFactory.getPath(new UUID[] { pathUuid }), effectiveDate);
-
-                I_Identify versioned = termFactory.getId(primaryUuid);
-                I_IdPart part = versioned.getMutableIdParts().get(0).duplicateIdPart();
-                part.setStatusId(termFactory.uuidToNative(statusUuid));
-                part.setPathId(termFactory.uuidToNative(pathUuid));
-                part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
-                part.setVersion(effectiveDate);
-                if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
-                    part.setDenotation(UUID.fromString(sourceId));
-                } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
-                    .iterator()
-                    .next())) {
-                    part.setDenotation(new Long(sourceId));
-                } else {
-                    part.setDenotation(sourceId); // use string
-                }
-
-                if (!versioned.hasMutableIdPart(part)) {
-                    versioned.addMutableIdPart(part);
-                    termFactory.writeId(versioned);
-                }
+                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(), termFactory
+                    .getPath(new UUID[] { pathUuid }), effectiveDate);
             }
 
+            I_Identify versioned = termFactory.getId(primaryUuid);
+            I_IdPart part =
+                    versioned.getMutableIdParts().get(0).makeIdAnalog(termFactory.uuidToNative(statusUuid),
+                        termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+
+            part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
+            if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
+                part.setDenotation(UUID.fromString(sourceId));
+            } else if (sourceSystemUuid
+                .equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())) {
+                part.setDenotation(new Long(sourceId));
+            } else {
+                part.setDenotation(sourceId); // use string
+            }
+
+            if (!versioned.hasMutableIdPart(part)) {
+                versioned.addMutableIdPart(part);
+            }
+
+            termFactory.writeId(versioned);
         } catch (Exception e) {
             e.printStackTrace();
             String errorMessage = "Exception while importing ID tuple : " + e.getLocalizedMessage();
@@ -140,9 +139,26 @@ public class IDTupleFileUtil {
     }
 
     public static void generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        termFactory.uuidToNativeWithGeneration(uuidToGenerate, termFactory.getId(
-            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
-            termFactory.getPath(new UUID[] { pathUuid }), Integer.MAX_VALUE);
+        Terms.get().uuidToNativeWithGeneration(uuidToGenerate,
+            Terms.get().getId(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids()).getNid(),
+            Terms.get().getPath(new UUID[] { pathUuid }), Integer.MAX_VALUE);
+    }
+
+    /**
+     * Adapted from ThinVersionHelper in VODB - not accessible in ace-api.
+     * 
+     * @param version
+     * @return
+     */
+    public static long convert(int version) {
+        int timeZeroInt = 1830407753;
+        if (version == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        if (version == Integer.MIN_VALUE) {
+            return Long.MIN_VALUE;
+        }
+        long added = timeZeroInt + version;
+        return added * 1000;
     }
 }
