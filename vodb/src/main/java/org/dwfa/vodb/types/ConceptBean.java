@@ -962,13 +962,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
             for (int nid : typePrefOrder.getListArray()) {
                 typeSet.add(nid);
             }
+            List<I_DescriptionTuple> descriptionTuples = getDescriptionTuples(allowedStatus, typeSet, positionSet, true, true);
             switch (sortPref) {
             case LANG_B4_TYPE:
-                return getLangPreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, true, true),
-                    typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+                return getLangPreferredDesc(descriptionTuples, typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet, sortPref);
             case TYPE_B4_LANG:
-                return getTypePreferredDesc(getDescriptionTuples(allowedStatus, typeSet, positionSet, true, true),
-                    typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet);
+                return getTypePreferredDesc(descriptionTuples, typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet, sortPref);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
             }
@@ -979,7 +978,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     private I_DescriptionTuple getTypePreferredDesc(Collection<I_DescriptionTuple> descriptions,
             I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, Set<I_Position> positionSet,
-            I_IntSet typeSet) throws IOException, ToIoException {
+            I_IntSet typeSet, LANGUAGE_SORT_PREF sortPref) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
                 List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
@@ -996,8 +995,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                         if (matchedList.size() == 1) {
                             return matchedList.get(0);
                         }
-                        return getLangPreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
-                            positionSet, typeSet);
+                        if (LANGUAGE_SORT_PREF.TYPE_B4_LANG.equals(sortPref)) {
+                            return getLangPreferredDesc(
+                                matchedList, typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet, sortPref);
+                        } else {
+                            return matchedList.get(0); 
+                        }
                     }
                 }
                 return descriptions.iterator().next();
@@ -1010,7 +1013,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     private I_DescriptionTuple getLangPreferredDesc(Collection<I_DescriptionTuple> descriptions,
             I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus, Set<I_Position> positionSet,
-            I_IntSet typeSet) throws IOException, ToIoException {
+            I_IntSet typeSet, LANGUAGE_SORT_PREF sortPref) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
                 List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
@@ -1018,9 +1021,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                     for (int langId : langPrefOrder.getListValues()) {
                         for (I_DescriptionTuple d : descriptions) {
                             try {
-                                int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang())
-                                    .localize()
-                                    .getNid();
+                                int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
                                 if (tupleLangId == langId) {
                                     matchedList.add(d);
                                     if (matchedList.size() == 2) {
@@ -1035,8 +1036,12 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                             if (matchedList.size() == 1) {
                                 return matchedList.get(0);
                             }
-                            return getTypePreferredDesc(matchedList, typePrefOrder, langPrefOrder, allowedStatus,
-                                positionSet, typeSet);
+                            if (LANGUAGE_SORT_PREF.LANG_B4_TYPE.equals(sortPref)) {
+                                return getTypePreferredDesc(
+                                    matchedList, typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet, sortPref);
+                            } else {
+                                return matchedList.get(0);
+                            }
                         }
                     }
                 }
