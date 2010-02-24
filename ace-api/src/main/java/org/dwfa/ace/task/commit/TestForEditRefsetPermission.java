@@ -185,36 +185,4 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
 
         return refsets;
     }
-
-    /**
-     * Gets the latest specified relationship's target.
-     * 
-     * @param relationshipType
-     * @return
-     * @throws Exception
-     */
-    public I_GetConceptData getLatestRelationshipTarget(I_GetConceptData concept, I_GetConceptData relationshipType)
-            throws Exception {
-
-        I_GetConceptData latestTarget = null;
-        int latestVersion = Integer.MIN_VALUE;
-
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
-
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
-        PositionSetReadOnly allPositions = getPositions(termFactory);
-        I_IntSet activeStatuses = getActiveStatus(termFactory);
-
-        List<? extends I_RelTuple> relationships =
-                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
-        for (I_RelTuple rel : relationships) {
-            if (rel.getVersion() > latestVersion) {
-                latestVersion = rel.getVersion();
-                latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC2Id());
-            }
-        }
-
-        return latestTarget;
-    }
 }
