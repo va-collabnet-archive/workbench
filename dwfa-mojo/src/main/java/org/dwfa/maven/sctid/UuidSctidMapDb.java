@@ -288,6 +288,43 @@ public class UuidSctidMapDb {
     }
 
     /**
+     * Updated the DB using a rf2 id file
+     *
+     * @param rf2IdFile File rf2 ids
+     * @throws SQLException DB error
+     * @throws IOException File error
+     */
+    public void updateDbFromAceIdFile(File rf2IdFile) throws SQLException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(rf2IdFile));
+        int insertCount = 0;
+
+        try {
+            br.readLine();
+            String lineStr;
+            while ((lineStr = br.readLine()) != null) {
+                String[] columns = lineStr.split("\t");
+                UUID uuid = UUID.fromString(columns[0]);
+
+                Long sctId;
+                try{
+                    sctId = Long.parseLong(columns[2]);
+                } catch (NumberFormatException nfe) {
+                    continue;
+                }
+
+                if (!validate || validateFileUuid(uuid, sctId, rf2IdFile)) {
+                    addUUIDSctIdEntry(uuid, sctId, false);
+                    insertCount++;
+                    commitBatch(insertCount);
+                }
+            }
+        } finally {
+            br.close();
+            conn.commit();
+        }
+    }
+
+    /**
      * Creates a new DB from a UUID sctId map file.
      *
      * @param mapFile mapping flat file.
