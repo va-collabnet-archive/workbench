@@ -58,6 +58,13 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
      *
      * @parameter
      */
+    File[] aceIdFiles;
+
+    /**
+     * rf2 id file
+     *
+     * @parameter
+     */
     File[] rf2IdFiles;
 
     /**
@@ -83,6 +90,10 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
             if (rf2IdFiles != null) {
                 for (File rf2IdFile : rf2IdFiles) {
                     UuidSctidMapDb.getInstance().updateDbFromRf2IdFile(rf2IdFile);
+                }
+            } else if (aceIdFiles != null) {
+                for (File rf2IdFile : aceIdFiles) {
+                    UuidSctidMapDb.getInstance().updateDbFromAceIdFile(rf2IdFile);
                 }
             }
         } catch (SQLException e) {
