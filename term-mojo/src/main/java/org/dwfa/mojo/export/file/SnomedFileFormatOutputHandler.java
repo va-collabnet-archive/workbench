@@ -9,12 +9,14 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.dwfa.dto.ComponentDto;
+import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.ExtensionDto;
 import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.sctid.UuidSnomedHandler;
+import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.export.ExportOutputHandler;
 
 public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandler {
@@ -134,12 +136,6 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 if (relationshipDto.getRelationshipGroupCode() == null) {
                     validationErrorList.add(relationshipDto.getConceptId() + " No group code");
                 }
-                if (relationshipDto.getRelationshipGroupId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No group id");
-                }
-                if (relationshipDto.getRelationshipId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No relationship id");
-                }
                 if (relationshipDto.getSourceId() == null) {
                     validationErrorList.add(relationshipDto.getConceptId() + " No source id");
                 }
@@ -197,27 +193,27 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * Validate the concept details (concept, description, relationship or extension)
      *
      * @param validationErrorList List of String
-     * @param conceptDto ConceptDto
+     * @param concept ConceptDto
      */
-    private void validateConceptDto(List<String> validationErrorList, ConceptDto conceptDto) {
-        if (conceptDto != null) {
-            if (conceptDto.getConceptId() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No concept id");
+    private void validateConceptDto(List<String> validationErrorList, Concept concept) {
+        if (concept != null) {
+            if (concept.getConceptId() == null) {
+                validationErrorList.add(concept.getConceptId() + " No concept id");
             }
-            if (conceptDto.getDateTime() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No concept date");
+            if (concept.getDateTime() == null) {
+                validationErrorList.add(concept.getConceptId() + " No concept date");
             }
-            if (conceptDto.getPathId() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No concept path");
+            if (concept.getPathId() == null) {
+                validationErrorList.add(concept.getConceptId() + " No concept path");
             }
-            if (conceptDto.getStatus() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No concept status");
+            if (concept.getStatusId() == null) {
+                validationErrorList.add(concept.getConceptId() + " No concept status");
             }
-            if (conceptDto.getType() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No concept type");
+            if (concept.getType() == null) {
+                validationErrorList.add(concept.getConceptId() + " No concept type");
             }
-            if (conceptDto.getNamespace() == null) {
-                validationErrorList.add(conceptDto.getConceptId() + " No name space");
+            if (concept.getNamespace() == null) {
+                validationErrorList.add(concept.getConceptId() + " No name space");
             }
         }
     }
@@ -228,39 +224,53 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @return Long SCTID
      * @throws Exception if cannot get an SCT id
      */
-    protected Long getSctId(ConceptDto conceptDto) throws Exception {
-        return getSctId(conceptDto, conceptDto.getConceptId());
+    protected Long getSctId(Concept concept) throws Exception {
+        return getSctId(concept, concept.getConceptId());
     }
 
     /**
      * Gets a new or retrieves the current mapping SCT id for a UUID based on
      * the ConceptDto name space and type.
      *
-     * @param conceptDto ConceptDto
+     * @param concept Concept
      * @param uuid UUID
      * @return Long SCTID
      * @throws Exception if cannot get an SCTID
      */
-    protected Long getSctId(ConceptDto conceptDto, UUID uuid) throws Exception {
-        return snomedIdHandler.getWithGeneration(uuid, conceptDto.getNamespace(), conceptDto.getType());
+    protected Long getSctId(Concept concept, UUID uuid) throws Exception {
+        return getSctId(concept, uuid, concept.getType());
+    }
+
+    /**
+     * Gets a new or retrieves the current mapping SCT id for a UUID based on
+     * the ConceptDto name space and type.
+     *
+     * @param concept Concept
+     * @param uuid UUID
+     * @param type TYPE sct id type
+     * @return Long SCTID
+     * @throws Exception if cannot get an SCTID
+     */
+    protected Long getSctId(Concept concept, UUID uuid, TYPE type) throws Exception {
+        return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
     }
 
     /**
      * The component release path/module
      *
-     * @param conceptDto ConceptDto
+     * @param concept Concept
      * @return Long SCTID
      * @throws Exception if cannot get an SCTID
      */
-    protected Long getModuleId(ConceptDto conceptDto) throws Exception {
-        return snomedIdHandler.getWithGeneration(conceptDto.getPathId(), conceptDto.getNamespace(), conceptDto.getType());
+    protected Long getModuleId(Concept concept) throws Exception {
+        return snomedIdHandler.getWithGeneration(concept.getPathId(), concept.getNamespace(), TYPE.CONCEPT);
     }
 
     /**
      * The release date for the component.
      *
-     * @param componentDto ComponentDto
+     * @param Concept concept
      * @return Date
      */
-    abstract String getReleaseDate(ConceptDto conceptDto);
+    abstract String getReleaseDate(Concept concept);
 }

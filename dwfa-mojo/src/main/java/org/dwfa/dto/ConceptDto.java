@@ -16,32 +16,28 @@
  */
 package org.dwfa.dto;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 /**
  * Concept details for exporting.
  */
-public class ConceptDto {
+public class ConceptDto extends BaseConceptDto implements Concept {
     private UUID conceptId;
-    private UUID pathId;
-    private UUID status;
-    private Date dateTime;
     private String fullySpecifiedName;
     private String ctv3Id;
     private String snomedId;
-    private boolean isActive;
     private boolean isPrimative;
-    private NAMESPACE namespace;
-    private TYPE type;
+    private List<IdentifierDto> identifierDtos;
 
     /**
      * Bean constructor.
      */
     public ConceptDto() {
-
+        identifierDtos = new ArrayList<IdentifierDto>();
     }
 
     /**
@@ -56,48 +52,6 @@ public class ConceptDto {
      */
     public void setConceptId(UUID conceptId) {
         this.conceptId = conceptId;
-    }
-
-    /**
-     * @return the pathId
-     */
-    public UUID getPathId() {
-        return pathId;
-    }
-
-    /**
-     * @param pathId the pathId to set
-     */
-    public void setPathId(UUID pathId) {
-        this.pathId = pathId;
-    }
-
-    /**
-     * @return the status
-     */
-    public UUID getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatusId(UUID status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the dateTime
-     */
-    public Date getDateTime() {
-        return dateTime;
-    }
-
-    /**
-     * @param dateTime the dateTime to set
-     */
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
     }
 
     /**
@@ -143,20 +97,6 @@ public class ConceptDto {
     }
 
     /**
-     * @return the isActive
-     */
-    public boolean isActive() {
-        return isActive;
-    }
-
-    /**
-     * @param isActive the isActive to set
-     */
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    /**
      * @return the isPrimative
      */
     public boolean isPrimative() {
@@ -171,30 +111,16 @@ public class ConceptDto {
     }
 
     /**
-     * @return the namespace
+     * @return the identifierDtos
      */
-    public NAMESPACE getNamespace() {
-        return namespace;
+    public List<IdentifierDto> getIdentifierDtos() {
+        return identifierDtos;
     }
 
     /**
-     * @param namespace the namespace to set
+     * @param identifierDtos the identifierDtos to set
      */
-    public void setNamespace(NAMESPACE namespace) {
-        this.namespace = namespace;
-    }
-
-    /**
-     * @return the type
-     */
-    public TYPE getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(TYPE type) {
-        this.type = type;
+    public void setIdentifierDtos(List<IdentifierDto> identifierDtos) {
+        this.identifierDtos = identifierDtos;
     }
 }

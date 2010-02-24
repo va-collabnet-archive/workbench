@@ -23,7 +23,7 @@ import java.util.List;
  * Container for all the details for a component, that is the core details plus all concept extensions.
  */
 public class ComponentDto {
-    private ConceptDto conceptDto;
+    private ConceptDto conceptDto = new ConceptDto();
     private List<DescriptionDto> descriptionDtos = new ArrayList<DescriptionDto>(0);
     private List<RelationshipDto> relationshipDos = new ArrayList<RelationshipDto>(0);
     private List<ExtensionDto> conceptExtensionDtos = new ArrayList<ExtensionDto>(0);

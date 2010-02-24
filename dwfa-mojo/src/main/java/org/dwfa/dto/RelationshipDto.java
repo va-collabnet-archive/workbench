@@ -24,11 +24,10 @@ import java.util.UUID;
 public class RelationshipDto extends ConceptDto {
     private UUID sourceId;
     private UUID destinationId;
-    private UUID relationshipGroupId;
     private UUID typeId;
     private UUID characteristicTypeId;
     private UUID modifierId;
-    private boolean isRefinable;
+    private Character refinableCode;
     private Character relationshipGroupCode;
     private Character characteristicTypeCode;
 
@@ -37,20 +36,6 @@ public class RelationshipDto extends ConceptDto {
      */
     public RelationshipDto() {
 
-    }
-
-    /**
-     * @return the relationshipId
-     */
-    public UUID getRelationshipId() {
-        return getConceptId();
-    }
-
-    /**
-     * @param relationshipId the relationshipId to set
-     */
-    public void setRelationshipId(UUID relationshipId) {
-        setConceptId(relationshipId);
     }
 
     /**
@@ -79,20 +64,6 @@ public class RelationshipDto extends ConceptDto {
      */
     public void setDestinationId(UUID destinationid) {
         this.destinationId = destinationid;
-    }
-
-    /**
-     * @return the relationshipGroupId
-     */
-    public UUID getRelationshipGroupId() {
-        return relationshipGroupId;
-    }
-
-    /**
-     * @param relationshipGroupId the relationshipGroupId to set
-     */
-    public void setRelationshipGroupId(UUID relationshipGroupId) {
-        this.relationshipGroupId = relationshipGroupId;
     }
 
     /**
@@ -140,15 +111,15 @@ public class RelationshipDto extends ConceptDto {
     /**
      * @return the isRefinable
      */
-    public boolean isRefinable() {
-        return isRefinable;
+    public Character getRefinable() {
+        return refinableCode;
     }
 
     /**
      * @param isRefinable the isRefinable to set
      */
-    public void setRefinable(boolean isRefinable) {
-        this.isRefinable = isRefinable;
+    public void setRefinable(Character refinableCode) {
+        this.refinableCode = refinableCode;
     }
 
     /**

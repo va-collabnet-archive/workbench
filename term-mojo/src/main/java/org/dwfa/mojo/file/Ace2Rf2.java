@@ -56,10 +56,10 @@ import org.dwfa.mojo.file.rf2.Rf2ConceptRow;
 import org.dwfa.mojo.file.rf2.Rf2ConceptWriter;
 import org.dwfa.mojo.file.rf2.Rf2DescriptionRow;
 import org.dwfa.mojo.file.rf2.Rf2DescriptionWriter;
+import org.dwfa.mojo.file.rf2.Rf2IdentifierRow;
 import org.dwfa.mojo.file.rf2.Rf2IdentifierWriter;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipRow;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipWriter;
-import org.dwfa.mojo.file.rf2.Rf2IdentifierWriter.Rf2IdentifierRow;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.util.AceDateFormat;
@@ -354,7 +354,7 @@ public class Ace2Rf2 extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage(), e);
         }
 
-        rf2IdentifierRow = rf2IdentifierWriter.new Rf2IdentifierRow();
+        rf2IdentifierRow = new Rf2IdentifierRow();
 
         do {
             try {

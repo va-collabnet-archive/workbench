@@ -400,12 +400,12 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             REFSET_TYPE_REL }),
 
         // Issue Repository Auxiliary root;
-        ISSUE_MANAGER_ROOT(new String[] { "Issue Manager Auxiliary Concept", "Issue Manager Auxiliary Concept" }, 
-        		new I_ConceptualizeUniversally[] {}),
-		ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" }, 
-	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
-		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
-        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;		
+        ISSUE_MANAGER_ROOT(new String[] { "Issue Manager Auxiliary Concept", "Issue Manager Auxiliary Concept" },
+                new I_ConceptualizeUniversally[] {}),
+        ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" },
+                new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
+        ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" },
+                new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;
         ;
 
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
@@ -418,6 +418,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         public String[] parents_S;
         public String[] descriptions_S;
+        private I_ConceptualizeLocally local;
 
         public String[] getParents_S() {
             return parents_S;
@@ -547,7 +548,10 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         }
 
         public I_ConceptualizeLocally localize() throws IOException, TerminologyException {
-            return LocalFixedConcept.get(getUids(), primitive);
+            if (local == null) {
+                local = LocalFixedConcept.get(getUids(), primitive);
+            }
+            return local;
         }
     }
 

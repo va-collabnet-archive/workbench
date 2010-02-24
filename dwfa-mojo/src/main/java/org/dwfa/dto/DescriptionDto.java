@@ -29,7 +29,7 @@ public class DescriptionDto extends ConceptDto {
     private String description;
     private Character initialCapitalStatusCode;
     private Character descriptionTypeCode;
-    private Character languageCode;
+    private String languageCode;
 
     /**
      * Bean constructor.
@@ -139,14 +139,14 @@ public class DescriptionDto extends ConceptDto {
     /**
      * @return the languageCode
      */
-    public Character getLanguageCode() {
+    public String getLanguageCode() {
         return languageCode;
     }
 
     /**
      * @param languageCode the languageCode to set
      */
-    public void setLanguageCode(Character languageCode) {
+    public void setLanguageCode(String languageCode) {
         this.languageCode = languageCode;
     }
 }

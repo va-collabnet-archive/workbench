@@ -11,9 +11,11 @@ import java.util.UUID;
 import junit.framework.Assert;
 
 import org.dwfa.dto.ComponentDto;
+import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.ExtensionDto;
+import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
@@ -21,6 +23,8 @@ import org.dwfa.mojo.file.rf2.Rf2ConceptReader;
 import org.dwfa.mojo.file.rf2.Rf2ConceptRow;
 import org.dwfa.mojo.file.rf2.Rf2DescriptionReader;
 import org.dwfa.mojo.file.rf2.Rf2DescriptionRow;
+import org.dwfa.mojo.file.rf2.Rf2IdentifierReader;
+import org.dwfa.mojo.file.rf2.Rf2IdentifierRow;
 import org.dwfa.mojo.file.rf2.Rf2ReferenceSetReader;
 import org.dwfa.mojo.file.rf2.Rf2ReferenceSetRow;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipReader;
@@ -51,6 +55,7 @@ public class Rf2OutputHandlerTest {
 
         componentDto.setConceptDto(new ConceptDto());
         setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDto().getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
 
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
         componentDto.getDescriptionDtos().get(0).setConceptId(componentDto.getConceptDto().getConceptId());
@@ -73,6 +78,11 @@ public class Rf2OutputHandlerTest {
         rf2OutputHandler.export(componentDto);
 
         rf2OutputHandler.finalize();
+
+        Rf2IdentifierReader rf2IdentifierReader = new Rf2IdentifierReader(new File(exportDirectory, "ids.rf2.txt"));
+        rf2IdentifierReader.setHasHeader(true);
+        assertIdentifierRow(componentDto.getConceptDto().getIdentifierDtos().get(0),
+            rf2IdentifierReader.iterator().next());
 
         Rf2ConceptReader rf2ConceptReader = new Rf2ConceptReader(new File(exportDirectory, "concepts.rf2.txt"));
         rf2ConceptReader.setHasHeader(true);
@@ -347,8 +357,6 @@ public class Rf2OutputHandlerTest {
             relationshipRow.getModifierSctId());
         Assert.assertEquals(getSctId(relationshipDto.getPathId(), relationshipDto),
             relationshipRow.getModuleSctId());
-        Assert.assertEquals(getSctId(relationshipDto.getRelationshipGroupId(), relationshipDto),
-            relationshipRow.getRelationshipGroup());
         Assert.assertEquals(getSctId(relationshipDto.getSourceId(), relationshipDto),
             relationshipRow.getSourceSctId());
         Assert.assertEquals(getSctId(relationshipDto.getTypeId(), relationshipDto),
@@ -372,20 +380,30 @@ public class Rf2OutputHandlerTest {
             descriptionRow.getTypeSctId());
     }
 
+
+    private void assertIdentifierRow(IdentifierDto identifierDto, Rf2IdentifierRow rf2IdentifierRow) throws Exception {
+        Assert.assertEquals(identifierDto.getConceptId().toString(), rf2IdentifierRow.getAlternateIdentifier().toString());
+        Assert.assertEquals(rf2OutputHandler.getReleaseDate(identifierDto), rf2IdentifierRow.getEffectiveTime());
+        Assert.assertEquals((identifierDto.isActive())?"1":"0", rf2IdentifierRow.getActive());
+        Assert.assertEquals(getSctId(identifierDto.getPathId(), identifierDto), rf2IdentifierRow.getModuleSctId());
+        Assert.assertEquals(identifierDto.getReferencedSctId().toString(), rf2IdentifierRow.getReferencedComponentSctId());
+        Assert.assertEquals(getSctId(identifierDto.getIdentifierSchemeUuid(), identifierDto), rf2IdentifierRow.getIdentifierSchemeSctId());
+    }
+
     private void assertConceptRow(ComponentDto componentDto, Rf2ConceptRow rf2ConceptRow) throws Exception {
         Assert.assertEquals(getSctId(componentDto.getConceptDto().getConceptId(), componentDto.getConceptDto()),
             rf2ConceptRow.getConceptSctId());
         Assert.assertEquals(rf2OutputHandler.getReleaseDate(componentDto.getConceptDto()), rf2ConceptRow.getEffectiveTime());
         Assert.assertEquals((componentDto.getConceptDto().isActive())?"1":"0", rf2ConceptRow.getActive());
         Assert.assertEquals(getSctId(componentDto.getConceptDto().getPathId(), componentDto.getConceptDto()), rf2ConceptRow.getModuleSctId());
-        Assert.assertEquals(getSctId(componentDto.getConceptDto().getStatus(), componentDto.getConceptDto()), rf2ConceptRow.getDefiniationStatusSctId());
+        Assert.assertEquals(getSctId(componentDto.getConceptDto().getStatusId(), componentDto.getConceptDto()), rf2ConceptRow.getDefiniationStatusSctId());
     }
 
-    private String getSctId(UUID id, ConceptDto conceptDto) throws Exception {
+    private String getSctId(UUID id, Concept concept) throws Exception {
         String sctId = null;
 
-        sctId = rf2OutputHandler.snomedIdHandler.getWithoutGeneration(id, conceptDto.getNamespace(),
-            conceptDto.getType()).toString();
+        sctId = rf2OutputHandler.snomedIdHandler.getWithoutGeneration(id, concept.getNamespace(),
+            concept.getType()).toString();
 
         return sctId;
     }
@@ -600,24 +618,6 @@ public class Rf2OutputHandlerTest {
         }
 
         componentDto.getRelationshipDtos().set(0, setRelationshipDto(new RelationshipDto()));
-        componentDto.getRelationshipDtos().get(0).setRelationshipGroupId(null);
-        try{
-            rf2OutputHandler.export(componentDto);
-            Assert.fail("Must have a Relationship Group Id");
-        } catch (Exception e) {
-
-        }
-
-        componentDto.getRelationshipDtos().set(0, setRelationshipDto(new RelationshipDto()));
-        componentDto.getRelationshipDtos().get(0).setRelationshipId(null);
-        try{
-            rf2OutputHandler.export(componentDto);
-            Assert.fail("Must have a Relationship Id");
-        } catch (Exception e) {
-
-        }
-
-        componentDto.getRelationshipDtos().set(0, setRelationshipDto(new RelationshipDto()));
         componentDto.getRelationshipDtos().get(0).setSourceId(null);
         try{
             rf2OutputHandler.export(componentDto);
@@ -680,6 +680,20 @@ public class Rf2OutputHandlerTest {
         }
     }
 
+    private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto) {
+        identifierDto.setActive(true);
+        identifierDto.setReferencedSctId(900000000000960019l);
+        identifierDto.setConceptId(UUID.randomUUID());
+        identifierDto.setDateTime(new Date());
+        identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
+        identifierDto.setPathId(UUID.randomUUID());
+        identifierDto.setNamespace(NAMESPACE.NEHTA);
+        identifierDto.setStatusId(UUID.randomUUID());
+        identifierDto.setType(TYPE.CONCEPT);
+
+        return identifierDto;
+    }
+
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
         conceptDto.setConceptId(UUID.randomUUID());
@@ -703,7 +717,7 @@ public class Rf2OutputHandlerTest {
         descriptionDto.setDescriptionTypeCode('0');
         descriptionDto.setFullySpecifiedName("FSN");
         descriptionDto.setInitialCapitalStatusCode('1');
-        descriptionDto.setLanguageCode('1');
+        descriptionDto.setLanguageCode("en");
         descriptionDto.setLanguageId(UUID.randomUUID());
         descriptionDto.setTypeId(UUID.randomUUID());
 
@@ -718,10 +732,8 @@ public class Rf2OutputHandlerTest {
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setCharacteristicTypeId(UUID.randomUUID());
         relationshipDto.setModifierId(UUID.randomUUID());
-        relationshipDto.setRefinable(false);
+        relationshipDto.setRefinable('1');
         relationshipDto.setRelationshipGroupCode('1');
-        relationshipDto.setRelationshipGroupId(UUID.randomUUID());
-        relationshipDto.setRelationshipId(UUID.randomUUID());
         relationshipDto.setTypeId(UUID.randomUUID());
 
         return relationshipDto;
@@ -733,6 +745,7 @@ public class Rf2OutputHandlerTest {
         extensionDto.setConcept1Id(UUID.randomUUID());
         extensionDto.setMemberId(UUID.randomUUID());
         extensionDto.setValue("Test String");
+        extensionDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
 
         return extensionDto;
     }
