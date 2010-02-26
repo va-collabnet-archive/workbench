@@ -21,12 +21,24 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 public class AddUuidListListToListViewBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
+
+            PropertyDescriptor failOnErrorPropName =
+                    new PropertyDescriptor("failOnErrorPropName",
+                       getBeanDescriptor().getBeanClass());
+            failOnErrorPropName.setBound(true);
+            failOnErrorPropName
+                .setPropertyEditorClass(CheckboxEditor.class);
+            failOnErrorPropName
+                .setDisplayName("<html><font color='green'>Fail on error:");
+            failOnErrorPropName.setShortDescription("Fail task on error.");
+
             PropertyDescriptor uuidListListPropName =
                     new PropertyDescriptor("uuidListListPropName",
                         getBeanDescriptor().getBeanClass());
@@ -37,7 +49,7 @@ public class AddUuidListListToListViewBeanInfo extends SimpleBeanInfo {
                 .setDisplayName("<html><font color='green'>Uuid List:");
             uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor rv[] = { uuidListListPropName };
+            PropertyDescriptor rv[] = { uuidListListPropName, failOnErrorPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

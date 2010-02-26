@@ -27,12 +27,14 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.util.ListUtil;
 import org.dwfa.ace.task.util.MultiMap;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -59,22 +61,28 @@ import org.apache.lucene.search.Hits;
 public class AddUuidListListToListView extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     /**
      * Property name for a list of uuid lists, typically used to represent a
      * list of concepts in a transportable way.
      */
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
+    private Boolean failOnError = Boolean.TRUE;
+    private List<String> invalidUuids = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
+        out.writeBoolean(failOnError);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion >= 2) {
+            uuidListListPropName = (String) in.readObject();
+            failOnError = in.readBoolean();
+        } else if (objDataVersion == 1) {
             uuidListListPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -101,6 +109,8 @@ public class AddUuidListListToListView extends AbstractTask {
             final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process.readProperty(uuidListListPropName);
             AceLog.getAppLog().info("Adding list of size: " + idListList.size());
 
+            invalidUuids = new ArrayList<String>();
+
             SwingUtilities.invokeAndWait(new Runnable() {
 
                 public void run() {
@@ -109,11 +119,18 @@ public class AddUuidListListToListView extends AbstractTask {
                             idListList, tf);
 
                     for (I_GetConceptData concept : elements) {
-                        model.addElement(concept);
+                        if (concept != null) {
+                            model.addElement(concept);
+                        }
                     }
                 }
             });
 
+            if (!failOnError && !invalidUuids.isEmpty()) {                
+                String errorMessages = "" + process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
+                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n" + ListUtil.concat(invalidUuids, "\n"));
+            }
+            
             return Condition.CONTINUE;
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
@@ -127,7 +144,7 @@ public class AddUuidListListToListView extends AbstractTask {
     }
 
     private I_GetConceptData[] getConceptsForList(List<List<UUID>> idListList,
-            I_TermFactory tf) {
+                                                  I_TermFactory tf) {
 
         I_GetConceptData[] elements = new I_GetConceptData[idListList.size()];
         Map idPositions = new MultiMap();
@@ -145,7 +162,18 @@ public class AddUuidListListToListView extends AbstractTask {
 
                     // Not a concept... try a description or
                     // relationship
-                    final int nid = tf.uuidToNative(idList);
+                    int nid = -1;
+                    try {
+                        nid = tf.uuidToNative(idList);
+                    } catch (NoMappingException nme) {
+                        if (failOnError) {
+                            throw nme;
+                        }
+                        invalidUuids.add(idList.get(0).toString());
+                        AceLog.getAppLog().log(Level.WARNING, "Invalid UUID: " + idList.get(0).toString());
+                        continue;
+                    }
+
                     List<UUID> uuids = tf.getId(nid).getUIDs();
 
                     if (uuids != null && !uuids.isEmpty()) {
@@ -169,7 +197,7 @@ public class AddUuidListListToListView extends AbstractTask {
 
         if (!idPositions.isEmpty()) {
             getRelationshipSources(tf, idPositions, elements);
-        }
+        }        
 
         return elements;
     }
@@ -199,7 +227,7 @@ public class AddUuidListListToListView extends AbstractTask {
                     }
                 }
             });
-        } catch (Exception e) {
+        } catch (Exception e) {                        
             String logMessage = "An error occurred. An id exists that cannot be resolved as a concept, "
                     + "description or relationship";
             AceLog.getAppLog().log(Level.SEVERE, logMessage, e);
@@ -243,6 +271,14 @@ public class AddUuidListListToListView extends AbstractTask {
 
     public void setUuidListListPropName(String uuidListListPropName) {
         this.uuidListListPropName = uuidListListPropName;
+    }
+
+    public Boolean isFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(Boolean failOnError) {
+        this.failOnError = failOnError;
     }
 
     /**

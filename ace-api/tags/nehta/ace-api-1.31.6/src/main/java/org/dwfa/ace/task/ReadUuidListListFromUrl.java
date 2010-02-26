@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import org.dwfa.ace.task.util.ListUtil;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -52,15 +54,18 @@ public class ReadUuidListListFromUrl extends AbstractTask {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private String uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
+
+    private Boolean failOnError = Boolean.TRUE;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
         out.writeObject(uuidFileNamePropName);
+        out.writeBoolean(failOnError);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -68,7 +73,10 @@ public class ReadUuidListListFromUrl extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
         	uuidListListPropName = (String) in.readObject();
-        	if (objDataVersion >= 2){
+        	if (objDataVersion >= 3) {
+                uuidFileNamePropName = (String) in.readObject();
+                failOnError = in.readBoolean();
+            } else if (objDataVersion == 2){
         		uuidFileNamePropName = (String) in.readObject();
         	} else {
         		uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
@@ -87,11 +95,12 @@ public class ReadUuidListListFromUrl extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
                                 throws TaskFailedException {
         try {
-        	            
+
+            List<String> invalidUuids = new ArrayList<String>();
              List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
              
             String uuidLineStr;
- 		
+ 		                                     
  //			worker.getLogger().info("file is: " + uuidFileName); 			
             String uuidFileName = (String) process.readProperty(uuidFileNamePropName);
              BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
@@ -99,15 +108,26 @@ public class ReadUuidListListFromUrl extends AbstractTask {
              while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
             	 List<UUID> uuidList = new ArrayList<UUID>();
             	 for (String uuidStr: uuidLineStr.split("\t")){
-         			 worker.getLogger().info("uuidStrs: " + uuidStr); 	
-            		 UUID uuid = UUID.fromString(uuidStr);
-            		 uuidList.add(uuid);
+         			 worker.getLogger().info("uuidStrs: " + uuidStr);
+                     try {
+                         UUID uuid = UUID.fromString(uuidStr);
+                         uuidList.add(uuid);
+                     } catch (IllegalArgumentException iae) {
+                         if (failOnError) {
+                             throw iae;
+                         }
+                         getLogger().log(Level.WARNING, "Invalid UUID: " + uuidStr);
+                         invalidUuids.add(uuidStr);
+                     }
             	 }
             	 uuidListOfLists.add(uuidList);
              } // end while 
              
 
             process.setProperty(this.uuidListListPropName, uuidListOfLists);
+            if (!failOnError && !invalidUuids.isEmpty()) {
+                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), ListUtil.concat(invalidUuids, "\n"));
+            }
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -149,5 +169,11 @@ public class ReadUuidListListFromUrl extends AbstractTask {
 		this.uuidFileNamePropName = dupPotFileName;
 	}
 
- 
+    public Boolean isFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(Boolean failOnError) {
+        this.failOnError = failOnError;
+    }
 }

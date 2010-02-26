@@ -21,6 +21,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
@@ -39,6 +40,17 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
+
+            PropertyDescriptor failOnErrorPropName =
+                    new PropertyDescriptor("failOnErrorPropName",
+                        ReadUuidListListFromUrl.class);
+            failOnErrorPropName.setBound(true);
+            failOnErrorPropName
+                .setPropertyEditorClass(CheckboxEditor.class);
+            failOnErrorPropName
+                .setDisplayName("<html><font color='green'>Fail on error:");
+            failOnErrorPropName.setShortDescription("Fail task on error.");
+
             PropertyDescriptor uuidListListPropName =
             //new PropertyDescriptor("luceneDups/dupPotMatchResults/dwfaDups.txt", ReadUuidListListFromUrl.class);
                     new PropertyDescriptor("uuidListListPropName",
@@ -61,7 +73,7 @@ public class ReadUuidListListFromUrlBeanInfo extends SimpleBeanInfo {
             uuidFileNamePropName.setShortDescription("File Name");
 
             PropertyDescriptor rv[] =
-                    { uuidListListPropName, uuidFileNamePropName };
+                    { uuidListListPropName, uuidFileNamePropName, failOnErrorPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
