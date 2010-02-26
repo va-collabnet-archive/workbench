@@ -19,6 +19,8 @@ package org.dwfa.mojo.epicexport.kp;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -97,9 +99,9 @@ public class EpicSoftDeleteWriter implements I_EpicExportRecordWriter {
     	ret.append(region);
     	ret.append("^1^Softdeleted on ");
     	Calendar c = Calendar.getInstance();
-    	ret.append(c.get(Calendar.YEAR));
-    	ret.append(c.get(Calendar.MONTH));
-    	ret.append(c.get(Calendar.DAY_OF_MONTH));
+    	Date d = new Date(c.getTimeInMillis());
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    	ret.append(sdf.format(d));
     	return ret.toString();
     }
     public void writeLine(String str) throws IOException {

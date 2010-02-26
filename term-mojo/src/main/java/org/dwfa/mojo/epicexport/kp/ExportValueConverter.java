@@ -16,6 +16,8 @@
  */
 package org.dwfa.mojo.epicexport.kp;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,7 @@ import org.dwfa.mojo.epicexport.ExternalTermPublisher;
 import org.dwfa.mojo.epicexport.ExternalTermRecord;
 import org.dwfa.mojo.epicexport.I_ExportValueConverter;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter.I_RefsetApplication;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * A value converter is a class that mines a refset, it's parent concept, or it's description concept, for values
@@ -46,6 +49,11 @@ import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter.I_RefsetApplication;
  */
 
 public class ExportValueConverter implements I_ExportValueConverter{
+	public static enum DISPLAYTYPE  {FULLY_SPECIFIED_NAME , PREFERED_TERM, SYNONYM, OTHER};
+	public static final String DISPLAY_TYPE_UUID_FSN = "5e1fe940-8faf-11db-b606-0800200c9a66";
+	public static final String DISPLAY_TYPE_UUID_PREFERED_TERM = "d8e3b37d-7c11-33ef-b1d0-8769e2264d44";
+	public static final String DISPLAY_TYPE_UUID_SYNONYM = "d6fad981-7df6-3388-94d8-238cc0465a79";
+	
 	public static final String SOFT_DELETE_FLAG = "*SD";
 	public static final String ID_UUID_UUID = "2faa9262-8fb2-11db-b606-0800200c9a66";
 	public static final String ID_UUID_SNOMED = "0418a591-f75b-39ad-be2c-3ab849326da9";
@@ -176,22 +184,27 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	I_DescriptionTuple newestOldTuple = null;
     	for (Iterator<? extends I_DescriptionVersioned> i = descs.iterator(); i.hasNext();) {
     		I_DescriptionVersioned d = i.next();
-    		for (I_DescriptionTuple dt : d.getTuples()) {
-    			if (dt.getVersion() < this.startingVersion)
-    				if (newestOldTuple == null) {
-    					newestOldTuple = dt;
-    				}
-    				else if (dt.getVersion() > newestOldTuple.getVersion()) {
-    					newestOldTuple = dt;
-    				}
-    		}
+    		newestOldTuple = getNewestTupleAsOf(this.startingVersion, d);
     	}
     	if (newestOldTuple != null)
     		ret = newestOldTuple.getMutablePart().getText();
     	return ret;
     }
     
-
+    public I_DescriptionTuple getNewestTupleAsOf(int version, I_DescriptionVersioned desc) {
+    	I_DescriptionTuple newestOldTuple = null;
+		for (I_DescriptionTuple dt : desc.getTuples()) {
+			if (dt.getVersion() < version)
+				if (newestOldTuple == null) {
+					newestOldTuple = dt;
+				}
+				else if (dt.getVersion() > newestOldTuple.getVersion()) {
+					newestOldTuple = dt;
+				}
+		}
+		return newestOldTuple;
+    }
+    
     public String getPreviousDisplayName(I_DescriptionVersioned d) throws Exception {
     	String ret = null;
 
@@ -239,14 +252,22 @@ public class ExportValueConverter implements I_ExportValueConverter{
     }
     
     private boolean isSoftDeleted(ExternalTermRecord record) throws Exception {
+    	//The term's description is retired
     	boolean ret = record.getTermStatus() == ExternalTermRecord.status.RETIRED;
+    	// ... or the concept's fully specified name is retired.
+    	ret = ret || getInterpretedStatus(getConceptStatus(record.getRootConcept(), Integer.MAX_VALUE)) 
+    		== ExternalTermRecord.status.RETIRED;
     	ExternalTermRecord.Item i = record.getFirstItem("2");
+    	// ... or the .2 refset is retired
     	ret = ret || getInterpretedStatus(i.getExtensionTuple().getStatusId()) == ExternalTermRecord.status.RETIRED;
     	return ret;
     }
     
     private boolean wasSoftDeleted(ExternalTermRecord record) throws Exception {
     	boolean ret = record.getPreviousStatus() == ExternalTermRecord.status.RETIRED;
+    	// ... or the concept's fully specfied name is retired.
+    	ret = ret || getInterpretedStatus(getConceptStatus(record.getRootConcept(), this.startingVersion)) 
+    		== ExternalTermRecord.status.RETIRED;
     	ExternalTermRecord.Item i = record.getFirstItem("2");
     	I_ThinExtByRefPart prevExt = ExternalTermPublisher.getPreviousVersionOfExtension(
     			i.getExtensionTuple(), this.startingVersion);
@@ -255,6 +276,68 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	return ret;
     }
     
+
+    private int getConceptStatus(I_GetConceptData concept, int version) throws Exception {
+    	int ret = 0;
+    	List<? extends I_DescriptionVersioned> descs = concept.getDescriptions();
+    	for (I_DescriptionVersioned d : descs) {
+    		if (ExportValueConverter.getDescriptionType(d) == ExportValueConverter.DISPLAYTYPE.FULLY_SPECIFIED_NAME) {
+				if (version == Integer.MAX_VALUE) {
+					ret = d.getLastTuple().getStatusId();
+				}
+				else {
+					I_DescriptionTuple dt = getNewestTupleAsOf(version, d);
+					if (dt != null)
+						ret = dt.getStatusId();
+				}
+			}
+    	}
+    	return ret;
+    }
+    
+    public static ExportValueConverter.DISPLAYTYPE getDescriptionType(I_DescriptionVersioned description) 
+    	throws IOException, TerminologyException {
+    	ExportValueConverter.DISPLAYTYPE ret = ExportValueConverter.DISPLAYTYPE.OTHER;
+		I_GetConceptData c = Terms.get().getConcept(description.getLastTuple().getTypeId());
+		String uuidStr = c.getUids().get(0).toString();
+		if (uuidStr.equals(DISPLAY_TYPE_UUID_FSN))
+			ret = ExportValueConverter.DISPLAYTYPE.FULLY_SPECIFIED_NAME;
+		else if(uuidStr.equals(DISPLAY_TYPE_UUID_PREFERED_TERM))
+			ret = ExportValueConverter.DISPLAYTYPE.PREFERED_TERM;
+		else if(uuidStr.equals(DISPLAY_TYPE_UUID_SYNONYM))
+			ret = ExportValueConverter.DISPLAYTYPE.SYNONYM;
+    	return ret;
+    }
+    
+    public static String getConceptDescription(I_GetConceptData concept, 
+    		ExportValueConverter.DISPLAYTYPE type) throws Exception {
+    	String ret = null;
+    	for (I_DescriptionVersioned d: concept.getDescriptions()) {
+    		if (ExportValueConverter.getDescriptionType(d) == type)
+    			ret = d.getLastTuple().getText();
+    	}
+    	return ret;
+    }
+
+    public static String getPreferedTerm(I_GetConceptData concept) throws Exception {
+    	return ExportValueConverter.getConceptDescription(concept, 
+    			ExportValueConverter.DISPLAYTYPE.PREFERED_TERM);
+    }
+
+    public static String getFullySpecifiedName(I_GetConceptData concept) throws Exception {
+    	return ExportValueConverter.getConceptDescription(concept, 
+    			ExportValueConverter.DISPLAYTYPE.FULLY_SPECIFIED_NAME);
+    }
+    
+    public static List<String> getSynonyms(I_GetConceptData concept) throws Exception {
+    	List<String> ret = new ArrayList<String>();
+    	for (I_DescriptionVersioned d: concept.getDescriptions()) {
+    		if (ExportValueConverter.getDescriptionType(d) == ExportValueConverter.DISPLAYTYPE.SYNONYM)
+    			ret.add(d.getLastTuple().getText());
+    	}
+    	return ret;
+    }
+
     private void addIdToRecord(String name, String UUID, I_GetConceptData concept, ExternalTermRecord record) 
     	throws Exception {
     	String id = getIdForConcept(concept, UUID);
@@ -282,22 +365,25 @@ public class ExportValueConverter implements I_ExportValueConverter{
     
     public ExternalTermRecord.status getInterpretedStatus(int statusId) throws Exception {
     	ExternalTermRecord.status ret = null;
-    	I_GetConceptData statusConcept = Terms.get().getConcept(statusId);
-    	String statusName = null;
-    	statusName = statusConcept.getDescriptions().get(0).getLastTuple().getMutablePart().getText();
-    	if (statusName != null) {
-    		if(statusName.equals("retired (inactive status type)") ||
-    				statusName.equals("concept retired (active status type)")) {
-    			ret = ExternalTermRecord.status.RETIRED;
-    		}
-    		else if(statusName.equals("current (active status type)")) {
-    			ret = ExternalTermRecord.status.CURRENT;
-    		}
-    		else if(statusName.equals("limited (active status type)")) {
-    			ret = ExternalTermRecord.status.LIMITED;
-    		}
-    		else
-    			AceLog.getAppLog().warning("Unhandled status: " + statusName);
+    	if (statusId != 0) {
+	    	I_GetConceptData statusConcept = Terms.get().getConcept(statusId);
+	    	String statusName = null;
+	    	statusName = ExportValueConverter.getPreferedTerm(statusConcept);
+	    	if (statusName != null) {
+	    		if(statusName.equals("retired") ||
+	    				statusName.equals("concept retired") ||
+	    				statusName.equals("inappropriate")) {
+	    			ret = ExternalTermRecord.status.RETIRED;
+	    		}
+	    		else if(statusName.equals("current")) {
+	    			ret = ExternalTermRecord.status.CURRENT;
+	    		}
+	    		else if(statusName.equals("limited")) {
+	    			ret = ExternalTermRecord.status.LIMITED;
+	    		}
+	    		else
+	    			AceLog.getAppLog().warning("Unhandled status: " + statusName);
+	    	}
     	}
     	return ret;
     }
