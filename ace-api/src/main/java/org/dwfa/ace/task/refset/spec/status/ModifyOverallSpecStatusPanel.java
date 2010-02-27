@@ -55,8 +55,10 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
     // components
     private JLabel refsetLabel;
     private JLabel refsetStatusLabel;
+    private JLabel newStatusLabel;
 
     private DynamicWidthComboBox refsetComboBox;
+    private DynamicWidthComboBox statusComboBox;
 
     public ModifyOverallSpecStatusPanel() {
         super();
@@ -73,10 +75,26 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
         // combo box
         refsetComboBox = new DynamicWidthComboBox(getValidRefsets().toArray());
+        statusComboBox = new DynamicWidthComboBox(getValidStatuses().toArray());
 
         // labels
         refsetLabel = new JLabel("Refset:");
-        refsetStatusLabel = new JLabel("Status: " + getPromotionStatus());
+        refsetStatusLabel = new JLabel("Existing status: ");
+        newStatusLabel = new JLabel("New status: ");
+    }
+
+    private Set<I_GetConceptData> getValidStatuses() {
+        Set<I_GetConceptData> statuses = new HashSet<I_GetConceptData>();
+        try {
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids()));
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_EDITABLE.getUids()));
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IN_REVIEW.getUids()));
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.COMPLETED.getUids()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statuses;
     }
 
     private String getPromotionStatus() {
@@ -126,7 +144,6 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        refsetStatusLabel = new JLabel("Status: ");
         this.add(refsetStatusLabel, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
@@ -137,6 +154,27 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         JLabel promotionStatusLabel = new JLabel(getPromotionStatus());
         this.add(promotionStatusLabel, gridBagConstraints);
+
+        // new status label and combo box
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new Insets(10, 5, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        this.add(newStatusLabel, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        if (statusComboBox.getItemCount() == 0) {
+            this.add(new JLabel("No statuses to display."), gridBagConstraints);
+        } else {
+            this.add(statusComboBox, gridBagConstraints);
+        }
 
         // filler
         gridBagConstraints = new GridBagConstraints();
@@ -202,6 +240,10 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
     public I_GetConceptData getRefset() {
         return (I_GetConceptData) refsetComboBox.getSelectedItem();
+    }
+
+    public I_GetConceptData getStatus() {
+        return (I_GetConceptData) statusComboBox.getSelectedItem();
     }
 
     class RefsetListener implements ActionListener {

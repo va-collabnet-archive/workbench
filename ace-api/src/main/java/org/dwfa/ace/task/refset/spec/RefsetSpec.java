@@ -312,6 +312,7 @@ public class RefsetSpec {
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
             SpecRefsetHelper helper = new SpecRefsetHelper();
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             if (promotionRefsetConcept != null && memberRefsetConcept != null) {
                 List<I_ThinExtByRefVersioned> promotionExtensions =
@@ -319,10 +320,11 @@ public class RefsetSpec {
                 for (I_ThinExtByRefVersioned promotionExtension : promotionExtensions) {
                     if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
                         I_ThinExtByRefPart latestPart = helper.getLatestPart(promotionExtension);
-
-                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                            I_ThinExtByRefPartConcept latestConceptPart = (I_ThinExtByRefPartConcept) latestPart;
-                            return Terms.get().getConcept(latestConceptPart.getC1id()).getInitialText();
+                        if (currentStatuses.contains(latestPart.getStatusId())) {
+                            if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                                I_ThinExtByRefPartConcept latestConceptPart = (I_ThinExtByRefPartConcept) latestPart;
+                                return Terms.get().getConcept(latestConceptPart.getC1id()).getInitialText();
+                            }
                         }
                     }
                 }
@@ -376,6 +378,8 @@ public class RefsetSpec {
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
 
             if (memberRefsetConcept != null && promotionRefsetConcept != null) {
+                refsetHelper.retireConceptExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept
+                    .getConceptId());
                 refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept
                     .getConceptId(), newStatus.getConceptId());
             }

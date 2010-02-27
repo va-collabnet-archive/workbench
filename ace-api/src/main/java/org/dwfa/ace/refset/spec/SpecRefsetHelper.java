@@ -1237,7 +1237,7 @@ public class SpecRefsetHelper {
                     }
 
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                        // found a member to retire
+                        // found a member to copy
                         for (I_Path editPath : getEditPaths()) {
                             I_ThinExtByRefPartConcept clone =
                                     (I_ThinExtByRefPartConcept) latestPart.makeAnalog(statusId,

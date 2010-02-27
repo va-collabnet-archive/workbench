@@ -43,7 +43,14 @@ public class GetModifyOverallSpecStatusPanelDataTaskBeanInfo extends SimpleBeanI
             refsetUuidPropName.setDisplayName("<html><font color='green'>refset UUID prop:");
             refsetUuidPropName.setShortDescription("The property to store the refset UUID in.");
 
-            PropertyDescriptor rv[] = { refsetUuidPropName };
+            PropertyDescriptor statusUuidPropName;
+            statusUuidPropName = new PropertyDescriptor("statusUuidPropName", getBeanDescriptor().getBeanClass());
+            statusUuidPropName.setBound(true);
+            statusUuidPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            statusUuidPropName.setDisplayName("<html><font color='green'>status UUID prop:");
+            statusUuidPropName.setShortDescription("The property to store the status UUID in.");
+
+            PropertyDescriptor rv[] = { refsetUuidPropName, statusUuidPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

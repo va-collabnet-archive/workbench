@@ -51,21 +51,27 @@ import org.dwfa.util.bean.Spec;
 public class GetModifyOverallSpecStatusPanelDataTask extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private String refsetUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
+    private String statusUuidPropName = ProcessAttachmentKeys.STATUS_UUID.getAttachmentKey();
 
     private I_TermFactory termFactory;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(refsetUuidPropName);
+        out.writeObject(statusUuidPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion <= dataVersion) {
+        if (objDataVersion == 1) {
             refsetUuidPropName = (String) in.readObject();
+            statusUuidPropName = ProcessAttachmentKeys.STATUS_UUID.getAttachmentKey();
+        } else if (objDataVersion >= dataVersion) {
+            refsetUuidPropName = (String) in.readObject();
+            statusUuidPropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -87,15 +93,22 @@ public class GetModifyOverallSpecStatusPanelDataTask extends AbstractTask {
                     ModifyOverallSpecStatusPanel panel = (ModifyOverallSpecStatusPanel) c;
 
                     I_GetConceptData refset = panel.getRefset();
+                    I_GetConceptData status = panel.getStatus();
 
                     if (refset == null) {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "You must select a refset. ",
                             "", JOptionPane.ERROR_MESSAGE);
                         return Condition.ITEM_CANCELED;
                     }
+                    if (status == null) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "You must select a status. ",
+                            "", JOptionPane.ERROR_MESSAGE);
+                        return Condition.ITEM_CANCELED;
+                    }
 
-                    // save selected refset UUID
+                    // save selected refset UUID and status UUID
                     process.setProperty(refsetUuidPropName, refset.getUids().iterator().next());
+                    process.setProperty(statusUuidPropName, status.getUids().iterator().next());
 
                     return Condition.ITEM_COMPLETE;
 
@@ -122,6 +135,14 @@ public class GetModifyOverallSpecStatusPanelDataTask extends AbstractTask {
 
     public void setRefsetUuidPropName(String refsetUuidPropName) {
         this.refsetUuidPropName = refsetUuidPropName;
+    }
+
+    public String getStatusUuidPropName() {
+        return statusUuidPropName;
+    }
+
+    public void setStatusUuidPropName(String statusUuidPropName) {
+        this.statusUuidPropName = statusUuidPropName;
     }
 
 }
