@@ -1513,4 +1513,14 @@ public class SpecRefsetHelper {
         }
         return false;
     }
+
+    public I_ThinExtByRefPart getLatestPart(I_ThinExtByRefVersioned memberExtension) {
+        I_ThinExtByRefPart latestPart = null;
+        for (I_ThinExtByRefPart part : memberExtension.getMutableParts()) {
+            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                latestPart = part;
+            }
+        }
+        return latestPart;
+    }
 }

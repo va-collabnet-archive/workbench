@@ -22,7 +22,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.spec.SpecRefsetHelper;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 public class RefsetSpec {
@@ -37,7 +42,7 @@ public class RefsetSpec {
      */
     public RefsetSpec(I_GetConceptData spec) {
         this.spec = spec;
-        termFactory = LocalVersionedTerminology.get();
+        termFactory = Terms.get();
     }
 
     /**
@@ -48,13 +53,12 @@ public class RefsetSpec {
      * @param memberRefsetInputted
      */
     public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted) {
-        termFactory = LocalVersionedTerminology.get();
+        termFactory = Terms.get();
         if (memberRefsetInputted) {
             try {
                 I_GetConceptData specifiesRefsetRel =
                         termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
                 this.spec = getLatestDestinationRelationshipSource(concept, specifiesRefsetRel);
-                termFactory = LocalVersionedTerminology.get();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -84,6 +88,18 @@ public class RefsetSpec {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getComputeTypeString() {
+        String computeTypeString = "";
+        if (isConceptComputeType()) {
+            computeTypeString = "concept";
+        } else if (isDescriptionComputeType()) {
+            computeTypeString = "description";
+        } else {
+            computeTypeString = "unknown";
+        }
+        return computeTypeString;
     }
 
     public boolean isDescriptionComputeType() {
@@ -222,14 +238,14 @@ public class RefsetSpec {
         I_GetConceptData latestTarget = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
         List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
-                latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC2Id());
+                latestTarget = Terms.get().getConcept(rel.getC2Id());
             }
         }
 
@@ -249,14 +265,14 @@ public class RefsetSpec {
         I_GetConceptData latestTarget = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
         List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();
-                latestTarget = LocalVersionedTerminology.get().getConcept(rel.getC1Id());
+                latestTarget = Terms.get().getConcept(rel.getC1Id());
             }
         }
 
@@ -276,7 +292,7 @@ public class RefsetSpec {
         I_RelTuple latestRel = null;
         int latestVersion = Integer.MIN_VALUE;
 
-        I_IntSet allowedTypes = LocalVersionedTerminology.get().newIntSet();
+        I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
         List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
@@ -288,5 +304,84 @@ public class RefsetSpec {
         }
 
         return latestRel;
+    }
+
+    public String getOverallSpecStatusString() {
+
+        try {
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+
+            if (promotionRefsetConcept != null && memberRefsetConcept != null) {
+                List<I_ThinExtByRefVersioned> promotionExtensions =
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                for (I_ThinExtByRefVersioned promotionExtension : promotionExtensions) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                        I_ThinExtByRefPart latestPart = helper.getLatestPart(promotionExtension);
+
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            I_ThinExtByRefPartConcept latestConceptPart = (I_ThinExtByRefPartConcept) latestPart;
+                            return Terms.get().getConcept(latestConceptPart.getC1id()).getInitialText();
+                        }
+                    }
+                }
+            }
+
+            return "none";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while locating status";
+        }
+    }
+
+    public boolean isEditableRefset() {
+
+        try {
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+            SpecRefsetHelper helper = new SpecRefsetHelper();
+
+            if (promotionRefsetConcept != null && memberRefsetConcept != null) {
+                List<I_ThinExtByRefVersioned> promotionExtensions =
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                for (I_ThinExtByRefVersioned promotionExtension : promotionExtensions) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                        I_ThinExtByRefPart latestPart = helper.getLatestPart(promotionExtension);
+
+                        if (latestPart instanceof I_ThinExtByRefPartConcept) {
+                            I_ThinExtByRefPartConcept latestConceptPart = (I_ThinExtByRefPartConcept) latestPart;
+                            I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
+                            if (status.getConceptId() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()
+                                || status.getConceptId() == ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.localize()
+                                    .getNid()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void modifyOverallSpecStatus(I_GetConceptData newStatus) throws Exception {
+        try {
+            SpecRefsetHelper refsetHelper = new SpecRefsetHelper();
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+
+            if (memberRefsetConcept != null && promotionRefsetConcept != null) {
+                refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept
+                    .getConceptId(), newStatus.getConceptId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error modifying the overall status of the refset : " + e.getLocalizedMessage());
+        }
     }
 }

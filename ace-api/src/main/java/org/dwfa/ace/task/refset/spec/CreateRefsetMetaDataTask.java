@@ -350,6 +350,10 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             newRelationship(promotionRefset, purposeRel, enumeratedAnnotation, aceConfig);
             newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
 
+            // set the overall refset status to the specified status
+            RefsetSpec spec = new RefsetSpec(refsetSpec);
+            spec.modifyOverallSpecStatus(status);
+
             process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(), memberRefset.getUids().iterator()
                 .next());
             process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(), refsetSpec.getUids()
