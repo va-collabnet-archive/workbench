@@ -40,7 +40,7 @@ import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
- * This panel allows the user to select a refset spec that they have owner/admin access to.
+ * This panel allows the user to select a refset spec that they have owner access to.
  * 
  * @author Chrissy Hill
  * 
@@ -132,7 +132,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         if (refsetComboBox.getItemCount() == 0) {
-            this.add(new JLabel("User does not have admin/owner permissions for any refsets."), gridBagConstraints);
+            this.add(new JLabel("User does not have owner role permission for any refsets."), gridBagConstraints);
         } else {
             this.add(refsetComboBox, gridBagConstraints);
         }
@@ -191,7 +191,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
     }
 
     /**
-     * Calculates a set of valid refsets. Valid refsets include any that the current user has owner or admin access to.
+     * Calculates a set of valid refsets. Valid refsets include any that the current user has owner access to.
      * 
      * @return The set of valid parents.
      */
@@ -202,11 +202,9 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
             I_TermFactory termFactory = Terms.get();
             I_GetConceptData activeUser = termFactory.getActiveAceFrameConfig().getDbConfig().getUserConcept();
             I_GetConceptData ownerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OWNER_ROLE.getUids());
-            I_GetConceptData adminRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ADMIN_ROLE.getUids());
 
             I_IntSet roleAllowedTypes = termFactory.newIntSet();
             roleAllowedTypes.add(ownerRole.getConceptId());
-            roleAllowedTypes.add(adminRole.getConceptId());
 
             SpecRefsetHelper helper = new SpecRefsetHelper();
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
