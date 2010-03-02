@@ -130,7 +130,9 @@ public final class ConvertToDerbyFormatMojo extends AbstractMojo {
 
                 for (File aFile : matchingFiles) {
                     logInfo("processing file", aFile);
-                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToDerbyLineConverter, concatfiles);
+                    String fileName = "";
+                    if (format.getaddfilename()) fileName = aFile.getName();
+                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToDerbyLineConverter, concatfiles, fileName);
                 }
             } catch (Exception e) {
                 getLog().error(e); // if a format fails, log and keep going to

@@ -41,7 +41,7 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
     }
 
     public void writer(final File file, final Table table, final String outputDirectory,
-            final LineToSQLConverter lineToSQLConverter, final boolean concat) {
+            final LineToSQLConverter lineToSQLConverter, final boolean concat, String fileName) {
         BufferedReader reader = null;
         PrintWriter writer = null;
 
@@ -53,7 +53,11 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
             String line = reader.readLine();// skip the header line.
 
             while ((line = reader.readLine()) != null) {
-                writer.println(lineToSQLConverter.convert(table, line));
+                String lineout = lineToSQLConverter.convert(table, line);
+                if (fileName != "") {
+                    lineout = fileName + "\t" + lineout;
+                }
+                writer.println(lineout);
             }
         } catch (Exception e) {
             throw new SQLFileWriterException(e);

@@ -24,14 +24,17 @@ public final class Format {
 
     private String type;
 
+    private boolean addfilename;
+
     private List<String> filters;
 
     public Format() {
         // for maven.
     }
 
-    public Format(final String type, final List<String> filters) {
+    public Format(final String type, final List<String> filters, boolean addfilename) {
         this.type = type;
+        this.addfilename = addfilename;
         this.filters = filters;
     }
 
@@ -39,11 +42,15 @@ public final class Format {
         return type;
     }
 
+    public boolean getaddfilename() {
+        return addfilename;
+    }
+
     public List<String> getFilters() {
         return filters;
     }
 
     public String toString() {
-        return "[Format type=" + type + ", filters=" + filters + " ]";
+        return "[Format type=" + type + ", addfilename=" + addfilename + ", filters=" + filters + " ]";
     }
 }

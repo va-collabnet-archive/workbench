@@ -22,19 +22,26 @@ public final class Format {
 
     private String type;
 
+    private boolean addfilename;
+
     private List<String> filters;
 
     public Format() {
         // for maven.
     }
 
-    public Format(final String type, final List<String> filters) {
+    public Format(final String type, final List<String> filters, boolean addfilename) {
         this.type = type;
+        this.addfilename = addfilename;
         this.filters = filters;
     }
 
     public String getType() {
         return type;
+    }
+
+    public boolean getaddfilename() {
+        return addfilename;
     }
 
     public List<String> getFilters() {
