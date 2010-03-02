@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -30,9 +32,11 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.RefsetHelper;
+import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -40,6 +44,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -81,19 +86,39 @@ public class PromoteRefset extends AbstractTask {
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
+            I_TermFactory tf = Terms.get();
+
+            while (config.getViewPositionSet().size() != 1 || config.getPromotionPathSet().size() != 1) {
+                if (config.getViewPositionSet().size() != 1) {
+                    config.setShowPreferences(true);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There must only be ONE view position. Please fix this in the preferences panel before "
+                            + "continuing. \n Current view positions: " + config.getViewPositionSet(), "",
+                        JOptionPane.ERROR_MESSAGE);
+                    InstructAndWait instruct = new InstructAndWait();
+                    instruct.setInstruction("Update preferences - ONE view position required.");
+                    instruct.evaluate(process, worker);
+                }
+                if (config.getPromotionPathSet().size() != 1) {
+                    config.setShowPreferences(true);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There must only be ONE promotion path. Please fix this in the preferences panel before "
+                            + "continuing. \n Current promotion paths: " + config.getPromotionPathSet(), "",
+                        JOptionPane.ERROR_MESSAGE);
+                    InstructAndWait instruct = new InstructAndWait();
+                    instruct.setInstruction("Update preferences - ONE promotion path required.");
+                    instruct.evaluate(process, worker);
+                }
+            }
+            config.setShowPreferences(false);
+
             Set<I_Position> viewPositionSet = config.getViewPositionSet();
             PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
-            if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
-                throw new TaskFailedException(
-                    "There must be only one view position, and one promotion path: viewPaths " + viewPositionSet
-                        + " promotionPaths: " + promotionPaths);
-            }
+
             I_GetConceptData refsetToPromote = config.getRefsetInSpecEditor();
             if (refsetToPromote == null) {
                 throw new TaskFailedException("The refset in the spec editor is null. ");
             }
-
-            I_TermFactory tf = LocalVersionedTerminology.get();
 
             tf.commit();
 
