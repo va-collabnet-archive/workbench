@@ -10,21 +10,12 @@
 		<properties>
 		<out.dir>D:/Data/ATestXML/test/Terminology/Export</out.dir>
 		 </properties>
-	
-	<dependencies>
-		<dependency>
-			<groupId>org.dwfa.mojo</groupId>
-			<artifactId>exporter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>runtime-directory</scope>
-		</dependency>
-	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.dwfa.mojo</groupId>
-				<artifactId>exporter</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<groupId>org.dwfa</groupId>
+				<artifactId>term-mojo</artifactId>
+				<version>1.44-SNAPSHOT</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.dwfa</groupId>
@@ -37,9 +28,9 @@
 						<version>1.39-SNAPSHOT</version>
 					</dependency>
 					<dependency>
-						<groupId>org.dwfa</groupId>
-						<artifactId>term-mojo</artifactId>
-						<version>1.43-SNAPSHOT</version>
+						<groupId>net.cfh.terms</groupId>
+						<artifactId>nhs-Exporter</artifactId>
+						<version>0.0.1-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -55,7 +46,7 @@
 								<publisherDTO>
 									<name>ReadV2</name>
 									<id_uuidS>17b9058f-8af8-3d1a-b750-b23d94eed52b</id_uuidS>
-									<publisherClassName>org.dwfa.mojo.exporter.publishers.ReadV2Publisher</publisherClassName>
+									<publisherClassName>net.nhs.cfh.terms.publishers.ReadV2Publisher</publisherClassName>
 									<outputDirectory>${out.dir}</outputDirectory>
 									<configProps>
 										<property>
@@ -67,7 +58,7 @@
 								<publisherDTO>
 									<name>ReadV3</name>
 									<id_uuidS>7f951a3a-39e0-3fba-92a0-1138edafa4c0</id_uuidS>
-									<publisherClassName>org.dwfa.mojo.exporter.publishers.ReadV3Publisher</publisherClassName>
+									<publisherClassName>net.nhs.cfh.terms.publishers.ReadV3Publisher</publisherClassName>
 									<outputDirectory>${out.dir}</outputDirectory>
 									<configProps>
 										<property>
@@ -79,7 +70,7 @@
 								<publisherDTO>
 									<name>SnoMed</name>
 									<id_uuidS>0418a591-f75b-39ad-be2c-3ab849326da9</id_uuidS>
-									<publisherClassName>org.dwfa.mojo.exporter.publishers.SnoMedPublisher</publisherClassName>
+									<publisherClassName>net.nhs.cfh.terms.publishers.SnomedPublisher</publisherClassName>
 									<outputDirectory>${out.dir}</outputDirectory>
 									<configProps>
 										<property>
@@ -88,10 +79,7 @@
 										</property>
 									</configProps>
 								</publisherDTO>
-
 							</publishers>
-
-
 						</configuration>
 					</execution>
 				</executions>
