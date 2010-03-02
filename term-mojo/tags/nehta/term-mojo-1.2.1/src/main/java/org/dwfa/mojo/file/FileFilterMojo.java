@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * 
+ *
  */
 package org.dwfa.mojo.file;
 
@@ -34,7 +34,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Simple Mojo that ssentially greps a file and writes the result to another file.
  * Given a regular expression the Mojo can be configured to copy all matching
  * or non-matchine lines from the input file to the output file
- * 
+ *
  * @author Dion McMurtrie
  *
  * @goal filter-file
@@ -43,7 +43,7 @@ public class FileFilterMojo extends AbstractMojo {
 
     /**
      * File to be read and filtered using the supplied expression
-     * 
+     *
      * @parameter
      * @required
      */
@@ -52,7 +52,7 @@ public class FileFilterMojo extends AbstractMojo {
     /**
      * File to write the filtering result to - NB if the file exists it will
      * be overwritten
-     * 
+     *
      * @parameter
      * @required
      */
@@ -61,7 +61,7 @@ public class FileFilterMojo extends AbstractMojo {
     /**
      * Regular expression used to match lines from the input file as a basis for
      * filtering the file.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -72,24 +72,31 @@ public class FileFilterMojo extends AbstractMojo {
      * If true, only lines matching the expression will be copied to the output file, if
      * false only lines not matching the expression will be copied to the output file.
      * Default value is true.
-     * 
+     *
      * @parameter
      */
     boolean matchingLinesPreserved = true;
 
     /**
      * Indicates if the output file should use DOS line termination - defaults to true
-     * 
+     *
      * @parameter
      */
     boolean useDosLineTermination = true;
 
     /**
      * indicates if the output file should be appended to or overwritten - defaults to overwrite
-     * 
+     *
      * @parameter
      */
     boolean append;
+
+    /**
+     * Copy the head line to the destination file.
+     *
+     * @parameter
+     */
+    boolean copyHeader = false;
 
     /* (non-Javadoc)
      * @see org.apache.maven.plugin.Mojo#execute()
@@ -111,6 +118,11 @@ public class FileFilterMojo extends AbstractMojo {
                     new BufferedWriter(new FileWriter(outputFile, append));
 
             String inputLine = reader.readLine();
+            if(copyHeader){
+                writeLine(writer, inputLine);
+                inputLine = reader.readLine();
+            }
+
             while (inputLine != null) {
                 boolean lineMatches = inputLine.matches(expression);
                 if (matchingLinesPreserved && lineMatches) {
