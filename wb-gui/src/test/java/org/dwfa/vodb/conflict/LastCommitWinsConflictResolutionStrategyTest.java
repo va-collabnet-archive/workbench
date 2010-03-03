@@ -23,6 +23,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class LastCommitWinsConflictResolutionStrategyTest {
@@ -39,6 +40,7 @@ public class LastCommitWinsConflictResolutionStrategyTest {
     TestLastCommitWinsResolutionStrategy conflictResolutionStrategy = new TestLastCommitWinsResolutionStrategy();
 
     @Test
+    @Ignore
     public void testDoesConflictExist() throws Exception {
         List<MockTuple> tuples = new ArrayList<MockTuple>();
 

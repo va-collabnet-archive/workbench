@@ -1,0 +1,2 @@
+The subdirectories in this folder are composed of svn:externals definitions, so that a MMB can be created independent
+of the location of the different submodules. 
