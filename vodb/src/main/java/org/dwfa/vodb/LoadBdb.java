@@ -99,17 +99,8 @@ public class LoadBdb {
                 + timer.getElapsedTime());
         printElapsedTime();
         AceLog.getAppLog().info("Starting populateTimeBranchDb()");
-        // monitor.setProgressInfoUpper("Starting populateTimeBranchDb().");
         ((VodbEnv) LocalVersionedTerminology.get()).populatePositions();
         printElapsedTime();
-        // AceConfig.monitor.setProgressInfoUpper("Starting
-        // makeLuceneIndex().");
-        ((VodbEnv) LocalVersionedTerminology.get())
-            .createLuceneDescriptionIndex();
-        // AceConfig.monitor.setProgressInfoUpper("Starting cleanup.");
-        printElapsedTime();
-        // ((VodbEnv) LocalVersionedTerminology.get()).close();
-        // printElapsedTime();
     }
 
     public static void main(String[] args, final File unjaringDir) throws Exception {
