@@ -91,6 +91,7 @@
         <module>wb-api</module>
         <module>wb-gui</module>        
         <module>wb-bdb</module>        
+        <module>wb-bdb-mojo</module>        
         <module>term-mojo</module>
     </modules>
 </project>
