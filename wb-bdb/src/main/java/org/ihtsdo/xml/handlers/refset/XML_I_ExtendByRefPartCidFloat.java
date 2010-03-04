@@ -36,7 +36,7 @@ public class XML_I_ExtendByRefPartCidFloat extends XML_RefSetBasic implements
 		getLocalE();
 		
 		if (!debug) {
-			//c1id = rpcm.getC1id();
+			c1id = rpcm.getC1id();
 			mVal = rpcm.getMeasurementValue();
 			uom = rpcm.getUnitsOfMeasureId();
 			versionid = rpcm.getVersion();
@@ -46,7 +46,7 @@ public class XML_I_ExtendByRefPartCidFloat extends XML_RefSetBasic implements
 			pathid = rpcm.getPathId();
 			
 		}
-		//BasicXMLStruct.getIntAtt(c1id, CommonXMLStatics.C1_ID_ATT, localE);
+		BasicXMLStruct.getIntAtt(c1id, CommonXMLStatics.C1_ID_ATT, localE);
 		BasicXMLStruct.getIntAtt(uom, CommonXMLStatics.UOM_ID_ATT, localE);
 		BasicXMLStruct.getStringAtt(Float.toString(mVal), CommonXMLStatics.VAL_ATT,localE);
 		
