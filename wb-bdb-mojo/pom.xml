@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
     	<groupId>org.ihtsdo</groupId>
-    	<artifactId>bdb</artifactId>
+    	<artifactId>wb-bdb</artifactId>
     	<version>1.0-SNAPSHOT</version>
     	<type>jar</type>
     	<scope>compile</scope>
