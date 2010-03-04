@@ -190,7 +190,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 username = null;
             }
             if (objDataVersion >= 1) {
-                dbFolder = (File) in.readObject();
+                //dbFolder = (File) in.readObject();                
                 if (dbFolderOverride != null) {
                     dbFolder = dbFolderOverride;
                 }
@@ -257,7 +257,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 username = null;
             }
             if (objDataVersion >= 1) {
-                dbFolder = (File) in.readObject();
+                //dbFolder = (File) in.readObject();
                 if (dbFolderOverride != null) {
                     dbFolder = dbFolderOverride;
                 }
