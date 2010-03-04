@@ -16,7 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartCidFloat extends I_ExtendByRefPart {
+public interface I_ExtendByRefPartCidFloat extends I_ExtendByRefPartCid,I_ExtendByRefPart {
 
     public int getUnitsOfMeasureId();
 
