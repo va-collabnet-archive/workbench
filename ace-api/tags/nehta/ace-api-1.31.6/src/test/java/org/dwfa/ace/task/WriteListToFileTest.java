@@ -16,6 +16,7 @@
 package org.dwfa.ace.task;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import junit.framework.TestCase;
@@ -36,6 +37,7 @@ public class WriteListToFileTest extends TestCase {
     private static final String EXPECTED_FILE = "src/test/resources/org/dwfa/ace/task/expectedWriteListToFileTest.txt";
     private static final String LIST_OUTPUT_FILE = "target/outputFile.txt";
     private static final String SERIALIZED_OUTPUT_FILE = "target/outputFile.txt";
+    private static final int EXPECTED_NUM_DECLARED_FIELDS = 6;
     private Mockery context;
     private I_EncodeBusinessProcess process;
     private I_Work worker;
@@ -51,7 +53,7 @@ public class WriteListToFileTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        super.tearDown();
+        new File(LIST_OUTPUT_FILE).delete();
     }
 
     /**
@@ -115,5 +117,48 @@ public class WriteListToFileTest extends TestCase {
         assertEquals(deserializedInstance.getObjectListPropertyName(), PROP_NAME);
 
         assertEquals(deserializedInstance.getOutputFile(), WriteListToFile.DEFAULT_FILE_NAME);
+    }
+
+    /**
+     * Ensures that the structure of the class has not changed, if it has the following methods need to be updated.
+     * equals
+     * hashCode
+     * writeObject
+     * readObject
+     *
+     * and the WriteListToFile.DATA_VERSION variable needs incrementing.
+     */
+    public void testCorrectNumberOfFieldsInClass() throws Exception {
+        assertEquals(WriteListToFile.class.getDeclaredFields().length, EXPECTED_NUM_DECLARED_FIELDS);
+    }
+
+    public void testWithNullList() throws Exception {
+        final List<String> originalPropValue = null;
+
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        context.checking(new Expectations() {
+
+            {
+                oneOf(process).readProperty(PROP_NAME);
+                will(returnValue(originalPropValue));
+            }
+        });
+        instance.evaluate(process, worker);
+        assertTrue(!new File(LIST_OUTPUT_FILE).exists());
+    }
+
+    public void testWithEmptyList() throws Exception {
+        final List<String> originalPropValue = new ArrayList<String>();
+
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        context.checking(new Expectations() {
+
+            {
+                oneOf(process).readProperty(PROP_NAME);
+                will(returnValue(originalPropValue));
+            }
+        });
+        instance.evaluate(process, worker);
+        assertTrue(!new File(LIST_OUTPUT_FILE).exists());
     }
 }

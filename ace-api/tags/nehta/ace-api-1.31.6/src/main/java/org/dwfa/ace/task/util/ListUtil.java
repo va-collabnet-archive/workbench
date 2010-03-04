@@ -17,20 +17,18 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ListUtil {
+public final class ListUtil {
+
+    private ListUtil() {
+    }
 
     public static String concat(List listOfValues, String seperator) {
-
-        String output = "";
-        for (int i = 0; i < listOfValues.size(); i++) {
-
-            String value = listOfValues.get(i).toString();
-            if (i < (listOfValues.size()-1)) {
-                output += value.toString() + seperator;
-            } else {
-                output += value.toString();
-            }
+        StringBuilder toReturn = new StringBuilder();
+        String valueSeparator = "";
+        for (Object value : listOfValues) {
+            toReturn.append(valueSeparator).append(value.toString());
+            valueSeparator = seperator;
         }
-         return output;
+        return toReturn.toString();
     }
 }

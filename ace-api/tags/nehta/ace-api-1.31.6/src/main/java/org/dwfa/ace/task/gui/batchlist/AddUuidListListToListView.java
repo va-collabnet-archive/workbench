@@ -69,6 +69,11 @@ public class AddUuidListListToListView extends AbstractTask {
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private boolean continueOnError;
     private List<String> invalidUuids;
+    private String uuidErrorMessage;
+
+    public AddUuidListListToListView() {
+        uuidErrorMessage = "";
+    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -132,8 +137,9 @@ public class AddUuidListListToListView extends AbstractTask {
 
             if (continueOnError && !invalidUuids.isEmpty()) {
                 String errorMessages = "" + process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
-                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n" + ListUtil.
-                        concat(invalidUuids, "\n"));
+                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n"
+                        + uuidErrorMessage);
+                process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
             }
 
             return Condition.CONTINUE;
@@ -176,6 +182,9 @@ public class AddUuidListListToListView extends AbstractTask {
                         }
                         invalidUuids.add(idList.get(0).toString());
                         AceLog.getAppLog().log(Level.WARNING, "Invalid UUID: " + idList.get(0).toString());
+                        if (uuidErrorMessage.isEmpty()) {
+                            uuidErrorMessage = nme.getMessage();
+                        }
                         continue;
                     }
 

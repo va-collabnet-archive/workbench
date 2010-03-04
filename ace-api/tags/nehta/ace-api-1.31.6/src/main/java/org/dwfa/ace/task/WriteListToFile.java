@@ -35,6 +35,8 @@ import org.dwfa.util.bean.Spec;
  * The {@code WriteListToFile} class is a subclass of {@code AbstractTask} that writes a {@code List} of
  * objects to a file.
  *
+ * If the {@code List} of Objects is empty or null, no file will be written.
+ *
  * When this class is modified, the equals and hashCode methods should also be updated.
  *
  * @author Mattthew Edwards
@@ -112,7 +114,9 @@ public final class WriteListToFile extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             List<Object> list = (List<Object>) process.readProperty(objectListPropertyName);
-            this.writeList(list);
+            if (list != null && !list.isEmpty()) {
+                this.writeList(list);
+            }
             return Condition.CONTINUE;
         } catch (Exception ex) {
             throw new TaskFailedException(ex);

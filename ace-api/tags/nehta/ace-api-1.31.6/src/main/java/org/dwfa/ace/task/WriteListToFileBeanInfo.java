@@ -29,11 +29,18 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class WriteListToFileBeanInfo extends SimpleBeanInfo {
 
+    private static final String DESCRIPTOR_DISPLAY_NAME =
+            "<html><font color='green'><center>Write a List of Objects<br> to a File";
+    private final BeanDescriptor beanDescriptor;
+
+    public WriteListToFileBeanInfo() {
+        beanDescriptor = new BeanDescriptor(ReadUuidListListFromUrl.class);
+        beanDescriptor.setDisplayName(DESCRIPTOR_DISPLAY_NAME);
+    }
+
     @Override
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ReadUuidListListFromUrl.class);
-        bd.setDisplayName("<html><font color='green'><center>Write a List of Objects to a File");
-        return bd;
+        return beanDescriptor;
     }
 
     @Override
