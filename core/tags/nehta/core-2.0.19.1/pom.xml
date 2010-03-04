@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- 
+    <!--
  !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  !
  !  Licensed under the Apache License, Version 2.0 (the "License");
  !  you may not use this file except in compliance with the License.
  !  You may obtain a copy of the License at
- ! 
+ !
  !      http://www.apache.org/licenses/LICENSE-2.0
  !
  !  Unless required by applicable law or agreed to in writing, software
@@ -32,10 +32,10 @@
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/tags/nehta/core-2.0.19.1</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm/tags/core-2.0.19</url>
     </scm>
-  <ciManagement>
-    <system>continuum</system>
-    <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=3</url>
-  </ciManagement>
+    <ciManagement>
+        <system>continuum</system>
+        <url>https://mgr.servers.aceworkspace.net/apps/ace_continuum2/continuum/projectView.action?projectId=3</url>
+    </ciManagement>
     <dependencies>
         <dependency>
             <groupId>org.dwfa.jini</groupId>
@@ -71,6 +71,18 @@
             <groupId>org.dwfa.jini</groupId>
             <artifactId>browser</artifactId>
             <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -150,3 +162,4 @@
         </plugins>
     </build>
 </project>
+
