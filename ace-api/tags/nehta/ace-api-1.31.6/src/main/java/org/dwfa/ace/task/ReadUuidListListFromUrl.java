@@ -1,18 +1,17 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.dwfa.ace.task;
 
@@ -45,88 +44,90 @@ import org.dwfa.util.bean.Spec;
  * @author Susan Castillo
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
-
+@BeanList(specs = {@Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN)})
 public class ReadUuidListListFromUrl extends AbstractTask {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 3;
-
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private String uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
-
-    private Boolean failOnError = Boolean.TRUE;
+    private boolean continueOnError;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
         out.writeObject(uuidFileNamePropName);
-        out.writeBoolean(failOnError);
+        out.writeBoolean(continueOnError);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion <= dataVersion) {
-        	uuidListListPropName = (String) in.readObject();
-        	if (objDataVersion >= 3) {
+
+        switch (objDataVersion) {
+            case 0:
+            case 1:
+                uuidListListPropName = (String) in.readObject();
+                uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
+                break;
+            case 2:
+                uuidListListPropName = (String) in.readObject();
                 uuidFileNamePropName = (String) in.readObject();
-                failOnError = in.readBoolean();
-            } else if (objDataVersion == 2){
-        		uuidFileNamePropName = (String) in.readObject();
-        	} else {
-        		uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
-        	}
-        } else {
-            throw new IOException(
-                    "Can't handle dataversion: " + objDataVersion);
+                break;
+            case 3:
+                uuidListListPropName = (String) in.readObject();
+                uuidFileNamePropName = (String) in.readObject();
+                continueOnError = in.readBoolean();
+                break;
+            default:
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
-                         throws TaskFailedException {
+            throws TaskFailedException {
         // Nothing to do
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-                                throws TaskFailedException {
+            throws TaskFailedException {
         try {
 
             List<String> invalidUuids = new ArrayList<String>();
-             List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
-             
+            List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
+
             String uuidLineStr;
- 		                                     
- //			worker.getLogger().info("file is: " + uuidFileName); 			
+
+            //			worker.getLogger().info("file is: " + uuidFileName);
             String uuidFileName = (String) process.readProperty(uuidFileNamePropName);
-             BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
-             
-             while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
-            	 List<UUID> uuidList = new ArrayList<UUID>();
-            	 for (String uuidStr: uuidLineStr.split("\t")){
-         			 worker.getLogger().info("uuidStrs: " + uuidStr);
-                     try {
-                         UUID uuid = UUID.fromString(uuidStr);
-                         uuidList.add(uuid);
-                     } catch (IllegalArgumentException iae) {
-                         if (failOnError) {
-                             throw iae;
-                         }
-                         getLogger().log(Level.WARNING, "Invalid UUID: " + uuidStr);
-                         invalidUuids.add(uuidStr);
-                     }
-            	 }
-            	 uuidListOfLists.add(uuidList);
-             } // end while 
-             
+            BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
+
+            while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
+                List<UUID> uuidList = new ArrayList<UUID>();
+                for (String uuidStr : uuidLineStr.split("\t")) {
+                    worker.getLogger().info("uuidStrs: " + uuidStr);
+                    try {
+                        UUID uuid = UUID.fromString(uuidStr);
+                        uuidList.add(uuid);
+                    } catch (IllegalArgumentException iae) {
+                        if (!continueOnError) {
+                            throw iae;
+                        }
+                        getLogger().log(Level.WARNING, "Invalid UUID: " + uuidStr);
+                        invalidUuids.add(uuidStr);
+                    }
+                }
+                uuidListOfLists.add(uuidList);
+            } // end while
+
 
             process.setProperty(this.uuidListListPropName, uuidListOfLists);
-            if (!failOnError && !invalidUuids.isEmpty()) {
-                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), ListUtil.concat(invalidUuids, "\n"));
+            if (continueOnError && !invalidUuids.isEmpty()) {
+                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), ListUtil.concat(invalidUuids,
+                        "\n"));
             }
 
             return Condition.CONTINUE;
@@ -139,41 +140,41 @@ public class ReadUuidListListFromUrl extends AbstractTask {
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
         } catch (FileNotFoundException e) {
-        	throw new TaskFailedException(e);
-		} catch (IOException e) {
-			throw new TaskFailedException(e);
-		} 
+            throw new TaskFailedException(e);
+        } catch (IOException e) {
+            throw new TaskFailedException(e);
+        }
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
 
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
-	public String getUuidListListPropName() {
-		return uuidListListPropName;
-	}
-
-	public void setUuidListListPropName(String potDupUuidList) {
-		this.uuidListListPropName = potDupUuidList;
-	}
-
-	public String getUuidFileNamePropName() {
-		return uuidFileNamePropName;
-	}
-
-	public void setUuidFileNamePropName(String dupPotFileName) {
-		this.uuidFileNamePropName = dupPotFileName;
-	}
-
-    public Boolean isFailOnError() {
-        return failOnError;
+    public String getUuidListListPropName() {
+        return uuidListListPropName;
     }
 
-    public void setFailOnError(Boolean failOnError) {
-        this.failOnError = failOnError;
+    public void setUuidListListPropName(String potDupUuidList) {
+        this.uuidListListPropName = potDupUuidList;
+    }
+
+    public String getUuidFileNamePropName() {
+        return uuidFileNamePropName;
+    }
+
+    public void setUuidFileNamePropName(String dupPotFileName) {
+        this.uuidFileNamePropName = dupPotFileName;
+    }
+
+    public boolean isContinueOnError() {
+        return continueOnError;
+    }
+
+    public void setContinueOnError(boolean isContinueOnError) {
+        this.continueOnError = isContinueOnError;
     }
 }

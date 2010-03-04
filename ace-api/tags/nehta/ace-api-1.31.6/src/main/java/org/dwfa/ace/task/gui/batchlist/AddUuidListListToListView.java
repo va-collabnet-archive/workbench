@@ -67,27 +67,31 @@ public class AddUuidListListToListView extends AbstractTask {
      * list of concepts in a transportable way.
      */
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
-    private Boolean failOnError = Boolean.TRUE;
-    private List<String> invalidUuids = null;
+    private boolean continueOnError;
+    private List<String> invalidUuids;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
-        out.writeBoolean(failOnError);
+        out.writeBoolean(continueOnError);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion >= 2) {
-            uuidListListPropName = (String) in.readObject();
-            failOnError = in.readBoolean();
-        } else if (objDataVersion == 1) {
-            uuidListListPropName = (String) in.readObject();
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
 
+        switch (objDataVersion) {
+            case 0:
+            case 1:
+                uuidListListPropName = (String) in.readObject();
+                break;
+            case 2:
+                uuidListListPropName = (String) in.readObject();
+                continueOnError = in.readBoolean();
+                break;
+            default:
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
@@ -126,11 +130,12 @@ public class AddUuidListListToListView extends AbstractTask {
                 }
             });
 
-            if (!failOnError && !invalidUuids.isEmpty()) {                
+            if (continueOnError && !invalidUuids.isEmpty()) {
                 String errorMessages = "" + process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
-                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n" + ListUtil.concat(invalidUuids, "\n"));
+                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n" + ListUtil.
+                        concat(invalidUuids, "\n"));
             }
-            
+
             return Condition.CONTINUE;
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
@@ -144,7 +149,7 @@ public class AddUuidListListToListView extends AbstractTask {
     }
 
     private I_GetConceptData[] getConceptsForList(List<List<UUID>> idListList,
-                                                  I_TermFactory tf) {
+            I_TermFactory tf) {
 
         I_GetConceptData[] elements = new I_GetConceptData[idListList.size()];
         Map idPositions = new MultiMap();
@@ -166,7 +171,7 @@ public class AddUuidListListToListView extends AbstractTask {
                     try {
                         nid = tf.uuidToNative(idList);
                     } catch (NoMappingException nme) {
-                        if (failOnError) {
+                        if (!continueOnError) {
                             throw nme;
                         }
                         invalidUuids.add(idList.get(0).toString());
@@ -197,7 +202,7 @@ public class AddUuidListListToListView extends AbstractTask {
 
         if (!idPositions.isEmpty()) {
             getRelationshipSources(tf, idPositions, elements);
-        }        
+        }
 
         return elements;
     }
@@ -227,7 +232,7 @@ public class AddUuidListListToListView extends AbstractTask {
                     }
                 }
             });
-        } catch (Exception e) {                        
+        } catch (Exception e) {
             String logMessage = "An error occurred. An id exists that cannot be resolved as a concept, "
                     + "description or relationship";
             AceLog.getAppLog().log(Level.SEVERE, logMessage, e);
@@ -273,12 +278,12 @@ public class AddUuidListListToListView extends AbstractTask {
         this.uuidListListPropName = uuidListListPropName;
     }
 
-    public Boolean isFailOnError() {
-        return failOnError;
+    public boolean isContinueOnError() {
+        return continueOnError;
     }
 
-    public void setFailOnError(Boolean failOnError) {
-        this.failOnError = failOnError;
+    public void setContinueOnError(boolean isContinueOnError) {
+        this.continueOnError = isContinueOnError;
     }
 
     /**

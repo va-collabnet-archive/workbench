@@ -28,9 +28,9 @@
   <name>ACE API</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31</developerConnection>
-    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/ace-api-1.31</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31.6</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31.6</developerConnection>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/ace-api-1.31.6</url>
   </scm>
   <ciManagement>
     <system>continuum</system>
@@ -99,7 +99,13 @@
       <artifactId>svnkit-javahl</artifactId>
       <version>1.2.1.5297</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -129,3 +135,4 @@
     </plugins>
   </build>
 </project>
+
