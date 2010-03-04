@@ -7,6 +7,7 @@ import org.dwfa.ace.log.AceLog;
 
 public class Terms {
     private static I_TermFactory factory;
+    private static String defaultFactoryClassname = "org.ihtsdo.db.bdb.BdbTermFactory";
 
     private static Object home;
 
@@ -49,13 +50,13 @@ public class Terms {
     @SuppressWarnings("unchecked")
     public static void openDefaultFactory(File envHome, boolean readOnly, Long cacheSize)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-            open((Class<I_ImplementTermFactory>) Class.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly, cacheSize);
+            open((Class<I_ImplementTermFactory>) Class.forName(defaultFactoryClassname), envHome, readOnly, cacheSize);
     }
 
     @SuppressWarnings("unchecked")
     public static void createFactory(File envHome, boolean readOnly, Long cacheSize, DatabaseSetupConfig dbSetupConfig)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-            open((Class<I_ImplementTermFactory>) Class.forName("org.dwfa.vodb.VodbEnv"), envHome, readOnly, cacheSize,
+            open((Class<I_ImplementTermFactory>) Class.forName(defaultFactoryClassname), envHome, readOnly, cacheSize,
                 dbSetupConfig);
     }
 
@@ -80,5 +81,6 @@ public class Terms {
     public static void setStealthfactory(I_TermFactory stealthfactory) {
         Terms.factory = stealthfactory;
     }
+
 
 }
