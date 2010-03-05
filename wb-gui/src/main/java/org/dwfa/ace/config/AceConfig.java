@@ -45,13 +45,13 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.JarExtractor;
-import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.je.DatabaseException;
 

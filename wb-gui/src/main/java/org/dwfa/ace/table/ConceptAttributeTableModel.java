@@ -44,11 +44,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class ConceptAttributeTableModel extends AbstractTableModel implements PropertyChangeListener {

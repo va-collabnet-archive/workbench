@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
 import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
@@ -36,7 +37,6 @@ import org.dwfa.ace.refset.I_RefsetDefaultsString;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
 import org.dwfa.ace.refset.I_RefsetDefaultsTemplateForRel;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 
 public class RefsetPreferences implements I_HoldRefsetPreferences, Serializable {
 

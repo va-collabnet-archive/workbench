@@ -33,13 +33,13 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import com.sleepycat.je.DatabaseException;

@@ -39,10 +39,10 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 
 public class DescriptionsForConceptTableModel extends DescriptionTableModel implements PropertyChangeListener {
 

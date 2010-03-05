@@ -27,8 +27,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 
 public class DestRelTableModel extends RelTableModel {
 

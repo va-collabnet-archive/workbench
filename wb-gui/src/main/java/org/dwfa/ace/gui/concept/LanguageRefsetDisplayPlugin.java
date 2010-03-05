@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionTableRenderer;
@@ -59,7 +60,6 @@ import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 
 public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements TableModelListener {
 

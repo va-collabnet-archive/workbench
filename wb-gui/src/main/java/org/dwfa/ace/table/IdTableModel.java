@@ -50,11 +50,11 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
 public class IdTableModel extends AbstractTableModel implements PropertyChangeListener {

@@ -29,12 +29,12 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 import org.dwfa.vodb.types.IntList;
 
 public class RefsetDefaults implements I_RefsetDefaults, Serializable {
