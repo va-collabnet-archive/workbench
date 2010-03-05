@@ -178,8 +178,8 @@ public class BdbCommitManager {
 			removeUncommitted(concept);
 			if (Bdb.watchList.containsKey(concept.getNid())) {
 				AceLog.getAppLog().info(
-						"---ииии Removing uncommitted concept: "
-								+ concept.getNid() + " ---ииии ");
+						"--- Removing uncommitted concept: "
+								+ concept.getNid() + " --- ");
 			}
 			return;
 		}
