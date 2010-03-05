@@ -71,8 +71,6 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
-
 public class JTreeWithDragImage extends JTree {
 
     private class TermLabelDragSourceListener implements DragSourceListener {
@@ -134,7 +132,7 @@ public class JTreeWithDragImage extends JTree {
             }
         }
 
-        private Transferable getTransferable(I_GetConceptData obj) throws DatabaseException, TerminologyException, IOException {
+        private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
             return new ConceptTransferable(Terms.get().getConcept(obj.getConceptId()));
         }
 

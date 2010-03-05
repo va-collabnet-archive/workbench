@@ -97,8 +97,6 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
-import com.sleepycat.je.DatabaseException;
-
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins, PropertyChangeListener, Scrollable {
 
     private class ShowHistoryListener implements ActionListener {
@@ -176,9 +174,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 public void run() {
                     try {
                         contentScroller.setViewportView(getContentPane());
-                    } catch (DatabaseException e) {
-                        AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
-                            "Database Exception: " + e.getLocalizedMessage(), e);
                     } catch (TerminologyException e) {
                         AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                                 "Database Exception: " + e.getLocalizedMessage(), e);
@@ -211,9 +206,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 historyButton.isSelected());
             try {
                 contentScroller.setViewportView(getContentPane());
-            } catch (DatabaseException e1) {
-                AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
-                    "Database Exception: " + e1.getLocalizedMessage(), e1);
             } catch (TerminologyException e1) {
                 AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                         "Database Exception: " + e1.getLocalizedMessage(), e1);
@@ -398,18 +390,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         }
     }
 
-    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, Integer panelId) throws DatabaseException,
+    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, Integer panelId) throws 
             IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, null, panelId);
     }
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+            throws  IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, null, enableListLink, panelId);
     }
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         this(host_enum, ace, link, conceptTabs, false, panelId);
     }
 
@@ -424,7 +416,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 	private LinkEditor linkEditor;
 
     public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, boolean enableListLink,
-            Integer panelId) throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+            Integer panelId) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
         this.panelId = panelId;
@@ -506,7 +498,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         addMouseListener(new ProgrammersPopupListener(this));
     }
 
-    public JComponent getContentPane() throws DatabaseException, TerminologyException, IOException {
+    public JComponent getContentPane() throws TerminologyException, IOException {
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;

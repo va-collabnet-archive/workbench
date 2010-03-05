@@ -53,8 +53,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.JarExtractor;
 
-import com.sleepycat.je.DatabaseException;
-
 public class AceConfig implements I_ConfigAceDb, Serializable {
 
     private static File dbFolderOverride = null;
@@ -111,11 +109,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // transient
     private transient File profileFile;
 
-    public AceConfig() throws DatabaseException, TerminologyException, IOException {
+    public AceConfig() throws TerminologyException, IOException {
         super();
     }
 
-    public AceConfig(File dbFolder) throws DatabaseException, TerminologyException, IOException {
+    public AceConfig(File dbFolder) throws TerminologyException, IOException {
         this();
         this.dbFolder = dbFolder;
     }
@@ -152,14 +150,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             out.writeObject(Terms.get().nativeToUuid(userConcept.getConceptId()));
             out.writeObject(Terms.get().nativeToUuid(userPath.getConceptId()));
             out.writeObject(fullName);
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
         } catch (TerminologyException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
+            throw new IOException(e);
         }
     }
 
@@ -254,7 +246,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     }
 
     public static void setupAceConfig(AceConfig config, File configFile, Long cacheSize, boolean includeSnomed)
-            throws DatabaseException, ParseException, TerminologyException, IOException, FileNotFoundException {
+            throws ParseException, TerminologyException, IOException, FileNotFoundException {
         try {
             if (config.userConcept == null) {
                 config.userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());

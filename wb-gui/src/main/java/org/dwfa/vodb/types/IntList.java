@@ -41,8 +41,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
-
 public class IntList implements ListDataListener, I_IntList {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
@@ -67,11 +65,7 @@ public class IntList implements ListDataListener, I_IntList {
 
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : list.getListValues()) {
-            try {
-                outList.add(Terms.get().nativeToUuid(i));
-            } catch (DatabaseException e) {
-                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-            }
+            outList.add(Terms.get().nativeToUuid(i));
         }
 
         out.writeInt(outList.size());

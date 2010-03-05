@@ -33,16 +33,12 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinVersionHelper;
-
-import com.sleepycat.je.DatabaseException;
 
 public class Path implements I_Path {
     /**
@@ -188,33 +184,25 @@ public class Path implements I_Path {
     }
 
     public UniversalAcePath getUniversal() throws IOException, TerminologyException {
-        try {
-            List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
+             List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
             for (I_Position position : origins) {
                 universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
-                    position.getPath().getConceptId()), ThinVersionHelper.convert(position.getVersion())));
+                    position.getPath().getConceptId()), Terms.get().convertToThickVersion(position.getVersion())));
             }
             return new UniversalAcePath(Terms.get().nativeToUuid(conceptId), universalOrigins);
-        } catch (DatabaseException e) {
-            throw new ToIoException(e);
-        }
     }
 
     public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
-        try {
-        	List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptId());
-        	if (uuids.size() > 0) {
-                out.writeObject(Terms.get().nativeToUuid(p.getConceptId()));
-        	} else {
-            	throw new IOException("no uuids for component: " + p);
-        	}
-        } catch (DatabaseException e) {
-            throw new IOException(e);
-        }
-        out.writeInt(p.getOrigins().size());
-        for (I_Position origin : p.getOrigins()) {
-            Position.writePosition(out, origin);
-        }
+    	List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptId());
+    	if (uuids.size() > 0) {
+    		out.writeObject(Terms.get().nativeToUuid(p.getConceptId()));
+    	} else {
+    		throw new IOException("no uuids for component: " + p);
+    	}
+    	out.writeInt(p.getOrigins().size());
+    	for (I_Position origin : p.getOrigins()) {
+    		Position.writePosition(out, origin);
+    	}
     }
 
     @SuppressWarnings("unchecked")

@@ -14,8 +14,6 @@ import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 
-import com.sleepycat.je.DatabaseException;
-
 public interface I_Search {
 
 	/**
@@ -31,18 +29,18 @@ public interface I_Search {
 	public void searchRegex(I_TrackContinuation tracker, Pattern p,
 			Collection<I_DescriptionVersioned> matches, CountDownLatch latch,
 			List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-			throws DatabaseException, IOException;
+			throws IOException;
 
 	public CountDownLatch searchLucene(I_TrackContinuation tracker,
 			String query, Collection<LuceneMatch> matches,
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
 			I_ConfigAceFrame config, LuceneProgressUpdator updater)
-			throws DatabaseException, IOException, ParseException;
+			throws IOException, ParseException;
 
 	public void searchConcepts(I_TrackContinuation tracker,
 			I_RepresentIdSet matches,
 			CountDownLatch latch, List<I_TestSearchResults> checkList,
-			I_ConfigAceFrame config) throws DatabaseException, IOException,
+			I_ConfigAceFrame config) throws IOException,
 			ParseException;
 
 }

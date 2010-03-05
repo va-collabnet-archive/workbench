@@ -183,8 +183,6 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.thread.NamedThreadFactory;
 
-import com.sleepycat.je.DatabaseException;
-
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
     public class TestTupleCalculator implements ActionListener {
@@ -338,8 +336,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                             new ConceptPanel(HOST_ENUM.CONCPET_PANEL_DATA_CHECK, ACE.this,
                                                 LINK_TYPE.DATA_CHECK_LINK, conceptTabs, Integer.MAX_VALUE);
                                     conceptPanels.add(dataCheckPanel);
-                                } catch (DatabaseException e) {
-                                    AceLog.getAppLog().alertAndLogException(e);
                                 } catch (IOException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
                                 } catch (ClassNotFoundException e) {
@@ -811,8 +807,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         for (I_Transact cb : uncommittedNoChecks) {
                             cb.commit(version, values);
                         }
-                    } catch (DatabaseException e) {
-                        throw new IOException(e);
                     } catch (Exception e) {
                         throw new IOException(e);
 					}
@@ -1721,7 +1715,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     CollectionEditorContainer conceptListEditor;
 
-    private Component getConceptListEditor() throws DatabaseException, IOException, ClassNotFoundException,
+    private Component getConceptListEditor() throws IOException, ClassNotFoundException,
             NoSuchAlgorithmException, TerminologyException {
         if (conceptListEditor == null) {
             if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {

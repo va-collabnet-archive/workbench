@@ -41,8 +41,6 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Path;
 
-import com.sleepycat.je.DatabaseException;
-
 public class AddImage extends AddComponent {
 
     public AddImage(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
@@ -76,7 +74,7 @@ public class AddImage extends AddComponent {
         termContainer.setTermComponent(cb);
     }
 
-    public static void addStockImages() throws DatabaseException, IOException, TerminologyException {
+    public static void addStockImages() throws IOException, TerminologyException {
 
         I_Path aceAuxPath = new Path(Integer.MIN_VALUE + 1, new ArrayList<I_Position>());
 
@@ -118,7 +116,7 @@ public class AddImage extends AddComponent {
 
     private static void addStockImage(String uuidStr, String textDesc,
             I_ConceptualizeUniversally conceptForImage, I_ConceptualizeUniversally imageType, String imageFormat,
-            String imageResource, I_Path aceAuxPath) throws TerminologyException, IOException, DatabaseException {
+            String imageResource, I_Path aceAuxPath) throws TerminologyException, IOException {
 
         I_GetConceptData concept = Terms.get().getConcept(conceptForImage.getUids());
         int typeNid = Terms.get().uuidToNative(imageType.getUids());

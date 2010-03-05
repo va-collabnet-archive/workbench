@@ -38,9 +38,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.dwfa.vodb.bind.ThinVersionHelper;
-
-import com.sleepycat.je.DatabaseException;
 
 public class Position implements I_Position {
 
@@ -236,8 +233,6 @@ public class Position implements I_Position {
             } else {
                 out.writeObject(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             }
-        } catch (DatabaseException e) {
-			throw new IOException(e);
         } catch (TerminologyException e) {
 			throw new IOException(e);
 		}
@@ -327,7 +322,7 @@ public class Position implements I_Position {
         } else if (version == Integer.MIN_VALUE) {
             buff.append("BOT");
         } else {
-            Date positionDate = new Date(ThinVersionHelper.convert(version));
+            Date positionDate = new Date(Terms.get().convertToThickVersion(version));
             buff.append(dateFormatter.format(positionDate));
         }
         return buff.toString();
@@ -343,7 +338,7 @@ public class Position implements I_Position {
     }
 
     public long getTime() {
-        return ThinVersionHelper.convert(version);
+        return Terms.get().convertToThickVersion(version);
     }
 
 }

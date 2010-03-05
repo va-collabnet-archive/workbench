@@ -48,7 +48,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinExtBinder;
+import org.ihtsdo.etypes.EConcept;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
 
@@ -120,8 +120,8 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
                     if (selPath != null) {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                         I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
-                        switch (ThinExtBinder.getExtensionType(specPart)) {
-                        case CONCEPT_CONCEPT:
+                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                        case CID_CID:
                             popup.addSeparator();
                             addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart,
                                 descUuid);

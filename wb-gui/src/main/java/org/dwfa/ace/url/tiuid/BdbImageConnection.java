@@ -31,8 +31,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
-
 public class BdbImageConnection extends URLConnection {
 
     I_ImageVersioned image;
@@ -132,10 +130,6 @@ public class BdbImageConnection extends URLConnection {
                     }
                 }
             }
-        } catch (DatabaseException e) {
-            IOException ex = new IOException();
-            ex.initCause(e);
-            throw ex;
         } catch (TerminologyException e) {
             IOException ex = new IOException();
             ex.initCause(e);

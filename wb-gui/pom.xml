@@ -34,6 +34,22 @@
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/vodb</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
+   <distributionManagement>
+        <site>
+            <id>website</id>
+            <url>file:///ciserver/sites/dwfa</url>
+        </site>
+        <snapshotRepository>
+            <id>archiva04.snapshots</id>
+            <name>Archiva04 Snapshots Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>archiva04.releases</id>
+            <name>Archiva04 Releases Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
+        </repository>
+    </distributionManagement>
     <licenses>
         <license>
             <name>Informatics, Inc. End User License Agreement</name>
@@ -41,19 +57,9 @@
     </licenses>
     <dependencies>
         <dependency>
-            <groupId>com.sleepycat</groupId>
-            <artifactId>je</artifactId>
-            <version>4.0.92</version>
-        </dependency>
-        <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-api</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>2.9.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -89,109 +95,6 @@
             <artifactId>trilead-ssh2</artifactId>
             <version>build213-svnkit-1.2-patch</version>
             <!--  <optional>true</optional>  -->
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>mahalo-dl</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>outrigger-dl</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>reggie-dl</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-
-        <dependency>
-            <!-- An alternative to:
-                <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4</version>
-                <scope>compile</scope>
-                </dependency>
-                secondary to licensing issues -->
-            <groupId>org.apache.geronimo.javamail</groupId>
-            <artifactId>geronimo-javamail_1.4_mail</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <!-- An alternative to:
-                <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>1.1</version>
-                </dependency>
-                secondary to licensing issues -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.1_spec</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>jsk-dl</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.jini</groupId>
-            <artifactId>jsk-lib</artifactId>
-            <version>2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.jini</groupId>
-            <artifactId>jsk-platform</artifactId>
-            <version>2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>browser</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>jsk-policy</artifactId>
-            <scope>provided</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>mahalo</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>outrigger</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>reggie</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>start</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa.jini</groupId>
-            <artifactId>tools</artifactId>
-            <scope>compile</scope>
-            <version>2.1</version>
         </dependency>
     </dependencies>
     <reporting>

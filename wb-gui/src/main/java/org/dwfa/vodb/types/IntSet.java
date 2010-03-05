@@ -40,8 +40,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
-
 public class IntSet implements ListDataListener, I_IntSet {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
@@ -253,11 +251,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : set.getSetValues()) {
-            try {
-                outList.add(Terms.get().nativeToUuid(i));
-            } catch (DatabaseException e) {
-                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-            }
+            outList.add(Terms.get().nativeToUuid(i));
         }
 
         out.writeInt(outList.size());

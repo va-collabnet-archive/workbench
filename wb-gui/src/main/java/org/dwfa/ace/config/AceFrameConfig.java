@@ -121,8 +121,6 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
-import com.sleepycat.je.DatabaseException;
-
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /**
      *
@@ -364,33 +362,21 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, statedViewTypes);
         IntSet.writeIntSet(out, inferredViewTypes);
 
-        try {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultStatus.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultDescriptionType.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipType.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultRelationshipRefinability.getConceptId()));
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
-        }
+        out.writeObject(Terms.get().nativeToUuid(defaultStatus.getConceptId()));
+        out.writeObject(Terms.get().nativeToUuid(defaultDescriptionType.getConceptId()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipType.getConceptId()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipRefinability.getConceptId()));
 
         IntList.writeIntList(out, treeDescPreferenceList);
         IntList.writeIntList(out, tableDescPreferenceList);
         IntList.writeIntList(out, shortLabelDescPreferenceList);
         IntList.writeIntList(out, longLabelDescPreferenceList);
         out.writeInt(termTreeDividerLoc);
-        try {
-            if (hierarchySelection != null) {
-                out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
-            } else {
-                out.writeObject(null);
-            }
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
+        if (hierarchySelection != null) {
+        	out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
+        } else {
+        	out.writeObject(null);
         }
         out.writeObject(null);
         out.writeObject(null);
@@ -425,10 +411,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                         AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
             }
             out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
         } catch (TerminologyException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -494,17 +476,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntList.writeIntList(out, contextIntList);
 
         // 35
-        try {
             writeConceptAsId(classificationRoot, out);
             writeConceptAsId(classifierIsaType, out);
             writeConceptAsId(classifierInputPathConcept, out);
             writeConceptAsId(classifierOutputPathConcept, out);
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
-        }
-
+ 
         // 36
         out.writeObject(conflictResolutionStrategy);
         out.writeBoolean(highlightConflictsInComponentPanel);
@@ -544,18 +520,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Path.writePathSet(out, promotionPathSet);
 
         // 45
-        try {
-            writeConceptAsId(classificationRoleRoot, out);
-        } catch (DatabaseException e) {
-            IOException newEx = new IOException();
-            newEx.initCause(e);
-            throw newEx;
-        }
+        writeConceptAsId(classificationRoleRoot, out);
 
     }
 
-    private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws DatabaseException,
-            IOException {
+    private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
         if (concept == null) {
             out.writeObject(null);
         } else {

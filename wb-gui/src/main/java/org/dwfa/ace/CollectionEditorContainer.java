@@ -71,8 +71,6 @@ import org.dwfa.gui.button.Button32x32;
 import org.dwfa.gui.toggle.Toggle32x32;
 import org.dwfa.tapi.TerminologyException;
 
-import com.sleepycat.je.DatabaseException;
-
 public class CollectionEditorContainer extends JPanel {
 
     public class ImportListButtonListener implements ActionListener {
@@ -223,7 +221,7 @@ public class CollectionEditorContainer extends JPanel {
     }
 
     public CollectionEditorContainer(TerminologyList list, ACE ace, JPanel descListProcessBuilderPanel)
-            throws DatabaseException, IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
         this.list = list;
@@ -249,7 +247,7 @@ public class CollectionEditorContainer extends JPanel {
         showComponentActionListener.actionPerformed(new ActionEvent(showComponentView, 0, "show"));
     }
 
-    private JSplitPane getListSplit(JList list, ACE ace) throws DatabaseException, IOException, ClassNotFoundException {
+    private JSplitPane getListSplit(JList list, ACE ace) throws IOException, ClassNotFoundException {
         listSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         listSplit.setOneTouchExpandable(true);
         listSplit.setTopComponent(new JScrollPane(list));

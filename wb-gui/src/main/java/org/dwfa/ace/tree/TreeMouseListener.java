@@ -44,7 +44,7 @@ import org.dwfa.ace.refset.RefsetCommentPopupListener;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.bind.ThinExtBinder;
+import org.ihtsdo.etypes.EConcept;
 
 public class TreeMouseListener extends MouseAdapter {
 
@@ -146,8 +146,8 @@ public class TreeMouseListener extends MouseAdapter {
                     if (selPath != null) {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                         I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
-                        switch (ThinExtBinder.getExtensionType(specPart)) {
-                        case CONCEPT_CONCEPT:
+                        switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                        case CID_CID:
                             popup.addSeparator();
                             addRefsetItems(popup, new File(AceFrame.pluginRoot, "refsetspec/branch-popup"), specPart);
                             break;
