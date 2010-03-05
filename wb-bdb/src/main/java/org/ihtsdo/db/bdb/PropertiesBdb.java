@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.vodb.ToIoException;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.je.Cursor;

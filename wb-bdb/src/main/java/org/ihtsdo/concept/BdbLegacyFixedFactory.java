@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.I_ExtendLocally;
@@ -15,7 +16,6 @@ import org.dwfa.tapi.I_ManifestLocally;
 import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.ToIoException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 
