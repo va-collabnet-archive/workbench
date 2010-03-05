@@ -190,8 +190,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 username = null;
             }
             if (objDataVersion >= 1) {
-                // dbFolder = (File) 
-                        in.readObject();                
+                
+                // Ignore the dbFolder from the profile 
+                in.readObject();
+                
+                dbFolder = new File("berkeley-db");
                 if (dbFolderOverride != null) {
                     dbFolder = dbFolderOverride;
                 }
@@ -258,8 +261,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 username = null;
             }
             if (objDataVersion >= 1) {
-                // dbFolder = (File) 
-                        in.readObject();
+                
+                // ignore the dbFolder from the profile
+                in.readObject();
+                
+                dbFolder = new File("berkeley-db");
                 if (dbFolderOverride != null) {
                     dbFolder = dbFolderOverride;
                 }
