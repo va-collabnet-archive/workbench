@@ -16,6 +16,7 @@
 package org.dwfa.ace.task;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -47,18 +48,31 @@ public final class WriteListToFile extends AbstractTask {
     private static final long serialVersionUID = 7;
     public static final String DEFAULT_FILE_NAME = "listOutput.txt";
     public static final String DEFAULT_PROPERTY_NAME = ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey();
+    public static final String DEFAULT_MESSAGE_KEY = ProcessAttachmentKeys.DLG_MSG.getAttachmentKey();
+    public static final String DEFAULT_FILE_WRITTEN_MESSAGE = "Output file was written. ";
+    public static final String DEFAULT_FILE_NOT_WRITTEN_MESSAGE = "Output file not was written. ";
     private static final int DATA_VERSION = 0;
     private String objectListPropertyName;
     private String outputFile;
+    private String messageKey;
+    private String fileWrittenOutputMessage;
+    private String fileNotWrittenOutputMessage;
 
     /**
      * Creates an instance of the {@code WriteListToFile} task with the specified filename;
      * @param fileName the fileName to write to.
      * @param objectListPropertyName the name of the property holding the object list.
+     * @param messageKey the name of the property to hold messages.
+     * @param fileWrittenOutputMessage a message to for when an output file is written.
+     * @param fileNotWrittenOutputMessage a message to for when an output file is NOT written.
      */
-    public WriteListToFile(String fileName, String objectListPropertyName) {
+    public WriteListToFile(String fileName, String objectListPropertyName, String messageKey,
+            String fileWrittenOutputMessage, String fileNotWrittenOutputMessage) {
         this.outputFile = fileName;
         this.objectListPropertyName = objectListPropertyName;
+        this.messageKey = messageKey;
+        this.fileWrittenOutputMessage = fileWrittenOutputMessage;
+        this.fileNotWrittenOutputMessage = fileNotWrittenOutputMessage;
     }
 
     /**
@@ -67,7 +81,8 @@ public final class WriteListToFile extends AbstractTask {
      * {@link ProcessAttachmentKeys#getAttachmentKey()}
      */
     public WriteListToFile() {
-        this(DEFAULT_FILE_NAME, DEFAULT_PROPERTY_NAME);
+        this(DEFAULT_FILE_NAME, DEFAULT_PROPERTY_NAME, DEFAULT_MESSAGE_KEY, DEFAULT_FILE_WRITTEN_MESSAGE,
+                DEFAULT_FILE_NOT_WRITTEN_MESSAGE);
     }
 
     /**
@@ -79,6 +94,10 @@ public final class WriteListToFile extends AbstractTask {
         out.writeInt(DATA_VERSION);
         out.writeObject(outputFile);
         out.writeObject(objectListPropertyName);
+        out.writeObject(messageKey);
+        out.writeObject(fileWrittenOutputMessage);
+        out.writeObject(fileNotWrittenOutputMessage);
+
     }
 
     /**
@@ -89,6 +108,15 @@ public final class WriteListToFile extends AbstractTask {
      * <br>
      * {@code objectListPropertyName} is initialised to the serialized value or the default value of
      * {@code A: OBJECTS_LIST} as defined by {@link ProcessAttachmentKeys#getAttachmentKey()}
+     * <br>
+     * {@code messageKey} is initialised to the serialized value or the default value of
+     * {@code A: DLG_MSG} as defined by {@link ProcessAttachmentKeys#getAttachmentKey()}
+     * <br>
+     * {@code fileWrittenOutputMessage} is initialised to the serialized value or the default value of
+     * {@code DEFAULT_FILE_WRITTEN_MESSAGE}.
+     * <br>
+     * {@code fileNotWrittenOutputMessage} is initialised to the serialized value or the default value of
+     * {@code DEFAULT_FILE_NOT_WRITTEN_MESSAGE}.
      * </p>
      * @param in the {@code ObjectInputStream} containing the serialized object.
      * @throws IOException will occur if there are failed or interrupted I/O operations.
@@ -102,9 +130,22 @@ public final class WriteListToFile extends AbstractTask {
             case 0:
                 String inOutputFile = (String) in.readObject();
                 outputFile = inOutputFile == null ? DEFAULT_FILE_NAME : inOutputFile;
+
                 String inObjectListPropertyName = (String) in.readObject();
                 objectListPropertyName = inObjectListPropertyName == null ? DEFAULT_PROPERTY_NAME
                         : inObjectListPropertyName;
+
+                String inMessageKey = (String) in.readObject();
+                messageKey = inMessageKey == null ? DEFAULT_MESSAGE_KEY
+                        : inMessageKey;
+
+                String inFileWrittenOutputMessage = (String) in.readObject();
+                fileWrittenOutputMessage = inFileWrittenOutputMessage == null ? DEFAULT_FILE_WRITTEN_MESSAGE
+                        : inFileWrittenOutputMessage;
+
+                String inFileNotWrittenOutputMessage = (String) in.readObject();
+                fileNotWrittenOutputMessage = inFileNotWrittenOutputMessage == null ? DEFAULT_FILE_NOT_WRITTEN_MESSAGE
+                        : inFileNotWrittenOutputMessage;
                 break;
             default:
                 throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -113,9 +154,16 @@ public final class WriteListToFile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            List<Object> list = (List<Object>) process.readProperty(objectListPropertyName);
-            if (list != null && !list.isEmpty()) {
-                this.writeList(list);
+            Object inProperty = process.readProperty(objectListPropertyName);
+            if (inProperty instanceof List) {
+                List<Object> list = (List<Object>) inProperty;
+                if (list != null && !list.isEmpty()) {
+                    this.writeList(list);
+                    this.appendMessage(process, String.format("%1$s%2$s", fileWrittenOutputMessage, new File(
+                            outputFile).getAbsolutePath()));
+                }
+            } else {
+                this.appendMessage(process, String.format("%1$s", fileNotWrittenOutputMessage));
             }
             return Condition.CONTINUE;
         } catch (Exception ex) {
@@ -149,9 +197,31 @@ public final class WriteListToFile extends AbstractTask {
                 writer.write(line.toString());
                 writer.newLine();
             }
+            Logger.getLogger(this.getClass().getName()).info(String.format("Output file written to '%1$s'.", new File(
+                    outputFile).getAbsolutePath()));
         } finally {
             writer.close();
         }
+    }
+
+    /**
+     * Convenience method to encapsulate adding error messages to existing error messages.
+     * @param process the current Business Process.
+     * @throws Exception if there is an {@link java.beans.IntrospectionException}, {@link IllegalAccessException} or
+     * {@link java.lang.reflect.InvocationTargetException} whilst accessing properties from the
+     * {@link I_EncodeBusinessProcess}.
+     */
+    private void appendMessage(I_EncodeBusinessProcess process, String messageToAppend) throws Exception {
+        StringBuilder messages = new StringBuilder();
+        String previousMessages = (String) process.readProperty(messageKey);
+
+        if (previousMessages != null && !previousMessages.isEmpty()) {
+            messages.append(previousMessages).append("\n");
+        }
+
+        messages.append(messageToAppend);
+
+        process.setProperty(messageKey, messages.toString());
     }
 
     /**
@@ -186,6 +256,55 @@ public final class WriteListToFile extends AbstractTask {
         this.outputFile = outputFile;
     }
 
+    /**
+     * Returns the value of ${code messageKey}
+     * @return messageKey - the name of the property that messages will be placed into.
+     */
+    public String getMessageKey() {
+        return messageKey;
+    }
+
+    /**
+     * Sets the value of {@code messageKey}
+     * @param messageKey - the value to assign to {@code messageKey}
+     */
+    public void setMessageKey(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    /**
+     * Returns the value of {@code fileNotWrittenOutputMessage}
+     * @return fileNotWrittenOutputMessage -the text to add to a message when displaying a message about not writing
+     * the file.
+     */
+    public String getFileNotWrittenOutputMessage() {
+        return fileNotWrittenOutputMessage;
+    }
+
+    /**
+     * Sets the value of {@code fileNotWrittenOutputMessage}
+     * @param fileNotWrittenOutputMessage - the value to assign to {@code fileNotWrittenOutputMessage}
+     */
+    public void setFileNotWrittenOutputMessage(String fileNotWrittenOutputMessage) {
+        this.fileNotWrittenOutputMessage = fileNotWrittenOutputMessage;
+    }
+
+    /**
+     * Returns the value of {@code fileWrittenOutputMessage}
+     * @return fileWrittenOutputMessage -the text to add to a message when displaying a message about writing the file.
+     */
+    public String getFileWrittenOutputMessage() {
+        return fileWrittenOutputMessage;
+    }
+
+    /**
+     * Sets the value of {@code fileWrittenOutputMessage}
+     * @param fileWrittenOutputMessage - the value to assign to {@code fileWrittenOutputMessage}
+     */
+    public void setFileWrittenOutputMessage(String fileWrittenOutputMessage) {
+        this.fileWrittenOutputMessage = fileWrittenOutputMessage;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -202,14 +321,28 @@ public final class WriteListToFile extends AbstractTask {
         if ((this.outputFile == null) ? (other.outputFile != null) : !this.outputFile.equals(other.outputFile)) {
             return false;
         }
+        if ((this.messageKey == null) ? (other.messageKey != null) : !this.messageKey.equals(other.messageKey)) {
+            return false;
+        }
+        if ((this.fileWrittenOutputMessage == null) ? (other.fileWrittenOutputMessage != null)
+                : !this.fileWrittenOutputMessage.equals(other.fileWrittenOutputMessage)) {
+            return false;
+        }
+        if ((this.fileNotWrittenOutputMessage == null) ? (other.fileNotWrittenOutputMessage != null)
+                : !this.fileNotWrittenOutputMessage.equals(other.fileNotWrittenOutputMessage)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 29 * hash + (this.objectListPropertyName != null ? this.objectListPropertyName.hashCode() : 0);
-        hash = 29 * hash + (this.outputFile != null ? this.outputFile.hashCode() : 0);
+        hash = 89 * hash + (this.objectListPropertyName != null ? this.objectListPropertyName.hashCode() : 0);
+        hash = 89 * hash + (this.outputFile != null ? this.outputFile.hashCode() : 0);
+        hash = 89 * hash + (this.messageKey != null ? this.messageKey.hashCode() : 0);
+        hash = 89 * hash + (this.fileWrittenOutputMessage != null ? this.fileWrittenOutputMessage.hashCode() : 0);
+        hash = 89 * hash + (this.fileNotWrittenOutputMessage != null ? this.fileNotWrittenOutputMessage.hashCode() : 0);
         return hash;
     }
 }

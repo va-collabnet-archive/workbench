@@ -16,7 +16,6 @@
 package org.dwfa.ace.task;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import junit.framework.TestCase;
@@ -34,10 +33,13 @@ import org.jmock.Mockery;
 public class WriteListToFileTest extends TestCase {
 
     private static final String PROP_NAME = WriteListToFile.DEFAULT_PROPERTY_NAME;
+    private static final String MSG_KEY = WriteListToFile.DEFAULT_MESSAGE_KEY;
+    private static final String DFLT_WRITTEN_MSG = WriteListToFile.DEFAULT_FILE_WRITTEN_MESSAGE;
+    private static final String DFLT_NOT_WRITTEN_MSG = WriteListToFile.DEFAULT_FILE_NOT_WRITTEN_MESSAGE;
     private static final String EXPECTED_FILE = "src/test/resources/org/dwfa/ace/task/expectedWriteListToFileTest.txt";
     private static final String LIST_OUTPUT_FILE = "target/outputFile.txt";
     private static final String SERIALIZED_OUTPUT_FILE = "target/outputFile.txt";
-    private static final int EXPECTED_NUM_DECLARED_FIELDS = 6;
+    private static final int EXPECTED_NUM_DECLARED_FIELDS = 12;
     private Mockery context;
     private I_EncodeBusinessProcess process;
     private I_Work worker;
@@ -67,12 +69,17 @@ public class WriteListToFileTest extends TestCase {
         originalPropValue.add("c6f8d026-c7a1-54e1-b85a-7907a2906516");
         originalPropValue.add("c6f8d026-c7a1-54e1-b85a-7907a2906511");
 
-        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME, MSG_KEY, DFLT_WRITTEN_MSG,
+                DFLT_NOT_WRITTEN_MSG);
         context.checking(new Expectations() {
 
             {
                 oneOf(process).readProperty(PROP_NAME);
                 will(returnValue(originalPropValue));
+                oneOf(process).readProperty(MSG_KEY);
+                will(returnValue(""));
+                oneOf(process).setProperty(MSG_KEY, String.format("%1$s%2$s", DFLT_WRITTEN_MSG, new File(
+                        LIST_OUTPUT_FILE).getAbsolutePath()));
             }
         });
         instance.evaluate(process, worker);
@@ -83,7 +90,8 @@ public class WriteListToFileTest extends TestCase {
         FileSerializerDeserializer<WriteListToFile> serializer =
                 new FileSerializerDeserializer<WriteListToFile>();
 
-        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME, MSG_KEY, DFLT_WRITTEN_MSG,
+                DFLT_NOT_WRITTEN_MSG);
 
         serializer.setObject(instance);
         serializer.setOutputFile(new File(SERIALIZED_OUTPUT_FILE));
@@ -117,6 +125,13 @@ public class WriteListToFileTest extends TestCase {
         assertEquals(deserializedInstance.getObjectListPropertyName(), PROP_NAME);
 
         assertEquals(deserializedInstance.getOutputFile(), WriteListToFile.DEFAULT_FILE_NAME);
+
+        assertEquals(deserializedInstance.getMessageKey(), WriteListToFile.DEFAULT_MESSAGE_KEY);
+
+        assertEquals(deserializedInstance.getFileWrittenOutputMessage(), WriteListToFile.DEFAULT_FILE_WRITTEN_MESSAGE);
+
+        assertEquals(deserializedInstance.getFileNotWrittenOutputMessage(),
+                WriteListToFile.DEFAULT_FILE_NOT_WRITTEN_MESSAGE);
     }
 
     /**
@@ -135,12 +150,16 @@ public class WriteListToFileTest extends TestCase {
     public void testWithNullList() throws Exception {
         final List<String> originalPropValue = null;
 
-        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME, MSG_KEY, DFLT_WRITTEN_MSG,
+                DFLT_NOT_WRITTEN_MSG);
         context.checking(new Expectations() {
 
             {
                 oneOf(process).readProperty(PROP_NAME);
                 will(returnValue(originalPropValue));
+                oneOf(process).readProperty(MSG_KEY);
+                will(returnValue(""));
+                oneOf(process).setProperty(MSG_KEY, "Output file not was written. ");
             }
         });
         instance.evaluate(process, worker);
@@ -150,12 +169,35 @@ public class WriteListToFileTest extends TestCase {
     public void testWithEmptyList() throws Exception {
         final List<String> originalPropValue = new ArrayList<String>();
 
-        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME);
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME, MSG_KEY, DFLT_WRITTEN_MSG,
+                DFLT_NOT_WRITTEN_MSG);
         context.checking(new Expectations() {
 
             {
                 oneOf(process).readProperty(PROP_NAME);
                 will(returnValue(originalPropValue));
+                oneOf(process).readProperty(MSG_KEY);
+                will(returnValue(""));
+                oneOf(process).setProperty(MSG_KEY, "Output file not was written. ");
+            }
+        });
+        instance.evaluate(process, worker);
+        assertTrue(!new File(LIST_OUTPUT_FILE).exists());
+    }
+
+    public void testWithNonListValue() throws Exception {
+        final String originalPropValue = "";
+
+        WriteListToFile instance = new WriteListToFile(LIST_OUTPUT_FILE, PROP_NAME, MSG_KEY, DFLT_WRITTEN_MSG,
+                DFLT_NOT_WRITTEN_MSG);
+        context.checking(new Expectations() {
+
+            {
+                oneOf(process).readProperty(PROP_NAME);
+                will(returnValue(originalPropValue));
+                oneOf(process).readProperty(MSG_KEY);
+                will(returnValue(""));
+                oneOf(process).setProperty(MSG_KEY, "Output file not was written. ");
             }
         });
         instance.evaluate(process, worker);

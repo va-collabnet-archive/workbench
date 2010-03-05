@@ -67,6 +67,33 @@ public class WriteListToFileBeanInfo extends SimpleBeanInfo {
             listPropertyName.setShortDescription("The name of the Object List property.");
             propertyDescriptors.add(listPropertyName);
 
+            PropertyDescriptor messageKey =
+                    new PropertyDescriptor("messageKey",
+                    WriteListToFile.class);
+            messageKey.setBound(true);
+            messageKey.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            messageKey.setDisplayName("<html><font color='green'>Message Property Name:");
+            messageKey.setShortDescription("The name of the Message property.");
+            propertyDescriptors.add(messageKey);
+
+            PropertyDescriptor fileWrittenOutputMessage =
+                    new PropertyDescriptor("fileWrittenOutputMessage",
+                    WriteListToFile.class);
+            fileWrittenOutputMessage.setBound(true);
+            fileWrittenOutputMessage.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fileWrittenOutputMessage.setDisplayName("<html><font color='green'>File Written Message:");
+            fileWrittenOutputMessage.setShortDescription("The Text to display if the file was written.");
+            propertyDescriptors.add(fileWrittenOutputMessage);
+
+            PropertyDescriptor fileNotWrittenOutputMessage =
+                    new PropertyDescriptor("fileNotWrittenOutputMessage",
+                    WriteListToFile.class);
+            fileNotWrittenOutputMessage.setBound(true);
+            fileNotWrittenOutputMessage.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            fileNotWrittenOutputMessage.setDisplayName("<html><font color='green'>File Not Written Message:");
+            fileNotWrittenOutputMessage.setShortDescription("The Text to display if the file was Not written.");
+            propertyDescriptors.add(fileNotWrittenOutputMessage);
+
             return propertyDescriptors.toArray(new PropertyDescriptor[propertyDescriptors.size()]);
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

@@ -136,10 +136,8 @@ public class AddUuidListListToListView extends AbstractTask {
             });
 
             if (continueOnError && !invalidUuids.isEmpty()) {
-                String errorMessages = "" + process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
-                process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages + "\n"
-                        + uuidErrorMessage);
-                process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
+                appendErrorMessages(process);
+                appendErrorObjects(process);
             }
 
             return Condition.CONTINUE;
@@ -182,7 +180,7 @@ public class AddUuidListListToListView extends AbstractTask {
                         }
                         invalidUuids.add(idList.get(0).toString());
                         AceLog.getAppLog().log(Level.WARNING, "Invalid UUID: " + idList.get(0).toString());
-                        if (uuidErrorMessage.isEmpty()) {
+                        if (uuidErrorMessage == null || uuidErrorMessage.isEmpty()) {
                             uuidErrorMessage = nme.getMessage();
                         }
                         continue;
@@ -313,5 +311,45 @@ public class AddUuidListListToListView extends AbstractTask {
             return description;
         }
         throw new TerminologyException("More that one description matched the id " + descriptionId);
+    }
+
+    /**
+     * Convenience method to encapsulate adding error messages to existing error messages.
+     * @param process
+     * @throws IntrospectionException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private void appendErrorMessages(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        StringBuilder errorMessages = new StringBuilder();
+
+        String previousMessages = (String) process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
+
+        if (previousMessages != null && !previousMessages.isEmpty()) {
+            errorMessages.append(previousMessages).append("\n");
+        }
+
+        errorMessages.append(uuidErrorMessage);
+
+        process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages.toString());
+    }
+
+    /**
+     * Convenience method to encapsulate appending objects to the Object List for use with the {@link WriteToFile} task.
+     * @param process
+     * @throws IntrospectionException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private void appendErrorObjects(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        List<Object> objects = new ArrayList<Object>();
+        Object inProperty = process.readProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey());
+        if (inProperty instanceof List) {
+            objects.addAll((List<Object>) inProperty);
+        }
+        objects.addAll(invalidUuids);
+        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
     }
 }
