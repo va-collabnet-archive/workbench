@@ -607,4 +607,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
      * Redraw the hierarchy view
      */
     public void fireUpdateHierarchyView();
+
+    public void refreshRefsetTab();
 }

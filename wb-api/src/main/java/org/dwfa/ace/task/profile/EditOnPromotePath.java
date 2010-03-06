@@ -70,6 +70,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+    public void refreshRefsetTab() {
+        config.refreshRefsetTab();
+    }
+
     public EditOnPromotePath(I_ConfigAceFrame config) {
         super();
         this.config = config;
