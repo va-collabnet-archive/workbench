@@ -66,7 +66,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
         add(CoreServices.CO_LogManagerService);
         add(CoreServices.CO_LogViewerNewFrame);
         add(CoreServices.CO_PhantomFrame);
-        add(CoreServices.CO_ServiceBrowserNewFrame);
+        //add(CoreServices.CO_ServiceBrowserNewFrame);
         // add(CoreServices.CO_ProcessBuilder);
         // add(CO_FormBuilderNewFrame);
         add(CO_AceEditor);
