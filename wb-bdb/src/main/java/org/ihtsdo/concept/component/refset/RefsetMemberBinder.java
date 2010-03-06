@@ -101,11 +101,14 @@ public class RefsetMemberBinder extends TupleBinding<List<RefsetMember<?, ?>>>
 			encountered.incrementAndGet();
 			assert refsetMember.primordialSapNid != Integer.MAX_VALUE;
 			if (refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId) {
-				refsetMembersToWrite.add(refsetMember);
+			    if (refsetMember.getTime() != Long.MIN_VALUE) {
+	                refsetMembersToWrite.add(refsetMember);
+			    }
 			} else {
 				if (refsetMember.revisions != null) {
-					for (RefsetRevision<?, ?> extraVersions: refsetMember.revisions) {
-						if (extraVersions.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId) {
+					for (RefsetRevision<?, ?> r: refsetMember.revisions) {
+						if (r.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId &&
+						        r.getTime() != Long.MIN_VALUE) {
 							refsetMembersToWrite.add(refsetMember);
 							break;
 						}

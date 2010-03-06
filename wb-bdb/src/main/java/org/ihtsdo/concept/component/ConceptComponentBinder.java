@@ -88,12 +88,14 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
  				try {
 					if (conceptComponent == null) {
 						conceptComponent = factory.create(enclosingConcept, input);
-						C oldComponent = (C) componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
-						if (oldComponent != null) {
-							conceptComponent = oldComponent;
-							if (nidToConceptComponentMap != null) {
-								nidToConceptComponentMap.put(nid, oldComponent);
-							}
+						if (conceptComponent.getTime() != Long.MIN_VALUE) {
+	                        C oldComponent = (C) componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
+	                        if (oldComponent != null) {
+	                            conceptComponent = oldComponent;
+	                            if (nidToConceptComponentMap != null) {
+	                                nidToConceptComponentMap.put(nid, oldComponent);
+	                            }
+	                        }
 						}
 					} else {
 						factory.create(enclosingConcept, input);
