@@ -66,7 +66,6 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
         add(CoreServices.CO_LogManagerService);
         add(CoreServices.CO_LogViewerNewFrame);
         add(CoreServices.CO_PhantomFrame);
-        add(CoreServices.CO_ServiceBrowserNewFrame);
         // add(CoreServices.CO_ProcessBuilder);
         // add(CO_FormBuilderNewFrame);
         add(CO_AceEditor);
@@ -107,7 +106,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
         ServiceConfigOption sco = new ServiceConfigOption(CoreServices.INBOX_QUEUE + queueName, "config${/}"
             + queueName + ".policy", "config${/}" + queueName + "Secure.policy", CoreServices.INBOX_QUEUE_PROP
             + queueName, "Publishes an Inbox Queue for business processes. ", true,
-            "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", CoreServices.dwaPath,
+            "jiniPortUrlPart, \"", "lib", CoreServices.dwaPath,
             "org.dwfa.queue.QueueServer", new String[] { "config${/}" + queueName + ".config" },
             new String[] { "config${/}" + queueName + "Secure.config" }, true, false, true,
             "<html>Every workflow node needs at least one inbox queue to recieve processes<br>"
@@ -121,7 +120,7 @@ public class AceServices extends ArrayList<ServiceConfigOption> {
         ServiceConfigOption sco = new ServiceConfigOption(CoreServices.OUTBOX_QUEUE + queueName, "config${/}"
             + queueName + ".policy", "config${/}" + queueName + "Secure.policy", CoreServices.OUTBOX_QUEUE_PROP
             + queueName, "Publishes an OutBox Queue for workflow. ", true,
-            "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", CoreServices.dwaPath,
+            "jiniPortUrlPart, \"", "lib", CoreServices.dwaPath,
             "org.dwfa.queue.QueueServer", new String[] { "config${/}" + queueName + ".config" },
             new String[] { "config${/}" + queueName + "Secure.config" }, true, false, true,
             "<html>Every workflow node needs at least one outbox queue to send processes<br>"

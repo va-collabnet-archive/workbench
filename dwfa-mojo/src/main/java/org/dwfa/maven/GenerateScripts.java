@@ -117,6 +117,11 @@ public class GenerateScripts extends AbstractMojo {
         l.info("outputDirectory: " + outputDirectory);
         l.info("libDir: " + libDir);
         l.info("jarDir: " + libDir);
+        if (scriptNames != null) {
+            l.info("scriptNames: " + Arrays.asList(scriptNames));
+        } else {
+            l.info("scriptNames: " + scriptNames);
+        }
 
         File[] jars;
         if (jarDir != null) {
@@ -167,6 +172,7 @@ public class GenerateScripts extends AbstractMojo {
             configureScript(jars);
         } else {
             for (String name : scriptNames) {
+                l.info("generating script: " + name);
                 if (name.equalsIgnoreCase("startCore")) {
                     startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "Workflow Bundle", true,
                         false, false, false);
@@ -193,6 +199,15 @@ public class GenerateScripts extends AbstractMojo {
                 } else if (name.equalsIgnoreCase("pStartJehri")) {
                     startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true,
                         false, false, true);
+                }  else if (name.equalsIgnoreCase("wb")) {
+                    startAllScript(jars, "wb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, false,
+                        false);
+                }  else if (name.equalsIgnoreCase("dWb")) {
+                    startAllScript(jars, "dWb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, true,
+                        false);
+                }  else if (name.equalsIgnoreCase("pWb")) {
+                    startAllScript(jars, "pWb", "start-wb-local.config", "1400m", "1400m", "Workbench Bundle", true, false, false,
+                        true);
                 }
             }
         }

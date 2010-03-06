@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -76,6 +75,14 @@ public class LoadBdb extends AbstractMojo {
 	 * @required
 	 */
     private File luceneDir;
+    
+    /**
+     * Generated resources directory.
+     * 
+     * @parameter expression="${project.build.directory}/classes/berkeley-db"
+     * @required
+     */
+    private File berkeleyDir;
 
 
 	AtomicInteger conceptsRead = new AtomicInteger();
@@ -95,8 +102,8 @@ public class LoadBdb extends AbstractMojo {
 			long startTime = System.currentTimeMillis();
 			File conceptsFile = new File(generatedResources, conceptsFileName);
 
-			FileIO.recursiveDelete(new File("target/classes/berkeley-db"));
-			Bdb.setup("target/classes/berkeley-db");
+			FileIO.recursiveDelete(berkeleyDir);
+			Bdb.setup(berkeleyDir.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(conceptsFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
@@ -152,9 +159,9 @@ public class LoadBdb extends AbstractMojo {
 			getLog().info("elapsed time: "
 									+ (System.currentTimeMillis() - startTime));
 
-			FileIO.recursiveDelete(new File("target/classes/berkeley-db/read-only"));
-			File dirToMove = new File("target/classes/berkeley-db/mutable");
-			dirToMove.renameTo(new File("target/classes/berkeley-db/read-only"));
+			FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
+			File dirToMove = new File(berkeleyDir, "mutable");
+			dirToMove.renameTo(new File(berkeleyDir, "read-only"));
 		} catch (Exception ex) {
 			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
 		} catch (Throwable ex) {
@@ -228,12 +235,11 @@ public class LoadBdb extends AbstractMojo {
         Bdb.getConceptDb().iterateConceptDataInSequence(indexer);
 
         
-        AceLog.getAppLog().info("Optimizing index time: " + timer.getElapsedTime());
+        AceLog.getAppLog().info("Lucene index start time: " + timer.getElapsedTime());
+        timer.reset();
         writer.optimize();
         writer.close();
-        if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-            AceLog.getAppLog().info("Index time: " + timer.getElapsedTime());
-            timer.stop();
-        }
+        AceLog.getAppLog().info("Optimizing index time: " + timer.getElapsedTime());
+        timer.stop();
     }
 }

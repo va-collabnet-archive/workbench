@@ -19,7 +19,7 @@ package org.dwfa.ace.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.mail.AuthenticationFailedException;
+import javax.security.sasl.AuthenticationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -44,12 +44,12 @@ public class ChangeFramePassword implements ActionListener {
             if (prompter.prompt("Current username/password", frameConfig.getUsername())) {
                 if (prompter.getUsername() != null) {
                     if (prompter.getUsername().equals(frameConfig.getUsername()) == false) {
-                        throw new AuthenticationFailedException("username does not match");
+                        throw new AuthenticationException("username does not match");
                     }
                 }
                 if (prompter.getPassword() != null) {
                     if (prompter.getPassword().equals(frameConfig.getPassword()) == false) {
-                        throw new AuthenticationFailedException("password does not match");
+                        throw new AuthenticationException("password does not match");
                     }
                 }
                 if (prompter.prompt("New username/password", AceConfig.config.getUsername())) {

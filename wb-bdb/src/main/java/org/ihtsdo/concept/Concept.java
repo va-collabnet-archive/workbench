@@ -635,8 +635,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 			I_IntSet allowedStatus, PositionSetReadOnly positionSet,
 			boolean addUncommitted) throws IOException {
 		List<ConceptAttributes.Version> returnTuples = new ArrayList<ConceptAttributes.Version>();
-		getConceptAttributes().addTuples(allowedStatus, positionSet,
-				returnTuples, addUncommitted);
+		ConceptAttributes cattr = getConceptAttributes();
+		if (cattr != null) {
+		    cattr.addTuples(allowedStatus, positionSet,
+                returnTuples, addUncommitted);
+		}
 		return returnTuples;
 	}
 
