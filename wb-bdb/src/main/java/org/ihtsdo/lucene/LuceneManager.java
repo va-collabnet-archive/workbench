@@ -71,7 +71,7 @@ public class LuceneManager {
         timer.start();
         luceneDirFile.mkdirs();
         writer.setUseCompoundFile(true);
-        writer.setMergeFactor(10000);
+        writer.setMergeFactor(100);
         writer.setMaxMergeDocs(Integer.MAX_VALUE);
         writer.setMaxBufferedDocs(1000);
  
