@@ -31,8 +31,15 @@ import org.ihtsdo.db.bdb.Bdb;
 public class LuceneManager {
 	
 	public static File luceneDirFile = new File("berkeley-db/lucene");
-	public static Directory luceneDir;
-	private static IndexWriter writer;
+	public static File getLuceneDirFile() {
+        return luceneDirFile;
+    }
+    public static void setLuceneDirFile(File luceneDirFile) {
+        LuceneManager.luceneDirFile = luceneDirFile;
+    }
+    public static Directory luceneDir;
+
+    private static IndexWriter writer;
 
 	private static IndexSearcher searcher;
 	

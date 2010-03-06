@@ -27,12 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
@@ -42,7 +38,7 @@ import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.lucene.IndexGenerator;
+import org.ihtsdo.lucene.LuceneManager;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -221,25 +217,9 @@ public class LoadBdb extends AbstractMojo {
 		}
 	}
 
+	
     public void createLuceneDescriptionIndex() throws Exception {
-        Stopwatch timer = new Stopwatch();
-        timer.start();
-        luceneDir.mkdirs();
-        IndexWriter writer = new IndexWriter(luceneDir, new StandardAnalyzer(), true);
-        writer.setUseCompoundFile(true);
-        writer.setMergeFactor(10000);
-        writer.setMaxMergeDocs(Integer.MAX_VALUE);
-        writer.setMaxBufferedDocs(1000);
- 
-        IndexGenerator indexer = new IndexGenerator(writer);
-        Bdb.getConceptDb().iterateConceptDataInSequence(indexer);
-
-        
-        AceLog.getAppLog().info("Lucene index start time: " + timer.getElapsedTime());
-        timer.reset();
-        writer.optimize();
-        writer.close();
-        AceLog.getAppLog().info("Optimizing index time: " + timer.getElapsedTime());
-        timer.stop();
+        LuceneManager.setLuceneDirFile(luceneDir);
+        LuceneManager.createLuceneDescriptionIndex();
     }
 }
