@@ -151,6 +151,7 @@ public class BdbCommitManager {
 		try {
 			Concept c = (Concept) concept;
 			dbWriterPermit.acquire();
+            dbWriterService.execute(new SetNidsForCid(c));
 			dbWriterService.execute(new ConceptWriter(c));
 			uncommittedCNidsNoChecks.add(c.getNid());
 			if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -168,6 +169,26 @@ public class BdbCommitManager {
 		addUncommitted(member.getEnclosingConcept());
 	}
 
+	private static class SetNidsForCid implements Runnable {
+	    Concept concept;
+        public SetNidsForCid(Concept concept) {
+            super();
+            this.concept = concept;
+        }
+        @Override
+        public void run() {
+            try {
+                Collection<Integer> nids = concept.getAllNids();
+                NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
+                for (int nid : nids) {
+                    nidCidMap.setCidForNid(concept.getNid(), nid);
+                }
+            } catch (IOException e) {
+               AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+	    
+	}
 	public static void addUncommitted(I_GetConceptData igcd) {
 		if (igcd == null) {
 			return;
@@ -189,11 +210,6 @@ public class BdbCommitManager {
 							+ " ---@@@ ");
 		}
 		try {
-			Collection<Integer> nids = concept.getAllNids();
-			NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
-			for (int nid : nids) {
-				nidCidMap.setCidForNid(igcd.getNid(), nid);
-			}
 			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
 			dataCheckMap.put(concept, warningsAndErrors);
 			for (I_TestDataConstraints test : creationTests) {
@@ -205,28 +221,41 @@ public class BdbCommitManager {
 			}
 			uncommittedCNids.add(concept.getNid());
 			dbWriterPermit.acquire();
+			dbWriterService.execute(new SetNidsForCid(concept));
 			dbWriterService.execute(new ConceptWriter(concept));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-
-		if (getActiveFrame() != null) {
-			I_ConfigAceFrame activeFrame = getActiveFrame();
-			for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
-					.getAceFrames()) {
-				frameConfig.setCommitEnabled(true);
-				updateAlerts();
-				if (concept.isUncommitted()) {
-					frameConfig.addUncommitted(concept);
-				} else {
-					frameConfig.removeUncommitted(concept);
-				}
-			}
-		}
+		
+		SwingUtilities.invokeLater(new UpdateFrames(concept));
 	}
 
+	private static class UpdateFrames implements Runnable {
+	    Concept c;
+	    
+        public UpdateFrames(Concept c) {
+            super();
+            this.c = c;
+        }
+
+        @Override
+        public void run() {
+            if (getActiveFrame() != null) {
+                I_ConfigAceFrame activeFrame = getActiveFrame();
+                for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
+                        .getAceFrames()) {
+                    frameConfig.setCommitEnabled(true);
+                    updateAlerts();
+                    if (c.isUncommitted()) {
+                        frameConfig.addUncommitted(c);
+                    } else {
+                        frameConfig.removeUncommitted(c);
+                    }
+                }
+            }
+        }
+	    
+	}
 	private static I_ConfigAceFrame getActiveFrame() {
 		try {
 			return Terms.get().getActiveAceFrameConfig();
