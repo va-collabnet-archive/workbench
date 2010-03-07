@@ -17,10 +17,9 @@
 package org.dwfa.ace.table.refset;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.StringWithTuple;
 
-public class StringWithExtTuple extends StringWithTuple implements Comparable<StringWithExtTuple>, I_CellTextWithTuple {
+public class StringWithExtTuple extends StringWithTuple<StringWithExtTuple>  {
 
     private I_ExtendByRefVersion tuple;
     private int id;
@@ -37,10 +36,6 @@ public class StringWithExtTuple extends StringWithTuple implements Comparable<St
 
     public I_ExtendByRefVersion getTuple() {
         return tuple;
-    }
-
-    public int compareTo(StringWithExtTuple another) {
-        return getCellText().compareTo(another.getCellText());
     }
 
     public int getId() {

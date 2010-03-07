@@ -17,6 +17,7 @@
 package org.dwfa.ace.api;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -162,7 +163,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public List<? extends I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
             TerminologyException;
 
-    public List<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException;
+    public Collection<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -499,9 +500,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
             boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
 
-    public List<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
+    public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
 
-    public List<? extends I_RelVersioned> getDestRels() throws IOException;
+    public Collection<? extends I_RelVersioned> getDestRels() throws IOException;
 
     public I_RelVersioned getDestRel(int relNid) throws IOException;
 
@@ -513,22 +514,26 @@ public interface I_GetConceptData extends I_AmTermComponent {
      *         of status.
      * @throws IOException
      */
-    public List<? extends I_RelVersioned> getSourceRels() throws IOException;
+    public Collection<? extends I_RelVersioned> getSourceRels() throws IOException;
 
     public String getInitialText() throws IOException;
 
     public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException;
 
-    public List<? extends I_ImageVersioned> getImages() throws IOException;
+    public Collection<? extends I_ImageVersioned> getImages() throws IOException;
 
     public List<UUID> getUids() throws IOException;
 
+    @Deprecated
     public List<I_DescriptionVersioned> getUncommittedDescriptions();
 
+    @Deprecated
     public List<I_RelVersioned> getUncommittedSourceRels();
 
+    @Deprecated
     public I_ConceptAttributeVersioned getUncommittedConceptAttributes();
 
+    @Deprecated
     public List<I_ImageVersioned> getUncommittedImages();
 
     public I_Identify getIdentifier() throws IOException;

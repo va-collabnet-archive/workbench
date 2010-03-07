@@ -81,6 +81,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
 
+    public void refreshRefsetTab() {
+        baseFrame.refreshRefsetTab();
+    }
+
     public JTree getTreeInTaxonomyPanel() {
         return baseFrame.getTreeInTaxonomyPanel();
     }

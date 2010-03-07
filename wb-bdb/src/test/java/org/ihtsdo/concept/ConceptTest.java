@@ -88,53 +88,6 @@ public class ConceptTest {
 	}
 
     @Test
-    @Ignore
-    public void testValidate() {
-        // Make all the test objects be the same 
-        testObj1 = makeTestObject1();
-        testObj2 = makeTestObject1();
-        testObj3 = makeTestObject2();
-        
-        System.out.println("TEST OBJ 1: " + testObj1.toLongString());
-        System.out.println("TEST OBJ 3: " + testObj3.toLongString());
-        
-        // Object 1 and Object 2 are the same so they should validate 
-        // and be considered equivalent 
-        try {
-            String result = testObj1.validate(testObj2);
-            if (result.length() == 0) {
-                System.out.println("Validating Obj1 and Obj2: VALID!");
-            } else {
-                System.out.println("Validating Obj1 and Obj2: NOT VALID!  " + 
-                    "(differences listed below):\n" + result.toString());
-            }           
-            assertTrue(result.length() == 0); 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            fail("Concepts are not valid"); 
-        }
-
-        // Object 1 and Object 3 are the different so they should not validate 
-        // and be considered unequal 
-        try {
-            String result = testObj1.validate(testObj3);
-            assertFalse(result.length() == 0); 
-            if (result.length() == 0) {
-                System.out.println("Validating Obj1 and Obj3: VALID!");
-            } else {
-                System.out.println("Validating Obj1 and Obj3: NOT VALID!  " + 
-                    "(differences listed below):\n" + result.toString());
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            fail("Concepts are not valid"); 
-        }
-
-    }
-
-    @Test
     public void testEqualsObject() throws IOException {
         // The contract of the equals method in Object 
         // specifies that equals must implement an equivalence 

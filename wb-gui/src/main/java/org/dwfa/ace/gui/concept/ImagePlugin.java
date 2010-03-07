@@ -51,7 +51,7 @@ import org.dwfa.ace.table.ImageTableModel.IMAGE_FIELD;
 import org.dwfa.ace.table.ImageTableModel.ImageWithImageTuple;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class ImagePlugin extends AbstractPlugin {
@@ -180,12 +180,11 @@ public class ImagePlugin extends AbstractPlugin {
         rowAddAfter.addActionListener(new AddImage(host, host.getConfig()));
         c.gridheight = 1;
         c.gridx++;
-        TableSorter sortingTable = new TableSorter(imageTableModel);
-        imageTable = new JTableWithDragImage(sortingTable);
+        imageTable = new JTableWithDragImage(imageTableModel);
+        SortClickListener.setupSorter(imageTable);
         imageTable.getSelectionModel().addListSelectionListener(this);
         imageTable.addMouseListener(imageTableModel.makePopupListener(imageTable, host.getConfig()));
         imageTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sortingTable.setTableHeader(imageTable.getTableHeader());
 
         IMAGE_FIELD[] columnEnums = imageTableModel.getColumnEnums();
         for (int i = 0; i < imageTable.getColumnCount(); i++) {
@@ -198,8 +197,8 @@ public class ImagePlugin extends AbstractPlugin {
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        imageTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         imagePanel.add(imageTable.getTableHeader(), c);

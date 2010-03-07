@@ -62,8 +62,8 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
@@ -80,6 +80,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+
+    public void refreshRefsetTab() {
+        frameConfig.refreshRefsetTab();
+    }
 
     public JTree getTreeInTaxonomyPanel() {
         return frameConfig.getTreeInTaxonomyPanel();
@@ -403,7 +407,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                         refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
                             .getViewPositionSetReadOnly(), addUncommitted);
                 for (I_RelTuple rel : markedParentRefset) {
-                    refsetsToShow.add(rel.getC2Id());
+                    if (!refsetsToShow.contains(rel.getC2Id())) {
+                        refsetsToShow.add(rel.getC2Id());
+                    }
                 }
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -518,7 +524,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         }
 
         private boolean notMarkedParent(I_GetConceptData child) throws IOException, TerminologyException {
-            List<? extends I_DescriptionVersioned> descriptions = child.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descriptions = child.getDescriptions();
             List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
             for (I_DescriptionVersioned desc : descriptions) {
                 // extensions on the description(s)

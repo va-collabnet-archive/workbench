@@ -86,7 +86,7 @@ public class AddRefsetMembersToListView extends AbstractTask {
             JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
-            List<? extends I_ExtendByRef> extVersions = tf.getRefsetExtensionMembers(refset.getConceptId());
+            Collection<? extends I_ExtendByRef> extVersions = tf.getRefsetExtensionMembers(refset.getConceptId());
             for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
                 List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
                     config.getViewPositionSetReadOnly(), true);

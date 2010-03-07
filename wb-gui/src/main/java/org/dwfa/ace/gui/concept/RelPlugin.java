@@ -55,7 +55,7 @@ import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.RelGroupFieldEditor;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
@@ -143,12 +143,11 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
         c.gridx++;
         c.gridwidth = 1;
 
-        TableSorter relSortingTable = new TableSorter(model);
-        relTable = new JTableWithDragImage(relSortingTable);
+        relTable = new JTableWithDragImage(model);
+        SortClickListener.setupSorter(relTable);
         relTable.getSelectionModel().addListSelectionListener(this);
-        relSortingTable.setTableHeader(relTable.getTableHeader());
-        relSortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        relTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         REL_FIELD[] columnEnums = model.getColumnEnums();
         for (int i = 0; i < relTable.getColumnCount(); i++) {
             TableColumn column = relTable.getColumnModel().getColumn(i);

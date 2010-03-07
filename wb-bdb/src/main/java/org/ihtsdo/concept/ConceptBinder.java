@@ -2,6 +2,7 @@ package org.ihtsdo.concept;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -229,7 +230,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 
 	private <C extends ConceptComponent<V, C>, V extends Revision<V, C>> byte[] getComponentBytes(
 			I_ManageConceptData conceptData, boolean primordial, OFFSETS offset,
-			List<C> componentList,
+			Collection<C> componentList,
 			ConceptComponentBinder<V, C> binder) throws InterruptedException,
 			ExecutionException, IOException {
 		byte[] componentBytes;
@@ -252,7 +253,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 
 	private byte[] getRefsetBytes(I_ManageConceptData conceptData, boolean primordial,
 			OFFSETS offset,
-			List<RefsetMember<?, ?>> members,
+			Collection<RefsetMember<?, ?>> members,
 			RefsetMemberBinder binder) throws InterruptedException,
 			ExecutionException, IOException {
 		byte[] componentBytes;

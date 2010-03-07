@@ -22,6 +22,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -319,7 +320,7 @@ public class ModifyUserRolePanel extends JPanel {
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
                 .getConceptId());
 
-            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();
+            Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();
             // (null, roleAllowedTypes, positions, true, true);
 
             for (I_RelVersioned versioned : roleRels) {
@@ -363,7 +364,7 @@ public class ModifyUserRolePanel extends JPanel {
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
                 .getConceptId());
 
-            List<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions,
+            Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions,
             // true,
             // true);
 

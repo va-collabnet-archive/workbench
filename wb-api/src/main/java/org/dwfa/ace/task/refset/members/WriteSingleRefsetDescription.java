@@ -83,7 +83,7 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
                 new TaskLogger(worker)).withSelectedDir(outputDirecotry).build();
 
             try {
-                List<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptId());
+                Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptId());
                 for (I_ExtendByRef extension : extensions) {
                     processor.processExtensionByReference(extension);
                 }

@@ -45,6 +45,7 @@ import javax.swing.JTree;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
@@ -53,32 +54,31 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.refset.CheckBoxCellRenderer;
 import org.dwfa.ace.table.refset.CheckBoxHeaderRenderer;
 import org.dwfa.ace.table.refset.ExtTableRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
-import org.dwfa.ace.table.refset.SelectableReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
 public class RefsetSpecPanel extends JPanel {
+
 
     private class HistoryActionListener implements ActionListener {
 
@@ -112,7 +112,7 @@ public class RefsetSpecPanel extends JPanel {
 
     private static final String HIERARCHICAL_VIEW = "taxonomy";
     private static final String REFSET_AND_PARENT_ONLY_VIEW = "  tree  ";
-    private static final String TABLE_VIEW = " members";
+    private static final String TABLE_VIEW = "members";
     private static final String COMMENT_VIEW = "comments";
 
     private Box verticalBox;
@@ -130,32 +130,35 @@ public class RefsetSpecPanel extends JPanel {
     private CheckBoxHeaderRenderer checkBoxHeaderRenderer;
     private SelectAllCheckBoxListener selectAllCheckBoxListener;
 
+    private TermTreeHelper hierarchicalTreeHelper;
+
+    private TermTreeHelper refsetAndParentOnlyTreeHelper;
+
     public RefsetSpecPanel(ACE ace) throws Exception {
         super(new GridBagLayout());
         aceFrameConfig = ace.getAceFrameConfig();
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setOneTouchExpandable(true);
 
-        TermTreeHelper hierarchicalTreeHelper =
+        hierarchicalTreeHelper =
                 new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
 
-        TermTreeHelper refsetAndParentOnlyTreeHelper =
+        refsetAndParentOnlyTreeHelper =
                 new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
+
+        bottomTabs = new JTabbedPane();
+        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
+        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", refsetAndParentOnlyTreeHelper);
         ace.getAceFrameConfig().addPropertyChangeListener("commit", refsetAndParentOnlyTreeHelper);
-        editor.getLabel().addTermChangeListener(refsetAndParentOnlyTreeHelper);
 
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", hierarchicalTreeHelper);
         ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
-        editor.getLabel().addTermChangeListener(hierarchicalTreeHelper);
 
-        bottomTabs = new JTabbedPane();
-        bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
-        bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
 
         verticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs.addTab(TABLE_VIEW, verticalBox);
@@ -193,13 +196,15 @@ public class RefsetSpecPanel extends JPanel {
                 break;
             }
         }
-        TableSorter sorter = (TableSorter) commentTable.getModel();
-        return (ReflexiveRefsetCommentTableModel) sorter.getTableModel();
+        return (ReflexiveRefsetCommentTableModel)  commentTable.getModel();
     }
 
     protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
             throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+        
+        columns.add(ReflexiveRefsetFieldData.getRowColumn());
+        
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
@@ -220,10 +225,10 @@ public class RefsetSpecPanel extends JPanel {
         column2.setColumnName("comment");
         column2.setCreationEditable(true);
         column2.setUpdateEditable(true);
-        column2.setFieldClass(String.class);
+        column2.setFieldClass(StringWithExtTuple.class);
         column2.setMin(5);
-        column2.setPref(50);
-        column2.setMax(150);
+        column2.setPref(150);
+        column2.setMax(1000);
         column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
         column2.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getStringValue"));
         column2.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setStringValue", String.class));
@@ -234,7 +239,7 @@ public class RefsetSpecPanel extends JPanel {
         column3.setColumnName("status");
         column3.setCreationEditable(false);
         column3.setUpdateEditable(false);
-        column3.setFieldClass(String.class);
+        column3.setFieldClass(StringWithExtTuple.class);
         column3.setMin(5);
         column3.setPref(150);
         column3.setMax(150);
@@ -246,24 +251,24 @@ public class RefsetSpecPanel extends JPanel {
 
         if (editor.getShowHistory()) {
             ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
-            column4.setColumnName("version");
+            column4.setColumnName("time");
             column4.setCreationEditable(false);
             column4.setUpdateEditable(false);
-            column4.setFieldClass(Number.class);
+            column4.setFieldClass(StringWithExtTuple.class);
             column4.setMin(5);
             column4.setPref(150);
             column4.setMax(150);
             column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column4.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getVersion"));
-            column4.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setVersion", int.class));
-            column4.setType(REFSET_FIELD_TYPE.VERSION);
+            column4.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getTime"));
+            column4.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setTime", long.class));
+            column4.setType(REFSET_FIELD_TYPE.TIME);
             columns.add(column4);
 
             ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
             column5.setColumnName("path");
             column5.setCreationEditable(false);
             column5.setUpdateEditable(false);
-            column5.setFieldClass(String.class);
+            column5.setFieldClass(StringWithExtTuple.class);
             column5.setMin(5);
             column5.setPref(150);
             column5.setMax(150);
@@ -280,18 +285,27 @@ public class RefsetSpecPanel extends JPanel {
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
         editor.getLabel().addTermChangeListener(commentTableModel);
-
-        commentTableModel.setComponentId(Integer.MIN_VALUE);
+        int componentId = Integer.MIN_VALUE;
+        I_AmTermComponent component = editor.getTermComponent();
+        if (component != null) {
+            componentId = component.getNid();
+        }
+        commentTableModel.setComponentId(componentId);
         commentTableModel.getRowCount();
-        TableSorter sortingTable = new TableSorter(commentTableModel);
 
-        JTableWithDragImage commentTable = new JTableWithDragImage(sortingTable);
-        commentTable.getColumnModel().getColumn(0).setIdentifier(column1);
-        commentTable.getColumnModel().getColumn(1).setIdentifier(column2);
+        JTableWithDragImage commentTable = new JTableWithDragImage(commentTableModel);
+        SortClickListener.setupSorter(commentTable);
+        for (int i = 0; i < commentTable.getColumnModel().getColumnCount();
+            i++) {
+            TableColumn column = commentTable.getColumnModel().getColumn(i);
+            column.setIdentifier(columns.get(i));
+            column.setPreferredWidth(columns.get(i).getPref());
+            column.setMaxWidth(columns.get(i).getMax());
+            column.setMinWidth(columns.get(i).getMin());
+        }
 
-        sortingTable.setTableHeader(commentTable.getTableHeader());
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        commentTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         commentTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -303,14 +317,18 @@ public class RefsetSpecPanel extends JPanel {
         return commentTable;
     }
 
+
     public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
             throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
+
+        columns.add(ReflexiveRefsetFieldData.getRowColumn());
+
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
         column1.setUpdateEditable(true);
-        column1.setFieldClass(Number.class);
+        column1.setFieldClass(StringWithExtTuple.class);
         column1.setMin(5);
         column1.setPref(150);
         column1.setMax(1000);
@@ -328,7 +346,7 @@ public class RefsetSpecPanel extends JPanel {
         column2.setColumnName("member type");
         column2.setCreationEditable(true);
         column2.setUpdateEditable(true);
-        column2.setFieldClass(Number.class);
+        column2.setFieldClass(StringWithExtTuple.class);
         column2.setMin(5);
         column2.setPref(50);
         column2.setMax(150);
@@ -342,7 +360,7 @@ public class RefsetSpecPanel extends JPanel {
         column3.setColumnName("member status");
         column3.setCreationEditable(false);
         column3.setUpdateEditable(false);
-        column3.setFieldClass(String.class);
+        column3.setFieldClass(StringWithExtTuple.class);
         column3.setMin(5);
         column3.setPref(150);
         column3.setMax(150);
@@ -356,7 +374,7 @@ public class RefsetSpecPanel extends JPanel {
         column4.setColumnName("promotion status");
         column4.setCreationEditable(false);
         column4.setUpdateEditable(false);
-        column4.setFieldClass(String.class);
+        column4.setFieldClass(StringWithExtTuple.class);
         column4.setMin(5);
         column4.setPref(150);
         column4.setMax(150);
@@ -368,24 +386,24 @@ public class RefsetSpecPanel extends JPanel {
 
         if (editor.getShowHistory()) {
             ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
-            column5.setColumnName("version");
+            column5.setColumnName("time");
             column5.setCreationEditable(false);
             column5.setUpdateEditable(false);
-            column5.setFieldClass(Number.class);
+            column5.setFieldClass(StringWithExtTuple.class);
             column5.setMin(5);
             column5.setPref(150);
             column5.setMax(150);
             column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-            column5.setReadMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("getVersion"));
-            column5.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setVersion", int.class));
-            column5.setType(REFSET_FIELD_TYPE.VERSION);
+            column5.setReadMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("getTime"));
+            column5.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setTime", long.class));
+            column5.setType(REFSET_FIELD_TYPE.TIME);
             columns.add(column5);
 
             ReflexiveRefsetFieldData column6 = new ReflexiveRefsetFieldData();
             column6.setColumnName("path");
             column6.setCreationEditable(false);
             column6.setUpdateEditable(false);
-            column6.setFieldClass(String.class);
+            column6.setFieldClass(StringWithExtTuple.class);
             column6.setMin(5);
             column6.setPref(150);
             column6.setMax(150);
@@ -397,29 +415,43 @@ public class RefsetSpecPanel extends JPanel {
         }
 
         refsetTableModel =
-                new SelectableReflexiveTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+                new ReflexiveRefsetTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
 
         aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
 
-        refsetTableModel.setComponentId(Integer.MIN_VALUE);
+        int componentId = Integer.MIN_VALUE;
+        I_AmTermComponent component = editor.getTermComponent();
+        if (component != null) {
+            componentId = component.getNid();
+        }
+        refsetTableModel.setComponentId(componentId);
+
         refsetTableModel.setPromotionFilterId(null);
         refsetTableModel.getRowCount();
-        TableSorter sortingTable = new TableSorter(refsetTableModel);
 
-        refsetTable = new JTableWithDragImage(sortingTable);
-        refsetTable.getColumnModel().getColumn(0).setIdentifier(column1);
-        refsetTable.getColumnModel().getColumn(1).setIdentifier(column2);
+        refsetTable = new JTableWithDragImage(refsetTableModel);
+        SortClickListener.setupSorter(refsetTable); 
+     
+        
+        for (int i = 0; i < columns.size(); i++) {
+            TableColumn column = refsetTable.getColumnModel().getColumn(i);
+            column.setIdentifier(columns.get(i));
+            column.setPreferredWidth(columns.get(i).getPref());
+            column.setMaxWidth(columns.get(i).getMax());
+            column.setMinWidth(columns.get(i).getMin());
+            column.setResizable(true);
+        }
 
+        /*
         // set renderer and editor for checkbox column
         // get the last column
         int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
 
         CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
-        sortingTable.setTableHeader(refsetTable.getTableHeader());
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        refsetTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
 
         selectAllCheckBoxListener = new SelectAllCheckBoxListener();
         checkBoxHeaderRenderer =
@@ -438,6 +470,7 @@ public class RefsetSpecPanel extends JPanel {
         // hide column as default (should only be visible during promotions BP)
         refsetTable.getColumnModel().removeColumn(checkBoxColumn);
         refsetTable.addMouseListener(new MouseClickListener());
+        */
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -831,5 +864,10 @@ public class RefsetSpecPanel extends JPanel {
 
     public void setRendererComponent(JCheckBox rendererComponent) {
         this.selectAllCheckBox = rendererComponent;
+    }
+
+    public void refresh() {
+        editor.refresh();
+        setRefsetInSpecEditor(getRefsetInSpecEditor());
     }
 }

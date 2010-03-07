@@ -19,6 +19,7 @@ package org.dwfa.ace.table.refset;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,9 +33,9 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -89,7 +90,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             if (refsetId == null || refsetId == Integer.MIN_VALUE) {
                 return true;
             }
-            List<? extends I_ExtendByRef> refsetMembers = Terms.get().getRefsetExtensionMembers(refsetId);
+            Collection<? extends I_ExtendByRef> refsetMembers = Terms.get().getRefsetExtensionMembers(refsetId);
 
             if (stopWork || refsetMembers.size() == 0) {
                 return false;
@@ -166,7 +167,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                         break;
                                     case STRING:
                                         break;
-                                    case VERSION:
+                                    case TIME:
                                         break;
                                     default:
                                         throw new UnsupportedOperationException("Don't know how to handle: " + col.type);

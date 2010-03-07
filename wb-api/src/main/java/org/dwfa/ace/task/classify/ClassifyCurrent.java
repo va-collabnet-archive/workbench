@@ -179,7 +179,7 @@ public class ClassifyCurrent extends AbstractTask {
         // }
     }
 
-    private void processRels(final I_SnorocketFactory rocket, final List<? extends I_RelVersioned> list) {
+    private void processRels(final I_SnorocketFactory rocket, final Collection<? extends I_RelVersioned> list) {
         if (null != list) {
             for (I_RelVersioned rel : list) {
                 final I_RelTuple lastTuple = rel.getLastTuple();

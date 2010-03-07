@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -144,7 +145,7 @@ public class DescStatement extends RefsetSpecStatement {
             possibleConcepts.or(parentPossibleConcepts);
             break;
         case DESC_IS_MEMBER_OF:
-            List<? extends I_ExtendByRef> refsetExtensions =
+            Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
@@ -197,7 +198,7 @@ public class DescStatement extends RefsetSpecStatement {
             }
             break;
         case DESC_IS_MEMBER_OF:
-            List<? extends I_ExtendByRef> refsetExtensions =
+            Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(((I_AmTermComponent) queryConstraint).getNid());
             Set<Integer> refsetMembers = new HashSet<Integer>();
             for (I_ExtendByRef ext : refsetExtensions) {

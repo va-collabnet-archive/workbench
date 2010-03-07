@@ -1658,6 +1658,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetTabIndex = conceptTabs.getTabCount();
 
         refsetSpecPanel = new RefsetSpecPanel(this);
+        refsetSpecPanel.setRefsetInSpecEditor(refsetSpecPanel.getRefsetInSpecEditor());
         conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
 
@@ -3527,4 +3528,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
 		return dataCheckListeners;
 	}
+
+    public void refreshRefsetTab() {
+        refsetSpecPanel.refresh();
+    }
 }

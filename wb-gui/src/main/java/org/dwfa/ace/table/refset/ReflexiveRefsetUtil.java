@@ -33,7 +33,7 @@ import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 
 public class ReflexiveRefsetUtil {
 
@@ -96,11 +96,10 @@ public class ReflexiveRefsetUtil {
         c.gridx++;
         c.gridwidth = 1;
 
-        TableSorter refsetSortingTable = new TableSorter(refsetModel);
-        JTableWithDragImage extTable = new JTableWithDragImage(refsetSortingTable);
-        refsetSortingTable.setTableHeader(extTable.getTableHeader());
-        refsetSortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        JTableWithDragImage extTable = new JTableWithDragImage(refsetModel);
+        SortClickListener.setupSorter(extTable);
+        extTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         ReflexiveRefsetFieldData[] columns = refsetModel.getColumns();
         for (int i = 0; i < extTable.getColumnCount(); i++) {
             TableColumn column = extTable.getColumnModel().getColumn(i);

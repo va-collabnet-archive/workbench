@@ -245,12 +245,13 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 													.getNid(),
 											thinExtByRefTuple.getMemberId(),
 											REFSET_TYPES.STR, refsetMap);
-							Terms.get().addUncommittedNoChecks(newExtension);
+							Terms.get().addUncommitted(newExtension);
 						}
 					}
 				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
+				aceConfig.refreshRefsetTab();
 			}
 		}
 	}
@@ -280,6 +281,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 			Terms.get().addUncommitted(
 					thinExtByRefTuple.getCore());
 			specEditor.updateSpecTree(false);
+            aceConfig.refreshRefsetTab();
 		}
 	}
 
@@ -307,6 +309,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 				}
 			}
 			specEditor.updateSpecTree(false);
+            aceConfig.refreshRefsetTab();
 		}
 	}
 
@@ -329,6 +332,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 			Terms.get().addUncommitted(
 					thinExtByRefTuple.getCore());
 			specEditor.updateSpecTree(false);
+            aceConfig.refreshRefsetTab();
 		}
 	}
 

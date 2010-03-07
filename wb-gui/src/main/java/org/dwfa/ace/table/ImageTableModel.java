@@ -178,7 +178,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
         STATUS("status", 5, 50, 250),
         FORMAT("format", 5, 30, 30),
         TYPE("type", 5, 85, 85),
-        VERSION("version", 5, 140, 140),
+        VERSION("time", 5, 140, 140),
         PATH("path", 5, 90, 150);
 
         private String columnName;
@@ -364,8 +364,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
     }
 
-    public static class StringWithImageTuple extends StringWithTuple implements Comparable<StringWithImageTuple>,
-            I_CellTextWithTuple {
+    public static class StringWithImageTuple extends StringWithTuple<StringWithImageTuple>  {
 
         I_ImageTuple tuple;
 
@@ -376,10 +375,6 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
 
         public I_ImageTuple getTuple() {
             return tuple;
-        }
-
-        public int compareTo(StringWithImageTuple another) {
-            return super.compareTo(another);
         }
     }
 

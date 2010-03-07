@@ -57,8 +57,8 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetSpecTreeCellRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
@@ -373,6 +373,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (rowIndex < 0) {
             return " ";
         }
+        if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
+            return rowIndex;
+        }
         try {
             I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
             Object value = null;
@@ -516,8 +519,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     }
                 }
                 return value;
-            case VERSION:
-                if (tuple.getVersion() == Integer.MAX_VALUE) {
+            case TIME:
+                if (tuple.getTime() == Long.MAX_VALUE) {
                     return new StringWithExtTuple(ThinVersionHelper.uncommittedHtml(), tuple, id);
                 }
                 return new StringWithExtTuple(ThinVersionHelper.format(tuple.getVersion()), tuple, id);

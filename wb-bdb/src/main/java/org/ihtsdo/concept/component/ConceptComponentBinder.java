@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +19,7 @@ import com.sleepycat.je.DatabaseEntry;
 
 public class ConceptComponentBinder<V extends Revision<V, C>, 
 									C extends ConceptComponent<V, C>> 
-	extends TupleBinding<List<C>> 
+	extends TupleBinding<Collection<C>> 
 	implements I_BindConceptComponents {
 
 
@@ -72,7 +73,8 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			// we have to put it back so the component can read it again...
 			input.reset();
 			C conceptComponent = (C) componentMap.get(nid);
-			if (nidToConceptComponentMap != null && nidToConceptComponentMap.containsKey(nid)) {
+			if (nidToConceptComponentMap != null && 
+			        nidToConceptComponentMap.containsKey(nid)) {
 				if (conceptComponent == null) {
 					conceptComponent = nidToConceptComponentMap.get(nid);
 					C oldComponent = (C) componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
@@ -98,7 +100,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	                        }
 						}
 					} else {
-						factory.create(enclosingConcept, input);
+					    conceptComponent.merge(factory.create(enclosingConcept, input));
 					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -113,7 +115,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	}
 
 	@Override
-	public void objectToEntry(List<C> conceptComponentList, TupleOutput output) {
+	public void objectToEntry(Collection<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
 			componentsEncountered.incrementAndGet();

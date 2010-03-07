@@ -252,7 +252,7 @@ public class PositionMapper {
 			return;
 		}
 		Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptId());
-		String pathDesc = pathConcept.getDescriptions().get(0).getText();
+		String pathDesc = pathConcept.getDescriptions().iterator().next().getText();
 		writeLock.lock();
 		if (completeLatch.getCount() == 1) {
 			try {

@@ -36,9 +36,9 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -170,7 +170,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        List<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptId());
+        Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptId());
 
         writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);

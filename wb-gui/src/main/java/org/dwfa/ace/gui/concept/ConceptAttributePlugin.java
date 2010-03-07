@@ -54,7 +54,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptAttributeTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class ConceptAttributePlugin extends AbstractPlugin implements TableModelListener {
@@ -185,15 +185,14 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
 
         c.gridheight = 1;
         c.gridx++;
-        TableSorter sortingTable = new TableSorter(conceptTableModel);
-        conceptTable = new JTableWithDragImage(sortingTable);
+        conceptTable = new JTableWithDragImage(conceptTableModel);
+        SortClickListener.setupSorter(conceptTable);
         conceptTable.getSelectionModel().addListSelectionListener(this);
         if (ACE.editMode) {
             conceptTable.addMouseListener(conceptTableModel.makePopupListener(conceptTable, host.getConfig()));
         }
 
         conceptTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sortingTable.setTableHeader(conceptTable.getTableHeader());
 
         CONCEPT_FIELD[] columnEnums = conceptTableModel.getColumnEnums();
         for (int i = 0; i < conceptTable.getColumnCount(); i++) {
@@ -206,8 +205,8 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        conceptTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         conceptPanel.add(conceptTable.getTableHeader(), c);

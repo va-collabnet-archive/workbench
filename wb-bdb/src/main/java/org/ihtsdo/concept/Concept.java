@@ -37,6 +37,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
@@ -531,7 +532,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return nid;
 	}
 
-	public ComponentList<Description> getDescriptions() throws IOException {
+	public Collection<Description> getDescriptions() throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Description>(new ArrayList<Description>());
 		}
@@ -829,14 +830,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 				returnConflictResolvedLatestState);
 	}
 
-	public List<Relationship> getDestRels() throws IOException {
+	public Collection<Relationship> getDestRels() throws IOException {
 		if (isCanceled()) {
 			return new ArrayList<Relationship>();
 		}
 		return data.getDestRels();
 	}
 
-	public List<RefsetMember<?, ?>> getExtensions() throws IOException {
+	public Collection<RefsetMember<?,?>> getExtensions() throws IOException {
 		if (isCanceled()) {
 			return new ArrayList<RefsetMember<?,?>>();
 		}
@@ -854,7 +855,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				returnConflictResolvedLatestState);
 	}
 
-	public List<Image> getImages() throws IOException {
+	public Collection<Image> getImages() throws IOException {
 		return data.getImages();
 	}
 
@@ -905,7 +906,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	private String getText() {
 		try {
 			if (getDescriptions().size() > 0) {
-				return getDescriptions().get(0).getFirstTuple().getText();
+				return getDescriptions().iterator().next().getFirstTuple().getText();
 			}
 		} catch (IOException ex) {
 			AceLog.getAppLog().nonModalAlertAndLogException(ex);
@@ -927,7 +928,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 											.getUids());
 				}
 				if (getDescriptions().size() > 0) {
-					I_DescriptionVersioned desc = getDescriptions().get(0);
+					I_DescriptionVersioned desc = getDescriptions().iterator().next();
 					for (I_DescriptionVersioned d : getDescriptions()) {
 						for (I_DescriptionPart part : d.getMutableParts()) {
 							if ((part.getTypeId() == fsDescNid)
@@ -936,7 +937,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 							}
 						}
 					}
-					return desc.getMutableParts().get(0).getText();
+					return desc.getFirstTuple().getText();
 				} else {
 					int sequence = nid + Integer.MIN_VALUE;
 					String errString = nid + " (" + sequence + ") "
@@ -1368,135 +1369,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getAllNids();
 	}
 
-	/**
-	 * Test method to check to see if two concepts are equal in all respects.
-	 * 
-	 * @param another
-	 * @return either a zero length String, or a String containing a description
-	 *         of the validation failures.
-	 * @throws IOException
-	 */
-	public String validate(Concept another) throws IOException {
-		assert another != null;
-		StringBuffer buf = new StringBuffer();
-		String validationResult = null;
-
-		// Compare nids
-		if (this.nid != another.nid) {
-			buf.append("\tConcept.nid not equal: \n" + "\t\tthis.nid = "
-					+ this.nid + "\n" + "\t\tanother.nid = " + another.nid
-					+ "\n");
-		}
-
-		// Compare Attributes
-		ConceptAttributes attributes = getConceptAttributes();
-		assert attributes != null : "validating: " + nid;
-		ConceptAttributes anotherAttributes = another.getConceptAttributes();
-		assert anotherAttributes != null : "validating: " + nid;
-		validationResult = attributes.validate(anotherAttributes);
-		if (validationResult.length() != 0) {
-			buf.append(validationResult);
-		}
-
-		// Compare Descriptions
-		List<Description> descriptionList = this.getDescriptions();
-		assert descriptionList != null : "validating: " + nid;
-		List<Description> anotherDescriptionList = another.getDescriptions();
-		assert anotherDescriptionList != null : "validating: " + nid;
-		for (int i = 0; i < descriptionList.size(); i++) {
-			// make sure there are elements in both arrays to compare
-			if (anotherDescriptionList.size() > i) {
-				Description thisDescription = descriptionList.get(i);
-				Description anotherDescription = anotherDescriptionList.get(i);
-				validationResult = thisDescription.validate(anotherDescription);
-				if (validationResult.length() != 0) {
-					buf.append("\tConcept.Descriptions[" + i
-							+ "] not equal: \n");
-					buf.append(validationResult);
-				}
-			} else {
-				buf.append("\tConcept.Descriptions[" + i + "] not equal: \n");
-				buf
-						.append("\t\tThere is no corresponding Description in another to compare it to.\n");
-			}
-		}
-
-		// Compare Relationships
-		List<Relationship> relationshipList = this.getSourceRels();
-		assert relationshipList != null : "validating: " + nid;
-		List<Relationship> anotherRelationshipList = another.getSourceRels();
-		assert anotherRelationshipList != null : "validating: " + nid;
-		for (int i = 0; i < relationshipList.size(); i++) {
-			// make sure there are elements in both arrays to compare
-			if (anotherRelationshipList.size() > i) {
-				Relationship thisRelationship = relationshipList.get(i);
-				Relationship anotherRelationship = anotherRelationshipList
-						.get(i);
-				validationResult = thisRelationship
-						.validate(anotherRelationship);
-				if (validationResult.length() != 0) {
-					buf.append("\tConcept.Relationships[" + i
-							+ "] not equal: \n");
-					buf.append(validationResult);
-				}
-			} else {
-				buf.append("\tConcept.Relationships[" + i + "] not equal: \n");
-				buf
-						.append("\t\tThere is no corresponding Relationship in another to compare it to.\n");
-			}
-		}
-
-		// Compare images
-		List<Image> imagesList = this.getImages();
-		assert imagesList != null : "validating: " + nid;
-		List<Image> anotherImagesList = another.getImages();
-		assert anotherImagesList != null : "validating: " + nid;
-		for (int i = 0; i < imagesList.size(); i++) {
-			// make sure there are elements in both arrays to compare
-			if (anotherImagesList.size() > i) {
-				Image thisImage = imagesList.get(i);
-				Image anotherImage = anotherImagesList.get(i);
-				validationResult = thisImage.validate(anotherImage);
-				if (validationResult.length() != 0) {
-					buf.append("\tConcept.Images[" + i + "] not equal: \n");
-					buf.append(validationResult);
-				}
-			} else {
-				buf.append("\tConcept.Images[" + i + "] not equal: \n");
-				buf
-						.append("\t\tThere is no corresponding Image in another to compare it to.\n");
-			}
-		}
-
-		// Compare Refset Members
-		List<RefsetMember<?, ?>> refsetMembersList = this.getExtensions();
-		assert refsetMembersList != null : "validating: " + nid;
-		List<RefsetMember<?, ?>> anotherRefsetMembersList = another
-				.getExtensions();
-		assert anotherRefsetMembersList != null : "validating: " + nid;
-		for (int i = 0; i < refsetMembersList.size(); i++) {
-			// make sure there are elements in both arrays to compare
-			if (anotherRefsetMembersList.size() > i) {
-				RefsetMember<?, ?> thisRefsetMember = refsetMembersList.get(i);
-				RefsetMember<?, ?> anotherRefsetMember = anotherRefsetMembersList
-						.get(i);
-				validationResult = thisRefsetMember
-						.validate(anotherRefsetMember);
-				if (validationResult.length() != 0) {
-					buf.append("\tConcept.RefsetMember[" + i
-							+ "] not equal: \n");
-					buf.append(validationResult);
-				}
-			} else {
-				buf.append("\tConcept.RefsetMember[" + i + "] not equal: \n");
-				buf
-						.append("\t\tThere is no corresponding RefsetMember in another to compare it to.\n");
-			}
-		}
-
-		return buf.toString();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1537,13 +1409,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 			buff.append("\n attributes: ");
 			buff.append(getConceptAttributes());
 			buff.append("\n descriptions: ");
-			formatList(buff, getDescriptions());
+			formatCollection(buff, getDescriptions());
 			buff.append("\n srcRels: ");
-			formatList(buff, getSourceRels());
+			formatCollection(buff, getSourceRels());
 			buff.append("\n images: ");
-			formatList(buff, getImages());
+			formatCollection(buff, getImages());
 			buff.append("\n refset members: ");
-			formatList(buff, getExtensions());
+			formatCollection(buff, getExtensions());
 			buff.append("\n destRel/type: ");
 			doubleNidFormatter(buff, data.getDestRelNidTypeNidList());
 			buff.append("\n refset/member for concept: ");
@@ -1630,7 +1502,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 	}
 
-	private void formatList(StringBuffer buff, List<?> list) {
+	private void formatCollection(StringBuffer buff, Collection<?> list) {
 		if (list != null && list.size() > 0) {
 			buff.append("[\n");
 			for (Object obj : list) {

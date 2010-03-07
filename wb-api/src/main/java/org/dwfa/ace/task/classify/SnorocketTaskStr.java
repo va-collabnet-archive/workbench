@@ -908,7 +908,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
         LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
 
         I_GetConceptData rootConcept = tf.getConcept(rootRoleNid);
-        List<? extends I_RelVersioned> thisLevel = rootConcept.getSourceRels();
+        Collection<? extends I_RelVersioned> thisLevel = rootConcept.getSourceRels();
         while (thisLevel.size() > 0) {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rv : thisLevel) {
@@ -937,7 +937,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
                     resultSet.add(rv.getC1Id());
                     // GET C2 RELS FOR NEXT LEVEL
                     I_GetConceptData c2 = tf.getConcept(rv.getC2Id());
-                    List<? extends I_RelVersioned> c2Rels = c2.getSourceRels();
+                    Collection<? extends I_RelVersioned> c2Rels = c2.getSourceRels();
                     for (I_RelVersioned nextRel : c2Rels)
                         nextLevel.add(nextRel);
                 }
@@ -1208,7 +1208,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             for (int c1 : focusCase1OutNid) {
                 I_GetConceptData relSource;
                 relSource = tf.getConcept(c1);
-                List<? extends I_RelVersioned> lrv = relSource.getSourceRels();
+                Collection<? extends I_RelVersioned> lrv = relSource.getSourceRels();
                 for (I_RelVersioned rv : lrv) {
 
                     Integer iR = rv.getRelId();
@@ -1235,7 +1235,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             s.append("\r\n:::");
             for (int c1Nid : focusCase1OutNid) {
                 I_GetConceptData sourceRel = tf.getConcept(c1Nid);
-                List<? extends I_RelVersioned> lsr = sourceRel.getSourceRels();
+                Collection<? extends I_RelVersioned> lsr = sourceRel.getSourceRels();
                 for (I_RelVersioned rv : lsr) {
 
                     Integer iR = rv.getRelId();

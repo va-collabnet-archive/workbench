@@ -161,9 +161,9 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             reviewedRejectedDeletionStatus =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
-            List<? extends I_ExtendByRef> memberExtensions =
+            Collection<? extends I_ExtendByRef> memberExtensions =
                     termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
-            List<? extends I_ExtendByRef> promotionExtensions =
+            Collection<? extends I_ExtendByRef> promotionExtensions =
                     termFactory.getRefsetExtensionMembers(promotionConcept.getConceptId());
 
             updatePromotionsRefset(memberExtensions, promotionExtensions);
@@ -184,8 +184,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
     }
 
-    private void updatePromotionsRefset(List<? extends I_ExtendByRef> memberExtensions,
-            List<? extends I_ExtendByRef> promotionExtensions) throws Exception {
+    private void updatePromotionsRefset(Collection<? extends I_ExtendByRef> memberExtensions,
+                                                   Collection<? extends I_ExtendByRef> promotionExtensions) throws Exception {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         for (I_ExtendByRef memberExtension : memberExtensions) {
             I_ExtendByRefPart latestMemberPart = getLatestPart(memberExtension);
@@ -265,7 +265,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         }
     }
 
-    private I_ExtendByRef getExtensionByComponent(int componentId, List<? extends I_ExtendByRef> promotionExtensions) {
+    private I_ExtendByRef getExtensionByComponent(int componentId, Collection<? extends I_ExtendByRef> promotionExtensions) {
         for (I_ExtendByRef extension : promotionExtensions) {
             if (extension.getComponentId() == componentId) {
                 return extension;

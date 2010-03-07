@@ -82,10 +82,10 @@ import org.dwfa.bpa.process.I_RenderMessage;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.Priority;
 import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
-import org.dwfa.bpa.util.FrameWithOpenFramesListener;
-import org.dwfa.bpa.util.TableSorter;
-import org.dwfa.util.io.FileIO;
 import org.dwfa.bpa.tasks.util.FileContent;
+import org.dwfa.bpa.util.FrameWithOpenFramesListener;
+import org.dwfa.bpa.util.SortClickListener;
+import org.dwfa.util.io.FileIO;
 
 /**
  * @author kec
@@ -130,10 +130,6 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
     private ActionListener popupListener = new AttachmentPopupActionListener();
 
     private JButton addAttachment;
-
-    private TableSorter attachmentSortingTable;
-
-    private TableSorter executionSortingTable;
 
     private JButton addEmptyAttachmentKey;
 
@@ -268,8 +264,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
             String command = e.getActionCommand().toLowerCase();
             if (command.equals("open...")) {
                 if (attachmentTable.getSelectedRow() >= 0) {
-                    String key = (String) attachmentTableModel.getValueAt(
-                        attachmentSortingTable.modelIndex(attachmentTable.getSelectedRow()),
+                    String key = (String) attachmentTableModel.getValueAt(attachmentTable.getSelectedRow(),
                         ProcessAttachmentTableModel.NAME);
 
                     Object object = process.readAttachement(key);
@@ -310,8 +305,7 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
          */
         private void saveAs() {
             try {
-                String key = (String) attachmentTableModel.getValueAt(
-                    attachmentSortingTable.modelIndex(attachmentTable.getSelectedRow()),
+                String key = (String) attachmentTableModel.getValueAt(attachmentTable.getSelectedRow(),
                     ProcessAttachmentTableModel.NAME);
                 Object obj = process.readAttachement(key);
                 // Create a file dialog box to prompt for a new file to display
@@ -362,8 +356,8 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
          *
          */
         private void removeAttachment() {
-            String key = (String) attachmentTableModel.getValueAt(
-                attachmentSortingTable.modelIndex(attachmentTable.getSelectedRow()), ProcessAttachmentTableModel.NAME);
+            String key = (String) attachmentTableModel.getValueAt(attachmentTable.getSelectedRow(), 
+                ProcessAttachmentTableModel.NAME);
             process.takeAttachment(key);
             try {
                 layoutComponents();
@@ -731,15 +725,14 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         c.gridy++;
         if (viewAttachments.isSelected()) {
             attachmentTableModel = new ProcessAttachmentTableModel(this.process);
-            attachmentSortingTable = new TableSorter(attachmentTableModel);
-            attachmentTable = new JTable(attachmentSortingTable);
+            attachmentTable = new JTable(attachmentTableModel);
+            SortClickListener.setupSorter(attachmentTable);
             attachmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            attachmentSortingTable.setTableHeader(attachmentTable.getTableHeader());
             attachmentTableModel.setWidths(attachmentTable);
 
             // Set up tool tips for column headers.
-            attachmentSortingTable.getTableHeader().setToolTipText(
-                "Click to specify sorting; Control-Click to specify secondary sorting");
+            attachmentTable.getTableHeader().setToolTipText(
+                "Click to specify sorting");
             attachmentTable.addMouseListener(new AttachmentPopupListener());
             JScrollPane scroller = new JScrollPane(attachmentTable);
             // scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -786,13 +779,12 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         String viewString = (String) this.viewCombo.getSelectedItem();
         if (viewString.equals(VIEW_HISTORY)) {
             ExecutionRecordTableModel tableModel = new ExecutionRecordTableModel(process);
-            executionSortingTable = new TableSorter(tableModel);
-            JTable executionTable = new JTable(executionSortingTable);
-            executionSortingTable.setTableHeader(executionTable.getTableHeader());
+            JTable executionTable = new JTable(tableModel);
+            SortClickListener.setupSorter(executionTable);
 
             // Set up tool tips for column headers.
-            executionSortingTable.getTableHeader().setToolTipText(
-                "Click to specify sorting; Control-Click to specify secondary sorting");
+            executionTable.getTableHeader().setToolTipText(
+                "Click to specify sorting");
 
             JScrollPane sp = new JScrollPane(executionTable);
             JPanel intermediary = new JPanel(new GridLayout(1, 1));

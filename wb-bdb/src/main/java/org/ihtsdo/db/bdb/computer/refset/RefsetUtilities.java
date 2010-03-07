@@ -36,9 +36,9 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ClosestDistanceHashSet;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
@@ -252,7 +252,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		for (I_GetConceptData refsetConcept : refsetChildren) {
 			Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
-			List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
+			Collection<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
 			for (I_RelVersioned rel : rels) {
 				List<? extends I_RelTuple> tuples = rel.getTuples();
 				for (I_RelTuple tuple : tuples) {

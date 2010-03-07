@@ -1,6 +1,7 @@
 package org.dwfa.ace.refset.spec;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -9,8 +10,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 
 public interface I_HelpSpecRefset extends I_HelpRefsets {
 	
@@ -170,7 +171,7 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
 			throws Exception;
 
 	public List<I_GetConceptData> filterListByConceptType(
-			List<? extends I_ExtendByRef> list,
+	    Collection<? extends I_ExtendByRef> list,
 			I_GetConceptData requiredPromotionStatusConcept) throws Exception;
 
 	public I_GetConceptData newConcept(I_ConfigAceFrame aceConfig,

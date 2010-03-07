@@ -138,7 +138,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private boolean active = true;
 
-    private String frameName = "Ace Frame";
+    private String frameName = "Workbench Frame";
 
     private I_IntSet destRelTypes = new IntSet();
 
@@ -2940,6 +2940,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     @Override
     public void setShowPromotionCheckBoxes(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionCheckBoxes(show);
+    }
+
+    @Override
+    public void refreshRefsetTab() {
+        aceFrame.getCdePanel().refreshRefsetTab();
     }
 
 }

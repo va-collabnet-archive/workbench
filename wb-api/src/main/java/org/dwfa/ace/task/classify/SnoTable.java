@@ -18,6 +18,7 @@ package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -402,7 +403,7 @@ public class SnoTable {
     private static ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean, List<I_Position> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
+            Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
@@ -656,7 +657,7 @@ public class SnoTable {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
 
         try {
-            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
+            Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;

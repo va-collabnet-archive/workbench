@@ -30,7 +30,7 @@ public class ERevision implements I_VersionExternally {
         return Terms.get().getId(nid);
     }
 
-    protected static List<? extends I_ExtendByRef> getRefsetMembers(int nid) throws TerminologyException, IOException {
+    protected static Collection<? extends I_ExtendByRef> getRefsetMembers(int nid) throws TerminologyException, IOException {
         return Terms.get().getRefsetExtensionMembers(nid);
     }
 

@@ -55,7 +55,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
     public enum DESC_FIELD {
-        SCORE("score", 5, 75, 75), DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text", 5, 300, 2000), LANG("lang", 5, 35, 55), CASE_FIXED("case", 5, 35, 55), STATUS("status", 5, 50, 100), TYPE("type", 5, 85, 450), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 150);
+        SCORE("score", 5, 75, 75), DESC_ID("did", 5, 100, 100), CON_ID("cid", 5, 100, 100), TEXT("text", 5, 300, 2000), LANG("lang", 5, 35, 55), CASE_FIXED("case", 5, 35, 55), STATUS("status", 5, 50, 100), TYPE("type", 5, 85, 450), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 150);
 
         private String columnName;
 
@@ -338,8 +338,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         this.progress = progress;
     }
 
-    public static class StringWithDescTuple extends StringWithTuple implements Comparable<StringWithDescTuple>,
-            I_CellTextWithTuple {
+    public static class StringWithDescTuple extends StringWithTuple<StringWithDescTuple>  {
         I_DescriptionTuple tuple;
 
         boolean wrapLines;
@@ -352,10 +351,6 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
         public I_DescriptionTuple getTuple() {
             return tuple;
-        }
-
-        public int compareTo(StringWithDescTuple another) {
-            return super.compareTo(another);
         }
 
         public boolean getWrapLines() {

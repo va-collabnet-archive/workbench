@@ -18,6 +18,7 @@ package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -98,7 +99,7 @@ public class SnoAB {
     private List<SnoRel> findIsaProximal(I_GetConceptData cBean) {
         List<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
-            List<? extends I_RelVersioned> relList = cBean.getSourceRels();
+            Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;

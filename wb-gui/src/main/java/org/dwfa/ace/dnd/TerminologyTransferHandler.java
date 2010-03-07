@@ -64,7 +64,6 @@ import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -136,9 +135,6 @@ public class TerminologyTransferHandler extends TransferHandler {
 			} else if (JTable.class.isAssignableFrom(c.getClass())) {
 			    JTable termTable = (JTable) c;
 			    TableModel tableModel = termTable.getModel();
-			    if (TableSorter.class.isAssignableFrom(tableModel.getClass())) {
-			        tableModel = ((TableSorter) tableModel).getTableModel();
-			    }
 			    if (RelTableModel.class.isAssignableFrom(tableModel.getClass())) {
 			        TableModel rtm = termTable.getModel();
 			        StringWithRelTuple swrt = (StringWithRelTuple) rtm.getValueAt(termTable.getSelectedRow(),
@@ -491,10 +487,6 @@ public class TerminologyTransferHandler extends TransferHandler {
         if (JTable.class.isAssignableFrom(comp.getClass())) {
             JTable table = (JTable) comp;
             TableModel model = table.getModel();
-            if (TableSorter.class.isAssignableFrom(model.getClass())) {
-                TableSorter sorter = (TableSorter) model;
-                model = sorter.getTableModel();
-            }
             if (DescriptionsFromCollectionTableModel.class.isAssignableFrom(model.getClass())) {
                 return false;
             }

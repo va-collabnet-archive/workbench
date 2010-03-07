@@ -49,6 +49,8 @@ import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
 
 import org.dwfa.ace.TermLabelMaker;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.dnd.AceTransferAction;
@@ -162,12 +164,19 @@ public class JTableWithDragImage extends JTable {
                 ReflexiveRefsetFieldData fieldData = (ReflexiveRefsetFieldData) columnIdentifier;
                 switch (fieldData.getType()) {
                 case COMPONENT_IDENTIFIER:
-                    throw new UnsupportedOperationException();
+                    Object component = Terms.get().getComponent(swextt.getId());
+                    if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
+                        return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
+                    }
+                    if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+                        return new DescriptionTransferable(Terms.get().getDescription(swextt.getId()));
+                    }
+                    throw new UnsupportedOperationException("Component: " + component);
                 case CONCEPT_IDENTIFIER:
                     return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
                 case STRING:
                     return new StringSelection(swextt.getCellText());
-                case VERSION:
+                case TIME:
                     return new StringSelection(swextt.getCellText());
                 default:
                     throw new UnsupportedOperationException("Can't handle fieldDataType: " + fieldData.getType());

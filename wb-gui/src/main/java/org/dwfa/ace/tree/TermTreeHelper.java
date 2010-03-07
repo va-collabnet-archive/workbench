@@ -335,9 +335,7 @@ public class TermTreeHelper implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         try {
 			setRoots();
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
         updateHierarchyView(evt.getPropertyName());

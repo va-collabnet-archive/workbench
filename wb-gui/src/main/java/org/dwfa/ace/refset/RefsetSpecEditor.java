@@ -98,7 +98,6 @@ import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.util.SwingWorker;
-import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -250,7 +249,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     if (historyButton.isSelected()) {
 
                         ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
-                        column5.setColumnName("version");
+                        column5.setColumnName("time");
                         column5.setCreationEditable(false);
                         column5.setUpdateEditable(false);
                         column5.setFieldClass(Number.class);
@@ -258,9 +257,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         column5.setPref(150);
                         column5.setMax(150);
                         column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-                        column5.setReadMethod(extType.getPartClass().getMethod("getVersion"));
-                        column5.setWriteMethod(extType.getPartClass().getMethod("setVersion", int.class));
-                        column5.setType(REFSET_FIELD_TYPE.VERSION);
+                        column5.setReadMethod(extType.getPartClass().getMethod("getTime"));
+                        column5.setWriteMethod(extType.getPartClass().getMethod("setTime", long.class));
+                        column5.setType(REFSET_FIELD_TYPE.TIME);
                         columns.add(column5);
 
                         ReflexiveRefsetFieldData column6 = new ReflexiveRefsetFieldData();
@@ -359,6 +358,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         public void propertyChange(PropertyChangeEvent evt) {
             refsetSpecConcept = null;
+            tempComponent = label.getTermComponent();
             if (label.getTermComponent() != null) {
                 ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
                 if (tabHistoryList.size() == 0) {
@@ -372,6 +372,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 }
             }
             updateSpecTree(false);
+            commentTableModel.fireTableDataChanged();
 
             if (treeHelper.getRenderer() != null) {
                 treeHelper.getRenderer().propertyChange(
@@ -518,6 +519,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
         label = new TermComponentLabel(this.ace.getAceFrameConfig());
         label.addMouseListener(new RefsetCommentPopupListener(ace.getAceFrameConfig(), this));
+        label.addTermChangeListener(treeHelper);
+        label.addTermChangeListener(refsetTree);
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
         this.ace.getAceFrameConfig().addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
         this.ace.getAceFrameConfig().addPropertyChangeListener(this);
@@ -556,7 +559,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         this.contentPanel = getContentPane();
         label.addPropertyChangeListener("termComponent", labelListener);
         if (this.tabHistoryList.size() > 0 && this.tabHistoryList.getFirst() != null) {
-            this.label.setTermComponent(this.tabHistoryList.getFirst());
+            this.tempComponent = this.tabHistoryList.getFirst();
             this.setTermComponent(this.tabHistoryList.getFirst());
         }
     }
@@ -740,6 +743,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                                         "<html><font color='blue'>Process complete: <font color='red'>"
                                             + exceptionMessage);
                                 }
+                                ace.getAceFrameConfig().refreshRefsetTab();
                             }
                         });
 
@@ -758,8 +762,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         JTabbedPane refsetTabs = new JTabbedPane();
         refsetTabs.addTab("specification", getSpecPane());
         commentTable = RefsetSpecPanel.createCommentTable(ace.getAceFrameConfig(), this);
-        TableSorter sorter = (TableSorter) commentTable.getModel();
-        commentTableModel = (ReflexiveRefsetCommentTableModel) sorter.getTableModel();
+        commentTableModel = (ReflexiveRefsetCommentTableModel) commentTable.getModel();
         commentScroller = new JScrollPane(commentTable);
         refsetTabs.addTab("comments", commentScroller);
         return refsetTabs;
@@ -821,13 +824,19 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     public I_AmTermComponent getTermComponent() {
+        I_AmTermComponent returnValue = tempComponent;
+        if (returnValue != null) {
+            return returnValue;
+        }
         return label.getTermComponent();
     }
-
+    
+    I_AmTermComponent tempComponent;
     public void setTermComponent(final I_AmTermComponent termComponent) {
+        tempComponent = termComponent;
         if (SwingUtilities.isEventDispatchThread()) {
             label.setTermComponent(termComponent);
-        } else {
+         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
@@ -1236,6 +1245,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public RefsetSpecPanel getRefsetSpecPanel() {
         return refsetSpecPanel;
+    }
+
+    public void refresh() {
+        if (commentTableModel != null) {
+            commentTableModel.fireTableDataChanged();
+        }
     }
 
 }

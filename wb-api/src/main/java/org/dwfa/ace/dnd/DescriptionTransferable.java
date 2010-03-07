@@ -57,6 +57,18 @@ public class DescriptionTransferable implements Transferable {
         }
     }
 
+    public DescriptionTransferable(I_DescriptionVersioned description) {
+        super();
+        this.tuple = description.getFirstTuple();
+        try {
+            thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
+            thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
+            conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (tuple == null) {
             return null;

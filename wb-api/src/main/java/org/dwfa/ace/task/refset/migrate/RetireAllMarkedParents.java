@@ -68,7 +68,7 @@ public class RetireAllMarkedParents extends AbstractTask {
 
         int refsetId = memberRefsetConcept.getConceptId();
 
-        List<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+        Collection<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 

@@ -78,7 +78,7 @@ public class LogicalFormsPanel extends JPanel implements ActionListener {
     final static String TAB_DIFF = "Differences";
     final static String TAB_EQUIV = "Equivalents";
     final static String TAB_DL = "Logic";
-    final static String TAB_VIEW = "Version";
+    final static String TAB_VIEW = "Time";
     final static String TAB_STATS = "Stats";
 
     public LogicalFormsPanel() {

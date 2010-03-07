@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,10 +34,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpCaculateMemberRefsets;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ClosestDistanceHashSet;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.ConceptRefsetInclusionDetails;
@@ -150,7 +151,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                 List<Integer> conceptsWithIncludeIndividual = new ArrayList<Integer>();
                 List<Integer> conceptsWithExcludeIndividual = new ArrayList<Integer>();
 
-                List<? extends I_ExtendByRef> refsetMembers = Terms.get().getRefsetExtensionMembers(i);
+                Collection<? extends I_ExtendByRef> refsetMembers = Terms.get().getRefsetExtensionMembers(i);
                 /*
                  * For each inclusion concept, find the type and keep a list of
                  * which are each type...reasons for inclusion
@@ -238,7 +239,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     ExcludeConcept(member, memberSetId, member);
                 }
 
-                List<? extends I_ExtendByRef> conceptsInMemberRefset = Terms.get().getRefsetExtensionMembers(memberSetId);
+                Collection<? extends I_ExtendByRef> conceptsInMemberRefset = Terms.get().getRefsetExtensionMembers(memberSetId);
                 /*
                  * Add all members to the member refset so we know what was
                  * already there

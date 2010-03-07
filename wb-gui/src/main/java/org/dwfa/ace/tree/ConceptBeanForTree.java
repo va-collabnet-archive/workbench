@@ -18,6 +18,7 @@ package org.dwfa.ace.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -89,7 +90,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getConceptAttributeTuples(allowedStatus, positions);
     }
 
-    public List<? extends I_DescriptionVersioned> getDescriptions() throws IOException {
+    public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException {
         return bean.getDescriptions();
     }
 
@@ -98,7 +99,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDescriptionTuples(allowedStatus, allowedTypes, positions);
     }
 
-    public List<? extends I_RelVersioned> getDestRels() throws IOException {
+    public Collection<? extends I_RelVersioned> getDestRels() throws IOException {
         if (parentDepth > 0) {
             return new ArrayList<I_RelVersioned>();
         }
@@ -113,7 +114,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, addUncommitted);
     }
 
-    public List<? extends I_ImageVersioned> getImages() throws IOException {
+    public Collection<? extends I_ImageVersioned> getImages() throws IOException {
         return bean.getImages();
     }
 
@@ -127,7 +128,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getInitialText();
     }
 
-    public List<? extends I_RelVersioned> getSourceRels() throws IOException {
+    public Collection<? extends I_RelVersioned> getSourceRels() throws IOException {
         return bean.getSourceRels();
     }
 
@@ -346,7 +347,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.isParentOfOrEqualTo(child, addUncommitted);
     }
 
-    public List<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException {
+    public Collection<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException {
         return bean.getExtensions();
     }
 

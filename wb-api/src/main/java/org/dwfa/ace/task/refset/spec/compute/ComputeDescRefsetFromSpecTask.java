@@ -252,7 +252,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
             // create a list of all the current refset members (this requires
             // filtering out retired versions)
-            List<? extends I_ExtendByRef> allRefsetMembers =
+            Collection<? extends I_ExtendByRef> allRefsetMembers =
                     termFactory.getRefsetExtensionMembers(refset.getConceptId());
 
             HashSet<Integer> currentRefsetMemberIds =
@@ -517,7 +517,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         }
     }
 
-    private HashSet<Integer> filterNonCurrentRefsetMembers(List<? extends I_ExtendByRef> allRefsetMembers,
+    private HashSet<Integer> filterNonCurrentRefsetMembers(Collection<? extends I_ExtendByRef> allRefsetMembers,
             I_HelpMemberRefset refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         HashSet<Integer> newList = new HashSet<Integer>();

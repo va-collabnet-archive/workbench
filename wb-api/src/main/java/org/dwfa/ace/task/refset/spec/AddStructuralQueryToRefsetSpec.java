@@ -71,7 +71,7 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
         if (getStructuralQueryTokenId() == RefsetAuxiliary.Concept.DESC_IS.localize().getNid()) {
             if (c3Description == null) {
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
-            			configFrame.getHierarchySelection().getDescriptions().get(0).getDescId());
+            			configFrame.getHierarchySelection().getDescriptions().iterator().next().getDescId());
             } else {
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
             			c3Description.getDescId());

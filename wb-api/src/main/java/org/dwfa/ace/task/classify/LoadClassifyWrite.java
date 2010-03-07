@@ -361,7 +361,7 @@ public class LoadClassifyWrite extends AbstractTask {
 
                 // CHECK I_RelVersioned: CID1, CID2
                 final I_GetConceptData relSource = tf.getConcept(cId1);
-                List<? extends I_RelVersioned> lrv = relSource.getSourceRels();
+                Collection<? extends I_RelVersioned> lrv = relSource.getSourceRels();
                 for (I_RelVersioned rv : lrv) {
                     if (cId2 == rv.getC2Id()) {
                         case3Rel = rv;

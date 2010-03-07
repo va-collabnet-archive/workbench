@@ -181,8 +181,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 				if (conceptExtension.getC1Nid() == nid) {
 					AceLog.getAppLog().severe(
 							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().get(0)
-											.getText());
+									+ pathConcept.getDescriptions().iterator().next().getFirstTuple().getText());
 				} else {
 					HashSet<I_Position> prevOrigins = new HashSet<I_Position>();
 					Path path = getPath(conceptExtension.getC1Nid(), prevOrigins);
@@ -210,8 +209,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 				if (conceptExtension.getC1Nid() == nid) {
 					AceLog.getAppLog().severe(
 							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().get(0)
-											.getText());
+									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
 				} else {
 					HashSet<I_Position> prevOrigins = new HashSet<I_Position>();
 					result.add(new Position(conceptExtension.getIntValue(),
@@ -237,8 +235,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 				if (conceptExtension.getC1Nid() == nid) {
 					AceLog.getAppLog().severe(
 							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().get(0)
-											.getText());
+									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
 				} else {
 					
 					Position anOrigin = new Position(conceptExtension.getIntValue(),

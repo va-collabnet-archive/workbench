@@ -54,11 +54,10 @@ public class IntSet implements ListDataListener, I_IntSet {
         for (int i = 1; i < values.length; i++) {
             if (this.setValues[i - 1] == this.setValues[i]) {
                 duplicates = true;
-                throw new RuntimeException("Set array contains duplicates: " + Arrays.asList(this.setValues));
             }
         }
         if (duplicates) {
-            AceLog.getAppLog().info("Set array contains duplicates: " + Arrays.asList(this.setValues));
+            AceLog.getAppLog().info("Set array contains duplicates: " + toString());
             HashSet<Integer> hashSetValues = new HashSet<Integer>();
             for (int i : values) {
                 hashSetValues.add(i);

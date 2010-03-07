@@ -19,7 +19,6 @@ package org.dwfa.ace.task.ebr;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.List;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -64,7 +63,7 @@ public class CountExtensionsInRefset extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            List<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
+            Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
                 refsetTermEntry.getLocalConcept().getNid());
             worker.getLogger().info(
                 "Counted " + extensions.size() + " extensions for " + refsetTermEntry.getLocalDesc().getText() + ".");

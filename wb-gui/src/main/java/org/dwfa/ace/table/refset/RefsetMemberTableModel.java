@@ -275,7 +275,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     public enum REFSET_FIELDS {
         // All extensions
-        REFSET_ID("refset", 5, 75, 1000), MEMBER_ID("member id", 5, 100, 100), COMPONENT_ID("component id", 5, 100, 100), STATUS("status", 5, 50, 250), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 180),
+        REFSET_ID("refset", 5, 75, 1000), MEMBER_ID("member id", 5, 100, 100), COMPONENT_ID("component id", 5, 100, 100), STATUS("status", 5, 50, 250), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 180),
 
         // Boolean extension
         BOOLEAN_VALUE("boolean value", 5, 100, 500),

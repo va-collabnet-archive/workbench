@@ -18,10 +18,6 @@ public class ComponentList<E> extends CopyOnWriteArrayList<E> {
 		return super.add(e);
 	}
 
-	@Override
-	public final void add(int index, E element) {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public final boolean addAll(Collection<? extends E> c) {
@@ -29,13 +25,7 @@ public class ComponentList<E> extends CopyOnWriteArrayList<E> {
 	}
 
 	@Override
-	public final boolean addAll(int index, Collection<? extends E> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public final void clear() {
 		throw new UnsupportedOperationException();
 	}
-	
 }

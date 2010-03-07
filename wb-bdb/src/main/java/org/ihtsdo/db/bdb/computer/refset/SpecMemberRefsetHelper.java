@@ -254,7 +254,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        List<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(memberRefsetId);
+        Collection<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(memberRefsetId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 

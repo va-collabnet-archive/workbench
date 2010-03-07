@@ -20,7 +20,7 @@ import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JPanel;
@@ -94,7 +94,7 @@ public class RefsetViewerPanel extends JPanel {
                 DefaultMutableTreeNode uncommittedNodes = new DefaultMutableTreeNode("Uncommitted Members");
                 newRoot.add(committedNodes);
                 newRoot.add(uncommittedNodes);
-                List<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
+                Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
                     refsetConcept.getConceptId());
 
                 for (I_ExtendByRef ext : extensions) {

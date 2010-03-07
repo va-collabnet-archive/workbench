@@ -29,9 +29,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpMemberRefsets;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.batch.Batch;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.tapi.AllowDataCheckSuppression;
@@ -236,7 +236,7 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        List<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(memberRefsetId);
+        Collection<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(memberRefsetId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 

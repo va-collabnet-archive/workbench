@@ -21,7 +21,6 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -200,7 +199,24 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 		protected int index = -1;
 		private boolean dup = false;
 
-		public Version() {
+		@Override
+        public boolean equals(Object obj) {
+            if (Version.class.isAssignableFrom(obj.getClass())) {
+                Version another = (Version) obj;
+                if (this.getNid() == another.getNid() &&
+                        this.index == another.index) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return index;
+        }
+
+        public Version() {
 			super();
 		}
 

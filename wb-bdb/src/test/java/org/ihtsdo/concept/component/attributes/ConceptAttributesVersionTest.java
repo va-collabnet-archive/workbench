@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,13 +99,13 @@ public class ConceptAttributesVersionTest {
 			ArrayList<ConceptAttributes> origList = c.getConceptAttributesList();
 			cab.objectToEntry(origList, entry);
 			cab.setupBinder(c, new GCValueComponentMap(ReferenceType.WEAK));
-			List<ConceptAttributes> newList = cab.entryToObject(entry);
+			Collection<ConceptAttributes> newList = cab.entryToObject(entry);
 			assertEquals(origList, newList);
 
 			Concept c2 = Concept.getTempConcept(test2Concept);
 			ArrayList<ConceptAttributes> c2List = c2.getConceptAttributesList();
 			cab.objectToEntry(c2List, entry);
-			List<ConceptAttributes> c2NewList = cab.entryToObject(entry);
+			Collection<ConceptAttributes> c2NewList = cab.entryToObject(entry);
 			assertEquals(c2List, c2NewList);
 			if (c2List.equals(newList)) {
 				fail("lists should not be equal");

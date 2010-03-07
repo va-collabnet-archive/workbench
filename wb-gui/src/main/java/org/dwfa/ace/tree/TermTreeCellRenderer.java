@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -47,13 +48,14 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -228,7 +230,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                         if (showRefsetInfoInTaxonomy) {
                             List<I_ExtendByRef> extensions =
                                      (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb.getConceptId());
-                            List<? extends I_DescriptionVersioned> descriptions = cb.getDescriptions();
+                            Collection<? extends I_DescriptionVersioned> descriptions = cb.getDescriptions();
                             List<I_ExtendByRef> descriptionExtensions = new ArrayList<I_ExtendByRef>();
                             for (I_DescriptionVersioned desc : descriptions) {
                                 List<? extends I_ExtendByRef> descExts =
@@ -346,10 +348,15 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                     } else {
                         setText("null desc: " + cb.getInitialText());
                     }
-                    ;
-                    int sourceRelTupleSize =
+                    
+                    List<? extends I_RelTuple> versions =
                             cb.getSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
-                                aceConfig.getViewPositionSetReadOnly(), false).size();
+                                aceConfig.getViewPositionSetReadOnly(), false);
+                    int sourceRelTupleSize = versions.size(); 
+                    if (sourceRelTupleSize > 1) {
+                        HashSet<I_RelTuple> unique = new HashSet<I_RelTuple>(versions);
+                        sourceRelTupleSize = unique.size();
+                    }
                     if (sourceRelTupleSize > 1) {
                         if (cb.isParentOpened()) {
                             this.setIcon(multiParentOpen);

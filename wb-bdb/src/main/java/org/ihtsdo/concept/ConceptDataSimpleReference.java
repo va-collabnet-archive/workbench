@@ -2,6 +2,7 @@ package org.ihtsdo.concept;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,11 +118,11 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 		return componentList;
 	}
 
-	private ArrayList<RefsetMember<?, ?>> getList(RefsetMemberBinder binder,
+	private Collection<RefsetMember<?, ?>> getList(RefsetMemberBinder binder,
 			OFFSETS offset, Concept enclosingConcept)
 			throws IOException {
 		binder.setupBinder(enclosingConcept, componentMap);
-		ArrayList<RefsetMember<?, ?>> componentList;
+		Collection<RefsetMember<?, ?>> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
 			checkFormatAndVersion(readOnlyInput);
@@ -509,7 +510,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
 	@Override
 	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
-		List<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
+	    Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
 		if (refsetMemberList.size() < useMemberMapThreshold) {
 			for (RefsetMember<?, ?> member: refsetMemberList) {
 				if (member.nid == memberNid) {
@@ -524,7 +525,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 		return refsetMembersMap.get(memberNid);
 	}
 
-	private synchronized void setupMemberMap(List<RefsetMember<?, ?>> refsetMemberList) {
+	private synchronized void setupMemberMap(Collection<RefsetMember<?, ?>> refsetMemberList) {
 		if (refsetMembersMap == null) {
 			refsetMembersMap = new ConcurrentHashMap<Integer, RefsetMember<?,?>>(refsetMemberList.size(), 0.75f, 2);
 			for (RefsetMember<?, ?> m: refsetMemberList) {

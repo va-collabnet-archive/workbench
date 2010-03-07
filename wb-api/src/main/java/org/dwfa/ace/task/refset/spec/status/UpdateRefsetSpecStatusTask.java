@@ -38,8 +38,8 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
@@ -214,7 +214,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
     private void updateStatusOfExtensions(I_GetConceptData extensionConcept, I_GetConceptData statusConcept)
             throws Exception {
-        List<? extends I_ExtendByRef> extensions =
+        Collection<? extends I_ExtendByRef> extensions =
                 termFactory.getRefsetExtensionMembers(extensionConcept.getConceptId());
 
         for (I_ExtendByRef extension : extensions) {
@@ -240,7 +240,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     private void updateStatusOfDescriptions(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
         for (I_GetConceptData currentConcept : concepts) {
-            List<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                     I_DescriptionPart templatePart = descVersioned.getLastTuple().getMutablePart();
@@ -257,7 +257,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     private void updateStatusOfRelationships(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
         for (I_GetConceptData currentConcept : concepts) {
-            List<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
+            Collection<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
             for (I_RelVersioned relVersioned : rels) {
                 for (I_Path editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
                     I_RelPart newPart = relVersioned.getLastTuple().getMutablePart();

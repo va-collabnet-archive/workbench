@@ -65,7 +65,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class DescriptionPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
@@ -251,8 +251,8 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
 
         c.gridheight = 1;
         c.gridx++;
-        TableSorter sortingTable = new TableSorter(descTableModel);
-        descTable = new JTableWithDragImage(sortingTable);
+        descTable = new JTableWithDragImage(descTableModel);
+        SortClickListener.setupSorter(descTable);
         descTable.getSelectionModel().addListSelectionListener(this);
         descTable.setDragEnabled(true);
         descTable.setTransferHandler(new TerminologyTransferHandler(descTable));
@@ -262,7 +262,6 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         }
 
         descTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sortingTable.setTableHeader(descTable.getTableHeader());
 
         DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
 
@@ -276,8 +275,8 @@ public class DescriptionPlugin extends AbstractPlugin implements TableModelListe
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        descTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         descPanel.add(descTable.getTableHeader(), c);

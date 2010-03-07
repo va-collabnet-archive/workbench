@@ -17,6 +17,7 @@
 package org.dwfa.ace.api.cs;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -63,7 +64,7 @@ public class RelationshipValidator extends SimpleValidator {
         failureReport = new StringBuffer();
 
         I_GetConceptData concept = tf.getConcept(tf.uuidToNative(bean.getIdentifier().getUIDs()));
-        List<? extends I_RelVersioned> databaseRelationships = concept.getSourceRels();
+        Collection<? extends I_RelVersioned> databaseRelationships = concept.getSourceRels();
         List<UniversalAceRelationship> beanRelationships = bean.getSourceRels();
 
         if (databaseRelationships.size() > beanRelationships.size()) {

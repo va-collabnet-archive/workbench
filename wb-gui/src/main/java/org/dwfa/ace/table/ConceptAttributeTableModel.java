@@ -228,7 +228,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
     }
 
     public enum CONCEPT_FIELD {
-        CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 250), DEFINED("defined", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 150);
+        CON_ID("cid", 5, 100, 100), STATUS("status", 5, 50, 250), DEFINED("defined", 5, 85, 1550), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 150);
 
         private String columnName;
 
@@ -538,8 +538,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         this.progress = progress;
     }
 
-    public static class StringWithConceptTuple extends StringWithTuple implements Comparable<StringWithConceptTuple>,
-            I_CellTextWithTuple {
+    public static class StringWithConceptTuple extends StringWithTuple<StringWithConceptTuple> {
         String cellText;
 
         I_ConceptAttributeTuple tuple;
@@ -556,10 +555,6 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
          */
         public I_ConceptAttributeTuple getTuple() {
             return tuple;
-        }
-
-        public int compareTo(StringWithConceptTuple another) {
-            return super.compareTo(another);
         }
     }
 

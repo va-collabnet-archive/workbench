@@ -20,6 +20,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -130,7 +131,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             if (cb == null) {
                 return true;
             }
-            List<? extends I_DescriptionVersioned> descs = cb.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descs = cb.getDescriptions();
             addToConceptsToFetch(descs);
             if (stopWork) {
                 return false;
@@ -169,7 +170,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             }
         }
 
-        private void addToConceptsToFetch(List<? extends I_DescriptionVersioned> descs) {
+        private void addToConceptsToFetch(Collection<? extends I_DescriptionVersioned> descs) {
             for (I_DescriptionVersioned d : descs) {
                 if (stopWork) {
                     return;

@@ -48,7 +48,7 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.IdTableModel.ID_FIELD;
 import org.dwfa.ace.table.IdTableModel.StringWithIdTuple;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class IdPlugin extends AbstractPlugin {
@@ -175,15 +175,14 @@ public class IdPlugin extends AbstractPlugin {
         idPanel.add(filler, c);
         c.gridheight = 1;
         c.gridx++;
-        TableSorter sortingTable = new TableSorter(idTableModel);
-        idTable = new JTableWithDragImage(sortingTable);
+        idTable = new JTableWithDragImage(idTableModel);
+        SortClickListener.setupSorter(idTable);
         idTable.getSelectionModel().addListSelectionListener(this);
         /*
          * idTable.addMouseListener(idTableModel.makePopupListener(idTable,
          * host.getConfig()));
          */
         idTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sortingTable.setTableHeader(idTable.getTableHeader());
 
         ID_FIELD[] columnEnums = idTableModel.getColumnEnums();
         for (int i = 0; i < idTable.getColumnCount(); i++) {
@@ -196,8 +195,8 @@ public class IdPlugin extends AbstractPlugin {
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        idTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         idPanel.add(idTable.getTableHeader(), c);

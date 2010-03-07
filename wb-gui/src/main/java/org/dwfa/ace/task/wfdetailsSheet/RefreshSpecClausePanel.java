@@ -55,12 +55,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelationshipTableRenderer;
@@ -68,7 +68,7 @@ import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -175,13 +175,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         }
 
         srcRelTableModel = new SrcRelTableModel(host, getSrcRelColumns(), frameConfig);
-        TableSorter relSortingTable = new TableSorter(srcRelTableModel);
-        relTable = new JTableWithDragImage(relSortingTable);
+        relTable = new JTableWithDragImage(srcRelTableModel);
         RelationshipTableRenderer renderer = new RelationshipTableRenderer();
+        SortClickListener.setupSorter(relTable);
         relTable.setDefaultRenderer(StringWithRelTuple.class, renderer);
-        relSortingTable.setTableHeader(relTable.getTableHeader());
-        relSortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        relTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         REL_FIELD[] columnEnums = srcRelTableModel.getColumnEnums();
         for (int i = 0; i < relTable.getColumnCount(); i++) {
             TableColumn column = relTable.getColumnModel().getColumn(i);

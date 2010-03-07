@@ -18,6 +18,7 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -369,7 +370,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
 
         I_GetConceptData relQueryConcept = (I_GetConceptData) component;
-        List<? extends I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
+        Collection<? extends I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
 
         for (I_RelVersioned versionedTuple : relTuples) {
             boolean valid = false;

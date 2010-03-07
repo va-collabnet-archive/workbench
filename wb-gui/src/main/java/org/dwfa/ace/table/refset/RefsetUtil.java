@@ -45,7 +45,7 @@ import org.dwfa.ace.table.I_CellTextWithTuple;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.ConceptFieldEditor;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
-import org.dwfa.bpa.util.TableSorter;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
 
@@ -126,11 +126,10 @@ public class RefsetUtil {
         c.gridx++;
         c.gridwidth = 1;
 
-        TableSorter refsetSortingTable = new TableSorter(refsetModel);
-        JTableWithDragImage extTable = new JTableWithDragImage(refsetSortingTable);
-        refsetSortingTable.setTableHeader(extTable.getTableHeader());
-        refsetSortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        JTableWithDragImage extTable = new JTableWithDragImage(refsetModel);
+        SortClickListener.setupSorter(extTable);
+        extTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         REFSET_FIELDS[] columnEnums = refsetModel.getColumns();
         for (int i = 0; i < extTable.getColumnCount(); i++) {
             TableColumn column = extTable.getColumnModel().getColumn(i);

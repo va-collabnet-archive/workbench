@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 
-public class RefsetMemberBinder extends TupleBinding<List<RefsetMember<?, ?>>> 
+public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, ?>>> 
 	implements I_BindConceptComponents {
 
 	public static AtomicInteger encountered = new AtomicInteger();
@@ -26,19 +27,16 @@ public class RefsetMemberBinder extends TupleBinding<List<RefsetMember<?, ?>>>
 
 	RefsetMemberFactory factory = new RefsetMemberFactory();
 
-	private ArrayList<RefsetMember<?, ?>> refsetMemberList;
+	private Collection<RefsetMember<?, ?>> refsetMemberList;
 	private Concept enclosingConcept; 
 	private GCValueComponentMap componentMap;
 
 
 	@Override
-	public ArrayList<RefsetMember<?, ?>> entryToObject(TupleInput input) {
+	public Collection<RefsetMember<?, ?>> entryToObject(TupleInput input) {
 		assert enclosingConcept != null;
 		int listSize = input.readInt();
-		if (refsetMemberList != null) {
-			refsetMemberList.ensureCapacity(listSize + refsetMemberList.size());
-		}
-		ArrayList<RefsetMember<?, ?>> newRefsetMemberList;
+		Collection<RefsetMember<?, ?>> newRefsetMemberList;
 		HashMap<Integer, RefsetMember<?, ?>> nidToRefsetMemberMap = null;
 		if (refsetMemberList != null) {
 			newRefsetMemberList = refsetMemberList;
@@ -72,29 +70,32 @@ public class RefsetMemberBinder extends TupleBinding<List<RefsetMember<?, ?>>>
 				try {
 					if (refsetMember == null) {
 						refsetMember = factory.create(nid, typeNid, enclosingConcept, input);
-						componentMap.putIfAbsent(nid, refsetMember);
-						RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) componentMap.putIfAbsent(nid, refsetMember);
-						if (oldMember != null) {
-							refsetMember = oldMember;
-							if (nidToRefsetMemberMap != null) {
-								nidToRefsetMemberMap.put(nid, refsetMember);
-							}
+						if (refsetMember.getTime() != Long.MIN_VALUE) {
+	                        componentMap.putIfAbsent(nid, refsetMember);
+	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) componentMap.putIfAbsent(nid, refsetMember);
+	                        if (oldMember != null) {
+	                            refsetMember = oldMember;
+	                            if (nidToRefsetMemberMap != null) {
+	                                nidToRefsetMemberMap.put(nid, refsetMember);
+	                            }
+	                        }
 						}
 					} else {
-						factory.create(nid, typeNid, enclosingConcept, input);
+					    refsetMember.merge(factory.create(nid, typeNid, enclosingConcept, input));
 					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-				newRefsetMemberList.add(refsetMember);
+				if (refsetMember.getTime() != Long.MIN_VALUE) {
+	                newRefsetMemberList.add(refsetMember);
+				}
 			}
 		}
-		newRefsetMemberList.trimToSize();
 		return newRefsetMemberList;
 	}
 
 	@Override
-	public void objectToEntry(List<RefsetMember<?, ?>> list,
+	public void objectToEntry(Collection<RefsetMember<?, ?>> list,
 			TupleOutput output) {
 		List<RefsetMember<?, ?>> refsetMembersToWrite = new ArrayList<RefsetMember<?, ?>>(list.size());
 		for (RefsetMember<?, ?> refsetMember: list) {
@@ -133,7 +134,7 @@ public class RefsetMemberBinder extends TupleBinding<List<RefsetMember<?, ?>>>
 
 
 	public void setTermComponentList(
-			ArrayList<RefsetMember<?, ?>> componentList) {
+	        Collection<RefsetMember<?, ?>> componentList) {
 		this.refsetMemberList = componentList;
 		
 	}

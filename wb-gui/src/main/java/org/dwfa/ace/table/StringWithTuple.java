@@ -16,7 +16,7 @@
  */
 package org.dwfa.ace.table;
 
-public abstract class StringWithTuple implements I_CellTextWithTuple {
+public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implements I_CellTextWithTuple<T> {
 
     private String cellText;
     private boolean isInConflict;
@@ -38,8 +38,8 @@ public abstract class StringWithTuple implements I_CellTextWithTuple {
         return text;
     }
 
-    public int compareTo(StringWithTuple another) {
-        return cellText.compareTo(another.cellText);
+    public int compareTo(T another) {
+        return cellText.compareTo(another.getCellText());
     }
 
     public String getCellText() {

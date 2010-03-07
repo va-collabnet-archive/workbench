@@ -78,9 +78,8 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.bpa.util.SwingWorker;
-import org.dwfa.bpa.util.TableSorter;
-import org.dwfa.bpa.util.TableSorter.SortOrder;
 import org.dwfa.jini.TransactionParticipantAggregator;
 import org.dwfa.queue.ObjectServerCore;
 
@@ -169,8 +168,7 @@ public class QueueViewerPanel extends JPanel {
                     for (int i = firstSelectedRow; i <= lastSelectedRow; i++) {
                         if (lsm.isSelectedIndex(i)) {
                             try {
-                                int modelIndex = tableOfQueueEntriesSortingTable.modelIndex(i);
-                                I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(modelIndex);
+                                I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(i);
                                 selectedProcesses.add(processMeta);
                                 if (logger.isLoggable(Level.FINE)) {
                                     logger.log(Level.FINE, "selectedProcesses: " + processMeta);
@@ -419,10 +417,11 @@ public class QueueViewerPanel extends JPanel {
     }
 
     private class ProcessSelectionActionListener implements ListSelectionListener {
-        TableSorter sorter;
+ 
+        private JTable table;
 
-        public ProcessSelectionActionListener(TableSorter sorter) {
-            this.sorter = sorter;
+        public ProcessSelectionActionListener(JTable table) {
+            this.table = table;
         }
 
         /**
@@ -444,8 +443,8 @@ public class QueueViewerPanel extends JPanel {
                 process = null;
             } else {
                 try {
-                    if (lsm.getMinSelectionIndex() < sorter.getRowCount()) {
-                        int firstSelectedRow = sorter.modelIndex(lsm.getMinSelectionIndex());
+                    if (lsm.getMinSelectionIndex() < table.getRowCount()) {
+                        int firstSelectedRow = lsm.getMinSelectionIndex();
                         tableOfQueueEntriesModel.updateQueueData();
                         I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(firstSelectedRow);
                         if (processMeta != null) {
@@ -619,10 +618,6 @@ public class QueueViewerPanel extends JPanel {
 
     GetQueuesAsWorker getQueuesAction = new GetQueuesAsWorker();
 
-    private TableSorter tableOfQueuesSortingTable;
-
-    private TableSorter tableOfQueueEntriesSortingTable;
-
     /**
      * @param worker
      * @throws InterruptedException
@@ -710,13 +705,11 @@ public class QueueViewerPanel extends JPanel {
 
     private JScrollPane createTableOfQueues() {
         tableOfQueuesModel = new ListOfQueuesTableModel();
-        tableOfQueuesSortingTable = new TableSorter(tableOfQueuesModel);
-        tableOfQueuesSortingTable.setSortingStatus(0, SortOrder.ASCENDING);
-        tableOfQueues = new JTable(tableOfQueuesSortingTable);
-        tableOfQueuesSortingTable.setTableHeader(tableOfQueues.getTableHeader());
+        tableOfQueues = new JTable(tableOfQueuesModel);
+        SortClickListener.setupSorter(tableOfQueues);
         // Set up tool tips for column headers.
-        tableOfQueuesSortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        tableOfQueues.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         // Create a tableOfQueues that allows one selection at a time.
         tableOfQueues.getSelectionModel().addListSelectionListener(new QueueSelectionListener());
         tableOfQueues.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -769,8 +762,8 @@ public class QueueViewerPanel extends JPanel {
                     if (selectedQueue != queue) {
                         selectedQueue = queue;
                         tableOfQueueEntriesModel = new QueueTableModel(queue);
-                        tableOfQueueEntriesSortingTable = new TableSorter(tableOfQueueEntriesModel);
-                        tableOfQueueEntries = new JTable(tableOfQueueEntriesSortingTable);
+                        tableOfQueueEntries = new JTable(tableOfQueueEntriesModel);
+                        SortClickListener.setupSorter(tableOfQueueEntries);
 
                         tableOfQueueEntries.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                             "executeTask");
@@ -778,14 +771,12 @@ public class QueueViewerPanel extends JPanel {
                             "executeTask");
                         tableOfQueueEntries.getActionMap().put("executeTask", new ExecuteAction());
 
-                        tableOfQueueEntriesSortingTable.setTableHeader(tableOfQueueEntries.getTableHeader());
-
                         // Set up tool tips for column headers.
-                        tableOfQueueEntriesSortingTable.getTableHeader().setToolTipText(
-                            "Click to specify sorting; Control-Click to specify secondary sorting");
+                        tableOfQueueEntries.getTableHeader().setToolTipText(
+                            "Click to specify sorting");
 
                         tableOfQueueEntries.getSelectionModel().addListSelectionListener(
-                            new ProcessSelectionActionListener(tableOfQueueEntriesSortingTable));
+                            new ProcessSelectionActionListener(tableOfQueueEntries));
                         queueContentsSplitPane.setTopComponent(new JScrollPane(tableOfQueueEntries));
                         int dividerLoc = queueContentsSplitPane.getDividerLocation();
                         queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));

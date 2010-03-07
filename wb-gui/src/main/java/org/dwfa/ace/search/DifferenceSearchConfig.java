@@ -70,6 +70,10 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+    public void refreshRefsetTab() {
+        frameConfig.refreshRefsetTab();
+    }
+
     Set<I_Position> positionSet;
 
     public DifferenceSearchConfig(I_ConfigAceFrame frameConfig, Set<I_Position> positionSet) {

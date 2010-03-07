@@ -63,8 +63,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 	 */
     private static final long serialVersionUID = 1L;
 
-    public static class StringWithIdTuple extends StringWithTuple implements Comparable<StringWithIdTuple>,
-            I_CellTextWithTuple {
+    public static class StringWithIdTuple extends StringWithTuple<StringWithIdTuple>  {
         String cellText;
 
         I_IdVersion tuple;
@@ -76,10 +75,6 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
         public I_IdVersion getTuple() {
             return tuple;
-        }
-
-        public int compareTo(StringWithIdTuple another) {
-            return super.compareTo(another);
         }
     }
 
@@ -233,7 +228,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     public enum ID_FIELD {
-        LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID("id", 5, 85, 1550), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 150), SOURCE("id source", 5, 50, 250);
+        LOCAL_ID("local id", 5, 100, 100), STATUS("status", 5, 50, 250), EXT_ID("id", 5, 85, 1550), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 150), SOURCE("id source", 5, 50, 250);
 
         private String columnName;
 

@@ -20,12 +20,27 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class ReflexiveRefsetFieldData {
+    
+    public static ReflexiveRefsetFieldData getRowColumn() {
+        ReflexiveRefsetFieldData rowColumn = new ReflexiveRefsetFieldData();
+        rowColumn.setColumnName("row");
+        rowColumn.setCreationEditable(false);
+        rowColumn.setUpdateEditable(false);
+        rowColumn.setFieldClass(Number.class);
+        rowColumn.setMin(5);
+        rowColumn.setPref(15);
+        rowColumn.setMax(60);
+        rowColumn.setType(REFSET_FIELD_TYPE.ROW);
+        return rowColumn;
+    }
+
 
     public enum REFSET_FIELD_TYPE {
+        ROW,
         CONCEPT_IDENTIFIER,
         COMPONENT_IDENTIFIER,
         STRING,
-        VERSION,
+        TIME,
         CHECK_BOX;
     }
 

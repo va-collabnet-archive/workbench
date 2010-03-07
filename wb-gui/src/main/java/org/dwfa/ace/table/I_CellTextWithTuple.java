@@ -16,7 +16,7 @@
  */
 package org.dwfa.ace.table;
 
-public interface I_CellTextWithTuple {
+public interface I_CellTextWithTuple<T extends I_CellTextWithTuple<T>> extends Comparable<T> {
 
     public String getCellText();
 

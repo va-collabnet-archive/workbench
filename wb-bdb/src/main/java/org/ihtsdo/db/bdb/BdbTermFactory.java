@@ -487,7 +487,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	}
 
 	@Override
-	public List<RefsetMember<?, ?>> getRefsetExtensionMembers(int refsetId)
+	public Collection<RefsetMember<?, ?>> getRefsetExtensionMembers(int refsetId)
 			throws IOException {
 		return Concept.get(refsetId).getExtensions();
 	}
@@ -1318,7 +1318,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 		public void processConceptData(Concept concept) throws Exception {
 
 			if (tracker.continueWork()) {
-				List<? extends I_DescriptionVersioned> descriptions = concept
+				Collection<? extends I_DescriptionVersioned> descriptions = concept
 						.getDescriptions();
 				CountDownLatch descriptionLatch = new CountDownLatch(
 						descriptions.size());

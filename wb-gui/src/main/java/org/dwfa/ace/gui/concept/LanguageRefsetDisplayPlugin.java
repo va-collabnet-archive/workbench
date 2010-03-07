@@ -58,7 +58,6 @@ import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
-import org.dwfa.bpa.util.TableSorter;
 import org.dwfa.tapi.TerminologyException;
 
 public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements TableModelListener {
@@ -259,8 +258,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
         c.gridheight = 1;
         c.gridx++;
-        TableSorter sortingTable = new TableSorter(descTableModel);
-        languageRefsetTable = new JTableWithDragImage(sortingTable);
+        languageRefsetTable = new JTableWithDragImage(descTableModel);
         languageRefsetTable.getSelectionModel().addListSelectionListener(this);
         languageRefsetTable.setDragEnabled(true);
         languageRefsetTable.setTransferHandler(new TerminologyTransferHandler(languageRefsetTable));
@@ -270,7 +268,6 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         }
 
         languageRefsetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sortingTable.setTableHeader(languageRefsetTable.getTableHeader());
 
         DESC_FIELD[] columnEnums = descTableModel.getColumnEnums();
 
@@ -284,8 +281,8 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         }
 
         // Set up tool tips for column headers.
-        sortingTable.getTableHeader().setToolTipText(
-            "Click to specify sorting; Control-Click to specify secondary sorting");
+        languageRefsetTable.getTableHeader().setToolTipText(
+            "Click to specify sorting");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         descPanel.add(languageRefsetTable.getTableHeader(), c);

@@ -25,9 +25,9 @@ import java.util.Set;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -82,7 +82,7 @@ public class RegenerateMarkedParents extends AbstractTask {
         int refsetId = memberRefsetConcept.getConceptId();
 
         Set<Integer> normalMemberIds = new HashSet<Integer>();
-        List<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+        Collection<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 

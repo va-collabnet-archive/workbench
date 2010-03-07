@@ -262,7 +262,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     private static final long serialVersionUID = 1L;
 
     public enum REL_FIELD {
-        REL_ID("rid", 5, 100, 100), SOURCE_ID("origin", 5, 300, 1000), REL_TYPE("type", 5, 120, 500), DEST_ID("destination", 5, 300, 1000), GROUP("group", 5, 36, 46), REFINABILITY("refinability", 5, 80, 180), CHARACTERISTIC("char", 5, 70, 70), STATUS("status", 5, 50, 250), VERSION("version", 5, 140, 140), PATH("path", 5, 90, 180);
+        REL_ID("rid", 5, 100, 100), SOURCE_ID("origin", 5, 300, 1000), REL_TYPE("type", 5, 120, 500), DEST_ID("destination", 5, 300, 1000), GROUP("group", 5, 36, 46), REFINABILITY("refinability", 5, 80, 180), CHARACTERISTIC("char", 5, 70, 70), STATUS("status", 5, 50, 250), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 180);
 
         private String columnName;
 
@@ -563,10 +563,6 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             }
         }
 
-        public boolean isActive() {
-            return active;
-        }
-
         public void setActive(boolean active) {
             this.active = active;
         }
@@ -623,8 +619,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         this.progress = progress;
     }
 
-    public static class StringWithRelTuple extends StringWithTuple implements Comparable<StringWithRelTuple>,
-            I_CellTextWithTuple {
+    public static class StringWithRelTuple extends StringWithTuple<StringWithRelTuple>  {
 
         I_RelTuple tuple;
 
@@ -636,11 +631,6 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         public I_RelTuple getTuple() {
             return tuple;
         }
-
-        public int compareTo(StringWithRelTuple o) {
-            return super.compareTo(o);
-        }
-
     }
 
     public REL_FIELD[] getColumnEnums() {

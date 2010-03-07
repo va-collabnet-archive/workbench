@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,8 +31,8 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
@@ -192,7 +193,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
         
         // STEP 4. IF PRESENT, ICD9 MAPPING MUST NOT BE RETIRED.
         try {
-            List<? extends I_ExtendByRef> extList;
+            Collection<? extends I_ExtendByRef> extList;
             extList = concept.getExtensions();
             I_ExtendByRef extResult = null;
             I_ExtendByRefPart extPartResult = null;
@@ -234,7 +235,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
         // Create list of descriptions which have type 2 extensions
         List<I_DescriptionVersioned> resultList = new ArrayList<I_DescriptionVersioned>();
 
-        List<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
+        Collection<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
             List<? extends I_ExtendByRef> extList = tf.getAllExtensionsForComponent(desc.getNid());
             // check each member for presence of Clinical Type 2 extension
@@ -276,7 +277,7 @@ public class TestForEdgCType2Req extends AbstractConceptTest {
         // Get the children refsets of EDGClinicalItem_2_National refset
         int refsetId = tf.uuidToNative(uuidEDGClinicalItem_2_National);
         I_GetConceptData parent = tf.getConcept(refsetId);
-        List<? extends I_RelVersioned> childRelList = parent.getDestRels();
+        Collection<? extends I_RelVersioned> childRelList = parent.getDestRels();
         returnRefsets.add(parent);
         for (I_RelVersioned childRel : childRelList) {
 

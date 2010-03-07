@@ -86,6 +86,7 @@ import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
+import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
@@ -594,7 +595,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                                                                            DESC_FIELD.TEXT, DESC_FIELD.TYPE }, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
-        descTable.setAutoCreateRowSorter(true);
+        SortClickListener.setupSorter(descTable);
         descTable.setDragEnabled(true);
         descTable.setTransferHandler(new TerminologyTransferHandler(this));
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(config, true);

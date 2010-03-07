@@ -5,7 +5,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.activity.ActivityPanel;
@@ -26,7 +26,7 @@ import org.ihtsdo.time.TimeUtil;
 public class RefsetComputer implements I_ProcessConceptData {
 	private int refsetNid;
 	private RefsetSpecQuery query;
-	private List<? extends I_ExtendByRef> allRefsetMembers;
+	private Collection<? extends I_ExtendByRef> allRefsetMembers;
 	private I_HelpMemberRefset memberRefsetHelper;
 	private I_RepresentIdSet currentRefsetMemberIds;
 	private Concept refsetConcept;
@@ -83,7 +83,7 @@ public class RefsetComputer implements I_ProcessConceptData {
 	}
 
 	private I_RepresentIdSet filterNonCurrentRefsetMembers(
-			List<? extends I_ExtendByRef> allRefsetMembers,
+	        Collection<? extends I_ExtendByRef> allRefsetMembers,
 			I_HelpMemberRefset refsetHelper, int refsetId, int memberTypeId)
 			throws Exception {
 
@@ -136,8 +136,8 @@ public class RefsetComputer implements I_ProcessConceptData {
 				String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
 				
 		    	activity.setProgressInfoLower("Elapsed: " + elapsedStr + 
-		    			" Remaining: " + remainingStr + 
-		    			"; Members: " + members.get() + 
+		    			";  Remaining: " + remainingStr + 
+		    			";  Members: " + members.get() + 
 		    			" New: " + newMembers.get() + 
 		    			" Ret: " + retiredMembers.get());
 			}

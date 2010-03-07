@@ -159,7 +159,7 @@ public interface I_TermFactory {
      * @throws ParseException
      * @throws IOException
      */
-    I_DescriptionVersioned getDescription(int dNid) throws TerminologyException, ParseException,
+    I_DescriptionVersioned getDescription(int dNid) throws TerminologyException,
             IOException;
 
     /**
@@ -464,7 +464,7 @@ public interface I_TermFactory {
      */
     void removeFromCacheAndRollbackTransaction(int memberId) throws IOException;
 
-    List<? extends I_ExtendByRef> getRefsetExtensionMembers(int refsetId) throws IOException;
+    Collection<? extends I_ExtendByRef> getRefsetExtensionMembers(int refsetId) throws IOException;
 
     List<? extends I_ExtendByRef> getAllExtensionsForComponent(int componentId) throws IOException;
 

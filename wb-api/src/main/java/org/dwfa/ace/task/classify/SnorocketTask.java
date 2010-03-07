@@ -1157,7 +1157,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             for (int c1 : focusCase1OutNid) {
                 I_GetConceptData relSource;
                 relSource = tf.getConcept(c1);
-                List<? extends I_RelVersioned> lrv = relSource.getSourceRels();
+                Collection<? extends I_RelVersioned> lrv = relSource.getSourceRels();
                 for (I_RelVersioned rv : lrv) {
 
                     Integer iR = rv.getRelId();
@@ -1184,7 +1184,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             s.append("\r\n:::");
             for (int c1Nid : focusCase1OutNid) {
                 I_GetConceptData sourceRel = tf.getConcept(c1Nid);
-                List<? extends I_RelVersioned> lsr = sourceRel.getSourceRels();
+                Collection<? extends I_RelVersioned> lsr = sourceRel.getSourceRels();
                 for (I_RelVersioned rv : lsr) {
 
                     Integer iR = rv.getRelId();
@@ -1237,7 +1237,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
 
         I_GetConceptData rootConcept = tf.getConcept(rootRoleNid);
-        List<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
+        Collection<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
         while (thisLevel.size() > 0) {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rv : thisLevel) {
@@ -1267,7 +1267,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
                     // GET C1 DESTINATION RELS FOR NEXT LEVEL
                     I_GetConceptData c1 = tf.getConcept(rv.getC1Id());
-                    List<? extends I_RelVersioned> c1Rels = c1.getDestRels();
+                    Collection<? extends I_RelVersioned> c1Rels = c1.getDestRels();
                     for (I_RelVersioned nextRel : c1Rels)
                         nextLevel.add(nextRel);
                 }

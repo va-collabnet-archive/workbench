@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,15 +42,15 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -470,7 +471,7 @@ public class TupleFileUtil {
 
     private void exportRefsetMembers(I_GetConceptData refset, I_ConfigAceFrame configFrame,
             BufferedWriter outputFileWriter) throws Exception {
-        List<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
+        Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
             refset.getConceptId());
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());

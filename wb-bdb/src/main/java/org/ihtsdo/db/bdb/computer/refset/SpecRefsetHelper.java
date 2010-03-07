@@ -1279,7 +1279,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 	 * .util.List, org.dwfa.ace.api.I_GetConceptData)
 	 */
 	public List<I_GetConceptData> filterListByConceptType(
-			List<? extends I_ExtendByRef> allExtensions,
+	    Collection<? extends I_ExtendByRef> allExtensions,
 			I_GetConceptData requiredPromotionStatusConcept) throws Exception {
 
 		List<I_GetConceptData> filteredList = new ArrayList<I_GetConceptData>();
