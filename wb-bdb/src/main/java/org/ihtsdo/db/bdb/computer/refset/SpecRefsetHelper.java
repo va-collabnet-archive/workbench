@@ -574,7 +574,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 	    		new RefsetPropertyMap(REFSET_TYPES.CID_CID);
 	    	refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
 	    	refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
-	    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            if (effectiveTime != Integer.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            }
 	    	I_ExtendByRef newExtension = 
 	    		getOrCreateRefsetExtension(refsetId, componentId, 
 	    				REFSET_TYPES.CID_CID, refsetMap);
@@ -632,7 +634,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 	    		new RefsetPropertyMap(REFSET_TYPES.STR);
 	    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
 	    	refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-	    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+	    	if (effectiveTime != Integer.MAX_VALUE) {
+	            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+	    	}
 	    	I_ExtendByRef newExtension = 
 	    		getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap);
 	    	if (isAutocommitActive()) {
@@ -689,7 +693,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 	    	refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
 	    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
 	    	refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-	    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            if (effectiveTime != Integer.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            }
 	    	I_ExtendByRef newExtension = 
 	    		getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap);
 	    	if (isAutocommitActive()) {
@@ -742,7 +748,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     	RefsetPropertyMap refsetMap = 
     		new RefsetPropertyMap(REFSET_TYPES.INT);
     	refsetMap.put(REFSET_PROPERTY.INTEGER_VALUE, value);
-    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Integer.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        }
     	I_ExtendByRef newExtension = 
     		getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.INT, refsetMap);
     	if (isAutocommitActive()) {
@@ -795,7 +803,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     	RefsetPropertyMap refsetMap = 
     		new RefsetPropertyMap(REFSET_TYPES.CID);
     	refsetMap.put(REFSET_PROPERTY.CID_ONE, conceptId);
-     	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Integer.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        }
     	I_ExtendByRef newExtension = 
     		makeMemberAndSetup(refsetId, componentId, REFSET_TYPES.CID, refsetMap, memberUuid);
     	if (isAutocommitActive()) {
@@ -846,7 +856,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     	refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
     	refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
     	refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Id);
-    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Integer.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        }
     	I_ExtendByRef newExtension = 
     		getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_CID, refsetMap);
     	if (isAutocommitActive()) {
@@ -905,7 +917,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     	refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
     	refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
     	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, stringValue);
-    	refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Integer.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        }
     	I_ExtendByRef newExtension = 
     		getOrCreateRefsetExtension(refsetId, componentId, 
     				REFSET_TYPES.CID_CID_STR, refsetMap);
