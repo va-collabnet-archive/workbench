@@ -89,8 +89,11 @@ import javax.swing.table.TableModel;
  * 
  *          Modified to support enumerations and generic collections.
  * @author Keith Campbell
+ * 
+ * @deprecated use the table sorting features built into java 6...
  */
 
+@Deprecated
 public class TableSorter extends AbstractTableModel {
     public enum SortOrder {
         DESCENDING, NOT_SORTED, ASCENDING
