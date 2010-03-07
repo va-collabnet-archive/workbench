@@ -84,7 +84,7 @@ public class RefsetCommentPopupListener extends MouseAdapter {
 													.getNid(),
 											conceptForComment.getConceptId(),
 											REFSET_TYPES.STR, refsetMap);
-							Terms.get().addUncommittedNoChecks(newExtension);
+							Terms.get().addUncommitted(newExtension);
 						}
 					}
 					refsetSpecEditor.getCommentTableModel().propertyChange(null);

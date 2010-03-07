@@ -284,6 +284,8 @@ public class RefsetSpecPanel extends JPanel {
                     .size()]));
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
+        aceFrameConfig.addPropertyChangeListener("commitEnabled", commentTableModel);
+        aceFrameConfig.addPropertyChangeListener("uncommitted", commentTableModel);
         editor.getLabel().addTermChangeListener(commentTableModel);
         int componentId = Integer.MIN_VALUE;
         I_AmTermComponent component = editor.getTermComponent();
@@ -419,6 +421,8 @@ public class RefsetSpecPanel extends JPanel {
 
         aceFrameConfig.addPropertyChangeListener("viewPositions", refsetTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", refsetTableModel);
+        aceFrameConfig.addPropertyChangeListener("commitEnabled", commentTableModel);
+        aceFrameConfig.addPropertyChangeListener("uncommitted", commentTableModel);
         editor.getLabel().addTermChangeListener(refsetTableModel);
 
         int componentId = Integer.MIN_VALUE;
