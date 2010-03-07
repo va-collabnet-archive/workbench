@@ -8,9 +8,9 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -207,9 +207,15 @@ public class RefsetPropertyMap {
 				}
 				break;
 			case VERSION:	
-				throw new UnsupportedOperationException();
-			case TIME:
-				throw new UnsupportedOperationException();
+				if (part.getVersion() != (Integer) entry.getValue()) {
+				    return false;
+				}
+				break;
+            case TIME:   
+                if (part.getTime() != (Long) entry.getValue()) {
+                    return false;
+                }
+                break;
 
 			default:
 				throw new RuntimeException("Can't handle: " + entry.getKey());
