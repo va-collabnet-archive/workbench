@@ -145,7 +145,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             AceLog.getEditLog().info(
                 "Reading from log " + changeSetFile.getName() + " until " + new Date(endTime).toString());
         }
-        boolean firstException = true;
+
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 Object obj = ois.readObject();
@@ -225,8 +225,14 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
     @SuppressWarnings("unchecked")
     private void lazyInit() throws FileNotFoundException, IOException, ClassNotFoundException {
+        if (!initialized) {
+            FileInputStream fis = new FileInputStream(changeSetFile);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            ois = new ObjectInputStream(bis);
+        }
+
         String lastImportSize = getVodb().getProperty(changeSetFile.getName());
-        if (lastImportSize != null) {
+        if (lastImportSize != null && !initialized) {
             long lastSize = Long.parseLong(lastImportSize);
             if (lastSize == changeSetFile.length()) {
                 AceLog.getAppLog().finer(
@@ -234,6 +240,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 // already imported, set to nothing to do...
                 nextCommit = Long.MAX_VALUE;
                 initialized = true;
+            } else {
+                ois.skipBytes((int) lastSize);
             }
         }
         if (initialized == false) {
@@ -251,9 +259,6 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 }
             }
             if (validated) {
-                FileInputStream fis = new FileInputStream(changeSetFile);
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                ois = new ObjectInputStream(bis);
                 Class<I_ReadChangeSet> readerClass = (Class<I_ReadChangeSet>) ois.readObject();
                 if (BinaryChangeSetReader.class.isAssignableFrom(readerClass)) {
                     AceLog.getEditLog().fine(
@@ -351,7 +356,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
                 if (componentUuid == null) {
                     AceLog.getAppLog().severe(
-                        " Error importing extension... Component with id does not exist: " + bean.getComponentUid());
+                        changeSetFile.getName() + " Error importing extension... Component with id does not exist: "
+                            + bean.getComponentUid());
                 } else {
                     int componentId = componentUuid.getNativeId();
                     int typeId = getVodb().getId(bean.getTypeUid()).getNativeId();
@@ -365,9 +371,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     if (part.getTime() == Long.MAX_VALUE) {
                         ThinExtByRefPart newPart = ThinExtByRefVersioned.makePart(part);
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (extension.getVersions().contains(newPart)) {
-                            changed = false;
-                        } else {
+                        if (!extension.getVersions().contains(newPart)) {
                             changed = true;
                             extension.addVersion(newPart);
                             values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -498,9 +502,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setStatusId(getNid(part.getConceptStatus()));
                         newPart.setDefined(part.isDefined());
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinAttributes.getVersions().contains(newPart)) {
-                            changed = false;
-                        } else {
+                        if (!thinAttributes.getVersions().contains(newPart)) {
                             changed = true;
                             thinAttributes.addVersion(newPart);
                             values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -573,9 +575,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         newPart.setTextDescription(part.getTextDescription());
                         newPart.setTypeId(getNid(part.getTypeId()));
                         newPart.setVersion(ThinVersionHelper.convert(time));
-                        if (thinImage.getVersions().contains(newPart)) {
-                            changed = false;
-                        } else {
+                        if (!thinImage.getVersions().contains(newPart)) {
                             changed = true;
                             thinImage.addVersion(newPart);
                             values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -712,9 +712,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                         } else {
                             newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                         }
-                        if (thinRel.getVersions().contains(newPart)) {
-                            changed = false;
-                        } else {
+                        if (!thinRel.getVersions().contains(newPart)) {
                             changed = true;
                             thinRel.addVersion(newPart);
                             values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -736,9 +734,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                             newPart.setTypeId(getNid(part.getRelTypeId()));
                             newPart.setStatusId(getNid(part.getStatusId()));
                             newPart.setVersion(ThinVersionHelper.convert(time));
-                            if (thinRel.getVersions().contains(newPart)) {
-                                changed = false;
-                            } else {
+                            if (!thinRel.getVersions().contains(newPart)) {
                                 changed = true;
                                 thinRel.addVersion(newPart);
                                 values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
@@ -788,9 +784,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                                     newPart.setText(part.getText());
                                     newPart.setTypeId(getNid(part.getTypeId()));
                                     newPart.setVersion(ThinVersionHelper.convert(time));
-                                    if (thinDesc.getVersions().contains(newPart)) {
-                                        changed = false;
-                                    } else {
+                                    if (!thinDesc.getVersions().contains(newPart)) {
                                         changed = true;
                                         thinDesc.addVersion(newPart);
                                         values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
