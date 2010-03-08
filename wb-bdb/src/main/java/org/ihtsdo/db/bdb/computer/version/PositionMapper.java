@@ -88,6 +88,9 @@ public class PositionMapper {
 	 */
 	public <V extends ConceptComponent<?, ?>.Version> boolean onRoute(V version)  {
 		queryCount++;
+		if (version.getSapNid() < 0) {
+		    return false;
+		}
 		// Forms a barrier to ensure that the setup is complete prior to use
 		try {
 			completeLatch.await();
@@ -119,6 +122,19 @@ public class PositionMapper {
 		relativePosition(V v1, V v2)
 			throws IOException {
 		queryCount++;
+	      if (v1.getSapNid() < 0) {
+	          if (v2.getSapNid() < 0) {
+	              return RELATIVE_POSITION.EQUAL;
+	          }
+	          return RELATIVE_POSITION.BEFORE;
+	        }
+          if (v2.getSapNid() < 0) {
+              if (v1.getSapNid() < 0) {
+                  return RELATIVE_POSITION.EQUAL;
+              }
+              return RELATIVE_POSITION.AFTER;
+            }
+
 		// Forms a barrier to ensure that the setup is complete prior to use
 		try {
 			completeLatch.await();

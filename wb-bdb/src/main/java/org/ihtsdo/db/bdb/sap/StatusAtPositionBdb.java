@@ -226,6 +226,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getPathId(int index) {
+        if (index < 0) {
+            return Integer.MIN_VALUE;
+        }
 		if (index < readOnlyArray.getSize()) {
 			return readOnlyArray.pathNids[index];
 		} else {
@@ -234,6 +237,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getStatusId(int index) {
+	    if (index < 0) {
+	        return Integer.MIN_VALUE;
+	    }
 		if (index < readOnlyArray.getSize()) {
 			return readOnlyArray.statusNids[index];
 		} else {
@@ -242,6 +248,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public long getTime(int index) {
+	    if (index < 0) {
+	        return Long.MIN_VALUE;
+	    }
 		if (index < readOnlyArray.getSize()) {
 			return readOnlyArray.commitTimes[index];
 		} else {
@@ -254,6 +263,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getVersion(int index) {
+        if (index < 0) {
+            return Integer.MIN_VALUE;
+        }
 		if (index < readOnlyArray.getSize()) {
 			return ThinVersionHelper.convert(readOnlyArray.commitTimes[index]);
 		} else {

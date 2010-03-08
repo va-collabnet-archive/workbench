@@ -310,6 +310,10 @@ public class Bdb {
 
 	public static I_AmTermComponent getComponent(int nid) throws IOException {
 		int cNid = Bdb.getConceptNid(nid);
+        if (cNid == Integer.MAX_VALUE) {
+            return null;
+        }
+
 		Concept c = Bdb.getConceptDb().getConcept(cNid);
 		if (cNid == nid) {
 			return c;

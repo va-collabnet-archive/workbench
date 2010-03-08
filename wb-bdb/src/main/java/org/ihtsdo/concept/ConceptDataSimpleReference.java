@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Semaphore;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
@@ -438,9 +439,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	@Override
 	public Set<Integer> getDescNids() throws IOException {
 		if (descNids == null) {
-			descNids = 
-				new CopyOnWriteArraySet<Integer>(getDescNidsReadOnly());
-			descNids.addAll(getMutableIntSet(OFFSETS.DESC_NIDS));
+		    CopyOnWriteArraySet<Integer> temp = 
+                new CopyOnWriteArraySet<Integer>(getDescNidsReadOnly());
+			temp.addAll(getMutableIntSet(OFFSETS.DESC_NIDS));
+			descNids = temp;
 		}
 		return descNids;
 	}
@@ -453,9 +455,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	@Override
 	public CopyOnWriteArraySet<Integer> getImageNids() throws IOException {
 		if (imageNids == null) {
-			imageNids = 
-				new CopyOnWriteArraySet<Integer>(getImageNidsReadOnly());
-			imageNids.addAll(getMutableIntSet(OFFSETS.IMAGE_NIDS));
+		    CopyOnWriteArraySet<Integer> temp = 
+                new CopyOnWriteArraySet<Integer>(getImageNidsReadOnly());
+			temp.addAll(getMutableIntSet(OFFSETS.IMAGE_NIDS));
+			imageNids = temp;
 		}
 		return imageNids;
 	}
@@ -468,10 +471,11 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	@Override
 	public CopyOnWriteArraySet<Integer> getSrcRelNids() throws IOException {
 		if (srcRelNids == null) {
-			srcRelNids = 
+		    CopyOnWriteArraySet<Integer> temp = 
 				new CopyOnWriteArraySet<Integer>(getSrcRelNidsReadOnly());
-			srcRelNids.addAll(
-					getMutableIntSet(OFFSETS.SRC_REL_NIDS));
+		    temp.addAll(getMutableIntSet(OFFSETS.SRC_REL_NIDS));
+		    
+		    srcRelNids = temp;
 		}
 		return srcRelNids;
 	}
@@ -484,8 +488,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	@Override
 	public CopyOnWriteArraySet<Integer> getMemberNids() throws IOException {
 		if (memberNids == null) {
-			memberNids = new CopyOnWriteArraySet<Integer>(getMemberNidsReadOnly());
-			memberNids.addAll(getMutableIntSet(OFFSETS.MEMBER_NIDS));
+		    CopyOnWriteArraySet<Integer> temp = 
+                new CopyOnWriteArraySet<Integer>(getMemberNidsReadOnly());
+			temp.addAll(getMutableIntSet(OFFSETS.MEMBER_NIDS));
+			memberNids = temp;
 		}
 		return memberNids;
 	}

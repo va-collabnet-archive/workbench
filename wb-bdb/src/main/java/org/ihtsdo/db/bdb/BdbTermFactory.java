@@ -530,6 +530,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 
 	@Override
 	public boolean hasConcept(int conceptId) throws IOException {
+        if (conceptId == Integer.MIN_VALUE || conceptId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
+            return false;
+        }
 		if (Bdb.getNidCNidMap().hasConcept(conceptId)) {
 			return true;
 		}
@@ -538,12 +541,25 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 
 	@Override
 	public boolean hasDescription(int descId, int conceptId) throws IOException {
-		throw new UnsupportedOperationException();
+        if (descId == Integer.MIN_VALUE || descId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
+            return false;
+        }
+        I_AmTermComponent c = Bdb.getComponent(descId);
+        if (c == null) {
+            return false;
+        }
+        return Description.class.isAssignableFrom(c.getClass());
 	}
 
 	@Override
 	public boolean hasExtension(int memberId) throws IOException {
+	    if (memberId == Integer.MIN_VALUE || memberId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
+	        return false;
+	    }
 		I_AmTermComponent c = Bdb.getComponent(memberId);
+        if (c == null) {
+            return false;
+        }
 		return RefsetMember.class.isAssignableFrom(c.getClass());
 	}
 
@@ -559,7 +575,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 
 	@Override
 	public boolean hasImage(int imageId) throws IOException {
-		throw new UnsupportedOperationException();
+        if (imageId == Integer.MIN_VALUE || imageId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
+            return false;
+        }
+        I_AmTermComponent c = Bdb.getComponent(imageId);
+        if (c == null) {
+            return false;
+        }
+        return Image.class.isAssignableFrom(c.getClass());
 	}
 
 	@Override
@@ -569,7 +592,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 
 	@Override
 	public boolean hasRel(int relId, int conceptId) throws IOException {
-		throw new UnsupportedOperationException();
+        if (relId == Integer.MIN_VALUE || relId > Bdb.getUuidsToNidMap().getCurrentMaxNid()) {
+            return false;
+        }
+        I_AmTermComponent c = Bdb.getComponent(relId);
+        if (c == null) {
+            return false;
+        }
+        return Relationship.class.isAssignableFrom(c.getClass());
 	}
 
 	@Override
