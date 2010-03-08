@@ -173,6 +173,9 @@ public class NewQueueListener implements ActionListener {
 
         JButton newQueueButton = (JButton) evt.getSource();
         Point location = newQueueButton.getMousePosition();
+        if (location == null) {
+            location = new Point(0, 0);
+        }
         queueTypePopup.show(newQueueButton, location.x, location.y);
     }
 }

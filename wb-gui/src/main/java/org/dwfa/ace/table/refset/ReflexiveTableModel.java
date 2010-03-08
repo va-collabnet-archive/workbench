@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,6 +71,8 @@ import org.dwfa.vodb.types.IntList;
 
 public abstract class ReflexiveTableModel extends AbstractTableModel implements PropertyChangeListener,
         I_HoldRefsetData {
+    
+    protected BitSet checkedRows = new BitSet();
 
     public static class StringExtFieldEditor extends DefaultCellEditor {
 
@@ -324,10 +327,16 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public int getColumnCount() {
+        if (checkBoxColumn) {
+            return columns.length + 1;
+        }
         return columns.length;
     }
 
     public String getColumnName(int col) {
+        if (col >= columns.length) {
+            return "";
+        }
         return columns[col].getColumnName();
     }
 
@@ -335,6 +344,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         this.tableComponentId = componentId;
         this.allTuples = null;
         this.allExtensions = null;
+        this.checkedRows.clear();
         if (ACE.editMode) {
             this.addButton.setEnabled(this.tableComponentId != Integer.MIN_VALUE);
         }
@@ -373,6 +383,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (rowIndex < 0) {
             return " ";
         }
+        
+        // Test to see if this is the extra boolean column for approving/denying members.
+        if (columnIndex >= columns.length) {
+            return checkedRows.get(rowIndex);
+        }
+        
         if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
             return rowIndex;
         }
@@ -515,7 +531,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             }
                         }
                     } else {
-                        throw new UnsupportedOperationException("Can't find component for id: " + id);
+                        return "No component for: " + id;
                     }
                 }
                 return value;
@@ -566,6 +582,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (ACE.editMode == false || allTuples == null) {
             return false;
         }
+        if (col >= columns.length) {
+            return true;
+        }
         if (columns[col].isCreationEditable() == false) {
             return false;
         }
@@ -587,6 +606,19 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public void setValueAt(Object value, int row, int col) {
+        if (col >= columns.length) {
+            if (Boolean.class.isAssignableFrom(value.getClass())) {
+                Boolean set = (Boolean) value;
+                if (set) {
+                    checkedRows.set(row);
+                } else {
+                    checkedRows.clear(row);
+                }
+                return;
+            }
+            AceLog.getAppLog().warning("Can't handle value: "  + value + " row: " + row + " col: " + col);
+            return;
+        }
         if (columns[col].isCreationEditable() || columns[col].isUpdateEditable()) {
             I_ExtendByRefVersion extTuple = allTuples.get(row);
             boolean changed = false;
@@ -659,6 +691,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     UpdateDataAlertsTimerTask alertUpdater;
 
+    private boolean checkBoxColumn = false;
+
     private void updateDataAlerts(int row) {
         if (alertUpdater != null) {
             alertUpdater.setActive(false);
@@ -669,6 +703,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public Class<?> getColumnClass(int c) {
+        if (c >= columns.length) {
+            return Boolean.class;
+        }
         return columns[c].getFieldClass();
     }
 
@@ -677,5 +714,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     protected abstract I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId);
+
+    public void enableCheckBoxColumn(boolean b) {
+        this.checkBoxColumn  = b;
+        
+    }
 
 }

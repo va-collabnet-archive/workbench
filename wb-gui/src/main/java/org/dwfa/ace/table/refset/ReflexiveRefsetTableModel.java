@@ -308,18 +308,26 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     }
 
     public Set<Integer> getSelectedTuples() {
-        return new HashSet<Integer>();
+        Set<Integer> memberNids = new HashSet<Integer>(checkedRows.cardinality());
+        for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i+1)) {
+            I_ExtendByRefVersion tuple = allTuples.get(i);
+            memberNids.add(tuple.getNid());
+        }
+        return memberNids;
     }
 
     public void clearSelectedTuples() {
-        // nothing to do
+        this.checkedRows.clear();
+        fireTableDataChanged();
     }
 
     public void selectAllTuples() {
-        // nothing to do
+        this.checkedRows.set(0, getRowCount() - 1);
+        fireTableDataChanged();
     }
 
     public void setShowPromotionCheckBoxes(boolean show) {
         // nothing to do
     }
+
 }

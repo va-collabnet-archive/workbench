@@ -20,11 +20,13 @@ import java.awt.Component;
 import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.AceTableRenderer;
 
 public class CheckBoxCellRenderer implements TableCellRenderer {
@@ -53,9 +55,13 @@ public class CheckBoxCellRenderer implements TableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-        checkBox.setSelected((Boolean) value);
-        setBackground(isSelected, row, checkBox);
-        return checkBox;
+        if (Boolean.class.isAssignableFrom(value.getClass())) {
+            checkBox.setSelected((Boolean) value);
+            setBackground(isSelected, row, checkBox);
+            return checkBox;
+        }
+        AceLog.getAppLog().warning("Wrong renderer for row: " + row + " column: " + column);
+        return new JLabel(value.toString());
     }
 
     protected void setBackground(boolean isSelected, int row, JCheckBox renderComponent) {

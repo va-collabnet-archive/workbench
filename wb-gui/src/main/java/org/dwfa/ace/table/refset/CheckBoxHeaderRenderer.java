@@ -43,15 +43,17 @@ public class CheckBoxHeaderRenderer implements TableCellRenderer, MouseListener 
     private JLabel label = new JLabel(new CheckBoxIcon(checkBox));
 
     public CheckBoxHeaderRenderer(ItemListener itemListener, RefsetSpecPanel panel, JTableHeader header) {
-        panel.setRendererComponent(checkBox);
+        panel.setCheckBoxRendererComponent(checkBox);
         checkBox.setOpaque(false);
         checkBox.setFont(header.getFont());
         checkBox.addItemListener(itemListener);
 
+        /*
         MouseListener[] listeners = header.getMouseListeners();
         for (int i = 0; i < listeners.length; i++) {
             header.removeMouseListener(listeners[i]);
         }
+        */
         header.addMouseListener(this);
     }
 

@@ -60,6 +60,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.table.refset.CheckBoxCellRenderer;
 import org.dwfa.ace.table.refset.CheckBoxHeaderRenderer;
 import org.dwfa.ace.table.refset.ExtTableRenderer;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
@@ -437,8 +438,8 @@ public class RefsetSpecPanel extends JPanel {
 
         refsetTable = new JTableWithDragImage(refsetTableModel);
         SortClickListener.setupSorter(refsetTable); 
+        refsetTable.getTableHeader().setToolTipText("Click to specify sorting");
      
-        
         for (int i = 0; i < columns.size(); i++) {
             TableColumn column = refsetTable.getColumnModel().getColumn(i);
             column.setIdentifier(columns.get(i));
@@ -448,38 +449,33 @@ public class RefsetSpecPanel extends JPanel {
             column.setResizable(true);
         }
 
-        /*
         // set renderer and editor for checkbox column
         // get the last column
-        int columnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
 
         CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
-        refsetTable.getTableHeader().setToolTipText(
-            "Click to specify sorting");
 
         selectAllCheckBoxListener = new SelectAllCheckBoxListener();
-        checkBoxHeaderRenderer =
-                new CheckBoxHeaderRenderer(selectAllCheckBoxListener, this, refsetTable.getTableHeader());
-        // refsetTable.getTableHeader();
+        checkBoxHeaderRenderer = new CheckBoxHeaderRenderer(selectAllCheckBoxListener, 
+            this, refsetTable.getTableHeader());
 
-        checkBoxColumn = refsetTable.getColumnModel().getColumn(columnIndex);
-        checkBoxColumn.setHeaderRenderer(checkBoxHeaderRenderer);
+        checkBoxColumn = new TableColumn();
+        checkBoxColumn.setCellRenderer(checkBoxRenderer);
         checkBoxColumn.setResizable(false);
+        checkBoxColumn.setHeaderRenderer(checkBoxHeaderRenderer);
+        checkBoxColumn.setModelIndex(columns.size());
 
         checkBoxColumn.setMaxWidth(checkBoxHeaderRenderer.getPreferredWidth());
         checkBoxColumn.setMinWidth(checkBoxHeaderRenderer.getPreferredWidth());
         checkBoxColumn.setPreferredWidth(checkBoxHeaderRenderer.getPreferredWidth());
-        checkBoxColumn.setCellRenderer(checkBoxRenderer);
 
         // hide column as default (should only be visible during promotions BP)
-        refsetTable.getColumnModel().removeColumn(checkBoxColumn);
+        //refsetTable.getColumnModel().removeColumn(checkBoxColumn);
         refsetTable.addMouseListener(new MouseClickListener());
-        */
-
+ 
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
         refsetTable.setDefaultRenderer(Number.class, renderer);
-        refsetTable.setDefaultRenderer(Boolean.class, renderer);
+        refsetTable.setDefaultRenderer(Boolean.class, checkBoxRenderer);
         refsetTable.setDefaultRenderer(Integer.class, renderer);
         refsetTable.setDefaultRenderer(Double.class, renderer);
         refsetTable.setDefaultRenderer(String.class, renderer);
@@ -774,6 +770,7 @@ public class RefsetSpecPanel extends JPanel {
 
         if (show) {
             refsetTable.getColumnModel().addColumn(checkBoxColumn);
+            refsetTableModel.enableCheckBoxColumn(true);
             horizontalBox.setMaximumSize(null);
             horizontalBox.setMinimumSize(null);
             horizontalBox.setPreferredSize(null);
@@ -785,6 +782,7 @@ public class RefsetSpecPanel extends JPanel {
             }
         } else {
             refsetTable.getColumnModel().removeColumn(checkBoxColumn);
+            refsetTableModel.enableCheckBoxColumn(false);
             horizontalBox.setMaximumSize(new Dimension(0, 0));
             horizontalBox.setMinimumSize(new Dimension(0, 0));
             horizontalBox.setPreferredSize(new Dimension(0, 0));
@@ -866,7 +864,7 @@ public class RefsetSpecPanel extends JPanel {
         return selectAllCheckBox;
     }
 
-    public void setRendererComponent(JCheckBox rendererComponent) {
+    public void setCheckBoxRendererComponent(JCheckBox rendererComponent) {
         this.selectAllCheckBox = rendererComponent;
     }
 
