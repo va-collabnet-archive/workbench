@@ -72,7 +72,7 @@ public class SetPromotionCheckBoxesTask extends AbstractTask {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TaskFailedException(e.getMessage());
+            throw new TaskFailedException(e);
         }
     }
 

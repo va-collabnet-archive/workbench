@@ -127,15 +127,16 @@ public class EConcept {
 
 		private static void setupNids() {
 			if (nidTypeMap == null) {
-                nidTypeMap = new HashMap<Integer, REFSET_TYPES>();
+			    HashMap<Integer, REFSET_TYPES> temp  = new HashMap<Integer, REFSET_TYPES>();
                 for (REFSET_TYPES type : REFSET_TYPES.values()) {
                     try {
                         type.typeNid = EComponent.uuidToNid(type.typeConcept.getUids());
-                        nidTypeMap.put(type.typeNid, type);
+                        temp.put(type.typeNid, type);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                nidTypeMap = temp;
             }
 		}
 
