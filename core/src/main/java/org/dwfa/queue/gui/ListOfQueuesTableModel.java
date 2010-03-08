@@ -54,7 +54,7 @@ public class ListOfQueuesTableModel extends AbstractTableModel {
 
     public void addQueue(QueueAdaptor q) {
         queues.add(q);
-        fireTableCellUpdated(queues.size() - 1, 0);
+        fireTableDataChanged();
     }
 
     public String getColumnName(int col) {
