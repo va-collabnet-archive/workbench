@@ -24,7 +24,7 @@
 		<org.dwfa.ace-ide-user-bp.version>1.3-SNAPSHOT</org.dwfa.ace-ide-user-bp.version>
 
 		<!-- standalone bundle variables -->
-		<sa.bundle.name>BasicUI-Bundle</sa.bundle.name>
+		<sa.bundle.name>basicUI</sa.bundle.name>
 		<sa.bundle.directory>${sa.bundle.name}-bundle</sa.bundle.directory>
 
 		<!-- change set update bundle variables -->
@@ -399,6 +399,26 @@
 					</execution>
 				</executions>
 			</plugin>
+								<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>${maven.assembly.plugin.version}</version>
+						<executions>
+							<execution>
+								<id>zipDir</id>
+								<phase>package</phase>
+								<goals>
+									<goal>assembly</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/zip-dir.xml</descriptor>
+									</descriptors>
+									<finalName>${sa.bundle.name}</finalName>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 		</plugins>
 	</build>
 	<profiles>
@@ -521,26 +541,6 @@
 								<version>1.6.5</version>
 							</dependency>
 						</dependencies>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>${maven.assembly.plugin.version}</version>
-						<executions>
-							<execution>
-								<id>zipDir</id>
-								<phase>package</phase>
-								<goals>
-									<goal>assembly</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>src/main/assembly/zip-dir.xml</descriptor>
-									</descriptors>
-									<finalName>${sa.bundle.name}</finalName>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
