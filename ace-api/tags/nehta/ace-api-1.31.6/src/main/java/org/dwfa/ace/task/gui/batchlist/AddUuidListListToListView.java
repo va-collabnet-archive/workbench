@@ -350,6 +350,6 @@ public class AddUuidListListToListView extends AbstractTask {
             objects.addAll((List<Object>) inProperty);
         }
         objects.addAll(invalidUuids);
-        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
+        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), objects);
     }
 }

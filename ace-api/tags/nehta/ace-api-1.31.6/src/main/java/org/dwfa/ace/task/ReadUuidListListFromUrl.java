@@ -107,14 +107,13 @@ public class ReadUuidListListFromUrl extends AbstractTask {
 
             String uuidLineStr;
 
-            //			worker.getLogger().info("file is: " + uuidFileName);
             String uuidFileName = (String) process.readProperty(uuidFileNamePropName);
             BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
 
-            while ((uuidLineStr = br.readLine()) != null) { // while loop begins here
+            while ((uuidLineStr = br.readLine()) != null) {
                 List<UUID> uuidList = new ArrayList<UUID>();
                 for (String uuidStr : uuidLineStr.split("\t")) {
-                    worker.getLogger().info("uuidStrs: " + uuidStr);
+                    worker.getLogger().fine("uuidStrs: " + uuidStr);
                     try {
                         UUID uuid = UUID.fromString(uuidStr);
                         uuidList.add(uuid);
@@ -132,7 +131,7 @@ public class ReadUuidListListFromUrl extends AbstractTask {
                 if (!uuidList.isEmpty()) {
                     uuidListOfLists.add(uuidList);
                 }
-            } // end while
+            }
 
 
             process.setProperty(this.uuidListListPropName, uuidListOfLists);
@@ -220,21 +219,13 @@ public class ReadUuidListListFromUrl extends AbstractTask {
      */
     private void appendErrorObjects(I_EncodeBusinessProcess process) throws IntrospectionException,
             IllegalAccessException, InvocationTargetException {
-//        List<String> previousErrors = (List<String>) process.readProperty(ProcessAttachmentKeys.OBJECTS_LIST.
-//                getAttachmentKey());
-//
-//        if (previousErrors != null && !previousErrors.isEmpty()) {
-//            invalidUuids.addAll(0, previousErrors);
-//        }
-//
-//        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
 
-   List<Object> objects = new ArrayList<Object>();
+        List<Object> objects = new ArrayList<Object>();
         Object inProperty = process.readProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey());
         if (inProperty instanceof List) {
             objects.addAll((List<Object>) inProperty);
         }
         objects.addAll(invalidUuids);
-        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), invalidUuids);
+        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), objects);
     }
 }
