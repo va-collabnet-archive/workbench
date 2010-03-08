@@ -70,7 +70,7 @@
 			<scope>runtime-directory</scope>
 			<version>${project.version}</version>
 		</dependency> -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.dwfa</groupId>
 			<artifactId>ace-ide-admin-bp</artifactId>
 			<version>${org.dwfa.ace-ide-admin-bp.version}</version>
@@ -93,7 +93,7 @@
 			<artifactId>ihtsdo-resources</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<!--
 				A dependency required to use the jini/jehri dynamic provider
