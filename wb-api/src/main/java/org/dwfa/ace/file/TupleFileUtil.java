@@ -400,7 +400,7 @@ public class TupleFileUtil {
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        RefsetQueryFactory.addExtensionsToMap((List<I_ExtendByRef>) extensions, extensionMap, fetchedComponents);
+        RefsetQueryFactory.addExtensionsToMap((List<I_ExtendByRef>) extensions, extensionMap, fetchedComponents, refsetSpec.getConceptId());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {

@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,14 +30,14 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -47,12 +48,14 @@ public class RefsetQueryFactory {
             TerminologyException, ParseException {
 
         // create tree object that corresponds to the database's refset spec
-        List<? extends I_ExtendByRef> extensions =
-                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+        Collection<? extends I_ExtendByRef> extensions =
+                Terms.get()
+                    .getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        addExtensionsToMap((List<I_ExtendByRef>) extensions, extensionMap, fetchedComponents);
+        
+        addExtensionsToMap(extensions, extensionMap, fetchedComponents, refsetSpec.getConceptId());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
@@ -303,15 +306,17 @@ public class RefsetQueryFactory {
      * @param fetchedComponents
      * @throws IOException
      */
-    public static void addExtensionsToMap(List<? extends I_ExtendByRef> list,
-            HashMap<Integer, DefaultMutableTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
+    public static void addExtensionsToMap(Collection<? extends I_ExtendByRef> list,
+            HashMap<Integer, DefaultMutableTreeNode> extensionMap, HashSet<Integer> fetchedComponents, int refsetNid)
             throws IOException {
         for (I_ExtendByRef ext : list) {
-            extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
-            if (fetchedComponents.contains(ext.getMemberId()) == false) {
-                fetchedComponents.add(ext.getMemberId());
-                addExtensionsToMap(Terms.get()
-                    .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents);
+            if (ext.getRefsetId() == refsetNid) {
+                extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+                if (fetchedComponents.contains(ext.getMemberId()) == false) {
+                    fetchedComponents.add(ext.getMemberId());
+                    addExtensionsToMap(Terms.get()
+                        .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents, refsetNid);
+                }
             }
         }
     }
