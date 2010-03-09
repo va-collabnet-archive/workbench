@@ -157,42 +157,12 @@ public class ConceptTest {
 
     }
 
-    @Test
-    public void testDifferentObjectsNotEqual() {
-        // Make two different objects 
-        try {
-            testObj1 = makeTestObject1();
-            testObj2 = makeTestObject2();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        // Test that they are not equal
-        assertFalse(testObj1.equals(testObj2));         
-        assertFalse(testObj2.equals(testObj1));         
-
-    }
 
     private Concept makeTestObject1() {
         
         // Create a test object... 
         Concept obj = null;
         EConcept ec = makeConcept1();  
-        try {
-            obj = Concept.getTempConcept(ec);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return obj;        
-    }
-
-    private Concept makeTestObject2() {
-        
-        // Create a test object... 
-        Concept obj = null;
-        EConcept ec = makeConcept2();  
         try {
             obj = Concept.getTempConcept(ec);
         } catch (IOException e) {

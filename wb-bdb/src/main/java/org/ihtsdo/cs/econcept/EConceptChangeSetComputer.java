@@ -129,7 +129,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 			int nid2 = nidNidItr.next();
 			Concept c1 = Bdb.getConceptForComponent(nid1);
 			Concept c2 = Bdb.getConceptForComponent(nid2);
-			if (c1.isCanceled() || c2.isCanceled()) {
+			if (c1 == null || c1.isCanceled() || c2 == null || c2.isCanceled()) {
 				//nothing to do...
 			} else {
 				uuidUuidList.add(Bdb.getPrimUuidForComponent(nid1));

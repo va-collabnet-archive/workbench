@@ -12,11 +12,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.JFrame;
+
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.concept.BdbLegacyFixedFactory;
@@ -25,6 +28,7 @@ import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
 import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
@@ -246,12 +250,22 @@ public class Bdb {
 	}
 	// Close the environment
 	public static void close() throws InterruptedException, ExecutionException {
-	    LuceneManager.close();
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
-				AceLog.getAppLog().info("Starting bdb close.");
+			    NidDataFromBdb.close();
+		        AceLog.getAppLog().info("Closing all JFrames.");
+		        for (JFrame f: OpenFrames.getFrames()) {
+		            if (f.isVisible()) {
+		                f.setVisible(false);
+		                f.dispose();
+		            }
+		        }
+		        LuceneManager.close();
+
+		        AceLog.getAppLog().info("Starting bdb close.");
 				Concept.flush();
+				PositionMapper.close();
 				Terms.get().cancel();
 				BdbCommitManager.shutdown();
 				AceLog.getAppLog().info("Starting last sync.");

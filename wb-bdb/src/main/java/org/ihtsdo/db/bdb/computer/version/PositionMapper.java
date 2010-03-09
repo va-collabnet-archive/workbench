@@ -54,7 +54,10 @@ public class PositionMapper {
 		BEFORE, EQUAL, AFTER, CONFLICTING, UNREACHABLE
 	};
 
-
+	private static boolean closed = false;
+	public static void close() {
+	    closed = true;
+	}
 	private static class PositionMapperSetupManager extends Thread {
 		public PositionMapperSetupManager() {
 			super("PositionMapperSetupManager");
@@ -65,7 +68,13 @@ public class PositionMapper {
 		public void run() {
 			while (true) {
 				try {
+                    if (closed) {
+                        return;
+                    }
 					PositionMapper m = mappersToSetup.take();
+					if (closed) {
+					    return;
+					}
 					m.setup();
 				} catch (Throwable e) {
 					AceLog.getAppLog().alertAndLogException(e);

@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -141,8 +142,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					ReferenceConcepts.REFSET_PATHS.getNid());
 
 			for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
-				CidMember conceptExtension = (CidMember) extPart;
-				result.add(conceptExtension.getC1Nid());
+			    I_ExtendByRefPartCid conceptExtension = (I_ExtendByRefPartCid) extPart;
+				result.add(conceptExtension.getC1id());
 			}
 			return result;
 

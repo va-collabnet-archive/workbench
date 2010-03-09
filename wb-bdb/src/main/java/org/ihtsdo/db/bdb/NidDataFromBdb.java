@@ -8,7 +8,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -31,6 +33,21 @@ public class NidDataFromBdb implements I_GetNidData {
 		new ThreadGroup("nid data threads");
 
 	private static ExecutorService executorPool;
+	
+	public static void close() {
+	    if (executorPool != null) {
+	        AceLog.getAppLog().info("Shutting down NidDataFromBdb executor pool.");
+	        executorPool.shutdown();
+	        AceLog.getAppLog().info("Awaiting termination of NidDataFromBdb executor pool.");
+	        try {
+	            executorPool.awaitTermination(90, TimeUnit.MINUTES);
+	        } catch (InterruptedException e) {
+	            AceLog.getAppLog().warning(e.toString());
+	        }
+            AceLog.getAppLog().info("Termination NidDataFromBdb executor pool.");
+	    }
+        executorPool = null;
+	}
 
 	public NidDataFromBdb(int nid, Database readOnly, Database readWrite) {
 		super();
