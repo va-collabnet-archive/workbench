@@ -47,6 +47,25 @@ public class LuceneManager {
 	
 	private static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	
+	public static void close() {
+        if (searcher != null) {
+            try {
+                searcher.close();
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+	    if (writer != null) {
+	        try {
+                writer.commit();
+                writer.close(true);
+            } catch (CorruptIndexException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+	    }
+	}
 	public static void init() throws IOException {
 		if (luceneDir == null) {
 			if (luceneDirFile.exists()) {

@@ -30,6 +30,7 @@ import org.ihtsdo.db.bdb.id.UuidBdb;
 import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.etypes.ERevision;
+import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 import com.sleepycat.je.CheckpointConfig;
@@ -245,6 +246,7 @@ public class Bdb {
 	}
 	// Close the environment
 	public static void close() throws InterruptedException, ExecutionException {
+	    LuceneManager.close();
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
