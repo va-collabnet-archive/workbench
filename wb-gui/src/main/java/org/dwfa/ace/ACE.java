@@ -2459,7 +2459,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             I_AmTermComponent.class, classificationInputPathLabel));
         classificationInputPathLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierInputPath",
             I_GetConceptData.class, aceFrameConfig));
-        wrapAndAdd(classifierPrefPanel, classificationInputPathLabel, "Classification Input Path: ");
+        wrapAndAdd(classifierPrefPanel, classificationInputPathLabel, "Classification Stated (Input) Path: ");
 
         TermComponentLabel classificationOutputPathLabel = new TermComponentLabel(aceFrameConfig);
         classificationOutputPathLabel.setTermComponent(aceFrameConfig.getClassifierOutputPath());
@@ -2467,7 +2467,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             I_AmTermComponent.class, classificationOutputPathLabel));
         classificationOutputPathLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierOutputPath",
             I_GetConceptData.class, aceFrameConfig));
-        wrapAndAdd(classifierPrefPanel, classificationOutputPathLabel, "Classification Output Path: ");
+        wrapAndAdd(classifierPrefPanel, classificationOutputPathLabel, "Classification Inferred (Output) Path: ");
 
         return classifierPrefPanel;
 
