@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -92,6 +93,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
@@ -358,6 +360,20 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private class LabelListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent evt) {
+
+            I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
+            if (refset != null) {
+                RefsetSpec spec = new RefsetSpec(refset, true);
+                refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
+                computeTypeValueLabel.setText(spec.getComputeTypeString());
+                if (leftTogglePane != null) {
+                    leftTogglePane.validate();
+                    if (leftTogglePane.getParent() != null) {
+                        leftTogglePane.getParent().validate();
+                    }
+                }
+            }
+
             refsetSpecConcept = null;
             tempComponent = label.getTermComponent();
             if (label.getTermComponent() != null) {
@@ -455,6 +471,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     private ACE ace;
 
+    private JLabel refsetStatusValueLabel;
+
+    private JLabel computeTypeValueLabel;
+
     private LinkedList<I_GetConceptData> tabHistoryList;
 
     private ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
@@ -496,6 +516,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private ReflexiveRefsetCommentTableModel commentTableModel;
 
     private RefsetSpecPanel refsetSpecPanel;
+
+    private JPanel leftTogglePane;
 
     public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel) throws Exception {
@@ -551,7 +573,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.gridy++;
         c.gridwidth = 3;
         c.fill = GridBagConstraints.HORIZONTAL;
-        topPanel.add(getToggleBar(), c);
+        JComponent toggleBar = getToggleBar();
+        topPanel.add(toggleBar, c);
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1.0;
         c.gridy++;
@@ -567,16 +590,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public JComponent getToggleBar() throws IOException, ClassNotFoundException {
         JPanel toggleBar = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.WEST;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.NONE;
-        c.weightx = 0;
-        c.weighty = 0;
+        GridBagConstraints outer = new GridBagConstraints();
+        outer.anchor = GridBagConstraints.WEST;
+        outer.gridx = 0;
+        outer.gridy = 0;
+        outer.fill = GridBagConstraints.NONE;
+        outer.weightx = 0;
+        outer.weighty = 0;
 
-        JPanel leftTogglePane = new JPanel(new FlowLayout());
-        toggleBar.add(leftTogglePane, c);
+        leftTogglePane = new JPanel(new GridBagLayout());
+        toggleBar.add(leftTogglePane, outer);
 
         JPanel rightTogglePane = new JPanel(new FlowLayout());
 
@@ -585,14 +608,42 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         historyButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
         historyButton.setSelected(false);
         historyButton.addActionListener(fixedToggleChangeActionListener);
-        historyButton.setToolTipText("show/hide the history records");
+        historyButton.setToolTipText("show/hide the history records"); // TODO
 
-        leftTogglePane.add(historyButton);
+        GridBagConstraints inner = new GridBagConstraints();
+        inner.anchor = GridBagConstraints.WEST;
+        inner.gridx = 0;
+        inner.gridy = 0;
+        inner.fill = GridBagConstraints.NONE;
+        inner.weightx = 0;
+        inner.weighty = 0;
+        inner.gridheight = 2; // make button use 2 rows
+        inner.insets = new Insets(0, 0, 0, 10);
+        leftTogglePane.add(historyButton, inner);
 
-        c.gridx++;
-        c.weightx = 1.0;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        toggleBar.add(new JPanel(), c);
+        inner.gridheight = 1;
+        inner.insets = new Insets(0, 0, 0, 0);
+        inner.gridx++;
+        inner.anchor = GridBagConstraints.EAST;
+        JLabel refsetStatusLabel = new JLabel("refset status: ");
+        leftTogglePane.add(refsetStatusLabel, inner);
+        inner.gridy++;
+        JLabel computeTypeLabel = new JLabel("compute type: ");
+        leftTogglePane.add(computeTypeLabel, inner);
+
+        inner.anchor = GridBagConstraints.WEST;
+        inner.gridx++;
+        inner.gridy--;
+        refsetStatusValueLabel = new JLabel("");
+        leftTogglePane.add(refsetStatusValueLabel, inner);
+        inner.gridy++;
+        computeTypeValueLabel = new JLabel("");
+        leftTogglePane.add(computeTypeValueLabel, inner);
+
+        outer.gridx++;
+        outer.weightx = 1.0;
+        outer.fill = GridBagConstraints.HORIZONTAL;
+        toggleBar.add(new JPanel(), outer);
 
         File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "refsetspec");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
@@ -602,11 +653,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         });
         if (plugins != null) {
-            c.weightx = 0.0;
-            c.weighty = 0.0;
-            c.fill = GridBagConstraints.NONE;
-            c.gridx++;
-            toggleBar.add(rightTogglePane, c);
+            outer.weightx = 0.0;
+            outer.weighty = 0.0;
+            outer.fill = GridBagConstraints.NONE;
+            outer.gridx++;
+            toggleBar.add(rightTogglePane, outer);
             boolean exceptions = false;
             StringBuffer exceptionMessage = new StringBuffer();
             exceptionMessage.append("<html>Exception(s) reading the following plugin(s): <p><p>");
@@ -623,12 +674,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         JButton pluginButton = new JButton(icon);
                         pluginButton.setToolTipText(bp.getSubject());
                         pluginButton.addActionListener(new PluginListener(f));
-                        rightTogglePane.add(pluginButton, c);
+                        rightTogglePane.add(pluginButton, outer);
                     } else {
                         JButton pluginButton = new JButton(bp.getName());
                         pluginButton.setToolTipText(bp.getSubject());
                         pluginButton.addActionListener(new PluginListener(f));
-                        rightTogglePane.add(pluginButton, c);
+                        rightTogglePane.add(pluginButton, outer);
                     }
                 } catch (Throwable e) {
                     exceptions = true;

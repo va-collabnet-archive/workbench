@@ -53,8 +53,9 @@ public class MemberTablePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            String commentText = (String) JOptionPane.showInputDialog(config.getTreeInSpecEditor().getRootPane(), "",
-                prompt + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
+            String commentText =
+                    (String) JOptionPane.showInputDialog(config.getTreeInSpecEditor().getRootPane(), "", prompt
+                        + ":             ", JOptionPane.PLAIN_MESSAGE, null, null, "");
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = config.getRefsetInSpecEditor();

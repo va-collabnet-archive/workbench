@@ -19,6 +19,7 @@ package org.dwfa.ace.table.refset;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +30,6 @@ import java.util.concurrent.ExecutionException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -37,6 +37,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecEditor;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
@@ -96,13 +97,47 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 return false;
             }
             for (I_ExtendByRef extension : refsetMembers) {
+
                 I_IntSet statusSet = host.getConfig().getAllowedStatus();
-                Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
-                if (host.getShowHistory() == true) {
+                PositionSetReadOnly positionSet = host.getConfig().getViewPositionSetReadOnly();
+                if (host instanceof RefsetSpecEditor) {
+                    if (((RefsetSpecEditor) host).getRefsetSpecPanel().getShowPromotionCheckBoxes()) {
+                        // include retired statuses
+                        statusSet = null;
+                        positionSet = null;
+                    }
+                }
+                if (host.getShowHistory()) {
                     statusSet = null;
                     positionSet = null;
                 }
-                for (I_ExtendByRefVersion ebrTuple : extension.getTuples(statusSet, new PositionSetReadOnly(positionSet), true, false)) {
+
+                List<? extends I_ExtendByRefVersion> original =
+                        extension.getTuples(statusSet, positionSet, true, false);
+                List<I_ExtendByRefVersion> allParts = new ArrayList<I_ExtendByRefVersion>();
+                allParts.addAll(original);
+
+                if (!host.getShowHistory()) {
+                    if (host instanceof RefsetSpecEditor) {
+                        if (((RefsetSpecEditor) host).getRefsetSpecPanel().getShowPromotionCheckBoxes()) {
+                            // need to remove all except for the latest
+                            I_ExtendByRefVersion latestTuple = null;
+                            for (I_ExtendByRefVersion tuple : allParts) {
+                                if (latestTuple == null || tuple.getVersion() >= latestTuple.getVersion()) {
+                                    latestTuple = tuple;
+                                }
+                            }
+
+                            allParts.clear();
+                            if (latestTuple != null) {
+                                allParts.add(latestTuple);
+                            }
+                        }
+                    }
+                }
+
+                for (I_ExtendByRefVersion part : allParts) {
+                    I_ExtendByRefVersion ebrTuple = (I_ExtendByRefVersion) part;
                     boolean addPart = true;
                     for (ReflexiveRefsetFieldData col : columns) {
                         if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
@@ -257,14 +292,13 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         }
     }
 
-    public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col)
-            throws IOException, IllegalAccessException, InvocationTargetException {
-        for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(
-            extension.getComponentId())) {
+    public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
+            IllegalAccessException, InvocationTargetException {
+        for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(extension.getComponentId())) {
             if (promotionRefsetId == extForMember.getRefsetId()) {
                 List<I_ExtendByRefVersion> promotionTuples =
-                        (List<I_ExtendByRefVersion>) extForMember.getTuples(host.getConfig().getAllowedStatus(), host.getConfig()
-				    .getViewPositionSetReadOnly(), false);
+                        (List<I_ExtendByRefVersion>) extForMember.getTuples(host.getConfig().getAllowedStatus(), host
+                            .getConfig().getViewPositionSetReadOnly(), false);
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -309,7 +343,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
     public Set<Integer> getSelectedTuples() {
         Set<Integer> memberNids = new HashSet<Integer>(checkedRows.cardinality());
-        for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i+1)) {
+        for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i + 1)) {
             I_ExtendByRefVersion tuple = allTuples.get(i);
             memberNids.add(tuple.getNid());
         }

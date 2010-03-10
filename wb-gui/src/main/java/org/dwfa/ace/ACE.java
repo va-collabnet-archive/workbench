@@ -177,6 +177,7 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.queue.gui.QueueViewerPanel;
+import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -1217,6 +1218,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JToggleButton showTreeButton;
 
     private JToggleButton showSubversionButton;
+
+    private static JButton synchronizeButton;
 
     private JToggleButton showQueuesButton;
 
@@ -2739,6 +2742,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     c.gridx++;
                     topPanel.add(pluginButton, c);
                     AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                    if (bp.getName().equals("Synchronize with Subversion")) {
+                        synchronizeButton = pluginButton;
+                        synchronizeButton.setEnabled(Svn.isConnectedToSvn());
+                    }
                 } else {
                     JButton pluginButton = new JButton(bp.getName());
                     pluginButton.setToolTipText(bp.getSubject());
@@ -2746,8 +2753,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     c.gridx++;
                     topPanel.add(pluginButton, c);
                     AceLog.getAppLog().info("adding viewer plugin: " + f.getName());
+                    if (bp.getName().equals("Synchronize with Subversion")) {
+                        synchronizeButton = pluginButton;
+                        synchronizeButton.setEnabled(Svn.isConnectedToSvn());
                 }
             }
+        }
         }
 
         c.gridx++;
@@ -3549,5 +3560,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void refreshRefsetTab() {
         refsetSpecPanel.refresh();
+    }
+
+    public static void setSynchronizeButtonIsEnabled(boolean enabled) {
+        if (synchronizeButton != null) {
+            synchronizeButton.setEnabled(enabled);
+        }
     }
 }

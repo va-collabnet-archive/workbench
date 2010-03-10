@@ -129,7 +129,7 @@ public class RelPopupListener extends MouseAdapter {
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
                 for (I_Path p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getMutablePart();
-                    if (selectedObject.getTuple().getVersion() != Long.MAX_VALUE) {
+                    if (newPart.getTime() != Long.MAX_VALUE) {
                         I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                         newPart =
                                 (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart.getPathId(),
@@ -159,10 +159,10 @@ public class RelPopupListener extends MouseAdapter {
                     }
 
                     model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                    model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(newPart
-                        .getCharacteristicId()));
-                    model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(newPart
-                        .getRefinabilityId()));
+                    model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(
+                        newPart.getCharacteristicId()));
+                    model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(
+                        newPart.getRefinabilityId()));
                     model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
 
                     I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());

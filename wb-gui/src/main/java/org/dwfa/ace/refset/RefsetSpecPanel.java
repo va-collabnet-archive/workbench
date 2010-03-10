@@ -86,6 +86,9 @@ public class RefsetSpecPanel extends JPanel {
             try {
                 commentTableModel = setupCommentTable();
                 setupRefsetMemberTable(commentTableModel);
+                if (refsetTable != null && refsetTable.getParent() != null) {
+                    refsetTable.getParent().validate();
+                }
             } catch (NoSuchMethodException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (Exception e) {
@@ -752,11 +755,6 @@ public class RefsetSpecPanel extends JPanel {
             showPromotionCheckBoxes = show;
             refsetTableModel.setShowPromotionCheckBoxes(show);
             setShowButtons(show);
-        }
-        if (show) {
-            if (!editor.getHistoryButton().isSelected()) {
-                editor.getHistoryButton().doClick();
-            }
         }
     }
 

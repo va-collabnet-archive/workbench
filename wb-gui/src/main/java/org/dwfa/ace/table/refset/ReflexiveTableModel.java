@@ -70,7 +70,7 @@ import org.dwfa.vodb.types.IntList;
 
 public abstract class ReflexiveTableModel extends AbstractTableModel implements PropertyChangeListener,
         I_HoldRefsetData {
-    
+
     protected BitSet checkedRows = new BitSet();
 
     public static class StringExtFieldEditor extends DefaultCellEditor {
@@ -188,12 +188,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             try {
-				populatePopup();
-			} catch (TerminologyException e) {
+                populatePopup();
+            } catch (TerminologyException e) {
                 throw new RuntimeException(e);
-			} catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
-			}
+            }
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
@@ -383,12 +383,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (rowIndex < 0) {
             return " ";
         }
-        
+
         // Test to see if this is the extra boolean column for approving/denying members.
         if (columnIndex >= columns.length) {
             return checkedRows.get(rowIndex);
         }
-        
+
         if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
             return rowIndex + 1;
         }
@@ -404,17 +404,16 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         value =
                                 columns[columnIndex].getReadMethod()
                                     .invoke(Terms.get().getConcept(tuple.getComponentId()),
-                                    columns[columnIndex].readParamaters);
+                                        columns[columnIndex].readParamaters);
                     } else {
                         try {
-                        I_DescriptionVersioned desc =
-                                tf.getDescription(id);
-                        if (desc != null) {
-                            value = desc.getLastTuple().getText();
-                        }
+                            I_DescriptionVersioned desc = tf.getDescription(id);
+                            if (desc != null) {
+                                value = desc.getLastTuple().getText();
+                            }
                         } catch (Exception e) {
                             value = "No description available.";
-                    }
+                        }
                     }
 
                 } else {
@@ -468,7 +467,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     }
                     return new StringWithExtTuple(Integer.toString(conceptId), tuple, id);
                 } else if (I_DescriptionTuple.class.isAssignableFrom(value.getClass())) {
-                	I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
+                    I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
                     return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptId());
                 }
                 return new StringWithExtTuple(value.toString(), tuple, id);
@@ -489,7 +488,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         I_ExtendByRef ext = tf.getExtension(id);
                         I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
                         List<I_ExtendByRefVersion> tuples =
-                                (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), false);
+                                (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config
+                                    .getViewPositionSetReadOnly(), false);
                         if (tuples.size() > 0) {
                             I_ExtendByRefVersion obj = tuples.iterator().next();
                             I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -511,7 +511,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
                             return new StringWithExtTuple(buff.toString(), tuple, id);
                         } else {
-                            tuples = (List<I_ExtendByRefVersion>) ext.getTuples(null, config.getViewPositionSetReadOnly(), false);
+                            tuples =
+                                    (List<I_ExtendByRefVersion>) ext.getTuples(null, config
+                                        .getViewPositionSetReadOnly(), false);
                             if (tuples.size() > 0) {
                                 I_ExtendByRefVersion obj = tuples.iterator().next();
                                 I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -537,15 +539,14 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         }
                     } else {
                         try {
-                            I_DescriptionVersioned desc =
-                                    tf.getDescription(id);
+                            I_DescriptionVersioned desc = tf.getDescription(id);
                             if (desc != null) {
                                 String text = desc.getLastTuple().getText();
                                 return new StringWithExtTuple(text, tuple, id);
                             }
                         } catch (TerminologyException e) {
                             return new StringWithExtTuple("No description available for id:" + id, tuple, id);
-                }
+                        }
 
                     }
                 }
@@ -631,7 +632,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 }
                 return;
             }
-            AceLog.getAppLog().warning("Can't handle value: "  + value + " row: " + row + " col: " + col);
+            AceLog.getAppLog().warning("Can't handle value: " + value + " row: " + row + " col: " + col);
             return;
         }
         if (columns[col].isCreationEditable() || columns[col].isUpdateEditable()) {
@@ -639,11 +640,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             boolean changed = false;
             if (extTuple.getVersion() == Integer.MAX_VALUE) {
                 try {
-                switch (columns[col].getType()) {
-                case CONCEPT_IDENTIFIER:
-                    Integer identifier = (Integer) value;
-                    referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
-                default:
+                    switch (columns[col].getType()) {
+                    case CONCEPT_IDENTIFIER:
+                        Integer identifier = (Integer) value;
+                        referencedConcepts.put(identifier, Terms.get().getConcept(identifier));
+                    default:
                         switch (columns[col].invokeOnObjectType) {
                         case COMPONENT:
                         case CONCEPT:
@@ -662,7 +663,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 + columns[col].invokeOnObjectType);
 
                         }
-                }
+                    }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
@@ -686,11 +687,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
         @Override
         public void run() {
-            if (active) {
+            if (isActive()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (active) {
-                        	I_ExtendByRefVersion tuple = allTuples.get(row);
+                        if (isActive()) {
+                            I_ExtendByRefVersion tuple = allTuples.get(row);
                             Terms.get().addUncommitted(tuple.getCore());
                         }
                     }
@@ -698,10 +699,13 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             }
         }
 
+        public boolean isActive() {
+            return active;
+        }
+
         public void setActive(boolean active) {
             this.active = active;
         }
-
     }
 
     UpdateDataAlertsTimerTask alertUpdater;
@@ -731,8 +735,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     protected abstract I_ChangeTableInSwing getTableChangedSwingWorker(int tableComponentId2, Integer promotionFilterId);
 
     public void enableCheckBoxColumn(boolean b) {
-        this.checkBoxColumn  = b;
-        
+        this.checkBoxColumn = b;
+
     }
 
 }

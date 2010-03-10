@@ -148,7 +148,8 @@ public abstract class TupleAdder<V, W> {
      * @param core
      */
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-            List<V> matchingTuples, boolean addUncommitted, List<? extends I_AmPart> versions, W core) {
+            List<V> matchingTuples, boolean addUncommitted, List<? extends I_AmPart> v, W core) {
+        ArrayList<I_AmPart> versions = new ArrayList<I_AmPart>(v); // create copy to avoid concurrent modification exceptions
         HashSet<I_AmPart> partsToAdd = new HashSet<I_AmPart>();
         HashSet<I_AmPart> uncommittedParts = new HashSet<I_AmPart>();
         if (positions == null) {
