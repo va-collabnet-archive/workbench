@@ -3,7 +3,6 @@ package org.ihtsdo.db.util;
 import java.lang.ref.Reference;
 
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.ConceptComponent;
 
 /**
  * Garbage Collectible Value Concept Map

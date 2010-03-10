@@ -31,7 +31,7 @@ public class IndexGenerator implements I_ProcessConceptData {
 
 
 	@Override
-	public boolean continueWork() throws Exception {
+	public boolean continueWork() {
 		return true;
 	}
 }

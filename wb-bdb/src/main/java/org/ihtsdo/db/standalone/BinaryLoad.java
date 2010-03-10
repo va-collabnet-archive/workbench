@@ -216,7 +216,7 @@ public class BinaryLoad {
 			}
 		}
 		@Override
-		public boolean continueWork() throws Exception {
+		public boolean continueWork() {
 			return true;
 		}
     }

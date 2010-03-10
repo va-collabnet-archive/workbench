@@ -1,8 +1,8 @@
 package org.ihtsdo.concept;
 
-public interface I_ProcessConceptData {
+import org.dwfa.ace.api.I_TrackContinuation;
 
-	public boolean continueWork() throws Exception;
+public interface I_ProcessConceptData extends I_TrackContinuation {
 
 	public void processConceptData(Concept concept) throws Exception;
 

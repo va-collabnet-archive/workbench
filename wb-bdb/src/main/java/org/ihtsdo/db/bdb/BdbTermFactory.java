@@ -1378,7 +1378,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 		}
 
 		@Override
-		public boolean continueWork() throws Exception {
+		public boolean continueWork() {
 			return tracker.continueWork();
 		}
 	}
@@ -1482,7 +1482,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	@Override
 	public void computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
 			throws Exception {
-		RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig);
+	    I_RepresentIdSet possibleIds = query.getPossibleConcepts(frameConfig, null);
+		RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
 		Bdb.getConceptDb().iterateConceptDataInParallel(computer);
 		computer.addUncommitted();
 		BdbCommitManager.commit();

@@ -37,7 +37,6 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
@@ -464,6 +463,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 			}
 		}
 		return c;
+	}
+	
+	public static Concept getIfInMap(int nid) {
+	    return concepts.get(nid);
 	}
 
 	public static Concept get(int nid, byte[] roBytes, byte[] mutableBytes)
