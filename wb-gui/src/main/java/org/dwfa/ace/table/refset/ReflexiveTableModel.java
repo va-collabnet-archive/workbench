@@ -383,6 +383,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         if (rowIndex < 0) {
             return " ";
         }
+        if (rowIndex >= allTuples.size()) {
+            return " "; // TODO check
+        }
 
         // Test to see if this is the extra boolean column for approving/denying members.
         if (columnIndex >= columns.length) {

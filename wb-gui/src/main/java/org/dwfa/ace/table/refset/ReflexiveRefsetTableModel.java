@@ -356,7 +356,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     }
 
     public void selectAllTuples() {
-        this.checkedRows.set(0, getRowCount() - 1);
+        this.checkedRows.set(0, getRowCount());
         fireTableDataChanged();
     }
 
