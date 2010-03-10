@@ -44,6 +44,18 @@ public class IntSet implements ListDataListener, I_IntSet {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
     private int[] setValues = new int[0];
+    
+    private static class LastContains {
+        public LastContains(int key, boolean result) {
+            lastContains = key;
+            lastResult = result;
+        }
+        public LastContains() {
+        }
+        private int lastContains = Integer.MAX_VALUE;
+        private boolean lastResult = false;
+    }
+    private LastContains lastContains = new LastContains();
 
     public IntSet(int[] values) {
         super();
@@ -117,7 +129,13 @@ public class IntSet implements ListDataListener, I_IntSet {
      * @see org.dwfa.ace.api.I_IntSet#contains(int)
      */
     public boolean contains(int key) {
-        return Arrays.binarySearch(setValues, key) >= 0;
+        LastContains last = lastContains;
+        if (last.lastContains == key) {
+            return last.lastResult;
+        }
+        boolean result = Arrays.binarySearch(setValues, key) >= 0;
+        lastContains = new LastContains(key, result);
+        return result;
     }
 
     /*
@@ -176,6 +194,7 @@ public class IntSet implements ListDataListener, I_IntSet {
         if (insertionPoint < 0) {
             return;
         }
+        lastContains = new LastContains();
         int[] newSet = new int[setValues.length - 1];
         for (int i = 0; i < insertionPoint; i++) {
             newSet[i] = setValues[i];
@@ -184,6 +203,7 @@ public class IntSet implements ListDataListener, I_IntSet {
             newSet[i - 1] = setValues[i];
         }
         setValues = newSet;
+        lastContains = new LastContains();
     }
 
     /*
@@ -208,11 +228,13 @@ public class IntSet implements ListDataListener, I_IntSet {
      */
     public synchronized void removeAll(int[] keys) {
     	HashSet<Integer> members = getAsSet();
+    	lastContains = new LastContains();
     	for (int key: keys) {
     		members.remove(key);
     	}
     	replaceWithSet(members);
-        intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
+    	lastContains = new LastContains();
+    	intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
     }
 
 	public HashSet<Integer> getAsSet() {

@@ -103,7 +103,7 @@ public class RefsetSpecPanel extends JPanel {
 
     private ReflexiveRefsetCommentTableModel commentTableModel;
 
-    RefsetSpecEditor editor;
+    private RefsetSpecEditor editor;
 
     private JTabbedPane bottomTabs;
 
