@@ -108,7 +108,6 @@ public class SnoDL implements Serializable {
     }
 
     public String toString() {
-        // :TODO:
         return toStringDl() + "; " + toStringKrss();
     }
 
@@ -126,29 +125,31 @@ public class SnoDL implements Serializable {
                 s = new StringBuilder(EPSILON_STR + " " + LEFT_INCLUSION_STR + " \""
                     + tf.getConcept(rhs.id).getInitialText() + "\"");
             } else if (lhs.size() == 1) {
-                s = new StringBuilder("\"" + tf.getConcept(lhs.get(0).id).getInitialText() + "\" " + LEFT_INCLUSION_STR
-                    + " \"" + tf.getConcept(rhs.id).getInitialText() + "\"");
+                s = new StringBuilder("\"" + tf.getConcept(lhs.get(0).id).getInitialText() + "\" "
+                        + LEFT_INCLUSION_STR + " \"" + tf.getConcept(rhs.id).getInitialText()
+                        + "\"");
             } else if (lhs.size() == 2) {
                 int lhs0Nid = lhs.get(0).id;
                 int lhs1Nid = lhs.get(1).id;
                 // int rhsNid = rhs.id;
-                s = new StringBuilder("\"" + tf.getConcept(lhs0Nid).getInitialText() + "\" " + WHITE_BULLET_STR + " \""
-                    + tf.getConcept(lhs1Nid).getInitialText() + "\" " + LEFT_INCLUSION_STR + " \""
+                s = new StringBuilder("\"" + tf.getConcept(lhs0Nid).getInitialText() + "\" "
+                        + WHITE_BULLET_STR + " \"" + tf.getConcept(lhs1Nid).getInitialText()
+                        + "\" " + LEFT_INCLUSION_STR + " \""
                     + tf.getConcept(rhs.id).getInitialText() + "\"");
             } else if (lhs.size() >= 3) {
                 s = new StringBuilder();
                 int i;
                 for (i = 0; i < lhs.size() - 1; i++) {
-                    s.append("\"" + tf.getConcept(i).getInitialText() + "\" " + WHITE_BULLET_STR + " ");
+                    s.append("\"" + tf.getConcept(lhs.get(i).id).getInitialText() + "\" "
+                            + WHITE_BULLET_STR + " ");
                 }
-                s.append("\"" + tf.getConcept(i).getInitialText() + "\" " + LEFT_INCLUSION_STR + " \""
-                    + tf.getConcept(rhs.id).getInitialText() + "\"");
+                s.append("\"" + tf.getConcept(lhs.get(i).id).getInitialText() + "\" "
+                        + LEFT_INCLUSION_STR + " \"" + tf.getConcept(rhs.id).getInitialText()
+                        + "\"");
             }
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -161,39 +162,46 @@ public class SnoDL implements Serializable {
         try {
             if (lhs.size() == 0) {
                 // (reflexive RN)
-                s = new StringBuilder("(reflexive \"" + tf.getConcept(rhs.id).getInitialText() + "\")");
+                s = new StringBuilder("(reflexive \"" + tf.getConcept(rhs.id).getInitialText()
+                        + "\")");
             } else if (lhs.size() == 1) {
                 // (define-primitive-role RN1 :parent RN2)
-                s = new StringBuilder("(define-primitive-role " + tf.getConcept(lhs.get(0).id).getInitialText()
-                    + "\" :parent \"" + tf.getConcept(rhs.id).getInitialText() + "\")");
+                s = new StringBuilder("(define-primitive-role "
+                        + tf.getConcept(lhs.get(0).id).getInitialText() + "\" :parent \""
+                        + tf.getConcept(rhs.id).getInitialText() + "\")");
             } else if (lhs.size() == 2) {
                 int lhs0Nid = lhs.get(0).id;
                 int lhs1Nid = lhs.get(1).id;
                 int rhsNid = rhs.id;
                 if (lhs0Nid == lhs1Nid && lhs1Nid == rhsNid) {
                     // (transitive RN)
-                    s = new StringBuilder("(transitive \"" + tf.getConcept(lhs0Nid).getInitialText() + "\")");
+                    s = new StringBuilder("(transitive \""
+                            + tf.getConcept(lhs0Nid).getInitialText() + "\")");
                 } else if (lhs0Nid == rhsNid) {
                     // (define-primitive-role RHS :right-identity LHS1)
-                    s = new StringBuilder("(define-primitive-role \"" + tf.getConcept(rhsNid).getInitialText()
-                        + "\" :right-identity \"" + tf.getConcept(lhs1Nid).getInitialText() + "\")");
+                    s = new StringBuilder("(define-primitive-role \""
+                            + tf.getConcept(rhsNid).getInitialText() + "\" :right-identity \""
+                            + tf.getConcept(lhs1Nid).getInitialText() + "\")");
 
                 } else if (lhs1Nid == rhsNid) {
-                    // (define-primitive-role RHS :right-identity LHS0)
-                    s = new StringBuilder("(define-primitive-role " + tf.getConcept(rhsNid).getInitialText()
-                        + "\" :left-identity \"" + tf.getConcept(lhs0Nid).getInitialText() + "\")");
+                    // (define-primitive-role RHS :left-identity LHS0)
+                    s = new StringBuilder("(define-primitive-role \""
+                            + tf.getConcept(rhsNid).getInitialText() + "\" :left-identity \""
+                            + tf.getConcept(lhs0Nid).getInitialText() + "\")");
                 } else {
-
+                    // (role-inclusion (compose LHS0 LHS1) RHS)
+                    s = new StringBuilder("(role-inclusion (compose \""
+                            + tf.getConcept(lhs0Nid).getInitialText() + "\" \""
+                            + tf.getConcept(lhs1Nid).getInitialText() + "\") \""
+                            + tf.getConcept(rhsNid).getInitialText() + "\")");
                 }
 
             } else if (lhs.size() >= 3) {
                 s = new StringBuilder(" .. ");
             }
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

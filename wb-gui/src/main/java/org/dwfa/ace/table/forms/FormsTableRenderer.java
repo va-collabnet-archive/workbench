@@ -47,18 +47,22 @@ public class FormsTableRenderer extends AceTableRenderer {
         JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
             column);
 
-        if (isSelected == false) {
-            if (renderInactive) {
-                renderComponent.setBackground(UIManager.getColor("Table.background"));
-                renderComponent.setForeground(UIManager.getColor("Table.foreground"));
-            } else {
+        // if (renderInactive) renderComponent.setBackground(Color.LIGHT_GRAY);
                 renderComponent.setBackground(colorForRow(row));
                 renderComponent.setForeground(UIManager.getColor("Table.foreground"));
-            }
-        } else {
-            renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
-            renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
-        }
+//        if (isSelected == false) {
+//            if (renderInactive) {
+//                renderComponent.setBackground(UIManager.getColor("Table.background"));
+//                renderComponent.setForeground(UIManager.getColor("Table.foreground"));
+//            } else {
+//                renderComponent.setBackground(colorForRow(row));
+//                renderComponent.setForeground(UIManager.getColor("Table.foreground"));
+//            }
+//        } else {
+//            // renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+//            renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
+//            renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
+//        }
 
         if (column < 6) {
             setHorizontalAlignment(SwingConstants.CENTER);
@@ -69,7 +73,6 @@ public class FormsTableRenderer extends AceTableRenderer {
         }
 
         setBorder(column, this, false, false); // .., same, uncommitted
-        // if (renderInactive) renderComponent.setBackground(Color.LIGHT_GRAY);
 
         renderComponent.setText((String) value);
         return renderComponent;

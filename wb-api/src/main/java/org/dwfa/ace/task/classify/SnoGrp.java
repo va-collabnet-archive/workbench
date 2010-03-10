@@ -27,7 +27,7 @@ import org.dwfa.ace.log.AceLog;
 public class SnoGrp extends ArrayList<SnoRel> {
     private static final long serialVersionUID = 1L;
     public static SnoAB gSnoAB = null;
-    boolean debug = false; // :DEBUG:
+    private static final boolean debug = false; // :DEBUG:
 
     public SnoGrp(List<SnoRel> relList, boolean needsToBeSorted) {
         super();
@@ -185,7 +185,6 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * @return
      */
     public SnoGrp whichRoleValDifferFrom(SnoGrp rg_B) {
-        // :DEBUG: debug string
         StringBuilder s = new StringBuilder("\r\n::: SnoGrp X.whichRoleValDifferFrom(Y)");
 
         int maxA = this.size();

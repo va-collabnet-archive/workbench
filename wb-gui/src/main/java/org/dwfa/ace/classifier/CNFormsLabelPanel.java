@@ -556,7 +556,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private SnoTable cSnoTable;
 
     // ** CONFIGURATION PARTICULARS **
-    private boolean debug = false; // :DEBUG:
+    private static final boolean debug = false; // :DEBUG:
     boolean showGroupLabels = true; // toggles grouped vs. single label display
 
     // ** GUI PARTICULARS **

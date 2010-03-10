@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
+import org.dwfa.ace.classifier.CNFormsTablePanel;
 import org.dwfa.ace.log.AceLog;
 
 public class StatedAndNormalFormsPlugin extends AbstractPlugin {
@@ -35,7 +36,8 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
-    private transient LogicalFormsPanel formsPanel;
+    // private transient LogicalFormsPanel formsPanel; :!!!:
+    private transient CNFormsTablePanel formsPanel;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -57,10 +59,10 @@ public class StatedAndNormalFormsPlugin extends AbstractPlugin {
         return TOGGLES.STATED_INFERRED.getPluginId();
     }
 
-    public LogicalFormsPanel getComponent(I_HostConceptPlugins host) {
+    public CNFormsTablePanel getComponent(I_HostConceptPlugins host) {
         if (formsPanel == null) {
             setHost(host);
-            formsPanel = new LogicalFormsPanel();
+            formsPanel = new CNFormsTablePanel();
             host.addPropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, this);
             host.addPropertyChangeListener("commit", this);
             try {

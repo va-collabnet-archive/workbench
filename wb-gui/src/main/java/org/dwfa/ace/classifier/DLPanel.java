@@ -108,6 +108,11 @@ public class DLPanel extends JPanel {
     private TableModel_DLEdit_Rhs tableModelDLEditRhs;
     private TableModel_DLList tableModelDLList;
     private TableModel_NeverGrp tableModelNeverGrp;
+    
+    //
+    private JTable tableDLEditLhs;
+    private JTable tableDLEditRhs;
+    private JTable tableNeverGrp;
 
     // EDIT & LIST TABLE COORDINATION
     private SnoDL editDL; // current DL being edited
@@ -120,8 +125,8 @@ public class DLPanel extends JPanel {
     private static final int FORMAT_KRSS = 1;
     private int dlFormat = FORMAT_DL;
 
-    // :DEBUG:
-    private boolean debug = true;
+    // INTERNAL
+    private static final boolean debug = false; // :DEBUG:
 
     public DLPanel(I_ConfigAceFrame caf) {
         super();
@@ -153,19 +158,22 @@ public class DLPanel extends JPanel {
             tableModelDLEditRhs.select(index);
             tableModelDLEditLhs.select(index);
             labelDL.setText("<html><font face='Dialog' size='3' color='black'>DL: "
-                + "<font face='Dialog' size='3' color='blue'>" + editDL.toStringDl());
+                    + "<font face='Dialog' size='3' color='black'>" + editDL.toStringDl());
             labelKRSS.setText("<html><font face='Dialog' size='3' color='black'>KRSS: "
-                + "<font face='Dialog' size='3' color='green'>" + editDL.toStringKrss());
+                    + "<font face='Dialog' size='3' color='black'>" + editDL.toStringKrss());
         }
     }
 
     public void update() {
         this.removeAll();
-        int widthDecr = 700;
+        int widthDescPref = 250;
+        int widthDescMin = 150;
+        int widthDescMax = 2000;
+
         int widthBtn = 32;
         int heightRow = 24;
 
-        // ADD FILE READ, WRITE BUTTONS
+        // BUTTONS: READ FROM FILE, WRITE TO FILE
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         c.fill = GridBagConstraints.NONE; // do not resize component
@@ -174,7 +182,8 @@ public class DLPanel extends JPanel {
         c.gridwidth = 1;
         c.weightx = 0;
         c.weighty = 0;
-        btnReadFromFile = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/read_from_disk.png")));
+        btnReadFromFile = new JButton(new ImageIcon(ACE.class
+                .getResource("/24x24/plain/read_from_disk.png")));
         btnReadFromFile.setToolTipText("Read Description Logic from file.");
         btnReadFromFile.addActionListener(new Listener_BtnFileRead());
         btnReadFromFile.setMaximumSize(btnDim_32x32);
@@ -183,67 +192,79 @@ public class DLPanel extends JPanel {
 
         c.weightx = 0.5;
         c.gridx += 1;
-        btnSaveToFile = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/save_to_disk.png")));
+        btnSaveToFile = new JButton(new ImageIcon(ACE.class
+                .getResource("/24x24/plain/save_to_disk.png")));
         btnSaveToFile.setToolTipText("Write Description Logic to file.");
         btnSaveToFile.addActionListener(new Listener_BtnFileWrite());
         btnSaveToFile.setMaximumSize(btnDim_32x32);
         btnSaveToFile.setPreferredSize(btnDim_32x32);
         this.add(btnSaveToFile, c);
 
-        // ADDED DESCRIPTION LOGIC EDITOR (DL Edit)
+        // LABEL: DESCRIPTION LOGIC EDITOR (DL Edit) **SECTION**
         c.gridy += 1;
         c.weightx = 0;
         c.gridx = 0;
         c.gridwidth = 2;
         JLabel label = new JLabel();
-        label.setText("Declaration Edit: LHS[0] o ... o LHS[k] -> RHS");
+        label.setText("Declaration Terms: LHS[0] o ... o LHS[k] -> RHS");
         this.add(label, c);
 
-        // RHS TABLE
+        // TABLE: RHS TABLE (VIEW ONLY)
+        c.fill = GridBagConstraints.HORIZONTAL; // resize horizontally
         c.gridy += 1;
         c.gridx = 1;
-        c.weightx = 0.5;
         c.gridwidth = 1;
+        c.weightx = 0.5;
 
         JTable table = new JTable(tableModelDLEditRhs);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr, heightRow * 2));
+        table.setMinimumSize(new Dimension(widthDescMin, heightRow * 1));
+        table.setPreferredSize(new Dimension(widthDescPref, heightRow * 1));
+        table.setMaximumSize(new Dimension(widthDescMax, heightRow * 1));
         TableColumn tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(widthDecr);
+        // tc.setPreferredWidth(widthDescPref);
+        tc.setResizable(true);
         tc.setCellRenderer(new Renderer_SnoCon());
         JScrollPane sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr, heightRow * 3));
+        sp.setPreferredSize(new Dimension(widthDescPref, heightRow * 2));
         this.add(sp, c);
 
-        // LHS BUTTON
+        // BUTTON: ADD LHS TERMS
+        c.fill = GridBagConstraints.NONE; // do not resize
         c.gridy += 1;
-        c.weightx = 0;
         c.gridx = 0;
         c.gridwidth = 1;
-        btnAddDLEdit = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
+        c.weightx = 0;
+        btnAddDLEdit = new JButton(new ImageIcon(ACE.class
+                .getResource("/24x24/plain/row_add_after.png")));
         btnAddDLEdit.setToolTipText("add new LHS role from taxonomy selection");
-        btnAddDLEdit.addActionListener(new Listener_BtnAdd_DLEdit(null, config));
+        btnAddDLEdit.addActionListener(new Listener_BtnAdd_DLLhs(null, config));
         btnAddDLEdit.setMaximumSize(btnDim_32x32);
         btnAddDLEdit.setPreferredSize(btnDim_32x32);
         this.add(btnAddDLEdit, c);
 
-        // LHS TABLE
-        c.weightx = 0.5;
+        // TABLE: LHS LIST
+        c.fill = GridBagConstraints.HORIZONTAL; // resize horizontally
         c.gridx = 1;
+        c.weightx = 0.5;
         table = new JTable(tableModelDLEditLhs);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 4));
+        int rows = tableModelDLEditLhs.getRowCount();
+        rows = rows <= 2 ? 2 : rows;
+        table.setMinimumSize(new Dimension(widthDescMin + 4 * widthBtn, heightRow * rows));
+        table.setPreferredSize(new Dimension(widthDescPref + 4 * widthBtn, heightRow * rows));
+        table.setMaximumSize(new Dimension(widthDescMax + 4 * widthBtn, heightRow * rows));
         tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(widthDecr);
         tc.setCellRenderer(new Renderer_SnoCon());
         setUpActButtons(table);
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 5));
+        sp.setPreferredSize(new Dimension(widthDescPref + 4 * widthBtn, heightRow * (rows + 1)));
         this.add(sp, c);
 
-        // COMMENT LABELS
+        // LABELS: DISPLAY DL & KRSS
+        c.fill = GridBagConstraints.NONE;
         c.gridy += 1;
         c.weightx = 0;
         c.gridx = 1;
@@ -252,8 +273,8 @@ public class DLPanel extends JPanel {
         c.gridy += 1;
         this.add(labelKRSS, c);
 
-        // ADD DESCRIPTION LOGIC SUMMARY LIST (DL List)
-        // DL LIST LABEL
+        // LABEL: "DL LIST" **SECTION**
+        c.fill = GridBagConstraints.NONE;
         c.gridy += 1;
         c.weightx = 0;
         c.gridx = 0;
@@ -262,19 +283,22 @@ public class DLPanel extends JPanel {
         label.setText("Declarations List: ");
         this.add(label, c);
 
-        // DL LIST BUTTON
+        // BUTTON: ADD "DL LIST" BUTTON
+        c.fill = GridBagConstraints.NONE;
         c.gridy += 1;
         c.gridx = 0;
         c.weightx = 0;
         c.gridwidth = 1;
-        btnAddDLList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
+        btnAddDLList = new JButton(new ImageIcon(ACE.class
+                .getResource("/24x24/plain/row_add_after.png")));
         btnAddDLList.setToolTipText("add new DL (RHS) from taxonomy selection");
         btnAddDLList.addActionListener(new Listener_BtnAdd_DLList(null, config));
         btnAddDLList.setMaximumSize(btnDim_32x32);
         btnAddDLList.setPreferredSize(btnDim_32x32);
         this.add(btnAddDLList, c);
 
-        // DL LIST TABLE
+        // TABLE: "DL LIST"
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.gridx = 1;
         table = new JTable(tableModelDLList);
@@ -282,19 +306,23 @@ public class DLPanel extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(new Listener_Row());
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 10));
+        //rows = tableModelDLList.getRowCount();
+        //rows = rows <= 2 ? 2 : rows;
+        //table.setMinimumSize(new Dimension(widthDescMin + 4 * widthBtn, heightRow * rows));
+        //table.setPreferredSize(new Dimension(widthDescPref + 4 * widthBtn, heightRow * rows));
+        //table.setMaximumSize(new Dimension(widthDescMax + 4 * widthBtn, heightRow * rows));
+
         tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(widthDecr);
         tc.setCellRenderer(new Renderer_SnoDL());
 
-        // DL, KRSS ComboBox :!!!:TODO:!!!:
+        // :!!!:NYI: DL, KRSS ComboBox
         if (true) {
             TableColumn_SelectSyntax col;
             String[] items = {
-                              "<html><font face='Dialog' size='3' color='blue'>DL Format",
-                              "<html><font face='Dialog' size='3' color='green'>KRSS Format",
-                              "<html><font face='Dialog' size='3' color='blue'>DL Format;</font>"
-                                  + "<font face='Dialog' size='3' color='green'>KRSS Format" };
+                    "<html><font face='Dialog' size='3' color='black'>DL Format",
+                    "<html><font face='Dialog' size='3' color='black'>KRSS Format",
+                    "<html><font face='Dialog' size='3' color='black'>DL Format;</font>"
+                            + "<font face='Dialog' size='3' color='black'>KRSS Format" };
             JComboBox combo = new JComboBox();
             for (int i = 0; i < items.length; i++) {
                 combo.addItem(items[i]);
@@ -304,10 +332,11 @@ public class DLPanel extends JPanel {
 
         setUpActButtons(table);
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 4 * widthBtn, heightRow * 11));
+        // sp.setPreferredSize(new Dimension(widthDescPref + 4 * widthBtn, heightRow * (rows + 1)));
         this.add(sp, c);
 
-        // *** ADD "NEVER GROUP" ROLES ***
+        // LABEL: "NEVER GROUP" ROLES **SECTION**
+        c.fill = GridBagConstraints.NONE;
         c.gridy += 1;
         c.weightx = 0;
         c.gridx = 0;
@@ -317,45 +346,63 @@ public class DLPanel extends JPanel {
         this.add(label, c);
 
         // ADD "NEVER GROUP" BUTTON
+        c.fill = GridBagConstraints.NONE;
         c.gridy += 1;
         c.gridx = 0;
         c.weightx = 0;
         c.weighty = 0.5;
         c.gridwidth = 1;
-        btnAddNeverGrp = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/row_add_after.png")));
+        btnAddNeverGrp = new JButton(new ImageIcon(ACE.class
+                .getResource("/24x24/plain/row_add_after.png")));
         btnAddNeverGrp.setToolTipText("add 'Never-Grouped' Role from taxonomy selection");
-        // btnAddNeverGrp.addActionListener(actionListener);
-        // new AddRelationship(host, host.getConfig())
         btnAddNeverGrp.addActionListener(new Listener_BtnAdd_NeverGrp(null, config));
         btnAddNeverGrp.setMaximumSize(btnDim_32x32);
         btnAddNeverGrp.setPreferredSize(btnDim_32x32);
         this.add(btnAddNeverGrp, c);
 
         // ADD "NEVER GROUP" TABLE
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
+        c.weighty = 0.5;
         c.gridx = 1;
         table = new JTable(tableModelNeverGrp);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(heightRow);
-        table.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn, heightRow * 10));
-        tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(widthDecr);
-        tc.setCellRenderer(new Renderer_SnoCon());
+        //rows = tableModelNeverGrp.getRowCount();
+        //rows = rows <= 2 ? 2 : rows;
+        //table.setMinimumSize(new Dimension(widthDescMin + 1 * widthBtn, heightRow * rows));
+        //table.setPreferredSize(new Dimension(widthDescPref + 1 * widthBtn, heightRow * rows));
+        //table.setMaximumSize(new Dimension(widthDescMax + 1 * widthBtn, heightRow * rows));
 
+        tc = table.getColumnModel().getColumn(0);
+        tc.setCellRenderer(new Renderer_SnoCon());
         Renderer_BtnAct_Del ngbr = new Renderer_BtnAct_Del();
         tc = table.getColumnModel().getColumn(1);
         tc.setCellRenderer(ngbr);
-        Editor_BtnAct ngbe = new Editor_BtnAct(new JButton());
-        tc.setCellEditor(ngbe);
+        tc.setCellEditor(new Editor_BtnAct(new JButton()));
         tc.setMaxWidth(32);
         tc.setResizable(false);
+        
         sp = new JScrollPane(table);
-        sp.setPreferredSize(new Dimension(widthDecr + 1 * widthBtn, heightRow * 11));
+        // sp.setPreferredSize(new Dimension(widthDescPref + 1 * widthBtn, heightRow * (rows + 1)));
         this.add(sp, c);
+
+        //
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy += 1;
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+        c.gridwidth = 2;
+        label = new JLabel();
+        label.setText("  ");
+        this.add(label, c);
+
     }
 
     void setUpActButtons(JTable table) {
         int width = 32;
+
         TableColumn tc = table.getColumnModel().getColumn(1);
         tc.setCellRenderer(new Renderer_BtnAct_Dup());
         tc.setMaxWidth(width);
@@ -423,7 +470,8 @@ public class DLPanel extends JPanel {
         }
 
         // *** TableCellEditor ***
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
             if (column >= 1)
                 return editor;
             else
@@ -438,7 +486,6 @@ public class DLPanel extends JPanel {
 
         // *** PropertyChangeListener ***
         public void propertyChange(PropertyChangeEvent evt) {
-            // TODO Auto-generated method stub
         }
 
         // *** CellEditor ***
@@ -466,10 +513,10 @@ public class DLPanel extends JPanel {
         }
     }
 
-    private class Listener_BtnAdd_DLEdit implements ActionListener {
+    private class Listener_BtnAdd_DLLhs implements ActionListener {
         private I_ConfigAceFrame config; // :!!!:
 
-        public Listener_BtnAdd_DLEdit(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
+        public Listener_BtnAdd_DLLhs(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
             this.config = config;
         }
@@ -478,7 +525,8 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            "Please set the Classifier Input (Stated) Path in the preferences.");
                     return;
                 }
                 doEdit(e, config);
@@ -488,14 +536,28 @@ public class DLPanel extends JPanel {
         }
 
         void doEdit(ActionEvent e, I_ConfigAceFrame config) {
+            if (editRowIdx < 0) {
+                String errStr = "Right Hand Term (RHS) must be added to the Declarations List first.";
+                AceLog.getAppLog().alertAndLog(Level.INFO, errStr, new Exception(errStr));
+                return;
+            }
 
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
+                int isRole = SnoTable.testIsRole(cNid);
+                if (isRole == 1) {
+                    AceLog.getAppLog().log(Level.INFO,
+                            "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
 
-                tableModelDLEditLhs.append(cNid);
-                updateEdit(editRowIdx);
+                    tableModelDLEditLhs.append(cNid);
+                    updateEdit(editRowIdx);
+                    tableModelDLList.update();
+                    tableModelDLList.fireTableDataChanged();
+                } else if (isRole == 0) {
+                    String errStr = "A role must be selected in the SNOMED taxomony.";
+                    AceLog.getAppLog().alertAndLog(Level.INFO, errStr, new Exception(errStr));
+                }
             }
 
         }
@@ -513,7 +575,8 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            "Please set the Classifier Input (Stated) Path in the preferences.");
                     return;
                 }
                 doEdit(e, config);
@@ -527,12 +590,21 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
+                int isRole = SnoTable.testIsRole(cNid);
+                if (isRole == 1) {
+                    AceLog.getAppLog().log(Level.INFO,
+                            "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
 
-                tableModelDLList.append(cNid);
-                editRowIdx = tableDLList.getRowCount() - 1;
-                tableDLList.setRowSelectionInterval(editRowIdx, editRowIdx);
-                tableModelDLEditLhs.select(editRowIdx);
+                    tableModelDLList.append(cNid);
+                    editRowIdx = tableDLList.getRowCount() - 1;
+                    tableDLList.setRowSelectionInterval(editRowIdx, editRowIdx);
+                    tableModelDLEditLhs.select(editRowIdx);
+
+                } else if (isRole == 0) {
+                    String errStr = "A role must be selected in the SNOMED taxomony.";
+                    AceLog.getAppLog().alertAndLog(Level.INFO, errStr, new Exception(errStr));
+                }
+
             }
 
         }
@@ -541,7 +613,8 @@ public class DLPanel extends JPanel {
     private class Listener_BtnAdd_NeverGrp implements ActionListener {
         private I_ConfigAceFrame config; // :!!!:
 
-        public Listener_BtnAdd_NeverGrp(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
+        public Listener_BtnAdd_NeverGrp(I_ContainTermComponent termContainer,
+                I_ConfigAceFrame config) {
             super();
             this.config = config;
         }
@@ -550,25 +623,26 @@ public class DLPanel extends JPanel {
             try {
                 if (config.getClassifierInputPath() == null) {
 
-                    JOptionPane.showMessageDialog(new JFrame(), "Please set the Classifier Edit Path ...");
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            "Please set the Classifier Input (Stated) Path in the preferences.");
                     return;
                 }
-                doEdit(e, config);
+                int cNid = Integer.MAX_VALUE;
+                if (config.getHierarchySelection() != null) {
+                    cNid = config.getHierarchySelection().getConceptId();
+                    int isRole = SnoTable.testIsRole(cNid);
+                    if (isRole == 1) {
+                        AceLog.getAppLog().log(Level.INFO,
+                                "::: TAXONOMY - NEVER GROUPED: " + SnoTable.toString(cNid));
+                        tableModelNeverGrp.append(cNid);
+                    } else if (isRole == 0) {
+                        String errStr = "A role must be selected in the SNOMED taxomony.";
+                        AceLog.getAppLog().alertAndLog(Level.INFO, errStr, new Exception(errStr));
+                    }
+                }
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
-        }
-
-        void doEdit(ActionEvent e, I_ConfigAceFrame config) {
-
-            int cNid = Integer.MAX_VALUE;
-            if (config.getHierarchySelection() != null) {
-                cNid = config.getHierarchySelection().getConceptId();
-                AceLog.getAppLog().log(Level.INFO, "::: TAXONOMY - NEVER GROUPED: " + SnoTable.toString(cNid));
-
-                tableModelNeverGrp.append(cNid);
-            }
-
         }
     }
 
@@ -576,12 +650,12 @@ public class DLPanel extends JPanel {
 
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent e) {
-            // :TODO: new Frame()
             try {
-                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(), "Open Logic",
-                    FileDialog.LOAD);
+                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
+                        "Open Logic", FileDialog.LOAD);
                 //
-                dialog.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(System.getProperty("user.dir")
+                        + System.getProperty("file.separator") + "logic");
                 dialog.setFilenameFilter(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
                         return name.endsWith(".dlogic");
@@ -605,14 +679,11 @@ public class DLPanel extends JPanel {
                 // Cleanup
                 dialog.dispose();
             } catch (FileNotFoundException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (IOException e2) { // from ObjectInputStream
-                // TODO Auto-generated catch block
                 e2.printStackTrace();
             } catch (ClassNotFoundException e3) {
-                // TODO Auto-generated catch block
                 e3.printStackTrace();
             }
 
@@ -623,12 +694,12 @@ public class DLPanel extends JPanel {
     private class Listener_BtnFileWrite implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            // :TODO: new Frame()
             try {
-                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(), "Save Logic (.dl)",
-                    FileDialog.SAVE);
+                FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
+                        "Save Logic (.dl)", FileDialog.SAVE);
                 //
-                dialog.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(System.getProperty("user.dir")
+                        + System.getProperty("file.separator") + "logic");
                 // Display dialog and wait for response
                 dialog.setVisible(true);
                 // Check response
@@ -649,12 +720,11 @@ public class DLPanel extends JPanel {
                 // Cleanup
                 dialog.dispose();
             } catch (FileNotFoundException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (IOException e2) { // from ObjectOutputStream
-                // TODO Auto-generated catch block
                 e2.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(e2);
             }
 
         }
@@ -678,21 +748,18 @@ public class DLPanel extends JPanel {
 
     }
 
-    private class Renderer_BtnAct_Del implements TableCellRenderer {
-        JButton btnDel;
-
+    private class Renderer_BtnAct_Del extends JButton implements TableCellRenderer {
         private static final long serialVersionUID = 1L;
 
         Renderer_BtnAct_Del() {
-            btnDel = new JButton();
-            btnDel.setOpaque(true);
-            btnDel.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/delete2.png")));
+            this.setOpaque(true);
+            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/delete2.png")));
+            this.setToolTipText("Delete");
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            // TODO Auto-generated method stub
-            return btnDel;
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            return this;
         }
     }
 
@@ -701,12 +768,13 @@ public class DLPanel extends JPanel {
 
         Renderer_BtnAct_Dup() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_plus.png"))); // add2.png
+            this.setIcon(new ImageIcon(this.getClass()
+                    .getResource("/16x16/plain/navigate_plus.png"))); // add2.png
+            this.setToolTipText("Duplicate");
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            // TODO Auto-generated method stub
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
             return this;
         }
     }
@@ -716,12 +784,13 @@ public class DLPanel extends JPanel {
 
         Renderer_BtnAct_Down() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_down.png"))); // navigate_down2.png
+            this.setIcon(new ImageIcon(this.getClass()
+                    .getResource("/16x16/plain/navigate_down.png"))); // navigate_down2.png
+            this.setToolTipText("Move down");
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            // TODO Auto-generated method stub
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
             return this;
         }
     }
@@ -731,12 +800,14 @@ public class DLPanel extends JPanel {
 
         Renderer_BtnAct_Up() {
             this.setOpaque(true);
-            this.setIcon(new ImageIcon(this.getClass().getResource("/16x16/plain/navigate_up.png"))); // navigate_up2.png
+            this
+                    .setIcon(new ImageIcon(this.getClass().getResource(
+                            "/16x16/plain/navigate_up.png"))); // navigate_up2.png
+            this.setToolTipText("Move up");
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            // TODO Auto-generated method stub
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
             return this;
         }
     }
@@ -750,10 +821,10 @@ public class DLPanel extends JPanel {
             setOpaque(true);
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-                row, column);
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value,
+                    isSelected, hasFocus, row, column);
 
             if (isSelected == false) {
                 if (renderInactive) {
@@ -778,8 +849,8 @@ public class DLPanel extends JPanel {
             try {
                 I_GetConceptData cb = tf.getConcept(sc.id);
                 s = new String(cb.getInitialText());
-                // if (debug) // :DEBUG:
-                // s = String.valueOf(sc.id) + " - " + s;
+                if (debug)
+                    s = String.valueOf(sc.id) + " - " + s;
             } catch (TerminologyException e) {
                 s = new String("error: concept not found");
                 e.printStackTrace();
@@ -803,10 +874,10 @@ public class DLPanel extends JPanel {
             setOpaque(true);
         }
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-                row, column);
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value,
+                    isSelected, hasFocus, row, column);
 
             if (isSelected == false) {
                 if (renderInactive) {
@@ -817,24 +888,36 @@ public class DLPanel extends JPanel {
                     renderComponent.setForeground(UIManager.getColor("Table.foreground"));
                 }
 
+                // value is the object from data[row][column]
+                SnoDL sdl = (SnoDL) value;
+                if (dlFormat == FORMAT_DL) {
+                    setText("<html><font face='Dialog' size='3' color='black'>" + sdl.toStringDl());
+                } else if (dlFormat == FORMAT_KRSS) {
+                    setText("<html><font face='Dialog' size='3' color='black'>"
+                            + sdl.toStringKrss());
+                } else {
+                    setText(sdl.toStringHtml());
+                }
             } else {
                 renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
                 renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
+
+                // value is the object from data[row][column]
+                SnoDL sdl = (SnoDL) value;
+                if (dlFormat == FORMAT_DL) {
+                    setText("<html><font face='Dialog' size='3' color='white'>" + sdl.toStringDl());
+                } else if (dlFormat == FORMAT_KRSS) {
+                    setText("<html><font face='Dialog' size='3' color='white'>"
+                            + sdl.toStringKrss());
+                } else {
+                    setText(sdl.toStringHtml());
+                }
             }
 
             setBorder(column, this, false, false); // .., same, uncommitted
             // if (renderInactive)
             // renderComponent.setBackground(Color.LIGHT_GRAY);
 
-            // value is the object from data[row][column]
-            SnoDL sdl = (SnoDL) value;
-            if (dlFormat == FORMAT_DL) {
-                setText("<html><font face='Dialog' size='3' color='blue'>" + sdl.toStringDl());
-            } else if (dlFormat == FORMAT_KRSS) {
-                setText("<html><font face='Dialog' size='3' color='green'>" + sdl.toStringKrss());
-            } else {
-                setText(sdl.toStringHtml());
-            }
             return this;
         }
     }
@@ -950,8 +1033,8 @@ public class DLPanel extends JPanel {
         protected static final int COLUMN_COUNT = 5;
 
         protected String[] columnNames = {
-                                          "<html><font face='Dialog' size='3' color='black'>"
-                                              + "LHS[k] (Left Hand Side)", "", "", "", "" };
+                "<html><font face='Dialog' size='3' color='black'>LHS[k] (Left Hand Side)", "", "",
+                "", "" };
         protected Object[][] data; // {concept, null-delete button}
 
         public TableModel_DLEdit_Lhs() {
@@ -1051,9 +1134,8 @@ public class DLPanel extends JPanel {
         protected static final int COLUMN_COUNT = 5;
 
         protected String[] columnNames = {
-                                          "<html><font face='Dialog' size='3' color='blue'>DL Format; </font>"
-                                              + "<font face='Dialog' size='3' color='green'>KRSS Format", "", "", "",
-                                          "" };
+                "<html><font face='Dialog' size='3' color='black'>DL Format; </font>"
+                        + "<font face='Dialog' size='3' color='black'>KRSS Format", "", "", "", "" };
         protected Object[][] data; // {concept, null-delete button}
 
         public TableModel_DLList() {
@@ -1131,18 +1213,19 @@ public class DLPanel extends JPanel {
         protected static final int DEL_BTN_COLUMN = 1;
         protected static final int COLUMN_COUNT = 2;
 
-        protected String[] columnNames = { "Never-Group Roles", "" };
+        protected String[] columnNames = {
+                "<html><font face='Dialog' size='3' color='black'>Never-Group Roles", "" };
         protected Object[][] data; // {concept, null-delete button}
 
         public TableModel_NeverGrp() {
             super();
-            update();
+            updateDataModelArray();
         }
 
         // append current selection from taxonomy selection
         public void append(int nid) {
             SnoDLSet.addNeverGroup(nid);
-            update();
+            updateDataModelArray();
             fireTableDataChanged();
         }
 
@@ -1171,12 +1254,12 @@ public class DLPanel extends JPanel {
         public void setValueAt(Object value, int row, int column) {
             if (column == DEL_BTN_COLUMN) {
                 SnoDLSet.delNeverGroup(row);
-                update();
+                updateDataModelArray();
                 fireTableDataChanged();
             }
         }
 
-        public void update() {
+        public void updateDataModelArray() {
             int max = SnoDLSet.sizeNeverGroup();
             data = new Object[max][COLUMN_COUNT];
             List<SnoConSer> srl = SnoDLSet.getNeverGroup();

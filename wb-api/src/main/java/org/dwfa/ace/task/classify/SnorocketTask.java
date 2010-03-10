@@ -151,9 +151,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     I_ShowActivity gui = null;
     private boolean continueThisAction = true;
 
-    // :DEBUG:
-    private boolean debug = false;
-    private boolean debugDump = false; // save to files
+    // INTERNAL
+    private static final boolean debug = false; // :DEBUG:
+    private static final boolean debugDump = false; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -217,8 +217,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        debug = false;
-        debugDump = false;
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
@@ -257,7 +255,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             int[] rNidArray = getRoleNids();
             int nextRIdx = rNidArray.length;
 
-            SnoPathProcess pcEdit = new SnoPathProcess(logger, null, cEditSnoCons, cEditSnoRels,
+            SnoPathProcess pcEdit = new SnoPathProcess(logger, cEditSnoCons, cEditSnoRels,
                     rNidArray, cEditPathPos, gui,false);
             tf.iterateConcepts(pcEdit);
             logger
@@ -453,7 +451,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // GET CLASSIFIER_PATH RELS
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
-            SnoPathProcess pcClass = new SnoPathProcess(logger, null, null, cClassSnoRels,
+            SnoPathProcess pcClass = new SnoPathProcess(logger, null, cClassSnoRels,
                     rNidArray, cClassPathPos, gui, true);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
@@ -945,8 +943,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     logger.severe("\r\n::: SERVERE ERROR isaNid MISMACTH ****");
                 }
             } else {
-                String errStr = "Classifier Is-a not set! Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
+                String errStr = "Classification 'Is a' not set in Classifier Preferences!";
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;

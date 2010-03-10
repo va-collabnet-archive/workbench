@@ -20,15 +20,16 @@ import javax.swing.table.AbstractTableModel;
 
 @SuppressWarnings("serial")
 public class FormsTableModel extends AbstractTableModel {
+    // color='...' is not overridden by foreground color
     private String[] columnNames = {
-                                    "SF",
-                                    "I",
-                                    "DN",
-                                    "AN",
-                                    "SC",
-                                    "LC",
-                                    "<html><font face='Dialog' size='3' color='blue'>Type: </font>"
-                                        + "<font face='Dialog' size='3' color='green'>Value" };
+            "<html><center><font face='Dialog' size='3' color='black'>SF</font></center></html>",
+            "<html><center><font face='Dialog' size='3' color='black'>I</font></center></html>",
+            "<html><center><font face='Dialog' size='3' color='black'>DN</font></center></html>",
+            "<html><center><font face='Dialog' size='3' color='black'>AN</font></center></html>",
+            "<html><center><font face='Dialog' size='3' color='black'>SC</font></center></html>",
+            "<html><center><font face='Dialog' size='3' color='black'>LC</font></center></html>",
+            "<html><font face='Dialog' size='3' color='#000066'>Type: </font>"
+                    + "<font face='Dialog' size='3' color='#006600'>Value" };
 
     private Object[][] data;
 

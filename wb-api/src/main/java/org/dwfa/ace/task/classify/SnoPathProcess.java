@@ -46,7 +46,6 @@ import org.dwfa.tapi.TerminologyException;
 public class SnoPathProcess implements I_ProcessConcepts {
     private List<I_Position> fromPathPos;
     private Logger logger;
-    private I_SnorocketFactory rocket;
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
     // Do not filter 'Is a' on classifier path
@@ -89,11 +88,10 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui = null;
 
-    public SnoPathProcess(Logger logger, I_SnorocketFactory rocket, List<SnoCon> snocons,
+    public SnoPathProcess(Logger logger, List<SnoCon> snocons,
             List<SnoRel> snorels, int[] allowedRoles, List<I_Position> fromPathPos,
             I_ShowActivity gui, boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
         this.logger = logger;
-        this.rocket = rocket;
         this.snocons = snocons;
         this.snorels = snorels;
         this.fromPathPos = fromPathPos;
@@ -108,8 +106,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
             logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
         }
         if (concept.getConceptId() == rootNid) {
-            if (rocket != null)
-                rocket.addConcept(concept.getConceptId(), false); // @@@
             if (snocons != null)
                 snocons.add(new SnoCon(concept.getConceptId(), false));
 
@@ -155,8 +151,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
         if (rels != null) {
             // Add Concept to Snorocket
             countConAdded++;
-            if (rocket != null)
-                rocket.addConcept(concept.getConceptId(), cPart1.isDefined());
 
             for (SnoRel x : rels) {
                 countRelAdded++;
@@ -170,9 +164,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
                 x.setCid(countRelAdded); // Update SnoRel sequential uid
                 if (snorels != null)
                     snorels.add(x); // Add to master input set
-                // Add Relationship to Snorocket
-                if (rocket != null)
-                    rocket.addRelationship(x.c1Id, x.typeId, x.c2Id, x.group);
             }
         }
     }

@@ -87,10 +87,8 @@ public class SnoAB {
             }
 
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return false;
@@ -128,7 +126,6 @@ public class SnoAB {
 
             } // FOR EACH [C1, C2] PAIR
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }

@@ -56,8 +56,18 @@ public class EquivPanel extends JPanel {
     public void update() {
         this.removeAll();
 
-        if (SnoQuery.getEquiv() == null)
+        if (SnoQuery.getEquiv() == null) {
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.FIRST_LINE_START;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.gridwidth = 1;
+            c.weightx = 0.5;
+            c.weighty = 0.5;
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- Equivalents report not currently available. --"), c);
             return;
+        }
         if (SnoQuery.getEquiv().size() == 0) {
             GridBagConstraints c = new GridBagConstraints();
             c.anchor = GridBagConstraints.FIRST_LINE_START;

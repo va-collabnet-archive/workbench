@@ -137,6 +137,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.checks.UncommittedListModel;
+import org.dwfa.ace.classifier.SnoRocketTabPanel;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
@@ -1342,6 +1343,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JScrollPane dataCheckListScroller;
     private JPanel dataCheckListPanel;
     private RefsetSpecPanel refsetSpecPanel;
+    private SnoRocketTabPanel snoRocketPanel;
     private TermTreeHelper treeHelper;
     private JFrame frame;
 
@@ -1644,24 +1646,39 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, this, LINK_TYPE.SEARCH_LINK, conceptTabs, 2);
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
+
+        // CONCEPT TAB R-1 (Taxonomy Link)
         conceptTabs.addTab("tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "tree Linked");
+
+        // CONCEPT TAB R-2 (Search Link)
         conceptTabs.addTab("search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "search Linked");
 
+        // CONCEPT TAB R-3
         ConceptPanel c3panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, this, LINK_TYPE.UNLINKED, conceptTabs, 3);
         conceptPanels.add(c3panel);
         conceptTabs.addTab("empty", null, c3panel, "Unlinked");
+
+        // CONCEPT TAB R-4
         ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED, conceptTabs, 4);
         conceptPanels.add(c4panel);
         conceptTabs.addTab("empty", null, c4panel, "Unlinked");
+        
+        // LIST TAB
         conceptTabs.addTab("   list   ", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
             getConceptListEditor());
-        refsetTabIndex = conceptTabs.getTabCount();
 
+        // REFSET SPEC TAB
+        refsetTabIndex = conceptTabs.getTabCount();
         refsetSpecPanel = new RefsetSpecPanel(this);
         refsetSpecPanel.setRefsetInSpecEditor(refsetSpecPanel.getRefsetInSpecEditor());
         conceptTabs.addTab("refSet spec", new ImageIcon(ACE.class.getResource("/16x16/plain/paperclip.png")),
             refsetSpecPanel);
 
+        // CLASSIFIER TAB
+        snoRocketPanel = new SnoRocketTabPanel(this);
+        conceptTabs.addTab("Classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
+                snoRocketPanel);
+        
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
@@ -2451,7 +2468,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             I_AmTermComponent.class, classificationIsaLabel));
         classificationIsaLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierIsaType",
             I_GetConceptData.class, aceFrameConfig));
-        wrapAndAdd(classifierPrefPanel, classificationIsaLabel, "Classification is-a: ");
+        wrapAndAdd(classifierPrefPanel, classificationIsaLabel, "Classification 'Is a': ");
 
         TermComponentLabel classificationInputPathLabel = new TermComponentLabel(aceFrameConfig);
         classificationInputPathLabel.setTermComponent(aceFrameConfig.getClassifierInputPath());
@@ -3162,6 +3179,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             } else {
                 return false;
             }
+
         }
 
         if (runShutdownProcesses) {
