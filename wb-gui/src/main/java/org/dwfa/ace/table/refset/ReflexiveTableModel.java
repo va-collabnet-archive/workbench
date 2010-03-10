@@ -55,7 +55,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -155,7 +154,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         ReflexiveRefsetFieldData field;
         private IntList popupIds;
 
-        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field) throws TerminologyException, IOException {
+        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, ReflexiveRefsetFieldData field)
+                throws TerminologyException, IOException {
             super(new JComboBox());
             this.popupIds = popupIds;
             this.field = field;
@@ -402,14 +402,19 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 if (columns[columnIndex].readParamaters != null) {
                     if (tf.hasConcept(id)) {
                         value =
-                                columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()),
+                                columns[columnIndex].getReadMethod()
+                                    .invoke(Terms.get().getConcept(tuple.getComponentId()),
                                     columns[columnIndex].readParamaters);
                     } else {
+                        try {
                         I_DescriptionVersioned desc =
                                 tf.getDescription(id);
                         if (desc != null) {
                             value = desc.getLastTuple().getText();
                         }
+                        } catch (Exception e) {
+                            value = "No description available.";
+                    }
                     }
 
                 } else {
@@ -471,14 +476,14 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 if (Integer.class.isAssignableFrom(value.getClass())) {
                     id = (Integer) value;
                     if (tf.hasConcept(id)) {
-                        I_GetConceptData concept = tf.getConcept(id);
-                        I_DescriptionTuple obj =
-                                concept.getDescTuple((I_IntList) columns[columnIndex].readParamaters[0],
-                                    (I_ConfigAceFrame) columns[columnIndex].readParamaters[1]);
-                        if (obj != null) {
-                            return new StringWithExtTuple(obj.getText(), tuple, id);
+
+                        I_DescriptionTuple desc =
+                                tf.getConcept(id).getDescTuple(host.getConfig().getTableDescPreferenceList(),
+                                    host.getConfig());
+                        if (desc != null) {
+                            return new StringWithExtTuple(desc.getText(), tuple, id);
                         }
-                        return new StringWithExtTuple("null obj", tuple, id);
+                        return new StringWithExtTuple(Integer.toString(id), tuple, id);
 
                     } else if (tf.hasExtension(id)) {
                         I_ExtendByRef ext = tf.getExtension(id);
@@ -531,7 +536,17 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                             }
                         }
                     } else {
-                        return "No component for: " + id;
+                        try {
+                            I_DescriptionVersioned desc =
+                                    tf.getDescription(id);
+                            if (desc != null) {
+                                String text = desc.getLastTuple().getText();
+                                return new StringWithExtTuple(text, tuple, id);
+                            }
+                        } catch (TerminologyException e) {
+                            return new StringWithExtTuple("No description available for id:" + id, tuple, id);
+                }
+
                     }
                 }
                 return value;

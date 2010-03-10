@@ -345,7 +345,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                     AceLog.getAppLog().alertAndLogException(e);
                                 } catch (TerminologyException e) {
                                     AceLog.getAppLog().alertAndLogException(e);
-								}
+                                }
                             }
                             conceptTabs.addTab("Checks", ConceptPanel.SMALL_ALERT_LINK_ICON, dataCheckPanel,
                                 "Data Checks Linked");
@@ -491,7 +491,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public class SetRefsetInToggleVisible implements ActionListener {
 
-    	REFSET_TYPES type;
+        REFSET_TYPES type;
 
         TOGGLES t;
 
@@ -552,79 +552,79 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static List<I_TestDataConstraints> creationTests = new ArrayList<I_TestDataConstraints>();
 
     /*
-    public static void addUncommittedNoChecks(I_Transact to) {
-        if (to == null) {
-            return;
-        }
-        if (commitInProgress) {
-            try {
-                to.abort();
-                AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return;
-        }
-        uncommittedNoChecks.add(to);
-    }
-	*/
+     * public static void addUncommittedNoChecks(I_Transact to) {
+     * if (to == null) {
+     * return;
+     * }
+     * if (commitInProgress) {
+     * try {
+     * to.abort();
+     * AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+     * } catch (IOException e) {
+     * throw new RuntimeException(e);
+     * }
+     * return;
+     * }
+     * uncommittedNoChecks.add(to);
+     * }
+     */
     /*
-    public static synchronized void addUncommitted(I_Transact to) {
-        if (to == null) {
-            return;
-        }
-        if (commitInProgress) {
-            try {
-                to.abort();
-                AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return;
-        }
-        I_GetConceptData uncommittedBean = null;
-        if (I_GetConceptData.class.isAssignableFrom(to.getClass())) {
-            uncommittedBean = (I_GetConceptData) to;
-            try {
-                if (uncommittedBean.isUncommitted() == false) {
-                    dataCheckMap.remove(uncommittedBean);
-                    removeUncommitted(to);
-                    return;
-                }
-            } catch (IOException e) {
-                AceLog.getEditLog().alertAndLogException(e);
-            }
-        }
-        List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-        dataCheckMap.put(uncommittedBean, warningsAndErrors);
-        for (I_TestDataConstraints test : creationTests) {
-            try {
-                warningsAndErrors.addAll(test.test(to, false));
-            } catch (Exception e) {
-                AceLog.getEditLog().alertAndLogException(e);
-            }
-        }
-        uncommitted.add(to);
-        if (aceConfig != null) {
-            for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
-                frameConfig.setCommitEnabled(true);
-                updateAlerts(frameConfig);
-                if (I_GetConceptData.class.isAssignableFrom(to.getClass())) {
-                	I_GetConceptData cb = (I_GetConceptData) to;
-                    try {
-                        if (cb.isUncommitted()) {
-                            frameConfig.addUncommitted(cb);
-                        } else {
-                            frameConfig.removeUncommitted(cb);
-                        }
-                    } catch (IOException e) {
-                        AceLog.getEditLog().alertAndLogException(e);
-                    }
-                }
-            }
-        }
-    }
-	*/
+     * public static synchronized void addUncommitted(I_Transact to) {
+     * if (to == null) {
+     * return;
+     * }
+     * if (commitInProgress) {
+     * try {
+     * to.abort();
+     * AceLog.getAppLog().alertAndLogException(new Exception("Cannot edit while a commit is in process."));
+     * } catch (IOException e) {
+     * throw new RuntimeException(e);
+     * }
+     * return;
+     * }
+     * I_GetConceptData uncommittedBean = null;
+     * if (I_GetConceptData.class.isAssignableFrom(to.getClass())) {
+     * uncommittedBean = (I_GetConceptData) to;
+     * try {
+     * if (uncommittedBean.isUncommitted() == false) {
+     * dataCheckMap.remove(uncommittedBean);
+     * removeUncommitted(to);
+     * return;
+     * }
+     * } catch (IOException e) {
+     * AceLog.getEditLog().alertAndLogException(e);
+     * }
+     * }
+     * List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+     * dataCheckMap.put(uncommittedBean, warningsAndErrors);
+     * for (I_TestDataConstraints test : creationTests) {
+     * try {
+     * warningsAndErrors.addAll(test.test(to, false));
+     * } catch (Exception e) {
+     * AceLog.getEditLog().alertAndLogException(e);
+     * }
+     * }
+     * uncommitted.add(to);
+     * if (aceConfig != null) {
+     * for (I_ConfigAceFrame frameConfig : getAceConfig().aceFrames) {
+     * frameConfig.setCommitEnabled(true);
+     * updateAlerts(frameConfig);
+     * if (I_GetConceptData.class.isAssignableFrom(to.getClass())) {
+     * I_GetConceptData cb = (I_GetConceptData) to;
+     * try {
+     * if (cb.isUncommitted()) {
+     * frameConfig.addUncommitted(cb);
+     * } else {
+     * frameConfig.removeUncommitted(cb);
+     * }
+     * } catch (IOException e) {
+     * AceLog.getEditLog().alertAndLogException(e);
+     * }
+     * }
+     * }
+     * }
+     * }
+     */
     public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -730,7 +730,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 	 *
 	 */
     public static void oldCommit() {
-    	AceLog.getAppLog().info("commit(): " + commitInProgress);
+        AceLog.getAppLog().info("commit(): " + commitInProgress);
         if (commitInProgress) {
             AceLog.getAppLog().alertAndLogException(new Exception("Commit is already in process."));
             return;
@@ -796,7 +796,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
                     if (writeChangeSets) {
                         if (uncommitted.size() > 0 || uncommittedNoChecks.size() > 0) {
-                        	throw new UnsupportedOperationException();
+                            throw new UnsupportedOperationException();
                         }
                     }
 
@@ -810,7 +810,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                         }
                     } catch (Exception e) {
                         throw new IOException(e);
-					}
+                    }
                     if (writeChangeSets) {
                         for (I_WriteChangeSet writer : csWriters) {
                             AceLog.getEditLog().info("Committing writer: " + writer.toString());
@@ -1240,8 +1240,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JToggleButton showSearchToggle;
 
-    public static ExecutorService threadPool = Executors.newFixedThreadPool(9,    
-    		new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
+    public static ExecutorService threadPool =
+            Executors.newFixedThreadPool(9, new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
 
     public static Timer timer = new Timer();
 
@@ -1733,8 +1733,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     CollectionEditorContainer conceptListEditor;
 
-    private Component getConceptListEditor() throws IOException, ClassNotFoundException,
-            NoSuchAlgorithmException, TerminologyException {
+    private Component getConceptListEditor() throws IOException, ClassNotFoundException, NoSuchAlgorithmException,
+            TerminologyException {
         if (conceptListEditor == null) {
             if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
                 aceFrameConfig.getTabHistoryMap().put("batchList", new ArrayList<I_GetConceptData>());
@@ -3190,10 +3190,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             shutdownFolder = new File(configFile.getParentFile(), "shutdown");
             executeShutdownProcesses(shutdownFolder);
             try {
-				Terms.get().close();
-			} catch (IOException e) {
+                Terms.get().close();
+            } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
-			}
+            }
         }
 
         return true;
@@ -3539,13 +3539,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         refsetSpecPanel.setShowPromotionCheckBoxes(show);
     }
 
-	public JTabbedPane getLeftTabs() {
-		return leftTabs;
-	}
+    public JTabbedPane getLeftTabs() {
+        return leftTabs;
+    }
 
-	public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
-		return dataCheckListeners;
-	}
+    public List<TermComponentDataCheckSelectionListener> getDataCheckListeners() {
+        return dataCheckListeners;
+    }
 
     public void refreshRefsetTab() {
         refsetSpecPanel.refresh();

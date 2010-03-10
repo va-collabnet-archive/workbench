@@ -80,7 +80,6 @@ import org.dwfa.vodb.types.Position;
 
 public class RefsetSpecPanel extends JPanel {
 
-
     private class HistoryActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent arg0) {
@@ -160,7 +159,6 @@ public class RefsetSpecPanel extends JPanel {
         ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", hierarchicalTreeHelper);
         ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
 
-
         verticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs.addTab(TABLE_VIEW, verticalBox);
         bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
@@ -197,15 +195,15 @@ public class RefsetSpecPanel extends JPanel {
                 break;
             }
         }
-        return (ReflexiveRefsetCommentTableModel)  commentTable.getModel();
+        return (ReflexiveRefsetCommentTableModel) commentTable.getModel();
     }
 
     protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
             throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
-        
+
         columns.add(ReflexiveRefsetFieldData.getRowColumn());
-        
+
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
         column1.setColumnName("referenced component");
         column1.setCreationEditable(true);
@@ -298,8 +296,7 @@ public class RefsetSpecPanel extends JPanel {
 
         JTableWithDragImage commentTable = new JTableWithDragImage(commentTableModel);
         SortClickListener.setupSorter(commentTable);
-        for (int i = 0; i < commentTable.getColumnModel().getColumnCount();
-            i++) {
+        for (int i = 0; i < commentTable.getColumnModel().getColumnCount(); i++) {
             TableColumn column = commentTable.getColumnModel().getColumn(i);
             column.setIdentifier(columns.get(i));
             column.setPreferredWidth(columns.get(i).getPref());
@@ -307,8 +304,7 @@ public class RefsetSpecPanel extends JPanel {
             column.setMinWidth(columns.get(i).getMin());
         }
 
-        commentTable.getTableHeader().setToolTipText(
-            "Click to specify sorting");
+        commentTable.getTableHeader().setToolTipText("Click to specify sorting");
 
         ExtTableRenderer renderer = new ExtTableRenderer();
         commentTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
@@ -319,7 +315,6 @@ public class RefsetSpecPanel extends JPanel {
         commentTable.setDefaultRenderer(String.class, renderer);
         return commentTable;
     }
-
 
     public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
             throws NoSuchMethodException, Exception {
@@ -437,9 +432,9 @@ public class RefsetSpecPanel extends JPanel {
         refsetTableModel.getRowCount();
 
         refsetTable = new JTableWithDragImage(refsetTableModel);
-        SortClickListener.setupSorter(refsetTable); 
+        SortClickListener.setupSorter(refsetTable);
         refsetTable.getTableHeader().setToolTipText("Click to specify sorting");
-     
+
         for (int i = 0; i < columns.size(); i++) {
             TableColumn column = refsetTable.getColumnModel().getColumn(i);
             column.setIdentifier(columns.get(i));
@@ -455,8 +450,8 @@ public class RefsetSpecPanel extends JPanel {
         CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
 
         selectAllCheckBoxListener = new SelectAllCheckBoxListener();
-        checkBoxHeaderRenderer = new CheckBoxHeaderRenderer(selectAllCheckBoxListener, 
-            this, refsetTable.getTableHeader());
+        checkBoxHeaderRenderer =
+                new CheckBoxHeaderRenderer(selectAllCheckBoxListener, this, refsetTable.getTableHeader());
 
         checkBoxColumn = new TableColumn();
         checkBoxColumn.setCellRenderer(checkBoxRenderer);
@@ -469,9 +464,9 @@ public class RefsetSpecPanel extends JPanel {
         checkBoxColumn.setPreferredWidth(checkBoxHeaderRenderer.getPreferredWidth());
 
         // hide column as default (should only be visible during promotions BP)
-        //refsetTable.getColumnModel().removeColumn(checkBoxColumn);
+        // refsetTable.getColumnModel().removeColumn(checkBoxColumn);
         refsetTable.addMouseListener(new MouseClickListener());
- 
+
         ExtTableRenderer renderer = new ExtTableRenderer();
         refsetTable.setDefaultRenderer(StringWithExtTuple.class, renderer);
         refsetTable.setDefaultRenderer(Number.class, renderer);
@@ -586,8 +581,7 @@ public class RefsetSpecPanel extends JPanel {
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
                 for (Integer tupleMemberId : tupleMemberIds) {
                     I_ExtendByRef tupleVersioned = tf.getExtension(tupleMemberId);
-                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned
-                        .getComponentId())) {
+                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
                         RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
@@ -676,8 +670,7 @@ public class RefsetSpecPanel extends JPanel {
                 PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
                 for (Integer tupleMemberId : tupleMemberIds) {
                     I_ExtendByRef tupleVersioned = tf.getExtension(tupleMemberId);
-                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned
-                        .getComponentId())) {
+                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
                         RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
@@ -759,6 +752,11 @@ public class RefsetSpecPanel extends JPanel {
             showPromotionCheckBoxes = show;
             refsetTableModel.setShowPromotionCheckBoxes(show);
             setShowButtons(show);
+        }
+        if (show) {
+            if (!editor.getHistoryButton().isSelected()) {
+                editor.getHistoryButton().doClick();
+            }
         }
     }
 
@@ -866,6 +864,14 @@ public class RefsetSpecPanel extends JPanel {
 
     public void setCheckBoxRendererComponent(JCheckBox rendererComponent) {
         this.selectAllCheckBox = rendererComponent;
+    }
+
+    public JTableWithDragImage getRefsetTable() {
+        return refsetTable;
+    }
+
+    public void setRefsetTable(JTableWithDragImage refsetTable) {
+        this.refsetTable = refsetTable;
     }
 
     public void refresh() {

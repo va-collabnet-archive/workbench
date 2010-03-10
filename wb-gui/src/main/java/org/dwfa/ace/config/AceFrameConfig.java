@@ -374,9 +374,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntList.writeIntList(out, longLabelDescPreferenceList);
         out.writeInt(termTreeDividerLoc);
         if (hierarchySelection != null) {
-        	out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
         } else {
-        	out.writeObject(null);
+            out.writeObject(null);
         }
         out.writeObject(null);
         out.writeObject(null);
@@ -476,11 +476,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntList.writeIntList(out, contextIntList);
 
         // 35
-            writeConceptAsId(classificationRoot, out);
-            writeConceptAsId(classifierIsaType, out);
-            writeConceptAsId(classifierInputPathConcept, out);
-            writeConceptAsId(classifierOutputPathConcept, out);
- 
+        writeConceptAsId(classificationRoot, out);
+        writeConceptAsId(classifierIsaType, out);
+        writeConceptAsId(classifierInputPathConcept, out);
+        writeConceptAsId(classifierOutputPathConcept, out);
+
         // 36
         out.writeObject(conflictResolutionStrategy);
         out.writeBoolean(highlightConflictsInComponentPanel);
@@ -594,15 +594,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 8) {
                 try {
-                    defaultStatus = Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultStatus =
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultDescriptionType =
-                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipType =
-                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipCharacteristic =
-                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                     defaultRelationshipRefinability =
-                    	Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -611,20 +612,23 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 try {
                     defaultStatus =
-                    	Terms.get().getConcept(AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids())
-                                .getNid());
+                            Terms.get().getConcept(
+                                AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getNid());
                     defaultDescriptionType =
-                    	Terms.get().getConcept(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNid());
+                            Terms.get().getConcept(
+                                AceConfig.getVodb().getId(
+                                    ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()).getNid());
                     defaultRelationshipType =
-                    	Terms.get().getConcept(AceConfig.getVodb()
-                                .getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNid());
+                            Terms.get().getConcept(
+                                AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getNid());
                     defaultRelationshipCharacteristic =
-                    	Terms.get().getConcept(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()).getNid());
+                            Terms.get().getConcept(
+                                AceConfig.getVodb().getId(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids())
+                                    .getNid());
                     defaultRelationshipRefinability =
-                    	Terms.get().getConcept(AceConfig.getVodb().getId(
-                                ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNid());
+                            Terms.get().getConcept(
+                                AceConfig.getVodb().getId(
+                                    ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()).getNid());
                 } catch (Exception e) {
                     IOException newEx = new IOException();
                     newEx.initCause(e);
@@ -725,7 +729,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 21) {
                 try {
-                    defaultImageType = Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
+                    defaultImageType =
+                            Terms.get().getConcept(AceConfig.getVodb().uuidToNative((List<UUID>) in.readObject()));
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }
@@ -2783,16 +2788,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {
@@ -2821,16 +2826,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             list.add(new ImagePlugin(false, order++));
             list.add(new ConflictPlugin(false, order++));
             list.add(new StatedAndNormalFormsPlugin(false, order++));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_US.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
-            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, 
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.AU_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_AU.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.UK_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_GB.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.USA_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_US.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.NZ_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_NZ.getUids())));
+            list.add(new LanguageRefsetDisplayPlugin(false, order++, TOGGLES.CA_DIALECT, Terms.get().getConcept(
+                ArchitectonicAuxiliary.Concept.EN_CA.getUids())));
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (UnsupportedEncodingException e) {
@@ -2946,5 +2951,4 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void refreshRefsetTab() {
         aceFrame.getCdePanel().refreshRefsetTab();
     }
-
 }

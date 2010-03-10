@@ -76,7 +76,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setLeafIcon(null);
         setClosedIcon(null);
         setOpenIcon(null);
-        I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+        I_GetConceptData viewerImageType =
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
         viewerImageTypes.add(viewerImageType.getConceptId());
     }
 
@@ -260,13 +261,15 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException, TerminologyException, ParseException {
+    private void addConceptDescription(List<String> htmlParts, int cid, String color) throws IOException,
+            TerminologyException, ParseException {
         htmlParts.add("<font color='" + color + "'>");
         addConceptDescription(htmlParts, cid);
         htmlParts.add("</font>");
     }
 
-    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException, TerminologyException, ParseException {
+    private void addConceptDescription(List<String> htmlParts, int cid) throws IOException, TerminologyException,
+            ParseException {
         I_TermFactory tf = Terms.get();
         if (tf.hasConcept(cid)) {
             I_GetConceptData cb = tf.getConcept(cid);
@@ -282,6 +285,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                 htmlParts.add(cb.toString());
             }
         } else {
+            try {
             I_DescriptionVersioned desc = tf.getDescription(cid);
             if (desc != null) {
                 String text = desc.getLastTuple().getText();
@@ -290,6 +294,9 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                 } else {
                     htmlParts.add(text);
                 }
+            }
+            } catch (TerminologyException e) {
+                htmlParts.add("No description available.");
             }
             
         }

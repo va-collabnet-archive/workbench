@@ -45,17 +45,19 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     private String constraintDesc;
 
     public String getConstraintDesc() throws TerminologyException, IOException {
+
         if (constraintDesc == null) {
             I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ExtendRefPartCidCidCid) getExtension().getMutablePart()).getC3id());
             try {
-                I_DescriptionTuple thisConstraintDesc = thisConstraint.getDescTuple(
-                    aceConfig.getTreeDescPreferenceList(), aceConfig);
+                I_DescriptionTuple thisConstraintDesc =
+                        thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
                 constraintDesc = thisConstraintDesc.getText().toLowerCase();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
         }
+
         return constraintDesc;
     }
 
@@ -63,8 +65,8 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         if (clauseDesc == null) {
         	I_GetConceptData thisClause = Terms.get().getConcept(((I_ExtendByRefPartCidCid) getExtension().getMutablePart()).getC2id());
             try {
-                I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(),
-                    aceConfig);
+                I_DescriptionTuple thisClauseDesc =
+                        thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
                 clauseDesc = thisClauseDesc.getText().toLowerCase();
             } catch (IOException e) {
                 throw new RuntimeException(e);

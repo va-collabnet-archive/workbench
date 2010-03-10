@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.swing.JOptionPane;
+
 import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
@@ -50,13 +52,17 @@ import org.tigris.subversion.javahl.SVNClientInterface;
 import org.tigris.subversion.javahl.Status;
 import org.tigris.subversion.javahl.StatusCallback;
 import org.tigris.subversion.javahl.StatusKind;
+import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.javahl.SVNClientImpl;
 
 public class Svn implements I_HandleSubversion {
 
     enum SvnImpl {
-        NATIVE, SVN_KIT
+        NATIVE,
+        SVN_KIT
     };
+
+    private static boolean connectedToSvn = false;
 
     private static SvnImpl impl = SvnImpl.SVN_KIT;
 
@@ -65,7 +71,13 @@ public class Svn implements I_HandleSubversion {
     private static SvnPrompter prompter = new SvnPrompter();
 
     public static SVNClientInterface getSvnClient() {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
         if (client == null) {
+
             switch (impl) {
             case NATIVE:
                 client = new SVNClient();
@@ -73,7 +85,13 @@ public class Svn implements I_HandleSubversion {
                 break;
 
             case SVN_KIT:
-                client = SVNClientImpl.newInstance();
+                SVNClientImpl c = SVNClientImpl.newInstance();
+                SVNClientImpl.setRuntimeCredentialsStorage(null);
+                c.setClientCredentialsStorage(null);
+                client = c;
+                client.password("");
+                client.username("");
+
                 AceLog.getAppLog().info("Created Svnkit pure java svn client: " + client.getVersion());
                 break;
 
@@ -135,6 +153,12 @@ public class Svn implements I_HandleSubversion {
 
     public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
         Status[] status = null;
         Svn.getSvnClient().setPrompt(authenticator);
         String workingCopy = svd.getWorkingCopyStr();
@@ -159,10 +183,12 @@ public class Svn implements I_HandleSubversion {
             }
             status = statusHandler.statusList.toArray(new Status[statusHandler.statusList.size()]);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished status for working copy: " + workingCopy);
         return status;
@@ -170,15 +196,22 @@ public class Svn implements I_HandleSubversion {
 
     public static void cleanup(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("starting cleanup");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
             Svn.getSvnClient().cleanup(svd.getWorkingCopyStr());
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished cleanup for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished cleanup for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished cleanup");
         ObjectServerCore.refreshServers();
@@ -187,6 +220,11 @@ public class Svn implements I_HandleSubversion {
 
     public static void commit(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting Commit");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -245,10 +283,12 @@ public class Svn implements I_HandleSubversion {
             }
 
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished commit");
     }
@@ -267,6 +307,11 @@ public class Svn implements I_HandleSubversion {
 
     public static void purge(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting purge");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -282,8 +327,9 @@ public class Svn implements I_HandleSubversion {
             for (Status s : statusHandler.getStatusList()) {
                 if (s.isManaged() == true) {
                     if (s.getTextStatus() == StatusKind.missing) {
-                        String purgeMessage = authenticator.askQuestion(svd.getRepositoryUrlStr(), s.getPath()
-                            + " purge message: ", true);
+                        String purgeMessage =
+                                authenticator.askQuestion(svd.getRepositoryUrlStr(), s.getPath() + " purge message: ",
+                                    true);
                         boolean force = true;
                         boolean keepLocal = false;
                         Map<String, String> revisionPropMap = new HashMap<String, String>();
@@ -294,10 +340,12 @@ public class Svn implements I_HandleSubversion {
                 }
             }
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished purge for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished purge for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished purge");
         ObjectServerCore.refreshServers();
@@ -306,6 +354,11 @@ public class Svn implements I_HandleSubversion {
 
     public static void revert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting revert");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -343,10 +396,12 @@ public class Svn implements I_HandleSubversion {
                 }
             }
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         } catch (IOException e) {
             SvnLog.alertAndLog(e);
             SvnLog.info("finished revert for working copy: " + svd.getWorkingCopyStr() + "with exception: "
@@ -359,12 +414,22 @@ public class Svn implements I_HandleSubversion {
     }
 
     private static void revert(Status s) throws ClientException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         Svn.getSvnClient().revert(s.getPath(), Depth.infinity, null);
         SvnLog.info("reverted: " + s.getPath());
     }
 
     public static void update(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("starting update");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -379,10 +444,12 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, depth, depthIsSticky, ignoreExternals,
                 allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished update");
         ObjectServerCore.refreshServers();
@@ -391,6 +458,11 @@ public class Svn implements I_HandleSubversion {
 
     public static void updateDatabase(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("starting database update");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -407,16 +479,23 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().update(svd.getWorkingCopyStr(), Revision.HEAD, depth, depthIsSticky, ignoreExternals,
                 allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished database update for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished database update for working copy: " + svd.getWorkingCopyStr()
+                    + "with exception: " + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished database update");
     }
 
     public static void checkout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("starting checkout");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -432,10 +511,12 @@ public class Svn implements I_HandleSubversion {
             Svn.getSvnClient().checkout(svd.getRepositoryUrlStr(), svd.getWorkingCopyStr(), revision, pegRevision,
                 depth, ignoreExternals, allowUnverObstructions);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished checkout for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished checkout for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished checkout");
         ObjectServerCore.refreshServers();
@@ -443,6 +524,11 @@ public class Svn implements I_HandleSubversion {
     }
 
     private static void handleAuthentication(PromptUserPassword3 authenticator) {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         Svn.getSvnClient().password("");
         Svn.getSvnClient().setPrompt(authenticator);
     }
@@ -509,8 +595,10 @@ public class Svn implements I_HandleSubversion {
             switchToReadOnlyMirror(svd);
             Svn.getSvnClient().list(url, revision, pegRevision, depth, direntFields, fetchLocks, callback);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                throw new TaskFailedException(e);
+            }
         }
         return callback.dirList;
     }
@@ -635,6 +723,11 @@ public class Svn implements I_HandleSubversion {
 
     public static void unlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting unlock");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -644,21 +737,33 @@ public class Svn implements I_HandleSubversion {
             }
             Svn.getSvnClient().lock(new String[] { toUnlock.getAbsolutePath() }, svd.getUsername(), false);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished unlock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished unlock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished unlock");
     }
 
     public void svnLock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         Svn.lock(svd, toLock, authenticator, interactive);
     }
 
     public static void lock(SubversionData svd, File toLock, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting lock");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -668,16 +773,23 @@ public class Svn implements I_HandleSubversion {
             }
             Svn.getSvnClient().lock(new String[] { toLock.getAbsolutePath() }, svd.getUsername(), false);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished lock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished lock for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished lock");
     }
 
     public static void doImport(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         SvnLog.info("Starting import");
         Svn.getSvnClient().setPrompt(authenticator);
         try {
@@ -697,10 +809,12 @@ public class Svn implements I_HandleSubversion {
             Map<?, ?> revpropTable = null;
             Svn.getSvnClient().doImport(path, url, message, depth, noIgnore, ignoreUnknownNodeTypes, revpropTable);
         } catch (ClientException e) {
-            SvnLog.alertAndLog(e);
-            SvnLog.info("finished import for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-                + e.getLocalizedMessage());
-            throw new TaskFailedException(e);
+            if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                SvnLog.alertAndLog(e);
+                SvnLog.info("finished import for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+                    + e.getLocalizedMessage());
+                throw new TaskFailedException(e);
+            }
         }
         SvnLog.info("finished import");
     }
@@ -708,6 +822,11 @@ public class Svn implements I_HandleSubversion {
     private static boolean supportReadOnlySwitch = false;
 
     private static void switchToReadOnlyMirror(SubversionData svd) throws TaskFailedException {
+        if (!isConnectedToSvn()) {
+            JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         if (svd.getWorkingCopyStr() == null) {
             return;
         }
@@ -732,18 +851,21 @@ public class Svn implements I_HandleSubversion {
                     boolean ignoreExternals = true;
                     boolean allowUnverObstructions = false;
                     SvnLog.info(" switching from: " + getRepoInfo(svd).getUrl() + " to: " + url);
-                    long version = Svn.getSvnClient().doSwitch(path, url, revision, pegRevision, depth, depthIsSticky,
-                        ignoreExternals, allowUnverObstructions);
+                    long version =
+                            Svn.getSvnClient().doSwitch(path, url, revision, pegRevision, depth, depthIsSticky,
+                                ignoreExternals, allowUnverObstructions);
                     SvnLog.info("Finished switch to read only at version: " + version);
                 } else {
                     SvnLog.info("Finished switch to read only: Not a working directory: " + workingDir);
                 }
 
             } catch (ClientException e) {
-                SvnLog.alertAndLog(e);
-                SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr()
-                    + "with exception: " + e.getLocalizedMessage());
-                throw new TaskFailedException(e);
+                if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                    SvnLog.alertAndLog(e);
+                    SvnLog.info("finished switch to read only for working copy: " + svd.getWorkingCopyStr()
+                        + "with exception: " + e.getLocalizedMessage());
+                    throw new TaskFailedException(e);
+                }
             }
         }
     }
@@ -753,5 +875,13 @@ public class Svn implements I_HandleSubversion {
             currentRepo = currentRepo.substring(0, currentRepo.length() - 1);
         }
         return currentRepo;
+    }
+
+    public static boolean isConnectedToSvn() {
+        return connectedToSvn;
+    }
+
+    public static void setConnectedToSvn(boolean connectedToSvn) {
+        Svn.connectedToSvn = connectedToSvn;
     }
 }

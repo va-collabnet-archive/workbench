@@ -106,8 +106,8 @@ import org.ihtsdo.etypes.EConcept;
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
     private static EnumSet<EConcept.REFSET_TYPES> allowedTypes =
-        EnumSet.of(EConcept.REFSET_TYPES.CID_CID, EConcept.REFSET_TYPES.CID_CID_CID,
-        		EConcept.REFSET_TYPES.CID_CID_STR);
+            EnumSet.of(EConcept.REFSET_TYPES.CID_CID, EConcept.REFSET_TYPES.CID_CID_CID,
+                EConcept.REFSET_TYPES.CID_CID_STR);
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -181,7 +181,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public class RefsetSpecSelectionListener implements TreeSelectionListener {
 
-
         public void valueChanged(TreeSelectionEvent tse) {
             if (tse.getNewLeadSelectionPath() != null) {
                 TreePath selectionPath = tse.getNewLeadSelectionPath();
@@ -191,7 +190,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 try {
 
                     EConcept.REFSET_TYPES extType = EConcept.REFSET_TYPES.nidToType(ext.getTypeId());
-
 
                     if (allowedTypes.contains(extType) == false) {
                         throw new Exception("Can't handle " + extType);
@@ -213,7 +211,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
                         column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
                         column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
-                        column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
+                        column3.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
                         columns.add(column3);
 
                     } else if (extType == EConcept.REFSET_TYPES.CID_CID_STR) {
@@ -343,6 +341,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 .isSelected());
             try {
                 updateSpecTree(false);
+                if (refsetSpecPanel != null && refsetSpecPanel.getRefsetTable() != null) {
+                    refsetSpecPanel.getRefsetTable().repaint();
+                }
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLog(contentPanel, Level.SEVERE,
                     "Database Exception: " + e1.getLocalizedMessage(), e1);
@@ -830,13 +831,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
         return label.getTermComponent();
     }
-    
+
     I_AmTermComponent tempComponent;
+
     public void setTermComponent(final I_AmTermComponent termComponent) {
         tempComponent = termComponent;
         if (SwingUtilities.isEventDispatchThread()) {
             label.setTermComponent(termComponent);
-         } else {
+        } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
@@ -910,7 +912,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (evt.getPropertyName().equals("commit")) {
             if (label.getTermComponent() != null) {
-            	I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
+                I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
                     if (cb.getConceptAttributes() == null) {
                         label.setTermComponent(null);
@@ -1180,7 +1182,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
         if (refsetConcept != null) {
             Set<? extends I_GetConceptData> specs =
-            	Terms.get().getRefsetHelper(ace.getAceFrameConfig()).getSpecificationRefsetForRefset(refsetConcept, ace.getAceFrameConfig());
+                    Terms.get().getRefsetHelper(ace.getAceFrameConfig()).getSpecificationRefsetForRefset(refsetConcept,
+                        ace.getAceFrameConfig());
             if (specs.size() > 0) {
                 refsetSpecConcept = specs.iterator().next();
             }
@@ -1247,10 +1250,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return refsetSpecPanel;
     }
 
+    public JToggleButton getHistoryButton() {
+        return historyButton;
+    }
+
     public void refresh() {
         if (commentTableModel != null) {
             commentTableModel.fireTableDataChanged();
         }
     }
-
 }
