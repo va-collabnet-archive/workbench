@@ -390,7 +390,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
         
         if (columns[columnIndex].type == REFSET_FIELD_TYPE.ROW) {
-            return rowIndex;
+            return rowIndex + 1;
         }
         try {
             I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
