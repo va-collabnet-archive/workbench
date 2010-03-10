@@ -905,12 +905,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private static RefsetMember<?, ?> setupNewMember(UUID primordialUuid, int referencedComponentNid,
             Concept refsetConcept, I_ConfigAceFrame config, RefsetMember<?, ?> member, RefsetPropertyMap propMap)
             throws IOException {
-        System.out.println(primordialUuid);
-        System.out.println(referencedComponentNid);
-        System.out.println(refsetConcept);
-        System.out.println(config);
-        // System.out.println(member);
-        System.out.println(propMap);
+
         assert config != null : "Config cannot be null.";
         assert config.getEditingPathSet() != null : "Config edit path set cannot be null.";
         member.enclosingConceptNid = refsetConcept.getNid();
