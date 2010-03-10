@@ -217,10 +217,10 @@ public class PositionMapper {
 			return RELATIVE_POSITION.CONFLICTING;
 		} else if (positionDistance[part1.getSapNid()] > 
 			positionDistance[part2.getSapNid()]) {
-			return RELATIVE_POSITION.AFTER;
+			return RELATIVE_POSITION.BEFORE;
 		} else if (positionDistance[part1.getSapNid()] < 
 			positionDistance[part2.getSapNid()]) {
-			return RELATIVE_POSITION.BEFORE;
+			return RELATIVE_POSITION.AFTER;
 		} 
 		return RELATIVE_POSITION.EQUAL;
 	}

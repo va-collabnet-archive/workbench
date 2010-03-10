@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,7 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_ProcessConceptData;
+import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -1482,8 +1484,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory,
 	@Override
 	public void computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
 			throws Exception {
+	    SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
+	    Concept refsetConcept = Concept.get(refsetNid);
+	    ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
+
+
+	    HashSet<Integer> currentConceptList = new HashSet<Integer>();
+	    for (RefsetMember<?, ?> v : members) {
+	        if (refsetHelper.hasCurrentRefsetExtension(refsetNid, v.getComponentId(), 
+	                ReferenceConcepts.NORMAL_MEMBER.getNid())) {
+                currentConceptList.add(v.getComponentId());
+	        }
+	    }
+
+	    
 	    I_RepresentIdSet possibleIds = query.getPossibleConcepts(frameConfig, null);
-		RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
+        // create a list of all the current refset members (this requires
+        // filtering out retired versions)
+	    possibleIds.or(getIdSetFromIntCollection(currentConceptList));
+	    
+
+        RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
 		Bdb.getConceptDb().iterateConceptDataInParallel(computer);
 		computer.addUncommitted();
 		BdbCommitManager.commit();

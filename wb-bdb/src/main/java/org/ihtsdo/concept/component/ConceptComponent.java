@@ -982,11 +982,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
 	@SuppressWarnings("unchecked")
 	public final boolean addRevision(R r) {
+	    boolean returnValue = false;
 		Concept c = getEnclosingConcept();
 		if (revisions == null) {
 			revisions = new ArrayList<R>(1);
+	        returnValue = revisions.add(r);
+		} else if (revisions.get(revisions.size() - 1) != r) {
+	        returnValue = revisions.add(r);
 		}
-		boolean returnValue = revisions.add(r);
 		r.primordialComponent = (C) this;
 		c.modified();
 		return returnValue;

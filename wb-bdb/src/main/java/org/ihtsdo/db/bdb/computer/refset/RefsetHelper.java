@@ -18,6 +18,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,9 +34,9 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -559,7 +560,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
 	public List<Integer> getChildrenOfConcept(int conceptId)
 			throws IOException, Exception {
-		throw new UnsupportedOperationException();
+	    Concept c = Concept.get(conceptId);
+	    Collection<Concept> children = c.getDestRelOrigins(getConfig().getAllowedStatus(), getConfig().getDestRelTypes(), 
+	        getConfig().getViewPositionSetReadOnly(), true);
+	    List<Integer> childNids = new ArrayList<Integer>(children.size());
+		for (Concept child: children) {
+		    childNids.add(child.getNid());
+		}
+		return childNids;
 	}
 
 }
