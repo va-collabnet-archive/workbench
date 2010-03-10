@@ -78,7 +78,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 4;
     private String newRefsetPropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
-    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
     private String reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
@@ -128,7 +128,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 editorUuidPropName = (String) in.readObject();
             } else {
                 // Set version 2 default values
-                statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+                statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
                 reviewerUuidPropName = ProcessAttachmentKeys.REVIEWER_UUID.getAttachmentKey();
                 ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
                 editorUuidPropName = ProcessAttachmentKeys.EDITOR_UUID.getAttachmentKey();
@@ -377,11 +377,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             UUID conceptUuid = UUID.randomUUID();
 
-            I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, 
-            		isDefined, 
-            		aceConfig, 
-            		status.getNid());
-            
+            I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, isDefined, aceConfig, status.getNid());
+
             termFactory.addUncommittedNoChecks(newConcept);
             return newConcept;
         } catch (Exception e) {
@@ -418,7 +415,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
         }
         UUID descUuid = UUID.randomUUID();
         termFactory.newDescription(descUuid, concept, "en", description, descriptionType, termFactory
-                    .getActiveAceFrameConfig(), status.getNid());
+            .getActiveAceFrameConfig(), status.getNid());
         termFactory.addUncommittedNoChecks(concept);
 
     }
@@ -434,11 +431,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             I_GetConceptData refConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
             int group = 0;
-            termFactory.newRelationship(relUuid, concept, 
-            		relationshipType, destination, charConcept,
-                        refConcept, termFactory.getConcept(statusId), group, 
-                        termFactory.getActiveAceFrameConfig());
-           termFactory.addUncommittedNoChecks(concept);
+            termFactory.newRelationship(relUuid, concept, relationshipType, destination, charConcept, refConcept,
+                termFactory.getConcept(statusId), group, termFactory.getActiveAceFrameConfig());
+            termFactory.addUncommittedNoChecks(concept);
 
         } catch (Exception e) {
             e.printStackTrace();

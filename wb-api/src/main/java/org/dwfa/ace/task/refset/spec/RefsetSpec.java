@@ -375,6 +375,7 @@ public class RefsetSpec {
 
     public void modifyOverallSpecStatus(I_GetConceptData newStatus) throws Exception {
         try {
+
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();

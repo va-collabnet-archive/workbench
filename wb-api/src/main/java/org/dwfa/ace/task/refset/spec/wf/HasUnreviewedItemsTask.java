@@ -110,14 +110,14 @@ public class HasUnreviewedItemsTask extends AbstractTask {
         List<I_GetConceptData> unreviewedAdditions =
                 refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
                     .getConceptId()), unreviewedAdditionConcept);
-        List<I_GetConceptData> unreviewdDeletions =
+        List<I_GetConceptData> unreviewedDeletions =
                 refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
                     .getConceptId()), unreviewedDeletionConcept);
 
         if (unreviewedAdditions.size() > 0) {
             return true;
         }
-        if (unreviewdDeletions.size() > 0) {
+        if (unreviewedDeletions.size() > 0) {
             return true;
         }
 
