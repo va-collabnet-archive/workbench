@@ -140,11 +140,11 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
         }
         if (sctId != null && !SctIdValidator.getInstance().getSctIdType(sctId.toString()).equals(type)) {
             logger.severe("Invalid sctid " + sctId + " for type " + type);
-            throw new Exception("BAD sctid " + sctId);
+            throw new Exception("BAD sctid " + sctId + " for type " + type);
         }
         if (sctId != null && !SctIdValidator.getInstance().getSctIdType(sctId.toString()).equals(type)) {
             logger.severe("Invalid sctid " + sctId + " for type " + type);
-            throw new Exception("BAD sctid " + sctId);
+            throw new Exception("BAD sctid " + sctId + " for type " + type);
         }
 
         return sctId;
