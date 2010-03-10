@@ -170,7 +170,9 @@ public class Rf2OutputHandlerTest {
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
         assetRelationshipRow(relationshipRow, relationshipDto);
 
-        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
+        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(),
+            componentDto.getConceptDto())
+            + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
         Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
         rf2ReferenceSetReader.setHasHeader(true);
 
@@ -334,7 +336,7 @@ public class Rf2OutputHandlerTest {
     }
 
     private void assertRefsetRow(Rf2ReferenceSetRow referenceSetRow, ExtensionDto extensionDto) throws Exception {
-        Assert.assertEquals(getSctId(extensionDto.getMemberId(), extensionDto), referenceSetRow.getMemberId());
+        Assert.assertEquals(getSctId(extensionDto.getMemberId(), extensionDto, TYPE.REFSET), referenceSetRow.getMemberId());
         Assert.assertEquals(getSctId(extensionDto.getConcept1Id(), extensionDto), referenceSetRow.getReferencedComponentId());
         Assert.assertEquals(getSctId(extensionDto.getConceptId(), extensionDto), referenceSetRow.getRefsetId());
         Assert.assertEquals((extensionDto.isActive()) ? "1" : "0", referenceSetRow.getActive());
@@ -399,13 +401,16 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(getSctId(componentDto.getConceptDto().getStatusId(), componentDto.getConceptDto()), rf2ConceptRow.getDefiniationStatusSctId());
     }
 
-    private String getSctId(UUID id, Concept concept) throws Exception {
+    private String getSctId(UUID id, Concept concept, TYPE type) throws Exception {
         String sctId = null;
 
-        sctId = rf2OutputHandler.snomedIdHandler.getWithoutGeneration(id, concept.getNamespace(),
-            concept.getType()).toString();
+        sctId = rf2OutputHandler.snomedIdHandler.getWithoutGeneration(id, concept.getNamespace(), type).toString();
 
         return sctId;
+    }
+
+    private String getSctId(UUID id, Concept concept) throws Exception {
+        return getSctId(id, concept, concept.getType());
     }
 
     @Test
