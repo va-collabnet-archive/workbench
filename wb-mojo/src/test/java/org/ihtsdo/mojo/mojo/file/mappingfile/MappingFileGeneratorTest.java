@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class MappingFileGeneratorTest {
 
-    private static final String BASE_RESOURCE_DIR = "src/test/resources/org/dwfa/mojo/file/mappingfile/";
+    private static final String BASE_RESOURCE_DIR = "target/generated-resources/mappingFiles/";
     private MappingFileGenerator generator;
 
     private File conceptsInputFile = new File(BASE_RESOURCE_DIR
