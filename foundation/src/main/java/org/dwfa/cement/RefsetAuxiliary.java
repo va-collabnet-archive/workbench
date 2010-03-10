@@ -141,7 +141,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             	CROSS_MAP_EXTENSION(new String[] { "cross map extension", "cross map" }, REFSET_TYPE), 
             	TEMPLATE_REL_EXTENSION(new String[] { "template relationship extension", "template for rel" }, REFSET_TYPE), 
             	TEMPLATE_EXTENSION(new String[] {"template extension", "template" }, REFSET_TYPE),
-            	LANGUAGE_ENUMERATION_EXTENSION(new String[] {"language enumeration refset", "language enumeratrion refset" }, REFSET_TYPE),
+            	LANGUAGE_ENUMERATION_EXTENSION(new String[] {"language enumeration refset", "language enumeration refset" }, REFSET_TYPE),
             	LANGUAGE_SPEC_EXTENSION(new String[] {"language spec refset", "language spec refset" }, REFSET_TYPE),
 
         BOOLEAN_CIRCLE_ICONS(new String[] { "boolean with circle icon", "boolean with circle" }, REFSET_AUXILIARY), BOOLEAN_CIRCLE_ICONS_TRUE(new String[] {
@@ -431,7 +431,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		ISSUE_REPOSITORY(new String[] { "Issue repository", "Issue repository" }, 
 	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
 		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
-        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),;		
+        		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),		
+  		
+		LANGUAGE_REFSET(new String[] { "language refset", "language refset" }, 
+	    		new I_ConceptualizeUniversally[] {REFSET_IDENTITY}),;		
+
 
         private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
