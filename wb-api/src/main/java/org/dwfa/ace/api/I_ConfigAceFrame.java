@@ -52,7 +52,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     };
 
     public enum LANGUAGE_SORT_PREF {
-        LANG_B4_TYPE("language before type"), TYPE_B4_LANG("type before language");
+        LANG_B4_TYPE("language before type"),
+        TYPE_B4_LANG("type before language");
 
         private String desc;
 
@@ -137,7 +138,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceEditingPath(I_Path oldPath, I_Path newPath);
 
     public Set<I_Path> getEditingPathSet();
-    
+
     public PathSetReadOnly getEditingPathSetReadOnly();
 
     public void addPromotionPath(I_Path p);
@@ -157,7 +158,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void replaceViewPosition(I_Position oldPosition, I_Position newPosition);
 
     public Set<I_Position> getViewPositionSet();
-    
+
     public PositionSetReadOnly getViewPositionSetReadOnly();
 
     public I_IntSet getChildrenExpandedNodes();
@@ -480,9 +481,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_GetConceptData getRefsetInSpecEditor();
 
     public void setRefsetInSpecEditor(I_GetConceptData refset);
-    
+
     public void setShowPromotionCheckBoxes(Boolean show);
-    
+
     public Boolean getShowPromotionCheckBoxes();
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException;

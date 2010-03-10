@@ -43,6 +43,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -363,7 +364,10 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    refsetSpecs.add(child);
+                    RefsetSpec spec = new RefsetSpec(child, true);
+                    if (spec.isEditableRefset()) {
+                        refsetSpecs.add(child);
+                    }
                 }
             }
         }

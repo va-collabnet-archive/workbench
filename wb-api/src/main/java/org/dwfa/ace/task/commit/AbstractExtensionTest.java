@@ -29,12 +29,13 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -125,4 +126,36 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
 
     public abstract List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
             throws TaskFailedException;
+
+    /**
+     * Gets the latest specified relationship's target.
+     * 
+     * @param relationshipType
+     * @return
+     * @throws Exception
+     */
+    public I_GetConceptData getLatestRelationshipTarget(I_GetConceptData concept, I_GetConceptData relationshipType)
+            throws Exception {
+
+        I_GetConceptData latestTarget = null;
+        int latestVersion = Integer.MIN_VALUE;
+
+        I_IntSet allowedTypes = Terms.get().newIntSet();
+        allowedTypes.add(relationshipType.getConceptId());
+
+        I_TermFactory termFactory = Terms.get();
+        PositionSetReadOnly allPositions = getPositions(termFactory);
+        I_IntSet activeStatuses = getActiveStatus(termFactory);
+
+        List<? extends I_RelTuple> relationships =
+                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
+        for (I_RelTuple rel : relationships) {
+            if (rel.getVersion() > latestVersion) {
+                latestVersion = rel.getVersion();
+                latestTarget = Terms.get().getConcept(rel.getC2Id());
+            }
+        }
+
+        return latestTarget;
+    }
 }

@@ -74,7 +74,7 @@ public class GetDataFromCreateRefsetPanel extends AbstractTask {
     private String profilePropName = ProcessAttachmentKeys.CURRENT_PROFILE.getAttachmentKey();
     private String refsetNamePropName = ProcessAttachmentKeys.WORKING_REFSET.getAttachmentKey();
     private String refsetParentUuidPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
-    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
     private String commentsPropName = ProcessAttachmentKeys.MESSAGE.getAttachmentKey();
     private String ownerUuidPropName = ProcessAttachmentKeys.OWNER_UUID.getAttachmentKey();
     private String requestorPropName = ProcessAttachmentKeys.REQUESTOR.getAttachmentKey();

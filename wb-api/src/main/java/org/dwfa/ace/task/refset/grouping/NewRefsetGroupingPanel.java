@@ -157,23 +157,42 @@ public class NewRefsetGroupingPanel extends JPanel {
     private Set<I_GetConceptData> getValidParents() {
         HashSet<I_GetConceptData> validParents = new HashSet<I_GetConceptData>();
         try {
-            I_GetConceptData refset =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+            I_GetConceptData refset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
+
+            validParents.add(refset);
+            validParents.addAll(getChildren(refset));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return validParents;
+    }
+
+    /**
+     * Recursively gets all the children of a concept.
+     * 
+     * @return The set of valid parents.
+     */
+    private Set<I_GetConceptData> getChildren(I_GetConceptData parent) {
+        HashSet<I_GetConceptData> results = new HashSet<I_GetConceptData>();
+        try {
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-            Set<? extends I_GetConceptData> results =
-                    refset.getDestRelOrigins(currentStatuses, allowedTypes, Terms.get()
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+            Set<? extends I_GetConceptData> children =
+                    parent.getDestRelOrigins(currentStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
+                        .getViewPositionSetReadOnly(), true, true);
 
-            validParents.addAll(results);
-            validParents.add(refset);
+            for (I_GetConceptData child : children) {
+                results.add(child);
+                results.addAll(getChildren(child));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return validParents;
+        return results;
     }
 
     public String getRefsetName() {

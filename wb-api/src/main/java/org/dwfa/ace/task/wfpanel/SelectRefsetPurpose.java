@@ -91,7 +91,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
             new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
     private transient TermEntry relRefinability =
             new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-    private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+    private transient TermEntry relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
     /*
      * -----------------------
@@ -124,7 +124,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
             relType = new TermEntry(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             relCharacteristic = new TermEntry(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
             relRefinability = new TermEntry(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids());
+            relStatus = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);

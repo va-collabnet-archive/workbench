@@ -112,7 +112,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 			
 
 			// check validity of query
-			if (query.getTotalStatementCount() == 0) {
+            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
 				AceLog.getAppLog().info("empty query");
 				return Condition.ITEM_CANCELED;
 			}

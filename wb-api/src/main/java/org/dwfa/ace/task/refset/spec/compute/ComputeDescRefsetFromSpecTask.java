@@ -196,19 +196,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             			normalMemberConcept.getConceptId());
 
             // check validity of query
-            if (query.getTotalStatementCount() == 0) {
-                if (showActivityPanel) {
-                    progressReportHtmlGenerator.setComplete(true);
-                    computeRefsetActivityPanel.complete();
-                    computeRefsetActivityPanel.setProgressInfoLower("Refset spec is empty - skipping execution.");
-                }
-
-                getLogger().info("Refset spec is empty - skipping execution.");
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Refset spec is empty - skipping execution.", "", JOptionPane.ERROR_MESSAGE);
-                return Condition.ITEM_CANCELED;
-            }
-            if (!query.isValidQuery()) {
+            if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
                 if (showActivityPanel) {
                     progressReportHtmlGenerator.setComplete(true);
                     computeRefsetActivityPanel.complete();
@@ -260,6 +248,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                         normalMemberConcept.getConceptId());
 
             // Compute the possible concepts to iterate over here...
+            if (query.getTotalStatementCount() != 0) {
             I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null);
             possibleDescriptions.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
@@ -329,6 +318,10 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
                     JOptionPane.ERROR_MESSAGE);
                 return Condition.ITEM_CANCELED;
+            }
+
+            } else { // empty refset, so we need to retire all the previous members
+                retiredMembers.addAll(currentRefsetMemberIds);
             }
 
             // Step 3 : create new member refsets

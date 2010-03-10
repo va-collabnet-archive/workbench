@@ -117,12 +117,6 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
                     I_GetConceptData ancillaryPurpose =
                             termFactory.getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
-                    I_GetConceptData refsetTypeRel =
-                            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
-                    I_GetConceptData crossMap =
-                            termFactory.getConcept(RefsetAuxiliary.Concept.CROSS_MAP_EXTENSION.getUids());
-                    I_GetConceptData extensionTable =
-                            termFactory.getConcept(ArchitectonicAuxiliary.Concept.EXTENSION_TABLE.getUids());
 
                     I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 
@@ -135,20 +129,17 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                         .getConcept(statusTermEntry.getIds()));
                     helper.newDescription(newRefsetGroupingConcept, ptConcept, refsetName, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newDescription(newRefsetGroupingConcept, extensionTable, "ORG_DWFA_CTV3_CROSS_MAP", config, termFactory
-                        .getConcept(statusTermEntry.getIds()));
 
                     // create relationships
-                    helper.newRelationship(newRefsetGroupingConcept, isA, parent, config, termFactory.getConcept(statusTermEntry
-                        .getIds()));
-                    helper.newRelationship(newRefsetGroupingConcept, purposeRel, ancillaryPurpose, config, termFactory
+                    helper.newRelationship(newRefsetGroupingConcept, isA, parent, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
-                    helper.newRelationship(newRefsetGroupingConcept, refsetTypeRel, crossMap, config, termFactory
+                    helper.newRelationship(newRefsetGroupingConcept, purposeRel, ancillaryPurpose, config, termFactory
                         .getConcept(statusTermEntry.getIds()));
 
                     // save newly created concept UUID
-                    process.setProperty(groupingConceptUuidPropName, newRefsetGroupingConcept.getUids().iterator().next());
-                    
+                    process.setProperty(groupingConceptUuidPropName, newRefsetGroupingConcept.getUids().iterator()
+                        .next());
+
                     return Condition.ITEM_COMPLETE;
 
                 }
@@ -176,11 +167,11 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
         this.statusTermEntry = statusTermEntry;
     }
 
-	public String getGroupingConceptUuidPropName() {
-		return groupingConceptUuidPropName;
-	}
+    public String getGroupingConceptUuidPropName() {
+        return groupingConceptUuidPropName;
+    }
 
-	public void setGroupingConceptUuidPropName(String groupingConceptUuidPropName) {
-		this.groupingConceptUuidPropName = groupingConceptUuidPropName;
-	}
+    public void setGroupingConceptUuidPropName(String groupingConceptUuidPropName) {
+        this.groupingConceptUuidPropName = groupingConceptUuidPropName;
+    }
 }

@@ -98,29 +98,28 @@ public class IDTupleFileUtil {
 
             if (!termFactory.hasId(primaryUuid)) {
                 termFactory.uuidToNative(primaryUuid);
-
-                I_Identify versioned = termFactory.getId(primaryUuid);
-                I_IdPart part = versioned.getMutableIdParts().get(0).duplicateIdPart();
-                part.setStatusId(termFactory.uuidToNative(statusUuid));
-                part.setPathId(termFactory.uuidToNative(pathUuid));
-                part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
-                part.setVersion(effectiveDate);
-                if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
-                    part.setDenotation(UUID.fromString(sourceId));
-                } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
-                    .iterator()
-                    .next())) {
-                    part.setDenotation(new Long(sourceId));
-                } else {
-                    part.setDenotation(sourceId); // use string
-                }
-
-                if (!versioned.hasMutableIdPart(part)) {
-                    versioned.addMutableIdPart(part);
-                    termFactory.writeId(versioned);
-                }
             }
 
+            I_Identify versioned = termFactory.getId(primaryUuid);
+            I_IdPart part =
+                    versioned.getMutableIdParts().get(0).makeIdAnalog(termFactory.uuidToNative(statusUuid),
+                        termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+
+            part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
+            if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
+                part.setDenotation(UUID.fromString(sourceId));
+            } else if (sourceSystemUuid
+                .equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())) {
+                part.setDenotation(new Long(sourceId));
+            } else {
+                part.setDenotation(sourceId); // use string
+            }
+
+            if (!versioned.hasMutableIdPart(part)) {
+                versioned.addMutableIdPart(part);
+            }
+
+            termFactory.writeId(versioned);
         } catch (Exception e) {
             e.printStackTrace();
             String errorMessage = "Exception while importing ID tuple : " + e.getLocalizedMessage();
@@ -139,5 +138,23 @@ public class IDTupleFileUtil {
 
     public static void generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
         Terms.get().uuidToNative(uuidToGenerate);
+    }
+
+    /**
+     * Adapted from ThinVersionHelper in VODB - not accessible in ace-api.
+     * 
+     * @param version
+     * @return
+     */
+    public static long convert(int version) {
+        int timeZeroInt = 1830407753;
+        if (version == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        if (version == Integer.MIN_VALUE) {
+            return Long.MIN_VALUE;
+        }
+        long added = timeZeroInt + version;
+        return added * 1000;
     }
 }

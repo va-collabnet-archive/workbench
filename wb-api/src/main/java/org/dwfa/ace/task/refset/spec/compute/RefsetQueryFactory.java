@@ -54,7 +54,7 @@ public class RefsetQueryFactory {
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
-        
+
         addExtensionsToMap(extensions, extensionMap, fetchedComponents, refsetSpec.getConceptId());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
@@ -215,17 +215,19 @@ public class RefsetQueryFactory {
                     boolean negate = getNegation(truthToken, termFactory);
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromGrouping(groupingToken);
-
+                    RefsetComputeType newComputeType;
                     switch (statementType) {
                     case CONCEPT:
+                        newComputeType = computeType;
                         break; // don't change compute type since it might be a concept-contains-desc followed by OR
                     case DESCRIPTION:
-                        computeType = RefsetComputeType.DESCRIPTION;
+                        newComputeType = RefsetComputeType.DESCRIPTION;
                         break;
                     case RELATIONSHIP:
-                        computeType = RefsetComputeType.RELATIONSHIP;
+                        newComputeType = RefsetComputeType.RELATIONSHIP;
                         break;
                     default:
+                        newComputeType = computeType;
                         break;
                     }
 
@@ -234,7 +236,7 @@ public class RefsetQueryFactory {
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
-                        processNode(childNode, subquery, computeType, configFrame, termFactory);
+                        processNode(childNode, subquery, newComputeType, configFrame, termFactory);
                     }
                     if (negate) {
                         subquery.negateQuery();
@@ -311,13 +313,13 @@ public class RefsetQueryFactory {
             throws IOException {
         for (I_ExtendByRef ext : list) {
             if (ext.getRefsetId() == refsetNid) {
-                extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
-                if (fetchedComponents.contains(ext.getMemberId()) == false) {
-                    fetchedComponents.add(ext.getMemberId());
+            extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+            if (fetchedComponents.contains(ext.getMemberId()) == false) {
+                fetchedComponents.add(ext.getMemberId());
                     addExtensionsToMap(Terms.get()
                         .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents, refsetNid);
-                }
             }
         }
     }
+}
 }

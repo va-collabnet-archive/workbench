@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.refset.spec;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -23,6 +24,11 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
 public class RefsetSpec {
@@ -84,6 +90,18 @@ public class RefsetSpec {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getComputeTypeString() {
+        String computeTypeString = "";
+        if (isConceptComputeType()) {
+            computeTypeString = "concept";
+        } else if (isDescriptionComputeType()) {
+            computeTypeString = "description";
+        } else {
+            computeTypeString = "unknown";
+        }
+        return computeTypeString;
     }
 
     public boolean isDescriptionComputeType() {
@@ -288,5 +306,88 @@ public class RefsetSpec {
         }
 
         return latestRel;
+    }
+
+    public String getOverallSpecStatusString() {
+
+        try {
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+
+            if (promotionRefsetConcept != null && memberRefsetConcept != null) {
+                Collection<? extends I_ExtendByRef> promotionExtensions =
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                for (I_ExtendByRef promotionExtension : promotionExtensions) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                        I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
+                        if (currentStatuses.contains(latestPart.getStatusId())) {
+                            if (latestPart instanceof I_ExtendByRefPartCid) {
+                                I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
+                                return Terms.get().getConcept(latestConceptPart.getC1id()).getInitialText();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return "none";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while locating status";
+        }
+    }
+
+    public boolean isEditableRefset() {
+
+        try {
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+
+            if (promotionRefsetConcept != null && memberRefsetConcept != null) {
+                Collection<? extends I_ExtendByRef> promotionExtensions =
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                for (I_ExtendByRef promotionExtension : promotionExtensions) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                        I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
+
+                        if (latestPart instanceof I_ExtendByRefPartCid) {
+                            I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
+                            I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
+                            if (status.getConceptId() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()
+                                || status.getConceptId() == ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.localize()
+                                    .getNid()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void modifyOverallSpecStatus(I_GetConceptData newStatus) throws Exception {
+        try {
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
+            I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
+
+            if (memberRefsetConcept != null && promotionRefsetConcept != null) {
+                helper
+                    .retireConceptExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept.getConceptId());
+                helper.newRefsetExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept.getConceptId(),
+                    newStatus.getConceptId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error modifying the overall status of the refset : " + e.getLocalizedMessage());
+        }
     }
 }
