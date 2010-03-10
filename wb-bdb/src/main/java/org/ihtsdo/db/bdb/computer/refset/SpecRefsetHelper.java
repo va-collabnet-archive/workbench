@@ -31,6 +31,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
@@ -41,8 +42,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
-import org.ihtsdo.db.bdb.computer.refset.SpecMemberRefsetHelper;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @AllowDataCheckSuppression
@@ -1227,7 +1226,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 promotionStatus = getPromotionStatus(extension);
             }
 
-            if (promotionStatus != null && promotionStatus.equals(requiredPromotionStatusConcept)) {
+            if (promotionStatus != null
+                && promotionStatus.getConceptId() == requiredPromotionStatusConcept.getConceptId()) {
                 if (Terms.get().hasConcept(extension.getComponentId())) {
                     filteredList.add(Terms.get().getConcept(extension.getComponentId()));
                 } else {
@@ -1265,9 +1265,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     private I_ExtendByRefPart getLatestCurrentPart(I_ExtendByRef memberExtension) throws TerminologyException,
             IOException {
         I_ExtendByRefPart latestPart = null;
+        List<? extends I_ExtendByRefVersion> original = memberExtension.getTuples(null, null, true, false);
 
-        for (I_ExtendByRefPart part : memberExtension.getMutableParts()) {
-            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+        for (I_ExtendByRefVersion part : original) {
+            if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                 for (Integer currentStatus : getCurrentStatusIds()) {
                     if (part.getStatusId() == currentStatus) {
                         latestPart = part;
