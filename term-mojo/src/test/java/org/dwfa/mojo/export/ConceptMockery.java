@@ -172,7 +172,7 @@ public class ConceptMockery {
         activeUuidList = new ArrayList<UUID>();
         activeUuidList.add(UUID.randomUUID());
         activeConceptData = mockConceptEnum(activeUuidList, ArchitectonicAuxiliary.Concept.ACTIVE, activeStatusNid);
-        expect(activeConceptData.isParentOf(activeConceptData, false)).andReturn(false).anyTimes();
+        expect(activeConceptData.isParentOf(activeConceptData, null, null, null, false)).andReturn(false).anyTimes();
         expect(termFactory.getConcept(activeStatusNid)).andReturn(activeConceptData).anyTimes();
 
         inActiveUuidList = new ArrayList<UUID>();
@@ -184,7 +184,7 @@ public class ConceptMockery {
         currentUuidList = new ArrayList<UUID>();
         currentUuidList.add(UUID.randomUUID());
         currentConceptData = mockConceptEnum(currentUuidList, ArchitectonicAuxiliary.Concept.CURRENT, currentStatusNid);
-        expect(activeConceptData.isParentOf(currentConceptData, false)).andReturn(true).anyTimes();
+        expect(activeConceptData.isParentOf(currentConceptData, null, null, null, false)).andReturn(true).anyTimes();
         expect(termFactory.getConcept(currentStatusNid)).andReturn(currentConceptData).anyTimes();
         replay(currentConceptData);
 
@@ -234,6 +234,7 @@ public class ConceptMockery {
         ctv3IdMapExtensionConceptData = mockConceptSpec(ConceptConstants.CTV3_ID_MAP_EXTENSION, ctv3MapNid);
         expect(termFactory.getConcept(ctv3MapNid)).andReturn(ctv3IdMapExtensionConceptData).anyTimes();
         expect(ctv3IdMapExtensionConceptData.getConceptId()).andReturn(ctv3MapNid).anyTimes();
+        expect(ctv3IdMapExtensionConceptData.getInitialText()).andReturn("CTV3Map").anyTimes();
         replay(ctv3IdMapExtensionConceptData);
 
         List<UUID> snomedRtIdExtensionUuidList = new ArrayList<UUID>();
@@ -241,6 +242,7 @@ public class ConceptMockery {
         snomedIdMapExtensionConceptData = mockConceptSpec(ConceptConstants.SNOMED_ID_MAP_EXTENSION, snomedIdMapNid);
         expect(termFactory.getConcept(snomedIdMapNid)).andReturn(snomedIdMapExtensionConceptData).anyTimes();
         expect(snomedIdMapExtensionConceptData.getConceptId()).andReturn(snomedIdMapNid).anyTimes();
+        expect(snomedIdMapExtensionConceptData.getInitialText()).andReturn("SNOMED_RT_IDMap").anyTimes();
         replay(snomedIdMapExtensionConceptData);
 
         I_GetConceptData duplicateStatusConceptData = mockConceptSpec(ConceptConstants.DUPLICATE_STATUS, duplicateStatusNId);
@@ -269,20 +271,23 @@ public class ConceptMockery {
 
         I_GetConceptData descriptionInactivationIndicatorConceptData = mockConceptSpec(ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR, descriptionInactivationIndicatorNid);
         expect(termFactory.getConcept(descriptionInactivationIndicatorNid)).andReturn(descriptionInactivationIndicatorConceptData).anyTimes();
-        expect(incluesionRootConceptData.isParentOf(descriptionInactivationIndicatorConceptData, false)).andReturn(true).anyTimes();
-        expect(exclusionsRootConceptData.isParentOf(descriptionInactivationIndicatorConceptData, false)).andReturn(false).anyTimes();
+        expect(descriptionInactivationIndicatorConceptData.getInitialText()).andReturn("description_inactivation").anyTimes();
+        expect(incluesionRootConceptData.isParentOf(descriptionInactivationIndicatorConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(descriptionInactivationIndicatorConceptData, null, null, null, false)).andReturn(false).anyTimes();
         replay(descriptionInactivationIndicatorConceptData);
 
         I_GetConceptData relationshipInactivationIndicatorConceptData = mockConceptSpec(ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR, relationshipInactivationIndicatorNid);
         expect(termFactory.getConcept(relationshipInactivationIndicatorNid)).andReturn(relationshipInactivationIndicatorConceptData).anyTimes();
-        expect(incluesionRootConceptData.isParentOf(relationshipInactivationIndicatorConceptData, false)).andReturn(true).anyTimes();
-        expect(exclusionsRootConceptData.isParentOf(relationshipInactivationIndicatorConceptData, false)).andReturn(false).anyTimes();
+        expect(relationshipInactivationIndicatorConceptData.getInitialText()).andReturn("relationship_inactivation").anyTimes();
+        expect(incluesionRootConceptData.isParentOf(relationshipInactivationIndicatorConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(relationshipInactivationIndicatorConceptData, null, null, null, false)).andReturn(false).anyTimes();
         replay(relationshipInactivationIndicatorConceptData);
 
         I_GetConceptData conceptInactivationIndicatorConceptData = mockConceptSpec(ConceptConstants.CONCEPT_INACTIVATION_INDICATOR, conceptInactivationIndicatorNid);
         expect(termFactory.getConcept(conceptInactivationIndicatorNid)).andReturn(conceptInactivationIndicatorConceptData).anyTimes();
-        expect(incluesionRootConceptData.isParentOf(conceptInactivationIndicatorConceptData, false)).andReturn(true).anyTimes();
-        expect(exclusionsRootConceptData.isParentOf(conceptInactivationIndicatorConceptData, false)).andReturn(false).anyTimes();
+        expect(conceptInactivationIndicatorConceptData.getInitialText()).andReturn("concept_inactivation").anyTimes();
+        expect(incluesionRootConceptData.isParentOf(conceptInactivationIndicatorConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(conceptInactivationIndicatorConceptData, null, null, null, false)).andReturn(false).anyTimes();
         replay(conceptInactivationIndicatorConceptData);
 
         I_GetConceptData movedFromHistoryConceptData = mockConceptSpec(ConceptConstants.MOVED_FROM_HISTORY, movedFromHistoryNid);
@@ -291,6 +296,7 @@ public class ConceptMockery {
 
         I_GetConceptData movedFromHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.MOVED_FROM_HISTORY_REFSET, movedFromHistoryRefsetNid);
         expect(termFactory.getConcept(movedFromHistoryRefsetNid)).andReturn(movedFromHistoryRefsetConceptData);
+        expect(movedFromHistoryRefsetConceptData.getInitialText()).andReturn("MOVED_FROM_HISTORY").anyTimes();
         replay(movedFromHistoryRefsetConceptData);
 
         I_GetConceptData movedToHistoryConceptData = mockConceptSpec(ConceptConstants.MOVED_TO_HISTORY, movedToHistoryNid);
@@ -299,6 +305,7 @@ public class ConceptMockery {
 
         I_GetConceptData movedToHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.MOVED_TO_HISTORY_REFSET, movedToHistoryRefsetNid);
         expect(termFactory.getConcept(movedToHistoryRefsetNid)).andReturn(movedToHistoryRefsetConceptData);
+        expect(movedToHistoryRefsetConceptData.getInitialText()).andReturn("MOVED_TO_HISTORY").anyTimes();
         replay(movedToHistoryRefsetConceptData);
 
         I_GetConceptData replacedByHistoryConceptData = mockConceptSpec(ConceptConstants.REPLACED_BY_HISTORY, replacedByHistoryNid);
@@ -307,6 +314,7 @@ public class ConceptMockery {
 
         I_GetConceptData replacedByHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.REPLACED_BY_HISTORY_REFSET, replacedByHistoryRefsetNid);
         expect(termFactory.getConcept(replacedByHistoryRefsetNid)).andReturn(replacedByHistoryRefsetConceptData);
+        expect(replacedByHistoryRefsetConceptData.getInitialText()).andReturn("REPLACED_BY_HISTORY").anyTimes();
         replay(replacedByHistoryRefsetConceptData);
 
         I_GetConceptData sameAsHistoryConceptData = mockConceptSpec(ConceptConstants.SAME_AS_HISTORY, sameAsHistoryNid);
@@ -315,6 +323,7 @@ public class ConceptMockery {
 
         I_GetConceptData sameAsHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.SAME_AS_HISTORY_REFSET, sameAsHistoryRefsetNid);
         expect(termFactory.getConcept(sameAsHistoryRefsetNid)).andReturn(sameAsHistoryRefsetConceptData);
+        expect(sameAsHistoryRefsetConceptData.getInitialText()).andReturn("SAME_AS_HISTORY").anyTimes();
         replay(sameAsHistoryRefsetConceptData);
 
         I_GetConceptData wasAHistoryConceptData = mockConceptSpec(ConceptConstants.WAS_A_HISTORY, wasAHistoryNid);
@@ -322,9 +331,10 @@ public class ConceptMockery {
         replay(wasAHistoryConceptData);
 
         I_GetConceptData wasAHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.WAS_A_HISTORY_REFSET, wasAHistoryRefsetNid);
-        expect(termFactory.getConcept(wasAHistoryRefsetNid)).andReturn(wasAHistoryRefsetConceptData);
-        expect(incluesionRootConceptData.isParentOf(wasAHistoryRefsetConceptData, false)).andReturn(true).anyTimes();
-        expect(exclusionsRootConceptData.isParentOf(wasAHistoryRefsetConceptData, false)).andReturn(false).anyTimes();
+        expect(termFactory.getConcept(wasAHistoryRefsetNid)).andReturn(wasAHistoryRefsetConceptData).anyTimes();
+        expect(incluesionRootConceptData.isParentOf(wasAHistoryRefsetConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(wasAHistoryRefsetConceptData, null, null, null, false)).andReturn(false).anyTimes();
+        expect(wasAHistoryRefsetConceptData.getInitialText()).andReturn("WAS_A_HISTORY").anyTimes();
         replay(wasAHistoryRefsetConceptData);
 
         List<UUID> duplicateUuidList = new ArrayList<UUID>();
@@ -337,7 +347,7 @@ public class ConceptMockery {
         ambiguousUuidList.add(UUID.randomUUID());
         I_GetConceptData aceAmbiguousConceptData = mockConceptEnum(ambiguousUuidList, ArchitectonicAuxiliary.Concept.AMBIGUOUS,
             aceAmbiguousStatusNId);
-        expect(activeConceptData.isParentOf(aceAmbiguousConceptData, false)).andReturn(true).anyTimes();
+        expect(activeConceptData.isParentOf(aceAmbiguousConceptData, null, null, null, false)).andReturn(true).anyTimes();
         expect(termFactory.getConcept(aceAmbiguousStatusNId)).andReturn(aceAmbiguousConceptData).anyTimes();
         replay(aceAmbiguousConceptData);
 
@@ -559,8 +569,8 @@ public class ConceptMockery {
         expect(exportableConceptSnomedRtIdPart.getPathId()).andReturn(exportPathNid).times(2);
         expect(exportableConceptSnomedRtIdPart.getStatusId()).andReturn(activeStatusNid);
         expect(exportableConcept.getId()).andReturn(exportIdVersioned);
-        expect(incluesionRootConceptData.isParentOf(snomedIdMapExtensionConceptData, false)).andReturn(true);
-        expect(exclusionsRootConceptData.isParentOf(snomedIdMapExtensionConceptData, false)).andReturn(false);
+        expect(incluesionRootConceptData.isParentOf(snomedIdMapExtensionConceptData, null, null, null, false)).andReturn(true);
+        expect(exclusionsRootConceptData.isParentOf(snomedIdMapExtensionConceptData, null, null, null, false)).andReturn(false);
         expect(exportIdVersioned.getVersions()).andReturn(conceptIdParts);
         return exportableConceptSnomedRtIdPart;
     }
@@ -587,8 +597,8 @@ public class ConceptMockery {
         expect(exportableConceptSnomedRtIdPart.getPathId()).andReturn(exportPathNid).times(2);
         expect(exportableConceptSnomedRtIdPart.getStatusId()).andReturn(activeStatusNid);
         expect(exportableConcept.getId()).andReturn(exportIdVersioned);
-        expect(incluesionRootConceptData.isParentOf(ctv3IdMapExtensionConceptData, false)).andReturn(true);
-        expect(exclusionsRootConceptData.isParentOf(ctv3IdMapExtensionConceptData, false)).andReturn(false);
+        expect(incluesionRootConceptData.isParentOf(ctv3IdMapExtensionConceptData, null, null, null, false)).andReturn(true);
+        expect(exclusionsRootConceptData.isParentOf(ctv3IdMapExtensionConceptData, null, null, null, false)).andReturn(false);
         expect(exportIdVersioned.getVersions()).andReturn(conceptIdParts);
         return exportableConceptSnomedRtIdPart;
     }
@@ -640,12 +650,12 @@ public class ConceptMockery {
         List<I_ConceptAttributeTuple> conceptTupleList = new ArrayList<I_ConceptAttributeTuple>();
 
         // expect the concept to be exportable
-        expect(incluesionRootConceptData.isParentOf(exportableConcept, false)).andReturn(true).times(2);
-        expect(exclusionsRootConceptData.isParentOf(exportableConcept, false)).andReturn(false).times(2);
+        expect(incluesionRootConceptData.isParentOf(exportableConcept, null, null, null, false)).andReturn(true).times(2);
+        expect(exclusionsRootConceptData.isParentOf(exportableConcept, null, null, null, false)).andReturn(false).times(2);
 
         // mock the exportable tuple
         conceptTupleList.add(exportableConceptTuple);
-        expect(exportableConcept.getConceptAttributeTuples(true)).andReturn(conceptTupleList);
+        expect(exportableConcept.getConceptAttributeTuples(null, null, false, true)).andReturn(conceptTupleList);
 
         // Id
         exportConceptUuidList.add(UUID.randomUUID());
@@ -779,8 +789,8 @@ public class ConceptMockery {
         // Matching relationship destination to be exportable
         I_GetConceptData destinationConceptData = createMock(I_GetConceptData.class);
         expect(relationshipTuple.getC2Id()).andReturn(destinationNid);
-        expect(incluesionRootConceptData.isParentOf(destinationConceptData, false)).andReturn(true);
-        expect(exclusionsRootConceptData.isParentOf(destinationConceptData, false)).andReturn(false);
+        expect(incluesionRootConceptData.isParentOf(destinationConceptData, null, null, null, false)).andReturn(true);
+        expect(exclusionsRootConceptData.isParentOf(destinationConceptData, null, null, null, false)).andReturn(false);
 
         // tuple ids
         I_IdPart exportableRelationshipIdPart = createMock(I_IdPart.class);
@@ -865,7 +875,7 @@ public class ConceptMockery {
         expect(conceptExtension.getRefsetId()).andReturn(refsetNid).times(2);
         expect(conceptExtension.getMemberId()).andReturn(memberNid).times(4);
         expect(conceptExtension.getComponentId()).andReturn(componentNid);
-        expect(conceptExtension.getTuples(false, true)).andReturn(extensionConceptTuples);
+        expect(conceptExtension.getTuples(null, null, false, true)).andReturn(extensionConceptTuples);
 
         I_ThinExtByRefTuple conceptExtensionTuple = createMock(I_ThinExtByRefTuple.class);
         expect(conceptExtensionTuple.getRefsetId()).andReturn(refsetNid).times(2);
@@ -883,8 +893,8 @@ public class ConceptMockery {
         List<UUID> memberIdUuidList = new ArrayList<UUID>();
         memberIdUuidList.add(UUID.randomUUID());
 
-        expect(incluesionRootConceptData.isParentOf(refsetConcept, false)).andReturn(true);
-        expect(exclusionsRootConceptData.isParentOf(refsetConcept, false)).andReturn(false);
+        expect(incluesionRootConceptData.isParentOf(refsetConcept, null, null, null, false)).andReturn(true);
+        expect(exclusionsRootConceptData.isParentOf(refsetConcept, null, null, null, false)).andReturn(false);
 
         expect(termFactory.getId(memberNid)).andReturn(memberIdVersioned);
         org.easymock.classextension.EasyMock.expect(exportPositionConceptData.getConceptId()).andReturn(exportPathNid);
@@ -904,7 +914,7 @@ public class ConceptMockery {
 
         conceptExtensions.add(conceptExtension);
         expect(termFactory.getAllExtensionsForComponent(componentNid)).andReturn(conceptExtensions);
-        expect(conceptExtension.getTuples(false, true)).andReturn(extensionConceptTuples);
+        expect(conceptExtension.getTuples(null, null, false, true)).andReturn(extensionConceptTuples);
 
         replay(memberIdPart, memberUuidIdPart, memberIdVersioned, conceptExtension, conceptExtensionTuple);
     }

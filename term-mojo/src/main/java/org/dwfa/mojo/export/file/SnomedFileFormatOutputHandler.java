@@ -273,4 +273,11 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @return Date
      */
     abstract String getReleaseDate(Concept concept);
+
+    /**
+     * Close all files.
+     *
+     * @throws IOException on file errors
+     */
+    abstract void closeFiles() throws IOException ;
 }

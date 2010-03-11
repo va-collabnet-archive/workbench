@@ -10,12 +10,19 @@ import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.util.AceDateFormat;
 
 public class Position {
-
+    private static final String LATEST_VERSION_STR = "latest";
     private Date timePoint;
     private I_GetConceptData path;
 
     public Position(PositionDescriptor positionDescriptor) throws Exception {
-        timePoint = AceDateFormat.getRf2DateFormat().parse(positionDescriptor.getTimeString());
+
+        if(positionDescriptor.getTimeString().equals(LATEST_VERSION_STR)) {
+            timePoint = new Date();
+            timePoint.setTime(Long.MAX_VALUE);
+        } else {
+            timePoint = AceDateFormat.getRf2DateFormat().parse(positionDescriptor.getTimeString());
+        }
+
         path = positionDescriptor.getPath().getVerifiedConcept();
     }
 
@@ -24,7 +31,7 @@ public class Position {
 
         for (T tuple : list) {
             if(tuple.getPathId() == path.getConceptId()
-                    && timePoint.getTime() <= tuple.getTime()){
+                    && tuple.getTime() <= timePoint.getTime()){
                 matchingTuples.add(tuple);
             }
         }

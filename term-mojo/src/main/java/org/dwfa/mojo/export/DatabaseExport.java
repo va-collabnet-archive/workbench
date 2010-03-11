@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,6 +31,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.dto.ComponentDto;
+import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
@@ -41,6 +43,10 @@ import org.dwfa.mojo.export.file.Rf2OutputHandler;
  * @goal database-export
  */
 public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
+    /**
+     * Class logger.
+     */
+    private Logger logger = Logger.getLogger(DatabaseExport.class.getName());
 
     /**
      * Get the exportable data from a concept
@@ -67,9 +73,16 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * Excluded hierarchy
      *
      * @parameter
-     * @required
      */
     private ConceptDescriptor[]  exclusions;
+
+    /**
+     * The default namespace for this export
+     *
+     * @parameter
+     * @required
+     */
+    private String defaultNamespace;
 
     /**
      * Directory for export files.
@@ -82,17 +95,29 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     /**
      * Directory for the SCT id database
      *
-     *
      * @parameter
      * @required
      */
-    private File SctIdDbDirectory;
+    private File sctIdDbDirectory;
 
-    /** Export file output handler for RF2 */
+    /**
+     * Export file output handler for RF2
+     */
     ExportOutputHandler rf2OutputHandler;
 
     /** Da factory */
     private I_TermFactory termFactory;
+
+    /**
+     * Processed concept count.
+     */
+    private int processedConceptCount = 0;
+
+    /**
+     * TODO need to mock this out.
+     * For testing
+     */
+    private boolean testing = false;;
 
     /**
      * Iterate concepts.
@@ -101,8 +126,10 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        logger.info("Start exporting concepts");
+
         try {
-            rf2OutputHandler = new Rf2OutputHandler(exportDirectory, SctIdDbDirectory);
+            rf2OutputHandler = new Rf2OutputHandler(exportDirectory, sctIdDbDirectory);
 
             List<Position> positions = new ArrayList<Position>();
             for (PositionDescriptor positionDescriptor : positionsForExport) {
@@ -113,11 +140,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 inclusionRoots.add(conceptDescriptor.getVerifiedConcept());
             }
             List<I_GetConceptData> exclusionRoots = new ArrayList<I_GetConceptData>();
-            for (ConceptDescriptor conceptDescriptor : exclusions) {
-                exclusionRoots.add(conceptDescriptor.getVerifiedConcept());
+            if (exclusions != null) {
+                for (ConceptDescriptor conceptDescriptor : exclusions) {
+                    exclusionRoots.add(conceptDescriptor.getVerifiedConcept());
+                }
             }
 
-            exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots);
+            exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots, NAMESPACE.fromString(defaultNamespace));
         } catch (IOException e) {
             throw new MojoExecutionException("Execute error: ", e);
         } catch (SQLException e) {
@@ -130,9 +159,15 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         try {
             getTermFactory().iterateConcepts(this);
+
+            if (!testing) {
+                ((Rf2OutputHandler) rf2OutputHandler).closeFiles();
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("Iterate error: ", e);
         }
+
+        logger.info("Finished exporting concepts");
     }
 
     /**
@@ -142,6 +177,11 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
+        processedConceptCount++;
+        if(processedConceptCount % 10000 == 0){
+            logger.info("Concepts processed: " + processedConceptCount);
+        }
+
         ComponentDto componentDto = exportSpecification.getDataForExport(concept);
         if(componentDto != null){
             rf2OutputHandler.export(componentDto);

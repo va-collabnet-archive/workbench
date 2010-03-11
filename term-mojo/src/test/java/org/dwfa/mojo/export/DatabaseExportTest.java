@@ -19,6 +19,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
+import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
@@ -72,7 +73,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         org.easymock.classextension.EasyMock.expect(conceptDescriptor.getVerifiedConcept()).andReturn(exportPositionConceptData);
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getPath()).andReturn(conceptDescriptor);
-        org.easymock.classextension.EasyMock.expect(positionDescriptor.getTimeString()).andReturn(AceDateFormat.getRf2TimezoneDateFormat().format(exportDate).replace("+1000", "Z"));
+        org.easymock.classextension.EasyMock.expect(positionDescriptor.getTimeString()).andReturn("latest").times(1, 2);
 
         PositionDescriptor[] exportPositions = new PositionDescriptor[]{positionDescriptor};
         Field positionsForExport = databaseExportClass.getDeclaredField("positionsForExport");
@@ -106,9 +107,14 @@ public class DatabaseExportTest extends ConceptMockery {
         exportDirectoryField.setAccessible(true);
         exportDirectoryField.set(databaseExport, exportDirectory);
 
-        Field sctIdDbDirectoryField = databaseExportClass.getDeclaredField("SctIdDbDirectory");
+        Field sctIdDbDirectoryField = databaseExportClass.getDeclaredField("sctIdDbDirectory");
         sctIdDbDirectoryField.setAccessible(true);
         sctIdDbDirectoryField.set(databaseExport, dbDirectory);
+
+        //set the default namespace
+        Field defaultNamespaceField = databaseExportClass.getDeclaredField("defaultNamespace");
+        defaultNamespaceField.setAccessible(true);
+        defaultNamespaceField.set(databaseExport, NAMESPACE.NEHTA.getDigits());
 
         //setup 1 call to iterate concepts
         termFactory.iterateConcepts(databaseExport);
@@ -175,6 +181,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportRefsetIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData refsetConcept = mockConcept(refsetNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
             exportPositionConceptData, pathUuidList, exportRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+        expect(refsetConcept.getInitialText()).andReturn("concept_refset").anyTimes();
 
         List<UUID> refsetUuidsList = new ArrayList<UUID>();
         refsetUuidsList.add(UUID.randomUUID());
@@ -193,6 +200,7 @@ public class DatabaseExportTest extends ConceptMockery {
         expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
         I_GetConceptData refsetStringConcept = mockConcept(refsetStringNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
             exportPositionConceptData, pathUuidList, exportStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+        expect(refsetStringConcept.getInitialText()).andReturn("concept_string_refset").anyTimes();
 
         List<UUID> refsetStringUuidsList = new ArrayList<UUID>();
         refsetStringUuidsList.add(UUID.randomUUID());
@@ -212,6 +220,7 @@ public class DatabaseExportTest extends ConceptMockery {
         expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
         I_GetConceptData refsetIntegerConcept = mockConcept(refsetIntegerNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
             exportPositionConceptData, pathUuidList, exportIntegerRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+        expect(refsetIntegerConcept.getInitialText()).andReturn("concept_int_refset").anyTimes();
 
         List<UUID> refsetIntegerUuidsList = new ArrayList<UUID>();
         refsetIntegerUuidsList.add(UUID.randomUUID());
@@ -232,6 +241,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_GetConceptData refsetConceptConcept = mockConcept(refsetCcNid, exportVersion, activeStatusNid, exportDate,
             new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCcRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
+        expect(refsetConceptConcept.getInitialText()).andReturn("concept_concept_refset").anyTimes();
 
         List<UUID> refsetCcUuidsList = new ArrayList<UUID>();
         refsetCcUuidsList.add(UUID.randomUUID());
@@ -251,6 +261,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_GetConceptData refsetConceptConceptString = mockConcept(refsetCcsNid, exportVersion, activeStatusNid, exportDate,
             new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCcStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
+        expect(refsetConceptConceptString.getInitialText()).andReturn("concept_concept_string_refset").anyTimes();
 
         List<UUID> refsetCcsUuidsList = new ArrayList<UUID>();
         refsetCcsUuidsList.add(UUID.randomUUID());
@@ -271,6 +282,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_GetConceptData refsetConceptConceptConcept = mockConcept(refsetCccNid, exportVersion, activeStatusNid, exportDate,
             new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCccRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
+        expect(refsetConceptConceptConcept.getInitialText()).andReturn("concept_concept_concept_string_refset").anyTimes();
 
         List<UUID> refsetCccUuidsList = new ArrayList<UUID>();
         refsetCccUuidsList.add(UUID.randomUUID());
@@ -307,7 +319,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         descriptionTuples.add(exportablepreferredDescriptionTuple);
         descriptionTuples.add(exportableFsnDescriptionTuple);
-        expect(exportableConcept.getDescriptionTuples(true)).andReturn(descriptionTuples);
+        expect(exportableConcept.getDescriptionTuples(null, null, null, true)).andReturn(descriptionTuples);
 
         //refsets
         List<I_ThinExtByRefVersioned> descriptionExtensions = new ArrayList<I_ThinExtByRefVersioned>();
@@ -318,6 +330,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_GetConceptData descriptionRefsetConcept = mockConcept(descRefsetNid, exportVersion, activeStatusNid, exportDate,
             new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportDescriptionRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
+        expect(descriptionRefsetConcept.getInitialText()).andReturn("description_refset").anyTimes();
 
         List<UUID> refsetDescriptionUuidsList = new ArrayList<UUID>();
         refsetDescriptionUuidsList.add(UUID.randomUUID());
@@ -333,7 +346,7 @@ public class DatabaseExportTest extends ConceptMockery {
         ///////////////////////////
         // Exportable relationships
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
 
         int relId = 200;
 
@@ -360,6 +373,8 @@ public class DatabaseExportTest extends ConceptMockery {
         I_GetConceptData relationshipRefsetConcept = mockConcept(relRefsetNid, exportVersion, activeStatusNid, exportDate,
             new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportRelationshipRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
+        expect(relationshipRefsetConcept.getInitialText()).andReturn("relationship_refset").anyTimes();
+
 
         List<UUID> refsetRelationshipUuidsList = new ArrayList<UUID>();
         refsetRelationshipUuidsList.add(UUID.randomUUID());
@@ -371,11 +386,16 @@ public class DatabaseExportTest extends ConceptMockery {
         org.easymock.classextension.EasyMock.replay(incluesionRootConceptData, exclusionsRootConceptData, exportPositionConceptData);
 
         //is the export path on the internation release path.
-        expect(snomedCoreConcept.isParentOf(exportPositionConceptData, false)).andReturn(false).anyTimes();
+        expect(snomedCoreConcept.isParentOf(exportPositionConceptData, null, null, null, false)).andReturn(false).anyTimes();
         replay(snomedCoreConcept);
         replay(termFactory);
 
+        Field testingField = databaseExport.getClass().getDeclaredField("testing");
+        testingField.setAccessible(true);
+        testingField.set(databaseExport, true);
+
         databaseExport.execute();
+        testingField.set(databaseExport, false);
 
         Field exportSpecificationField = databaseExport.getClass().getDeclaredField("exportSpecification");
         exportSpecificationField.setAccessible(true);
@@ -393,9 +413,9 @@ public class DatabaseExportTest extends ConceptMockery {
         Field rf2OutputHandlerField = databaseExportClass.getDeclaredField("rf2OutputHandler");
         rf2OutputHandlerField.setAccessible(true);
         rf2OutputHandler = (Rf2OutputHandler)rf2OutputHandlerField.get(databaseExport);
-        Method finaliseMethod = rf2OutputHandler.getClass().getDeclaredMethod("finalize");
-        finaliseMethod.setAccessible(true);
-        finaliseMethod.invoke(rf2OutputHandler);
+        Method closeFilesMethod = rf2OutputHandler.getClass().getDeclaredMethod("closeFiles");
+        closeFilesMethod.setAccessible(true);
+        closeFilesMethod.invoke(rf2OutputHandler);
     }
 
     /**
@@ -457,13 +477,13 @@ public class DatabaseExportTest extends ConceptMockery {
 
         descriptionTuples.add(exportablepreferredDescriptionTuple);
         descriptionTuples.add(exportableFsnDescriptionTuple);
-        expect(exportableConcept.getDescriptionTuples(true)).andReturn(descriptionTuples);
+        expect(exportableConcept.getDescriptionTuples(null, null, null, true)).andReturn(descriptionTuples);
 
         ///////////////////////////
         // concept relationships //
         ///////////////////////////
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
         int relId = 200;
 
         List<UUID> exportRelationshipUuidList = new ArrayList<UUID>();
@@ -477,7 +497,12 @@ public class DatabaseExportTest extends ConceptMockery {
 
         replay(termFactory);
 
+        Field testingField = databaseExport.getClass().getDeclaredField("testing");
+        testingField.setAccessible(true);
+        testingField.set(databaseExport, true);
+
         databaseExport.execute();
+        testingField.set(databaseExport, false);
 
         Field exportSpecificationField = databaseExport.getClass().getDeclaredField("exportSpecification");
         exportSpecificationField.setAccessible(true);
@@ -493,9 +518,9 @@ public class DatabaseExportTest extends ConceptMockery {
         Field rf2OutputHandlerField = databaseExportClass.getDeclaredField("rf2OutputHandler");
         rf2OutputHandlerField.setAccessible(true);
         rf2OutputHandler = (Rf2OutputHandler)rf2OutputHandlerField.get(databaseExport);
-        Method finaliseMethod = rf2OutputHandler.getClass().getDeclaredMethod("finalize");
-        finaliseMethod.setAccessible(true);
-        finaliseMethod.invoke(rf2OutputHandler);
+        Method closeFilesMethod = rf2OutputHandler.getClass().getDeclaredMethod("closeFiles");
+        closeFilesMethod.setAccessible(true);
+        closeFilesMethod.invoke(rf2OutputHandler);
     }
 
     private I_GetConceptData createExportableConcept(int exportConceptNid, List<UUID> exportConceptUuidList, int exportConcept2Nid, int statusNid) throws Exception {
@@ -547,13 +572,13 @@ public class DatabaseExportTest extends ConceptMockery {
 
         descriptionTuples.add(exportablepreferredDescriptionTuple);
         descriptionTuples.add(exportableFsnDescriptionTuple);
-        expect(exportableConcept.getDescriptionTuples(true)).andReturn(descriptionTuples);
+        expect(exportableConcept.getDescriptionTuples(null, null, null, true)).andReturn(descriptionTuples);
 
         ///////////////////////////
         // concept relationships //
         ///////////////////////////
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
         int relId = exportConcept2Nid * 20000;
 
         List<UUID> exportRelationshipUuidList = new ArrayList<UUID>();

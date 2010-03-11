@@ -77,7 +77,7 @@ public class Rf2OutputHandlerTest {
 
         rf2OutputHandler.export(componentDto);
 
-        rf2OutputHandler.finalize();
+        rf2OutputHandler.closeFiles();
 
         Rf2IdentifierReader rf2IdentifierReader = new Rf2IdentifierReader(new File(exportDirectory, "ids.rf2.txt"));
         rf2IdentifierReader.setHasHeader(true);
@@ -102,7 +102,7 @@ public class Rf2OutputHandlerTest {
         assetRelationshipRow(relationshipRow, relationshipDto);
 
         for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
-            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + extensionDto.getFullySpecifiedName();
+            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + "." + extensionDto.getFullySpecifiedName();
             Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
             rf2ReferenceSetReader.setHasHeader(true);
 
@@ -112,7 +112,7 @@ public class Rf2OutputHandlerTest {
         }
 
         for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
-            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + extensionDto.getFullySpecifiedName();
+            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + "." + extensionDto.getFullySpecifiedName();
             Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
             rf2ReferenceSetReader.setHasHeader(true);
 
@@ -122,7 +122,7 @@ public class Rf2OutputHandlerTest {
         }
 
         for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
-            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + extensionDto.getFullySpecifiedName();
+            String referenceSetName = getSctId(extensionDto.getConceptId(), componentDto.getConceptDto()) + "." + extensionDto.getFullySpecifiedName();
             Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
             rf2ReferenceSetReader.setHasHeader(true);
 
@@ -151,7 +151,7 @@ public class Rf2OutputHandlerTest {
 
         rf2OutputHandler.export(componentDto);
 
-        rf2OutputHandler.finalize();
+        rf2OutputHandler.closeFiles();
 
         Rf2ConceptReader rf2ConceptReader = new Rf2ConceptReader(new File(exportDirectory, "concepts.rf2.txt"));
         rf2ConceptReader.setHasHeader(true);
@@ -171,9 +171,8 @@ public class Rf2OutputHandlerTest {
         assetRelationshipRow(relationshipRow, relationshipDto);
 
         String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(),
-            componentDto.getConceptDto())
-            + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
-        Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
+            componentDto.getConceptDto()) + "." + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
+        Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName+ ".txt"));
         rf2ReferenceSetReader.setHasHeader(true);
 
         Rf2ReferenceSetRow referenceSetRow = rf2ReferenceSetReader.iterator().next();
@@ -201,7 +200,7 @@ public class Rf2OutputHandlerTest {
 
         rf2OutputHandler.export(componentDto);
 
-        rf2OutputHandler.finalize();
+        rf2OutputHandler.closeFiles();
 
         Rf2ConceptReader rf2ConceptReader = new Rf2ConceptReader(new File(exportDirectory, "concepts.rf2.txt"));
         rf2ConceptReader.setHasHeader(true);
@@ -220,7 +219,7 @@ public class Rf2OutputHandlerTest {
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
         assetRelationshipRow(relationshipRow, relationshipDto);
 
-        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
+        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + "." + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
         Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
         rf2ReferenceSetReader.setHasHeader(true);
 
@@ -252,7 +251,7 @@ public class Rf2OutputHandlerTest {
 
         rf2OutputHandler.export(componentDto);
 
-        rf2OutputHandler.finalize();
+        rf2OutputHandler.closeFiles();
 
         Rf2ConceptReader rf2ConceptReader = new Rf2ConceptReader(new File(exportDirectory, "concepts.rf2.txt"));
         rf2ConceptReader.setHasHeader(true);
@@ -271,7 +270,7 @@ public class Rf2OutputHandlerTest {
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
         assetRelationshipRow(relationshipRow, relationshipDto);
 
-        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
+        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + "." + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
         Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
         rf2ReferenceSetReader.setHasHeader(true);
 
@@ -303,7 +302,7 @@ public class Rf2OutputHandlerTest {
 
         rf2OutputHandler.export(componentDto);
 
-        rf2OutputHandler.finalize();
+        rf2OutputHandler.closeFiles();
 
         Rf2ConceptReader rf2ConceptReader = new Rf2ConceptReader(new File(exportDirectory, "concepts.rf2.txt"));
         rf2ConceptReader.setHasHeader(true);
@@ -322,7 +321,7 @@ public class Rf2OutputHandlerTest {
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
         assetRelationshipRow(relationshipRow, relationshipDto);
 
-        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
+        String referenceSetName = getSctId(componentDto.getConceptExtensionDtos().get(0).getConceptId(), componentDto.getConceptDto()) + "." + componentDto.getConceptExtensionDtos().get(0).getFullySpecifiedName();
         Rf2ReferenceSetReader rf2ReferenceSetReader = new Rf2ReferenceSetReader(new File(exportDirectory, referenceSetName + ".txt"));
         rf2ReferenceSetReader.setHasHeader(true);
 
@@ -703,7 +702,7 @@ public class Rf2OutputHandlerTest {
         conceptDto.setActive(true);
         conceptDto.setConceptId(UUID.randomUUID());
         conceptDto.setDateTime(new Date());
-        conceptDto.setFullySpecifiedName("Flaming ducks");
+        conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);
         conceptDto.setPathId(UUID.randomUUID());
         conceptDto.setPrimative(false);

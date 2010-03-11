@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
  * here that can be removed by refactoring the code that uses that date format
  * to use one of the other date formats, fantastic, please do it! Any reduction
  * in the number of these formats is a bonus.
- * 
+ *
  */
 public class AceDateFormat {
 
@@ -48,7 +48,7 @@ public class AceDateFormat {
     public static final String IDS_FORMAT = "yyyyMMdd HH:mm:ss";
     public static final String RF1_DIRECTORY_FORMAT = "yyyy-MM-dd";
     public static final String RF1_FORMAT = "yyyyMMdd";
-    public static final String RF2_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
+    public static final String RF2_FORMAT = "yyyyMMdd";
     public static final String RF2_TZ_FORMAT = "yyyyMMdd'T'HHmmssZ";
     public static final String OLD_ACE_EXPORT_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
     public static final String VERSION_HELPER_TZ_FORMAT = "yyyy.MM.dd HH:mm:ss z";

@@ -57,12 +57,22 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf2RelationshipWriter relationshipFile;
     private Map<Long, Rf2ReferenceSetWriter> referenceSetFileMap;
 
+    /**
+     * Constructor
+     *
+     * @param exportDirectory File
+     * @param SctIdDbDirectory File
+     * @throws IOException
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public Rf2OutputHandler(File exportDirectory, File SctIdDbDirectory) throws IOException, SQLException,
             ClassNotFoundException {
         super(SctIdDbDirectory);
 
         this.exportDirectory = exportDirectory;
 
+        exportDirectory.mkdirs();
         identifierFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.rf2.txt"));
         conceptFile = new Rf2ConceptWriter(new File(exportDirectory + File.separator + "concepts.rf2.txt"));
         descriptionFile = new Rf2DescriptionWriter(new File(exportDirectory + File.separator + "descriptions.rf2.txt"));
@@ -72,6 +82,9 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         referenceSetFileMap = new HashMap<Long, Rf2ReferenceSetWriter>();
     }
 
+    /**
+     * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#exportComponent(org.dwfa.dto.ComponentDto)
+     */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
         conceptFile.write(getRf2ConceptRow(componentDto.getConceptDto()));
@@ -115,12 +128,11 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     }
 
     /**
-     * @see java.lang.Object#finalize()
+     * Close all the files.
+     *
+     * @throws IOException if files cannot be closed.
      */
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-
+    public void closeFiles() throws IOException {
         identifierFile.close();
         conceptFile.close();
         descriptionFile.close();
@@ -137,6 +149,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * The refset file name is the refset name, could write logic here to get
      * the full file name or just get the assembly project to fix them.
      *
+     * @param conceptDto ConceptDto
      * @param extensionDto ExtensionDto
      * @return Rf2ReferenceSetWriter
      * @throws Exception cannot get an SCT id
@@ -145,13 +158,37 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Long sctId = getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT);
 
         if (!referenceSetFileMap.containsKey(sctId)) {
-            referenceSetFileMap.put(sctId, new Rf2ReferenceSetWriter(new File(exportDirectory + File.separator + sctId
-                + extensionDto.getFullySpecifiedName() + ".txt")));
+            referenceSetFileMap.put(sctId, new Rf2ReferenceSetWriter(new File(exportDirectory + File.separator + sctId + "."
+                + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt")));
         }
 
         return referenceSetFileMap.get(sctId);
     }
 
+    /**
+     * Camel case with first letter capped.
+     *
+     * @param string String
+     *
+     * @return String
+     */
+    private String convertToCamelCase(String string) {
+        StringBuffer sb = new StringBuffer();
+        String[] str = string.replaceAll("/", "").split(" ");
+        for (String temp : str) {
+            sb.append(Character.toUpperCase(temp.charAt(0)));
+            sb.append(temp.substring(1).toLowerCase());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Get the Rf2IdentifierRows from the ConceptDto.
+     *
+     * @param conceptDto ConceptDto
+     * @return List of Rf2IdentifierRow
+     * @throws Exception
+     */
     private List<Rf2IdentifierRow> getRf2IdentifierRows(ConceptDto conceptDto) throws Exception {
         List<Rf2IdentifierRow> rf2IdentifierRows = new ArrayList<Rf2IdentifierRow>(conceptDto.getIdentifierDtos()
             .size());
@@ -232,10 +269,10 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setModuleSctId(getModuleId(descriptionDto).toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
         rf2DescriptionRow.setActive(getActiveFlag(descriptionDto));
-        rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId()).toString());
-        rf2DescriptionRow.setLanaguageCode(getSctId(descriptionDto, descriptionDto.getLanguageId()).toString());
+        rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId(), TYPE.CONCEPT).toString());
+        rf2DescriptionRow.setLanaguageCode(getSctId(descriptionDto, descriptionDto.getLanguageId(), TYPE.CONCEPT).toString());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
-        rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getTypeId()).toString());
+        rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getTypeId(), TYPE.CONCEPT).toString());
 
         return rf2DescriptionRow;
     }
@@ -257,9 +294,8 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
         relationshipRow.setActive(getActiveFlag(relationshipDto));
         relationshipRow.setCharacteristicSctId(getSctId(relationshipDto, relationshipDto.getCharacteristicTypeId(), TYPE.CONCEPT).toString());
-        relationshipRow.setModifierSctId(getSctId(relationshipDto, relationshipDto.getModifierId()).toString());
-        relationshipRow.setRelationshipSctId(getSctId(relationshipDto, relationshipDto.getConceptId()).toString());
-        relationshipRow.setTypeSctId(getSctId(relationshipDto, relationshipDto.getTypeId()).toString());
+        relationshipRow.setModifierSctId(getSctId(relationshipDto, relationshipDto.getModifierId(), TYPE.CONCEPT).toString());
+        relationshipRow.setTypeSctId(getSctId(relationshipDto, relationshipDto.getTypeId(), TYPE.CONCEPT).toString());
 
         return relationshipRow;
     }

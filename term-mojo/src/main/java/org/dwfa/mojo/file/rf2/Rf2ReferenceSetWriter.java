@@ -39,6 +39,7 @@ public class Rf2ReferenceSetWriter extends GenericFileWriter<Rf2ReferenceSetRow>
             TerminologyException {
         if(!hasHeader){
             writeHeader(replationshipRow.getHeader());
+            hasHeader = true;
         }
 
         return replationshipRow.toString();
