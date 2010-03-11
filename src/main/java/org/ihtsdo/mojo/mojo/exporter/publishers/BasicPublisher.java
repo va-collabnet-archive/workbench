@@ -13,7 +13,8 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.vodb.types.ConceptBean;
+import org.ihtsdo.concept.Concept;
+
 
 public class BasicPublisher implements I_PublishConcepts {
 	
@@ -88,7 +89,7 @@ public class BasicPublisher implements I_PublishConcepts {
 		if(con_id != -1){
 			foundConCount++;
 		 try {
-			 ConceptBean cb = ConceptBean.get(con_id);	 
+			 Concept cb = Concept.get(con_id);	 
 			 uuid_s = cb.getUids().iterator().next().toString();
 			 localProcessConceptBean(cb);
 		    } catch (IOException e) {
@@ -101,7 +102,7 @@ public class BasicPublisher implements I_PublishConcepts {
 	 * Designed to be over ridden by a subclass
 	 * @param cb
 	 */
-	public void localProcessConceptBean(ConceptBean cb){
+	public void localProcessConceptBean(Concept cb){
 		log.severe("Basic Publisher localProcessConceptBean called. This should be subclassed!!!");
 	}
 	
