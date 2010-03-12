@@ -64,7 +64,7 @@ public class IdentifierSet implements I_RepresentIdSet {
     public void setMember(int nid) {
     	int index = nid + offset;
     	bitSet.ensureCapacity(index);
-        bitSet.fastSet(index);
+        bitSet.set(index);
     }
 
     /*
@@ -75,7 +75,7 @@ public class IdentifierSet implements I_RepresentIdSet {
     public void setNotMember(int nid) {
     	int index = nid + offset;
     	bitSet.ensureCapacity(index);
-        bitSet.fastClear(index);
+        bitSet.clear(index);
     }
 
     /*
