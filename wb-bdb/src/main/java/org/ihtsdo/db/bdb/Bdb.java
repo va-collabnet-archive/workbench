@@ -36,6 +36,7 @@ import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.etypes.ERevision;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.time.TimeUtil;
 
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
@@ -226,27 +227,63 @@ public class Bdb {
 	
 	private static class Sync implements Runnable {
 
+	    private ActivityPanel activity;
+	    private long startTime = System.currentTimeMillis();
+	    
+	    private Sync() {
+	        activity = new ActivityPanel(true, null, null);
+	        activity.setIndeterminate(true);
+	        activity.setProgressInfoUpper("Database sync to disk...");
+	        activity.setProgressInfoLower("Starting sync...");
+	        activity.getStopButton().setVisible(false);
+	    }
+
 		@Override
 		public void run() {
 			try {
+	            activity.setIndeterminate(false);
+	            activity.setValue(0);
+	            activity.setMaximum(8);
 				setProperty(G_VERSION, Long.toString(gVersion.incrementAndGet()));
+                activity.setProgressInfoLower("Writing uuidDb... ");
 				uuidDb.sync();
+                activity.setValue(1);
+                activity.setProgressInfoLower("Writing uuidsToNidMapDb... ");
 				uuidsToNidMapDb.sync();
+                activity.setValue(2);
 				nidCidMapDb.sync();
+                activity.setValue(3);
+                activity.setProgressInfoLower("Writing statusAtPositionDb... ");
 				statusAtPositionDb.sync();
+                activity.setValue(4);
+                activity.setProgressInfoLower("Writing conceptDb... ");
 				conceptDb.sync();
+                activity.setValue(5);
+                activity.setProgressInfoLower("Writing propDb... ");
 				propDb.sync();
+                activity.setProgressInfoLower("Writing mutable environment... ");
+                activity.setValue(6);
 				mutable.bdbEnv.sync();
+                activity.setProgressInfoLower("Writing readonly environment... ");
+                activity.setValue(7);
 				if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 					readOnly.bdbEnv.sync();
 				}
+                activity.setValue(8);
+                long endTime = System.currentTimeMillis();
+
+                long elapsed = endTime - startTime;
+                String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+
+                activity.setProgressInfoUpper("Database sync complete.");
+                activity.setProgressInfoLower("Elapsed: " + elapsedStr);
+                activity.complete();
 			} catch (DatabaseException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
-		
 	}
 	// Close the environment
 	public static void close() throws InterruptedException, ExecutionException {
@@ -254,28 +291,42 @@ public class Bdb {
 			closed = true;
 			try {
 			    NidDataFromBdb.close();
-		        AceLog.getAppLog().info("Closing all JFrames.");
+                AceLog.getAppLog().info("Closing all JFrames.");
+                System.out.println("Closing all JFrames.");
 		        for (JFrame f: OpenFrames.getFrames()) {
 		            if (f.isVisible()) {
 		                f.setVisible(false);
 		                f.dispose();
 		            }
 		        }
+                AceLog.getAppLog().info("Starting LuceneManager close.");
+                System.out.println("Starting LuceneManager close.");
 		        LuceneManager.close();
 
-		        AceLog.getAppLog().info("Starting bdb close.");
+                AceLog.getAppLog().info("Starting bdb close.");
+                System.out.println("Starting bdb close.");
 				Concept.flush();
+                AceLog.getAppLog().info("Starting PositionMapper close.");
+                System.out.println("Starting PositionMapper close.");
 				PositionMapper.close();
+                AceLog.getAppLog().info("Cancel uncommitted changes.");
+                System.out.println("Cancel uncommitted changes.");
 				Terms.get().cancel();
+                AceLog.getAppLog().info("Starting BdbCommitManager shutdown.");
+                System.out.println("Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
-				AceLog.getAppLog().info("Starting last sync.");
+                AceLog.getAppLog().info("Starting last sync.");
+                System.out.println("Starting last sync.");
 				new Sync().run();
-				AceLog.getAppLog().info("Shutting down sync service.");
+                AceLog.getAppLog().info("Shutting down sync service.");
+                System.out.println("Shutting down sync service.");
 				syncService.shutdown();
-				AceLog.getAppLog().info("Awaiting termination of sync service.");
+                AceLog.getAppLog().info("Awaiting termination of sync service.");
+                System.out.println("Awaiting termination of sync service.");
 				syncService.awaitTermination(90, TimeUnit.MINUTES);
 				mutable.bdbEnv.sync();
-				AceLog.getAppLog().info("mutable.bdbEnv.sync() finished.");
+                AceLog.getAppLog().info("mutable.bdbEnv.sync() finished.");
+                System.out.println("mutable.bdbEnv.sync() finished.");
 				uuidDb.close();
 				uuidsToNidMapDb.close();
 				nidCidMapDb.close();

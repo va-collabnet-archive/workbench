@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -18,12 +19,20 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.time.TimeUtil;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
+    
+    protected static boolean writeDebugFiles = false;
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
     private File changeSetFile;
+    
+    private File cswcFile;
+    private transient DataOutputStream cswcOut;
+    private File csweFile;
+    private transient DataOutputStream csweOut;
+    private I_IntSet commitSapNids;
 
     private File tempFile;
 
@@ -32,6 +41,8 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	private I_ComputeEConceptForChangeSet computer;
 	
 	private ChangeSetPolicy policy;
+	
+	private Semaphore writePermit = new Semaphore(1);
 
     public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy) {
         super();
@@ -42,6 +53,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
 	@Override
 	public void open(I_IntSet commitSapNids) throws IOException {
+	    this.commitSapNids = commitSapNids;
 		computer = new EConceptChangeSetComputer(policy, commitSapNids);
         if (changeSetFile.exists() == false) {
             changeSetFile.getParentFile().mkdirs();
@@ -51,6 +63,13 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
         AceLog.getAppLog().info(
             "Copying from: " + changeSetFile.getCanonicalPath() + "\n        to: " + tempFile.getCanonicalPath());
         tempOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(tempFile, true)));
+        if (writeDebugFiles) {
+            cswcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".cswc");
+            cswcOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cswcFile, true)));
+
+            csweFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".cswe");
+            csweOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(csweFile, true)));
+        }
 	}
 
 
@@ -60,6 +79,22 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             tempOut.flush();
             tempOut.close();
             tempOut = null;
+            if (cswcOut != null) {
+                cswcOut.flush();
+                cswcOut.close();
+                cswcOut = null;
+                if (cswcFile.length() == 0) {
+                    cswcFile.delete();
+                }
+            }
+            if (csweOut != null) {
+                csweOut.flush();
+                csweOut.close();
+                csweOut = null;
+                if (csweFile.length() == 0) {
+                    csweFile.delete();
+                }
+            }
             String canonicalFileString = tempFile.getCanonicalPath();
             if (tempFile.exists()) {
             	if (tempFile.length() > 0) {
@@ -70,6 +105,9 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                     tempFile = new File(canonicalFileString);
             	}
                 tempFile.delete();
+            }
+            if (changeSetFile.length() == 0) {
+                changeSetFile.delete();
             }
         }
 	}
@@ -84,11 +122,29 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	        		c.toLongString());
 		} else {
 			EConcept eC = computer.getEConcept(c);
+            AceLog.getAppLog().info("Write time: " + time + " ("
+                + TimeUtil.formatDateForFile(time)+ ")");
+            AceLog.getAppLog().info("eConcept: " + eC.toString());
+            writePermit.acquireUninterruptibly();
 	        tempOut.writeLong(time);
-	        AceLog.getAppLog().info("Write time: " + time + " ("
-	        		+ TimeUtil.formatDateForFile(time)+ ")");
-	        AceLog.getAppLog().info("eConcept: " + eC.toString());
 			eC.writeExternal(tempOut);
+			if (cswcOut != null) {
+                cswcOut.writeUTF("\n*******************************\n");
+                cswcOut.writeUTF(TimeUtil.formatDateForFile(time));
+                cswcOut.writeUTF(" sapNids for commit: ");
+                cswcOut.writeUTF(commitSapNids.toString());
+                cswcOut.writeUTF("\n*******************************\n");
+                cswcOut.writeUTF(c.toLongString());
+			}
+            if (csweOut != null) {
+                csweOut.writeUTF("\n*******************************\n");
+                csweOut.writeUTF(TimeUtil.formatDateForFile(time));
+                csweOut.writeUTF(" sapNids for commit: ");
+                csweOut.writeUTF(commitSapNids.toString());
+                csweOut.writeUTF("\n*******************************\n");
+                csweOut.writeUTF(eC.toString());
+            }
+			writePermit.release();
 		}
 	}
 

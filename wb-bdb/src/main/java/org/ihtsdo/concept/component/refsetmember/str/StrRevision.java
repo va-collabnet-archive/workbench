@@ -11,6 +11,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class StrRevision extends RefsetRevision<StrRevision, StrMember> 
 	implements I_ExtendByRefPartStr 
@@ -26,7 +27,6 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" stringValue:" + "'" + this.stringValue + "'");
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -115,6 +115,12 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 	public StrRevision duplicate() {
 		throw new UnsupportedOperationException();
 	}
-	
-	
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeString(stringValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        stringValue = input.readString();
+    }
 }

@@ -7,10 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.util.GCValueComponentMap;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -50,6 +52,17 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 		
 		for (int index = 0; index < listSize; index++) {
 			int typeNid = input.readInt();
+			
+			// Can be removed in the future, here strictly for read/write conformance testing.
+			try {
+                REFSET_TYPES.nidToType(typeNid);
+            } catch (IOException e1) {
+               AceLog.getAppLog().alertAndLogException(
+                   new Exception("For concept: " + enclosingConcept.toString(), e1));
+               AceLog.getAppLog().info("List prior to exception: " + 
+                   newRefsetMemberList);
+               return newRefsetMemberList;
+            }
 			input.mark(8);
 			int nid = input.readInt();
 			input.reset();

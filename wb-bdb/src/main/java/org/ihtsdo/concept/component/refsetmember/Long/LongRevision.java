@@ -11,6 +11,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	implements I_ExtendByRefPartLong {
@@ -25,7 +26,6 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" longValue:" + this.longValue);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -110,5 +110,13 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
 	}
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeLong(longValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        longValue = input.readLong();
+    }
 
 }

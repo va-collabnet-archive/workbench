@@ -11,6 +11,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMember>
 	implements I_ExtendByRefPartBoolean {
@@ -109,4 +110,13 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
 	}
+
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeBoolean(booleanValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        booleanValue = input.readBoolean();
+    }
 }

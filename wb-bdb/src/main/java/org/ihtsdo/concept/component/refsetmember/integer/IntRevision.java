@@ -8,10 +8,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	implements I_ExtendByRefPartInt {
@@ -26,7 +26,6 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" intValue:" + this.intValue);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -113,5 +112,13 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	public void setIntValue(int value) {
 		this.intValue = value;
 	}
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeInt(intValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        intValue = input.readInt();
+    }
 
 }

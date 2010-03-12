@@ -7,7 +7,6 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.bind.tuple.TupleOutput;
 
 public abstract class RefsetRevision<V extends RefsetRevision<V, C>, 
                                               C extends RefsetMember<V, C>> 
@@ -26,6 +25,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 
 	public RefsetRevision(TupleInput input, C primordialComponent) {
 		super(input, primordialComponent);
+		readFieldsFromInput(input);
 	}
 
 	public RefsetRevision(ERevision eVersion,
@@ -50,13 +50,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 		throw new UnsupportedOperationException();
 	}
 
-
-	@Override
-	protected void writeFieldsToBdb(TupleOutput output) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	protected ArrayIntList getVariableVersionNids() {
 		throw new UnsupportedOperationException();
@@ -73,8 +66,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();  
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -91,4 +82,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
         }
         return false;
     }
+
+    protected abstract void readFieldsFromInput(TupleInput input);
 }

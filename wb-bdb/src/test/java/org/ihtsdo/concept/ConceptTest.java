@@ -2,17 +2,14 @@ package org.ihtsdo.concept;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.util.io.FileIO;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -21,14 +18,13 @@ import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageRevision;
-import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 import org.ihtsdo.etypes.ERefsetCidIntRevision;
+import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 public class ConceptTest {
 
@@ -134,27 +130,6 @@ public class ConceptTest {
         // For any non-null value x, x.equals(null) should return false.
         assertFalse(testObj1.equals(null)); 
        
-    }
-
-    @Test
-    public void testEqualsInACollection() {
-        // Make both the objects be the same 
-        try {
-            testObj1 = makeTestObject1();
-            testObj2 = makeTestObject1();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        // Put testComponent1 in a collection 
-        Set<Concept> coll = new java.util.HashSet<Concept>();
-        coll.add(testObj1);
-
-        // Test for the presence of testComponent1 by using the  
-        // equivalent object testComponent2
-        assertTrue(coll.contains(testObj2));         
-
     }
 
 

@@ -11,6 +11,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember> {
 
@@ -26,7 +27,6 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid:" + this.c1Nid);
         buf.append(" floatValue:" + this.floatValue);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -125,5 +125,14 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 	public void setFloatValue(float floatValue) {
 		this.floatValue = floatValue;
 	}
-
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeInt(c1Nid);
+        output.writeFloat(floatValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        c1Nid = input.readInt();
+        floatValue = input.readFloat();
+    }
 }

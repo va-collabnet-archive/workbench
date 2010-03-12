@@ -42,7 +42,6 @@ public class DescriptionRevision
         buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
         buf.append(" typeNid:" + this.getTypeId());
         buf.append(" lang:" + this.getLang());
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -123,7 +122,7 @@ public class DescriptionRevision
 
 	protected DescriptionRevision(TupleInput input, 
 			Description primoridalMember) {
-		super(input.readInt(), primoridalMember);
+		super(input, primoridalMember);
 		text = input.readString();
 		if (text == null) {
 			text = primoridalMember.getText();

@@ -39,7 +39,6 @@ public class RelationshipRevision
         buf.append(" group:" + this.group);
         buf.append(" refinability:");
 		ConceptComponent.addNidToBuffer(buf, this.refinabilityNid);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

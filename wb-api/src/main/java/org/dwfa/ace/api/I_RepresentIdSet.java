@@ -41,4 +41,6 @@ public interface I_RepresentIdSet {
 
     public int totalBits();
 
+    public void clear();
+
 }

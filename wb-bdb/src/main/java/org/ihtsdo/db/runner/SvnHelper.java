@@ -19,6 +19,7 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.cs.ChangeSetImporter;
@@ -261,6 +262,7 @@ public class SvnHelper {
         // import any change sets that may be downloaded
         // from svn...
         try {
+            Terms.get().suspendChangeSetWriters();
             AceLog.getAppLog().info("Starting eccs import");
 
         	// TODO Support Import here...
@@ -285,6 +287,7 @@ public class SvnHelper {
             }
 
             AceLog.getAppLog().info("Finished eccs import");
+            Terms.get().resumeChangeSetWriters();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }

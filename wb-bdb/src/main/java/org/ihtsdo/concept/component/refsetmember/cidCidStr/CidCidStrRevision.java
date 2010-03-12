@@ -12,6 +12,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidStrMember>
 	implements I_ExtendByRefPartCidCidString {
@@ -31,7 +32,6 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         buf.append(" c1Nid:" + this.c1Nid);
         buf.append(" c2Nid:" + this.c2Nid);
         buf.append(" strValue:" + "'" + this.strValue + "'");
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -180,5 +180,17 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 	public CidCidStrRevision duplicate() {
 		throw new UnsupportedOperationException();
 	}
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        output.writeInt(c1Nid);
+        output.writeInt(c2Nid);
+        output.writeString(strValue);
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        c1Nid = input.readInt();
+        c2Nid = input.readInt();
+        strValue = input.readString();
+    }
 
 }

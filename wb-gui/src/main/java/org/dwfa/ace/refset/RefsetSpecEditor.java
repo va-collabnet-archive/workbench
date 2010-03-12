@@ -1128,7 +1128,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         if (ext.getComponentId() == localRefsetSpecConcept.getConceptId()) {
                             root.add(extNode);
                         } else {
-                            extensionMap.get(ext.getComponentId()).add(extNode);
+                            if (extensionMap.containsKey(ext.getComponentId())) {
+                                extensionMap.get(ext.getComponentId()).add(extNode);
+                            } else {
+                                AceLog.getAppLog().alertAndLogException(new Exception("Can't find component in map: " + ext.getComponentId()));
+                                AceLog.getAppLog().warning("Can't find component in map: " + ext.getComponentId() + 
+                                    "Extension: " + ext + " \n map: " + extensionMap + 
+                                    " localRefsetSpecConcept: " + localRefsetSpecConcept.toLongString());
+                            }
                         }
                     } else {
                         break;

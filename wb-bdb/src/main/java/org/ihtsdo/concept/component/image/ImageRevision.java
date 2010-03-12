@@ -25,7 +25,6 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	    buf.append(this.getClass().getSimpleName() + ":{");
 	    buf.append(" textDescription:" + "'" + this.textDescription + "'");
 	    buf.append(" typeNid:" + this.typeNid);
-	    buf.append(" }=> ");
 	    buf.append(super.toString());
 	    return buf.toString();
 	}

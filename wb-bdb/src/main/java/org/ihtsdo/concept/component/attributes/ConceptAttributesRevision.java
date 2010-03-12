@@ -40,7 +40,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     public ConceptAttributesRevision(TupleInput input, ConceptAttributes primoridalMember) {
-        super(input.readInt(), primoridalMember);
+        super(input, primoridalMember);
         defined = input.readBoolean();
     }
 
@@ -84,7 +84,6 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append("conceptAttributes: " + this.primordialComponent.nid);
         buf.append(" defined: " + this.defined);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }

@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
@@ -28,7 +27,10 @@ import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -46,7 +48,6 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.db.util.ConcurrentSet;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 
@@ -80,21 +81,29 @@ public class BdbCommitManager {
 	}
 
 	private static class LuceneWriter implements Runnable {
-		private ConcurrentSet<Integer> uncommittedDescNids;
+	    private int batchSize = 200;
+		private IdentifierSet descNidsToWrite;
 
-		public LuceneWriter(ConcurrentSet<Integer> uncommittedDescNids) {
+		public LuceneWriter(IdentifierSet descNidsToCommit) {
 			super();
-			this.uncommittedDescNids = uncommittedDescNids;
+			this.descNidsToWrite = descNidsToCommit;
 		}
 
 		@Override
 		public void run() {
 			try {
-				ArrayList<Description> toIndex = new ArrayList<Description>(
-						uncommittedDescNids.size());
-				for (int dNid : uncommittedDescNids) {
-					Description d = (Description) Bdb.getComponent(dNid);
+				ArrayList<Description> toIndex = new ArrayList<Description>(batchSize + 1);
+				I_IterateIds idItr = descNidsToWrite.iterator();
+				int count = 0;
+				while (idItr.next()) {
+				    count++;
+					Description d = (Description) Bdb.getComponent(idItr.nid());
 					toIndex.add(d);
+					if (count > batchSize) {
+					    count = 0;
+		                LuceneManager.writeToLucene(toIndex);
+		                toIndex = new ArrayList<Description>(batchSize + 1);
+					}
 				}
 				LuceneManager.writeToLucene(toIndex);
 			} catch (Exception e) {
@@ -106,14 +115,11 @@ public class BdbCommitManager {
 
 
 	
-	private static ConcurrentSet<Integer> uncommittedCNids = new ConcurrentSet<Integer>(
-			20);
+	private static I_RepresentIdSet uncommittedCNids = new IdentifierSet();
 
-	private static ConcurrentSet<Integer> uncommittedCNidsNoChecks = new ConcurrentSet<Integer>(
-			20);
+	private static I_RepresentIdSet uncommittedCNidsNoChecks = new IdentifierSet();
 
-	private static AtomicReference<ConcurrentSet<Integer>> uncommittedDescNids = new AtomicReference<ConcurrentSet<Integer>>(
-			new ConcurrentSet<Integer>(20));
+	private static I_RepresentIdSet uncommittedDescNids = new IdentifierSet();
 
 	private static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
@@ -153,7 +159,7 @@ public class BdbCommitManager {
 			dbWriterPermit.acquire();
             dbWriterService.execute(new SetNidsForCid(c));
 			dbWriterService.execute(new ConceptWriter(c));
-			uncommittedCNidsNoChecks.add(c.getNid());
+			uncommittedCNidsNoChecks.setMember(c.getNid());
 			if (Bdb.watchList.containsKey(concept.getNid())) {
 				AceLog.getAppLog().info(
 						"---@@@ Adding uncommitted NO checks: "
@@ -219,7 +225,7 @@ public class BdbCommitManager {
 					AceLog.getEditLog().alertAndLogException(e);
 				}
 			}
-			uncommittedCNids.add(concept.getNid());
+			uncommittedCNids.setMember(concept.getNid());
 			dbWriterPermit.acquire();
 			dbWriterService.execute(new SetNidsForCid(concept));
 			dbWriterService.execute(new ConceptWriter(concept));
@@ -269,30 +275,28 @@ public class BdbCommitManager {
 
 	public static void commit() {
 		// TODO add commit tests...
-		KindOfComputer.reset();
-		long commitTime = System.currentTimeMillis();
 		try {
 			synchronized (uncommittedCNids) {
 				synchronized (uncommittedCNidsNoChecks) {
+			        KindOfComputer.reset();
+			        long commitTime = System.currentTimeMillis();
 					IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
 							commitTime);
 
 					if (writeChangeSets) {
-						uncommittedCNidsNoChecks.addAll(uncommittedCNids);
+						uncommittedCNidsNoChecks.or(uncommittedCNids);
 						ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
 								uncommittedCNidsNoChecks, commitTime,
 								sapNidsFromCommit);
 						changeSetWriterService.execute(handler);
 					}
 					uncommittedCNids.clear();
-					uncommittedCNidsNoChecks.clear();
-
-					ConcurrentSet<Integer> descNidsToCommit = uncommittedDescNids
-					.getAndSet(new ConcurrentSet<Integer>(20));
+					uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
 
 					luceneWriterPermit.acquire();
+                    IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
+                    uncommittedDescNids.clear();
 					luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
-					uncommittedCNids.setCapacity(10);
 					dataCheckMap.clear();
 				}
 			}
@@ -372,9 +376,7 @@ public class BdbCommitManager {
     				handleCanceledConcepts(uncommittedCNids);
     				handleCanceledConcepts(uncommittedCNidsNoChecks);
     				uncommittedCNidsNoChecks.clear();
-    				uncommittedCNidsNoChecks.setCapacity(10);
     				uncommittedCNids.clear();
-    				uncommittedCNids.setCapacity(10);
     				Bdb.getSapDb().commit(Long.MIN_VALUE);
     				dataCheckMap.clear();
     			} catch (IOException e1) {
@@ -386,10 +388,11 @@ public class BdbCommitManager {
     	updateFrames();
     }
 
-	private static void handleCanceledConcepts(Set<Integer> cNids)
+	private static void handleCanceledConcepts(I_RepresentIdSet uncommittedCNids2)
 			throws IOException {
-		for (int cNid : cNids) {
-			Concept c = Concept.get(cNid);
+	    I_IterateIds idItr = uncommittedCNids2.iterator();
+		while (idItr.next()) {
+			Concept c = Concept.get(idItr.nid());
 			if (c.isCanceled()) {
 				Terms.get().forget(c);
 			}
@@ -500,7 +503,7 @@ public class BdbCommitManager {
 					}
 					// hide data checks tab...
 				}
-				if (uncommittedCNids.size() == 0) {
+				if (uncommittedCNids.cardinality() == 0) {
 					frameConfig.setCommitEnabled(false);
 					frameConfig.fireCommit();
 				} else {
@@ -533,8 +536,8 @@ public class BdbCommitManager {
 	}
 
 	public static void removeUncommitted(final Concept concept) {
-		uncommittedCNids.remove(concept.getNid());
-		if (uncommittedCNids.size() == 0) {
+		uncommittedCNids.setNotMember(concept.getNid());
+		if (uncommittedCNids.cardinality() == 0) {
 			dataCheckMap.clear();
 		} else {
 			dataCheckMap.remove(concept);
@@ -564,23 +567,25 @@ public class BdbCommitManager {
 	}
 
 	public static Set<Concept> getUncommitted() {
-		Set<Concept> returnSet = new HashSet<Concept>();
-		Iterator<Integer> cNidItr = uncommittedCNids.iterator();
-		while (cNidItr.hasNext()) {
-			try {
-				returnSet.add(Concept.get(cNidItr.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return returnSet;
+	    try {
+	        Set<Concept> returnSet = new HashSet<Concept>();
+	        I_IterateIds cNidItr = uncommittedCNids.iterator();
+	        while (cNidItr.next()) {
+	            returnSet.add(Concept.get(cNidItr.nid()));
+	        }
+	        return returnSet;
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
 	}
 
 	public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
 		List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-		for (int cNid : uncommittedCNids) {
+        try {
+            I_IterateIds cNidItr = uncommittedCNids.iterator();
+            while (cNidItr.next()) {
 			try {
-				Concept toTest = Concept.get(cNid);
+				Concept toTest = Concept.get(cNidItr.nid());
 				for (I_TestDataConstraints test : commitTests) {
 					try {
 						for (AlertToDataConstraintFailure failure : test.test(
@@ -595,11 +600,14 @@ public class BdbCommitManager {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
 		return warningsAndErrors;
 	}
 
 	public static void addUncommittedDescNid(int dNid) {
-		uncommittedDescNids.get().add(dNid);
+		uncommittedDescNids.setMember(dNid);
 	}
 
 	public static long getLastCommit() {

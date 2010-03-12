@@ -122,7 +122,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 }
             }
             int completed = processedCount.incrementAndGet();
-            if (completed % 500 == 0) {
+            if (completed % 5000 == 0) {
                 activity.setValue(completed);
                 if (!canceled) {
                     long endTime = System.currentTimeMillis();

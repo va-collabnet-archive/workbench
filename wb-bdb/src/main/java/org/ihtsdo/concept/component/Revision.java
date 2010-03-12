@@ -158,8 +158,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	 */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("Revision:{");
-        buf.append(" sap:");
+         buf.append(" sap:");
         buf.append(sapNid);
         buf.append(" path:");
         ConceptComponent.addNidToBuffer(buf, getPathId());

@@ -53,7 +53,7 @@ public class IdentifierSet implements I_RepresentIdSet {
     public boolean isMember(int nid) {
     	int index = nid + offset;
     	bitSet.ensureCapacity(index);
-        return bitSet.fastGet(index);
+        return bitSet.get(index);
     }
 
     /*
@@ -181,4 +181,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 		}
 		return buff.toString();
 	}
+    public void clear() {
+        bitSet.clear(0, bitSet.capacity());
+    }
 }

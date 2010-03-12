@@ -10,6 +10,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.ERefsetRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> {
 
@@ -21,7 +22,6 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
     public String toString() {
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -90,5 +90,13 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 		// TODO
 		throw new UnsupportedOperationException();
 	}
+    @Override
+    protected void writeFieldsToBdb(TupleOutput output) {
+        // nothing to write
+    }
+    @Override
+    protected void readFieldsFromInput(TupleInput input) {
+        // nothing to read
+    }
 
 }
