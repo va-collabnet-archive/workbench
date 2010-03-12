@@ -27,6 +27,7 @@ public class RelationshipDto extends ConceptDto {
     private UUID typeId;
     private UUID characteristicTypeId;
     private UUID modifierId;
+    private UUID RefinabilityId;
     private Character refinableCode;
     private Character relationshipGroupCode;
     private Character characteristicTypeCode;
@@ -106,6 +107,20 @@ public class RelationshipDto extends ConceptDto {
      */
     public void setModifierId(UUID modifierId) {
         this.modifierId = modifierId;
+    }
+
+    /**
+     * @return the refinabilityId
+     */
+    public final UUID getRefinabilityId() {
+        return RefinabilityId;
+    }
+
+    /**
+     * @param refinabilityId the refinabilityId to set
+     */
+    public final void setRefinabilityId(UUID refinabilityId) {
+        RefinabilityId = refinabilityId;
     }
 
     /**

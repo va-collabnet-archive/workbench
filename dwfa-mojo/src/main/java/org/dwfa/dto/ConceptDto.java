@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.dwfa.maven.transform.SctIdGenerator.TYPE;
-
 /**
  * Concept details for exporting.
  */

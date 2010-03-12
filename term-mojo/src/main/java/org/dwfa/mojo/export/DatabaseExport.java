@@ -30,10 +30,13 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
+import org.dwfa.mojo.export.file.AceOutputHandler;
+import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
 
 
@@ -105,6 +108,16 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     ExportOutputHandler rf2OutputHandler;
 
+    /**
+     * Export file output handler for RF1
+     */
+    ExportOutputHandler rf1OutputHandler;
+
+    /**
+     * Export file output handler for Ace
+     */
+    AceOutputHandler aceOutputHandler;;
+
     /** Da factory */
     private I_TermFactory termFactory;
 
@@ -117,7 +130,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * TODO need to mock this out.
      * For testing
      */
-    private boolean testing = false;;
+    private boolean testing = false;
 
     /**
      * Iterate concepts.
@@ -130,6 +143,8 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         try {
             rf2OutputHandler = new Rf2OutputHandler(exportDirectory, sctIdDbDirectory);
+            rf1OutputHandler = new Rf1OutputHandler(exportDirectory, sctIdDbDirectory);
+            aceOutputHandler = new AceOutputHandler(exportDirectory, sctIdDbDirectory);
 
             List<Position> positions = new ArrayList<Position>();
             for (PositionDescriptor positionDescriptor : positionsForExport) {
@@ -184,7 +199,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         ComponentDto componentDto = exportSpecification.getDataForExport(concept);
         if(componentDto != null){
-            rf2OutputHandler.export(componentDto);
+            try{
+                rf2OutputHandler.export(componentDto);
+                rf1OutputHandler.export(componentDto);
+                aceOutputHandler.export(componentDto);
+            } catch (ValidationException ve) {
+                logger.severe(ve.getMessage());
+            }
         }
     }
 

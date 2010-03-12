@@ -243,7 +243,7 @@ public class ExportSpecification {
                             List<I_ThinExtByRefTuple> conceptExtensionTuples = extPosition.getMatchingTuples(
                                 thinExtByRefVersioned.getTuples(null, null, false, true));
                             componentDto.getConceptExtensionDtos().addAll(
-                                extensionProcessor.processList(thinExtByRefVersioned, conceptExtensionTuples, TYPE.CONCEPT));
+                                extensionProcessor.processList(thinExtByRefVersioned, conceptExtensionTuples, TYPE.CONCEPT, true));
                         }
                     }
                 }
@@ -256,7 +256,7 @@ public class ExportSpecification {
                             List<I_ThinExtByRefTuple> descriptionExtensionTuples = extPosition.getMatchingTuples(thinExtByRefVersioned.getTuples(
                                 null, null, false, true));
                             componentDto.getDescriptionExtensionDtos().addAll(
-                                extensionProcessor.processList(thinExtByRefVersioned, descriptionExtensionTuples, TYPE.DESCRIPTION));
+                                extensionProcessor.processList(thinExtByRefVersioned, descriptionExtensionTuples, TYPE.DESCRIPTION, true));
                         }
                     }
                 }
@@ -273,7 +273,7 @@ public class ExportSpecification {
                                     null, null, false, true));
 
                                 componentDto.getRelationshipExtensionDtos().addAll(
-                                    extensionProcessor.processList(thinExtByRefVersioned, relationshipExtensionTuples, TYPE.RELATIONSHIP));
+                                    extensionProcessor.processList(thinExtByRefVersioned, relationshipExtensionTuples, TYPE.RELATIONSHIP, true));
                             }
                         }
                     }
@@ -315,6 +315,7 @@ public class ExportSpecification {
         relationshipDto.setConceptId(termFactory.getUids(tuple.getRelId()).iterator().next());
         relationshipDto.setDestinationId(termFactory.getUids(tuple.getC2Id()).iterator().next());
         relationshipDto.setModifierId(ConceptConstants.MODIFIER_SOME.getUuids()[0]);
+        relationshipDto.setRefinabilityId(termFactory.getUids(tuple.getRefinabilityId()).iterator().next());
         int refinableChar = ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(termFactory.getUids(tuple.getRefinabilityId()));
         relationshipDto.setRefinable(Character.forDigit(refinableChar, 10));
         relationshipDto.setRelationshipGroupCode(Character.forDigit(tuple.getGroup(), 10));
@@ -403,9 +404,24 @@ public class ExportSpecification {
 
         setUuidSctIdIdentifier(componentDto.getConceptDto(), tuple, conceptData.getId().getVersions(), TYPE.CONCEPT);
 
-        componentDto.getConceptDto().setFullySpecifiedName(
-            getTupleVersion(conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true),
-                tuple).getText());
+        List<I_DescriptionTuple> descriptionTuples = conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true);
+
+        String fsn = "NO FSN!!!";
+        if (!descriptionTuples.isEmpty()) {
+            I_DescriptionTuple fsnTuple = getTupleVersion(descriptionTuples, tuple);
+            if (fsnTuple != null) {
+                fsn = fsnTuple.getText();
+            } else {
+                logger.severe("No FSN for the tuple version: " + tuple.getVersion() + " concept "
+                    + termFactory.getConcept(conceptData.getNid()));
+                fsn = descriptionTuples.get(0).getText();
+            }
+        } else {
+            logger.severe("No FSN for: " + tuple.getVersion() + " concept "
+                + termFactory.getConcept(conceptData.getNid()));
+        }
+        componentDto.getConceptDto().setFullySpecifiedName(fsn);
+
         componentDto.getConceptDto().setPrimative(tuple.isDefined());
         componentDto.getConceptDto().setType(TYPE.CONCEPT);
 
@@ -431,7 +447,7 @@ public class ExportSpecification {
                 list.add(extensionTuple);
 
                 componentDto.getRelationshipExtensionDtos().addAll(
-                    extensionProcessor.processList(extensionTuple.getCore(), list, TYPE.CONCEPT));
+                    extensionProcessor.processList(extensionTuple.getCore(), list, TYPE.CONCEPT, false));
             }
         }
     }
@@ -461,7 +477,7 @@ public class ExportSpecification {
                     componentNid, tuple);
                 list.add(extensionTuple);
 
-                extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, type));
+                extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, type, false));
             }
         }
     }
@@ -484,7 +500,7 @@ public class ExportSpecification {
         list.add(ctv3tuple);
 
         componentDto.getConceptExtensionDtos().addAll(
-            extensionProcessor.processList(ctv3tuple.getCore(), list, TYPE.CONCEPT));
+            extensionProcessor.processList(ctv3tuple.getCore(), list, TYPE.CONCEPT, false));
     }
 
     /**
@@ -505,7 +521,7 @@ public class ExportSpecification {
         list.add(snomedIdtuple);
 
         componentDto.getConceptExtensionDtos().addAll(
-            extensionProcessor.processList(snomedIdtuple.getCore(), list, TYPE.CONCEPT));
+            extensionProcessor.processList(snomedIdtuple.getCore(), list, TYPE.CONCEPT, false));
     }
 
     /**
@@ -582,6 +598,8 @@ public class ExportSpecification {
         baseConceptDto.setNamespace(getNamespace(idVersions,tuple));
         baseConceptDto.setPathId(termFactory.getConcept(tuple.getPathId()).getUids().get(0));
         baseConceptDto.setStatusId(termFactory.getConcept(tuple.getStatusId()).getUids().get(0));
+        baseConceptDto.setStatusCode(ArchitectonicAuxiliary.getSnomedConceptStatusId(
+            termFactory.getConcept(tuple.getStatusId()).getUids()) + "");
 
         return baseConceptDto;
     }
@@ -913,7 +931,8 @@ public class ExportSpecification {
          * @throws IOException DB errors
          * @throws TerminologyException DB errors
          */
-        public List<ExtensionDto> processList(I_ThinExtByRefVersioned thinExtByRefVersioned, List<I_ThinExtByRefTuple> list, TYPE type) throws IOException, TerminologyException {
+        @SuppressWarnings("unchecked")
+        public List<ExtensionDto> processList(I_ThinExtByRefVersioned thinExtByRefVersioned, List<I_ThinExtByRefTuple> list, TYPE type, boolean isClinical) throws IOException, TerminologyException {
             List<ExtensionDto> extensionDtos = new ArrayList<ExtensionDto>();
 
             for (I_ThinExtByRefTuple t : list) {
@@ -922,6 +941,7 @@ public class ExportSpecification {
                     I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(t.getTypeId());
                     if(extensionProcessor != null){
                         ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t.getPart(), type);
+                        extensionDto.setIsClinical(isClinical);
                         extensionDtos.add(extensionDto);
                     } else {
                         logger.severe("No extension processor for refset " + termFactory.getConcept(t.getRefsetId()).getInitialText());

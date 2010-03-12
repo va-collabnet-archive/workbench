@@ -28,6 +28,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 public class BaseConceptDto {
     private UUID pathId;
     private UUID status;
+    private String statusCode;
     private Date dateTime;
     private boolean isActive;
     private NAMESPACE namespace;
@@ -66,6 +67,20 @@ public class BaseConceptDto {
      */
     public void setStatusId(UUID status) {
         this.status = status;
+    }
+
+    /**
+     * @return the statusCode
+     */
+    public final String getStatusCode() {
+        return statusCode;
+    }
+
+    /**
+     * @param statusCode the statusCode to set
+     */
+    public final void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
     }
 
     /**

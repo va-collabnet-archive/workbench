@@ -51,7 +51,11 @@ import org.dwfa.util.AceDateFormat;
 public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
 
     private File exportDirectory;
+    private File exportClinicalRefsetDirectory;
+    private File exportStructuralRefsetDirectory;
     private Rf2IdentifierWriter identifierFile;
+    private Rf2IdentifierWriter identifierCliniclFile;
+    private Rf2IdentifierWriter identifierStructuralFile;
     private Rf2ConceptWriter conceptFile;
     private Rf2DescriptionWriter descriptionFile;
     private Rf2RelationshipWriter relationshipFile;
@@ -71,9 +75,18 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         super(SctIdDbDirectory);
 
         this.exportDirectory = exportDirectory;
+        this.exportDirectory.mkdirs();
 
-        exportDirectory.mkdirs();
+        exportClinicalRefsetDirectory = new File(this.exportDirectory.getAbsolutePath() + File.separatorChar + "refsets"
+            + File.separatorChar + "clinical" + File.separatorChar);
+        exportStructuralRefsetDirectory = new File(this.exportDirectory.getAbsolutePath() + File.separatorChar
+            + "refsets" + File.separatorChar + "structural" + File.separatorChar);
+        exportClinicalRefsetDirectory.mkdirs();
+        exportStructuralRefsetDirectory.mkdirs();
+
         identifierFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.rf2.txt"));
+        identifierCliniclFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.clinical.rf2.txt"));
+        identifierStructuralFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.structural.rf2.txt"));
         conceptFile = new Rf2ConceptWriter(new File(exportDirectory + File.separator + "concepts.rf2.txt"));
         descriptionFile = new Rf2DescriptionWriter(new File(exportDirectory + File.separator + "descriptions.rf2.txt"));
         relationshipFile = new Rf2RelationshipWriter(new File(exportDirectory + File.separator
@@ -124,7 +137,11 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private void writeExtensionRow(ExtensionDto extensionDto) throws Exception, IOException, TerminologyException {
         Rf2ReferenceSetRow referenceSetRow = getRf2ExtensionRow(extensionDto);
         getReferenceSetWriter(extensionDto).write(referenceSetRow);
-        identifierFile.write(getRf2MemberIdentifierRow(extensionDto));
+        if(extensionDto.isClinical()){
+            identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+        } else {
+            identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
+        }
     }
 
     /**
@@ -158,8 +175,16 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Long sctId = getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT);
 
         if (!referenceSetFileMap.containsKey(sctId)) {
-            referenceSetFileMap.put(sctId, new Rf2ReferenceSetWriter(new File(exportDirectory + File.separator + sctId + "."
-                + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt")));
+            Rf2ReferenceSetWriter newReferenceSetWriter;
+            if (extensionDto.isClinical()) {
+                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportClinicalRefsetDirectory
+                    + File.separator + sctId + "." + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
+            } else {
+                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportStructuralRefsetDirectory
+                    + File.separator + sctId + "." + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
+            }
+
+            referenceSetFileMap.put(sctId, newReferenceSetWriter);
         }
 
         return referenceSetFileMap.get(sctId);

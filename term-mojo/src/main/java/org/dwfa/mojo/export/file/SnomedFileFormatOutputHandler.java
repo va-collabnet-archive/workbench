@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
@@ -60,7 +61,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
 
             logger.warning(componentDto.getConceptDto().getConceptId() + " Validation Errors:" + validationErrors.toString());
             if (failOnError) {
-                throw new Exception("Validation Errors:" + validationErrors);
+                throw new ValidationException("Validation Errors:" + validationErrors);
             }
         }
     }

@@ -814,7 +814,7 @@ public class ConceptMockery {
         expect(termFactory.getUids(conceptNid)).andReturn(conceptUuidList).times(2);
         expect(relationshipTuple.getC2Id()).andReturn(destinationNid);
         expect(termFactory.getUids(destinationNid)).andReturn(exportRelationshipDestinationUuidList);
-        expect(relationshipTuple.getRefinabilityId()).andReturn(optionalRefinabilityNid);
+        expect(relationshipTuple.getRefinabilityId()).andReturn(optionalRefinabilityNid).times(2);
         expect(relationshipTuple.getGroup()).andReturn(1);
         expect(relationshipTuple.getC1Id()).andReturn(conceptNid);
         expect(relationshipTuple.getTypeId()).andReturn(typeNid);

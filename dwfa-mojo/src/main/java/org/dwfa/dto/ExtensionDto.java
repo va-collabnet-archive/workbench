@@ -27,9 +27,10 @@ public class ExtensionDto extends ConceptDto {
     private UUID concept1Id;
     private UUID concept2Id;
     private UUID concept3Id;
+    private boolean isClinical;
 
     public ExtensionDto() {
-
+        isClinical = true;
     }
 
     /**
@@ -100,5 +101,20 @@ public class ExtensionDto extends ConceptDto {
      */
     public void setConcept3Id(UUID concept3Id) {
         this.concept3Id = concept3Id;
+    }
+
+    /**
+     * @return the isClinical
+     */
+    public boolean isClinical() {
+        return isClinical;
+    }
+
+    /**
+     *
+     * @param isClinicalToSet boolean
+     */
+    public void setIsClinical(boolean isClinicalToSet) {
+        isClinical = isClinicalToSet;
     }
 }
