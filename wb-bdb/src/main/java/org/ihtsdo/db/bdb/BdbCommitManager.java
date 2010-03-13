@@ -557,7 +557,7 @@ public class BdbCommitManager {
 			try {
 				frameConfig.removeUncommitted(concept);
 				updateAlerts();
-				if (uncommittedCNids.size() == 0) {
+				if (uncommittedCNids.cardinality() == 0) {
 					frameConfig.setCommitEnabled(false);
 				}
 			} catch (Exception e) {
