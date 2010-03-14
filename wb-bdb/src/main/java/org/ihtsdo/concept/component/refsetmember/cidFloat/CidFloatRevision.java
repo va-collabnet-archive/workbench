@@ -130,9 +130,4 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         output.writeInt(c1Nid);
         output.writeFloat(floatValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
-        floatValue = input.readFloat();
-    }
 }

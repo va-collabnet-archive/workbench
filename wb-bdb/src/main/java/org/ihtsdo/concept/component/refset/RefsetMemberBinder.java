@@ -11,7 +11,6 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.util.GCValueComponentMap;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -31,7 +30,6 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 
 	private Collection<RefsetMember<?, ?>> refsetMemberList;
 	private Concept enclosingConcept; 
-	private GCValueComponentMap componentMap;
 
 
 	@Override
@@ -66,11 +64,11 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 			input.mark(8);
 			int nid = input.readInt();
 			input.reset();
-			RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) componentMap.get(nid);
+			RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) Concept.componentMap.get(nid);
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
 				if (refsetMember == null) {
 					refsetMember = nidToRefsetMemberMap.get(nid);
-					RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) componentMap.putIfAbsent(nid, refsetMember);
+					RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentMap.putIfAbsent(nid, refsetMember);
 					if (oldMember != null) {
 						refsetMember = oldMember;
 						if (nidToRefsetMemberMap != null) {
@@ -84,8 +82,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 					if (refsetMember == null) {
 						refsetMember = factory.create(nid, typeNid, enclosingConcept, input);
 						if (refsetMember.getTime() != Long.MIN_VALUE) {
-	                        componentMap.putIfAbsent(nid, refsetMember);
-	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) componentMap.putIfAbsent(nid, refsetMember);
+						    Concept.componentMap.putIfAbsent(nid, refsetMember);
+	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentMap.putIfAbsent(nid, refsetMember);
 	                        if (oldMember != null) {
 	                            refsetMember = oldMember;
 	                            if (nidToRefsetMemberMap != null) {
@@ -140,9 +138,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 
 
 	@Override
-	public void setupBinder(Concept enclosingConcept, GCValueComponentMap componentMap) {
+	public void setupBinder(Concept enclosingConcept) {
 		this.enclosingConcept = enclosingConcept;
-		this.componentMap = componentMap;
 	}
 
 

@@ -397,16 +397,21 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		Collection<Integer> descNids = getDescNids();
 		Collection<Integer> srcRelNids = getSrcRelNids();
 		Collection<Integer> imgNids = getImageNids();
-		Collection<Integer> memberNids = getMemberNids();
+ 		Collection<Integer> memberNids = getMemberNids();
 
 		int size = 1 + descNids.size() + srcRelNids.size() + imgNids.size()
 				+ memberNids.size();
 
 		ArrayList<Integer> allContainedNids = new ArrayList<Integer>(size);
 		allContainedNids.add(enclosingConcept.getNid());
+        assert enclosingConcept.getNid() != 0;
+        assert !descNids.contains(0);
 		allContainedNids.addAll(descNids);
+        assert !srcRelNids.contains(0);
 		allContainedNids.addAll(srcRelNids);
+	    assert !imgNids.contains(0);
 		allContainedNids.addAll(imgNids);
+        assert !memberNids.contains(0);
 		allContainedNids.addAll(memberNids);
 		return allContainedNids;
 	}

@@ -135,24 +135,11 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<IntRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			IntRevision r = new IntRevision(input, this);
-			if (r.getTime() != Long.MIN_VALUE) {
-				revisions.add(r);
-			}
-		}
+	protected final IntRevision readMemberRevision(TupleInput input) {
+	    return new IntRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		intValue = input.readInt();
 	}
 	@Override

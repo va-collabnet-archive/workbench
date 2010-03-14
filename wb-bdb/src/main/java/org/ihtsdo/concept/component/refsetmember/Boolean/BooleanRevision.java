@@ -26,7 +26,6 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" booleanValue:" + this.booleanValue);
-        buf.append(" }=> ");
         buf.append(super.toString());
         return buf.toString();
     }
@@ -71,7 +70,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 	public BooleanRevision(TupleInput input, 
 			BooleanMember primoridalMember) {
 		super(input, primoridalMember);
-		booleanValue = input.readBoolean();
+        booleanValue = input.readBoolean();
 	}
 
 	public BooleanRevision(ERefsetBooleanRevision eVersion,
@@ -114,9 +113,5 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeBoolean(booleanValue);
-    }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        booleanValue = input.readBoolean();
     }
 }

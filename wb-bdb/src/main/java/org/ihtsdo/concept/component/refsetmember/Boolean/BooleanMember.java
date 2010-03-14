@@ -162,24 +162,11 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<BooleanRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			BooleanRevision br = new BooleanRevision(input, this);
-			if (br.getTime() != Long.MIN_VALUE) {
-				revisions.add(br);
-			}
-		}
+	protected final BooleanRevision readMemberRevision(TupleInput input) {
+		return new BooleanRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		booleanValue = input.readBoolean();
 	}
 	@Override

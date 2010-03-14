@@ -148,10 +148,5 @@ public class CidIntRevision
         output.writeInt(c1Nid);
         output.writeInt(intValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
-        intValue = input.readInt();
-    }
 
 }

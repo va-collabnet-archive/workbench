@@ -22,6 +22,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetMember;
@@ -31,16 +32,16 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public abstract class RefsetMember<V extends RefsetRevision<V, C>, 
-								   C extends RefsetMember<V, C>> 
-			extends ConceptComponent<V, C> 
+public abstract class RefsetMember<R extends RefsetRevision<R, C>, 
+								   C extends RefsetMember<R, C>> 
+			extends ConceptComponent<R, C> 
 			implements I_ExtendByRef {
 
 
 	public int referencedComponentNid;
 
 	public class Version 
-	extends ConceptComponent<V, C>.Version 
+	extends ConceptComponent<R, C>.Version 
 	implements I_ExtendByRefVersion, I_ExtendByRefPart {
 
 		public Version() {
@@ -65,7 +66,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		@Override
 		public void addVersion(I_ExtendByRefPart part) {
 			versions = null;
-			RefsetMember.this.addRevision((V) part);
+			RefsetMember.this.addRevision((R) part);
 		}
 
 		@Override
@@ -201,9 +202,9 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	}
 
 	@Override
-	public boolean fieldsEqual(ConceptComponent<V, C> obj) {
+	public boolean fieldsEqual(ConceptComponent<R, C> obj) {
 		if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
-			RefsetMember<V,C> another = (RefsetMember<V,C>) obj;
+			RefsetMember<R,C> another = (RefsetMember<R,C>) obj;
 			if (this.getTypeId() != another.getTypeId()) {
 				return false;
 			}
@@ -235,27 +236,38 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
         return buf.toString();
     }
 	
-	protected abstract boolean membersEqual(ConceptComponent<V, C> obj);
+	protected abstract boolean membersEqual(ConceptComponent<R, C> obj);
 
 	public void readFromBdb(TupleInput input)  {
 		referencedComponentNid = input.readInt();
-		readMember(input);
+		readMemberFields(input);
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
-			readMemberParts(input, additionalVersionCount);
+	        if (revisions == null) {
+	            revisions = new ArrayList<R>(additionalVersionCount);
+	        } else {
+	            revisions.ensureCapacity(revisions.size()
+	                    + additionalVersionCount);
+	        }
+	        for (int i = 0; i < additionalVersionCount; i++) {
+	            R r = readMemberRevision(input);
+	            if (r.getTime() != Long.MIN_VALUE) {
+	                revisions.add(r);
+	            }
+	        }
 		}
 	}
 
-	protected abstract void readMember(TupleInput input);
+	protected abstract void readMemberFields(TupleInput input);
 
-	protected abstract void readMemberParts(TupleInput input, int additionalVersionCount);
+	protected abstract R readMemberRevision(TupleInput input);
 
 
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-		List<RefsetRevision<V, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<V, C>>();
+		List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<R, C>>();
 		if (revisions != null) {
-			for (RefsetRevision<V, C> p: revisions) {
+			for (RefsetRevision<R, C> p: revisions) {
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid &&
 						p.getTime() != Long.MIN_VALUE) {
 					additionalVersionsToWrite.add(p);
@@ -265,7 +277,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		output.writeInt(referencedComponentNid);
 		writeMember(output);
 		output.writeShort(additionalVersionsToWrite.size());
-		for (RefsetRevision<V, C> p: additionalVersionsToWrite) {
+		for (RefsetRevision<R, C> p: additionalVersionsToWrite) {
 			p.writePartToBdb(output);
 		}		
 	}
@@ -301,7 +313,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@Override
 	public void addVersion(I_ExtendByRefPart part) {
 		versions = null;
-		super.addRevision((V) part);
+		super.addRevision((R) part);
 	}
 
 
@@ -344,7 +356,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 
 
 	@Override
-	public RefsetMember<V, C> getMutablePart() {
+	public RefsetMember<R, C> getMutablePart() {
 		return this;
 	}
 
@@ -417,14 +429,14 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 		throw new UnsupportedOperationException();
 	}
 
-	protected abstract VersionComputer<RefsetMember<V,C>.Version> getVersionComputer();
+	protected abstract VersionComputer<RefsetMember<R,C>.Version> getVersionComputer();
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
 			List<I_ExtendByRefVersion> returnTuples, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RefsetMember<V,C>.Version> versionsToAdd = new ArrayList<RefsetMember<V,C>.Version>();
+		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
 				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
 		returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
@@ -435,7 +447,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@Override
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
 			List<I_ExtendByRefVersion> returnTuples, boolean addUncommitted) {
-		List<RefsetMember<V,C>.Version> versionsToAdd = new ArrayList<RefsetMember<V,C>.Version>();
+		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
 				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
 		returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
@@ -447,7 +459,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	public void addTuples(List<I_ExtendByRefVersion> returnTuples,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RefsetMember<V,C>.Version> versionsToAdd = new ArrayList<RefsetMember<V,C>.Version>();
+		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), 
 				Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), versionsToAdd, 
 				addUncommitted, (List<Version>) getVersions());
@@ -461,7 +473,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 			PositionSetReadOnly positions, boolean addUncommitted,
 			boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
-		List<RefsetMember<V,C>.Version> versionsToAdd = new ArrayList<RefsetMember<V,C>.Version>();
+		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
 				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
 		return versionsToAdd;
@@ -472,7 +484,7 @@ public abstract class RefsetMember<V extends RefsetRevision<V, C>,
 	@Override
 	public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
 			PositionSetReadOnly positions, boolean addUncommitted) {
-		List<RefsetMember<V,C>.Version> versionsToAdd = new ArrayList<RefsetMember<V,C>.Version>();
+		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
 				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
 		return versionsToAdd;

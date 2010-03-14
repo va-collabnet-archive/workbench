@@ -158,24 +158,11 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 	
 	
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<CidStrRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			CidStrRevision r = new CidStrRevision(input, this);
-			if (r.getTime() != Long.MIN_VALUE) {
-				revisions.add(r);
-			}
-		}
+	protected final CidStrRevision readMemberRevision(TupleInput input) {
+	    return new CidStrRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		c1Nid = input.readInt();
 		strValue = input.readString();
 	}

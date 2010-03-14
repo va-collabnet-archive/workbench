@@ -119,8 +119,4 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeString(stringValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        stringValue = input.readString();
-    }
 }

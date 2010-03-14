@@ -29,7 +29,6 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	private ComponentFactory<V, C> factory;
 	private AtomicInteger componentsEncountered;
 	private AtomicInteger componentsWritten;
-	private GCValueComponentMap componentMap;
 
 	public ConceptComponentBinder(ComponentFactory<V, C> factory, 
 								  AtomicInteger componentsEncountered, 
@@ -72,12 +71,12 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			int nid = input.readInt();
 			// we have to put it back so the component can read it again...
 			input.reset();
-			C conceptComponent = (C) componentMap.get(nid);
+			C conceptComponent = (C) Concept.componentMap.get(nid);
 			if (nidToConceptComponentMap != null && 
 			        nidToConceptComponentMap.containsKey(nid)) {
 				if (conceptComponent == null) {
 					conceptComponent = nidToConceptComponentMap.get(nid);
-					C oldComponent = (C) componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
+					C oldComponent = (C) Concept.componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
 					if (oldComponent != null) {
 						conceptComponent = oldComponent;
 						if (nidToConceptComponentMap != null) {
@@ -91,7 +90,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 					if (conceptComponent == null) {
 						conceptComponent = factory.create(enclosingConcept, input);
 						if (conceptComponent.getTime() != Long.MIN_VALUE) {
-	                        C oldComponent = (C) componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
+	                        C oldComponent = (C) Concept.componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
 	                        if (oldComponent != null) {
 	                            conceptComponent = oldComponent;
 	                            if (nidToConceptComponentMap != null) {
@@ -148,10 +147,9 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	}
 
 	@Override
-	public void setupBinder(Concept enclosingConcept, GCValueComponentMap componentMap) {
+	public void setupBinder(Concept enclosingConcept) {
 		this.enclosingConcept = enclosingConcept;
 		this.readOnlyConceptComponentList = null;
-		this.componentMap = componentMap;
 	}
 
 	public void setTermComponentList(ArrayList<C> componentList) {

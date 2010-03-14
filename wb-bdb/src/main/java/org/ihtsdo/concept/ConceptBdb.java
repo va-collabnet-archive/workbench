@@ -76,6 +76,9 @@ public class ConceptBdb extends ComponentBdb {
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---!!! Writing to conceptBdb: " + concept.toLongString() + "\n---!!! ");
         }
+        if (concept.isCanceled()) {
+            return;
+        }
         ConceptBinder binder = new ConceptBinder();
         DatabaseEntry key = new DatabaseEntry();
         int cNid = concept.getNid();

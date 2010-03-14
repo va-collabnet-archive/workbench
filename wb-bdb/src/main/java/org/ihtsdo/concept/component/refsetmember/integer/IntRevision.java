@@ -116,9 +116,4 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeInt(intValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        intValue = input.readInt();
-    }
-
 }

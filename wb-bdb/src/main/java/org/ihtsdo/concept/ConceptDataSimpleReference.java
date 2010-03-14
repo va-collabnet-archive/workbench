@@ -28,16 +28,12 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
-import org.ihtsdo.db.util.GCValueComponentMap;
-import org.ihtsdo.db.util.ReferenceType;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
-	private static GCValueComponentMap componentMap = new GCValueComponentMap(ReferenceType.WEAK);
-
-	private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
+    private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
 	private AtomicReference<AddSrcRelList> srcRels = new AtomicReference<AddSrcRelList>();
 	private AtomicReference<AddDescriptionList> descriptions = new AtomicReference<AddDescriptionList>();
 	private AtomicReference<AddImageList> images = new AtomicReference<AddImageList>();
@@ -90,7 +86,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	private <C extends ConceptComponent<V, C>, V extends Revision<V, C>> ArrayList<C> getList(
 			ConceptComponentBinder<V, C> binder, OFFSETS offset,
 			Concept enclosingConcept) throws IOException {
-		binder.setupBinder(enclosingConcept, componentMap);
+		binder.setupBinder(enclosingConcept);
 		ArrayList<C> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {
@@ -122,7 +118,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	private Collection<RefsetMember<?, ?>> getList(RefsetMemberBinder binder,
 			OFFSETS offset, Concept enclosingConcept)
 			throws IOException {
-		binder.setupBinder(enclosingConcept, componentMap);
+		binder.setupBinder(enclosingConcept);
 		Collection<RefsetMember<?, ?>> componentList;
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
 		if (readOnlyInput.available() > 0) {

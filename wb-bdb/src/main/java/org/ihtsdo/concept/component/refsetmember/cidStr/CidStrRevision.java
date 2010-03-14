@@ -150,10 +150,4 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
         output.writeInt(c1Nid);
         output.writeString(strValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
-        strValue = input.readString();
-    }
-
 }

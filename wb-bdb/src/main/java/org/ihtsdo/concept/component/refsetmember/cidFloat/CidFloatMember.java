@@ -62,24 +62,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<CidFloatRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			CidFloatRevision r = new CidFloatRevision(input, this);
-			if (r.getTime() != Long.MIN_VALUE) {
-				revisions.add(r);
-			}
-		}
+	protected final CidFloatRevision readMemberRevision(TupleInput input) {
+	    return new CidFloatRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		c1Nid = input.readInt();
 		floatValue = input.readFloat();
 	}

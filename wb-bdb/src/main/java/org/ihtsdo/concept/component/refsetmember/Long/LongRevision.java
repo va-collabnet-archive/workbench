@@ -114,9 +114,4 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeLong(longValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        longValue = input.readLong();
-    }
-
 }

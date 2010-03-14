@@ -98,7 +98,7 @@ public class ConceptAttributesVersionTest {
 			DatabaseEntry entry = new DatabaseEntry();
 			ArrayList<ConceptAttributes> origList = c.getConceptAttributesList();
 			cab.objectToEntry(origList, entry);
-			cab.setupBinder(c, new GCValueComponentMap(ReferenceType.WEAK));
+			cab.setupBinder(c);
 			Collection<ConceptAttributes> newList = cab.entryToObject(entry);
 			assertEquals(origList, newList);
 

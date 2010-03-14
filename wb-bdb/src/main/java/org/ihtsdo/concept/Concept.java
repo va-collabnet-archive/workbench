@@ -61,6 +61,7 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
+import org.ihtsdo.db.util.GCValueComponentMap;
 import org.ihtsdo.db.util.GCValueConceptMap;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.ReferenceType;
@@ -79,6 +80,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public static GCValueConceptMap concepts = new GCValueConceptMap(
 			refType);
+
+	public static GCValueComponentMap componentMap = new GCValueComponentMap(ReferenceType.WEAK);
+
 
 	public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
@@ -184,7 +188,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				for (ERefsetMember<?> er: eConcept.getRefsetMembers()) {
 					int rNid = Bdb.uuidToNid(er.primordialUuid);
 					RefsetMember<?, ?> r = c.getRefsetMember(rNid);
-					if (currentMemberNids.contains(rNid)) {
+					if (currentMemberNids.contains(rNid) && r != null) {
 						r.merge(RefsetMemberFactory.create(er, c));
 					} else {
 						c.getRefsetMembers().add(RefsetMemberFactory.create(er, c));
@@ -1607,6 +1611,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public void setConceptAttributes(ConceptAttributes attributes)
 			throws IOException {
+	    assert attributes.nid != 0;
+	    nid = attributes.nid;
 		data.set(attributes);
 	}
 
@@ -1687,7 +1693,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	
 	protected void finalize() throws Throwable {
-        if (isUnwritten()) {
+        if (isUnwritten() && !isCanceled()) {
             try {
             	synchronized (concepts) {
             		if (isUnwritten()) {
@@ -1702,19 +1708,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
     }
 	
-	public static void flush() throws Exception {
-    	synchronized (concepts) {
-    		for (Reference<Concept> cRef: concepts.values()) {
-    			Concept c = cRef.get();
-    			if (c != null && c.isUnwritten()) {
-    	          BdbCommitManager.writeImmediate(c);
-    			}
-    		}
-		}
-	}
-
-
-	  public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
+	public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
 	      throws IOException {
 	    return ConflictHelper.getCommonDescTuples(this, config);
 	  }

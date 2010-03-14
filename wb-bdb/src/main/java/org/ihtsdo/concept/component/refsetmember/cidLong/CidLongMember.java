@@ -78,24 +78,11 @@ public class CidLongMember
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<CidLongRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			CidLongRevision r = new CidLongRevision(input, this);
-			if (r.getTime() != Long.MIN_VALUE) {
-				revisions.add(r);
-			}
-		}
+	protected final CidLongRevision readMemberRevision(TupleInput input) {
+		return new CidLongRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		c1Nid = input.readInt();
 		longValue = input.readLong();
 	}

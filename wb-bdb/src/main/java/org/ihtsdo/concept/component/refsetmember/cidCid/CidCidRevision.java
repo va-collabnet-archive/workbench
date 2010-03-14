@@ -155,10 +155,5 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
         output.writeInt(c1Nid);
         output.writeInt(c2Nid);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
-        c2Nid = input.readInt();
-    }
 
 }

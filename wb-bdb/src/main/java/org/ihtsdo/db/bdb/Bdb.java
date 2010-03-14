@@ -305,7 +305,6 @@ public class Bdb {
 
                 AceLog.getAppLog().info("Starting bdb close.");
                 System.out.println("Starting bdb close.");
-				Concept.flush();
                 AceLog.getAppLog().info("Starting PositionMapper close.");
                 System.out.println("Starting PositionMapper close.");
 				PositionMapper.close();

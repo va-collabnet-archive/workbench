@@ -26,7 +26,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
     public String toString() {
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c1Nid: " + this.c1Nid);
         buf.append(super.toString());
         return buf.toString();
     }
@@ -74,7 +74,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	public CidRevision(TupleInput input, 
 			CidMember primoridalMember) {
 		super(input, primoridalMember);
-		c1Nid = input.readInt();
+        c1Nid = input.readInt();
 	}
 
 	public CidRevision(ERefsetCidRevision eVersion,
@@ -119,9 +119,5 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeInt(c1Nid);
-    }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
     }
 }

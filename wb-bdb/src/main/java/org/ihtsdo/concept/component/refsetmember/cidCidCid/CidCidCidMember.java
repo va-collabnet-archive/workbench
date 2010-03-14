@@ -178,24 +178,11 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	}
 
 	@Override
-	protected final void readMemberParts(TupleInput input,
-			int additionalVersionCount) {
-		if (revisions == null) {
-			revisions = new ArrayList<CidCidCidRevision>(
-					additionalVersionCount);
-		} else {
-			revisions.ensureCapacity(revisions.size()
-					+ additionalVersionCount);
-		}
-		for (int i = 0; i < additionalVersionCount; i++) {
-			CidCidCidRevision r = new CidCidCidRevision(input, this);
-			if (r.getTime() != Long.MIN_VALUE) {
-				revisions.add(r);
-			}
-		}
+	protected final CidCidCidRevision readMemberRevision(TupleInput input) {
+		return new CidCidCidRevision(input, this);
 	}
 	@Override
-	protected void readMember(TupleInput input) {
+	protected void readMemberFields(TupleInput input) {
 		c1Nid = input.readInt();
 		c2Nid = input.readInt();
 		c3Nid = input.readInt();

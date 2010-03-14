@@ -25,7 +25,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 
 	public RefsetRevision(TupleInput input, C primordialComponent) {
 		super(input, primordialComponent);
-		readFieldsFromInput(input);
 	}
 
 	public RefsetRevision(ERevision eVersion,
@@ -82,6 +81,4 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
         }
         return false;
     }
-
-    protected abstract void readFieldsFromInput(TupleInput input);
 }

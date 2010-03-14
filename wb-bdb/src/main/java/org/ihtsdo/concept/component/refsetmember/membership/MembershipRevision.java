@@ -94,9 +94,5 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
     protected void writeFieldsToBdb(TupleOutput output) {
         // nothing to write
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        // nothing to read
-    }
 
 }

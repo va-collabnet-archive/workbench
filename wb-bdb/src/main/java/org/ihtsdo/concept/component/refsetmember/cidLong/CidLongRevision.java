@@ -134,10 +134,4 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
         output.writeInt(c1Nid);
         output.writeLong(longValue);
     }
-    @Override
-    protected void readFieldsFromInput(TupleInput input) {
-        c1Nid = input.readInt();
-        longValue = input.readLong();
-    }
-
 }

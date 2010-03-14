@@ -6,7 +6,6 @@ public interface I_BindConceptComponents {
 
 	public Concept getEnclosingConcept();
 
-	public void setupBinder(Concept enclosingConcept,
-			GCValueComponentMap componentMap);
+	public void setupBinder(Concept enclosingConcept);
 
 }
