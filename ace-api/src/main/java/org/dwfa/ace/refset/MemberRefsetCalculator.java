@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -143,9 +143,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                 /*
                  * For each inclusion concept, find the type and keep a list of
                  * which are each type...reasons for inclusion
-                 * 
+                 *
                  * stop descending if child is in the exclusion lineage set
-                 * 
+                 *
                  * Skip children which are in the exclusion individual set
                  */
                 for (I_ThinExtByRefVersioned member : refsetMembers) {
@@ -207,9 +207,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
                 /*
                  * Iterate over exclusions and find which ones are excluded
-                 * 
+                 *
                  * stop descending if child is in the inclusion lineage set
-                 * 
+                 *
                  * skip children which are in the inclusion individual set
                  */
                 for (Integer member : conceptsWithExclusion) {
@@ -434,7 +434,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
         System.out.println("id for individual include is " + this.includeIndividual);
         System.out.println("id for individual exclude is " + this.excludeIndividual);
 
-        for (Integer refset : newRefsetMembers.keySet()) {
+        /** Need to process all new and old members */
+        Set<Integer> newAndOldRefsetNid = new HashSet<Integer>();
+        newAndOldRefsetNid.addAll(newRefsetMembers.keySet());
+        newAndOldRefsetNid.addAll(newRefsetExclusion.keySet());
+
+        for (Integer refset : newAndOldRefsetNid) {
             ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
 
             ConflictReportWriter conflictWriter = new ConflictReportWriter(outputDirectory.getAbsolutePath()
@@ -509,147 +514,150 @@ public class MemberRefsetCalculator extends RefsetUtilities {
             reportWriter.write("\n\nNew included members of refset " + getConcept(refset) + " are: ");
             reportWriter.newLine();
             newMembers = newRefsetMembers.get(refset);
+            if(newMembers == null){
+                newMembers = new ClosestDistanceHashSet();
+            }
             oldMembers = existingRefsetMembers.get(refset);
+
+            //let the madness begin
+            Set<Integer> keySet = new HashSet<Integer>();
+            keySet.addAll(newMembers.keySet());
+            if (oldMembers != null) {
+                keySet.removeAll(oldMembers.keySet());
+            }
+
+            int count = 0;
+            long sysTime = System.currentTimeMillis();
+            for (Integer conceptId : keySet) {
+                count++;
+                if (count % commitSize == 0) {
+                    System.out.println("adding member " + count + " of " + keySet.size() + " ("
+                        + (System.currentTimeMillis() - sysTime) + ")");
+                    sysTime = System.currentTimeMillis();
+                }
+                if (!useNonTxInterface && termFactory.getUncommitted().size() > commitSize) {
+                    termFactory.commit();
+                }
+                ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
+                reportWriter.write(getConcept(member.getConceptId()).toString());
+                reportWriter.newLine();
+                if (!validateOnly) {
+                    if (useNonTxInterface) {
+                        nonTxWriter.addToRefset(null, member.getConceptId(),
+                            getMembershipType(member.getInclusionTypeId()), refset, currentStatusId);
+                    } else {
+                        addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
+                    }
+                }
+            }
+
+            newMembers = existingRefsetMembers.get(refset);
+            oldMembers = newRefsetMembers.get(refset);
+
             if (newMembers != null) {
-                Set<Integer> keySet = new HashSet<Integer>();
+                keySet = new HashSet<Integer>();
                 keySet.addAll(newMembers.keySet());
                 if (oldMembers != null) {
                     keySet.removeAll(oldMembers.keySet());
                 }
-
-                int count = 0;
-                long sysTime = System.currentTimeMillis();
                 for (Integer conceptId : keySet) {
-                    count++;
-                    if (count % commitSize == 0) {
-                        System.out.println("adding member " + count + " of " + keySet.size() + " ("
-                            + (System.currentTimeMillis() - sysTime) + ")");
-                        sysTime = System.currentTimeMillis();
-                    }
-                    if (!useNonTxInterface && termFactory.getUncommitted().size() > commitSize) {
-                        termFactory.commit();
-                    }
-                    ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
-                    reportWriter.write(getConcept(member.getConceptId()).toString());
-                    reportWriter.newLine();
-                    if (!validateOnly) {
-                        if (useNonTxInterface) {
-                            nonTxWriter.addToRefset(null, member.getConceptId(),
-                                getMembershipType(member.getInclusionTypeId()), refset, currentStatusId);
-                        } else {
-                            addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
-                        }
-                    }
+                    exclusions.add(newMembers.get(conceptId));
                 }
+            }
 
-                newMembers = existingRefsetMembers.get(refset);
-                oldMembers = newRefsetMembers.get(refset);
-
-                if (newMembers != null) {
-                    keySet = new HashSet<Integer>();
-                    keySet.addAll(newMembers.keySet());
-                    if (oldMembers != null) {
-                        keySet.removeAll(oldMembers.keySet());
-                    }
-                    for (Integer conceptId : keySet) {
-                        exclusions.add(newMembers.get(conceptId));
-                    }
+            ClosestDistanceHashSet existingMembers = existingRefsetMembers.get(refset);
+            ClosestDistanceHashSet newExclusionMembers = newRefsetExclusion.get(refset);
+            if (existingMembers != null) {
+                keySet = new HashSet<Integer>();
+                keySet.addAll(existingMembers.keySet());
+                if (newExclusionMembers != null) {
+                    keySet.retainAll(newExclusionMembers.keySet());
+                } else {
+                    keySet.clear();
                 }
-
-                newMembers = existingRefsetMembers.get(refset);
-                oldMembers = newRefsetExclusion.get(refset);
-                if (newMembers != null) {
-                    keySet = new HashSet<Integer>();
-                    keySet.addAll(newMembers.keySet());
-                    if (oldMembers != null) {
-                        keySet.retainAll(oldMembers.keySet());
-                    } else {
-                        keySet.clear();
-                    }
-                    for (Integer key : keySet) {
-                        exclusions.add(newMembers.get(key));
-                    }
+                for (Integer key : keySet) {
+                    exclusions.add(existingMembers.get(key));
                 }
-                reportWriter.write("\n\nNew excluded members who used to be members of refset " + getConcept(refset)
-                    + " are: ");
+            }
+            reportWriter.write("\n\nNew excluded members who used to be members of refset " + getConcept(refset)
+                + " are: ");
+            reportWriter.newLine();
+            for (ConceptRefsetInclusionDetails i : exclusions.values()) {
+                reportWriter.write(getConcept(i.getConceptId()).toString());
                 reportWriter.newLine();
-                for (ConceptRefsetInclusionDetails i : exclusions.values()) {
-                    reportWriter.write(getConcept(i.getConceptId()).toString());
-                    reportWriter.newLine();
-                    if (!validateOnly) {
-                        I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(), refset);
+                if (!validateOnly) {
+                    I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(), refset);
+                    if (ext != null) {
+                        if (!newestPartRetired(ext)) {
+                            if (useNonTxInterface) {
+                                I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
+                                nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptId(),
+                                    latestExtVersion.getConceptId(), refset, retiredConceptId);
+                            } else {
+                                retireLatestExtension(ext);
+                            }
+                        }
+                    } else {
+                        System.out.println("No extension exists with this refset id for this component");
+                    }
+                }
+            }
+
+            if (markParents) {
+                ClosestDistanceHashSet oldparents = existingParentMembers.get(refset);
+                ClosestDistanceHashSet parents = findParentsToBeMarked(newRefsetMembers.get(refset));
+
+                if (existingRefsetMembers.get(refset) != null && oldparents != null) {
+                    oldparents.removeAll(existingRefsetMembers.get(refset));
+                }
+                if (newRefsetMembers.get(refset) != null && parents != null) {
+                    parents.removeAll(newRefsetMembers.get(refset));
+                }
+
+                reportWriter.write("\n\nParents that are not marked but will be marked in refset "
+                    + getConcept(refset) + " are: ");
+                reportWriter.newLine();
+                for (ConceptRefsetInclusionDetails parent : parents.values()) {
+                    if (oldparents == null
+                        || (oldparents != null && !oldparents.containsKey(parent.getConceptId()))) {
+                        if (!validateOnly) {
+                            if (useNonTxInterface) {
+                                nonTxWriter.addToRefset(null, parent.getConceptId(),
+                                    ConceptConstants.PARENT_MARKER.localize().getNid(), refset, currentStatusId);
+                            } else {
+                                addToMemberSetAsParent(parent.getConceptId(), refset);
+                            }
+                            reportWriter.write(getConcept(parent.getConceptId()).toString());
+                            reportWriter.newLine();
+                        }
+                    } else {
+                        reportWriter.write(getConcept(parent.getConceptId()).toString()
+                            + " ------- is already marked as parent");
+                        reportWriter.newLine();
+                    }
+                }
+                if (oldparents != null) {
+                    oldparents.removeAll(parents);
+                    for (ConceptRefsetInclusionDetails existingParent : oldparents.values()) {
+                        I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),
+                            refset);
                         if (ext != null) {
                             if (!newestPartRetired(ext)) {
                                 if (useNonTxInterface) {
                                     I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-                                    nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptId(),
+                                    nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptId(),
                                         latestExtVersion.getConceptId(), refset, retiredConceptId);
                                 } else {
                                     retireLatestExtension(ext);
                                 }
                             }
                         } else {
-                            System.out.println("No extension exists with this refset id for this component");
+                            System.out.println("No extension exists with this refset id for this component : "
+                                + getConcept(existingParent.getConceptId()).toString());
                         }
-                    }
-                }
-
-                if (markParents) {
-                    ClosestDistanceHashSet oldparents = existingParentMembers.get(refset);
-                    ClosestDistanceHashSet parents = findParentsToBeMarked(newRefsetMembers.get(refset));
-
-                    if (existingRefsetMembers.get(refset) != null && oldparents != null) {
-                        oldparents.removeAll(existingRefsetMembers.get(refset));
-                    }
-                    if (newRefsetMembers.get(refset) != null && parents != null) {
-                        parents.removeAll(newRefsetMembers.get(refset));
-                    }
-
-                    reportWriter.write("\n\nParents that are not marked but will be marked in refset "
-                        + getConcept(refset) + " are: ");
-                    reportWriter.newLine();
-                    for (ConceptRefsetInclusionDetails parent : parents.values()) {
-                        if (oldparents == null
-                            || (oldparents != null && !oldparents.containsKey(parent.getConceptId()))) {
-                            if (!validateOnly) {
-                                if (useNonTxInterface) {
-                                    nonTxWriter.addToRefset(null, parent.getConceptId(),
-                                        ConceptConstants.PARENT_MARKER.localize().getNid(), refset, currentStatusId);
-                                } else {
-                                    addToMemberSetAsParent(parent.getConceptId(), refset);
-                                }
-                                reportWriter.write(getConcept(parent.getConceptId()).toString());
-                                reportWriter.newLine();
-                            }
-                        } else {
-                            reportWriter.write(getConcept(parent.getConceptId()).toString()
-                                + " ------- is already marked as parent");
-                            reportWriter.newLine();
-                        }
-                    }
-                    if (oldparents != null) {
-                        oldparents.removeAll(parents);
-                        for (ConceptRefsetInclusionDetails existingParent : oldparents.values()) {
-                            I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),
-                                refset);
-                            if (ext != null) {
-                                if (!newestPartRetired(ext)) {
-                                    if (useNonTxInterface) {
-                                        I_ThinExtByRefPartConcept latestExtVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
-                                        nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptId(),
-                                            latestExtVersion.getConceptId(), refset, retiredConceptId);
-                                    } else {
-                                        retireLatestExtension(ext);
-                                    }
-                                }
-                            } else {
-                                System.out.println("No extension exists with this refset id for this component : "
-                                    + getConcept(existingParent.getConceptId()).toString());
-                            }
-                            reportWriter.write(getConcept(existingParent.getConceptId()).toString()
-                                + " ------- to be retired");
-                            reportWriter.newLine();
-                        }
+                        reportWriter.write(getConcept(existingParent.getConceptId()).toString()
+                            + " ------- to be retired");
+                        reportWriter.newLine();
                     }
                 }
 
