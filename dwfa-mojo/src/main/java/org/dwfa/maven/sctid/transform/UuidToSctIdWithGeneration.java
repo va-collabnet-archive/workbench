@@ -16,7 +16,6 @@
  */
 package org.dwfa.maven.sctid.transform;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -44,8 +43,6 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
  */
 public abstract class UuidToSctIdWithGeneration extends AbstractTransform implements I_ReadAndTransform {
     private static Logger logger = Logger.getLogger(UuidToSctIdWithGeneration.class.getName());
-    /** Directory for DB file. */
-    private File sourceDirectory = null;
     /** Static DB Map handler. */
     static UuidSnomedDbMapHandler map;
 
@@ -55,29 +52,17 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * 
      * @param transform Transform
      */
+    @Override
     public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
-        setupImpl(transformer.getBuildDirectory(), transformer.getSourceDirectory());
-    }
-
-    /**
-     * Sets up the <code>map</code> for the source directory.
-     * 
-     * NB the map is static so the first Transform source directory is used to
-     * read/create the DB file.
-     * 
-     * @param buildDirectory NOT USED
-     * @param sourceDirectoryToSet location for the DB file
-     * @throws IOException reading files.
-     * @throws ClassNotFoundException error opening DB.
-     */
-    public void setupImpl(File buildDirectory, File sourceDirectoryToSet) throws IOException, ClassNotFoundException {
-        sourceDirectory = sourceDirectoryToSet;
-
         try {
-            initMap(null, sourceDirectory);
+            initMap();
         } catch (SQLException e) {
             throw new RuntimeException("Cannot load DB", e);
         }
+    }
+    
+    public void setupImpl() throws IOException, ClassNotFoundException {
+        setupImpl(null);
     }
 
     /**
@@ -90,11 +75,11 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * @throws ClassNotFoundException error opening DB.
      * @throws SQLException creating DB object
      */
-    private static synchronized void initMap(File idGeneratedDir, File sourceDirectory) throws IOException,
+    private static synchronized void initMap() throws IOException,
             ClassNotFoundException, SQLException {
         logger.info("initMap");
         if (map == null) {
-            map = new UuidSnomedDbMapHandler(sourceDirectory);
+            map = new UuidSnomedDbMapHandler();
             logger.info("new UuidSnomedDbMapHandler");
         }
     }

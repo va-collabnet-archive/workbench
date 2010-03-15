@@ -17,6 +17,7 @@ import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.ExtensionDto;
 import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.rf2.Rf2ConceptReader;
@@ -29,12 +30,27 @@ import org.dwfa.mojo.file.rf2.Rf2ReferenceSetReader;
 import org.dwfa.mojo.file.rf2.Rf2ReferenceSetRow;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipReader;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipRow;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Test the Rf2OutputHandler - tests will be executed against a Derby embedded database unless the following system
+ * properties are set
+ * <ul>
+ * <li>uuid.map.test.database.password</li>
+ * <li>uuid.map.test.database.user</li>
+ * <li>uuid.map.test.database.url</li>
+ * <li>uuid.map.test.database.driver</li>
+ * </ul>
+ */
 public class Rf2OutputHandlerTest {
 
+    public static final String UUID_MAP_TEST_DATABASE_PASSWORD = "uuid.map.test.database.password";
+    public static final String UUID_MAP_TEST_DATABASE_USER = "uuid.map.test.database.user";
+    public static final String UUID_MAP_TEST_DATABASE_URL = "uuid.map.test.database.url";
+    public static final String UUID_MAP_TEST_DATABASE_DRIVER = "uuid.map.test.database.driver";
     static Rf2OutputHandler rf2OutputHandler;
     static File dbDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "test-id-db");
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "rf2");
@@ -47,7 +63,20 @@ public class Rf2OutputHandlerTest {
 
     @Before
     public void setUp() throws IOException, SQLException, ClassNotFoundException {
-        rf2OutputHandler = new Rf2OutputHandler(exportDirectory, dbDirectory);
+        
+        exportDirectory.mkdirs();
+        if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+                "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
+
+        } else {
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
+        }
+        
+        rf2OutputHandler = new Rf2OutputHandler(exportDirectory);
     }
 
     @AfterClass

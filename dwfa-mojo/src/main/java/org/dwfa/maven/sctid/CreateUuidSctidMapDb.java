@@ -25,23 +25,46 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
+ * Creates a new Uuid-Sctid map database optionally initialised with provided map data.
+ * 
  * @goal createUuidSctidMapDb
  */
 public class CreateUuidSctidMapDb extends AbstractMojo {
 
     /**
-     * DB file
+     * URL used to connect to the database
      * 
      * @parameter
      * @required
      */
-    File dbMapDirectory;
+    String dbConnectionUrl;
+    
+    /**
+     * Database driver fully qualified class name
+     * 
+     * @parameter
+     * @required
+     */
+    String dbDriver;
+    
+    /**
+     * Database user to optionally authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbUsername;
+    
+    /**
+     * Database user's password optionally used to authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbPassword;
 
     /**
      * Fixed id map file
      * 
      * @parameter
-     * @required
      */
     File fixIdMapDirectory;
 
@@ -58,20 +81,48 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
      * 
      * @parameter
      */
-    boolean validate = false;;
+    boolean validate = false;
 
     /**
      * Append files to database.
      * 
      * @parameter
      */
-    boolean appendToDb = false;;
+    boolean appendToDb = false;
+    
+    /**
+     * Indicates if a existing database is found whether it should be overwritten - defaults to false
+     * 
+     * @parameter
+     */
+    boolean createFreshDatabase = false;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        UuidSctidMapDb.setDatabaseProperties(dbDriver, dbConnectionUrl, dbUsername, dbPassword);
+        UuidSctidMapDb mapDbInstance = UuidSctidMapDb.getInstance(true);
+        
         try {
-            UuidSctidMapDb.getInstance().openDb(dbMapDirectory, fixIdMapDirectory, readWriteMapDirectory, validate,
-                appendToDb);
+            boolean databaseExists = mapDbInstance.isDatabaseInitialised();
+            
+            if (!createFreshDatabase && databaseExists) {
+                throw new MojoFailureException("Existing database found, proceeding would overwrite! Cannot proceed!");
+            }
+            
+            if (databaseExists) {
+                getLog().warn("Existing database found but instructed to overwrite - dropping database now");
+                mapDbInstance.openDb();
+                mapDbInstance.dropDb();
+                mapDbInstance.close();
+            }
+            
+            if (fixIdMapDirectory != null) {
+                mapDbInstance.createDb(fixIdMapDirectory, readWriteMapDirectory, validate);
+            } else {
+                mapDbInstance.createDb();
+            }
+            
         } catch (SQLException e) {
             throw new MojoExecutionException("SQLException ", e);
         } catch (IOException e) {
@@ -80,11 +131,10 @@ public class CreateUuidSctidMapDb extends AbstractMojo {
             throw new MojoExecutionException("ClassNotFoundException ", e);
         } finally {
             try {
-                UuidSctidMapDb.getInstance().close();
+                mapDbInstance.close();
             } catch (SQLException e) {
                 throw new MojoExecutionException("SQLException ", e);
             }
         }
     }
-
 }

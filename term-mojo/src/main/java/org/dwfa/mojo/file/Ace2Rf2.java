@@ -234,9 +234,9 @@ public class Ace2Rf2 extends AbstractMojo {
             exportDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             rf2DateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            uuidToSctIdConcept.setupImpl(new File(buildDirectory), new File(sourceDirectory));
-            uuidToSctIdDescription.setupImpl(new File(buildDirectory), new File(sourceDirectory));
-            uuidToSctIdRelationship.setupImpl(new File(buildDirectory), new File(sourceDirectory));
+            uuidToSctIdConcept.setupImpl();
+            uuidToSctIdDescription.setupImpl();
+            uuidToSctIdRelationship.setupImpl();
 
             primationSctId = uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION.getUids()
                 .iterator()

@@ -29,27 +29,47 @@ import org.dwfa.maven.sctid.UuidSctidMapDb;
  * @goal updateUuidSctidMapDb
  */
 public class UpdateUuidSctidMapDb extends AbstractMojo {
-
     /**
-     * DB file
-     *
+     * URL used to connect to the database
+     * 
      * @parameter
      * @required
      */
-    File dbMapDirectory;
+    String dbConnectionUrl;
+    
+    /**
+     * Database driver fully qualified class name
+     * 
+     * @parameter
+     * @required
+     */
+    String dbDriver;
+    
+    /**
+     * Database user to optionally authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbUsername;
+    
+    /**
+     * Database user's password optionally used to authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbPassword;
 
     /**
      * Fixed id map file
      *
      * @parameter
-     * @required
      */
     File fixIdMapDirectory;
 
     /**
      * List of read write map File
      *
-     * @required
+     * @parameter
      */
     File readWriteMapDirectory;
 
@@ -73,23 +93,28 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
      *
      * @parameter
      */
-    boolean validate = false;;
-
-    /**
-     * Append files to database.
-     *
-     * @parameter
-     */
-    boolean appendToDb = false;;
+    boolean validate = false;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        UuidSctidMapDb.setDatabaseProperties(dbDriver, dbConnectionUrl, dbUsername, dbPassword);
+        UuidSctidMapDb mapDbInstance = UuidSctidMapDb.getInstance();
+
         try {
-            UuidSctidMapDb.getInstance().openDb(dbMapDirectory, fixIdMapDirectory, readWriteMapDirectory, validate,
-                appendToDb);
+            if (!mapDbInstance.isDatabaseInitialised()) {
+                throw new MojoFailureException("Database is not initialised - cannot update. Please create a database first");
+            }
+            
+            if (fixIdMapDirectory != null) {
+                mapDbInstance.openDb(fixIdMapDirectory, readWriteMapDirectory, validate);
+            } else {
+                mapDbInstance.openDb();
+            }
+                
             if (rf2IdFiles != null) {
                 for (File rf2IdFile : rf2IdFiles) {
-                    UuidSctidMapDb.getInstance().updateDbFromRf2IdFile(rf2IdFile);
+                    mapDbInstance.updateDbFromRf2IdFile(rf2IdFile);
                 }
             } else if (aceIdFiles != null) {
                 for (File rf2IdFile : aceIdFiles) {
@@ -104,7 +129,7 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
             throw new MojoExecutionException("ClassNotFoundException ", e);
         } finally {
             try {
-                UuidSctidMapDb.getInstance().close();
+                mapDbInstance.close();
             } catch (SQLException e) {
                 throw new MojoExecutionException("SQLException ", e);
             }

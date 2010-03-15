@@ -16,7 +16,6 @@
  */
 package org.dwfa.maven.sctid;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -62,9 +61,15 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws SQLException Running and setting setup SQL statements
      * @throws ClassNotFoundException error creating the DB.
      */
-    public UuidSnomedDbMapHandler(File databaseDirectory) throws IOException, SQLException, ClassNotFoundException {
+    public UuidSnomedDbMapHandler() throws IOException, SQLException, ClassNotFoundException {
         uuidSctidMapDb = UuidSctidMapDb.getInstance();
-        uuidSctidMapDb.openDb(databaseDirectory);
+        
+        if (uuidSctidMapDb.isDatabaseInitialised()) {
+            uuidSctidMapDb.openDb();
+        } else {
+            uuidSctidMapDb.createDb();
+        }
+        
         uuidSctidMapDb.setValidate(true);
 
         nextSctSequenceMap = new HashMap<String, Long>();

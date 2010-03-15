@@ -1,6 +1,5 @@
 package org.dwfa.maven.sctid;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -13,12 +12,34 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class RunSql extends AbstractMojo {
     /**
-     * DB file
-     *
+     * URL used to connect to the database
+     * 
      * @parameter
      * @required
      */
-    File dbMapDirectory;
+    String dbConnectionUrl;
+    
+    /**
+     * Database driver fully qualified class name
+     * 
+     * @parameter
+     * @required
+     */
+    String dbDriver;
+    
+    /**
+     * Database user to optionally authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbUsername;
+    
+    /**
+     * Database user's password optionally used to authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbPassword;
 
     /**
      * Array of SQL to run.
@@ -31,7 +52,9 @@ public class RunSql extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            UuidSctidMapDb.getInstance().openDb(dbMapDirectory);
+            UuidSctidMapDb.setDatabaseProperties(dbDriver, dbConnectionUrl, dbUsername, dbPassword);
+            
+            UuidSctidMapDb.getInstance().openDb();
             for (String sql : sqlArray) {
                 UuidSctidMapDb.getInstance().runAndCommitSql(sql);
             }

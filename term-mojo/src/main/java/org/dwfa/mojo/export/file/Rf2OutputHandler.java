@@ -70,9 +70,9 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public Rf2OutputHandler(File exportDirectory, File SctIdDbDirectory) throws IOException, SQLException,
+    public Rf2OutputHandler(File exportDirectory) throws IOException, SQLException,
             ClassNotFoundException {
-        super(SctIdDbDirectory);
+        super();
 
         this.exportDirectory = exportDirectory;
         this.exportDirectory.mkdirs();

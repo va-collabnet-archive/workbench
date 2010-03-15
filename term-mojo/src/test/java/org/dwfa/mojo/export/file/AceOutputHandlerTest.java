@@ -15,6 +15,7 @@ import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.ace.AceConceptReader;
@@ -31,13 +32,27 @@ import org.junit.Test;
 
 public class AceOutputHandlerTest {
 
+    public static final String UUID_MAP_TEST_DATABASE_PASSWORD = "uuid.map.test.database.password";
+    public static final String UUID_MAP_TEST_DATABASE_USER = "uuid.map.test.database.user";
+    public static final String UUID_MAP_TEST_DATABASE_URL = "uuid.map.test.database.url";
+    public static final String UUID_MAP_TEST_DATABASE_DRIVER = "uuid.map.test.database.driver";
     static AceOutputHandler aceOutputHandler;
     static File dbDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "test-id-db");
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "ace");
 
     @Before
     public void setUp() throws IOException, SQLException, ClassNotFoundException {
-        aceOutputHandler = new AceOutputHandler(exportDirectory, dbDirectory);
+        if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+                "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
+
+        } else {
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+                System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
+        }
+        aceOutputHandler = new AceOutputHandler(exportDirectory);
     }
 
     @AfterClass

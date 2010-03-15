@@ -147,8 +147,6 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
         }
 
         try {
-            MemberRefsetHandler.setFixedMapDirectory(fixedMapDirectory);
-            MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
             MemberRefsetHandler.setPathReleaseDateConfig(pathReleaseDateConfig);
 
             if (rf2Descriptor != null && rf2Descriptor.getModule() != null) {

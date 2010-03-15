@@ -80,22 +80,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     File subsetOutputDirectory;
 
     /**
-     * Directory where the fixed SCTID map is located
-     * 
-     * @parameter
-     * @required
-     */
-    File fixedMapDirectory;
-
-    /**
-     * Directory where the read/write SCTID maps are stored
-     * 
-     * @parameter
-     * @required
-     */
-    File readWriteMapDirectory;
-
-    /**
      * Release version used to embed in the subset file names - if not specified
      * then the "path version" reference set is used to determine the version
      * 
@@ -139,14 +123,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory() || !fixedMapDirectory.canRead()) {
-            throw new MojoExecutionException("Cannot proceed, fixedMapDirectory must exist and be readable");
-        }
-
-        if (!readWriteMapDirectory.exists() || !readWriteMapDirectory.isDirectory() || !readWriteMapDirectory.canRead()) {
-            throw new MojoExecutionException("Cannot proceed, readWriteMapDirectory must exist and be readable");
-        }
-
         try {
             allowedStatuses = tf.newIntSet();
             positions = new HashSet<I_Position>();
@@ -160,9 +136,6 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             }
 
             subsetOutputDirectory.mkdirs();
-
-            MemberRefsetHandler.setFixedMapDirectory(fixedMapDirectory);
-            MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
 
             tf.iterateConcepts(this);
 

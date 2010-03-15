@@ -145,22 +145,6 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     File sctidStructuralRefsetOutputDirectory;
 
     /**
-     * Directory where the fixed SCTID map is located
-     *
-     * @parameter
-     * @required
-     */
-    File fixedMapDirectory;
-
-    /**
-     * Directory where the read/write SCTID maps are stored
-     *
-     * @parameter
-     * @required
-     */
-    File readWriteMapDirectory;
-
-    /**
      * Release version used to embed in the refset file names - if not specified
      * then the "path version" reference set is used to determine the version
      *
@@ -314,14 +298,6 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             throw new MojoExecutionException("", e);
         }
 
-        if (!fixedMapDirectory.exists() || !fixedMapDirectory.isDirectory() || !fixedMapDirectory.canRead()) {
-            throw new MojoExecutionException("Cannot proceed, fixedMapDirectory must exist and be readable");
-        }
-
-        if (!readWriteMapDirectory.exists() || !readWriteMapDirectory.isDirectory() || !readWriteMapDirectory.canRead()) {
-            throw new MojoExecutionException("Cannot proceed, readWriteMapDirectory must exist and be readable");
-        }
-
         if (useRF2 && (aceIdentifierFile == null || aceStructuralIdentifierFile == null)) {
             throw new MojoExecutionException(
                 "Cannot proceed, RF2 requires a aceIdentifierFile and aceStructuralIdentifierFile");
@@ -355,8 +331,6 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             }
             uuidRefsetOutputDirectory.mkdirs();
 
-            MemberRefsetHandler.setFixedMapDirectory(fixedMapDirectory);
-            MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
             MemberRefsetHandler.setPathReleaseDateConfig(pathReleaseDateConfig);
             if (useRF2 && rf2Descriptor != null && rf2Descriptor.getModule() != null) {
                 MemberRefsetHandler.setModule(rf2Descriptor.getModule());

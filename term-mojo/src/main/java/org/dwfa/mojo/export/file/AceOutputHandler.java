@@ -57,9 +57,9 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public AceOutputHandler(File exportDirectory, File sctIdDbDirectory) throws IOException, SQLException,
+    public AceOutputHandler(File exportDirectory) throws IOException, SQLException,
             ClassNotFoundException {
-        super(sctIdDbDirectory);
+        super();
 
         exportDirectory.mkdirs();
         idsFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.ace.txt"));

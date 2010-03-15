@@ -24,9 +24,22 @@ import java.util.UUID;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.dwfa.maven.sctid.UuidSctidMapDb;
+import org.dwfa.maven.sctid.UuidSctidMapDbTest;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 
+/**
+ * Test the UuidToSctConIdWithGeneration - tests will be executed against a Derby embedded database unless the following system
+ * properties are set
+ * <ul>
+ * <li>uuid.map.test.database.password</li>
+ * <li>uuid.map.test.database.user</li>
+ * <li>uuid.map.test.database.url</li>
+ * <li>uuid.map.test.database.driver</li>
+ * </ul>
+ */
 public class UuidToSctConIdWithGenerationTest extends TestCase {
+    private File testDatabase = new File("target", "TestDb");
     Random random = new Random(new Date().getTime());
     UuidToSctConIdWithGeneration uuidToSctConIdWithGeneration;
     Long loadTestSize = 10001l;
@@ -34,9 +47,23 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+                "jdbc:derby:directory:" + testDatabase.getCanonicalPath() + ";create=true;");
+
+        } else {
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_DRIVER), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_URL), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_USER), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_PASSWORD));
+        }
+        
+        UuidSctidMapDb.getInstance().close();
+
+        UuidSctidMapDb.getInstance(true);
 
         uuidToSctConIdWithGeneration = new UuidToSctConIdWithGeneration();
-        uuidToSctConIdWithGeneration.setupImpl(null, new File("target", "TestDb"));
+        uuidToSctConIdWithGeneration.setupImpl(null);
     }
 
     @Override
@@ -44,6 +71,7 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
         super.tearDown();
         uuidToSctConIdWithGeneration.cleanup(null);
     }
+
 
     private NAMESPACE getRandomNamespace() {
         return NAMESPACE.values()[random.nextInt(NAMESPACE.values().length)];
@@ -62,7 +90,7 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
         UUID uuid = UUID.randomUUID();
         NAMESPACE namespace = getRandomNamespace();
         UuidToSctDescIdWithGeneration uuidToSctDescIdWithGeneration = new UuidToSctDescIdWithGeneration();
-        uuidToSctDescIdWithGeneration.setupImpl(null, new File("target", "TestDb"));
+        uuidToSctDescIdWithGeneration.setupImpl(null);
 
         String sctId = uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 
@@ -82,7 +110,7 @@ public class UuidToSctConIdWithGenerationTest extends TestCase {
         NAMESPACE namespace = getRandomNamespace();
         NAMESPACE alternateNamespace = getRandomNamespace();
         UuidToSctDescIdWithGeneration uuidToSctDescIdWithGeneration = new UuidToSctDescIdWithGeneration();
-        uuidToSctDescIdWithGeneration.setupImpl(null, new File("target", "TestDb"));
+        uuidToSctDescIdWithGeneration.setupImpl(null);
 
         String sctId = uuidToSctConIdWithGeneration.transform(uuid.toString(), namespace);
 

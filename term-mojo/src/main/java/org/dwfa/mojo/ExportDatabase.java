@@ -186,14 +186,6 @@ public class ExportDatabase extends AbstractMojo {
     private ConceptDescriptor pathForIds;
 
     /**
-     * Directory containing the SCTID map to be used if generateSctIds is set to
-     * true.
-     *
-     * @parameter
-     */
-    private File sctIdMapDirectory;
-
-    /**
      * Namespace for the SCTIDs if generateSctIds is set to true.
      *
      * @parameter
@@ -280,8 +272,7 @@ public class ExportDatabase extends AbstractMojo {
             expItr.setPathReleaseDateConfig(pathReleaseDateConfig);
             expItr.setFullExport(fullExport);
             if (generateSctIds) {
-                expItr.enableSctIdGeneration(NAMESPACE.fromString(namespace), pathForIds.getVerifiedConcept(),
-                    sctIdMapDirectory);
+                expItr.enableSctIdGeneration(NAMESPACE.fromString(namespace), pathForIds.getVerifiedConcept());
             }
             LocalVersionedTerminology.get().iterateConcepts(expItr);
 

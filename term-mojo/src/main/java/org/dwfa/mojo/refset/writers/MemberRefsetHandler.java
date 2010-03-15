@@ -16,7 +16,6 @@
  */
 package org.dwfa.mojo.refset.writers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
@@ -73,8 +72,6 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     private static final String UUID_REG_EXP = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
     private static final String ID = "MEMBER_ID";
     private static UuidSnomedDbMapHandler sctGenerator = null;
-    private static File fixedMapDirectory;
-    private static File readWriteMapDirectory;
     private DateFormat dateFormat = AceDateFormat.getRf2DateFormat();
     String DATE_FORMAT = "yyyy.mm.dd hh:mm:ss";
     private I_TermFactory tf;
@@ -427,7 +424,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     private static synchronized UuidSnomedDbMapHandler getSctGenerator() throws IOException, SQLException,
             ClassNotFoundException {
         if (sctGenerator == null) {
-            sctGenerator = new UuidSnomedDbMapHandler(readWriteMapDirectory);
+            sctGenerator = new UuidSnomedDbMapHandler();
         }
         return sctGenerator;
     }
@@ -606,38 +603,12 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         throw new TerminologyException("Identifier '" + id + "' cannot be handled - not a UUID or an SCTID");
     }
 
-    public File getFixedMapDirectory() {
-        return fixedMapDirectory;
-    }
-
-    public static synchronized void setFixedMapDirectory(File fixedMapDirectory) {
-        if (MemberRefsetHandler.fixedMapDirectory != null) {
-            throw new RuntimeException("Fixed map directory can only be set once! Current value is "
-                + fixedMapDirectory + " - please call MemberRefsetHandler.cleanup() to reset maps and files");
-        }
-        MemberRefsetHandler.fixedMapDirectory = fixedMapDirectory;
-    }
-
-    public File getReadWriteMapDirectory() {
-        return readWriteMapDirectory;
-    }
-
-    public static synchronized void setReadWriteMapDirectory(File readWriteMapDirectory) {
-        if (MemberRefsetHandler.readWriteMapDirectory != null) {
-            throw new RuntimeException("Read write map directory can only be set once! Current value is "
-                + readWriteMapDirectory + " - please call MemberRefsetHandler.cleanup() to reset maps and files");
-        }
-        MemberRefsetHandler.readWriteMapDirectory = readWriteMapDirectory;
-    }
-
     public static synchronized void cleanup() throws Exception {
         if (sctGenerator != null) {
             sctGenerator.writeMaps();
             sctGenerator = null;
 
         }
-        fixedMapDirectory = null;
-        readWriteMapDirectory = null;
     }
 
     public static void setModule(ConceptDescriptor moduleDescriptor) throws Exception {

@@ -23,9 +23,22 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import org.dwfa.maven.sctid.UuidSctidMapDb;
+import org.dwfa.maven.sctid.UuidSctidMapDbTest;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 
+/**
+ * Test the UuidToSctDescIdWithGeneration - tests will be executed against a Derby embedded database unless the following system
+ * properties are set
+ * <ul>
+ * <li>uuid.map.test.database.password</li>
+ * <li>uuid.map.test.database.user</li>
+ * <li>uuid.map.test.database.url</li>
+ * <li>uuid.map.test.database.driver</li>
+ * </ul>
+ */
 public class UuidToSctDescIdWithGenerationTest extends TestCase {
+    private File testDatabase = new File("target", "TestDb");
     Random random = new Random(new Date().getTime());
     UuidToSctDescIdWithGeneration uuidToSctDescIdWithGeneration;
     Long loadTestSize = 10001l;
@@ -33,17 +46,38 @@ public class UuidToSctDescIdWithGenerationTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
+        
         uuidToSctDescIdWithGeneration = new UuidToSctDescIdWithGeneration();
-        uuidToSctDescIdWithGeneration.setupImpl(null, new File("target", "TestDb"));
+        
+        if (System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+                "jdbc:derby:directory:" + testDatabase.getCanonicalPath() + ";create=true;");
+
+        } else {
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_DRIVER), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_URL), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_USER), 
+                System.getProperty(UuidSctidMapDbTest.UUID_MAP_TEST_DATABASE_PASSWORD));
+        }
+        
+        uuidToSctDescIdWithGeneration.setupImpl(null);
+        
+        deleteTestDatabase();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         uuidToSctDescIdWithGeneration.cleanup(null);
+        deleteTestDatabase();
     }
-
+    
+    private void deleteTestDatabase() {
+        if (testDatabase.exists()) {
+            testDatabase.delete();
+        }
+    }
+    
     private NAMESPACE getRandomNamespace() {
         return NAMESPACE.values()[random.nextInt(NAMESPACE.values().length)];
     }

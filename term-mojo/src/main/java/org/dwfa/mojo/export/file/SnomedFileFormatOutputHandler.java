@@ -30,9 +30,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     /** Set to true to throw exceptions on validation errors. */
     boolean failOnError = true;
 
-    public SnomedFileFormatOutputHandler(File SctIdDbDirectory) throws IOException, SQLException, ClassNotFoundException {
+    public SnomedFileFormatOutputHandler() throws IOException, SQLException, ClassNotFoundException {
         //TODO add factory class to do this
-        snomedIdHandler = new UuidSnomedDbMapHandler(SctIdDbDirectory);
+        snomedIdHandler = new UuidSnomedDbMapHandler();
     }
 
     /**

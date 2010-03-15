@@ -16,9 +16,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
@@ -29,6 +29,10 @@ import org.junit.Test;
 
 public class DatabaseExportTest extends ConceptMockery {
 
+    public static final String UUID_MAP_TEST_DATABASE_PASSWORD = "uuid.map.test.database.password";
+    public static final String UUID_MAP_TEST_DATABASE_USER = "uuid.map.test.database.user";
+    public static final String UUID_MAP_TEST_DATABASE_URL = "uuid.map.test.database.url";
+    public static final String UUID_MAP_TEST_DATABASE_DRIVER = "uuid.map.test.database.driver";
     static File dbDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "test-id-db");
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "rf2");
 
@@ -50,16 +54,15 @@ public class DatabaseExportTest extends ConceptMockery {
 
     @Before
     public void setUp() throws Exception {
+
         exportDirectory.mkdirs();
         databaseExportClass = databaseExport.getClass();
 
         snomedIsAUuuidList.add(ConceptConstants.SNOMED_IS_A.getUuids()[0]);
 
         //mock the LocalVersionedTerminology
-        Field factoryField = LocalVersionedTerminology.class.getDeclaredField("factory");
-        factoryField.setAccessible(true);
-        factoryField.set(null, termFactory);
-
+        setField(databaseExportClass, databaseExport, "termFactory", termFactory);
+        
         databaseExport.setTermFactory(termFactory);
 
         pathUuidList = new ArrayList<UUID>();
@@ -75,9 +78,7 @@ public class DatabaseExportTest extends ConceptMockery {
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getTimeString()).andReturn("latest").times(1, 2);
 
         PositionDescriptor[] exportPositions = new PositionDescriptor[]{positionDescriptor};
-        Field positionsForExport = databaseExportClass.getDeclaredField("positionsForExport");
-        positionsForExport.setAccessible(true);
-        positionsForExport.set(databaseExport, exportPositions);
+        setField(databaseExportClass, databaseExport, "positionsForExport", exportPositions);
 
         //mock the include root
         ConceptDescriptor incluesionRoot = createMock(ConceptDescriptor.class);
@@ -86,9 +87,7 @@ public class DatabaseExportTest extends ConceptMockery {
         expect(incluesionRootConceptData.getNid()).andReturn(incluesionRootConceptDataNid).anyTimes();
 
         ConceptDescriptor[] includedConceptDescriptors = new ConceptDescriptor[]{incluesionRoot};
-        Field inclusions = databaseExportClass.getDeclaredField("inclusions");
-        inclusions.setAccessible(true);
-        inclusions.set(databaseExport, includedConceptDescriptors);
+        setField(databaseExportClass, databaseExport, "inclusions", includedConceptDescriptors);
 
         //mock the exclude root
         ConceptDescriptor exclusionsRoot = createMock(ConceptDescriptor.class);
@@ -96,27 +95,35 @@ public class DatabaseExportTest extends ConceptMockery {
         org.easymock.classextension.EasyMock.expect(exclusionsRoot.getVerifiedConcept()).andReturn(exclusionsRootConceptData);
 
         ConceptDescriptor[] excludedConceptDescriptors = new ConceptDescriptor[]{exclusionsRoot};
-        Field exclusions = databaseExportClass.getDeclaredField("exclusions");
-        exclusions.setAccessible(true);
-        exclusions.set(databaseExport, excludedConceptDescriptors);
+        setField(databaseExportClass, databaseExport, "exclusions", excludedConceptDescriptors);
         org.easymock.classextension.EasyMock.replay(incluesionRoot, exclusionsRoot, positionDescriptor, conceptDescriptor);
 
         //setup the export output handler details
-        Field exportDirectoryField = databaseExportClass.getDeclaredField("exportDirectory");
-        exportDirectoryField.setAccessible(true);
-        exportDirectoryField.set(databaseExport, exportDirectory);
+        setField(databaseExportClass, databaseExport, "exportDirectory", exportDirectory);
 
-        Field sctIdDbDirectoryField = databaseExportClass.getDeclaredField("sctIdDbDirectory");
-        sctIdDbDirectoryField.setAccessible(true);
-        sctIdDbDirectoryField.set(databaseExport, dbDirectory);
+        //set uuid-sctid map database parameters
+       // if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+            setField(databaseExportClass, databaseExport, "dbDriver", "org.apache.derby.jdbc.EmbeddedDriver");
+            setField(databaseExportClass, databaseExport, "dbConnectionUrl", "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
+//        } else {
+//            setField(databaseExportClass, databaseExport, "dbDriver", System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER));
+//            setField(databaseExportClass, databaseExport, "dbConnectionUrl", System.getProperty(UUID_MAP_TEST_DATABASE_URL));
+//            setField(databaseExportClass, databaseExport, "dbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
+//            setField(databaseExportClass, databaseExport, "dbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
+//        }
+        
 
         //set the default namespace
-        Field defaultNamespaceField = databaseExportClass.getDeclaredField("defaultNamespace");
-        defaultNamespaceField.setAccessible(true);
-        defaultNamespaceField.set(databaseExport, NAMESPACE.NEHTA.getDigits());
+        setField(databaseExportClass, databaseExport, "defaultNamespace", NAMESPACE.NEHTA.getDigits());
 
         //setup 1 call to iterate concepts
         termFactory.iterateConcepts(databaseExport);
+    }
+
+    private void setField(Class clazz, Object obj, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(obj, value);
     }
 
     @After

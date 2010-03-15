@@ -248,18 +248,12 @@ public class ExportIterator implements I_ProcessConcepts {
         activeDescriptionStatusIds.add(ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getNid());
     }
 
-    public void enableSctIdGeneration(SctIdGenerator.NAMESPACE namespace, I_GetConceptData pathForIds,
-            File sctidUuidDbDirectory) throws IOException, ClassNotFoundException, TerminologyException {
+    public void enableSctIdGeneration(SctIdGenerator.NAMESPACE namespace, I_GetConceptData pathForIds) throws IOException, ClassNotFoundException, TerminologyException {
         this.generateSctIds = true;
         this.namespace = namespace;
         this.pathForIds = pathForIds;
 
         if (generateSctIds) {
-            if (sctidUuidDbDirectory == null) {
-                throw new TerminologyException(
-                    "Invalid configuration - generateSctIds is set to true, however sctidUuidDbDirectory '"
-                        + sctidUuidDbDirectory + "' is not a valid directory");
-            }
 
             if (namespace == null) {
                 throw new TerminologyException("Namespace must be set if generation of SCTIDs is enabled");
@@ -270,11 +264,11 @@ public class ExportIterator implements I_ProcessConcepts {
             }
 
             uuidToSctIdConcept = new UuidToSctConIdWithGeneration();
-            uuidToSctIdConcept.setupImpl(null, sctidUuidDbDirectory);
+            uuidToSctIdConcept.setupImpl();
             uuidToSctIdDescription = new UuidToSctDescIdWithGeneration();
-            uuidToSctIdDescription.setupImpl(null, sctidUuidDbDirectory);
+            uuidToSctIdDescription.setupImpl();
             uuidToSctIdRelationship = new UuidToSctRelIdWithGeneration();
-            uuidToSctIdRelationship.setupImpl(null, sctidUuidDbDirectory);
+            uuidToSctIdRelationship.setupImpl();
         }
     }
 

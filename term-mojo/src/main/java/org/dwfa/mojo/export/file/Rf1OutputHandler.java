@@ -52,9 +52,9 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public Rf1OutputHandler(File exportDirectory, File sctIdDbDirectory) throws IOException, SQLException,
+    public Rf1OutputHandler(File exportDirectory) throws IOException, SQLException,
             ClassNotFoundException {
-        super(sctIdDbDirectory);
+        super();
 
         exportDirectory.mkdirs();
         conceptFile = new Rf1ConceptWriter(new File(exportDirectory + File.separator + "concepts.rf1.txt"));

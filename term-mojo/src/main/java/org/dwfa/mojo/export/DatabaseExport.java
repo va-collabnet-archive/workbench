@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.dto.ComponentDto;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
@@ -96,12 +97,34 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private File exportDirectory;
 
     /**
-     * Directory for the SCT id database
-     *
+     * URL used to connect to the UUID-SCTID database
+     * 
      * @parameter
      * @required
      */
-    private File sctIdDbDirectory;
+    String dbConnectionUrl;
+    
+    /**
+     * UUID-SCTID database driver fully qualified class name
+     * 
+     * @parameter
+     * @required
+     */
+    String dbDriver;
+    
+    /**
+     * UUID-SCTID database user to optionally authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbUsername;
+    
+    /**
+     * UUID-SCTID database user's password optionally used to authenticate to the database
+     * 
+     * @parameter
+     */
+    String dbPassword;
 
     /**
      * Export file output handler for RF2
@@ -142,12 +165,21 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         logger.info("Start exporting concepts");
 
         try {
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, dbDriver);
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, dbConnectionUrl);
+            if (dbUsername != null) {
+                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_USER, dbUsername);
+            }
+            if (dbPassword != null) {
+                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, dbPassword);
+            }
+            
             rf2OutputHandler = new Rf2OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar), sctIdDbDirectory);
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar));
             rf1OutputHandler = new Rf1OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar), sctIdDbDirectory);
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar));
             aceOutputHandler = new AceOutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar), sctIdDbDirectory);
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar));
 
             List<Position> positions = new ArrayList<Position>();
             for (PositionDescriptor positionDescriptor : positionsForExport) {
