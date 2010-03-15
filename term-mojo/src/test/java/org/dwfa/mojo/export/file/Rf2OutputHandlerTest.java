@@ -63,19 +63,19 @@ public class Rf2OutputHandlerTest {
 
     @Before
     public void setUp() throws IOException, SQLException, ClassNotFoundException {
-        
+
         exportDirectory.mkdirs();
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
-            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
 
         } else {
-            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER),
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL),
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER),
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
-        
+
         rf2OutputHandler = new Rf2OutputHandler(exportDirectory);
     }
 
@@ -262,7 +262,7 @@ public class Rf2OutputHandlerTest {
         ExtensionDto extensionDto = componentDto.getConceptExtensionDtos().get(0);
         assertRefsetRow(referenceSetRow, extensionDto);
 
-        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getReferencedComponentId2());
+        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getComponentId2());
     }
 
     @Test
@@ -313,8 +313,8 @@ public class Rf2OutputHandlerTest {
         ExtensionDto extensionDto = componentDto.getConceptExtensionDtos().get(0);
         assertRefsetRow(referenceSetRow, extensionDto);
 
-        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getReferencedComponentId2());
-        Assert.assertEquals(getSctId(extensionDto.getConcept3Id(), extensionDto), referenceSetRow.getReferencedComponentId3());
+        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getComponentId2());
+        Assert.assertEquals(getSctId(extensionDto.getConcept3Id(), extensionDto), referenceSetRow.getComponentId3());
     }
 
     @Test
@@ -364,14 +364,15 @@ public class Rf2OutputHandlerTest {
         ExtensionDto extensionDto = componentDto.getConceptExtensionDtos().get(0);
         assertRefsetRow(referenceSetRow, extensionDto);
 
-        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getReferencedComponentId2());
-        Assert.assertEquals(getSctId(extensionDto.getConcept3Id(), extensionDto), referenceSetRow.getReferencedComponentId3());
+        Assert.assertEquals(getSctId(extensionDto.getConcept2Id(), extensionDto), referenceSetRow.getComponentId2());
+        Assert.assertEquals(getSctId(extensionDto.getConcept3Id(), extensionDto), referenceSetRow.getComponentId3());
         Assert.assertEquals(extensionDto.getValue(), referenceSetRow.getValue());
     }
 
     private void assertRefsetRow(Rf2ReferenceSetRow referenceSetRow, ExtensionDto extensionDto) throws Exception {
         Assert.assertEquals(getSctId(extensionDto.getMemberId(), extensionDto, TYPE.REFSET), referenceSetRow.getMemberId());
-        Assert.assertEquals(getSctId(extensionDto.getConcept1Id(), extensionDto), referenceSetRow.getReferencedComponentId());
+        Assert.assertEquals(getSctId(extensionDto.getReferencedConceptId(), extensionDto), referenceSetRow.getReferencedComponentId());
+        Assert.assertEquals(getSctId(extensionDto.getConcept1Id(), extensionDto), referenceSetRow.getComponentId1());
         Assert.assertEquals(getSctId(extensionDto.getConceptId(), extensionDto), referenceSetRow.getRefsetId());
         Assert.assertEquals((extensionDto.isActive()) ? "1" : "0", referenceSetRow.getActive());
         Assert.assertEquals(rf2OutputHandler.getReleaseDate(extensionDto), referenceSetRow.getEffectiveTime());
@@ -702,6 +703,7 @@ public class Rf2OutputHandlerTest {
         componentDto.getConceptExtensionDtos().add(setExtensionDto(new ExtensionDto()));
 
         componentDto.getConceptExtensionDtos().get(0).setConcept1Id(null);
+        componentDto.getConceptExtensionDtos().get(0).setValue(null);
         try{
             rf2OutputHandler.export(componentDto);
             Assert.fail("Must have a referenced component Id");
@@ -781,6 +783,7 @@ public class Rf2OutputHandlerTest {
     private ExtensionDto setExtensionDto(ExtensionDto extensionDto) {
         setConceptDtoData(extensionDto);
 
+        extensionDto.setReferencedConceptId(UUID.randomUUID());
         extensionDto.setConcept1Id(UUID.randomUUID());
         extensionDto.setMemberId(UUID.randomUUID());
         extensionDto.setValue("Test String");

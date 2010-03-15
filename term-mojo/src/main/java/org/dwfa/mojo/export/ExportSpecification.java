@@ -44,6 +44,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -64,7 +65,7 @@ import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
-import org.dwfa.vodb.types.ThinExtByRefPartConceptString;
+import org.dwfa.vodb.types.ThinExtByRefPartString;
 import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
@@ -117,10 +118,10 @@ public class ExportSpecification {
     private I_GetConceptData ctv3IdMapExtension;
     /** Snomed Rt Id reference set. */
     private I_GetConceptData snomedRtIdMapExtension;
+    /** concept string extension type. */
+    private int stringExtensionNid;
     /** concept extension type. */
     private int conceptExtensionNid;
-    /** concept string extension type. */
-    private int conceptStringExtensionNid;
 
     /** Ace Workbench inactive status. */
     int aceDuplicateStatusNId;
@@ -138,6 +139,8 @@ public class ExportSpecification {
     int movedElsewhereStatusNId;
     /** History relationship types to History relationship reference set map. */
     Map<Integer, Integer> historyStatusRefsetMap = new HashMap<Integer, Integer>();
+    /** relationship refinablility reference set */
+    int relationshipRefinabilityExtensionNid;
 
     int descriptionInactivationIndicatorNid;
     int relationshipInactivationIndicatorNid;
@@ -183,8 +186,8 @@ public class ExportSpecification {
         fullySpecifiedDescriptionTypeIIntSet.add(fullySpecifiedDescriptionType.getConceptId());
         ctv3IdMapExtension = termFactory.getConcept(ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid());
         snomedRtIdMapExtension = termFactory.getConcept(ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid());
+        stringExtensionNid = RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
         conceptExtensionNid = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
-        conceptStringExtensionNid = RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.localize().getNid();
         duplicateStatusNId = ConceptConstants.DUPLICATE_STATUS.localize().getNid();
         ambiguousStatusNId = ConceptConstants.AMBIGUOUS_STATUS.localize().getNid();
         erroneousStatusNId = ConceptConstants.ERRONEOUS_STATUS.localize().getNid();
@@ -210,6 +213,7 @@ public class ExportSpecification {
             ConceptConstants.SAME_AS_HISTORY_REFSET.localize().getNid());
         historyStatusRefsetMap.put(ConceptConstants.WAS_A_HISTORY.localize().getNid(),
             ConceptConstants.WAS_A_HISTORY_REFSET.localize().getNid());
+        relationshipRefinabilityExtensionNid = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
 
         setPositions(positions);
         setInclusions(inclusions);
@@ -295,6 +299,8 @@ public class ExportSpecification {
      *
      * Adds relationship inactivation members.
      *
+     * Adds relationship refinability members.
+     *
      * @param componentDto ComponentDto - updated with a new relationship
      * @param tuple I_RelTuple - to add to the ComponentDto
      * @throws IOException DB errors
@@ -307,9 +313,10 @@ public class ExportSpecification {
 
         getBaseConceptDto(relationshipDto, tuple, idParts);
 
-        setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getRelId(), tuple,
+        setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), tuple,
             conceptInactivationIndicatorNid, TYPE.RELATIONSHIP);
         setConceptHistory(componentDto, tuple.getRelVersioned());
+        setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple);
 
         setUuidSctIdIdentifier(relationshipDto, tuple, idParts, TYPE.CONCEPT);
 
@@ -447,7 +454,7 @@ public class ExportSpecification {
                 List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
 
                 I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(historyStatusRefsetMap.get(versionPart.getTypeId()), 0,
-                    versionedRel.getC2Id(), versionPart);
+                    versionedRel.getC1Id(), versionedRel.getC2Id(), versionPart);
                 list.add(extensionTuple);
 
                 componentDto.getRelationshipExtensionDtos().addAll(
@@ -478,12 +485,31 @@ public class ExportSpecification {
                 List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
 
                 I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(inactivationIndicatorRefsetNid, 0,
-                    componentNid, tuple);
+                    componentNid, rf2InactiveStatus, tuple);
                 list.add(extensionTuple);
 
                 extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, type, false));
             }
         }
+    }
+
+    /**
+     * Export relationship refinability (relationships refinability reference) for all relationships.
+     *
+     * @param extensionDtos to add the refinability to
+     * @param relationshipTuple I_RelTuple
+     * @throws Exception
+     */
+    private void setRelationshipRefinabilityReferenceSet(List<ExtensionDto> extensionDtos,
+            I_RelTuple relationshipTuple) throws Exception {
+        List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
+
+        I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(relationshipRefinabilityExtensionNid, 0, relationshipTuple.getRelId(),
+            relationshipTuple.getRefinabilityId(), relationshipTuple);
+
+        list.add(extensionTuple);
+
+        extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, TYPE.RELATIONSHIP, false));
     }
 
     /**
@@ -535,18 +561,17 @@ public class ExportSpecification {
      *
      * @param refsetNid int
      * @param memberNid int
-     * @param componentNid int
+     * @param referencedComponentNid int
      * @param amPart I_AmPart int
      * @return I_ThinExtByRefTuple
      */
-    private I_ThinExtByRefTuple createThinExtByRefTuple(int refsetNid, int memberNid, int componentNid,
-            I_AmPart amPart) {
-        ThinExtByRefVersioned thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, componentNid,
+    private I_ThinExtByRefTuple createThinExtByRefTuple(int refsetNid, int memberNid, int referencedComponentNid,
+            int component1, I_AmPart amPart) {
+        ThinExtByRefVersioned thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, referencedComponentNid,
             conceptExtensionNid);
 
         I_ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
-        conceptExtension.setC1id(componentNid);
-        conceptExtension.setPathId(amPart.getPathId());
+        conceptExtension.setC1id(component1);
         conceptExtension.setPathId(amPart.getPathId());
         conceptExtension.setStatusId(amPart.getStatusId());
         conceptExtension.setVersion(amPart.getVersion());
@@ -557,7 +582,7 @@ public class ExportSpecification {
     }
 
     /**
-     * Create a I_ThinExtByRefTuple for a concept string reference set member.
+     * Create a I_ThinExtByRefTuple for a string reference set member.
      *
      * Path version and status are copied from amPart.
      *
@@ -571,11 +596,10 @@ public class ExportSpecification {
     private I_ThinExtByRefTuple createThinExtByRefTuple(int refsetNid, int memberNid, int componentNid,
             I_AmPart amPart, String string) {
         ThinExtByRefVersioned thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, componentNid,
-            conceptStringExtensionNid);
+            stringExtensionNid);
 
-        I_ThinExtByRefPartConceptString conceptExtension = new ThinExtByRefPartConceptString();
-        conceptExtension.setC1id(componentNid);
-        conceptExtension.setStr(string);
+        I_ThinExtByRefPartString conceptExtension = new ThinExtByRefPartString();
+        conceptExtension.setStringValue(string);
         conceptExtension.setPathId(amPart.getPathId());
         conceptExtension.setPathId(amPart.getPathId());
         conceptExtension.setStatusId(amPart.getStatusId());
@@ -940,6 +964,7 @@ public class ExportSpecification {
          */
         @SuppressWarnings("unchecked")
         public ExtensionProcessor() throws Exception {
+            extensionMap.put(RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid(), new StringExtensionProcessor());
             extensionMap.put(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid(), new ConceptExtensionProcessor());
             extensionMap.put(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION.localize().getNid(), new ConceptStringExtensionProcessor());
             extensionMap.put(RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.localize().getNid(), new ConceptIntegerExtensionProcessor());
@@ -986,8 +1011,8 @@ public class ExportSpecification {
      *
      * @param <T>  extends I_ThinExtByRefPartConcept
      */
-    private class ConceptExtensionProcessor<T extends I_ThinExtByRefPartConcept> implements
-            I_AmExtensionProcessor<I_ThinExtByRefPartConcept> {
+    private class BaseExtensionProcessor<T extends I_ThinExtByRefPart> implements
+            I_AmExtensionProcessor<I_ThinExtByRefPart> {
 
         /**
          * @see org.dwfa.mojo.export.ExportSpecification.I_AmExtensionProcessor#getExtensionDto(org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, org.dwfa.maven.transform.SctIdGenerator.TYPE)
@@ -996,7 +1021,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConcept tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPart tuple, TYPE type) throws IOException, TerminologyException {
             ExtensionDto extensionDto = new ExtensionDto();
             List<I_IdPart> idParts;
 
@@ -1012,8 +1037,8 @@ public class ExportSpecification {
             setUuidSctIdIdentifier(extensionDto, tuple, idParts, TYPE.REFSET);
 
             extensionDto.setConceptId(termFactory.getUids(thinExtByRefVersioned.getRefsetId()).iterator().next());
-            extensionDto.setConcept1Id(termFactory.getUids(tuple.getC1id()).iterator().next());
-            extensionDto.setMemberId(getUuid(tuple.getC1id(), thinExtByRefVersioned));
+            extensionDto.setReferencedConceptId(termFactory.getUids(thinExtByRefVersioned.getComponentId()).iterator().next());
+            extensionDto.setMemberId(getUuid(thinExtByRefVersioned));
             extensionDto.setNamespace(getNamespace(idParts, tuple));
             extensionDto.setType(type);
             extensionDto.setFullySpecifiedName(termFactory.getConcept(thinExtByRefVersioned.getRefsetId()).getInitialText());
@@ -1031,13 +1056,13 @@ public class ExportSpecification {
          * @throws IOException
          */
         private I_IdPart getIdUuidSctIdPart(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConcept tuple) throws TerminologyException, IOException {
+                I_ThinExtByRefPart tuple) throws TerminologyException, IOException {
             I_IdPart sctUuidPart = new ThinIdPart();
             sctUuidPart.setStatusId(currentConcept.getNid());
             sctUuidPart.setPathId(tuple.getPathId());
             sctUuidPart.setSource(ctv3IdMapExtension.getNid());
             sctUuidPart.setVersion(tuple.getVersion());
-            sctUuidPart.setSourceId(getUuid(tuple.getC1id(), thinExtByRefVersioned));
+            sctUuidPart.setSourceId(getUuid(thinExtByRefVersioned));
 
             return sctUuidPart;
         }
@@ -1045,23 +1070,48 @@ public class ExportSpecification {
         /**
          * Gets the UUID for the member. If member id is 0 a new UUID is create.
          *
-         * @param componentId member component
          * @param thinExtByRefVersioned I_ThinExtByRefVersioned
          * @return UUID
          * @throws TerminologyException
          * @throws IOException
          */
-        private UUID getUuid(int componentId, I_ThinExtByRefVersioned thinExtByRefVersioned)
+        private UUID getUuid(I_ThinExtByRefVersioned thinExtByRefVersioned)
                 throws TerminologyException, IOException {
             UUID uuid = null;
 
             if (thinExtByRefVersioned.getMemberId() != 0) {
                 uuid = termFactory.getUids(thinExtByRefVersioned.getMemberId()).iterator().next();
             } else {
-                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(componentId)
+                uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(thinExtByRefVersioned.getComponentId())
                         + termFactory.getUids(thinExtByRefVersioned.getRefsetId())).getBytes("8859_1"));
             }
             return uuid;
+        }
+    }
+
+    /**
+     * Extension processor for  I_ThinExtByRefPartConcept.
+     *
+     * @param <T>  extends I_ThinExtByRefPartConcept
+     */
+    private class ConceptExtensionProcessor<T extends I_ThinExtByRefPartConcept> implements
+            I_AmExtensionProcessor<I_ThinExtByRefPartConcept> {
+
+        BaseExtensionProcessor<T> extensionProcessor = new BaseExtensionProcessor<T>();
+
+        /**
+         * @see org.dwfa.mojo.export.ExportSpecification.I_AmExtensionProcessor#getExtensionDto(org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, org.dwfa.maven.transform.SctIdGenerator.TYPE)
+         *
+         * Creates the ExtensionDto for a Concept extension.
+         */
+        @Override
+        public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
+                I_ThinExtByRefPartConcept tuple, TYPE type) throws IOException, TerminologyException {
+            ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
+
+            extensionDto.setConcept1Id(termFactory.getUids(tuple.getC1id()).iterator().next());
+
+            return extensionDto;
         }
     }
 
@@ -1085,6 +1135,31 @@ public class ExportSpecification {
             ExtensionDto extensionDto = conceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             extensionDto.setValue(tuple.getStr());
+
+            return extensionDto;
+        }
+    }
+
+    /**
+     * Extension processor for  I_ThinExtByRefPartConceptConcept.
+     *
+     * @param <T>  extends I_ThinExtByRefPartConceptConcept
+     */
+    private class StringExtensionProcessor<T extends I_ThinExtByRefPartString> implements
+            I_AmExtensionProcessor<I_ThinExtByRefPartString> {
+        BaseExtensionProcessor<T> extensionProcessor = new BaseExtensionProcessor<T>();
+
+        /**
+         * @see org.dwfa.mojo.export.ExportSpecification.I_AmExtensionProcessor#getExtensionDto(org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, org.dwfa.maven.transform.SctIdGenerator.TYPE)
+         *
+         * Concept String extensions
+         */
+        @Override
+        public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
+                I_ThinExtByRefPartString tuple, TYPE type) throws IOException, TerminologyException {
+            ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
+
+            extensionDto.setValue(tuple.getStringValue());
 
             return extensionDto;
         }

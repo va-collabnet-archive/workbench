@@ -12,8 +12,9 @@ public class Rf2ReferenceSetRow {
     String moduleId;
     String refsetId;
     String referencedComponentId;
-    String referencedComponentId2;
-    String referencedComponentId3;
+    String componentId1;
+    String componentId2;
+    String componentId3;
     String value;
 
     private int CONCEPT_COLUMNS = 6;
@@ -39,12 +40,15 @@ public class Rf2ReferenceSetRow {
             if(isSctId(columns[i])){
                 switch(i) {
                 case 6 :
-                    referencedComponentId2 = columns[i];
+                    componentId1 = columns[i];
                     break;
                 case 7 :
-                    referencedComponentId3 = columns[i];
+                    componentId2 = columns[i];
                     break;
                 case 8 :
+                    componentId3 = columns[i];
+                    break;
+                case 9 :
                     value = columns[i];
                     break;
                 }
@@ -73,9 +77,10 @@ public class Rf2ReferenceSetRow {
     public String getHeader() {
         return "id" + COLUMN_DELIMITER + "effectiveTime" + COLUMN_DELIMITER + "active" + COLUMN_DELIMITER + "moduleId"
             + COLUMN_DELIMITER + "refSetId" + COLUMN_DELIMITER + "referencedComponentId"
-            + ((referencedComponentId2 == null) ? "" : COLUMN_DELIMITER + "referencedComponentId2")
-            + ((referencedComponentId3 == null) ? "" : COLUMN_DELIMITER + "referencedComponentId3")
-            + ((value == null) ? "" : COLUMN_DELIMITER + "valueId");
+            + ((componentId1 == null) ? "" : COLUMN_DELIMITER + "valueId1")
+            + ((componentId2 == null) ? "" : COLUMN_DELIMITER + "valueId2")
+            + ((componentId3 == null) ? "" : COLUMN_DELIMITER + "valueId3")
+            + ((value == null) ? "" : COLUMN_DELIMITER + "value");
     }
 
     /**
@@ -83,10 +88,11 @@ public class Rf2ReferenceSetRow {
      */
     public String toString() {
         return memberId + COLUMN_DELIMITER + effectiveTime + COLUMN_DELIMITER + active + COLUMN_DELIMITER + moduleId
-            + COLUMN_DELIMITER + refsetId + COLUMN_DELIMITER + referencedComponentId + COLUMN_DELIMITER
-            + ((referencedComponentId2 == null) ? "" : referencedComponentId2) + COLUMN_DELIMITER
-            + ((referencedComponentId3 == null) ? "" : referencedComponentId3) + COLUMN_DELIMITER
-            + ((value == null) ? "" : value);
+            + COLUMN_DELIMITER + refsetId + COLUMN_DELIMITER + referencedComponentId
+            + ((componentId1 == null) ? "" : COLUMN_DELIMITER + componentId1)
+            + ((componentId2 == null) ? "" : COLUMN_DELIMITER + componentId2)
+            + ((componentId3 == null) ? "" : COLUMN_DELIMITER + componentId3)
+            + ((value == null) ? "" : COLUMN_DELIMITER + value);
     }
 
     /**
@@ -174,31 +180,45 @@ public class Rf2ReferenceSetRow {
     }
 
     /**
-     * @return the referencedComponentId2
+     * @return the componentId1
      */
-    public String getReferencedComponentId2() {
-        return referencedComponentId2;
+    public String getComponentId1() {
+        return componentId1;
     }
 
     /**
-     * @param referencedComponentId2 the referencedComponentId2 to set
+     * @param componentId1 the componentId1 to set
      */
-    public void setReferencedComponentId2(String referencedComponentId2) {
-        this.referencedComponentId2 = referencedComponentId2;
+    public void setComponentId1(String componentId1) {
+        this.componentId1 = componentId1;
     }
 
     /**
-     * @return the referencedComponentId3
+     * @return the componentId2
      */
-    public String getReferencedComponentId3() {
-        return referencedComponentId3;
+    public String getComponentId2() {
+        return componentId2;
     }
 
     /**
-     * @param referencedComponentId3 the referencedComponentId3 to set
+     * @param componentId2 the componentId2 to set
      */
-    public void setReferencedComponentId3(String referencedComponentId3) {
-        this.referencedComponentId3 = referencedComponentId3;
+    public void setComponentId2(String componentId2) {
+        this.componentId2 = componentId2;
+    }
+
+    /**
+     * @return the componentId3
+     */
+    public String getComponentId3() {
+        return componentId3;
+    }
+
+    /**
+     * @param componentId3 the componentId3 to set
+     */
+    public void setComponentId3(String componentId3) {
+        this.componentId3 = componentId3;
     }
 
     /**

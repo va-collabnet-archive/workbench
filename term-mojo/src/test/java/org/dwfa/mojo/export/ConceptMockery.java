@@ -32,6 +32,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -119,7 +120,8 @@ public class ConceptMockery {
     int enNid = Integer.MAX_VALUE - 57;
     int enUsNid = Integer.MAX_VALUE - 58;
     int sourceUuidNid = Integer.MAX_VALUE - 59;
-
+    int relationshipRefinabilityExtensionNid = Integer.MAX_VALUE - 60;
+    int stringExtensionNid = Integer.MAX_VALUE - 61;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -134,7 +136,6 @@ public class ConceptMockery {
     I_GetConceptData incluesionRootConceptData;
     I_GetConceptData exclusionsRootConceptData;
 
-
     List<UUID> snomedIsAUuuidList = new ArrayList<UUID>();
     List<UUID> snomedIntIdUuidList;
     List<UUID> activeUuidList;
@@ -142,7 +143,6 @@ public class ConceptMockery {
     List<UUID> preferredDescriptionTypeUuidList;
     List<UUID> snomedCoreUuidList;
     List<UUID> snomedRtIdUuidList;
-
 
     // setup fsn int type used to get the concepts FSN
     I_IntSet fsnIIntSet = createMock(I_IntSet.class);
@@ -347,6 +347,14 @@ public class ConceptMockery {
         expect(wasAHistoryRefsetConceptData.getInitialText()).andReturn("WAS_A_HISTORY").anyTimes();
         replay(wasAHistoryRefsetConceptData);
 
+        I_GetConceptData relationshipRefinabilityExtensionConceptData = mockConceptSpec(ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION,
+            relationshipRefinabilityExtensionNid);
+        expect(termFactory.getConcept(relationshipRefinabilityExtensionNid)).andReturn(relationshipRefinabilityExtensionConceptData).anyTimes();
+        expect(incluesionRootConceptData.isParentOf(relationshipRefinabilityExtensionConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(relationshipRefinabilityExtensionConceptData, null, null, null, false)).andReturn(false).anyTimes();
+        expect(relationshipRefinabilityExtensionConceptData.getInitialText()).andReturn("RELATIONSHIP_REFINABILITY_EXTENSION").anyTimes();
+        replay(relationshipRefinabilityExtensionConceptData);
+
         List<UUID> duplicateUuidList = new ArrayList<UUID>();
         duplicateUuidList.add(UUID.randomUUID());
         I_GetConceptData duplicateConceptData = mockConceptEnum(duplicateUuidList, ArchitectonicAuxiliary.Concept.DUPLICATE,
@@ -485,6 +493,12 @@ public class ConceptMockery {
         I_GetConceptData enUsConceptData = mockConceptEnum(enUsUuidList,
             ArchitectonicAuxiliary.Concept.EN_US, enUsNid);
         replay(enUsConceptData);
+
+        List<UUID> stringExtensionUuidList = new ArrayList<UUID>();
+        stringExtensionUuidList.add(UUID.randomUUID());
+        I_GetConceptData stringExtensionConceptData = mockConceptEnum(stringExtensionUuidList,
+            RefsetAuxiliary.Concept.STRING_EXTENSION, stringExtensionNid);
+        replay(stringExtensionConceptData);
 
         List<UUID> conceptExtensionUuidList = new ArrayList<UUID>();
         conceptExtensionUuidList.add(UUID.randomUUID());
@@ -808,7 +822,6 @@ public class ConceptMockery {
         List<I_IdPart> relationshipIdParts = new ArrayList<I_IdPart>();
         I_IdVersioned exportRelationshipIdVersioned = createMock(I_IdVersioned.class);
         exportRelIdUuidList.add(UUID.randomUUID());
-        expect(relationshipTuple.getRelId()).andReturn(relNid);
         expect(termFactory.getId(relNid)).andReturn(exportRelationshipIdVersioned);
 
         mockConceptId(relationshipTuple, version, date, relationshipIdParts, exportRelationshipIdVersioned,
@@ -819,22 +832,24 @@ public class ConceptMockery {
 
         // relationship details
         expect(relationshipTuple.getCharacteristicId()).andReturn(characteristicNid).times(2);
-        expect(relationshipTuple.getRelId()).andReturn(relNid).times(3);
-        expect(termFactory.getUids(relNid)).andReturn(exportRelIdUuidList).times(4);
+        expect(relationshipTuple.getRelId()).andReturn(relNid).times(5);
+        expect(termFactory.getUids(relNid)).andReturn(exportRelIdUuidList).times(7);
         expect(termFactory.getUids(conceptNid)).andReturn(conceptUuidList).times(2);
+        expect(relationshipTuple.getC1Id()).andReturn(sourceUuidNid);
         expect(relationshipTuple.getC2Id()).andReturn(destinationNid);
         expect(termFactory.getUids(destinationNid)).andReturn(exportRelationshipDestinationUuidList);
-        expect(relationshipTuple.getRefinabilityId()).andReturn(optionalRefinabilityNid).times(2);
+        expect(relationshipTuple.getRefinabilityId()).andReturn(optionalRefinabilityNid).times(3);
         expect(relationshipTuple.getGroup()).andReturn(1);
         expect(relationshipTuple.getC1Id()).andReturn(conceptNid);
         expect(relationshipTuple.getTypeId()).andReturn(typeNid);
-        expect(relationshipTuple.getVersion()).andReturn(version);
-        expect(relationshipTuple.getPathId()).andReturn(exportPathNid);
+        expect(relationshipTuple.getVersion()).andReturn(version).times(2);
+        expect(relationshipTuple.getPathId()).andReturn(exportPathNid).times(3);
 
 
         //relationship versions
         I_RelVersioned relVersioned = createMock(I_RelVersioned.class);
         expect(relationshipTuple.getRelVersioned()).andReturn(relVersioned);
+        expect(relVersioned.getC1Id()).andReturn(sourceUuidNid);
         expect(relVersioned.getC2Id()).andReturn(destinationNid);
         I_RelPart relPart = createMock(I_RelPart.class);
         List<I_RelPart> relParts = new ArrayList<I_RelPart>();
@@ -915,12 +930,11 @@ public class ConceptMockery {
         expect(memberIdPart.getVersion()).andReturn(version);
         expect(part.getVersion()).andReturn(version);
 
-//        expect(part.getStatusId()).andReturn(statusNid);
         expect(part.getVersion()).andReturn(version);
 
         expect(termFactory.getUids(refsetNid)).andReturn(refsetIdUuidList);
         expect(termFactory.getUids(memberNid)).andReturn(memberIdUuidList);
-        expect(termFactory.getUids(componentNid)).andReturn(conceptUuidList).times(2);
+        expect(termFactory.getUids(componentNid)).andReturn(conceptUuidList).times(3);
 
         conceptExtensions.add(conceptExtension);
         expect(termFactory.getAllExtensionsForComponent(componentNid)).andReturn(conceptExtensions);
@@ -930,7 +944,7 @@ public class ConceptMockery {
     }
 
     /**
-     * Creates a mock concept extension
+     * Creates a mock string extension
      *
      * @param refsetConcept
      * @param version
@@ -938,6 +952,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param String
      * @param conceptUuidList
      * @param pathNid
      * @param exportPositionConceptData
@@ -949,7 +964,43 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, List<UUID> conceptUuidList, int pathNid, I_GetConceptData exportPositionConceptData,
+            int componentNid, String str, List<UUID> conceptUuidList, int pathNid, I_GetConceptData exportPositionConceptData,
+            List<UUID> pathUuidList, I_GetConceptData incluesionRootConceptData,
+            I_GetConceptData exclusionsRootConceptData, List<I_ThinExtByRefVersioned> conceptExtensions)
+            throws TerminologyException, IOException {
+        I_ThinExtByRefPartString extensionStringPart = createMock(I_ThinExtByRefPartString.class);
+
+        mockBaseExtension(refsetConcept, version, statusNid, date, refsetNid, refsetIdUuidList, memberNid, componentNid,
+            conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
+            exclusionsRootConceptData, extensionStringPart, stringExtensionNid, conceptExtensions);
+
+        expect(extensionStringPart.getStringValue()).andReturn(str).times(2);
+
+        replay(extensionStringPart);
+    }
+
+    /**
+     * Creates a mock concept extension
+     *
+     * @param refsetConcept
+     * @param version
+     * @param date
+     * @param refsetNid
+     * @param memberNid
+     * @param componentNid
+     * @param component1Nid
+     * @param conceptUuidList
+     * @param pathNid
+     * @param exportPositionConceptData
+     * @param pathUuidList
+     * @param incluesionRootConceptData
+     * @param exclusionsRootConceptData
+     * @param conceptExtensions
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
+            int componentNid, int component1Nid, List<UUID> conceptUuidList, int pathNid, I_GetConceptData exportPositionConceptData,
             List<UUID> pathUuidList, I_GetConceptData incluesionRootConceptData,
             I_GetConceptData exclusionsRootConceptData, List<I_ThinExtByRefVersioned> conceptExtensions)
             throws TerminologyException, IOException {
@@ -959,7 +1010,7 @@ public class ConceptMockery {
             conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensionPart, conceptExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
 
         replay(conceptExtensionPart);
     }
@@ -973,6 +1024,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param component1Nid
      * @param stringValue
      * @param conceptUuidList
      * @param pathNid
@@ -985,7 +1037,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, String stringValue, List<UUID> conceptUuidList, int pathNid,
+            int componentNid, int component1Nid, String stringValue, List<UUID> conceptUuidList, int pathNid,
             I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData,
             List<I_ThinExtByRefVersioned> conceptExtensions) throws TerminologyException, IOException {
@@ -995,7 +1047,7 @@ public class ConceptMockery {
             exportPositionConceptData, pathUuidList, incluesionRootConceptData, exclusionsRootConceptData,
             conceptExtensionPart, conceptStringExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
         expect(conceptExtensionPart.getStr()).andReturn(stringValue);
 
         replay(conceptExtensionPart);
@@ -1010,6 +1062,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param component1Nid
      * @param intValue Integer NB make sure you use Integer and not int or
      *            you'll get a concept concept extension and you don't want
      *            that.
@@ -1024,7 +1077,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, Integer intValue, List<UUID> conceptUuidList, int pathNid,
+            int componentNid, int component1Nid, Integer intValue, List<UUID> conceptUuidList, int pathNid,
             I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData,
             List<I_ThinExtByRefVersioned> conceptExtensions) throws TerminologyException, IOException {
@@ -1034,7 +1087,7 @@ public class ConceptMockery {
             conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensionPart, conceptIntExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
         expect(conceptExtensionPart.getIntValue()).andReturn(intValue);
 
         replay(conceptExtensionPart);
@@ -1049,6 +1102,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param component1Nid
      * @param component2Nid
      * @param conceptUuidList
      * @param pathNid
@@ -1061,7 +1115,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, int component2Nid, List<UUID> conceptUuidList, int pathNid,
+            int componentNid, int component1Nid, int component2Nid, List<UUID> conceptUuidList, int pathNid,
             I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData,
             List<I_ThinExtByRefVersioned> conceptExtensions) throws TerminologyException, IOException {
@@ -1071,7 +1125,7 @@ public class ConceptMockery {
             conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensionPart, conceptConceptExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
         expect(conceptExtensionPart.getC2id()).andReturn(component2Nid);
 
         replay(conceptExtensionPart);
@@ -1086,6 +1140,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param component1Nid
      * @param component2Nid
      * @param stringValue
      * @param conceptUuidList
@@ -1099,7 +1154,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, int component2Nid, String stringValue, List<UUID> conceptUuidList, int pathNid,
+            int componentNid, int component1Nid, int component2Nid, String stringValue, List<UUID> conceptUuidList, int pathNid,
             I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData,
             List<I_ThinExtByRefVersioned> conceptExtensions) throws TerminologyException, IOException {
@@ -1109,7 +1164,7 @@ public class ConceptMockery {
             conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensionPart, conceptConceptStringExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
         expect(conceptExtensionPart.getC2id()).andReturn(component2Nid);
         expect(conceptExtensionPart.getStringValue()).andReturn(stringValue);
 
@@ -1125,6 +1180,7 @@ public class ConceptMockery {
      * @param refsetNid
      * @param memberNid
      * @param componentNid
+     * @param component1Nid
      * @param component2Nid
      * @param component3Nid
      * @param conceptUuidList
@@ -1138,7 +1194,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockExtension(I_GetConceptData refsetConcept, int version, int statusNid, Date date, int refsetNid, List<UUID> refsetIdUuidList, int memberNid,
-            int componentNid, int component2Nid, int component3Nid, List<UUID> conceptUuidList, int pathNid,
+            int componentNid, int component1Nid, int component2Nid, int component3Nid, List<UUID> conceptUuidList, int pathNid,
             I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData,
             List<I_ThinExtByRefVersioned> conceptExtensions) throws TerminologyException, IOException {
@@ -1148,7 +1204,7 @@ public class ConceptMockery {
             conceptUuidList, pathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensionPart, conceptConceptConceptExtensionNid, conceptExtensions);
 
-        expect(conceptExtensionPart.getC1id()).andReturn(componentNid).times(2);
+        expect(conceptExtensionPart.getC1id()).andReturn(component1Nid).times(2);
         expect(conceptExtensionPart.getC2id()).andReturn(component2Nid);
         expect(conceptExtensionPart.getC3id()).andReturn(component3Nid);
 

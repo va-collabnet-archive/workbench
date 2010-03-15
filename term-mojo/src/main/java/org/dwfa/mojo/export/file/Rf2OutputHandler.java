@@ -337,23 +337,44 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
 
         referenceSetRow.setRefsetId(getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT).toString());
         referenceSetRow.setMemberId(getSctId(extensionDto, extensionDto.getMemberId(), TYPE.REFSET).toString());
-        referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getConcept1Id()).toString());
+        referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getReferencedConceptId()).toString());
         referenceSetRow.setModuleId(getModuleId(extensionDto).toString());
         referenceSetRow.setEffectiveTime(getReleaseDate(extensionDto));
         referenceSetRow.setActive(getActiveFlag(extensionDto));
-        referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getConcept1Id()).toString());
 
+        TYPE valueComponentType = getValueComponentExtensionType(extensionDto);
+        if (extensionDto.getConcept1Id() != null) {
+            referenceSetRow.setComponentId1(getSctId(extensionDto, extensionDto.getConcept1Id(), valueComponentType).toString());
+        }
         if (extensionDto.getConcept2Id() != null) {
-            referenceSetRow.setReferencedComponentId2(getSctId(extensionDto, extensionDto.getConcept2Id()).toString());
+            referenceSetRow.setComponentId2(getSctId(extensionDto, extensionDto.getConcept2Id(), valueComponentType).toString());
         }
         if (extensionDto.getConcept3Id() != null) {
-            referenceSetRow.setReferencedComponentId3(getSctId(extensionDto, extensionDto.getConcept3Id()).toString());
+            referenceSetRow.setComponentId3(getSctId(extensionDto, extensionDto.getConcept3Id(), valueComponentType).toString());
         }
         if (extensionDto.getValue() != null) {
             referenceSetRow.setValue(extensionDto.getValue());
         }
 
         return referenceSetRow;
+    }
+
+    /**
+     * Check if the refset is a structural refset. If so then the TYPE of the
+     * refset value is a concept eg Description Inactivation Indicator is a
+     * concept.
+     *
+     * @param extensionDto ExtensionDto
+     * @return TYPE
+     */
+    private TYPE getValueComponentExtensionType(ExtensionDto extensionDto) {
+        TYPE type = TYPE.CONCEPT;
+
+        if(extensionDto.isClinical()){
+            type = extensionDto.getType();
+        }
+
+        return type;
     }
 
     /**

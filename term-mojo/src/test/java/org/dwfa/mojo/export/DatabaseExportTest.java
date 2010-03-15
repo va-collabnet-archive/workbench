@@ -16,9 +16,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
@@ -54,7 +54,6 @@ public class DatabaseExportTest extends ConceptMockery {
 
     @Before
     public void setUp() throws Exception {
-
         exportDirectory.mkdirs();
         databaseExportClass = databaseExport.getClass();
 
@@ -102,15 +101,15 @@ public class DatabaseExportTest extends ConceptMockery {
         setField(databaseExportClass, databaseExport, "exportDirectory", exportDirectory);
 
         //set uuid-sctid map database parameters
-       // if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
+        if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
             setField(databaseExportClass, databaseExport, "dbDriver", "org.apache.derby.jdbc.EmbeddedDriver");
             setField(databaseExportClass, databaseExport, "dbConnectionUrl", "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
-//        } else {
-//            setField(databaseExportClass, databaseExport, "dbDriver", System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER));
-//            setField(databaseExportClass, databaseExport, "dbConnectionUrl", System.getProperty(UUID_MAP_TEST_DATABASE_URL));
-//            setField(databaseExportClass, databaseExport, "dbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
-//            setField(databaseExportClass, databaseExport, "dbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
-//        }
+        } else {
+            setField(databaseExportClass, databaseExport, "dbDriver", System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER));
+            setField(databaseExportClass, databaseExport, "dbConnectionUrl", System.getProperty(UUID_MAP_TEST_DATABASE_URL));
+            setField(databaseExportClass, databaseExport, "dbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
+            setField(databaseExportClass, databaseExport, "dbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
+        }
         
 
         //set the default namespace
@@ -157,20 +156,27 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdPart exportableConceptSnomedCtv3IdPart = setCtv3Id(exportIdVersioned, conceptIdParts, exportableConcept,
             incluesionRootConceptData, exclusionsRootConceptData, exportVersion);
 
+
         //for concept concept refsets and relationship
-        int exportConcept2Nid = 11;
+        int exportConcept1Nid = 11;
+        List<UUID> exportConcept1UuidList = new ArrayList<UUID>();
+        I_GetConceptData exportableConcept1 = createExportableConcept(exportConcept1Nid, exportConcept1UuidList, exportConcept1Nid + 1, activeStatusNid);
+        exportableConcepts.add(exportableConcept1);
+
+        //for concept concept refsets and relationship
+        int exportConcept2Nid = 13;
         List<UUID> exportConcept2UuidList = new ArrayList<UUID>();
         I_GetConceptData exportableConcept2 = createExportableConcept(exportConcept2Nid, exportConcept2UuidList, exportConcept2Nid + 1, activeStatusNid);
         exportableConcepts.add(exportableConcept2);
 
         //for concept concept concept refsets
-        int exportConcept3Nid = 13;
+        int exportConcept3Nid = 15;
         List<UUID> exportConcept3UuidList = new ArrayList<UUID>();
         I_GetConceptData exportableConcept3 = createExportableConcept(exportConcept3Nid, exportConcept3UuidList, exportConcept3Nid + 1, activeStatusNid);
         exportableConcepts.add(exportableConcept3);
 
         //for inactive concept
-        int exportConcept4Nid = 15;
+        int exportConcept4Nid = 17;
         List<UUID> exportConcept4UuidList = new ArrayList<UUID>();
         I_GetConceptData exportableConcept4 = createExportableConcept(exportConcept4Nid, exportConcept4UuidList, exportConcept4Nid + 1, aceAmbiguousStatusNId);
         exportableConcepts.add(exportableConcept4);
@@ -191,7 +197,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         List<UUID> refsetUuidsList = new ArrayList<UUID>();
         refsetUuidsList.add(UUID.randomUUID());
-        mockExtension(refsetConcept, exportVersion, activeStatusNid, exportDate, refsetNid, refsetUuidsList, memberNid, exportConceptNid,
+        mockExtension(refsetConcept, exportVersion, activeStatusNid, exportDate, refsetNid, refsetUuidsList, memberNid, memberNid - 1, exportConceptNid,
             exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensions);
 
@@ -211,7 +217,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetStringUuidsList = new ArrayList<UUID>();
         refsetStringUuidsList.add(UUID.randomUUID());
         mockExtension(refsetStringConcept, exportVersion, activeStatusNid, exportDate, refsetStringNid, refsetStringUuidsList, memberStringNid,
-            exportConceptNid, "Woolie", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConceptNid, memberNid - 1, "Woolie", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetStringConcept, exportStrRefsetIdVersioned);
@@ -231,7 +237,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetIntegerUuidsList = new ArrayList<UUID>();
         refsetIntegerUuidsList.add(UUID.randomUUID());
         mockExtension(refsetIntegerConcept, exportVersion, activeStatusNid, exportDate, refsetIntegerNid, refsetIntegerUuidsList, memberIntegerNid,
-            exportConceptNid, new Integer("80085"), exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConceptNid, memberNid - 1, new Integer("80085"), exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetIntegerConcept, exportIntegerRefsetIdVersioned);
@@ -252,10 +258,10 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetCcUuidsList = new ArrayList<UUID>();
         refsetCcUuidsList.add(UUID.randomUUID());
         mockExtension(refsetConceptConcept, exportVersion, activeStatusNid, exportDate, refsetCcNid, refsetCcUuidsList, memberCcNid, exportConceptNid,
-            exportConcept2Nid, exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConcept1Nid, exportConcept2Nid, exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
-        replay(refsetConceptConcept, exportableConcept2, exportCcRefsetIdVersioned);
+        replay(refsetConceptConcept, exportableConcept1, exportableConcept2, exportCcRefsetIdVersioned);
 
         //////////////////////////////////////////
         //Concept Concept String reference sets //
@@ -272,7 +278,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetCcsUuidsList = new ArrayList<UUID>();
         refsetCcsUuidsList.add(UUID.randomUUID());
         mockExtension(refsetConceptConceptString, exportVersion, activeStatusNid, exportDate, refsetCcsNid, refsetCcsUuidsList, memberCcsNid, exportConceptNid,
-            exportConcept2Nid, "mamoth", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConcept1Nid,  exportConcept2Nid, "mamoth", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetConceptConceptString, exportCcStrRefsetIdVersioned);
@@ -293,10 +299,30 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetCccUuidsList = new ArrayList<UUID>();
         refsetCccUuidsList.add(UUID.randomUUID());
         mockExtension(refsetConceptConcept, exportVersion, activeStatusNid, exportDate, refsetCccNid, refsetCccUuidsList, memberCccNid, exportConceptNid,
-            exportConcept2Nid, exportConcept3Nid, exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConcept1Nid, exportConcept2Nid, exportConcept3Nid, exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetConceptConceptConcept, exportableConcept3, exportCccRefsetIdVersioned);
+
+        //////////////////////////////////
+        //String reference sets //
+        //////////////////////////////////
+        int refsetStringExNid = 1000210;
+        int memberStringExNid = 10002100;
+
+        I_IdVersioned exportStrExRefsetIdVersioned = createMock(I_IdVersioned.class);
+        expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
+        I_GetConceptData refsetString = mockConcept(refsetStringExNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
+            exportPositionConceptData, pathUuidList, sourceUuidNid, exportStrExRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+        expect(refsetString.getInitialText()).andReturn("concept_string_refset").anyTimes();
+
+        List<UUID> refsetStringExUuidsList = new ArrayList<UUID>();
+        refsetStringExUuidsList.add(UUID.randomUUID());
+        mockExtension(refsetString, exportVersion, activeStatusNid, exportDate, refsetStringExNid, refsetStringExUuidsList, memberStringExNid,
+            exportConceptNid, "Woolie", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
+
+        replay(refsetString, exportStrExRefsetIdVersioned);
 
         /////////////////////////
         //Concept descriptions //
@@ -341,7 +367,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetDescriptionUuidsList = new ArrayList<UUID>();
         refsetDescriptionUuidsList.add(UUID.randomUUID());
         mockExtension(descriptionRefsetConcept, exportVersion, activeStatusNid, exportDate, descRefsetNid, refsetDescriptionUuidsList, descMemberNid,
-            ptDescriptionId, exportPtUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            ptDescriptionId, fsnDescriptionId, exportPtUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, descriptionExtensions);
 
         expect(termFactory.getAllExtensionsForComponent(ptDescriptionId)).andReturn(descriptionExtensions);
@@ -385,7 +411,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetRelationshipUuidsList = new ArrayList<UUID>();
         refsetRelationshipUuidsList.add(UUID.randomUUID());
         mockExtension(relationshipRefsetConcept, exportVersion, activeStatusNid, exportDate, relRefsetNid, refsetRelationshipUuidsList,
-            relMemberNid, relId, exportRelationshipUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            relMemberNid, relId, historyRelId, exportRelationshipUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, relationshipExtensions);
 
         replay(relationshipRefsetConcept, exportRelationshipRefsetIdVersioned);
@@ -499,6 +525,9 @@ public class DatabaseExportTest extends ConceptMockery {
 
         expect(termFactory.getAllExtensionsForComponent(relId)).andReturn(new ArrayList<I_ThinExtByRefVersioned>());
 
+        //is the export path on the internation release path.
+        expect(snomedCoreConcept.isParentOf(exportPositionConceptData, null, null, null, false)).andReturn(false).anyTimes();
+        replay(snomedCoreConcept);
         org.easymock.classextension.EasyMock.replay(incluesionRootConceptData, exclusionsRootConceptData, exportPositionConceptData);
 
         replay(termFactory);

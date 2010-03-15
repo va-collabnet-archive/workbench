@@ -24,6 +24,7 @@ import java.util.UUID;
 public class ExtensionDto extends ConceptDto {
     private String value;
     private UUID memberId;
+    private UUID referencedConceptId;
     private UUID concept1Id;
     private UUID concept2Id;
     private UUID concept3Id;
@@ -45,6 +46,20 @@ public class ExtensionDto extends ConceptDto {
      */
     public void setMemberId(UUID memberId) {
         this.memberId = memberId;
+    }
+
+    /**
+     * @return the referencedConceptId
+     */
+    public UUID getReferencedConceptId() {
+        return referencedConceptId;
+    }
+
+    /**
+     * @param referencedConceptId the referencedConceptId to set
+     */
+    public void setReferencedConceptId(UUID referencedConceptId) {
+        this.referencedConceptId = referencedConceptId;
     }
 
     /**

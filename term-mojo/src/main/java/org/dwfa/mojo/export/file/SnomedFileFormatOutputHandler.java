@@ -106,8 +106,11 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 if (extensionDto.getMemberId() == null) {
                     validationErrorList.add(extensionDto.getConceptId() + " No member id");
                 }
-                if (extensionDto.getConcept1Id() == null) {
+                if (extensionDto.getReferencedConceptId() == null) {
                     validationErrorList.add(extensionDto.getConceptId() + " No referenced component id");
+                }
+                if (extensionDto.getConcept1Id() == null && extensionDto.getValue() == null) {
+                    validationErrorList.add(extensionDto.getConceptId() + " value");
                 }
             }
 
