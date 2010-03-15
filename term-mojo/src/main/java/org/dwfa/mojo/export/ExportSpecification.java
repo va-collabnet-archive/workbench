@@ -103,6 +103,8 @@ public class ExportSpecification {
     private I_GetConceptData ctv3Id;
     /** SNOMED UUID concept. */
     private I_GetConceptData snomedT3Uuid;
+    /** UUID Source concept. */
+    private I_GetConceptData unspecifiedUuid;
     /** Initial case not sensitive concepts. */
     private I_GetConceptData initialCharacterNotCaseSensitive;
     /** Initial all characters sensitive concepts. */
@@ -170,6 +172,8 @@ public class ExportSpecification {
         ctv3Id = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getUids().iterator().next());
         snomedT3Uuid = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.localize().getUids().iterator().next());
+        unspecifiedUuid = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getUids().iterator().next());
         initialCharacterNotCaseSensitive = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.INITIAL_CHARACTER_NOT_CASE_SENSITIVE.localize().getUids().iterator().next());
         allCharactersCaseSensitive = termFactory.getConcept(
@@ -605,7 +609,7 @@ public class ExportSpecification {
     }
 
     /**
-     * Adds an identifier row for UUID to SCTID to the ConceptDto.
+     * Adds an identifier row for UUID (type 3 and 5) to SCTID to the ConceptDto.
      *
      * If not SCTID then no identifier row is added
      *
@@ -619,21 +623,43 @@ public class ExportSpecification {
      */
     private void setUuidSctIdIdentifier(ConceptDto conceptDto, I_AmPart tuple,
             List<I_IdPart> idVersions, TYPE type) throws TerminologyException, IOException {
-        I_IdPart uuidPart = getLatesIdtVersion(idVersions, snomedT3Uuid.getConceptId(), tuple);
+
+        I_IdPart type5UuidPart = getLatesIdtVersion(idVersions, unspecifiedUuid.getConceptId(), tuple);
         I_IdPart sctIdPart = getLatesIdtVersion(idVersions, snomedIntId.getConceptId(), tuple);
+        I_IdPart type3UidPart = getLatesIdtVersion(idVersions, snomedT3Uuid.getConceptId(), tuple);
 
-        if (uuidPart != null && sctIdPart != null) {
-            IdentifierDto identifierDto = new IdentifierDto();
-            getBaseConceptDto(identifierDto, tuple, idVersions);
-            identifierDto.setType(type);
-
-            identifierDto.setActive(isActive(sctIdPart.getStatusId()));
-            identifierDto.setConceptId(UUID.fromString(uuidPart.getSourceId().toString()));
-            identifierDto.setReferencedSctId(Long.valueOf(sctIdPart.getSourceId().toString()));
-            identifierDto.setIdentifierSchemeUuid(snomedIntId.getUids().get(0));
-
-            conceptDto.getIdentifierDtos().add(identifierDto);
+        if (type5UuidPart != null && sctIdPart != null) {
+            setIdentifier(conceptDto, tuple, idVersions, type, type5UuidPart, sctIdPart);
         }
+        if (type3UidPart != null && sctIdPart != null) {
+            setIdentifier(conceptDto, tuple, idVersions, type, type3UidPart, sctIdPart);
+        }
+    }
+
+    /**
+     * Sets the id mapping for the UUID to SCTID
+     *
+     * @param conceptDto ConceptDto to add the identifier to.
+     * @param tuple I_AmPart
+     * @param idVersions List of I_IdPart
+     * @param type TYPE
+     * @param uuidPart I_IdPart
+     * @param sctIdPart I_IdPart
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private void setIdentifier(ConceptDto conceptDto, I_AmPart tuple, List<I_IdPart> idVersions, TYPE type,
+            I_IdPart uuidPart, I_IdPart sctIdPart) throws IOException, TerminologyException {
+        IdentifierDto identifierDto = new IdentifierDto();
+        getBaseConceptDto(identifierDto, tuple, idVersions);
+        identifierDto.setType(type);
+
+        identifierDto.setActive(isActive(sctIdPart.getStatusId()));
+        identifierDto.setConceptId(UUID.fromString(uuidPart.getSourceId().toString()));
+        identifierDto.setReferencedSctId(Long.valueOf(sctIdPart.getSourceId().toString()));
+        identifierDto.setIdentifierSchemeUuid(snomedIntId.getUids().get(0));
+
+        conceptDto.getIdentifierDtos().add(identifierDto);
     }
 
     /**

@@ -118,6 +118,8 @@ public class ConceptMockery {
     int mandatoryRefinabilityNid = Integer.MAX_VALUE - 56;
     int enNid = Integer.MAX_VALUE - 57;
     int enUsNid = Integer.MAX_VALUE - 58;
+    int sourceUuidNid = Integer.MAX_VALUE - 59;
+
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -147,6 +149,7 @@ public class ConceptMockery {
     private ArrayList<UUID> inActiveUuidList;
     private I_GetConceptData inActiveConceptData;
     private ArrayList<UUID> currentUuidList;
+    private I_GetConceptData sourceUuidConceptData;
 
     /**
      * Sets up the meta data concepts and the term factory
@@ -213,6 +216,13 @@ public class ConceptMockery {
             snomedT3UuidNid);
         expect(snomedT3UuidConceptData.getConceptId()).andReturn(snomedT3UuidNid).anyTimes();
         replay(snomedT3UuidConceptData);
+
+        List<UUID> sourceUuidUuidList = new ArrayList<UUID>();
+        sourceUuidUuidList.add(UUID.randomUUID());
+        sourceUuidConceptData = mockConceptEnum(sourceUuidUuidList, ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID,
+            sourceUuidNid);
+        expect(sourceUuidConceptData.getConceptId()).andReturn(sourceUuidNid).anyTimes();
+        replay(sourceUuidConceptData);
 
         List<UUID> ctv3IdUuidList = new ArrayList<UUID>();
         ctv3IdUuidList.add(UUID.randomUUID());
@@ -532,7 +542,7 @@ public class ConceptMockery {
      * @throws IOException
      */
     public void mockConceptId(I_AmPart tuple, int version, Date date, List<I_IdPart> idParts,
-            I_IdVersioned idVersioned, I_IdPart sctIdPart, I_IdPart uuidIdPart, List<UUID> componentUuidList, TYPE type)
+            I_IdVersioned idVersioned, I_IdPart sctIdPart, I_IdPart uuidIdPart, int sourceUuidNid, List<UUID> componentUuidList, TYPE type)
             throws TerminologyException, IOException {
         setNameSpaceId(idParts, sctIdPart, type, version);
 
@@ -540,7 +550,7 @@ public class ConceptMockery {
         expect(tuple.getVersion()).andReturn(version).times(3);
         expect(tuple.getPathId()).andReturn(exportPathNid);
 
-        expect(uuidIdPart.getSource()).andReturn(snomedT3UuidNid).times(6);
+        expect(uuidIdPart.getSource()).andReturn(sourceUuidNid).times(7);
         expect(uuidIdPart.getVersion()).andReturn(version).times(2);
         expect(uuidIdPart.getSourceId()).andReturn(componentUuidList.get(0).toString()).times(3);
         expect(tuple.getTime()).andReturn(date.getTime());
@@ -563,7 +573,7 @@ public class ConceptMockery {
         I_IdPart exportableConceptSnomedRtIdPart = createMock(I_IdPart.class);
         conceptIdParts.add(exportableConceptSnomedRtIdPart);
 
-        expect(exportableConceptSnomedRtIdPart.getSource()).andReturn(snomedRtNid).times(6);
+        expect(exportableConceptSnomedRtIdPart.getSource()).andReturn(snomedRtNid).times(7);
         expect(exportableConceptSnomedRtIdPart.getVersion()).andReturn(exportVersion).times(3);
         expect(exportableConceptSnomedRtIdPart.getSourceId()).andReturn(SctIdGenerator.generate(sctSequence, NAMESPACE.NEHTA, TYPE.CONCEPT)).times(3);
         expect(exportableConceptSnomedRtIdPart.getPathId()).andReturn(exportPathNid).times(2);
@@ -591,7 +601,7 @@ public class ConceptMockery {
         I_IdPart exportableConceptSnomedRtIdPart = createMock(I_IdPart.class);
         conceptIdParts.add(exportableConceptSnomedRtIdPart);
 
-        expect(exportableConceptSnomedRtIdPart.getSource()).andReturn(ctv3Nid).times(6);
+        expect(exportableConceptSnomedRtIdPart.getSource()).andReturn(ctv3Nid).times(7);
         expect(exportableConceptSnomedRtIdPart.getVersion()).andReturn(exportVersion).times(3);
         expect(exportableConceptSnomedRtIdPart.getSourceId()).andReturn(SctIdGenerator.generate(sctSequence, NAMESPACE.NEHTA, TYPE.CONCEPT)).times(3);
         expect(exportableConceptSnomedRtIdPart.getPathId()).andReturn(exportPathNid).times(2);
@@ -640,7 +650,7 @@ public class ConceptMockery {
      * @throws TerminologyException
      */
     public I_GetConceptData mockConcept(int exportConceptNid, int version, int statusNid, Date date, List<UUID> exportConceptUuidList,
-            I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList, I_IdVersioned exportIdVersioned, List<I_IdPart> conceptIdParts,
+            I_GetConceptData exportPositionConceptData, List<UUID> pathUuidList, int sourceUuidNid, I_IdVersioned exportIdVersioned, List<I_IdPart> conceptIdParts,
             I_GetConceptData incluesionRootConceptData, I_GetConceptData exclusionsRootConceptData) throws IOException,
             TerminologyException {
         I_GetConceptData exportableConcept = createMock(I_GetConceptData.class);
@@ -662,10 +672,10 @@ public class ConceptMockery {
         expect(exportableConcept.getUids()).andReturn(exportConceptUuidList).anyTimes();
         expect(termFactory.getConcept(exportConceptNid)).andReturn(exportableConcept).anyTimes();
         expect(exportableConceptIdPart.getSource()).andReturn(snomedIntNid);
-        expect(exportableConceptUuidIdPart.getSource()).andReturn(snomedT3UuidNid);
+        expect(exportableConceptUuidIdPart.getSource()).andReturn(sourceUuidNid);
 
         mockConceptId(exportableConceptTuple, version, date, conceptIdParts, exportIdVersioned,
-            exportableConceptIdPart, exportableConceptUuidIdPart, exportConceptUuidList, TYPE.CONCEPT);
+            exportableConceptIdPart, exportableConceptUuidIdPart, sourceUuidNid, exportConceptUuidList, TYPE.CONCEPT);
         expect(exportableConcept.getId()).andReturn(exportIdVersioned).times(6);
         expect(exportableConcept.getNid()).andReturn(exportConceptNid).anyTimes();
         expect(exportIdVersioned.getVersions()).andReturn(conceptIdParts).times(2);
@@ -724,7 +734,7 @@ public class ConceptMockery {
         org.easymock.classextension.EasyMock.expect(exportPosition.getConceptId()).andReturn(exportPathNid);
 
         mockConceptId(exportableFsnDescriptionTuple, version, date, descriptionIdParts, exportDescriptionIdVersioned,
-            exportableDescriptionFsnIdPart, exportableDescriptionFsnUuuidPart, exportDescriptionUuidList,
+            exportableDescriptionFsnIdPart, exportableDescriptionFsnUuuidPart, sourceUuidNid, exportDescriptionUuidList,
             TYPE.DESCRIPTION);
 
         mockBaseDetails(exportableFsnDescriptionTuple, version, statusNid, date, exportPosition, pathUuidList);
@@ -740,7 +750,7 @@ public class ConceptMockery {
         expect(exportableFsnDescriptionTuple.getVersion()).andReturn(version).times(3);
         expect(exportableDescriptionFsnIdPart.getVersion()).andReturn(version);
         expect(exportableDescriptionFsnIdPart.getSource()).andReturn(snomedIntNid);
-        expect(exportableDescriptionFsnUuuidPart.getSource()).andReturn(snomedT3UuidNid);
+        expect(exportableDescriptionFsnUuuidPart.getSource()).andReturn(sourceUuidNid);
 
         expect(termFactory.getUids(conceptNid)).andReturn(conceptUuids).times(2);
         expect(termFactory.getUids(descriptionNid)).andReturn(exportDescriptionUuidList).times(4);
@@ -802,7 +812,7 @@ public class ConceptMockery {
         expect(termFactory.getId(relNid)).andReturn(exportRelationshipIdVersioned);
 
         mockConceptId(relationshipTuple, version, date, relationshipIdParts, exportRelationshipIdVersioned,
-            exportableRelationshipIdPart, exportableRelationshipUuidIdPart, exportRelIdUuidList, TYPE.RELATIONSHIP);
+            exportableRelationshipIdPart, exportableRelationshipUuidIdPart, sourceUuidNid, exportRelIdUuidList, TYPE.RELATIONSHIP);
 
         // base concept details.
         mockBaseDetails(relationshipTuple, version, statusNid, date, positionConceptData, pathUuidList);
@@ -901,7 +911,7 @@ public class ConceptMockery {
 
         mockBaseDetails(part, version, statusNid,date, exportPositionConceptData, pathUuidList);
         mockConceptId(part, version, date, memberIdParts, memberIdVersioned, memberIdPart, memberUuidIdPart,
-            memberIdUuidList, TYPE.REFSET);
+            sourceUuidNid, memberIdUuidList, TYPE.REFSET);
         expect(memberIdPart.getVersion()).andReturn(version);
         expect(part.getVersion()).andReturn(version);
 
@@ -1152,7 +1162,7 @@ public class ConceptMockery {
      * @param exportableConceptIdPart
      */
     public void setNameSpaceId(List<I_IdPart> idParts, I_IdPart exportableConceptIdPart, TYPE type, int exportVersion) {
-        expect(exportableConceptIdPart.getSource()).andReturn(snomedIntNid).times(6);
+        expect(exportableConceptIdPart.getSource()).andReturn(snomedIntNid).times(7);
         expect(exportableConceptIdPart.getStatusId()).andReturn(activeStatusNid);
         expect(exportableConceptIdPart.getVersion()).andReturn(exportVersion).times(3);
         String sctid = SctIdGenerator.generate(sctSequence++, NAMESPACE.NEHTA, type);

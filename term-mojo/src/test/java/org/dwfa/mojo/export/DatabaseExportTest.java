@@ -23,7 +23,6 @@ import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
-import org.dwfa.util.AceDateFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -142,7 +141,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportIdVersioned = createMock(I_IdVersioned.class);
         List<I_IdPart> conceptIdParts = new ArrayList<I_IdPart>();
         I_GetConceptData exportableConcept = mockConcept(exportConceptNid, exportVersion, currentStatusNid, exportDate,
-            exportConceptUuidList, exportPositionConceptData, pathUuidList, exportIdVersioned, conceptIdParts, incluesionRootConceptData,
+            exportConceptUuidList, exportPositionConceptData, pathUuidList, snomedT3UuidNid, exportIdVersioned, conceptIdParts, incluesionRootConceptData,
             exclusionsRootConceptData);
         exportableConcepts.add(exportableConcept);
 
@@ -180,7 +179,7 @@ public class DatabaseExportTest extends ConceptMockery {
         expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
         I_IdVersioned exportRefsetIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData refsetConcept = mockConcept(refsetNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
-            exportPositionConceptData, pathUuidList, exportRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+            exportPositionConceptData, pathUuidList, sourceUuidNid, exportRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
         expect(refsetConcept.getInitialText()).andReturn("concept_refset").anyTimes();
 
         List<UUID> refsetUuidsList = new ArrayList<UUID>();
@@ -199,7 +198,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportStrRefsetIdVersioned = createMock(I_IdVersioned.class);
         expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
         I_GetConceptData refsetStringConcept = mockConcept(refsetStringNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
-            exportPositionConceptData, pathUuidList, exportStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+            exportPositionConceptData, pathUuidList, sourceUuidNid, exportStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
         expect(refsetStringConcept.getInitialText()).andReturn("concept_string_refset").anyTimes();
 
         List<UUID> refsetStringUuidsList = new ArrayList<UUID>();
@@ -219,7 +218,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportIntegerRefsetIdVersioned = createMock(I_IdVersioned.class);
         expect(exportableConcept.getConceptId()).andReturn(exportConceptNid);
         I_GetConceptData refsetIntegerConcept = mockConcept(refsetIntegerNid, exportVersion, activeStatusNid, exportDate, new ArrayList<UUID>(),
-            exportPositionConceptData, pathUuidList, exportIntegerRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
+            exportPositionConceptData, pathUuidList, sourceUuidNid, exportIntegerRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
         expect(refsetIntegerConcept.getInitialText()).andReturn("concept_int_refset").anyTimes();
 
         List<UUID> refsetIntegerUuidsList = new ArrayList<UUID>();
@@ -239,7 +238,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportCcRefsetIdVersioned = createMock(I_IdVersioned.class);
         expect(exportableConcept2.getConceptId()).andReturn(exportConcept2Nid);
         I_GetConceptData refsetConceptConcept = mockConcept(refsetCcNid, exportVersion, activeStatusNid, exportDate,
-            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCcRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
+            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, sourceUuidNid, exportCcRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
         expect(refsetConceptConcept.getInitialText()).andReturn("concept_concept_refset").anyTimes();
 
@@ -259,7 +258,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_IdVersioned exportCcStrRefsetIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData refsetConceptConceptString = mockConcept(refsetCcsNid, exportVersion, activeStatusNid, exportDate,
-            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCcStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
+            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, sourceUuidNid, exportCcStrRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
         expect(refsetConceptConceptString.getInitialText()).andReturn("concept_concept_string_refset").anyTimes();
 
@@ -280,7 +279,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdVersioned exportCccRefsetIdVersioned = createMock(I_IdVersioned.class);
         expect(exportableConcept3.getConceptId()).andReturn(exportConcept2Nid);
         I_GetConceptData refsetConceptConceptConcept = mockConcept(refsetCccNid, exportVersion, activeStatusNid, exportDate,
-            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportCccRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
+            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, sourceUuidNid, exportCccRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
         expect(refsetConceptConceptConcept.getInitialText()).andReturn("concept_concept_concept_string_refset").anyTimes();
 
@@ -328,7 +327,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_IdVersioned exportDescriptionRefsetIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData descriptionRefsetConcept = mockConcept(descRefsetNid, exportVersion, activeStatusNid, exportDate,
-            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportDescriptionRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
+            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, sourceUuidNid, exportDescriptionRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
         expect(descriptionRefsetConcept.getInitialText()).andReturn("description_refset").anyTimes();
 
@@ -371,7 +370,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_IdVersioned exportRelationshipRefsetIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData relationshipRefsetConcept = mockConcept(relRefsetNid, exportVersion, activeStatusNid, exportDate,
-            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, exportRelationshipRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
+            new ArrayList<UUID>(), exportPositionConceptData, pathUuidList, snomedT3UuidNid, exportRelationshipRefsetIdVersioned, new ArrayList<I_IdPart>(), incluesionRootConceptData,
             exclusionsRootConceptData);
         expect(relationshipRefsetConcept.getInitialText()).andReturn("relationship_refset").anyTimes();
 
@@ -434,7 +433,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_IdVersioned exportIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData exportableConcept = mockConcept(exportConceptNid, exportVersion, activeStatusNid, exportDate,
-            exportConceptUuidList, exportPositionConceptData, pathUuidList, exportIdVersioned,
+            exportConceptUuidList, exportPositionConceptData, pathUuidList, sourceUuidNid, exportIdVersioned,
             new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
 
         expect(termFactory.getAllExtensionsForComponent(exportConceptNid)).andReturn(new ArrayList<I_ThinExtByRefVersioned>());
@@ -445,7 +444,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<I_IdPart> conceptIdParts2 = new ArrayList<I_IdPart>();
         I_IdVersioned exportIdVersioned2 = createMock(I_IdVersioned.class);
         I_GetConceptData exportableConcept2 = mockConcept(exportConcept2Nid, exportVersion, activeStatusNid, exportDate,
-            exportConcept2UuidList, exportPositionConceptData, pathUuidList, exportIdVersioned2,
+            exportConcept2UuidList, exportPositionConceptData, pathUuidList, sourceUuidNid, exportIdVersioned2,
             conceptIdParts2, incluesionRootConceptData, exclusionsRootConceptData);
 
         /////////////////////////
@@ -530,7 +529,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_IdVersioned exportIdVersioned = createMock(I_IdVersioned.class);
         I_GetConceptData exportableConcept = mockConcept(exportConceptNid, exportVersion, statusNid, exportDate,
-            exportConceptUuidList, exportPositionConceptData, pathUuidList, exportIdVersioned,
+            exportConceptUuidList, exportPositionConceptData, pathUuidList, sourceUuidNid, exportIdVersioned,
             new ArrayList<I_IdPart>(), incluesionRootConceptData, exclusionsRootConceptData);
 
         expect(termFactory.getAllExtensionsForComponent(exportConceptNid)).andReturn(new ArrayList<I_ThinExtByRefVersioned>());
@@ -540,7 +539,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<I_IdPart> conceptIdParts2 = new ArrayList<I_IdPart>();
         I_IdVersioned exportIdVersioned2 = createMock(I_IdVersioned.class);
         I_GetConceptData exportableConcept2 = mockConcept(exportConcept2Nid, exportVersion, statusNid, exportDate,
-            exportConcept2UuidList, exportPositionConceptData, pathUuidList, exportIdVersioned2,
+            exportConcept2UuidList, exportPositionConceptData, pathUuidList, sourceUuidNid, exportIdVersioned2,
             conceptIdParts2, incluesionRootConceptData, exclusionsRootConceptData);
 
         /////////////////////////

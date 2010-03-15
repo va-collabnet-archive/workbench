@@ -142,9 +142,12 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         logger.info("Start exporting concepts");
 
         try {
-            rf2OutputHandler = new Rf2OutputHandler(exportDirectory, sctIdDbDirectory);
-            rf1OutputHandler = new Rf1OutputHandler(exportDirectory, sctIdDbDirectory);
-            aceOutputHandler = new AceOutputHandler(exportDirectory, sctIdDbDirectory);
+            rf2OutputHandler = new Rf2OutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar), sctIdDbDirectory);
+            rf1OutputHandler = new Rf1OutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar), sctIdDbDirectory);
+            aceOutputHandler = new AceOutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar), sctIdDbDirectory);
 
             List<Position> positions = new ArrayList<Position>();
             for (PositionDescriptor positionDescriptor : positionsForExport) {
