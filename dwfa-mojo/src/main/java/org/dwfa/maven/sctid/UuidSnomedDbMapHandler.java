@@ -161,9 +161,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws Exception if cannot write maps to the DB.
      */
     public void writeMaps() throws Exception {
-        for (UUID uuid : memoryUuidSctidMap.keySet()) {
-            uuidSctidMapDb.addUUIDSctIdEntry(uuid, memoryUuidSctidMap.get(uuid));
-        }
+        uuidSctidMapDb.addUUIDSctIdEntryList(memoryUuidSctidMap);
         memoryUuidSctidMap.clear();
         logger.info("Committed memory map to DB");
     }
