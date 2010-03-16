@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,14 +60,14 @@ final public class XMLUtil {
 	// private static final Log log = LogFactory.getLog(XMLUtil.class);
 	private static final Logger log = Logger.getLogger(XMLUtil.class.getName());
 	private static SimpleErrorHandler mErrorhandler = new SimpleErrorHandler();
-	public static String XpathFactory="net.sf.saxon.xpath.XPathFactoryImpl";
+	public static String XpathFactory = "net.sf.saxon.xpath.XPathFactoryImpl";
 
-	//RESERVED CHARS
-	
+	// RESERVED CHARS
+
 	public static String SPACE = " ";
 	public static String EQUALS = "=\"";
 	public static String QUOTE = "\"";
-	
+
 	public static String GT = ">";
 	public static String GT_A = "&gt;";
 	public static String LT = "<";
@@ -77,8 +78,7 @@ final public class XMLUtil {
 	public static String AND = "&";
 	public static String AND_A = "&amp;";
 	public static String NBSP_A = "&nbsp;";
-	
-	
+
 	public static String encodePlainText4XML(String content) {
 
 		String temp = "";
@@ -94,8 +94,8 @@ final public class XMLUtil {
 				content = temp.replaceAll(AND, AND_A);
 
 			} catch (Exception E) {
-				System.out.println("ex in encodeString4XML content = " + content
-						+ " result = " + result);
+				System.out.println("ex in encodeString4XML content = "
+						+ content + " result = " + result);
 			}
 		}
 
@@ -155,7 +155,7 @@ final public class XMLUtil {
 
 		return content;
 	}
-	
+
 	/**
 	 * Builds and returns a document indicated by the filename/url
 	 * 
@@ -323,30 +323,30 @@ final public class XMLUtil {
 	 * @throws Exception
 	 */
 
-	/*public static void writeXMLToStream(Document document, OutputStream stream)
-			throws Exception {
-		OutputFormat format = new OutputFormat(document); // Serialize DOM
-		// log.severe("format encoding = "+format.getEncoding());
-		format.setIndent(4);
-		// format.setEncoding(CommonProps.DEFAULTENC);
-		XMLSerializer serial = new XMLSerializer(stream, format);
-		serial.serialize(document);
+	/*
+	 * public static void writeXMLToStream(Document document, OutputStream
+	 * stream) throws Exception { OutputFormat format = new
+	 * OutputFormat(document); // Serialize DOM //
+	 * log.severe("format encoding = "+format.getEncoding());
+	 * format.setIndent(4); // format.setEncoding(CommonProps.DEFAULTENC);
+	 * XMLSerializer serial = new XMLSerializer(stream, format);
+	 * serial.serialize(document);
+	 * 
+	 * }
+	 */
 
-	}*/
-	
 	public static void writeXMLToStream(Document document, OutputStream stream)
-	throws Exception {
+			throws Exception {
 		if (document == null) {
 			log.severe("You have passed me a null object");
 		}
 		if (document != null) {
-		StreamResult result = new StreamResult(stream);	
-		DOMSource domSource = new DOMSource(document);
-		Transformer transformer = ProcessXSLT.getEmptyTransformer();
-		transformer.transform(domSource, result);
+			StreamResult result = new StreamResult(stream);
+			DOMSource domSource = new DOMSource(document);
+			Transformer transformer = ProcessXSLT.getEmptyTransformer();
+			transformer.transform(domSource, result);
 		}
 	}
-	
 
 	/**
 	 * Given a DOM this returns the XML as string formatted for pretty printing
@@ -355,7 +355,7 @@ final public class XMLUtil {
 	 * @return String
 	 * @throws Exception
 	 */
-	
+
 	public static String writeXMLToString(Document document) {
 		String output = "";
 		if (document == null) {
@@ -364,7 +364,7 @@ final public class XMLUtil {
 		if (document != null) {
 			try {
 				StringWriter sw = new StringWriter();
-				StreamResult result = new StreamResult(sw);	
+				StreamResult result = new StreamResult(sw);
 				DOMSource domSource = new DOMSource(document);
 				Transformer transformer = ProcessXSLT.getEmptyTransformer();
 				transformer.transform(domSource, result);
@@ -378,30 +378,20 @@ final public class XMLUtil {
 		return output;
 	}
 
-	/*public static String writeXMLToString(Document document) {
-		String output = "";
-		if (document == null) {
-			log.severe("You have passed me a null object");
-
-		}
-		if (document != null) {
-			try {
-				StringWriter sw = new StringWriter();
-				OutputFormat format = new OutputFormat(document); // Serialize
-				// log.severe("format encoding = "+format.getEncoding());
-				// DOM
-				format.setIndent(4);
-				XMLSerializer serial = new XMLSerializer(sw, format);
-				serial.serialize(document);
-				output = sw.toString();
-			} catch (Exception E) {
-				// log.error("Error thrown in XMLUtil.writeXMLToString", E);
-				log.log(Level.SEVERE,
-						"Error thrown in XMLUtil.writeXMLToString", E);
-			}
-		}
-		return output;
-	} */
+	/*
+	 * public static String writeXMLToString(Document document) { String output
+	 * = ""; if (document == null) {
+	 * log.severe("You have passed me a null object");
+	 * 
+	 * } if (document != null) { try { StringWriter sw = new StringWriter();
+	 * OutputFormat format = new OutputFormat(document); // Serialize //
+	 * log.severe("format encoding = "+format.getEncoding()); // DOM
+	 * format.setIndent(4); XMLSerializer serial = new XMLSerializer(sw,
+	 * format); serial.serialize(document); output = sw.toString(); } catch
+	 * (Exception E) { // log.error("Error thrown in XMLUtil.writeXMLToString",
+	 * E); log.log(Level.SEVERE, "Error thrown in XMLUtil.writeXMLToString", E);
+	 * } } return output; }
+	 */
 
 	/**
 	 * Creates & returns an empty DOM document
@@ -418,7 +408,8 @@ final public class XMLUtil {
 			dom = mDB.newDocument();
 		} catch (Exception e) {
 			// log.error("Exception thrown in XMLUtil.getEmptyDocument", e);
-			log.log(Level.SEVERE,"Exception thrown in XMLUtil.getEmptyDocument ", e);
+			log.log(Level.SEVERE,
+					"Exception thrown in XMLUtil.getEmptyDocument ", e);
 		}
 		return dom;
 	}
@@ -530,7 +521,8 @@ final public class XMLUtil {
 			throws TransformerException {
 
 		Transformer transformer = ProcessXSLT.getEmptyTransformer();
-		transformer.setOutputProperty(OutputKeys.ENCODING,CommonXMLStatics.DEFAULTENC);
+		transformer.setOutputProperty(OutputKeys.ENCODING,
+				CommonXMLStatics.DEFAULTENC);
 		StringWriter stringWriter = new StringWriter();
 		DOMSource ds = null;
 		try {
@@ -564,6 +556,7 @@ final public class XMLUtil {
 	 * 
 	 * public static String UNCDATANamedElementString(String NodeAsString,
 	 * String ElementName){
+	 * 
 	 * 
 	 * 
 	 * log.severe("UNCDATANamedElementString called ElementName = "+ElementName);
@@ -839,8 +832,7 @@ final public class XMLUtil {
 		Object matches = null;
 		// TODO move this to a generic start up method
 		System.setProperty("javax.xml.xpath.XPathFactory:"
-				+ XPathConstants.DOM_OBJECT_MODEL,
-				XpathFactory);
+				+ XPathConstants.DOM_OBJECT_MODEL, XpathFactory);
 
 		XPathFactory xpathFactory = XPathFactory
 				.newInstance(XPathConstants.DOM_OBJECT_MODEL);
@@ -909,8 +901,6 @@ final public class XMLUtil {
 		return selectXPathString(Xpath, InNode, "", "");
 	}
 
-
-
 	public static String removeNonXMLEntities(String XML) {
 
 		String result = XML.replaceAll("&nbsp;", " ");
@@ -952,24 +942,30 @@ final public class XMLUtil {
 	public static Element getFirstElementChild(Node node) {
 
 		Element E = null;
-		NodeList nl = node.getChildNodes();
-
-		int nlLen = nl.getLength();
-		if (nlLen > 0) {
-			Node n = null;
-			// int y = 0;
-
-			for (int i = 0; i < nlLen; i++) {
-				n = nl.item(i);
-				// log.severe("createChildElements listing nodes name " +
-				// n.getLocalName());
-				if (n.getNodeType() == Node.ELEMENT_NODE) {
-					E = (Element) n;
-
-				}
+		for (Node childNode = node.getFirstChild(); childNode != null; childNode = childNode
+				.getNextSibling()) {
+			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+				E = (Element) childNode;
+				return E;
 			}
 		}
 		return E;
+
+	}
+
+	public static Vector<Element> getChildElemsByName(String name, Node parent) {
+		Vector<Element> v = new Vector<Element>();
+		Element E = null;
+		for (Node childNode = parent.getFirstChild(); childNode != null; childNode = childNode
+				.getNextSibling()) {
+			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+				if (childNode.getNodeName() == name) {
+					E = (Element) childNode;
+					v.add(E);
+				}
+			}
+		}
+		return v;
 	}
 
 	public static Document createDocFromNode(Node node) {
@@ -1260,7 +1256,7 @@ final public class XMLUtil {
 			// log.severe("inputxml = "+inputxml);
 			RetS = transform(renderer, inputxml, enc);
 		} catch (Exception E) {
-			//log.error("Error in Transform ", E);
+			// log.error("Error in Transform ", E);
 			log.log(Level.SEVERE, "Error in Transform ", E);
 		}
 
@@ -1271,7 +1267,7 @@ final public class XMLUtil {
 			String enc) {
 
 		String RetS = "";
-		//String defEnc = CommonProps.DEFAULTENC;
+		// String defEnc = CommonProps.DEFAULTENC;
 		// log.severe("Enc = "+enc);
 		if (enc == null || enc.length() == 0) {
 			String docLevelEnc = BasicXMLParser.getFirstAttValue(inputxml,

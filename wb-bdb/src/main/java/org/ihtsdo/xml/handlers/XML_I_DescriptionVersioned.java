@@ -3,6 +3,7 @@ package org.ihtsdo.xml.handlers;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -27,6 +28,16 @@ public class XML_I_DescriptionVersioned extends XML_basic implements
 		this.debug = debug;
 		this.parent = parent;
 		process();
+	}
+	
+	public XML_I_DescriptionVersioned(EConcept econcept, Element parent) {
+		super();
+		this.parent = parent;
+		processXML(econcept);
+	}
+	
+	public void processXML(EConcept econcept) {
+		
 	}
 	
 	public void process() {

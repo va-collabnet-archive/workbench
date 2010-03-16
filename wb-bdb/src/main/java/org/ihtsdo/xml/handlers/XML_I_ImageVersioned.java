@@ -3,6 +3,7 @@ package org.ihtsdo.xml.handlers;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -28,6 +29,17 @@ public class XML_I_ImageVersioned extends XML_basic implements I_Handle_XML {
 		this.parent = parent;
 		process();
 	}
+	
+	public XML_I_ImageVersioned(EConcept econcept, Element parent) {
+		super();
+		this.parent = parent;
+		processXML(econcept);
+	}
+	
+	public void processXML(EConcept econcept) {
+		
+	}
+	
 	public void process() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.IMG_ENAME);
 		

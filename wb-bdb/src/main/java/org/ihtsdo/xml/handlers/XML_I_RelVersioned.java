@@ -4,6 +4,7 @@ package org.ihtsdo.xml.handlers;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -37,6 +38,17 @@ public class XML_I_RelVersioned extends XML_basic implements I_Handle_XML {
 		process();
 	}
 
+	public XML_I_RelVersioned(EConcept econcept, Element parent, boolean dest) {
+		super();
+		this.parent = parent;
+		this.dest = dest;
+		processXML(econcept);
+	}
+	
+	public void processXML(EConcept econcept) {
+		
+	}
+	
 	public void process() {
 		setSrcDest();
 		

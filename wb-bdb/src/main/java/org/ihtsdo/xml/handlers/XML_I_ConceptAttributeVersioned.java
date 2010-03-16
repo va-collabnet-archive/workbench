@@ -2,6 +2,8 @@ package org.ihtsdo.xml.handlers;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -25,6 +27,23 @@ public class XML_I_ConceptAttributeVersioned extends XML_basic implements
 		this.debug = debug;
 		this.parent = parent;
 		process();
+	}
+	
+	public XML_I_ConceptAttributeVersioned(EConcept econcept, Element parent) {
+		super();
+		this.parent = parent;
+		processXML(econcept);
+	}
+	
+	public void processXML(EConcept econcept) {
+		EConceptAttributes eca1 = new EConceptAttributes();
+		
+		
+		//For each 
+		
+		
+		econcept.setConceptAttributes(eca1);
+		
 	}
 
 	public void process() {

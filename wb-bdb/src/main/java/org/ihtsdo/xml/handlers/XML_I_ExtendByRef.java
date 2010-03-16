@@ -3,6 +3,7 @@ package org.ihtsdo.xml.handlers;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -28,6 +29,17 @@ public class XML_I_ExtendByRef extends XML_basic implements
 		this.parent = parent;
 		process();
 	}
+	
+	public XML_I_ExtendByRef(EConcept econcept, Element parent) {
+		super();
+		this.parent = parent;
+		processXML(econcept);
+	}
+	
+	public void processXML(EConcept econcept) {
+		
+	}
+	
 	public void process() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.EXT_ENAME);
 		
