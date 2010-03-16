@@ -43,7 +43,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Computes the members of a concept refset given a refset spec. This refset
+ * Computes the members of a refset given a refset spec. This refset
  * spec is the one currently displayed in the refset spec editing panel. The
  * refset spec's "specifies refset" relationship indicates which member refset
  * will be created.
@@ -54,196 +54,187 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class ComputeRefsetFromSpecTask extends AbstractTask {
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final int dataVersion = 1;
+    private static final int dataVersion = 1;
 
-	private boolean cancelComputation = false;
+    private boolean cancelComputation = false;
 
-	private Set<Integer> nestedRefsets;
+    private Set<Integer> nestedRefsets;
 
-	private Set<Integer> excludedRefsets;
+    private Set<Integer> excludedRefsets;
 
-	private void writeObject(ObjectOutputStream out) throws IOException {
-		out.writeInt(dataVersion);
-	}
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
 
-	private void readObject(ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
-		int objDataVersion = in.readInt();
-		if (objDataVersion == dataVersion) {
-			// Nothing to do
-		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);
-		}
-	}
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
+        if (objDataVersion == dataVersion) {
+            // Nothing to do
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		// Nothing to do
-	}
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // Nothing to do
+    }
 
-	private Condition computeRefset(I_ConfigAceFrame configFrame,
-			I_GetConceptData refset, boolean showActivityPanel) {
+    private Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
 
-		if (refset == null) {
-			JOptionPane.showMessageDialog(LogWithAlerts
-					.getActiveFrame(null), "No refset to compute.", "",
-					JOptionPane.ERROR_MESSAGE);
-			return Condition.ITEM_CANCELED;
-		}
+        if (refset == null) {
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                "No refset in refset spec panel to compute.", "", JOptionPane.ERROR_MESSAGE);
+            AceLog.getAppLog().info("No refset in refset spec panel to compute.");
+            return Condition.ITEM_CANCELED;
+        }
 
+        try {
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
+            I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+            if (refsetSpecHelper.isDescriptionComputeType()) {
+                computeType = RefsetComputeType.DESCRIPTION;
+            } else if (refsetSpecHelper.isRelationshipComputeType()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Invalid refset spec to compute - relationship compute types not supported.", "",
+                    JOptionPane.ERROR_MESSAGE);
+                AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
+                return Condition.ITEM_CANCELED;
+            }
 
-		try {
-			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
-			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            // verify a valid refset spec construction
+            if (refsetSpec == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
+                    "", JOptionPane.ERROR_MESSAGE);
+                AceLog.getAppLog().info(
+                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+                return Condition.ITEM_CANCELED;
+            }
+            // Step 1: create the query object, based on the refset spec
+            RefsetSpecQuery query =
+                    RefsetQueryFactory.createQuery(configFrame, Terms.get(), refsetSpec, refset, computeType);
 
-			// verify a valid refset spec construction
-			if (refsetSpec == null) {
-				AceLog.getAppLog().info("Invalid refset spec to compute");
-				return Condition.ITEM_CANCELED;
-			}
-			// Step 1: create the query object, based on the refset spec
-			RefsetSpecQuery query = RefsetQueryFactory.createQuery(configFrame,
-					Terms.get(), refsetSpec, refset, RefsetComputeType.CONCEPT);
-			
-
-			// check validity of query
+            // check validity of query
             if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
-				AceLog.getAppLog().info("empty query");
-				return Condition.ITEM_CANCELED;
-			}
-			if (!query.isValidQuery()) {
-				AceLog.getAppLog().info("invalid query");
-				return Condition.ITEM_CANCELED;
-			}
+                getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
+            }
 
-			computeNestedRefsets(configFrame, showActivityPanel, query);
+            computeNestedRefsets(configFrame, showActivityPanel, query);
 
-			AceLog.getAppLog().info(
-					"Start execution of refset spec : "
-							+ refsetSpec.getInitialText());
+            AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
-			// create a list of all the current refset members (this requires
-			// filtering out retired versions)
+            Terms.get().computeRefset(refset.getNid(), query, configFrame);
 
-			
-			Terms.get().computeRefset(refset.getNid(), query, configFrame);
+            if (cancelComputation) {
+                Terms.get().cancel();
+                getLogger().info("Refset compute cancelled.");
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute cancelled.", "",
+                    JOptionPane.ERROR_MESSAGE);
+                return Condition.ITEM_CANCELED;
+            }
 
-			if (cancelComputation) {
-				Terms.get().cancel();
-				return Condition.ITEM_CANCELED;
-			}
+            return Condition.ITEM_COMPLETE;
 
-			return Condition.ITEM_COMPLETE;
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            try {
+                Terms.get().cancel();
+                Terms.get().getActiveAceFrameConfig().setCommitAbortButtonsVisible(true);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            } catch (TerminologyException termException) {
+                termException.printStackTrace();
+            }
+            return Condition.ITEM_CANCELED;
+        }
+    }
 
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
-			try {
-				Terms.get().cancel();
-				Terms.get().getActiveAceFrameConfig()
-						.setCommitAbortButtonsVisible(true);
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			} catch (TerminologyException termException) {
-				termException.printStackTrace();
-			}
-			return Condition.ITEM_CANCELED;
-		}
-	}
+    private void computeNestedRefsets(I_ConfigAceFrame configFrame, boolean showActivityPanel, RefsetSpecQuery query)
+            throws TerminologyException, IOException, Exception {
+        // compute any nested refsets (e.g. if this spec uses
+        // "Concept is member of : refset2", then the members of
+        // "Refset2" will be calculated as part of the computation
+        Set<Integer> nestedRefsets = query.getNestedRefsets();
+        this.setNestedRefsets(nestedRefsets);
+        for (Integer nestedRefsetId : nestedRefsets) {
+            if (!excludedRefsets.contains(nestedRefsetId)) {
 
-	private void computeNestedRefsets(I_ConfigAceFrame configFrame,
-			boolean showActivityPanel, RefsetSpecQuery query)
-			throws TerminologyException, IOException, Exception {
-		// compute any nested refsets (e.g. if this spec uses
-		// "Concept is member of : refset2", then the members of
-		// "Refset2" will be calculated as part of the computation
-		Set<Integer> nestedRefsets = query.getNestedRefsets();
-		this.setNestedRefsets(nestedRefsets);
-		for (Integer nestedRefsetId : nestedRefsets) {
-			if (!excludedRefsets.contains(nestedRefsetId)) {
+                Condition condition =
+                        computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
+                if (condition == Condition.ITEM_CANCELED) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Error computing dependant refset: " + Terms.get().getConcept(nestedRefsetId).getInitialText()
+                            + ". Re-run separately.", "", JOptionPane.ERROR_MESSAGE);
+                }
+                getNestedRefsets().addAll(nestedRefsets);
+            }
+            Terms.get().commit();
+        }
+    }
 
-				Condition condition = computeRefset(configFrame, Terms.get()
-						.getConcept(nestedRefsetId), showActivityPanel);
-				if (condition == Condition.ITEM_CANCELED) {
-					JOptionPane.showMessageDialog(LogWithAlerts
-							.getActiveFrame(null),
-							"Error computing dependant refset: "
-									+ Terms.get().getConcept(nestedRefsetId)
-											.getInitialText()
-									+ ". Re-run separately.", "",
-							JOptionPane.ERROR_MESSAGE);
-				}
-				getNestedRefsets().addAll(nestedRefsets);
-			}
-			Terms.get().commit();
-		}
-	}
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        I_ConfigAceFrame configFrame =
+                (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        assert configFrame != null;
+        try {
+            I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
+            boolean showActivityPanel = true;
+            excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of a task
+            nestedRefsets = new HashSet<Integer>();
+            Condition condition = computeRefset(configFrame, refset, showActivityPanel);
+            configFrame.setCommitAbortButtonsVisible(true);
+            return condition;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unable to complete refset compute: "
+                + ex.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+            try {
+                Terms.get().cancel();
+                configFrame.setCommitAbortButtonsVisible(true);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            return Condition.ITEM_CANCELED;
+        }
+    }
 
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-			throws TaskFailedException {
-		I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG
-							.name());
-		assert configFrame != null;
-		try {
-			I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
-			boolean showActivityPanel = true;
-			excludedRefsets = new HashSet<Integer>(); // no excluded refsets
-														// when running as part
-														// of task
-			nestedRefsets = new HashSet<Integer>();
-			Condition condition = computeRefset(configFrame, refset,
-					showActivityPanel);
-			configFrame.setCommitAbortButtonsVisible(true);
-			return condition;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-					"Unable to complete refset compute: " + ex.getMessage(),
-					"", JOptionPane.ERROR_MESSAGE);
-			try {
-				Terms.get().cancel();
-				configFrame.setCommitAbortButtonsVisible(true);
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
-			return Condition.ITEM_CANCELED;
-		}
-	}
+    public int[] getDataContainerIds() {
+        return new int[] {};
+    }
 
-	public int[] getDataContainerIds() {
-		return new int[] {};
-	}
+    public Collection<Condition> getConditions() {
+        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+    }
 
-	public Collection<Condition> getConditions() {
-		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
-	}
+    public boolean isCancelComputation() {
+        return cancelComputation;
+    }
 
-	public boolean isCancelComputation() {
-		return cancelComputation;
-	}
+    public void setCancelComputation(boolean cancelComputation) {
+        this.cancelComputation = cancelComputation;
+    }
 
-	public void setCancelComputation(boolean cancelComputation) {
-		this.cancelComputation = cancelComputation;
-	}
+    public Set<Integer> getNestedRefsets() {
+        return nestedRefsets;
+    }
 
-	public Set<Integer> getNestedRefsets() {
-		return nestedRefsets;
-	}
+    public void setNestedRefsets(Set<Integer> nestedRefsets) {
+        this.nestedRefsets = nestedRefsets;
+    }
 
-	public void setNestedRefsets(Set<Integer> nestedRefsets) {
-		this.nestedRefsets = nestedRefsets;
-	}
+    public Set<Integer> getExcludedRefsets() {
+        return excludedRefsets;
+    }
 
-	public Set<Integer> getExcludedRefsets() {
-		return excludedRefsets;
-	}
-
-	public void setExcludedRefsets(Set<Integer> excludedRefsets) {
-		this.excludedRefsets = excludedRefsets;
-	}
+    public void setExcludedRefsets(Set<Integer> excludedRefsets) {
+        this.excludedRefsets = excludedRefsets;
+    }
 }

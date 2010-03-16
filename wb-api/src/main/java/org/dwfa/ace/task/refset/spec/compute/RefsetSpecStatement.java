@@ -27,8 +27,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
@@ -53,8 +53,6 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         CONCEPT_STATUS_IS_CHILD_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF),
         CONCEPT_STATUS_IS_KIND_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF),
         CONCEPT_STATUS_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF),
-        // CONCEPT_CONTAINS_REL_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING),
-        // CONCEPT_CONTAINS_DESC_GROUPING(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING),
 
         DESC_IS(RefsetAuxiliary.Concept.DESC_IS),
         DESC_IS_MEMBER_OF(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF),
@@ -256,7 +254,6 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
-    // ** checked
     protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
         // get all extensions for this concept
         List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(componentId);
@@ -303,15 +300,15 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     public void setTokenEnum(QUERY_TOKENS tokenEnum) {
         this.tokenEnum = tokenEnum;
     }
-    
+
     public String toString() {
-    	StringBuffer buff = new StringBuffer();
-    	buff.append("RefsetSpecStatment: ");
-    	buff.append(!useNotQualifier);
-    	buff.append(" ");
-    	buff.append(getTokenEnum());
-    	buff.append(" ");
-    	buff.append(queryConstraint);
-    	return buff.toString();
+        StringBuffer buff = new StringBuffer();
+        buff.append("RefsetSpecStatment: ");
+        buff.append(!useNotQualifier);
+        buff.append(" ");
+        buff.append(getTokenEnum());
+        buff.append(" ");
+        buff.append(queryConstraint);
+        return buff.toString();
     }
 }

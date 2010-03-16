@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
@@ -180,13 +179,12 @@ public class DescStatement extends RefsetSpecStatement {
         return possibleConcepts;
     }
 
-    @SuppressWarnings( { "deprecation", "unchecked" })
     public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame configFrame,
             I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
 
         I_RepresentIdSet possibleDescriptions = termFactory.getEmptyIdSet();
         if (parentPossibleDescriptions == null) {
-            parentPossibleDescriptions = termFactory.getDescriptionIdSet();
+            parentPossibleDescriptions = termFactory.getConceptIdSet();
         }
 
         switch (tokenEnum) {
@@ -194,7 +192,7 @@ public class DescStatement extends RefsetSpecStatement {
             if (isNegated()) {
                 possibleDescriptions.or(parentPossibleDescriptions);
             } else {
-                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getDescId());
+                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getConceptId());
             }
             break;
         case DESC_IS_MEMBER_OF:
@@ -202,7 +200,15 @@ public class DescStatement extends RefsetSpecStatement {
                     termFactory.getRefsetExtensionMembers(((I_AmTermComponent) queryConstraint).getNid());
             Set<Integer> refsetMembers = new HashSet<Integer>();
             for (I_ExtendByRef ext : refsetExtensions) {
-                refsetMembers.add(ext.getComponentId());
+                int componentId = ext.getComponentId();
+                if (Terms.get().hasConcept(componentId)) {
+                    refsetMembers.add(componentId);
+                } else {
+                    I_DescriptionVersioned desc = Terms.get().getDescription(componentId);
+                    if (desc != null) {
+                        refsetMembers.add(desc.getConceptId());
+                    }
+                }
             }
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetFromIntCollection(refsetMembers);
             if (isNegated()) {
@@ -243,9 +249,9 @@ public class DescStatement extends RefsetSpecStatement {
                     while (iterator.hasNext()) {
                         Hit next = (Hit) iterator.next();
                         Document doc = next.getDocument();
-                        int dnid = Integer.parseInt(doc.get("dnid"));
-
-                        possibleDescriptions.setMember(dnid);
+                        // int dnid = Integer.parseInt(doc.get("dnid"));
+                        int cnid = Integer.parseInt(doc.get("cnid"));
+                        possibleDescriptions.setMember(cnid);
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
