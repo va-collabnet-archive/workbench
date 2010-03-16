@@ -50,6 +50,7 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -63,6 +64,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
@@ -81,6 +83,7 @@ import org.dwfa.ace.search.I_Search;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
@@ -370,7 +373,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_RepresentIdSet getDescriptionIdSet() throws IOException {
-        throw new UnsupportedOperationException();
+        I_RepresentIdSet descriptionIdSet = new IdentifierSet();
+        I_IterateIds iterator = getConceptIdSet().iterator();
+        while (iterator.next()) {
+            Concept concept = Bdb.getConcept(iterator.nid());
+            for (Description description : concept.getDescriptions()) {
+                descriptionIdSet.setMember(description.getDescId());
+            }
+        }
+        return descriptionIdSet;
     }
 
     @Override
@@ -1387,20 +1398,36 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
+        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true);
         ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
-        HashSet<Integer> currentConceptList = new HashSet<Integer>();
+        HashSet<Integer> currentMembersList = new HashSet<Integer>();
         for (RefsetMember<?, ?> v : members) {
             if (refsetHelper.hasCurrentRefsetExtension(refsetNid, v.getComponentId(), ReferenceConcepts.NORMAL_MEMBER
                 .getNid())) {
-                currentConceptList.add(v.getComponentId());
+                if (Terms.get().hasConcept(v.getComponentId())) {
+                    currentMembersList.add(v.getComponentId());
+                } else { // assume it is a description member
+                    I_DescriptionVersioned desc = Terms.get().getDescription(v.getComponentId());
+                    if (desc != null) {
+                        currentMembersList.add(desc.getConceptId());
+                    }
+                }
             }
         }
 
-        I_RepresentIdSet possibleIds = query.getPossibleConcepts(frameConfig, null);
-        // create a list of all the current refset members (this requires
-        // filtering out retired versions)
-        possibleIds.or(getIdSetFromIntCollection(currentConceptList));
+        I_RepresentIdSet possibleIds;
+        if (specHelper.isConceptComputeType()) {
+            possibleIds = query.getPossibleConcepts(frameConfig, null);
+        } else if (specHelper.isDescriptionComputeType()) {
+            possibleIds = query.getPossibleDescriptions(frameConfig, null);
+        } else {
+            throw new Exception("Relationship compute type not supported.");
+        }
+
+        // add the current members to the list of possible concepts to check (in case some need to be retired)
+        possibleIds.or(getIdSetFromIntCollection(currentMembersList));
+        AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
         RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
         Bdb.getConceptDb().iterateConceptDataInParallel(computer);
