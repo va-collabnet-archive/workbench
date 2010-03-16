@@ -102,13 +102,13 @@ public class DatabaseExportTest extends ConceptMockery {
 
         //set uuid-sctid map database parameters
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
-            setField(databaseExportClass, databaseExport, "dbDriver", "org.apache.derby.jdbc.EmbeddedDriver");
-            setField(databaseExportClass, databaseExport, "dbConnectionUrl", "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
+            setField(databaseExportClass, databaseExport, "uuidSctidDbDriver", "org.apache.derby.jdbc.EmbeddedDriver");
+            setField(databaseExportClass, databaseExport, "uuidSctidDbConnectionUrl", "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
         } else {
-            setField(databaseExportClass, databaseExport, "dbDriver", System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER));
-            setField(databaseExportClass, databaseExport, "dbConnectionUrl", System.getProperty(UUID_MAP_TEST_DATABASE_URL));
-            setField(databaseExportClass, databaseExport, "dbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
-            setField(databaseExportClass, databaseExport, "dbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
+            setField(databaseExportClass, databaseExport, "uuidSctidDbDriver", System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER));
+            setField(databaseExportClass, databaseExport, "uuidSctidDbConnectionUrl", System.getProperty(UUID_MAP_TEST_DATABASE_URL));
+            setField(databaseExportClass, databaseExport, "uuidSctidDbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
+            setField(databaseExportClass, databaseExport, "uuidSctidDbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
         
 

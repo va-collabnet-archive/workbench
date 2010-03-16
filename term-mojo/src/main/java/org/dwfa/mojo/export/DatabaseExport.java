@@ -102,7 +102,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      * @required
      */
-    String dbConnectionUrl;
+    String uuidSctidDbConnectionUrl;
     
     /**
      * UUID-SCTID database driver fully qualified class name
@@ -110,21 +110,21 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      * @required
      */
-    String dbDriver;
+    String uuidSctidDbDriver;
     
     /**
      * UUID-SCTID database user to optionally authenticate to the database
      * 
      * @parameter
      */
-    String dbUsername;
+    String uuidSctidDbUsername;
     
     /**
      * UUID-SCTID database user's password optionally used to authenticate to the database
      * 
      * @parameter
      */
-    String dbPassword;
+    String uuidSctidDbPassword;
 
     /**
      * Export file output handler for RF2
@@ -165,13 +165,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         logger.info("Start exporting concepts");
 
         try {
-            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, dbDriver);
-            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, dbConnectionUrl);
-            if (dbUsername != null) {
-                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_USER, dbUsername);
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
+            if (uuidSctidDbUsername != null) {
+                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_USER, uuidSctidDbUsername);
             }
-            if (dbPassword != null) {
-                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, dbPassword);
+            if (uuidSctidDbPassword != null) {
+                System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, uuidSctidDbPassword);
             }
             
             rf2OutputHandler = new Rf2OutputHandler(
