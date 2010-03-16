@@ -63,13 +63,13 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
@@ -176,7 +176,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         REFSET_FIELDS field;
         private IntList popupIds;
 
-        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, REFSET_FIELDS field) throws TerminologyException, IOException {
+        public ConceptFieldEditor(I_ConfigAceFrame config, IntList popupIds, REFSET_FIELDS field)
+                throws TerminologyException, IOException {
             super(new JComboBox());
             this.popupIds = popupIds;
             this.field = field;
@@ -209,12 +210,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             try {
-				populatePopup();
-			} catch (TerminologyException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+                populatePopup();
+            } catch (TerminologyException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
@@ -226,34 +227,34 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             StringWithExtTuple swet = (StringWithExtTuple) value;
 
             try {
-				switch (field) {
-				case REFSET_ID:
-				    return Terms.get().getConcept(swet.getTuple().getRefsetId());
-				case MEMBER_ID:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				case COMPONENT_ID:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				case STATUS:
-				    return Terms.get().getConcept(swet.getTuple().getStatusId());
-				case VERSION:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				case PATH:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				case BOOLEAN_VALUE:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				case CONCEPT_ID:
-				    return Terms.get().getConcept(((I_ExtendByRefPartCid) swet.getTuple().getMutablePart()).getC1id());
-				case INTEGER_VALUE:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
-				default:
-				    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                switch (field) {
+                case REFSET_ID:
+                    return Terms.get().getConcept(swet.getTuple().getRefsetId());
+                case MEMBER_ID:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                case COMPONENT_ID:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                case STATUS:
+                    return Terms.get().getConcept(swet.getTuple().getStatusId());
+                case VERSION:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                case PATH:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                case BOOLEAN_VALUE:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                case CONCEPT_ID:
+                    return Terms.get().getConcept(((I_ExtendByRefPartCid) swet.getTuple().getMutablePart()).getC1id());
+                case INTEGER_VALUE:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
+                default:
+                    throw new UnsupportedOperationException("Can't do concept combobox on " + field);
 
-				}
-			} catch (TerminologyException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+                }
+            } catch (TerminologyException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
@@ -275,7 +276,12 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     public enum REFSET_FIELDS {
         // All extensions
-        REFSET_ID("refset", 5, 75, 1000), MEMBER_ID("member id", 5, 100, 100), COMPONENT_ID("component id", 5, 100, 100), STATUS("status", 5, 50, 250), VERSION("time", 5, 140, 140), PATH("path", 5, 90, 180),
+        REFSET_ID("refset", 5, 75, 1000),
+        MEMBER_ID("member id", 5, 100, 100),
+        COMPONENT_ID("component id", 5, 100, 100),
+        STATUS("status", 5, 50, 250),
+        VERSION("time", 5, 140, 140),
+        PATH("path", 5, 90, 180),
 
         // Boolean extension
         BOOLEAN_VALUE("boolean value", 5, 100, 500),
@@ -287,8 +293,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         CONCEPT_ID("concept", 5, 300, 1000),
 
         // Integer extension
-        INTEGER_VALUE("integer value", 5, 100, 500)
-        ;
+        INTEGER_VALUE("integer value", 5, 100, 500);
         private String columnName;
 
         private int min;
@@ -322,91 +327,84 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
     }
 
-    private static REFSET_FIELDS[] booleanRefsetFields = new REFSET_FIELDS[] {
-                                                                              REFSET_FIELDS.REFSET_ID,
-                                                                              // REFSET_FIELDS.MEMBER_ID,
-                                                                              // REFSET_FIELDS.COMPONENT_ID,
-                                                                              REFSET_FIELDS.BOOLEAN_VALUE,
-                                                                              REFSET_FIELDS.STATUS,
-                                                                              REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+    private static REFSET_FIELDS[] booleanRefsetFields =
+            new REFSET_FIELDS[] {
+                                 REFSET_FIELDS.REFSET_ID,
+                                 // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.BOOLEAN_VALUE, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION,
+                                 REFSET_FIELDS.PATH };
 
-    private static REFSET_FIELDS[] booleanRefsetFieldsNoHistory = new REFSET_FIELDS[] {
-                                                                                       REFSET_FIELDS.REFSET_ID,
-                                                                                       // REFSET_FIELDS.MEMBER_ID,
-                                                                                       // REFSET_FIELDS.COMPONENT_ID,
-                                                                                       REFSET_FIELDS.BOOLEAN_VALUE,
-                                                                                       REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.BRANCH
-    };
+    private static REFSET_FIELDS[] booleanRefsetFieldsNoHistory =
+            new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.BOOLEAN_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.BRANCH
+            };
 
-    private static REFSET_FIELDS[] stringRefsetFields = new REFSET_FIELDS[] {
-                                                                             REFSET_FIELDS.REFSET_ID,
-                                                                             // REFSET_FIELDS.MEMBER_ID,
-                                                                             // REFSET_FIELDS.COMPONENT_ID,
-                                                                             REFSET_FIELDS.STRING_VALUE,
-                                                                             REFSET_FIELDS.STATUS,
-                                                                             REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+    private static REFSET_FIELDS[] stringRefsetFields =
+            new REFSET_FIELDS[] {
+                                 REFSET_FIELDS.REFSET_ID,
+                                 // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.STRING_VALUE, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION,
+                                 REFSET_FIELDS.PATH };
 
-    private static REFSET_FIELDS[] stringRefsetFieldsNoHistory = new REFSET_FIELDS[] {
-                                                                                      REFSET_FIELDS.REFSET_ID,
-                                                                                      // REFSET_FIELDS.MEMBER_ID,
-                                                                                      // REFSET_FIELDS.COMPONENT_ID,
-                                                                                      REFSET_FIELDS.STRING_VALUE,
-                                                                                      REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.PATH
-    };
+    private static REFSET_FIELDS[] stringRefsetFieldsNoHistory =
+            new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.STRING_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.PATH
+            };
 
-    private static REFSET_FIELDS[] conceptRefsetFields = new REFSET_FIELDS[] {
-                                                                              REFSET_FIELDS.REFSET_ID,
-                                                                              // REFSET_FIELDS.MEMBER_ID,
-                                                                              // REFSET_FIELDS.COMPONENT_ID,
-                                                                              REFSET_FIELDS.CONCEPT_ID,
-                                                                              REFSET_FIELDS.STATUS,
-                                                                              REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+    private static REFSET_FIELDS[] conceptRefsetFields =
+            new REFSET_FIELDS[] {
+                                 REFSET_FIELDS.REFSET_ID,
+                                 // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION,
+                                 REFSET_FIELDS.PATH };
 
-    private static REFSET_FIELDS[] conceptRefsetFieldsNoHistory = new REFSET_FIELDS[] {
-                                                                                       REFSET_FIELDS.REFSET_ID,
-                                                                                       // REFSET_FIELDS.MEMBER_ID,
-                                                                                       // REFSET_FIELDS.COMPONENT_ID,
-                                                                                       REFSET_FIELDS.CONCEPT_ID,
-                                                                                       REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.BRANCH
-    };
+    private static REFSET_FIELDS[] conceptRefsetFieldsNoHistory =
+            new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.BRANCH
+            };
 
-    private static REFSET_FIELDS[] conIntRefsetFields = new REFSET_FIELDS[] {
-                                                                             REFSET_FIELDS.REFSET_ID,
-                                                                             // REFSET_FIELDS.MEMBER_ID,
-                                                                             // REFSET_FIELDS.COMPONENT_ID,
-                                                                             REFSET_FIELDS.CONCEPT_ID,
-                                                                             REFSET_FIELDS.INTEGER_VALUE,
-                                                                             REFSET_FIELDS.STATUS,
-                                                                             REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+    private static REFSET_FIELDS[] conIntRefsetFields =
+            new REFSET_FIELDS[] {
+                                 REFSET_FIELDS.REFSET_ID,
+                                 // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS,
+                                 REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
 
-    private static REFSET_FIELDS[] conIntRefsetFieldsNoHistory = new REFSET_FIELDS[] {
-                                                                                      REFSET_FIELDS.REFSET_ID,
-                                                                                      // REFSET_FIELDS.MEMBER_ID,
-                                                                                      // REFSET_FIELDS.COMPONENT_ID,
-                                                                                      REFSET_FIELDS.CONCEPT_ID,
-                                                                                      REFSET_FIELDS.INTEGER_VALUE,
-                                                                                      REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.BRANCH
-    };
-    private static REFSET_FIELDS[] integerRefsetFields = new REFSET_FIELDS[] {
-                                                                              REFSET_FIELDS.REFSET_ID,
-                                                                              // REFSET_FIELDS.MEMBER_ID,
-                                                                              // REFSET_FIELDS.COMPONENT_ID,
-                                                                              REFSET_FIELDS.INTEGER_VALUE,
-                                                                              REFSET_FIELDS.STATUS,
-                                                                              REFSET_FIELDS.VERSION, REFSET_FIELDS.PATH };
+    private static REFSET_FIELDS[] conIntRefsetFieldsNoHistory =
+            new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.CONCEPT_ID, REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.BRANCH
+            };
+    private static REFSET_FIELDS[] integerRefsetFields =
+            new REFSET_FIELDS[] {
+                                 REFSET_FIELDS.REFSET_ID,
+                                 // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, REFSET_FIELDS.VERSION,
+                                 REFSET_FIELDS.PATH };
 
-    private static REFSET_FIELDS[] integerRefsetFieldsNoHistory = new REFSET_FIELDS[] {
-                                                                                       REFSET_FIELDS.REFSET_ID,
-                                                                                       // REFSET_FIELDS.MEMBER_ID,
-                                                                                       // REFSET_FIELDS.COMPONENT_ID,
-                                                                                       REFSET_FIELDS.INTEGER_VALUE,
-                                                                                       REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
-    // REFSET_FIELDS.BRANCH
-    };
+    private static REFSET_FIELDS[] integerRefsetFieldsNoHistory =
+            new REFSET_FIELDS[] { REFSET_FIELDS.REFSET_ID,
+            // REFSET_FIELDS.MEMBER_ID,
+                                 // REFSET_FIELDS.COMPONENT_ID,
+                                 REFSET_FIELDS.INTEGER_VALUE, REFSET_FIELDS.STATUS, // REFSET_FIELDS.VERSION,
+            // REFSET_FIELDS.BRANCH
+            };
 
     public static REFSET_FIELDS[] getRefsetColumns(I_HostConceptPlugins host, REFSET_TYPES type) {
         if (host.getShowHistory()) {
@@ -565,14 +563,16 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 conceptsToFetch.add(ext.getRefsetId());
                 List<? extends I_ExtendByRefVersion> parts = new ArrayList<I_ExtendByRefVersion>();
                 if (!host.getShowHistory()) {
-                	parts = ext.getTuples(allowedStatus, null, true, true);
+                    parts = ext.getTuples(allowedStatus, null, true, true);
                 } else {
                     parts = ext.getTuples();
                 }
                 for (I_ExtendByRefVersion tuple : parts) {
-                    if (getExtPartClass().equals(tuple.getClass()) == false) {
+
+                    if (!getExtPartClass().isAssignableFrom(tuple.getClass())) {
                         break;
                     }
+
                     if (I_ExtendByRefPartBoolean.class.isAssignableFrom(tuple.getClass())) {
                         conceptsToFetch.add(tuple.getStatusId());
                         conceptsToFetch.add(tuple.getPathId());
@@ -597,7 +597,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     } else if (I_ExtendByRefPartInt.class.isAssignableFrom(tuple.getClass())) {
                         conceptsToFetch.add(tuple.getStatusId());
                         conceptsToFetch.add(tuple.getPathId());
-                    } 
+                    }
                     if (stopWork) {
                         return false;
                     }
@@ -749,9 +749,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         try {
             I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
 
-            boolean inConflict = (host.getConfig().getHighlightConflictsInComponentPanel() && host.getConfig()
-                .getConflictResolutionStrategy()
-                .isInConflict(tuple.getCore()));
+            boolean inConflict =
+                    (host.getConfig().getHighlightConflictsInComponentPanel() && host.getConfig()
+                        .getConflictResolutionStrategy().isInConflict(tuple.getCore()));
 
             switch (columns[columnIndex]) {
 
@@ -794,9 +794,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 return new StringWithExtTuple(Integer.toString(tuple.getPathId()), tuple, tuple.getPathId(), inConflict);
 
             case BOOLEAN_VALUE:
-                return new StringWithExtTuple(
-                    Boolean.toString(((I_ExtendByRefPartBoolean) tuple.getMutablePart()).getBooleanValue()), tuple,
-                    tuple.getMemberId(), inConflict);
+                return new StringWithExtTuple(Boolean.toString(((I_ExtendByRefPartBoolean) tuple.getMutablePart())
+                    .getBooleanValue()), tuple, tuple.getMemberId(), inConflict);
 
             case STRING_VALUE:
                 return new StringWithExtTuple(((I_ExtendByRefPartStr) tuple.getMutablePart()).getStringValue(), tuple,
@@ -804,20 +803,20 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             case CONCEPT_ID:
                 if (referencedConcepts.containsKey(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id())) {
-                    return new StringWithExtTuple(getPrefText(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()),
-                        tuple, ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
+                    return new StringWithExtTuple(
+                        getPrefText(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()), tuple,
+                        ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
                 }
-                return new StringWithExtTuple(
-                    Integer.toString(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()), tuple,
-                    ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
+                return new StringWithExtTuple(Integer.toString(((I_ExtendByRefPartCid) tuple.getMutablePart())
+                    .getC1id()), tuple, ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
 
             case INTEGER_VALUE:
                 if (I_ExtendByRefPartCidInt.class.isAssignableFrom(tuple.getMutablePart().getClass())) {
                     int value = ((I_ExtendByRefPartCidInt) tuple.getMutablePart()).getIntValue();
-                    if (Terms.get().getRefsetHelper(host.getConfig()).hasPurpose(tuple.getRefsetId(), RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION)) {
-                        return new StringWithExtTuple((value == Integer.MAX_VALUE) ? "latest"
-                                                                                  : ThinVersionHelper.format(value),
-                            tuple, tuple.getMemberId(), inConflict);
+                    if (Terms.get().getRefsetHelper(host.getConfig()).hasPurpose(tuple.getRefsetId(),
+                        RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION)) {
+                        return new StringWithExtTuple((value == Integer.MAX_VALUE) ? "latest" : ThinVersionHelper
+                            .format(value), tuple, tuple.getMemberId(), inConflict);
                     } else {
                         return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
                     }
@@ -826,7 +825,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
                 }
 
-           }
+            }
 
             AceLog.getAppLog().alertAndLogException(new Exception("Can't handle column type: " + columns[columnIndex]));
         } catch (Exception e) {
@@ -836,7 +835,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
     }
 
     private String getPrefText(int id) throws IOException {
-    	I_GetConceptData cb = referencedConcepts.get(id);
+        I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             return desc.getText();
@@ -876,49 +875,49 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 refsetDefaults = preferences.getBooleanPreferences();
                 extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.BOOLEAN);
-                extProps.put(REFSET_PROPERTY.BOOLEAN_VALUE, ((I_RefsetDefaultsBoolean) refsetDefaults).getDefaultForBooleanRefset());
+                extProps.put(REFSET_PROPERTY.BOOLEAN_VALUE, ((I_RefsetDefaultsBoolean) refsetDefaults)
+                    .getDefaultForBooleanRefset());
                 break;
             case STRING:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.STR);
                 refsetDefaults = preferences.getStringPreferences();
                 extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, ((I_RefsetDefaultsString) refsetDefaults).getDefaultForStringRefset());
+                extProps.put(REFSET_PROPERTY.STRING_VALUE, ((I_RefsetDefaultsString) refsetDefaults)
+                    .getDefaultForStringRefset());
                 break;
             case CONCEPT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
                 refsetDefaults = preferences.getConceptPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.
-                		getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
-                extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults).
-                		getDefaultForConceptRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
+                    .getDefaultForConceptRefset().getConceptId());
                 break;
             case CON_INT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.
-                		getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
-                extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults).
-                		getDefaultForConceptRefset().getConceptId());
-                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults).
-                		getDefaultForIntegerValue());
+                extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
+                    .getDefaultForConceptRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults)
+                    .getDefaultForIntegerValue());
                 break;
             case INTEGER:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
                 refsetDefaults = preferences.getIntegerPreferences();
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.
-                		getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
-                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults).
-                		getDefaultForIntegerRefset());
+                extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
+                    .getDefaultForIntegerRefset());
                 break;
             default:
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
-            I_ExtendByRef extension = refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptId(), 
-            		tableComponentId, extProps.getMemberType(), extProps);
+            I_ExtendByRef extension =
+                    refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptId(),
+                        tableComponentId, extProps.getMemberType(), extProps);
             Terms.get().addUncommitted(extension);
             propertyChange(null);
         } catch (TerminologyException e) {
@@ -929,7 +928,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             AceLog.getAppLog().alertAndLogException(e);
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
-		}
+        }
     }
 
     public boolean isCellEditable(int row, int col) {
@@ -955,66 +954,66 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
         boolean changed = false;
         if (extTuple.getVersion() == Integer.MAX_VALUE) {
             try {
-				switch (columns[col]) {
-				case REFSET_ID:
-				    Integer refsetId = (Integer) value;
-				    if (refsetId != extTuple.getCore().getRefsetId()) {
-				        extTuple.getCore().setRefsetId(refsetId);
-				        referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
-				        changed = true;
-				    }
-				    break;
-				case MEMBER_ID:
-				    break;
-				case COMPONENT_ID:
-				    break;
-				case STATUS:
-				    Integer statusId = (Integer) value;
-				    if (statusId != extTuple.getStatusId()) {
-				        extTuple.setStatusId(statusId);
-				        referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
-				        changed = true;
-				    }
-				    break;
-				case VERSION:
-				    break;
-				case PATH:
-				    break;
-				case BOOLEAN_VALUE:
-				    Boolean booleanValue = (Boolean) value;
-				    if (booleanValue != ((I_ExtendByRefPartBoolean) extTuple.getMutablePart()).getBooleanValue()) {
-				        ((I_ExtendByRefPartBoolean) extTuple.getMutablePart()).setBooleanValue(booleanValue);
-				        changed = true;
-				    }
-				    break;
-				case STRING_VALUE:
-				    String stringValue = (String) value;
-				    if (stringValue.equals(((I_ExtendByRefPartStr) extTuple.getMutablePart()).getStringValue()) == false) {
-				        ((I_ExtendByRefPartStr) extTuple.getMutablePart()).setStringValue(stringValue);
-				        changed = true;
-				    }
-				    break;
-				case CONCEPT_ID:
-				    Integer conceptId = (Integer) value;
-				    ((I_ExtendByRefPartCid) extTuple.getMutablePart()).setC1id(conceptId);
-				    referencedConcepts.put(conceptId, Terms.get().getConcept(conceptId));
-				    changed = true;
-				    break;
-				case INTEGER_VALUE:
-				    Integer intValue = (Integer) value;
-				    if (I_ExtendByRefPartCidInt.class.isAssignableFrom(extTuple.getMutablePart().getClass())) {
-				        ((I_ExtendByRefPartCidInt) extTuple.getMutablePart()).setIntValue(intValue);
-				    } else {
-				        ((I_ExtendByRefPartInt) extTuple.getMutablePart()).setIntValue(intValue);
-				    }
-				    changed = true;
-				    break;
-				}
-			} catch (TerminologyException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+                switch (columns[col]) {
+                case REFSET_ID:
+                    Integer refsetId = (Integer) value;
+                    if (refsetId != extTuple.getCore().getRefsetId()) {
+                        extTuple.getCore().setRefsetId(refsetId);
+                        referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
+                        changed = true;
+                    }
+                    break;
+                case MEMBER_ID:
+                    break;
+                case COMPONENT_ID:
+                    break;
+                case STATUS:
+                    Integer statusId = (Integer) value;
+                    if (statusId != extTuple.getStatusId()) {
+                        extTuple.setStatusId(statusId);
+                        referencedConcepts.put(statusId, Terms.get().getConcept(statusId));
+                        changed = true;
+                    }
+                    break;
+                case VERSION:
+                    break;
+                case PATH:
+                    break;
+                case BOOLEAN_VALUE:
+                    Boolean booleanValue = (Boolean) value;
+                    if (booleanValue != ((I_ExtendByRefPartBoolean) extTuple.getMutablePart()).getBooleanValue()) {
+                        ((I_ExtendByRefPartBoolean) extTuple.getMutablePart()).setBooleanValue(booleanValue);
+                        changed = true;
+                    }
+                    break;
+                case STRING_VALUE:
+                    String stringValue = (String) value;
+                    if (stringValue.equals(((I_ExtendByRefPartStr) extTuple.getMutablePart()).getStringValue()) == false) {
+                        ((I_ExtendByRefPartStr) extTuple.getMutablePart()).setStringValue(stringValue);
+                        changed = true;
+                    }
+                    break;
+                case CONCEPT_ID:
+                    Integer conceptId = (Integer) value;
+                    ((I_ExtendByRefPartCid) extTuple.getMutablePart()).setC1id(conceptId);
+                    referencedConcepts.put(conceptId, Terms.get().getConcept(conceptId));
+                    changed = true;
+                    break;
+                case INTEGER_VALUE:
+                    Integer intValue = (Integer) value;
+                    if (I_ExtendByRefPartCidInt.class.isAssignableFrom(extTuple.getMutablePart().getClass())) {
+                        ((I_ExtendByRefPartCidInt) extTuple.getMutablePart()).setIntValue(intValue);
+                    } else {
+                        ((I_ExtendByRefPartInt) extTuple.getMutablePart()).setIntValue(intValue);
+                    }
+                    changed = true;
+                    break;
+                }
+            } catch (TerminologyException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             if (changed) {
                 fireTableDataChanged();
                 AceLog.getAppLog().info("refset table changed");
