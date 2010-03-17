@@ -38,11 +38,13 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.AceDateFormat;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,7 +114,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
 
     private List<I_DescriptionTuple> duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
 
-    private List<I_RelTuple> duplicateRelTuples = new ArrayList<I_RelTuple>();
+    private Map<TupleKey,List<I_RelTuple>> duplicateRelTuples = new HashMap<TupleKey, List<I_RelTuple>>();
 
     private Logger logger = Logger.getLogger(CopyPathToPath.class.getName());
 
@@ -138,7 +140,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
             }
 
             duplicateDescTuples = new ArrayList<I_DescriptionTuple>();
-            duplicateRelTuples = new ArrayList<I_RelTuple>();
+            duplicateRelTuples = new HashMap<TupleKey, List<I_RelTuple>>();
 
             if (validate && hasAttributes(concept) || hasAttributes(concept)) {
                 processConceptAttributes(concept.getConceptAttributes());
@@ -160,12 +162,20 @@ public class CopyPathToPath implements I_ProcessConcepts {
                         + tuple.getVersion() + "\n\t(" + tuple.getText() + ")");
                 }
             }
-            if (!duplicateRelTuples.isEmpty()) {
-                duplicateVersionRelationships = Boolean.TRUE;
-                logger.severe("***** Duplicate-versioned relationship tuple(s) in concept: " + concept.getUids().get(0));
-                for (I_RelTuple tuple : duplicateRelTuples) {
-                    logger.severe("Rel id: " + tuple.getRelId() + ", Path id: " + tuple.getPathId() + ", Version: "
-                        + tuple.getVersion() + "\n\t(" + tuple.getTypeId() + ")");
+            for (List<I_RelTuple> duplicateList : duplicateRelTuples.values()) {
+                if (duplicateList.size() > 1) {
+                    duplicateVersionRelationships = Boolean.TRUE;
+                    logger.severe("***** Duplicate-versioned relationship tuple(s) in concept: " + concept.getUids().get(0));
+                    logger.severe("Rel id: " + duplicateList.get(0).getRelId() + " Has " + duplicateList.size());
+                    for (I_RelTuple duplicateIRelTuple : duplicateList) {
+                        logger.severe("Path id: " + tf.getConcept(duplicateIRelTuple.getPathId()).getInitialText()
+                            + ", Version: "
+                            + AceDateFormat.getRf2TimezoneDateFormat().format(new Date(duplicateIRelTuple.getTime()))
+                            + "\n\t(" + tf.getConcept(duplicateIRelTuple.getTypeId()).getInitialText() + ")\n\t"
+                            + duplicateIRelTuple.getRelId() + " " + duplicateIRelTuple.getC1Id() + " " + duplicateIRelTuple.getC2Id() + "\n\t"
+                            + duplicateIRelTuple.getCharacteristicId() + " " + duplicateIRelTuple.getGroup() + "\n\t"
+                            + duplicateIRelTuple.getRefinabilityId() + " " + duplicateIRelTuple.getStatusId());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -449,15 +459,11 @@ public class CopyPathToPath implements I_ProcessConcepts {
             List<I_RelTuple> versions = new ArrayList<I_RelTuple>();
 
             if (versionsMap.containsKey(key)) {
-
                 versions = versionsMap.get(key);
-
-                if (!duplicateRelTuples.contains(tuple)) {
-                    duplicateRelTuples.add(tuple);
-                }
             }
             versions.add(tuple);
             versionsMap.put(key, versions);
+            duplicateRelTuples.put(key, versions);
         }
 
         boolean datachanged = processEntity(relVersioned, relVersioned.getTuples(true));

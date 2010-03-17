@@ -241,6 +241,8 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                 nextCommit = Long.MAX_VALUE;
                 initialized = true;
             } else {
+                AceLog.getAppLog().finer(
+                    "Change set already read: " + lastSize + " Skipping read bytes " + FileIO.getNormalizedRelativePath(changeSetFile));
                 ois.skipBytes((int) lastSize);
             }
         }
@@ -654,21 +656,33 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
                     } else {
                         newPart.setVersion(ThinVersionHelper.convert(part.getTime()));
                     }
-                    values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
-                    thinRel.addVersion(newPart);
-                }
-                try {
-                    ThinRelVersioned oldVersioned = (ThinRelVersioned) getVodb().getRel(thinRel.getRelId(),
-                        thinRel.getC1Id());
-                    if (oldVersioned != null) {
-                        oldVersioned.merge(thinRel);
-                        AceLog.getEditLog().fine(
-                            "Merging rel with existing (should have been null): \n" + thinRel + "\n\n" + oldVersioned);
+
+                    if (!thinRel.getVersions().contains(newPart)) {
+                        values.add(new TimePathId(newPart.getVersion(), newPart.getPathId()));
+                        thinRel.addVersion(newPart);
                     }
-                } catch (DatabaseException e) {
-                    // expected exception...
                 }
-                getVodb().writeRel(thinRel);
+
+                ThinRelVersioned oldVersioned = null;
+                try {
+                    oldVersioned = (ThinRelVersioned) getVodb().getRel(thinRel.getRelId(), thinRel.getC1Id());
+                } catch (DatabaseException ignorNoRelationshipsFound) {
+                }
+
+                //If there is an existing relationship, add the new version if the details are different.
+                if (oldVersioned != null) {
+                    if (oldVersioned.merge(thinRel)) {
+                        getVodb().writeRel(thinRel);
+                        AceLog.getAppLog().info(
+                            "Merging rel with existing (should have been null): \n" + thinRel + "\n\n" + oldVersioned);
+                    } else {
+                        AceLog.getAppLog().severe(
+                            "Ignoring as existing relationship with the details \n" + thinRel + "\n\n" + oldVersioned);
+                    }
+                } else {
+                    getVodb().writeRel(thinRel);
+                }
+
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
                     List<I_RelVersioned> destRels = getVodb().getDestRels(thinRel.getC2Id());
