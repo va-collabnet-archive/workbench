@@ -14,26 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.task.classify;
+package org.dwfa.ace.task.refset.spec.status;
 
 import java.beans.BeanDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-public class ClassifyCurrentBeanInfo extends SimpleBeanInfo {
+public class SetWFToModifyOverallSpecStatusPanelTaskBeanInfo extends SimpleBeanInfo {
+
+    /**
+    *
+    */
+    public SetWFToModifyOverallSpecStatusPanelTaskBeanInfo() {
+        super();
+    }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
-        return new PropertyDescriptor[0];
+
+        PropertyDescriptor rv[] = {};
+        return rv;
+
     }
 
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ClassifyCurrent.class);
-        // !!!
-        // bd.setDisplayName("<html><font color='green'><center>Classify in Current Tab");
-        bd.setDisplayName("<html><font color='purple'><center>ClassifyCurrent Current Tab");
+        BeanDescriptor bd = new BeanDescriptor(SetWFToModifyOverallSpecStatusPanelTask.class);
+        bd.setDisplayName("<html><font color='blue'><center>Set WF Panel to<br>Modify Overall Spec<br>Status panel");
         return bd;
     }
 

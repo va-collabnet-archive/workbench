@@ -167,11 +167,46 @@ public class SpecRefsetHelper {
         I_IntSet statuses = termFactory.newIntSet();
 
         try {
+
+            statuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.PENDING_MOVE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
             statuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_DUAL_REVIEW.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DUAL_REVIEWED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.RESOLVED_IN_DUAL.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.ADJUDICATED.localize().getNid());
             statuses.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
             statuses.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
-            statuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.OPTIONAL.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DEVELOPMENTAL.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.EXPERIMENTAL.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FROM_SNOMED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.REASSIGNED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DUAL_REVIEWED_AND_REASSIGNED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.RESOLVED_IN_DUAL_AND_REASSIGNED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.PROCESSED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DUAL_REVIEWED_AND_PROCESSED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.RESOLVED_IN_DUAL_AND_PROCESSED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.ADJUDICATED_AND_PROCESSED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.INTERNAL_USE_ONLY.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_INTERNAL_USE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DUPLICATE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_REL_ERROR.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.CURRENT_TEMP_INTERNAL_USE.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.FLAGGED_POTENTIAL_DESC_STYLE_ERROR.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION.localize().getNid());
+            statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.localize().getNid());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1202,7 +1237,7 @@ public class SpecRefsetHelper {
                     }
 
                     if (latestPart instanceof I_ThinExtByRefPartConcept) {
-                        // found a member to retire
+                        // found a member to copy
                         for (I_Path editPath : getEditPaths()) {
                             I_ThinExtByRefPartConcept clone =
                                     (I_ThinExtByRefPartConcept) latestPart.makeAnalog(statusId,
@@ -1477,5 +1512,15 @@ public class SpecRefsetHelper {
             }
         }
         return false;
+    }
+
+    public I_ThinExtByRefPart getLatestPart(I_ThinExtByRefVersioned memberExtension) {
+        I_ThinExtByRefPart latestPart = null;
+        for (I_ThinExtByRefPart part : memberExtension.getMutableParts()) {
+            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                latestPart = part;
+            }
+        }
+        return latestPart;
     }
 }

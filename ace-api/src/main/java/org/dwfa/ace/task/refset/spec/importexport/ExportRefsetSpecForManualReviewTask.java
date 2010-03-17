@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -35,6 +36,7 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
@@ -58,8 +60,7 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,
- * in a tab delimited format of
- * (concept name, sct id, associated comment).
+ * in a tab delimited format of (concept name, sct id, associated comment).
  * Comment is left blank as this is filled in externally.
  * 
  * @author Chrissy Hill
@@ -284,15 +285,28 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(descType.getConceptId());
 
+        String latestDescription =
+                getLatestDescription(componentId, helper.getCurrentStatusIntSet(), allowedTypes, termFactory
+                    .getActiveAceFrameConfig().getViewPositionSetReadOnly());
+
+        if (latestDescription == null) {
+            // try relaxing the rules for searching - check all statuses & positions
+            latestDescription = getLatestDescription(componentId, null, allowedTypes, null);
+        }
+
+        return latestDescription;
+    }
+
+    private String getLatestDescription(int componentId, I_IntSet statuses, I_IntSet allowedTypes,
+            PositionSetReadOnly positions) throws IOException, TerminologyException, ParseException {
+        I_TermFactory termFactory = Terms.get();
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
         List<? extends I_DescriptionTuple> descriptionResults = null;
         if (termFactory.hasConcept(componentId)) {
             I_GetConceptData concept = termFactory.getConcept(componentId);
-            descriptionResults =
-                    concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+            descriptionResults = concept.getDescriptionTuples(statuses, allowedTypes, positions, true);
         } else {
             UUID descUuid = termFactory.getId(componentId).getUUIDs().iterator().next();
             I_DescriptionVersioned descVersioned = termFactory.getDescription(descUuid.toString());
