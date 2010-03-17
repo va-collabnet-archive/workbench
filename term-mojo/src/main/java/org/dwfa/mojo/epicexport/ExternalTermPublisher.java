@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -204,12 +205,18 @@ public class ExternalTermPublisher {
     }
     
     private I_ThinExtByRefPart getPreviousVersion(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
+    	    	
+    	return ExternalTermPublisher.getPreviousVersionOfExtension(thinExtByRefTuple, startingVersion);
+    }
+
+    public static I_ThinExtByRefPart getPreviousVersionOfExtension(I_ThinExtByRefTuple thinExtByRefTuple,
+    		int startingVersion) throws Exception {
     	List<? extends I_ThinExtByRefPart> versions = thinExtByRefTuple.getVersions();
     	
     	I_ThinExtByRefPart newestOldVersion  = null;
     	for (Iterator<? extends I_ThinExtByRefPart> i = versions.iterator(); i.hasNext(); ) {
     		I_ThinExtByRefPart v = i.next();
-    		if (v.getVersion() <= this.startingVersion) {
+    		if (v.getVersion() <= startingVersion) {
 	    		if (newestOldVersion == null) {
 	    			newestOldVersion = v;
 	    		}
@@ -220,7 +227,7 @@ public class ExternalTermPublisher {
     	}
     	return newestOldVersion;
     }
-
+    
     
     private void mineRefsetsForItems(I_GetConceptData refsetConcept, 
     		I_ThinExtByRefTuple extensionTuple, I_GetConceptData conceptForDescription,
@@ -247,6 +254,7 @@ public class ExternalTermPublisher {
 	    						this.converter.getItemValue(), this.converter.getPreviousItemValue(),
 	    						extensionTuple);
 	    				addRegion(app.getMasterfile(), app.getRegion());
+	    				saveDescriptionStatus(app.getMasterfile(), description);
 	    			}
 	    		}
 	    		else {
@@ -261,8 +269,38 @@ public class ExternalTermPublisher {
     private void addRegion(String masterfile, String region) {
     	ExternalTermRecord record = getExternalRecordForMasterfile(masterfile);
     	record.addRegion(region);
-
     }
+
+    private void saveDescriptionStatus(String masterfile, I_DescriptionVersioned description) throws Exception {
+    	ExternalTermRecord record = getExternalRecordForMasterfile(masterfile);
+    	if (description != null) {
+	    	I_DescriptionTuple dt = description.getLastTuple();
+	    	if (dt != null) {
+		    	int statusId = description.getLastTuple().getMutablePart().getStatusId();
+		    	record.setTermStatus(this.converter.getInterpretedStatus(statusId));
+	    	}
+	    	record.setPreviousStatus(getPreviousStatus(description));
+    	}
+    }
+    
+    private ExternalTermRecord.status getPreviousStatus(I_DescriptionVersioned d) throws Exception {
+    	ExternalTermRecord.status ret = null;
+
+    	I_DescriptionTuple newestOldTuple = null;
+    	for (I_DescriptionTuple dt : d.getTuples()) {
+			if (dt.getVersion() < this.startingVersion)
+				if (newestOldTuple == null) {
+					newestOldTuple = dt;
+				}
+				else if (dt.getVersion() > newestOldTuple.getVersion()) {
+					newestOldTuple = dt;
+				}
+		}
+    	if (newestOldTuple != null)
+    		ret = this.converter.getInterpretedStatus(newestOldTuple.getMutablePart().getStatusId());
+    	return ret;
+    }
+
     
     private void addItem(String masterFile, String item, Object value, Object previousValue,
     		I_ThinExtByRefTuple extensionTuple) {
@@ -325,7 +363,7 @@ public class ExternalTermPublisher {
     	return ret;
     }
   
-    
+
     private class DisplayName {
     	public String masterFile;
     	public String region;

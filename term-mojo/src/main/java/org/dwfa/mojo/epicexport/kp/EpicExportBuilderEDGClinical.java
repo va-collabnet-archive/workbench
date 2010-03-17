@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.dwfa.mojo.epicexport.AbstractEpicExportBuilder;
 import org.dwfa.mojo.epicexport.EpicExportManager;
+import org.dwfa.mojo.epicexport.EpicExportWriter;
 import org.dwfa.mojo.epicexport.I_EpicExportRecordWriter;
 import org.dwfa.mojo.epicexport.I_EpicLoadFileBuilder;
 import org.dwfa.mojo.epicexport.I_ExportFactory;
@@ -29,7 +30,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 	public static final int DISPLAY_NAME = 2;
 	public static final int ITEM_11 = 11;
 	public static final String[] INTERESTED_ITEMS = {"2", "40", "50", "100", "2000", "200", "7010", "7000", "80", "91", "207"};
-	public static final String[] EREC_ITEMS = {"50", "7010"};
+	public static final String[] EREC_ITEMS = {"5", "50", "7010"};
 	public static final String[] MANDATORY_ITEMS = {"2", "40", "7000", "7010", "91", "80", "100", "207"};
 	
 	public String masterfile = EpicLoadFileFactory.EPIC_MASTERFILE_NAME_EDG_CLINICAL;
@@ -42,7 +43,7 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 	public void writeRecord(String version, List<String> regions) throws Exception {
 		
 		if (this.isChangedRecord()) {
-			if (getFirstItem("11") == null) {
+			if (hasItem("11") == false) {
 				//"NRNC" Its a new record
 				addErrorIfTrue(! this.allItemsArePopulated(MANDATORY_ITEMS),
 						"One or more mandatory items are missing");
@@ -52,9 +53,9 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 				I_EpicExportRecordWriter writer = getExportManager().getWriter(getWriterName(masterfile, version, "nrnc"));
 				this.setWriter(writer);
 				writer.newRecord();
-				writeAnyErrors();
 				if (writer.getRecordsWrittenCount() == 0)
 					writeHeader();
+				writeAnyErrors();
 				writeLiteralItem("1", "");
 				writeItems("2", "35", "40");
 				// writeLiteralItem("35x", this.getParentUUID());
@@ -74,9 +75,9 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writer.newRecord();
 					writeItem("11", "1");
 					writeItem("2");
+					writeItem("5");
 					writeLiteralItem("20", "L");
 					writeItem("40");
-					// writeLiteralItem("35x", this.getParentUUID());
 					writeItem("35");
 					writeItemIfChanged("100");
 					if (this.itemIsPopulated("2000"))
@@ -99,12 +100,12 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					if (writer.getRecordsWrittenCount() == 0)
 						writeHeader();
 					writeItem("2");
+					writeItem("5");
 					writeItem("11", "1");
 					if (this.itemIsPopulated("2000"))
 						writeItem("2000");
 					else if (this.itemIsPopulated("200"))
 						writeItem("200");
-					// writeLiteralItem("35x", this.getParentUUID());
 					writeItem("35");
 					writeItem("40");
 					writeItemIfChanged("100");
@@ -116,6 +117,13 @@ public class EpicExportBuilderEDGClinical extends AbstractEpicExportBuilder impl
 					writeItemIfChanged("7010");
 					// writeItem("rootuuid");
 					writer.saveRecord();
+				}
+				if (this.hasItem("5")) {
+					if (this.getFirstItem("5").getValue().toString().equals(ExportValueConverter.SOFT_DELETE_FLAG)) {
+						EpicExportWriter.writeSoftDeleteFile(getExportManager(), 
+								new String("softdelete_").concat(masterfile).concat("_").concat(version),
+								this.getFirstItem("11").getValue().toString(), masterfile);
+					}
 				}
 			}
 		}

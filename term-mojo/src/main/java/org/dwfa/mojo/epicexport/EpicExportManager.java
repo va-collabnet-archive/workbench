@@ -86,7 +86,11 @@ public class EpicExportManager {
         return ret;
     }
 
-    /**
+    
+    public HashMap<String, I_EpicExportRecordWriter> getWriters() {
+		return writers;
+	}
+	/**
      * Looks for an existing export builder that handles the named record
      * type, and creates a new writer if not present.
      * 

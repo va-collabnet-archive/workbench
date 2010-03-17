@@ -32,25 +32,36 @@
     <name>Informatics, Inc.</name>
     <url>http://www.informatics.com</url>
   </organization>
+	<dependencies>
+		<dependency>
+			<groupId>net.jini</groupId>
+			<artifactId>jsk-lib</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.jini</groupId>
+			<artifactId>jsk-platform</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>mahalo</artifactId>
+			<scope>compile</scope>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>browser</artifactId>
+			<version>2.1</version>
+		</dependency>
+	</dependencies>
   <scm>
     <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</connection>
     <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</developerConnection>
     <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
   </scm>
-  <dependencies>
-    <dependency>
-      <groupId>net.jini</groupId>
-      <artifactId>jsk-lib</artifactId>
-      <version>2.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.jini</groupId>
-      <artifactId>jsk-platform</artifactId>
-      <version>2.1</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>

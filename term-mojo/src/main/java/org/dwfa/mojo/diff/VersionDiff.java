@@ -45,6 +45,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
@@ -594,7 +595,7 @@ public class VersionDiff extends AbstractMojo {
      * refset
      */
     private void createRefsetConcept(I_Position pos1, I_Position pos2, Integer member_refset) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData fully_specified_description_type = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         I_GetConceptData preferred_description_type = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
         I_GetConceptData member_refset_con = null;
@@ -639,7 +640,7 @@ public class VersionDiff extends AbstractMojo {
 
     @Deprecated
     protected I_GetConceptData createChangeTypeConcept(String name) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData fully_specified_description_type = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         I_GetConceptData preferred_description_type = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
         I_ConfigAceFrame config = tf.newAceFrameConfig();
@@ -668,13 +669,12 @@ public class VersionDiff extends AbstractMojo {
      * Adds a concept to the refset
      */
     private void addToRefset(int concept_id, int change_id, String comment) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData include_individual = tf.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
         int typeId = include_individual.getConceptId();
         I_GetConceptData active_status = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
         int statusId = active_status.getConceptId();
-        int memberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
-            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), tf.getPaths(), Integer.MAX_VALUE);
+        int memberId = tf.uuidToNative(UUID.randomUUID());
         I_ThinExtByRefVersioned newExtension = tf.newExtension(refset.getConceptId(), memberId, concept_id, typeId);
         I_ThinExtByRefPartConceptConceptString ext = tf.newConceptConceptStringExtensionPart();
         ext.setC1id(concept_id);
@@ -696,8 +696,7 @@ public class VersionDiff extends AbstractMojo {
             System.out.println("None for " + change_id);
             return;
         }
-        memberId = tf.uuidToNativeWithGeneration(UUID.randomUUID(),
-            ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), tf.getPaths(), Integer.MAX_VALUE);
+        memberId = tf.uuidToNative(UUID.randomUUID());
         newExtension = tf.newExtension(member_refset.getConceptId(), memberId, concept_id, typeId);
         I_ThinExtByRefPartConcept member_ext = tf.newConceptExtensionPart();
         member_ext.setC1id(concept_id);
@@ -785,7 +784,7 @@ public class VersionDiff extends AbstractMojo {
     private List<Integer> buildConceptEnum(List<String> concepts, String tag) throws Exception {
         ArrayList<Integer> ret = new ArrayList<Integer>();
         logConfig(tag + " size = " + concepts.size());
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (String str : concepts) {
             I_GetConceptData con = tf.getConcept(Arrays.asList(UUID.fromString(str)));
             if (con == null) {
@@ -799,7 +798,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void compareAttributes(I_GetConceptData c, I_Path path) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_ConceptAttributePart a1 = null;
         I_ConceptAttributePart a2 = null;
         for (I_ConceptAttributePart a : c.getConceptAttributes().getMutableParts()) {
@@ -842,7 +841,7 @@ public class VersionDiff extends AbstractMojo {
     int descriptions_filtered = 0;
 
     private void compareDescriptions(I_GetConceptData c, I_Path path) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (I_DescriptionVersioned d : c.getDescriptions()) {
             descriptions++;
             I_DescriptionPart d1 = null;
@@ -942,7 +941,7 @@ public class VersionDiff extends AbstractMojo {
     int relationships_filtered = 0;
 
     private void compareRelationships(I_GetConceptData c, I_Path path) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (I_RelVersioned d : c.getSourceRels()) {
             relationships++;
             I_RelPart r1 = null;
@@ -1049,7 +1048,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private I_Path processConfig() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
         this.v1_id = ThinVersionHelper.convertTz(this.v1);
         this.v2_id = ThinVersionHelper.convertTz(this.v2);
@@ -1195,7 +1194,7 @@ public class VersionDiff extends AbstractMojo {
     int concepts_filtered = 0;
 
     private void diff() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
         I_Path path = processConfig();
 
@@ -1264,7 +1263,7 @@ public class VersionDiff extends AbstractMojo {
     private void listDiff() throws Exception {
         getLog().info("diff list");
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(list_file)));
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         List<Integer> description_changes = Arrays.asList(this.added_description_change,
             this.deleted_description_change, this.description_status_change, this.description_term_change,
             this.description_type_change, this.description_language_change, this.description_case_change);
@@ -1336,7 +1335,7 @@ public class VersionDiff extends AbstractMojo {
     // status type)
 
     private void listStatus() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (Concept c : Arrays.asList(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.LIMITED,
             ArchitectonicAuxiliary.Concept.PENDING_MOVE, ArchitectonicAuxiliary.Concept.RETIRED,
             ArchitectonicAuxiliary.Concept.DUPLICATE, ArchitectonicAuxiliary.Concept.OUTDATED,
@@ -1349,7 +1348,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listDescriptionType() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (Concept c : Arrays.asList(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE,
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE,
             ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE)) {
@@ -1360,7 +1359,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listCharacteristic() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (Concept c : Arrays.asList(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC,
             ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC,
             ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC,
@@ -1372,7 +1371,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listRefinability() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (Concept c : Arrays.asList(ArchitectonicAuxiliary.Concept.NOT_REFINABLE,
             ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY, ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY)) {
             getLog().info(
@@ -1382,7 +1381,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listRel() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (org.dwfa.cement.SNOMED.Concept c : Arrays.asList(SNOMED.Concept.IS_A)) {
             getLog().info(
                 "Rel type: " + tf.getConcept(c.getUids()).getUids().get(0) + " "
@@ -1399,7 +1398,7 @@ public class VersionDiff extends AbstractMojo {
     // -597018953
 
     private void listVersions() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
         getLog().info(c.getInitialText());
         I_ConceptAttributeVersioned cv = c.getConceptAttributes();
@@ -1409,7 +1408,7 @@ public class VersionDiff extends AbstractMojo {
         I_GetConceptData syn_type = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
         for (I_DescriptionVersioned cd : c.getDescriptions()) {
             for (I_DescriptionPart cvp : cd.getMutableParts()) {
-                if (cvp.getTypeId() == syn_type.getConceptId() && cvp.getText().contains("version")) {
+                if (cvp.getTypeId() == syn_type.getConceptId() && cvp.getText().contains("time")) {
                     getLog().info("Version: " + cvp.getText());
                     getLog().info("         " + cvp.getVersion());
                     getLog().info("         " + ThinVersionHelper.format(cvp.getVersion()));
@@ -1439,7 +1438,7 @@ public class VersionDiff extends AbstractMojo {
 
     private ArrayList<Integer> getChildren(int concept_id, I_Path path, int version) throws Exception {
         ArrayList<Integer> ret = new ArrayList<Integer>();
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(concept_id);
         for (I_RelVersioned d : c.getDestRels()) {
             I_RelPart dm = null;
@@ -1460,7 +1459,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listRoots(I_Path path) throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
         for (I_RelVersioned d : c.getDestRels()) {
             I_RelPart d1 = null;
@@ -1492,7 +1491,7 @@ public class VersionDiff extends AbstractMojo {
     }
 
     private void listPaths() throws Exception {
-        I_TermFactory tf = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         for (I_Path path : tf.getPaths()) {
             I_GetConceptData path_con = tf.getConcept(path.getConceptId());
             getLog().info("Path: " + path_con.getInitialText());
