@@ -54,8 +54,6 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
         // add(CO_SequenceAuthorityOidUuid);
         // add(CO_SequenceAuthorityUuid);
         // add(CO_SequenceAuthorityVerhoeff);
-        add(CO_ServiceBrowser);
-        add(CO_ServiceBrowserNewFrame);
         add(CO_SyncQueue);
         // add(CO_Tunnel);
         // add(CO_WebQueue);
@@ -64,8 +62,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
 
     }
 
-    public static String dwaPath = "VHelp.addLibVersion(\"core\") + \"${path.separator}\" + "
-        + "VHelp.addLibVersion(\"activation\") + \"${path.separator}\" + " + "VHelp.addLibVersion(\"mail\")";
+    public static String dwaPath = "VHelp.addLibVersion(\"core\")";
 
     public static String PHANTOM_FRAME = "Phantom Frame";
     public static String PHANTOM_FRAME_PROP = "org.dwfa.PHANTOM_FRAME";
@@ -104,7 +101,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String AGING_QUEUE_PROP = "org.dwfa.AGING_QUEUE";
     public static ServiceConfigOption CO_AgingQueue = new ServiceConfigOption(AGING_QUEUE,
         "config${/}queueAging.policy", "config${/}queueAgingSecure.policy", AGING_QUEUE_PROP,
-        "Publishes an Aging Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"",
+        "Publishes an Aging Queue for workflow. ", true, "jiniPortUrlPart, \"",
         "lib", dwaPath, "org.dwfa.queue.QueueServer", new String[] { "config${/}queueAging.config" },
         new String[] { "config${/}queueAgingSecure.config" }, true, false, false, "");
 
@@ -178,32 +175,6 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
                                                                                          "lib-dl", "-verbose", },
         new String[] { "-port", "jiniPort", "-dir", "lib-dl", "-verbose", }, false, false, false, "");
 
-    public static ServiceConfigOption CO_ServiceBrowser = new ServiceConfigOption(JINI_SERVICE_BROWSER,
-        "config${/}browser.policy", "config${/}browserSecure.policy", JINI_SERVICE_BROWSER_PROP,
-        "Optional component to allow browsing Jini services on the network. ", false,
-        "jiniPortUrlPart, VHelp.addDlVersion(\"browser-dl\"), \"", "lib", "VHelp.addLibVersion(\"browser\")"
-            + "+ \"${path.separator}\" + VHelp.addLibVersion(\"macadaptor\")",
-        "org.dwfa.servicebrowser.BrowserAdaptor", new String[] { "config${/}browser.config" },
-        new String[] { "config${/}browserSecure.config" }, true, false, false, "");
-
-    public static ServiceConfigOption CO_ServiceBrowserNewFrame = new ServiceConfigOption(
-        JINI_SERVICE_BROWSER_NEW_FRAME, "config${/}newWindowGenerator.policy",
-        "config${/}newWindowGeneratorSecure.policy", JINI_SERVICE_BROWSER_NEW_FRAME_PROP,
-        "Menu option to create a window to allow browsing Jini services on the network. ", true, // enabled
-        // by
-        // default
-        "", // codebase
-        null, // jardir
-        dwaPath, // classpath
-        "org.dwfa.bpa.util.NewWindowGenerator", // mainclass
-        new String[] { "config${/}newBrowserFrame.config" }, // args
-        new String[] { "config${/}newBrowserFrameSecure.config" }, // secure
-        // args
-        true, // optional
-        false, // alert if selected
-        false, // alert if deselected
-        ""); // alert string
-
     public static ServiceConfigOption CO_ServiceRegistrar = new ServiceConfigOption(SERVICE_REGISTRAR,
         "config${/}reggie.policy", "config${/}reggieSecure.policy", SERVICE_REGISTRAR_PROP,
         "There must be at least one on the network, or you can't discover services. ", true,
@@ -266,7 +237,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
 
     public static ServiceConfigOption CO_Inbox = new ServiceConfigOption(INBOX_QUEUE, "config${/}queueInbox.policy",
         "config${/}queueInboxSecure.policy", INBOX_QUEUE_PROP, "Publishes an Inbox Queue for business processes. ",
-        true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
+        true, "jiniPortUrlPart, \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
         new String[] { "config${/}queueInbox.config" }, new String[] { "config${/}queueInboxSecure.config" }, true,
         false, true, "<html>Every workflow node needs at least one inbox queue to recieve processes<br>"
             + " from other nodes. Please ensure that at least one of the machines in this node<br>"
@@ -274,7 +245,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
 
     public static ServiceConfigOption CO_OutboxQueue = new ServiceConfigOption(OUTBOX_QUEUE,
         "config${/}queueOutbox.policy", "config${/}queueOutboxSecure.policy", OUTBOX_QUEUE_PROP,
-        "Publishes an OutBox Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"",
+        "Publishes an OutBox Queue for workflow. ", true, "jiniPortUrlPart, \"",
         "lib", dwaPath, "org.dwfa.queue.QueueServer", new String[] { "config${/}queueOutbox.config" },
         new String[] { "config${/}queueOutboxSecure.config" }, true, false, true,
         "<html>Every workflow node needs at least one outbox queue to send processes<br>"
@@ -284,7 +255,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static ServiceConfigOption CO_ComputeQueue = new ServiceConfigOption(COMPUTE_QUEUE,
         "config${/}queueCompute.policy", "config${/}queueComputeSecure.policy", COMPUTE_QUEUE_PROP,
         "Publishes a Compute Queue (does not support user interaction) for workflow. ", true,
-        "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
+        "jiniPortUrlPart, \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
         new String[] { "config${/}queueCompute.config" }, new String[] { "config${/}queueComputeSecure.config" }, true,
         false, false, "");
 
@@ -294,7 +265,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
         "config${/}queueLauncherSecure.policy",
         LAUNCHER_QUEUE_PROP,
         "<html>Publishes queue from which processes can be launched, but they will remain in the queue for subsequent launches<br><font color='blue'>(take operations are actually read operations). ",
-        true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
+        true, "jiniPortUrlPart, \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
         new String[] { "config${/}queueLauncher.config" }, new String[] { "config${/}queueLauncherSecure.config" },
         true, false, false, "");
 
@@ -302,7 +273,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String SYNC_QUEUE_PROP = "org.dwfa.SYNC_QUEUE";
     public static ServiceConfigOption CO_SyncQueue = new ServiceConfigOption(SYNC_QUEUE, "config${/}queueSync.policy",
         "config${/}queueSyncSecure.policy", SYNC_QUEUE_PROP, "Publishes a Synchronization Queue for workflow. ", true,
-        "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
+        "jiniPortUrlPart, \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
         new String[] { "config${/}queueSync.config" }, new String[] { "config${/}queueSyncSecure.config" }, true,
         false, false, "");
 
@@ -310,7 +281,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String WEB_QUEUE_PROP = "org.dwfa.WEB_QUEUE";
     public static ServiceConfigOption CO_WebQueue = new ServiceConfigOption(WEB_QUEUE, "config${/}queueWeb.policy",
         "config${/}queueWebSecure.policy", WEB_QUEUE_PROP, "Publishes a Web Queue for workflow. ", true,
-        "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
+        "jiniPortUrlPart, \"", "lib", dwaPath, "org.dwfa.queue.QueueServer",
         new String[] { "config${/}queueWeb.config" }, new String[] { "config${/}queueWebSecure.config" }, true, false,
         false, "");
 
@@ -359,7 +330,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
     public static String ARCHIVAL_QUEUE_PROP = "org.dwfa.ARCHIVAL";
     public static ServiceConfigOption CO_Archival = new ServiceConfigOption(ARCHIVAL_QUEUE,
         "config${/}queueArchival.policy", "config${/}queueArchivalSecure.policy", ARCHIVAL_QUEUE_PROP,
-        "Publishes an Archival Queue for workflow. ", true, "jiniPortUrlPart, VHelp.addDlVersion(\"queue-dl\"), \"",
+        "Publishes an Archival Queue for workflow. ", true, "jiniPortUrlPart, \"",
         "lib", dwaPath, "org.dwfa.queue.QueueServer", new String[] { "config${/}queueArchival.config" },
         new String[] { "config${/}queueArchivalSecure.config" }, true, false, false, "");
 
