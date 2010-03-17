@@ -32,21 +32,7 @@ package org.dwfa.vodb.process;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.logging.Logger;
-
+import com.sleepycat.je.DatabaseException;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -54,7 +40,18 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
 import org.dwfa.vodb.types.IntSet;
 
-import com.sleepycat.je.DatabaseException;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Logger;
 
 public abstract class ProcessSources {
 
@@ -176,18 +173,7 @@ public abstract class ProcessSources {
         while (tokenType != StreamTokenizer.TT_EOF) {
             if (st.sval.equals("Primary UUID")) {
                 AceLog.getAppLog().warning("Unexpected data encounterd in id stream: " + st.sval);
-                // go to CR or LF
-                tokenType = st.nextToken();
-                while (tokenType != 13 && tokenType != 10) { // is CR
-                    // LF
-                    tokenType = st.nextToken();
-                }
-
-                // Beginning of loop
-                tokenType = st.nextToken();
-                while (tokenType == 10) {
-                    tokenType = st.nextToken();
-                }
+                skipLineOne(st, idLatch);
             } else {
                 UUID primaryUuid = (UUID) getId(st);
                 tokenType = st.nextToken();
