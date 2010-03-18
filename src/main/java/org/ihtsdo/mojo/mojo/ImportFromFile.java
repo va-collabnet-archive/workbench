@@ -17,7 +17,7 @@
 package org.ihtsdo.mojo.mojo;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.file.IterableFileReader;
 
 /**
@@ -43,6 +43,6 @@ public abstract class ImportFromFile extends AbstractMojo {
      * @parameter
      * @required
      */
-    public IterableFileReader<I_ThinExtByRefVersioned> fileHandler;
+    public IterableFileReader<I_ExtendByRef> fileHandler;
 
 }
