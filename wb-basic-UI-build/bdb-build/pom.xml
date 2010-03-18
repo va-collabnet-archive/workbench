@@ -26,9 +26,9 @@
 	<build>
 		<plugins>
 			 <plugin>
-                <groupId>org.dwfa</groupId>
-                <artifactId>dwfa-mojo</artifactId>
-                <version>2.0.31-SNAPSHOT</version>
+                <groupId>org.ihtsdo</groupId>
+                <artifactId>wb-mojo</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -249,9 +249,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.dwfa</groupId>
-                <artifactId>term-mojo</artifactId>
-                <version>1.44-SNAPSHOT</version>
+                <groupId>org.ihtsdo</groupId>
+                <artifactId>wb-mojo</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>vodb-open</id>
