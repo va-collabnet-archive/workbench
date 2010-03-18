@@ -17,6 +17,7 @@
 package org.dwfa.maven.sctid;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -27,6 +28,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -129,6 +132,8 @@ public class UuidSctidMapDb {
     private String databaseUser;
     /** DB password */
     private String databasePassword;
+    private Map<Integer, Integer> typeMap = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> namespaceMap = new HashMap<Integer, Integer>();
     /** Instance of the DB. */
     private static UuidSctidMapDb instance;
 
@@ -426,6 +431,8 @@ public class UuidSctidMapDb {
             runSql("TRUNCATE TABLE SCT_NAMESPACE");
             runSql("TRUNCATE TABLE SCT_TYPE");
         }
+        typeMap.clear();
+        namespaceMap.clear();
         updateNamespaceTable();
         updateTypeTable();
     }
@@ -492,44 +499,83 @@ public class UuidSctidMapDb {
      * @throws SQLException DB error
      * @throws IOException File error
      */
-    public void updateDbFromRf2IdFile(File rf2IdFile) throws SQLException, IOException {
-        logger.info("Importing RF2 data from file " + rf2IdFile + " into UuidSctidMapDb");
-        if (databaseDriver.equals("com.mysql.jdbc.Driver")) {
-            runSql("ALTER TABLE UUID_SCT_MAP DISABLE KEYS");
-            runSql("LOAD DATA LOCAL INFILE '" + rf2IdFile.getAbsolutePath() + "' INTO TABLE UUID_SCT_MAP"
-                + " FIELDS TERMINATED BY '\t' IGNORE 1 LINES"
-                + " (@identifierSchemeId, @uuid, @effectiveTime, @active, @moduleId, @sctId)"
-                + " SET MSB = (conv( substr( replace( @uuid, \"-\", \"\" ) ,1,16 ), 16, -10)),"
-                + " LSB = (conv(substr(replace(@uuid, \"-\", \"\"),17,32), 16, -10)),"
-                + " SCTID = @sctId,"
-                + " TYPE_ID = (SELECT SCT_TYPE_ID FROM SCT_TYPE WHERE SCT_TYPE_CODE = LEFT(RIGHT(@sctId, 2), 1)),"
-                + " NAMESPACE_ID = (IFNULL((SELECT SCT_NAMESPACE_ID FROM SCT_NAMESPACE WHERE SCT_NAMESPACE = LEFT( RIGHT(@sctId, 10), 8)), 0))");
-            runSql("ALTER TABLE UUID_SCT_MAP ENABLE KEYS");
-        } else {
-            BufferedReader br = new BufferedReader(new FileReader(rf2IdFile));
-            int insertCount = 0;
+    public void updateDbFromRf2IdFile(File... rf2IdFiles) throws SQLException, IOException {
+        logger.info("Importing RF2 data from file " + rf2IdFiles + " into UuidSctidMapDb");
+        if (isDatabaseMySQL()) {
+            for (File file : rf2IdFiles) {
+                runSql("LOAD DATA LOCAL INFILE '" + file.getAbsolutePath() + "' INTO TABLE UUID_SCT_MAP"
+                    + " FIELDS TERMINATED BY '\t' IGNORE 1 LINES"
+                    + " (@identifierSchemeId, @uuid, @effectiveTime, @active, @moduleId, @sctId)"
+                    + " SET MSB = (conv( substr( replace( @uuid, \"-\", \"\" ) ,1,16 ), 16, -10)),"
+                    + " LSB = (conv(substr(replace(@uuid, \"-\", \"\"),17,32), 16, -10)),"
+                    + " SCTID = @sctId,"
+                    + " TYPE_ID = (SELECT SCT_TYPE_ID FROM SCT_TYPE WHERE SCT_TYPE_CODE = LEFT(RIGHT(@sctId, 2), 1)),"
+                    + " NAMESPACE_ID = (IFNULL((SELECT SCT_NAMESPACE_ID FROM SCT_NAMESPACE WHERE SCT_NAMESPACE = LEFT( RIGHT(@sctId, 10), 8)), 0))");
+            }
+        } else if (isDerbyEmbeddedDatabase()) {
+            File data = File.createTempFile("UuidSctid", "rf2");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(data, false));
+
+            for (File file : rf2IdFiles) {
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                //throw away header
+                String line = reader.readLine();
+                
+                while ((line = reader.readLine()) != null) {
+                    String[] columns = line.split("\t");
     
-            try {
-                br.readLine();
-                String lineStr;
-                dropIndexes();
-                while ((lineStr = br.readLine()) != null) {
-                    String[] columns = lineStr.split("\t");
                     UUID uuid = UUID.fromString(columns[1]);
-                    Long sctId = Long.parseLong(columns[5]);
-    
-                    if (!validate || validateFileUuid(uuid, sctId, rf2IdFile)) {
-                        addUUIDSctIdEntry(uuid, sctId, false);
-                        insertCount++;
-                        commitBatch(insertCount);
+                    String sctid = columns[5];
+                                    
+                    writer.append(uuid.getMostSignificantBits() + "");
+                    writer.append("\t");
+                    writer.append(uuid.getLeastSignificantBits() + "");
+                    writer.append("\t");
+                    writer.append(sctid);
+                    writer.append("\t");
+                    writer.append(getSctIdType(sctid) + "");
+                    writer.append("\t");
+                    writer.append(getSctIdNamespace(sctid) + "");
+                    writer.append(System.getProperty("line.separator"));      
+                }
+                reader.close();
+            }
+            
+            writer.close();
+            
+            runSql("CALL SYSCS_UTIL.SYSCS_IMPORT_TABLE (null,'UUID_SCT_MAP','" + data.getAbsolutePath() + "','\t','\"',null,0)");
+            data.delete();
+        } else {
+            int insertCount = 0;
+            BufferedReader br = null;
+            try {
+                String lineStr;
+                for (File file : rf2IdFiles) {
+                    br = new BufferedReader(new FileReader(file));
+                    br.readLine();
+                    while ((lineStr = br.readLine()) != null) {
+                        String[] columns = lineStr.split("\t");
+                        UUID uuid = UUID.fromString(columns[1]);
+                        Long sctId = Long.parseLong(columns[5]);
+        
+                        if (!validate || validateFileUuid(uuid, sctId, file)) {
+                            addUUIDSctIdEntry(uuid, sctId, false);
+                            insertCount++;
+                            commitBatch(insertCount);
+                        }
                     }
                 }
-                createIndexes();
             } finally {
-                br.close();
+                if (br != null) {
+                    br.close();
+                }
                 conn.commit();
             }
         }
+    }
+
+    private boolean isDatabaseMySQL() {
+        return databaseDriver.equals("com.mysql.jdbc.Driver");
     }
 
     /**
@@ -683,8 +729,13 @@ public class UuidSctidMapDb {
      */
     private int getSctIdType(String sctId) throws NoSuchElementException, SQLException {
         int type = Integer.parseInt(sctId.substring(sctId.length() - 2, sctId.length() - 1));
-
-        return getTypeId(TYPE.fromString("" + type));
+        
+        Integer result = typeMap .get(type);
+        if (result == null) {
+            result = getTypeId(TYPE.fromString("" + type));
+        }
+        typeMap.put(type, result);
+        return result;
     }
 
     /**
@@ -726,7 +777,12 @@ public class UuidSctidMapDb {
             namespace = Integer.parseInt(sctId.substring(sctId.length() - 10, sctId.length() - 2));
         }
 
-        return getNamespaceId(NAMESPACE.fromString("" + namespace));
+        Integer result = namespaceMap.get(namespace);
+        if (result == null) {
+            result = getNamespaceId(NAMESPACE.fromString("" + namespace));
+        }
+        namespaceMap.put(namespace, result);
+        return result;
     }
 
     /**
@@ -973,8 +1029,10 @@ public class UuidSctidMapDb {
         Class.forName(databaseDriver);
 
         conn = DriverManager.getConnection(databaseConnectionUrl, databaseUser, databasePassword);
-
+        conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
         conn.setAutoCommit(autoCommit);
+        typeMap.clear();
+        namespaceMap.clear();
     }
 
     /**
@@ -1121,10 +1179,97 @@ public class UuidSctidMapDb {
      * @throws SQLException adding new mapping row.
      */
     public void addUUIDSctIdEntryList(Map<UUID, Long> entryList) throws SQLException {
-        for (UUID uuid : entryList.keySet()) {
-            addUUIDSctIdEntry(uuid, entryList.get(uuid), false);
+        logger.info("Adding batch of " + entryList.size());
+
+        if ((isDatabaseMySQL() || isDerbyEmbeddedDatabase()) && entryList.size() > 100) {
+            dataPumpBatch(entryList);
+        } else {
+            bulkInsertStatementBatch(entryList);
         }
         conn.commit();
+        logger.info("Committed batch of " + entryList.size());
+    }
+       
+    private void bulkInsertStatementBatch(Map<UUID, Long> entryList) throws SQLException {
+        logger.info("initiating batch insert " + entryList.size());
+        
+        int count = 0;
+        
+        StringBuffer statement = new StringBuffer("INSERT INTO UUID_SCT_MAP VALUES ");
+        
+        Iterator<UUID> keySet = entryList.keySet().iterator();
+        while (keySet.hasNext()) {
+            UUID uuid = keySet.next();
+            statement.append("(");
+            statement.append(uuid.getMostSignificantBits());
+            statement.append(",");
+            statement.append(uuid.getLeastSignificantBits());
+            statement.append(",");
+            statement.append(entryList.get(uuid));
+            statement.append(",");
+            statement.append(getSctIdType(entryList.get(uuid).toString()));
+            statement.append(",");
+            statement.append(getSctIdNamespace(entryList.get(uuid).toString()));
+            statement.append(")");
+            if (count++ > 1000) {
+                count = 0;
+                conn.createStatement().executeUpdate(statement.toString());
+                conn.commit();
+                statement = new StringBuffer("INSERT INTO UUID_SCT_MAP VALUES ");
+            } else if (keySet.hasNext()) {
+                statement.append(",");
+            }
+        }
+        
+        if (!statement.toString().equals("INSERT INTO UUID_SCT_MAP VALUES ")) {
+            conn.createStatement().executeUpdate(statement.toString());
+        }
+    }
+
+    private void dataPumpBatch(Map<UUID, Long> entryList) throws SQLException {
+        logger.info("initiating data pump " + entryList.size());
+
+        File data;
+        BufferedWriter writer;
+        try {
+            data = File.createTempFile("UuidSctid", "batch");
+
+            writer = new BufferedWriter(new FileWriter(data, false));
+
+            Iterator<UUID> keySet = entryList.keySet().iterator();
+            while (keySet.hasNext()) {
+                UUID uuid = keySet.next();
+                writer.append(uuid.getMostSignificantBits() + "");
+                writer.append("\t");
+                writer.append(uuid.getLeastSignificantBits() + "");
+                writer.append("\t");
+                writer.append(entryList.get(uuid).toString());
+                writer.append("\t");
+                writer.append(getSctIdType(entryList.get(uuid).toString()) + "");
+                writer.append("\t");
+                writer.append(getSctIdNamespace(entryList.get(uuid).toString()) + "");
+                if (keySet.hasNext()) {
+                    writer.append(System.getProperty("line.separator"));
+                }
+            }
+
+            if (isDatabaseMySQL()) {
+                writer.close();
+                runSql("LOAD DATA LOCAL INFILE '" + data.getAbsolutePath() + "' INTO TABLE UUID_SCT_MAP"
+                    + " FIELDS TERMINATED BY '\t'"
+                    + " (MSB, LSB, SCTID, TYPE_ID, NAMESPACE_ID)");
+            } else if (isDerbyEmbeddedDatabase()){
+                writer.append(System.getProperty("line.separator"));
+                writer.close();
+                runSql("CALL SYSCS_UTIL.SYSCS_IMPORT_TABLE (null,'UUID_SCT_MAP','" + data.getAbsolutePath() + "','\t','\"',null,0)");
+            } else {
+                throw new SQLException("Database is of unknown type - pump not supported");
+            }
+            data.delete();
+            
+        } catch (IOException e) {
+            throw new SQLException("Can't create local temporary file and write data into it for import!", e);
+        }
     }
 
     /**
@@ -1180,6 +1325,8 @@ public class UuidSctidMapDb {
             getNamespaceRow.close();
             getMaxSctIdForNamespaceAndType.close();
 
+            typeMap.clear();
+            namespaceMap.clear();
             conn.commit();
             conn.close();
             conn = null;

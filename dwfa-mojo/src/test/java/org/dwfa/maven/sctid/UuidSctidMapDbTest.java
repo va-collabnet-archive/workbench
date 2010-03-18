@@ -23,6 +23,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -235,6 +237,19 @@ public class UuidSctidMapDbTest extends TestCase {
         assertTrue(mapDb.getSctId(Type5UuidFactory.get("first" + Integer.toString(1000))) == null);
     }
 
+    public void testAddUUIDSctIdEntryList() throws Exception {
+        Map<UUID, Long> map = new HashMap<UUID, Long>();
+        for (int i = 0; i < 1000; i++) {
+            map.put(UUID.randomUUID(), Long.parseLong(SctIdGenerator.generate(i+1, getRandomNamespace(), getRandomType())));
+        }
+        
+        mapDb.addUUIDSctIdEntryList(map);
+        
+        for (UUID uuid : map.keySet()) {
+            assertEquals(map.get(uuid), mapDb.getSctId(uuid));
+        }
+    }
+    
     public void testAddUUIDSctIdEntry() throws Exception {
         mapDb.addUUIDSctIdEntry(Type5UuidFactory.get("new" + Integer.toString(1)),
             Long.valueOf(SctIdGenerator.generate(mapSize + 1, getRandomNamespace(), getRandomType())));

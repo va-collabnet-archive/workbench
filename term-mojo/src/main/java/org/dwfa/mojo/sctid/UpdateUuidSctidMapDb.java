@@ -113,9 +113,7 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
             }
                 
             if (rf2IdFiles != null) {
-                for (File rf2IdFile : rf2IdFiles) {
-                    mapDbInstance.updateDbFromRf2IdFile(rf2IdFile);
-                }
+                mapDbInstance.updateDbFromRf2IdFile(rf2IdFiles);
             } else if (aceIdFiles != null) {
                 for (File rf2IdFile : aceIdFiles) {
                     UuidSctidMapDb.getInstance().updateDbFromAceIdFile(rf2IdFile);

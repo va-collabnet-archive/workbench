@@ -39,6 +39,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
  * @author Ean Dungey
  */
 public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
+    public static final String UUID_SNOMED_DB_MAP_HANDLER_MAX_CACHE_SIZE = "UuidSnomedDbMapHandler.max.cache.size";
     /** Class logger */
     private Logger logger = Logger.getLogger(this.getClass().getName());
     /** The currently mapped UUIDs. */
@@ -48,7 +49,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     /** The next sequence for a given namespace and type. */
     private Map<String, Long> nextSctSequenceMap;
     /** Maximum number of ids to cache before writing to DB. */
-    private int MAX_CACHE_SIZE = 50000;
+    private int MAX_CACHE_SIZE = Integer.parseInt(System.getProperty(UUID_SNOMED_DB_MAP_HANDLER_MAX_CACHE_SIZE, "50000"));
 
     /**
      * Create or reads the database.
