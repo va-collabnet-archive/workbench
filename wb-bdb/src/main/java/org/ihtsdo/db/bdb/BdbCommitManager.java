@@ -223,11 +223,18 @@ public class BdbCommitManager {
 			dataCheckMap.put(concept, warningsAndErrors);
 			for (I_TestDataConstraints test : creationTests) {
 				try {
-					warningsAndErrors.addAll(test.test(concept, false));
+                    warningsAndErrors.addAll(test.test(concept, false));
+                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
+                    for (RefsetMember<?, ?> extension : extensions) {
+                        if (extension.isUncommitted()) {
+                            warningsAndErrors.addAll(test.test(extension, false));
+                        }
+                    }
 				} catch (Exception e) {
 					AceLog.getEditLog().alertAndLogException(e);
 				}
 			}
+			
 			uncommittedCNids.setMember(concept.getNid());
 			dbWriterPermit.acquire();
 			dbWriterService.execute(new SetNidsForCid(concept));
