@@ -65,18 +65,12 @@ public class LogWithAlerts {
             if (SwingUtilities.isEventDispatchThread()) {
                 alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
             } else {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
-                        }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
+                    }
 
-                    });
-                } catch (InterruptedException e) {
-                    getLogger().log(Level.SEVERE, message, e);
-                } catch (InvocationTargetException e) {
-                    getLogger().log(Level.SEVERE, message, e);
-                }
+                });
             }
         } else {
             getLogger().log(level, message, ex);
