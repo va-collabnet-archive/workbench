@@ -185,4 +185,4 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
 
         return refsets;
     }
-            }
+}

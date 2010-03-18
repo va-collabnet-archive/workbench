@@ -35,7 +35,6 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_GetExtensionData;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -61,18 +60,12 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
     @Override
     public final List<AlertToDataConstraintFailure> test(I_Transact component, boolean forCommit)
             throws TaskFailedException {
-        if (I_GetExtensionData.class.isAssignableFrom(component.getClass())) {
-            I_GetExtensionData extension = (I_GetExtensionData) component;
-            try {
-                return test(extension.getExtension(), forCommit);
-            } catch (IOException e) {
-                throw new TaskFailedException(e);
-            }
-        } else if (I_ExtendByRef.class.isAssignableFrom(component.getClass())) {
-            return test((I_ExtendByRef) component, forCommit);
-        }
         return new ArrayList<AlertToDataConstraintFailure>();
     }
+
+    @Override
+    public abstract List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
+            throws TaskFailedException;
 
     public I_GetConceptData getConceptSafe(I_TermFactory termFactory, Collection<UUID> concepts) throws Exception {
         if (termFactory.hasId(concepts)) {
@@ -123,9 +116,6 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         }
         return activeSet;
     }
-
-    public abstract List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
-            throws TaskFailedException;
 
     /**
      * Gets the latest specified relationship's target.

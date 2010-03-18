@@ -19,6 +19,7 @@ package org.dwfa.ace.task.commit;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.bpa.process.TaskFailedException;
 
 /**
@@ -42,5 +43,8 @@ import org.dwfa.bpa.process.TaskFailedException;
 public interface I_TestDataConstraints {
 
     public List<AlertToDataConstraintFailure> test(I_Transact component, boolean forCommit) throws TaskFailedException;
+
+    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
+            throws TaskFailedException;
 
 }

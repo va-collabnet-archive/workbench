@@ -66,8 +66,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
         out.writeInt(dataVersion);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
             //
@@ -105,8 +104,8 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
     private boolean isInitialized = false;
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension,
-            boolean forCommit) throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
+            throws TaskFailedException {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
         // STEP 0. Setup up all relevant parameters
@@ -174,10 +173,9 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
                     if (len > 80) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                            "<html><font color=blue>" + part.getText().substring(0, 40)
-                                + "</font>... " + "<br>exceeds 80 character limit by  "
-                                + (len - 80) + " characters.", concept));
+                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html><font color=blue>"
+                                + part.getText().substring(0, 40) + "</font>... "
+                                + "<br>exceeds 80 character limit by  " + (len - 80) + " characters.", concept));
                     }
                 }
             }
@@ -199,8 +197,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
             for (I_RelTuple rt : rvtl) {
                 try {
 
-                    boolean testChildOf = SnoTable.testIsaChildOf(nidSnoConParents, rt.getTypeId(),
-                        rt.getC1Id());
+                    boolean testChildOf = SnoTable.testIsaChildOf(nidSnoConParents, rt.getTypeId(), rt.getC1Id());
                     // boolean test = SnoTable.findIsaCycle(rt.getC1Id(),
                     // rt.getTypeId(), rt.getC2Id());
                     if (testChildOf)
@@ -215,10 +212,11 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
             }
         }
         if (isChildOf == false) {
-            String msg = "<html>EDG Clinical Item 2: NON-CHILD ERROR.<br>"
-                + "Must be child of Clinical Finding, Event or Situation. ";
-            alertList.add(new AlertToDataConstraintFailure(
-                AlertToDataConstraintFailure.ALERT_TYPE.WARNING, msg, concept));
+            String msg =
+                    "<html>EDG Clinical Item 2: NON-CHILD ERROR.<br>"
+                        + "Must be child of Clinical Finding, Event or Situation. ";
+            alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING, msg,
+                concept));
         }
 
         // STEP 4. IF PRESENT, ICD9 MAPPING MUST NOT BE RETIRED.
@@ -246,8 +244,8 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
 
             if (extPartResult != null && extPartResult.getStatusId() == nidRETIRED) {
                 String msg = "<html>IDC9-CM Code Mapping must not be RETIRED.";
-                alertList.add(new AlertToDataConstraintFailure(
-                    AlertToDataConstraintFailure.ALERT_TYPE.WARNING, msg, concept));
+                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING, msg,
+                    concept));
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -260,16 +258,15 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
         return alertList;
     }
 
-    private List<I_DescriptionVersioned> findDescription_Type2(I_GetConceptData concept)
-            throws TerminologyException, IOException {
+    private List<I_DescriptionVersioned> findDescription_Type2(I_GetConceptData concept) throws TerminologyException,
+            IOException {
         // Create list of descriptions which have type 2 extensions
         List<I_DescriptionVersioned> resultList = new ArrayList<I_DescriptionVersioned>();
 
         boolean addUncommited = true;
         Collection<? extends I_DescriptionVersioned> descList = concept.getDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<? extends I_ExtendByRef> extList = tf.getAllExtensionsForComponent(desc.getNid(),
-                addUncommited);
+            List<? extends I_ExtendByRef> extList = tf.getAllExtensionsForComponent(desc.getNid(), addUncommited);
             // check each member for presence of Clinical Type 2 extension
             for (I_ExtendByRef ext : extList) {
                 int refSetNid = ext.getRefsetId();
@@ -285,8 +282,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
 
         descList = concept.getUncommittedDescriptions();
         for (I_DescriptionVersioned desc : descList) {
-            List<? extends I_ExtendByRef> extList = tf.getAllExtensionsForComponent(desc.getNid(),
-                addUncommited);
+            List<? extends I_ExtendByRef> extList = tf.getAllExtensionsForComponent(desc.getNid(), addUncommited);
             // check each member for presence of Clinical Type 2 extension
             for (I_ExtendByRef ext : extList) {
                 int refSetNid = ext.getRefsetId();
@@ -303,8 +299,7 @@ public class TestForEdgEType2Req extends AbstractExtensionTest {
         return resultList;
     }
 
-    private List<I_GetConceptData> findRefSets_Type2() throws TerminologyException, ParseException,
-            IOException {
+    private List<I_GetConceptData> findRefSets_Type2() throws TerminologyException, ParseException, IOException {
         List<I_GetConceptData> returnRefsets = new ArrayList<I_GetConceptData>();
 
         // Get the children refsets of EDGClinicalItem_2_National refset

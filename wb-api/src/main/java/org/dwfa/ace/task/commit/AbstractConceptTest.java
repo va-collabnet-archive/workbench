@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -61,6 +62,12 @@ public abstract class AbstractConceptTest extends AbstractDataConstraintTest {
         if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
             return test((I_GetConceptData) component, forCommit);
         }
+        return new ArrayList<AlertToDataConstraintFailure>();
+    }
+
+    @Override
+    public final List<AlertToDataConstraintFailure> test(I_ExtendByRef extension, boolean forCommit)
+            throws TaskFailedException {
         return new ArrayList<AlertToDataConstraintFailure>();
     }
 
