@@ -24,7 +24,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.DatabaseSetupConfig;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
@@ -89,7 +89,7 @@ public class VodbOpen extends AbstractMojo {
         System.setProperty("java.awt.headless", "true");
         getLog().info("useExistingDb: " + useExistingDb);
         try {
-            if (useExistingDb != null && Boolean.getBoolean(useExistingDb) && LocalVersionedTerminology.get() != null) {
+            if (useExistingDb != null && Boolean.getBoolean(useExistingDb) && Terms.get() != null) {
                 return;
             }
 
@@ -108,7 +108,7 @@ public class VodbOpen extends AbstractMojo {
                 dbSetupConfig = new DatabaseSetupConfig();
             }
             getLog().info("vodb dir: " + vodbDirectory);
-            LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+            Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
         } catch (InstantiationException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IllegalAccessException e) {

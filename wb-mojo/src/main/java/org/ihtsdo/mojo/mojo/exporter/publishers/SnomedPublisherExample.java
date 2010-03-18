@@ -5,7 +5,8 @@ package org.ihtsdo.mojo.mojo.exporter.publishers;
  */
 
 import java.util.logging.Logger;
-import org.ihtsdo.concept.Concept;
+
+import org.dwfa.ace.api.I_GetConceptData;
 
 public class SnomedPublisherExample extends BasicPublisher {
 	private static final Logger log = Logger.getLogger(SnomedPublisherExample.class.getName());
@@ -18,7 +19,7 @@ public class SnomedPublisherExample extends BasicPublisher {
 		return localPropsOK;
 	}
 	
-	public void localProcessConceptBean(Concept cb){
+	public void localProcessConceptBean(I_GetConceptData cb){
 		if(foundConCount == 1000){
 		log.severe("SnoMed num found = "+foundConCount);	
 		}
