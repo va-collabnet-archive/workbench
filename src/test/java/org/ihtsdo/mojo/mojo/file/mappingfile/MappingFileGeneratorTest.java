@@ -31,6 +31,7 @@ import java.util.HashSet;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MappingFileGeneratorTest {
@@ -59,6 +60,7 @@ public class MappingFileGeneratorTest {
     }
 
     @Test
+    @Ignore
     public void testConceptsFile() throws MojoExecutionException, MojoFailureException, IOException {
         File outputFile = new File(BASE_RESOURCE_DIR + "mappingFileGeneratorTest-concepts-outfile.txt");
         generator.setInputFile(conceptsInputFile);
@@ -83,6 +85,7 @@ public class MappingFileGeneratorTest {
     }
 
     @Test
+    @Ignore
     public void testConceptsFileAppend() throws MojoExecutionException, MojoFailureException, IOException {
         BufferedReader reader = new BufferedReader(new FileReader(appendTest));
         File outputFile = new File(appendTest.getAbsoluteFile() + ".appended_output_file.txt");
@@ -110,6 +113,7 @@ public class MappingFileGeneratorTest {
     }
 
     @Test
+    @Ignore
     public void testDescriptionsFile() throws MojoExecutionException, MojoFailureException, IOException {
         File outputFile = new File(BASE_RESOURCE_DIR + "mappingFileGeneratorTest-descriptions-outfile.txt");
         generator.setInputFile(descriptionsInputFile);
@@ -121,6 +125,7 @@ public class MappingFileGeneratorTest {
     }
 
     @Test
+    @Ignore
     public void testRelationshipsFile() throws MojoExecutionException, MojoFailureException, IOException {
         File outputFile = new File(BASE_RESOURCE_DIR + "mappingFileGeneratorTest-relationships-outfile.txt");
         generator.setInputFile(relationshipsInputFile);
