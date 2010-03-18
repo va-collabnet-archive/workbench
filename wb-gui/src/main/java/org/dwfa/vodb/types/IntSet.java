@@ -272,7 +272,10 @@ public class IntSet implements ListDataListener, I_IntSet {
 
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : set.getSetValues()) {
-            outList.add(Terms.get().nativeToUuid(i));
+            List<UUID> uuids = Terms.get().nativeToUuid(i);
+            if (uuids != null && uuids.size() > 0) {
+                outList.add(uuids);
+            }
         }
 
         out.writeInt(outList.size());

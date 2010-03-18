@@ -100,6 +100,7 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_ProcessConceptData;
 import org.ihtsdo.concept.component.ComponentList;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -1124,8 +1125,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public List<UUID> nativeToUuid(int nid) throws IOException {
-        return Bdb.getConceptForComponent(nid).getUidsForComponent(nid);
-    }
+        Concept concept = Bdb.getConceptForComponent(nid);
+        if (concept != null) {
+            return concept.getUidsForComponent(nid);
+        }
+        return null;
+     }
 
     @Override
     public I_ImageVersioned getImage(UUID uuid) throws IOException {

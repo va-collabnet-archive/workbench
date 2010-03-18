@@ -154,7 +154,6 @@ public class AceLoginDialog extends javax.swing.JDialog {
      */
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
-        System.exit(0);
     }
 
     /**

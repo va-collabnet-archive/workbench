@@ -5,11 +5,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +48,7 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceLoginDialog;
 import org.dwfa.ace.config.AceProtocols;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.app.DwfaEnv;
@@ -109,8 +112,7 @@ public class WorkbenchRunner {
 			activity.setProgressInfoLower("Setting up the environment...");
 			activity.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.out
-							.println("System.exit from activity action listener: "
+					System.out.println("System.exit from activity action listener: "
 									+ e.getActionCommand());
 					System.exit(0);
 				}
@@ -148,6 +150,25 @@ public class WorkbenchRunner {
 
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
+			
+			if (System.getProperty("newprofile") != null) {
+                File dbFolder = new File("berkeley-db");
+                if (jiniConfig != null) {
+                    dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
+                        new File("target/berkeley-db"));
+                }
+                AceConfig.config = new AceConfig(dbFolder);
+                String username = "username";
+                File profileFile = new File("profiles/" + username, username + ".ace");
+                AceConfig.config.setProfileFile(profileFile);
+                AceConfig.setupAceConfig(AceConfig.config, null, null, false);
+
+	            File startupFolder = new File(profileFile.getParent(), "startup");
+	            startupFolder.mkdirs();
+
+	            File shutdownFolder = new File(profileFile.getParent(), "shutdown");
+	            shutdownFolder.mkdirs();
+			}
 
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
@@ -214,9 +235,7 @@ public class WorkbenchRunner {
 				if (lastProfileDir.isFile()) {
 					wbConfigFile = lastProfileDir;
 				} else {
-					String[] profileFiles = lastProfileDir
-							.list(new FilenameFilter() {
-
+					String[] profileFiles = lastProfileDir.list(new FilenameFilter() {
 								public boolean accept(File dir, String name) {
 									return name.endsWith(".ace");
 								}
@@ -226,9 +245,7 @@ public class WorkbenchRunner {
 						wbConfigFile = new File(lastProfileDir, profileFiles[0])
 								.getCanonicalFile();
 					} else if (profileFiles != null && profileFiles.length > 1) {
-						AceLog
-								.getAppLog()
-								.warning(
+						AceLog.getAppLog().warning(
 										"Profile from jini configuration does not exist and more than one profile file found in "
 												+ "last profile directory "
 												+ lastProfileDir
@@ -515,11 +532,11 @@ public class WorkbenchRunner {
 					OpenFrames.removeFrame(parentFrame);
 					parentFrame.setVisible(false);
 				}
-				latch.countDown();
 				OpenFrames.removeFrameListener(fl);
+                latch.countDown();
 			} catch (TaskFailedException e) {
+                latch.countDown();
 				AceLog.getAppLog().alertAndLogException(e);
-				System.exit(0);
 			}
 		}
 

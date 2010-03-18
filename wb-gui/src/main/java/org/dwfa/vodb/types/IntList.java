@@ -96,11 +96,13 @@ public class IntList implements ListDataListener, I_IntList {
                 if (ignoreMappingErrors) {
                     try {
                         Object uuidObj = in.readObject();
-                        if (List.class.isAssignableFrom(uuidObj.getClass())) {
-                            list[i] = Terms.get().uuidToNative((List<UUID>) uuidObj);
-                        } else {
-                            AceLog.getAppLog().alertAndLogException(
-                                new Exception("<html>Expecting List<UUID>. Found:<br>" + uuidObj));
+                        if (uuidObj != null) {
+                            if (List.class.isAssignableFrom(uuidObj.getClass())) {
+                                list[i] = Terms.get().uuidToNative((List<UUID>) uuidObj);
+                            } else {
+                                AceLog.getAppLog().alertAndLogException(
+                                    new Exception("<html>Expecting List<UUID>. Found:<br>" + uuidObj));
+                            }
                         }
                     } catch (NoMappingException e) {
                         AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
