@@ -28,7 +28,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -47,7 +47,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     public String getConstraintDesc() throws TerminologyException, IOException {
 
         if (constraintDesc == null) {
-            I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ExtendRefPartCidCidCid) getExtension().getMutablePart()).getC3id());
+            I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) getExtension().getMutablePart()).getC3id());
             try {
                 I_DescriptionTuple thisConstraintDesc =
                         thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -216,8 +216,8 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     }
 
     private int compareConstraint(I_ExtendByRefVersion thisExt, I_ExtendByRefVersion otherExt) throws IOException, TerminologyException {
-    	I_GetConceptData thisClause = Terms.get().getConcept(((I_ExtendRefPartCidCidCid) thisExt.getMutablePart()).getC3id());
-    	I_GetConceptData otherClause = Terms.get().getConcept(((I_ExtendRefPartCidCidCid) otherExt.getMutablePart()).getC3id());
+    	I_GetConceptData thisClause = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) thisExt.getMutablePart()).getC3id());
+    	I_GetConceptData otherClause = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) otherExt.getMutablePart()).getC3id());
         I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
         if (thisClauseDesc == null || otherClauseDesc == null) {

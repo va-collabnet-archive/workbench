@@ -27,14 +27,14 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
     }
 
     /**
-     * Gets the last I_ThinExtByRefPartConcept that has a status of current for
+     * Gets the last I_ExtendByRefPartCid that has a status of current for
      * a refset and concept.
      * 
      * @param refsetId
      *            int
      * @param conceptId
      *            int
-     * @return I_ThinExtByRefPartConcept with a status of current.
+     * @return I_ExtendByRefPartCid with a status of current.
      * 
      * @throws Exception
      *             if cannot get all extension for a concept id..

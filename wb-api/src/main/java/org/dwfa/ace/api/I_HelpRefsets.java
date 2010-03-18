@@ -19,7 +19,7 @@ public interface I_HelpRefsets extends I_HelpLineage {
 	 * 
 	 * @param refsetId int
 	 * @param conceptId int
-	 * @return I_ThinExtByRefPartConcept with a status of current.
+	 * @return I_ExtendByRefPartCid with a status of current.
 	 * 
 	 * @throws Exception if cannot get all extension for a concept id..
 	 */

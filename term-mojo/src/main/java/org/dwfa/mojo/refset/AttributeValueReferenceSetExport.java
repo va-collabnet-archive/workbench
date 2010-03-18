@@ -33,8 +33,8 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -190,8 +190,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
      * @throws Exception cannot create or export the concept.
      */
     private void extractStatus(I_AmPart latest, int relId) throws Exception {
-        I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.STATUS_REASON_EXTENSION);
-        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+        I_ExtendByRefVersion tuple = getCurrentExtension(relId, ConceptConstants.STATUS_REASON_EXTENSION);
+        I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) tuple;
         if (part == null) {
             // if the status is INACTIVE or ACTIVE there is no need for a
             // reason. For simplicity, CURRENT will be treated this way too,
@@ -209,7 +209,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         } else if (part.getC1id() != latest.getStatusId()) {
             // add a new row with the latest refinability
             part.setC1id(latest.getStatusId());
-            export((I_ThinExtByRefTuple) part);
+            export((I_ExtendByRefVersion) part);
         }
     }
 
@@ -222,8 +222,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
      * @throws Exception cannot create or export the concept.
      */
     private void extractDefinitionType(I_ConceptAttributePart latest, int conceptId) throws Exception {
-        I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.DEFINITION_TYPE_EXTENSION);
-        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+        I_ExtendByRefVersion tuple = getCurrentExtension(conceptId, ConceptConstants.DEFINITION_TYPE_EXTENSION);
+        I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) tuple;
         if (part == null) {
             // no extension at all
             part = tf.newConceptExtensionPart();
@@ -235,7 +235,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         } else if (part.getC1id() != latest.getStatusId()) {
             // add a new row with the latest refinability
             part.setC1id(latest.isDefined() ? getNid(Concept.DEFINED_DEFINITION) : getNid(Concept.PRIMITIVE_DEFINITION));
-            export((I_ThinExtByRefTuple) part);
+            export((I_ExtendByRefVersion) part);
         }
     }
 
@@ -260,8 +260,8 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
      * @throws Exception cannot create or export the concept.
      */
     private void extractRelationshipRefinability(I_RelPart latest, int relId) throws Exception {
-        I_ThinExtByRefTuple tuple = getCurrentExtension(relId, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION);
-        I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) tuple;
+        I_ExtendByRefVersion tuple = getCurrentExtension(relId, ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION);
+        I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) tuple;
         if (part == null) {
             // no extension at all
             part = tf.newConceptExtensionPart();
@@ -273,7 +273,7 @@ public class AttributeValueReferenceSetExport extends ReferenceSetExport {
         } else if (part.getC1id() != latest.getRefinabilityId()) {
             // add a new row with the latest refinability
             part.setC1id(latest.getRefinabilityId());
-            export((I_ThinExtByRefTuple) tuple);
+            export((I_ExtendByRefVersion) tuple);
         }
     }
 }

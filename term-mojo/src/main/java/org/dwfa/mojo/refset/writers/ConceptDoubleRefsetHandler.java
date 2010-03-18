@@ -20,18 +20,18 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid)
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctid)
             throws TerminologyException, IOException {
-        I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) tuple.getMutablePart();
+        I_ExtendByRefPartMeasurement measurementPart = (I_ExtendByRefPartMeasurement) tuple.getMutablePart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
             + toId(tf, measurementPart.getUnitsOfMeasureId(), sctid) + MemberRefsetHandler.FILE_DELIMITER
@@ -39,9 +39,9 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
     }
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
             int componentId, boolean sctId) throws TerminologyException, IOException {
-        I_ThinExtByRefPartMeasurement measurementPart = (I_ThinExtByRefPartMeasurement) part;
+        I_ExtendByRefPartMeasurement measurementPart = (I_ExtendByRefPartMeasurement) part;
 
         return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
             + MemberRefsetHandler.FILE_DELIMITER + measurementPart.getMeasurementValue();
@@ -54,11 +54,11 @@ public class ConceptDoubleRefsetHandler extends MemberRefsetHandler {
     }
 
     @Override
-    protected I_ThinExtByRefPart processLine(String line) {
-        I_ThinExtByRefPartMeasurement part;
+    protected I_ExtendByRefPart processLine(String line) {
+        I_ExtendByRefPartMeasurement part;
         try {
 
-            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line,
+            I_ExtendByRef versioned = getExtensionVersioned(line,
                 RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION);
 
             part = getTermFactory().newMeasurementExtensionPart();

@@ -2,7 +2,6 @@ package org.ihtsdo.cs.econcept;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +21,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.ChangeSetPolicy;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.etypes.EComponent;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -121,12 +121,11 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 		return eRefsetMembers;
 	}
 
-	private List<UUID> processNidNidList(List<? extends Integer> nidNidList) throws IOException {
-		List<UUID> uuidUuidList = new ArrayList<UUID>(nidNidList.size());
-		Iterator<? extends Integer> nidNidItr = nidNidList.iterator();
-		while (nidNidItr.hasNext()) {
-			int nid1 = nidNidItr.next();
-			int nid2 = nidNidItr.next();
+	private List<UUID> processNidNidList(List<? extends NidPair> nidNidList) throws IOException {
+		List<UUID> uuidUuidList = new ArrayList<UUID>(nidNidList.size() * 2);
+		for (NidPair pair: nidNidList) {
+			int nid1 = pair.getNid1();
+			int nid2 = pair.getNid2();
 			Concept c1 = Bdb.getConceptForComponent(nid1);
 			Concept c2 = Bdb.getConceptForComponent(nid2);
 			if (c1 == null || c1.isCanceled() || c2 == null || c2.isCanceled()) {

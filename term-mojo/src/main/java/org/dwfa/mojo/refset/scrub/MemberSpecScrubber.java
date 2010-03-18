@@ -21,9 +21,9 @@ import java.util.Iterator;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 
@@ -57,7 +57,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
 
     public void process(ConceptExtFinder conceptExtensions) {
         try {
-            Iterator<I_ThinExtByRefVersioned> iterator = conceptExtensions.iterator();
+            Iterator<I_ExtendByRef> iterator = conceptExtensions.iterator();
             while (iterator.hasNext()) {
                 processExtension(iterator.next());
             }
@@ -67,26 +67,26 @@ public class MemberSpecScrubber implements ConceptExtHandler {
         }
     }
 
-    private void processExtension(I_ThinExtByRefVersioned conceptExtension) throws Exception {
+    private void processExtension(I_ExtendByRef conceptExtension) throws Exception {
 
         // Get all the "current" parts
-        ArrayList<I_ThinExtByRefPartConcept> subjects = new ArrayList<I_ThinExtByRefPartConcept>();
-        for (I_ThinExtByRefPart part : conceptExtension.getMutableParts()) {
-            if (part instanceof I_ThinExtByRefPartConcept) {
+        ArrayList<I_ExtendByRefPartCid> subjects = new ArrayList<I_ExtendByRefPartCid>();
+        for (I_ExtendByRefPart part : conceptExtension.getMutableParts()) {
+            if (part instanceof I_ExtendByRefPartCid) {
                 if (part.getStatus() == currentStatusId) {
-                    subjects.add((I_ThinExtByRefPartConcept) part);
+                    subjects.add((I_ExtendByRefPartCid) part);
                 }
             }
         }
 
         // Exclude all the matching "retired" parts (must have a later version
         // and the same path)
-        ArrayList<I_ThinExtByRefPartConcept> retiredSubjects = new ArrayList<I_ThinExtByRefPartConcept>();
-        for (I_ThinExtByRefPart part : conceptExtension.getMutableParts()) {
-            if (part instanceof I_ThinExtByRefPartConcept) {
-                for (I_ThinExtByRefPartConcept subjectPart : subjects) {
+        ArrayList<I_ExtendByRefPartCid> retiredSubjects = new ArrayList<I_ExtendByRefPartCid>();
+        for (I_ExtendByRefPart part : conceptExtension.getMutableParts()) {
+            if (part instanceof I_ExtendByRefPartCid) {
+                for (I_ExtendByRefPartCid subjectPart : subjects) {
                     if (part.getStatus() == retiredStatusId) {
-                        if ((subjectPart.getConceptId() == ((I_ThinExtByRefPartConcept) part).getConceptId())
+                        if ((subjectPart.getConceptId() == ((I_ExtendByRefPartCid) part).getConceptId())
                             && (subjectPart.getPathId() == part.getPathId())
                             && (subjectPart.getVersion() <= part.getVersion())) {
                             retiredSubjects.add(subjectPart);
@@ -94,7 +94,7 @@ public class MemberSpecScrubber implements ConceptExtHandler {
                     }
                     if (part.getStatus() == currentStatusId) {
                         // Watch out for a newer current part (an un-retirement)
-                        if ((subjectPart.getConceptId() == ((I_ThinExtByRefPartConcept) part).getConceptId())
+                        if ((subjectPart.getConceptId() == ((I_ExtendByRefPartCid) part).getConceptId())
                             && (subjectPart.getPathId() == part.getPathId())
                             && (subjectPart.getVersion() > part.getVersion())) {
                             retiredSubjects.remove(subjectPart);
@@ -106,9 +106,9 @@ public class MemberSpecScrubber implements ConceptExtHandler {
         subjects.removeAll(retiredSubjects);
 
         // Retire remaining current parts on the same path
-        for (I_ThinExtByRefPartConcept subjectPart : subjects) {
+        for (I_ExtendByRefPartCid subjectPart : subjects) {
 
-            I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) subjectPart.makeAnalog(retiredStatusId, subjectPart.getPathId(), Long.MAX_VALUE);
+            I_ExtendByRefPartCid newPart = (I_ExtendByRefPartCid) subjectPart.makeAnalog(retiredStatusId, subjectPart.getPathId(), Long.MAX_VALUE);
             conceptExtension.addVersion(newPart);
             termFactory.addUncommitted(conceptExtension);
         }

@@ -42,9 +42,9 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
@@ -198,12 +198,12 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
     private void exportRefsets(int refsetId) throws TerminologyException, Exception {
 
-        List<I_ThinExtByRefVersioned> extensions = tf.getRefsetExtensionMembers(refsetId);
-        TreeMap<Long, I_ThinExtByRefTuple> treeMap = new TreeMap<Long, I_ThinExtByRefTuple>();
+        List<I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetId);
+        TreeMap<Long, I_ExtendByRefVersion> treeMap = new TreeMap<Long, I_ExtendByRefVersion>();
         memberUuids = new TreeSet<UUID>();
 
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-            for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
+        for (I_ExtendByRef thinExtByRefVersioned : extensions) {
+            for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
                 true, true)) {
                 try {
 
@@ -246,12 +246,12 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         String subsetId = "" + getSubsetId();
         while (iterator.hasNext()) {
             Long key = iterator.next();
-            I_ThinExtByRefTuple ext = treeMap.get(key);
+            I_ExtendByRefVersion ext = treeMap.get(key);
             export(ext, subsetVersion, subsetId, subsetType);
         }
     }
 
-    private void export(I_ThinExtByRefTuple thinExtByRefTuple, String subsetVersion, String subsetId, String subsetType)
+    private void export(I_ExtendByRefVersion thinExtByRefTuple, String subsetVersion, String subsetId, String subsetType)
             throws Exception {
         export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId(), subsetVersion, subsetId, subsetType);
@@ -284,7 +284,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         return testSpecification(tf.getConcept(id));
     }
 
-    private void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId,
+    private void export(I_ExtendByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId,
             String subsetVersion, String subsetId, String subsetType) throws Exception {
         RefsetType refsetType = refsetTypeMap.get(refsetId);
         String realmId = currentSpec.realmId;

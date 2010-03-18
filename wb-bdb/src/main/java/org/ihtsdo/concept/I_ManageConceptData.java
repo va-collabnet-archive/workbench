@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ihtsdo.concept.ConceptDataManager.SetModifiedWhenChangedList;
 import org.ihtsdo.concept.component.ComponentList;
@@ -15,6 +14,7 @@ import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.db.util.NidPair;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -68,41 +68,41 @@ public interface I_ManageConceptData {
 	public TupleInput getReadWriteTupleInput() throws IOException;
 
 	public void setDestRelNidTypeNidList(
-			List<Integer> destRelOriginNidTypeNidList) throws IOException;
+			List<NidPair> destRelOriginNidTypeNidList) throws IOException;
 
 	public void setRefsetNidMemberNidForConceptList(
-			List<Integer> refsetNidMemberNidForConceptList) throws IOException;
+			List<NidPair> refsetNidMemberNidForConceptList) throws IOException;
 
 	public void setRefsetNidMemberNidForDescriptionsList(
-			List<Integer> refsetNidMemberNidForDescriptionsList) throws IOException;
+			List<NidPair> refsetNidMemberNidForDescriptionsList) throws IOException;
 
 	public void setRefsetNidMemberNidForRelsList(
-			List<Integer> refsetNidMemberNidForRelsList) throws IOException;
+			List<NidPair> refsetNidMemberNidForRelsList) throws IOException;
 
 
 	public void setRefsetNidMemberNidForImagesList(
-			List<Integer> refsetNidMemberNidForImagesList) throws IOException;
+			List<NidPair> refsetNidMemberNidForImagesList) throws IOException;
 
 	public void setRefsetNidMemberNidForRefsetMembersList(
-			List<Integer> refsetNidMemberNidForRefsetMembersList) throws IOException;
+			List<NidPair> refsetNidMemberNidForRefsetMembersList) throws IOException;
 
 	public SetModifiedWhenChangedList getDestRelNidTypeNidList() throws IOException;
-	public List<? extends Integer> getDestRelNidTypeNidListReadOnly() throws IOException;
+	public List<? extends NidPair> getDestRelNidTypeNidListReadOnly() throws IOException;
 
 	public SetModifiedWhenChangedList getRefsetNidMemberNidForConceptList() throws IOException;
-	public List<? extends Integer> getRefsetNidMemberNidForConceptListReadOnly() throws IOException;
+	public List<? extends NidPair> getRefsetNidMemberNidForConceptListReadOnly() throws IOException;
 
 	public SetModifiedWhenChangedList getRefsetNidMemberNidForDescriptionsList() throws IOException;
-	public List<? extends Integer> getRefsetNidMemberNidForDescriptionsListReadOnly() throws IOException;
+	public List<? extends NidPair> getRefsetNidMemberNidForDescriptionsListReadOnly() throws IOException;
 
 	public SetModifiedWhenChangedList getRefsetNidMemberNidForRelsList() throws IOException;
-	public List<? extends Integer> getRefsetNidMemberNidForRelsListReadOnly() throws IOException;
+	public List<? extends NidPair> getRefsetNidMemberNidForRelsListReadOnly() throws IOException;
 
 	public SetModifiedWhenChangedList getRefsetNidMemberNidForImagesList() throws IOException;
-	public List<? extends Integer> getRefsetNidMemberNidForImagesListReadOnly() throws IOException;
+	public List<? extends NidPair> getRefsetNidMemberNidForImagesListReadOnly() throws IOException;
 
 	public SetModifiedWhenChangedList getRefsetNidMemberNidForRefsetMembersList() throws IOException;
-	public List<? extends Integer> getRefsetNidMemberNidForRefsetMembersListReadOnly() throws IOException;
+	public List<? extends NidPair> getRefsetNidMemberNidForRefsetMembersListReadOnly() throws IOException;
 
 	public ConceptComponent<?, ?> getComponent(int nid) throws IOException;
 

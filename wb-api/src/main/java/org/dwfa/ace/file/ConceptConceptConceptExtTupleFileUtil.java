@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -50,7 +50,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
                     "Non concept-concept-concept ext tuple passed to concept-concept-concept file util.");
             }
 
-            I_ExtendRefPartCidCidCid part = (I_ExtendRefPartCidCidCid) tuple.getMutablePart();
+            I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
             UUID c1Uuid = termFactory.getUids(part.getC1id()).iterator().next();
             UUID c2Uuid = termFactory.getUids(part.getC2id()).iterator().next();
             UUID c3Uuid = termFactory.getUids(part.getC3id()).iterator().next();

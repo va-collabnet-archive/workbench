@@ -432,7 +432,7 @@ public interface I_TermFactory {
     /**
      * Create a new concrete extension part.
      * <p>
-     * eg. newExtensionPart(I_ThinExtByRefPartConcept.class)
+     * eg. newExtensionPart(I_ExtendByRefPartCid.class)
      * 
      * @param <T> A sub-type of {@link I_ExtendByRefPart}.
      * @param t The interface to be instantiated.

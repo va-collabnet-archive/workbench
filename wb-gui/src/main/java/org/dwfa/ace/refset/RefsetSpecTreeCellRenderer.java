@@ -37,7 +37,7 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -237,7 +237,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private void renderStructuralQueryClause(I_ExtendByRefVersion firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
-        I_ExtendRefPartCidCidCid cccPart = (I_ExtendRefPartCidCidCid) firstTuple.getMutablePart();
+        I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) firstTuple.getMutablePart();
         if (indent) {
             htmlParts.add("&nbsp;&nbsp;");
         }

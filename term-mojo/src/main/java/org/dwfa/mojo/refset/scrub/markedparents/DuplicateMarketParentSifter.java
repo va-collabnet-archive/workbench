@@ -19,7 +19,7 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 
 /**
  * Sifts through the list of supplied "normal members" and "marked parents".
@@ -32,8 +32,8 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
  */
 public final class DuplicateMarketParentSifter {
 
-    public List<I_ThinExtByRefVersioned> sift(final MarkedParentProcessor markedParentProcessor) {
-        List<I_ThinExtByRefVersioned> sortedMembersList = new ArrayList<I_ThinExtByRefVersioned>();
+    public List<I_ExtendByRef> sift(final MarkedParentProcessor markedParentProcessor) {
+        List<I_ExtendByRef> sortedMembersList = new ArrayList<I_ExtendByRef>();
         SiftingStrategy duplicateMarkedParentStrategy = new DuplicateMarkedParentStrategy(sortedMembersList);
         SiftingStrategy normalMemberStrategy = new NormalMemberStrategy(sortedMembersList);
 
@@ -68,9 +68,9 @@ public final class DuplicateMarketParentSifter {
      */
     private final class NormalMemberStrategy implements SiftingStrategy {
 
-        private final List<I_ThinExtByRefVersioned> sortedMembersList;
+        private final List<I_ExtendByRef> sortedMembersList;
 
-        private NormalMemberStrategy(final List<I_ThinExtByRefVersioned> sortedMembersList) {
+        private NormalMemberStrategy(final List<I_ExtendByRef> sortedMembersList) {
             this.sortedMembersList = sortedMembersList;
         }
 
@@ -84,14 +84,14 @@ public final class DuplicateMarketParentSifter {
      */
     private final class DuplicateMarkedParentStrategy implements SiftingStrategy {
 
-        private final List<I_ThinExtByRefVersioned> sortedMembersList;
+        private final List<I_ExtendByRef> sortedMembersList;
 
-        private DuplicateMarkedParentStrategy(final List<I_ThinExtByRefVersioned> sortedMembersList) {
+        private DuplicateMarkedParentStrategy(final List<I_ExtendByRef> sortedMembersList) {
             this.sortedMembersList = sortedMembersList;
         }
 
         public void sift(final ComponentRefsetMembers markedParentMember) {
-            List<I_ThinExtByRefVersioned> affectedMembers = markedParentMember.getMembers();
+            List<I_ExtendByRef> affectedMembers = markedParentMember.getMembers();
             for (int x = 0; x < affectedMembers.size() - 1; x++) {
                 sortedMembersList.add(affectedMembers.get(x));// add all but the
                 // last one

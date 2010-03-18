@@ -60,7 +60,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelationshipTableRenderer;
@@ -154,8 +154,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 break;
             } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize()
                 .getNid()) {
-                I_ExtendRefPartCidCidCid cccPart =
-                        (I_ExtendRefPartCidCidCid) tuple.getMutablePart();
+                I_ExtendByRefPartCidCidCid cccPart =
+                        (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
                 I_GetConceptData part1 = tf.getConcept(cccPart.getC1id());
                 I_GetConceptData part2 = tf.getConcept(cccPart.getC2id());
                 I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
@@ -266,8 +266,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             buff.append(" ");
             buff.append(tf.getConcept(ccPart.getC2id()).toString());
         } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-            I_ExtendRefPartCidCidCid cccPart =
-                    (I_ExtendRefPartCidCidCid) tuple.getMutablePart();
+            I_ExtendByRefPartCidCidCid cccPart =
+                    (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
             buff.append(tf.getConcept(cccPart.getC1id()).toString());
             buff.append(" ");
             buff.append(tf.getConcept(cccPart.getC2id()).toString());
@@ -621,8 +621,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                             }
                         } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
                             .localize().getNid()) {
-                            I_ExtendRefPartCidCidCid newCCCPart =
-                                    (I_ExtendRefPartCidCidCid) tuple.getMutablePart().makeAnalog(
+                            I_ExtendByRefPartCidCidCid newCCCPart =
+                                    (I_ExtendByRefPartCidCidCid) tuple.getMutablePart().makeAnalog(
                                         currentNid, p.getConceptId(), Long.MAX_VALUE);
                             newMember.addVersion(newCCCPart);
                             tf.addUncommitted(newMember);

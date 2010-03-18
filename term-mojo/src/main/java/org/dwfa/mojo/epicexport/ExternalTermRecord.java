@@ -10,12 +10,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -204,7 +204,7 @@ public class ExternalTermRecord {
 		items.add(new Item(name, value, previousValue));
 	}
 
-	public void addItem(String name, Object value, Object previousValue, I_ThinExtByRefTuple extensionTuple_) {
+	public void addItem(String name, Object value, Object previousValue, I_ExtendByRefVersion extensionTuple_) {
 		if (items == null)
 			items = new ArrayList<Item>();
 		items.add(new Item(name, value, previousValue, extensionTuple_));
@@ -296,13 +296,13 @@ public class ExternalTermRecord {
 	        	// Add the core
 	        	UUID uuidTypeString = UUID.fromString("4a5d2768-e2ae-3bc1-be2d-8d733cd4abdb");
 	        	int nidTypeString = tf.getConcept(uuidTypeString).getConceptId();
-	        	I_ThinExtByRefVersioned newExt = tf.newExtension(refset.getNid(), memberId, 
+	        	I_ExtendByRef newExt = tf.newExtension(refset.getNid(), memberId, 
 	        			this.getOwningConcept().getNid(),
 	                nidTypeString);
 	            tf.addUncommitted(newExt);
 	            
 	            // Add the part
-	            I_ThinExtByRefPartString newExtPart = tf.newExtensionPart(I_ThinExtByRefPartString.class);
+	            I_ExtendByRefPartString newExtPart = tf.newExtensionPart(I_ExtendByRefPartString.class);
 
 	            newExtPart.setPathId(nidEditPath);
 	            newExtPart.setStatusId(nidCurrent);
@@ -331,7 +331,7 @@ public class ExternalTermRecord {
 		private String name;
 		private Object value;
 		private Object previousValue;
-		private I_ThinExtByRefTuple sourceExtensionTuple;
+		private I_ExtendByRefVersion sourceExtensionTuple;
 		
 		
 		public Item(String name, Object value) {
@@ -345,7 +345,7 @@ public class ExternalTermRecord {
 			this.setPreviousValue(previousValue);
 		}
 
-		public Item(String name, Object value, Object previousValue, I_ThinExtByRefTuple extensionTuple) {
+		public Item(String name, Object value, Object previousValue, I_ExtendByRefVersion extensionTuple) {
 			this.setName(name);
 			this.setValue(value);
 			this.setPreviousValue(previousValue);
@@ -405,11 +405,11 @@ public class ExternalTermRecord {
 			this.previousValue = previousValue;
 		}
 		
-		public I_ThinExtByRefTuple getExtensionTuple() {
+		public I_ExtendByRefVersion getExtensionTuple() {
 			return sourceExtensionTuple;
 		}
 
-		public void setExtensionTuple(I_ThinExtByRefTuple extensionTuple) {
+		public void setExtensionTuple(I_ExtendByRefVersion extensionTuple) {
 			this.sourceExtensionTuple = extensionTuple;
 		}
 
@@ -424,8 +424,8 @@ public class ExternalTermRecord {
 		 * @throws Exception
 		 */
 		public void memberUpdate(String val) throws TerminologyException, Exception {
-			I_ThinExtByRefPart part = sourceExtensionTuple.getMutablePart();
-			if (I_ThinExtByRefPartString.class.isAssignableFrom(part.getClass()))
+			I_ExtendByRefPart part = sourceExtensionTuple.getMutablePart();
+			if (I_ExtendByRefPartString.class.isAssignableFrom(part.getClass()))
 				memberUpdateString(val);
 			else
 				throw new TerminologyException("Data type mismatch: Item " + this.getName());
@@ -438,8 +438,8 @@ public class ExternalTermRecord {
 		 * @throws Exception
 		 */
 		public void memberUpdate(int val) throws TerminologyException {
-			I_ThinExtByRefPart part = sourceExtensionTuple.getMutablePart();
-			if (I_ThinExtByRefPartInteger.class.isAssignableFrom(part.getClass()))
+			I_ExtendByRefPart part = sourceExtensionTuple.getMutablePart();
+			if (I_ExtendByRefPartInteger.class.isAssignableFrom(part.getClass()))
 				memberUpdateInt(val);
 			else
 				throw new TerminologyException("Data type mismatch: Item " + this.getName());
@@ -452,8 +452,8 @@ public class ExternalTermRecord {
 		 * @throws Exception
 		 */
 		public void memberUpdate(boolean val) throws TerminologyException {
-			I_ThinExtByRefPart part = sourceExtensionTuple.getMutablePart();
-			if (I_ThinExtByRefPartBoolean.class.isAssignableFrom(part.getClass()))
+			I_ExtendByRefPart part = sourceExtensionTuple.getMutablePart();
+			if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass()))
 				memberUpdateBoolean(val);
 			else
 				throw new TerminologyException("Data type mismatch: Item " + this.getName());
@@ -468,13 +468,13 @@ public class ExternalTermRecord {
 		public void memberUpdateString(String val) throws TerminologyException, Exception {
 			if (this.sourceExtensionTuple == null)
 				throw new TerminologyException("Cannot update value; source extension tuple is null: Item " + this.getName());
-	    	I_ThinExtByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
-	    	I_ThinExtByRefVersioned core = sourceExtensionTuple.getCore();
-	    	I_ThinExtByRefPartString extPartStr = (I_ThinExtByRefPartString) mutablePart;
+	    	I_ExtendByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
+	    	I_ExtendByRef core = sourceExtensionTuple.getCore();
+	    	I_ExtendByRefPartString extPartStr = (I_ExtendByRefPartString) mutablePart;
 	    	if (!extPartStr.getStringValue().equalsIgnoreCase(val)) {
 System.out.println("Updating item to: " + val); 		
-		    	I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
-	            I_ThinExtByRefPartString duplStr = (I_ThinExtByRefPartString) dupl;
+		    	I_ExtendByRefPart dupl = (I_ExtendByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
+	            I_ExtendByRefPartString duplStr = (I_ExtendByRefPartString) dupl;
 	            duplStr.setStringValue(val);
 	            core.addVersion(dupl);
 	            Terms.get().addUncommitted(core);
@@ -495,12 +495,12 @@ System.out.println("Uncommitted: " +Terms.get().getUncommitted().size());
 		public void memberUpdateInt(int val) throws TerminologyException {
 			if (this.sourceExtensionTuple == null)
 				throw new TerminologyException("Cannot update value - source extension tuple is null");
-	    	I_ThinExtByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
-	    	I_ThinExtByRefVersioned core = sourceExtensionTuple.getCore();
-	    	I_ThinExtByRefPartInteger extPartInt = (I_ThinExtByRefPartInteger) mutablePart;
+	    	I_ExtendByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
+	    	I_ExtendByRef core = sourceExtensionTuple.getCore();
+	    	I_ExtendByRefPartInteger extPartInt = (I_ExtendByRefPartInteger) mutablePart;
 	    	if (extPartInt.getIntValue() != val) {
-		    	I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
-		    	I_ThinExtByRefPartInteger duplInt = (I_ThinExtByRefPartInteger) dupl;
+		    	I_ExtendByRefPart dupl = (I_ExtendByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
+		    	I_ExtendByRefPartInteger duplInt = (I_ExtendByRefPartInteger) dupl;
 		    	duplInt.setIntValue(val);
 	            core.addVersion(dupl);
 	            Terms.get().addUncommitted(core);
@@ -516,12 +516,12 @@ System.out.println("Uncommitted: " +Terms.get().getUncommitted().size());
 		public void memberUpdateBoolean(boolean val) throws TerminologyException {
 			if (this.sourceExtensionTuple == null)
 				throw new TerminologyException("Cannot update value - source extension tuple is null");
-	    	I_ThinExtByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
-	    	I_ThinExtByRefVersioned core = sourceExtensionTuple.getCore();
-	    	I_ThinExtByRefPartBoolean extPartBool = (I_ThinExtByRefPartBoolean) mutablePart;
+	    	I_ExtendByRefPart mutablePart = sourceExtensionTuple.getMutablePart();
+	    	I_ExtendByRef core = sourceExtensionTuple.getCore();
+	    	I_ExtendByRefPartBoolean extPartBool = (I_ExtendByRefPartBoolean) mutablePart;
 	    	if (extPartBool.getBooleanValue() != val) {
-		    	I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
-		    	I_ThinExtByRefPartBoolean duplBool = (I_ThinExtByRefPartBoolean) dupl;
+		    	I_ExtendByRefPart dupl = (I_ExtendByRefPart) mutablePart.makeAnalog(mutablePart.getStatusId(), mutablePart.getPathId(), nidVersion);
+		    	I_ExtendByRefPartBoolean duplBool = (I_ExtendByRefPartBoolean) dupl;
 		    	duplBool.setBooleanValue(val);
 	            core.addVersion(dupl);
 	            Terms.get().addUncommitted(core);
@@ -531,9 +531,9 @@ System.out.println("Uncommitted: " +Terms.get().getUncommitted().size());
 		public void retireMember() throws TerminologyException {
 			if (this.sourceExtensionTuple == null)
 				throw new TerminologyException("Cannot retire member - source extension tuple is null");
-			I_ThinExtByRefPart extPart = sourceExtensionTuple.getMutablePart();
-			I_ThinExtByRefVersioned core = sourceExtensionTuple.getCore();
-	        I_ThinExtByRefPart dupl = (I_ThinExtByRefPart) extPart.makeAnalog(nidRetired, extPart.getPathId(), 
+			I_ExtendByRefPart extPart = sourceExtensionTuple.getMutablePart();
+			I_ExtendByRef core = sourceExtensionTuple.getCore();
+	        I_ExtendByRefPart dupl = (I_ExtendByRefPart) extPart.makeAnalog(nidRetired, extPart.getPathId(), 
 	        		Terms.get().convertToThickVersion(nidVersion));
 	        core.addVersion(dupl);
 	        Terms.get().addUncommitted(core);

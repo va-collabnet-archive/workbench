@@ -26,7 +26,7 @@ import org.dwfa.ace.task.util.Logger;
 
 /**
  * An exporter of reference sets that can be shared between tasks and mojos.
- * Given a reference set extension as a <code>I_ThinExtByRefVersioned</code>
+ * Given a reference set extension as a <code>I_ExtendByRef</code>
  * exports it to a file with the reference set name.
  * {@link #processExtensionByReference} should be called for each extension and
  * 

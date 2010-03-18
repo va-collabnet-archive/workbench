@@ -28,6 +28,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private ActivityPanel activity;
     private long startTime = System.currentTimeMillis();
     private AtomicInteger processedCount = new AtomicInteger();
+    private AtomicInteger processedChangedCount = new AtomicInteger();
+    private int changedCount = Integer.MIN_VALUE;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
 			long commitTime, IntSet sapNidsFromCommit) {
@@ -35,8 +37,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
 		this.cNidsToWrite = cNidsToWrite;
+		changedCount = cNidsToWrite.cardinality();
 		this.commitTime = commitTime;
-		this.commitTimeStr = TimeUtil.formatDate(commitTime);
+		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
+		    " gVersion: " + Bdb.gVersion.incrementAndGet() + 
+		    " (" + cNidsToWrite.cardinality() + " total concept changes)";
 		this.sapNidsFromCommit = sapNidsFromCommit;
 		changeSetWriters.incrementAndGet();
 	}
@@ -90,6 +95,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     @Override
     public void processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc) throws Exception {
         if (cNidsToWrite.isMember(cNid)) {
+            processedChangedCount.incrementAndGet();
             Concept c = fcfc.fetch();
             for (I_WriteChangeSet writer: writers) {
                 writer.writeChanges(c, commitTime);
@@ -104,7 +110,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
             String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
 
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr);
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + 
+                " processed: " + processedChangedCount + "/" + changedCount);
         }
     }
 

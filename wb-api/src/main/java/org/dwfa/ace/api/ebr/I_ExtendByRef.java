@@ -29,28 +29,28 @@ public interface I_ExtendByRef extends I_AmTermComponent {
 
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) of this reference set member.<br>
-     *         This is the surrogate key <code>I_ThinExtByRefVersioned</code> object itself.<br> 
-     *         The <code>I_ThinExtByRefVersioned</code> object associates a
+     *         This is the surrogate key <code>I_ExtendByRef</code> object itself.<br> 
+     *         The <code>I_ExtendByRef</code> object associates a
      *         concept, description or relationship component as member of a given reference set
      */
     public int getMemberId();
 
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) of the component which this reference set member extends.<br> 
-     *         The component extended by this <code>I_ThinExtByRefVersioned</code> may be a concept, description or relationship.<br> 
+     *         The component extended by this <code>I_ExtendByRef</code> may be a concept, description or relationship.<br> 
      */
     public int getComponentId();
 
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) for the concept which represent this reference set member's extension type.<br> 
-     *         Example types which this <code>I_ThinExtByRefVersioned</code> reference set member type are boolean, String, Concept and so on...<br> 
+     *         Example types which this <code>I_ExtendByRef</code> reference set member type are boolean, String, Concept and so on...<br> 
      */
     public int getTypeId();
 
     public List<? extends I_ExtendByRefPart> getMutableParts();
 
     /**
-     * @return <code><b>int</b></code> -- native identifier (nid) for the reference set to which this <code>I_ThinExtByRefVersioned</code>
+     * @return <code><b>int</b></code> -- native identifier (nid) for the reference set to which this <code>I_ExtendByRef</code>
      *         extension is a member.
      */
     public int getRefsetId();

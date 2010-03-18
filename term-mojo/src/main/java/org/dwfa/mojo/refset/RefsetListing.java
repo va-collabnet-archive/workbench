@@ -43,9 +43,9 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 
@@ -206,11 +206,11 @@ public class RefsetListing extends AbstractMojo {
                             out.println("<td>");
                             // out.println(val_con.getInitialText());
                             //
-                            for (I_ThinExtByRefVersioned mem : tf.getRefsetExtensionMembers(val_con.getConceptId())) {
+                            for (I_ExtendByRef mem : tf.getRefsetExtensionMembers(val_con.getConceptId())) {
                                 I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
-                                I_ThinExtByRefPart p = mem.getMutableParts().get(0);
-                                if (p instanceof I_ThinExtByRefPartString) {
-                                    I_ThinExtByRefPartString pccs = (I_ThinExtByRefPartString) p;
+                                I_ExtendByRefPart p = mem.getMutableParts().get(0);
+                                if (p instanceof I_ExtendByRefPartString) {
+                                    I_ExtendByRefPartString pccs = (I_ExtendByRefPartString) p;
                                     out.println("<tr>");
                                     out.println("<td>");
                                     out.println("<td>");

@@ -28,6 +28,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
+import org.ihtsdo.db.util.NidPair;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -248,10 +249,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	protected List<RefsetMember<?, ?>> getRefsetMembers(
 			SetModifiedWhenChangedList members) throws IOException {
 		List<RefsetMember<?, ?>> refsetMembers = new ArrayList<RefsetMember<?, ?>>();
-		int i = 0;
-		while (i < members.size()) {
-			int refsetNid = members.get(i++);
-			int memberNid = members.get(i++);
+		for (NidPair pair: members) {
+			int refsetNid = pair.getNid1();
+			int memberNid = pair.getNid2();
 			Concept refsetConcept = Bdb.getConceptDb().getConcept(refsetNid);
 			RefsetMember<?, ?> member = refsetConcept
 					.getRefsetMember(memberNid);
@@ -274,7 +274,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 	}
 
 	@Override
-	public void setDestRelNidTypeNidList(List<Integer> destRelNidTypeNidList) throws IOException {
+	public void setDestRelNidTypeNidList(List<NidPair> destRelNidTypeNidList) throws IOException {
 		this.destRelNidTypeNidList.set(new SetModifiedWhenChangedList(destRelNidTypeNidList));
 		enclosingConcept.modified();
 	}
@@ -293,35 +293,35 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
 	@Override
 	public void setRefsetNidMemberNidForConceptList(
-			List<Integer> refsetNidMemberNidForConceptList) throws IOException {
+			List<NidPair> refsetNidMemberNidForConceptList) throws IOException {
 		this.refsetNidMemberNidForConceptList.set(new SetModifiedWhenChangedList(
 				refsetNidMemberNidForConceptList));
 		enclosingConcept.modified();
 	}
 
 	@Override
-	public void setRefsetNidMemberNidForDescriptionsList(List<Integer> refsetNidMemberNidForDescriptionsList)
+	public void setRefsetNidMemberNidForDescriptionsList(List<NidPair> refsetNidMemberNidForDescriptionsList)
 	throws IOException {
 		this.refsetNidMemberNidForDescriptionsList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForDescriptionsList));
 		enclosingConcept.modified();
 	}
 
 	@Override
-	public void setRefsetNidMemberNidForRelsList(List<Integer> refsetNidMemberNidForRelsList)
+	public void setRefsetNidMemberNidForRelsList(List<NidPair> refsetNidMemberNidForRelsList)
 	throws IOException {
 		this.refsetNidMemberNidForRelsList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForRelsList));
 		enclosingConcept.modified();
 	}
 
 	@Override
-	public void setRefsetNidMemberNidForImagesList(List<Integer> refsetNidMemberNidForImagesList)
+	public void setRefsetNidMemberNidForImagesList(List<NidPair> refsetNidMemberNidForImagesList)
 	throws IOException {
 		this.refsetNidMemberNidForImagesList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForImagesList));
 		enclosingConcept.modified();
 	}
 
 	@Override
-	public void setRefsetNidMemberNidForRefsetMembersList(List<Integer> refsetNidMemberNidForRefsetMembersList)
+	public void setRefsetNidMemberNidForRefsetMembersList(List<NidPair> refsetNidMemberNidForRefsetMembersList)
 	throws IOException {
 		this.refsetNidMemberNidForRefsetMembersList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForRefsetMembersList));
 		enclosingConcept.modified();

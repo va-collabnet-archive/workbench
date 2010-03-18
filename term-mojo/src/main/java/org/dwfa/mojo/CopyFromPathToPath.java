@@ -50,9 +50,9 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 
@@ -232,7 +232,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
             processConceptAttributes(arg0.getConceptAttributes());
         }
         processDescription(arg0.getDescriptions());
-        for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(arg0.getConceptId())) {
+        for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(arg0.getConceptId())) {
             processExtensionByReference(extension);
         }
         processId(arg0.getIdentifier());
@@ -339,7 +339,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     private void processDescription(List<? extends I_DescriptionVersioned> descriptions) throws Exception {
         for (I_DescriptionVersioned descriptionVersioned : descriptions) {
             processDescription(descriptionVersioned);
-            for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(descriptionVersioned.getDescId())) {
+            for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(descriptionVersioned.getDescId())) {
                 processExtensionByReference(extension);
             }
         }
@@ -444,13 +444,13 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         t.getDescVersioned().addVersion(newPart);
     }
 
-    public void processExtensionByReference(I_ThinExtByRefVersioned extByRef) throws Exception {
+    public void processExtensionByReference(I_ExtendByRef extByRef) throws Exception {
 
         if (++extCount % 1000 == 0) {
             getLog().info("processed extension " + extCount);
         }
 
-        Collection<I_ThinExtByRefTuple> extensions;
+        Collection<I_ExtendByRefVersion> extensions;
         if (readLatestPartOnly) {
             extensions = getLatestExtensions(extByRef.getTuples(null, null, true));
         } else {
@@ -458,8 +458,8 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
 
         boolean datachanged = false;
-        I_ThinExtByRefTuple latestPart = null;
-        for (I_ThinExtByRefTuple t : extensions) {
+        I_ExtendByRefVersion latestPart = null;
+        for (I_ExtendByRefVersion t : extensions) {
             if (fromPathIds.contains(t.getPathId())) {
                 if (copyOnlyLatestState) {
                     if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
@@ -481,9 +481,9 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    private Collection<I_ThinExtByRefTuple> getLatestExtensions(List<I_ThinExtByRefTuple> tuples) {
-        Map<Integer, I_ThinExtByRefTuple> map = new HashMap<Integer, I_ThinExtByRefTuple>();
-        for (I_ThinExtByRefTuple extension : tuples) {
+    private Collection<I_ExtendByRefVersion> getLatestExtensions(List<I_ExtendByRefVersion> tuples) {
+        Map<Integer, I_ExtendByRefVersion> map = new HashMap<Integer, I_ExtendByRefVersion>();
+        for (I_ExtendByRefVersion extension : tuples) {
             if (map.containsKey(extension.getMemberId())) {
                 if (map.get(extension.getMemberId()).getVersion() < extension.getVersion()) {
                     map.put(extension.getMemberId(), extension);
@@ -495,8 +495,8 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
         return map.values();
     }
 
-    private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-        I_ThinExtByRefPart newPart = t;
+    private void duplicateExtensionTuple(I_ExtendByRefVersion t) {
+        I_ExtendByRefPart newPart = t;
         newPart.setPathId(toPathId);
         newPart.setVersion(versionTime);
         if (statusId != 0) {
@@ -643,7 +643,7 @@ public class CopyFromPathToPath extends AbstractMojo implements I_ProcessConcept
     private void processRelationship(List<? extends I_RelVersioned> list) throws Exception {
         for (I_RelVersioned relVersioned : list) {
             processRelationship(relVersioned);
-            for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(relVersioned.getRelId())) {
+            for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(relVersioned.getRelId())) {
                 processExtensionByReference(extension);
             }
         }

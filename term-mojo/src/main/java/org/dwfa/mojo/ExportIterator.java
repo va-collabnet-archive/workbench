@@ -47,9 +47,9 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
@@ -617,9 +617,9 @@ public class ExportIterator implements I_ProcessConcepts {
 
                 int pathVersionRefsetNid = termFactory.uuidToNative(ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
                 int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-                for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(pathId)) {
+                for (I_ExtendByRef extension : termFactory.getAllExtensionsForComponent(pathId)) {
                     if (extension.getRefsetId() == pathVersionRefsetNid) {
-                        I_ThinExtByRefPart latestPart = getLatestVersion(extension);
+                        I_ExtendByRefPart latestPart = getLatestVersion(extension);
                         if (latestPart.getStatusId() == currentStatusId) {
 
                             if (pathVersion != null) {
@@ -627,7 +627,7 @@ public class ExportIterator implements I_ProcessConcepts {
                                     + ConceptConstants.PATH_VERSION_REFSET.getDescription());
                             }
 
-                            pathVersion = ((I_ThinExtByRefPartString) latestPart).getStringValue();
+                            pathVersion = ((I_ExtendByRefPartString) latestPart).getStringValue();
                         }
                     }
                 }
@@ -747,9 +747,9 @@ public class ExportIterator implements I_ProcessConcepts {
         return termFactory.getUids(nid).iterator().next();
     }
 
-    private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
-        I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getMutableParts()) {
+    private I_ExtendByRefPart getLatestVersion(I_ExtendByRef extension) {
+        I_ExtendByRefPart latestPart = null;
+        for (I_ExtendByRefPart part : extension.getMutableParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

@@ -36,10 +36,10 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.spec.ConceptSpec;
@@ -274,14 +274,14 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
 
         int conceptId = concept.getConceptId();
 
-        List<? extends I_ThinExtByRefVersioned> extensions = termFactory.getAllExtensionsForComponent(conceptId);
+        List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(conceptId);
 
         // process each refset associated with this concept and work out
         // if any of them are the refset we are looking for
         int refsetCount = 0;
-        I_ThinExtByRefVersioned memberSet = null;
-        for (I_ThinExtByRefVersioned refSetExtension : extensions) {
-            List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+        I_ExtendByRef memberSet = null;
+        for (I_ExtendByRef refSetExtension : extensions) {
+            List<I_ExtendByRefVersion> exensionParts = new ArrayList<I_ExtendByRefVersion>();
             synchronized (termFactory) {
                 refSetExtension.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
             }
@@ -335,8 +335,8 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
         }
 
         // process each reference set extension
-        for (I_ThinExtByRefVersioned extensionData : extensions) {
-            List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+        for (I_ExtendByRef extensionData : extensions) {
+            List<I_ExtendByRefVersion> exensionParts = new ArrayList<I_ExtendByRefVersion>();
             synchronized (termFactory) {
                 extensionData.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
             }
@@ -347,7 +347,7 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
             }
 
             includedInLatestMemberSet = latestMembersetIncludesConcept(memberSet);
-            I_ThinExtByRefVersioned part = extensionData;
+            I_ExtendByRef part = extensionData;
             int extensionTypeId = part.getTypeId();
             getLog().debug(
                 "processConcept(I_GetConceptData) - processing extensionTypeId " + extensionTypeId + " referenceSetId "
@@ -359,9 +359,9 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
                 int typeId = 0;
                 getLog().debug("processConcept(I_GetConceptData) - valid type/refset, processing");
 
-                List<? extends I_ThinExtByRefPart> versions = part.getMutableParts();
-                for (I_ThinExtByRefPart version : versions) {
-                    I_ThinExtByRefPartConcept temp = (I_ThinExtByRefPartConcept) version;
+                List<? extends I_ExtendByRefPart> versions = part.getMutableParts();
+                for (I_ExtendByRefPart version : versions) {
+                    I_ExtendByRefPartCid temp = (I_ExtendByRefPartCid) version;
                     typeId = temp.getConceptId();
                     getLog().debug(
                         "processConcept(I_GetConceptData) - determining type version " + temp.getVersion()
@@ -439,21 +439,21 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
      * @return True if the member set includes the concept, false if it doesn't.
      * @throws Exception
      */
-    public boolean latestMembersetIncludesConcept(I_ThinExtByRefVersioned extensionPart) throws Exception {
-        getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
+    public boolean latestMembersetIncludesConcept(I_ExtendByRef extensionPart) throws Exception {
+        getLog().debug("latestMembersetIncludesConcept(I_ExtendByRef=" + extensionPart + ") - start"); //$NON-NLS-1$ //$NON-NLS-2$
 
         if (extensionPart == null) {
-            getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + false); //$NON-NLS-1$
+            getLog().debug("latestMembersetIncludesConcept(I_ExtendByRef) - end - return value=" + false); //$NON-NLS-1$
             return false;
         }
 
-        List<I_ThinExtByRefTuple> exensionParts = new ArrayList<I_ThinExtByRefTuple>();
+        List<I_ExtendByRefVersion> exensionParts = new ArrayList<I_ExtendByRefVersion>();
         synchronized (termFactory) {
             extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, exensionParts, true);
         }
 
         boolean result = exensionParts.size() > 0;
-        getLog().debug("latestMembersetIncludesConcept(I_ThinExtByRefVersioned) - end - return value=" + result);
+        getLog().debug("latestMembersetIncludesConcept(I_ExtendByRef) - end - return value=" + result);
 
         return result;
     }
@@ -464,34 +464,34 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
      * @param extensionPart The extension to check.
      * @throws Exception
      */
-    public void retireLatestExtension(I_ThinExtByRefVersioned extensionPart) throws Exception {
+    public void retireLatestExtension(I_ExtendByRef extensionPart) throws Exception {
         getLog().debug(
-            "retireLatestExtension(I_ThinExtByRefVersioned=" + extensionPart + ") - start for concept "
+            "retireLatestExtension(I_ExtendByRef=" + extensionPart + ") - start for concept "
                 + getFsnFromConceptId(extensionPart.getComponentId()));
 
         if (extensionPart != null) {
 
-            List<I_ThinExtByRefTuple> extensionParts = new ArrayList<I_ThinExtByRefTuple>();
+            List<I_ExtendByRefVersion> extensionParts = new ArrayList<I_ExtendByRefVersion>();
 
             synchronized (termFactory) {
                 extensionPart.addTuples(getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), null, extensionParts, true);
             }
 
             if (extensionParts.size() > 0) {
-                I_ThinExtByRefPart latestVersion = assertExactlyOne(extensionParts);
+                I_ExtendByRefPart latestVersion = assertExactlyOne(extensionParts);
 
-                I_ThinExtByRefPart clone = (I_ThinExtByRefPart) latestVersion.makeAnalog(retiredConceptId, latestVersion.getPathId(), Long.MAX_VALUE);
+                I_ExtendByRefPart clone = (I_ExtendByRefPart) latestVersion.makeAnalog(retiredConceptId, latestVersion.getPathId(), Long.MAX_VALUE);
                 extensionPart.addVersion(clone);
 
                 getLog().debug(
-                    "retireLatestExtension(I_ThinExtByRefVersioned) - updated version of extension for "
+                    "retireLatestExtension(I_ExtendByRef) - updated version of extension for "
                         + getFsnFromConceptId(extensionPart.getComponentId()));
 
                 termFactory.addUncommitted(extensionPart);
             }
         }
 
-        getLog().debug("retireLatestExtension(I_ThinExtByRefVersioned) - end"); //$NON-NLS-1$
+        getLog().debug("retireLatestExtension(I_ExtendByRef) - end"); //$NON-NLS-1$
     }
 
     /**
@@ -513,8 +513,8 @@ public class MemberSetCalculator extends Thread implements I_ProcessConcepts {
                 ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
                 Integer.MAX_VALUE);
 
-            I_ThinExtByRefVersioned newExtension;
-            I_ThinExtByRefPartConcept conceptExtension;
+            I_ExtendByRef newExtension;
+            I_ExtendByRefPartCid conceptExtension;
 
             synchronized (termFactory) {
                 newExtension = termFactory.newExtension(memberSetId, memberId, conceptId, typeId);

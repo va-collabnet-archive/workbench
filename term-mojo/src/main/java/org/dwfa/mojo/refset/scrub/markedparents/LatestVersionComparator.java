@@ -19,16 +19,16 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 
 /**
  * Comparator that sorts versions by commit time.
  */
-public final class LatestVersionComparator implements Comparator<I_ThinExtByRefPart>, Serializable {
+public final class LatestVersionComparator implements Comparator<I_ExtendByRefPart>, Serializable {
 
     private static final long serialVersionUID = -1882231859707932247L;
 
-    public int compare(final I_ThinExtByRefPart o1, final I_ThinExtByRefPart o2) {
+    public int compare(final I_ExtendByRefPart o1, final I_ExtendByRefPart o2) {
         return o1.getVersion() - o2.getVersion();// the latest version wins.
     }
 }

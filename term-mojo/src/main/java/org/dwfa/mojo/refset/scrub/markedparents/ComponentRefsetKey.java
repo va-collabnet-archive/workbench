@@ -18,7 +18,7 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 
 import java.io.Serializable;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 
 /**
  * Uniquely identifies a component in a specific reference set.
@@ -30,7 +30,7 @@ public final class ComponentRefsetKey implements Serializable {
     private final Integer componentId;
     private final Integer refsetId;
 
-    public ComponentRefsetKey(final I_ThinExtByRefVersioned member) {
+    public ComponentRefsetKey(final I_ExtendByRef member) {
         componentId = member.getComponentId();
         refsetId = member.getRefsetId();
     }

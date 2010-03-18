@@ -19,9 +19,9 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.util.CandidateWriter;
@@ -60,21 +60,21 @@ public final class MarkedParentProcessor {
         currentStatusId = terminologyFactoryUtil.getNativeConceptId(ArchitectonicAuxiliary.Concept.CURRENT);
     }
 
-    public void process(final String memberRefsetName, final List<I_ThinExtByRefVersioned> refsetMembers)
+    public void process(final String memberRefsetName, final List<I_ExtendByRef> refsetMembers)
             throws Exception {
-        for (I_ThinExtByRefVersioned member : refsetMembers) {
-            List<? extends I_ThinExtByRefPart> versions = member.getMutableParts();
-            for (I_ThinExtByRefPart version : versions) {
-                if (version instanceof I_ThinExtByRefPartConcept && isCurrentOrRetired(version)) {
-                    int inclusionType = ((I_ThinExtByRefPartConcept) version).getConceptId();
+        for (I_ExtendByRef member : refsetMembers) {
+            List<? extends I_ExtendByRefPart> versions = member.getMutableParts();
+            for (I_ExtendByRefPart version : versions) {
+                if (version instanceof I_ExtendByRefPartCid && isCurrentOrRetired(version)) {
+                    int inclusionType = ((I_ExtendByRefPartCid) version).getConceptId();
                     processType(memberRefsetName, member, version, inclusionType);
                 }
             }
         }
     }
 
-    private void processType(final String memberRefsetName, final I_ThinExtByRefVersioned member,
-            final I_ThinExtByRefPart version, final int inclusionType) throws Exception {
+    private void processType(final String memberRefsetName, final I_ExtendByRef member,
+            final I_ExtendByRefPart version, final int inclusionType) throws Exception {
         if (isMarkedParent(inclusionType)) {
             duplicateMarkedParentMarker.put(member);
             candidateWriter.logCandidate(memberRefsetName, member);
@@ -99,7 +99,7 @@ public final class MarkedParentProcessor {
         return normalMemberList;
     }
 
-    private boolean isCurrentOrRetired(final I_ThinExtByRefPart version) {
+    private boolean isCurrentOrRetired(final I_ExtendByRefPart version) {
         return isCurrent(version) || version.getStatus() == retiredStatusId;
     }
 
@@ -111,7 +111,7 @@ public final class MarkedParentProcessor {
         return normalMemberId == inclusionType;
     }
 
-    public boolean isCurrent(final I_ThinExtByRefPart version) {
+    public boolean isCurrent(final I_ExtendByRefPart version) {
         return version.getStatus() == currentStatusId;
     }
 }

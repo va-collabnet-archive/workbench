@@ -26,8 +26,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -104,8 +104,8 @@ public class GenerateConceptSpecRefset extends AbstractMojo {
         int memberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(),
             ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
             Integer.MAX_VALUE);
-        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, memberId, conceptId, typeId);
-        I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
+        I_ExtendByRef newExtension = termFactory.newExtension(refsetId, memberId, conceptId, typeId);
+        I_ExtendByRefPartCid conceptExtension = termFactory.newConceptExtensionPart();
         conceptExtension.setConceptId(conceptId);
         I_GetConceptData path = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
         // System.out.println("Path: " + path.getUids().get(0));

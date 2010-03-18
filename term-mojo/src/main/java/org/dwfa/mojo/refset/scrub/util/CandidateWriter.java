@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.TreeMap;
 
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 
 public final class CandidateWriter {
 
@@ -37,16 +37,16 @@ public final class CandidateWriter {
         reportWriter = new PrintWriter(reportFile);
     }
 
-    public void logCandidate(String refsetName, I_ThinExtByRefVersioned candidate) throws Exception {
+    public void logCandidate(String refsetName, I_ExtendByRef candidate) throws Exception {
         String conceptDesc = termFactory.getConcept(candidate.getComponentId()).getInitialText();
 
         // First index the version parts so we can print back in chronological
         // order
         TreeMap<Long, PartDescription> partIndex = new TreeMap<Long, PartDescription>();
-        for (I_ThinExtByRefPart part : candidate.getMutableParts()) {
-            if (part instanceof I_ThinExtByRefPartConcept) {
+        for (I_ExtendByRefPart part : candidate.getMutableParts()) {
+            if (part instanceof I_ExtendByRefPartCid) {
                 PartDescription partDesc = new PartDescription();
-                int inclusionType = ((I_ThinExtByRefPartConcept) part).getConceptId();
+                int inclusionType = ((I_ExtendByRefPartCid) part).getConceptId();
                 partDesc.typeDesc = termFactory.getConcept(inclusionType).getInitialText();
                 partDesc.statusDesc = termFactory.getConcept(part.getStatus()).getInitialText();
                 partDesc.pathDesc = termFactory.getConcept(part.getPathId()).getInitialText();

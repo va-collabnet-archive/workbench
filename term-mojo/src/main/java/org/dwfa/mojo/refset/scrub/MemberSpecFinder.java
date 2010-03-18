@@ -23,9 +23,9 @@ import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
@@ -78,10 +78,10 @@ public class MemberSpecFinder implements ConceptExtFinder {
      * have an
      * valid concept value/type.
      */
-    public Iterator<I_ThinExtByRefVersioned> iterator() {
+    public Iterator<I_ExtendByRef> iterator() {
         try {
             candidateWriter = new CandidateWriter(reportFile, termFactory);
-            ArrayList<I_ThinExtByRefVersioned> candidates = new ArrayList<I_ThinExtByRefVersioned>();
+            ArrayList<I_ExtendByRef> candidates = new ArrayList<I_ExtendByRef>();
 
             for (Integer refsetId : refsetHelper.getSpecificationRefsets()) {
 
@@ -94,13 +94,13 @@ public class MemberSpecFinder implements ConceptExtFinder {
                     .iterator()
                     .next());
 
-                List<I_ThinExtByRefVersioned> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
-                for (I_ThinExtByRefVersioned member : refsetMembers) {
-                    List<? extends I_ThinExtByRefPart> versions = member.getMutableParts();
-                    for (I_ThinExtByRefPart version : versions) {
+                List<I_ExtendByRef> refsetMembers = termFactory.getRefsetExtensionMembers(memberRefsetId);
+                for (I_ExtendByRef member : refsetMembers) {
+                    List<? extends I_ExtendByRefPart> versions = member.getMutableParts();
+                    for (I_ExtendByRefPart version : versions) {
                         if (version.getStatus() == CURRENT_STATUS_ID) {
-                            if (version instanceof I_ThinExtByRefPartConcept) {
-                                int inclusionType = ((I_ThinExtByRefPartConcept) version).getConceptId();
+                            if (version instanceof I_ExtendByRefPartCid) {
+                                int inclusionType = ((I_ExtendByRefPartCid) version).getConceptId();
                                 if (!isValidType(inclusionType)) {
                                     candidates.add(member);
                                     candidateWriter.logCandidate(memberRefsetName, member);

@@ -28,8 +28,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter;
 import org.dwfa.tapi.TerminologyException;
@@ -54,13 +54,13 @@ public class RegionalHibernationBuilder {
 	}
 	
 	public void buildAnyHibernationForConcept(I_GetConceptData concept, String cid) throws IOException, TerminologyException {
-		List<? extends I_ThinExtByRefVersioned> extensions =
+		List<? extends I_ExtendByRef> extensions =
 			Terms.get().getAllExtensionsForComponent(concept.getConceptId());
 				
-    	for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+    	for (I_ExtendByRef thinExtByRefVersioned : extensions) {
     		// getLog().info("Processing extension: " + thinExtByRefVersioned );
         	if (Terms.get().hasConcept(thinExtByRefVersioned.getRefsetId())) {
-                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
+                for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
 	                    positions, false, false)) {
 	                	// export(thinExtByRefTuple, concept);
                 		I_GetConceptData refsetConcept = Terms.get().

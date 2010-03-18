@@ -16,7 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendRefPartCidCidCid extends I_ExtendByRefPartCidCid {
+public interface I_ExtendByRefPartCidCidCid extends I_ExtendByRefPartCidCid {
 
     public int getC3id();
 

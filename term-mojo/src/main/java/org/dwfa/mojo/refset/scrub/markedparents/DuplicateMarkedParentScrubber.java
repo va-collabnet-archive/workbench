@@ -21,9 +21,9 @@ import java.util.TreeSet;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
@@ -57,7 +57,7 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
     public void process(final ConceptExtFinder finder) {
         try {
             for (Object aFinder : finder) {
-                processExtension((I_ThinExtByRefVersioned) aFinder);
+                processExtension((I_ExtendByRef) aFinder);
             }
             termFactory.commit();
         } catch (Exception e) {
@@ -65,14 +65,14 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
         }
     }
 
-    private void processExtension(final I_ThinExtByRefVersioned member) throws Exception {
+    private void processExtension(final I_ExtendByRef member) throws Exception {
         // sort by version, smallest to largest.
-        SortedSet<I_ThinExtByRefPart> sortedVersions = new TreeSet<I_ThinExtByRefPart>(new LatestVersionComparator());
+        SortedSet<I_ExtendByRefPart> sortedVersions = new TreeSet<I_ExtendByRefPart>(new LatestVersionComparator());
         sortedVersions.addAll(member.getMutableParts());
 
         // Get the latest version.
-        I_ThinExtByRefPartConcept oldPart = (I_ThinExtByRefPartConcept) sortedVersions.last();
-        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) oldPart.makeAnalog(retiredStatusId, oldPart.getPathId(), Long.MAX_VALUE);
+        I_ExtendByRefPartCid oldPart = (I_ExtendByRefPartCid) sortedVersions.last();
+        I_ExtendByRefPartCid newPart = (I_ExtendByRefPartCid) oldPart.makeAnalog(retiredStatusId, oldPart.getPathId(), Long.MAX_VALUE);
          member.addVersion(newPart);
         termFactory.addUncommitted(member);
     }

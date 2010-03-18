@@ -41,8 +41,11 @@ import org.dwfa.app.DwfaEnv;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -400,39 +403,61 @@ public class BdbCommitManager {
 	}
 
 	public static void forget(I_RelVersioned rel) throws IOException {
-		Concept c = Bdb.getConcept(rel.getC1Id());
-		synchronized (c) {
-			Relationship r = (Relationship) rel;
-			if (r.getTime() != Long.MAX_VALUE) {
-				// Only need to forget additional versions;
-				if (r.revisions == null) {
-					throw new UnsupportedOperationException(
-							"Cannot forget a committed component.");
-				} else {
-					synchronized (r.revisions) {
-						Iterator<RelationshipRevision> ri = r.revisions
-								.iterator();
-						while (ri.hasNext()) {
-							RelationshipRevision rr = ri.next();
-							if (rr.getTime() == Long.MAX_VALUE) {
-								ri.remove();
-							}
-						}
-					}
-				}
-			} else {
-				// have to forget "all" references to component...
-				c.getSourceRels().remove(rel);
-			}
-		}
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	    Concept c = Bdb.getConcept(rel.getC1Id());
+	    Relationship r = (Relationship) rel;
+	    if (r.getTime() != Long.MAX_VALUE) {
+	        // Only need to forget additional versions;
+	        if (r.revisions == null) {
+	            throw new UnsupportedOperationException(
+	            "Cannot forget a committed component.");
+	        } else {
+	            synchronized (r.revisions) {
+	                Iterator<RelationshipRevision> ri = r.revisions
+	                .iterator();
+	                while (ri.hasNext()) {
+	                    RelationshipRevision rr = ri.next();
+	                    if (rr.getTime() == Long.MAX_VALUE) {
+	                        ri.remove();
+	                    }
+	                }
+	            }
+	        }
+	    } else {
+	        // have to forget "all" references to component...
+	        c.getSourceRels().remove(rel);
+	        c.getData().getSrcRelNids().remove(rel.getNid());
+	    }
+	    c.modified();
+	    Terms.get().addUncommittedNoChecks(c);
 	}
 
-	public static void forget(I_DescriptionVersioned desc) {
+	public static void forget(I_DescriptionVersioned desc) throws IOException {
 		Description d = (Description) desc;
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		Concept c = Bdb.getConcept(d.getConceptId());
+		if (d.getTime() != Long.MAX_VALUE) {
+		    // Only need to forget additional versions;
+		    if (d.revisions == null) {
+		        throw new UnsupportedOperationException(
+		            "Cannot forget a committed component.");
+		    } else {
+		        synchronized (d.revisions) {
+		            Iterator<DescriptionRevision> di = d.revisions
+		            .iterator();
+		            while (di.hasNext()) {
+		                DescriptionRevision dr = di.next();
+		                if (dr.getTime() == Long.MAX_VALUE) {
+		                    di.remove();
+		                }
+		            }
+		        }
+		    }
+		} else {
+		    // have to forget "all" references to component...
+		    c.getDescriptions().remove(d);
+            c.getData().getDescNids().remove(d.getNid());
+		}
+		c.modified();
+		Terms.get().addUncommittedNoChecks(c);
 	}
 
 	public static void forget(I_GetConceptData concept) throws IOException {
@@ -440,10 +465,32 @@ public class BdbCommitManager {
 		Bdb.getConceptDb().forget(c);
 	}
 
-	public static void forget(I_ExtendByRef extension) {
+    public static void forget(I_ExtendByRef extension) throws IOException {
 		RefsetMember<?, ?> m = (RefsetMember<?, ?>) extension;
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+        Concept c = Bdb.getConcept(m.getRefsetId());
+        if (m.getTime() != Long.MAX_VALUE) {
+            // Only need to forget additional versions;
+            if (m.revisions == null) {
+                throw new UnsupportedOperationException(
+                    "Cannot forget a committed component.");
+            } else {
+                synchronized (m.revisions) {
+                    Iterator<?> mi =  m.revisions.iterator();
+                    while (mi.hasNext()) {
+                        Revision<?,?> mr = (Revision<?, ?>) mi.next();
+                        if (mr.getTime() == Long.MAX_VALUE) {
+                            mi.remove();
+                        }
+                    }
+                }
+            }
+        } else {
+            // have to forget "all" references to component...
+            c.getRefsetMembers().remove(m);
+            c.getData().getMemberNids().remove(m.getNid());
+        }
+        c.modified();
+        Terms.get().addUncommittedNoChecks(c);
 	}
 
 	private static void loadTests(String directory,

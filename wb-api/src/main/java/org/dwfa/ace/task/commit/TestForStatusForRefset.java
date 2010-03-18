@@ -96,10 +96,10 @@ public class TestForStatusForRefset extends AbstractConceptTest {
                 allPositions, true, true)) {
                 // System.out.println(refset.getInitialText());
                 for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(refset.getConceptId())) {
-                    // List<I_ThinExtByRefVersioned> extensions = termFactory
+                    // List<I_ExtendByRef> extensions = termFactory
                     // .getAllExtensionsForComponent(refset.getConceptId(),
                     // true);
-                    // for (I_ThinExtByRefVersioned ext : extensions) {
+                    // for (I_ExtendByRef ext : extensions) {
                     // System.out.println(ext.getComponentId() + " "
                     // + termFactory.getConcept(ext.getComponentId()));
                     if (mem.getComponentId() == concept.getConceptId()) {

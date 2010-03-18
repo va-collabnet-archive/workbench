@@ -46,10 +46,10 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidConceptString;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
@@ -675,8 +675,8 @@ public class VersionDiff extends AbstractMojo {
         I_GetConceptData active_status = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
         int statusId = active_status.getConceptId();
         int memberId = tf.uuidToNative(UUID.randomUUID());
-        I_ThinExtByRefVersioned newExtension = tf.newExtension(refset.getConceptId(), memberId, concept_id, typeId);
-        I_ThinExtByRefPartConceptConceptString ext = tf.newConceptConceptStringExtensionPart();
+        I_ExtendByRef newExtension = tf.newExtension(refset.getConceptId(), memberId, concept_id, typeId);
+        I_ExtendByRefPartCidConceptString ext = tf.newConceptConceptStringExtensionPart();
         ext.setC1id(concept_id);
         ext.setC2id(change_id);
         ext.setStr(comment);
@@ -698,7 +698,7 @@ public class VersionDiff extends AbstractMojo {
         }
         memberId = tf.uuidToNative(UUID.randomUUID());
         newExtension = tf.newExtension(member_refset.getConceptId(), memberId, concept_id, typeId);
-        I_ThinExtByRefPartConcept member_ext = tf.newConceptExtensionPart();
+        I_ExtendByRefPartCid member_ext = tf.newConceptExtensionPart();
         member_ext.setC1id(concept_id);
         // path = tf
         // .getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
@@ -1268,14 +1268,14 @@ public class VersionDiff extends AbstractMojo {
             this.deleted_description_change, this.description_status_change, this.description_term_change,
             this.description_type_change, this.description_language_change, this.description_case_change);
         int diffs = 0;
-        for (I_ThinExtByRefVersioned mem : tf.getRefsetExtensionMembers(refset.getConceptId())) {
+        for (I_ExtendByRef mem : tf.getRefsetExtensionMembers(refset.getConceptId())) {
             diffs++;
             if (diffs % 1000 == 0)
                 getLog().info("diffs " + diffs);
             I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
-            I_ThinExtByRefPart p = mem.getMutableParts().get(0);
-            if (p instanceof I_ThinExtByRefPartConceptConceptString) {
-                I_ThinExtByRefPartConceptConceptString pccs = (I_ThinExtByRefPartConceptConceptString) p;
+            I_ExtendByRefPart p = mem.getMutableParts().get(0);
+            if (p instanceof I_ExtendByRefPartCidConceptString) {
+                I_ExtendByRefPartCidConceptString pccs = (I_ExtendByRefPartCidConceptString) p;
                 if (description_changes.contains(pccs.getC2id())) {
                     String[] comments = pccs.getStr().split("\t");
                     int id = Integer.parseInt(comments[0]);
@@ -1293,14 +1293,14 @@ public class VersionDiff extends AbstractMojo {
         getLog().info("diffs " + diffs);
         for (I_GetConceptData rs : refsets.values()) {
             diffs = 0;
-            for (I_ThinExtByRefVersioned mem : tf.getRefsetExtensionMembers(rs.getConceptId())) {
+            for (I_ExtendByRef mem : tf.getRefsetExtensionMembers(rs.getConceptId())) {
                 diffs++;
                 if (diffs % 1000 == 0)
                     getLog().info(rs.getInitialText() + " diffs " + diffs);
                 I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
-                I_ThinExtByRefPart p = mem.getMutableParts().get(0);
-                if (p instanceof I_ThinExtByRefPartConcept) {
-                    I_ThinExtByRefPartConcept pccs = (I_ThinExtByRefPartConcept) p;
+                I_ExtendByRefPart p = mem.getMutableParts().get(0);
+                if (p instanceof I_ExtendByRefPartCid) {
+                    I_ExtendByRefPartCid pccs = (I_ExtendByRefPartCid) p;
                     out.println(rs.getInitialText() + "\t" + "MEMBER" + "\t"
                         + tf.getConcept(pccs.getC1id()).getInitialText());
                 } else {

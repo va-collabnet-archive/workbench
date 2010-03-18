@@ -21,14 +21,14 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
@@ -50,7 +50,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
  * 
  * @see org.dwfa.mojo.refset.ExportRefSet
  */
-public class ExportedRefsetHandler extends IterableFileReader<I_ThinExtByRefVersioned> {
+public class ExportedRefsetHandler extends IterableFileReader<I_ExtendByRef> {
 
     private final SimpleDateFormat EXPORTED_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -85,7 +85,7 @@ public class ExportedRefsetHandler extends IterableFileReader<I_ThinExtByRefVers
     }
 
     @Override
-    protected I_ThinExtByRefVersioned processLine(String line) {
+    protected I_ExtendByRef processLine(String line) {
         try {
             String[] tokens = line.split("\t");
 
@@ -107,44 +107,44 @@ public class ExportedRefsetHandler extends IterableFileReader<I_ThinExtByRefVers
             int memberId = termFactory.uuidToNativeWithGeneration(memberUUID,
                 ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), termFactory.getPaths(),
                 Integer.MAX_VALUE);
-            I_ThinExtByRefVersioned extension = termFactory.newExtension(refsetNid, memberId, componentId, typeId);
+            I_ExtendByRef extension = termFactory.newExtension(refsetNid, memberId, componentId, typeId);
 
-            I_ThinExtByRefPart extPart = null;
+            I_ExtendByRefPart extPart = null;
 
             switch (getRefsetType()) {
 
             case BOOLEAN:
                 extPart = termFactory.newBooleanExtensionPart();
-                ((I_ThinExtByRefPartBoolean) extPart).setBooleanValue(new Boolean(tokens[6]).booleanValue());
+                ((I_ExtendByRefPartBoolean) extPart).setBooleanValue(new Boolean(tokens[6]).booleanValue());
                 break;
 
             case CONCEPT:
                 extPart = termFactory.newConceptExtensionPart();
-                ((I_ThinExtByRefPartConcept) extPart).setConceptId(termFactory.uuidToNative(UUID.fromString(tokens[6])));
+                ((I_ExtendByRefPartCid) extPart).setConceptId(termFactory.uuidToNative(UUID.fromString(tokens[6])));
                 break;
 
             case CONCEPT_INTEGER:
                 extPart = termFactory.newConceptIntExtensionPart();
-                ((I_ThinExtByRefPartConceptInt) extPart).setConceptId(componentId);
-                ((I_ThinExtByRefPartConceptInt) extPart).setIntValue(new Integer(tokens[6]).intValue());
+                ((I_ExtendByRefPartCidInt) extPart).setConceptId(componentId);
+                ((I_ExtendByRefPartCidInt) extPart).setIntValue(new Integer(tokens[6]).intValue());
                 break;
 
             case STRING:
                 extPart = termFactory.newStringExtensionPart();
-                ((I_ThinExtByRefPartString) extPart).setStringValue(tokens[6]);
+                ((I_ExtendByRefPartString) extPart).setStringValue(tokens[6]);
                 break;
 
             case INTEGER:
                 extPart = termFactory.newIntegerExtensionPart();
-                ((I_ThinExtByRefPartInteger) extPart).setValue(new Integer(tokens[6]).intValue());
+                ((I_ExtendByRefPartInteger) extPart).setValue(new Integer(tokens[6]).intValue());
                 break;
 
             case CONCEPT_DOUBLE:
                 extPart = termFactory.newMeasurementExtensionPart();
-                ((I_ThinExtByRefPartMeasurement) extPart).setMeasurementValue(new Double(tokens[6]).doubleValue());
+                ((I_ExtendByRefPartMeasurement) extPart).setMeasurementValue(new Double(tokens[6]).doubleValue());
                 UUID unitOfMeasureUuid = UUID.fromString(tokens[7]);
                 int unitOfMeasureNid = termFactory.uuidToNative(unitOfMeasureUuid);
-                ((I_ThinExtByRefPartMeasurement) extPart).setUnitsOfMeasureId(unitOfMeasureNid);
+                ((I_ExtendByRefPartMeasurement) extPart).setUnitsOfMeasureId(unitOfMeasureNid);
                 break;
             }
 

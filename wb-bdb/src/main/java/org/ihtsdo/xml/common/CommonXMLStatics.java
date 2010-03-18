@@ -163,13 +163,13 @@ public class CommonXMLStatics {
 	/** nId **/
 	public static String N_ID_ATT = "nId";
 	
-	/** I_ThinExtByRefPart **/
+	/** I_ExtendByRefPart **/
 	/** RefSetPart **/
 	public static String REFSET_PART_ENAME = "refSetPart";
 	/** characteristicId **/
 	public static String CLASS_NAME_ATT = "className";
 	
-	/** I_ThinExtByRefVersioned **/
+	/** I_ExtendByRef **/
 	/** Extension **/
 	public static String EXT_ENAME = "extension";
 	/** RefSet **/
@@ -189,7 +189,7 @@ public class CommonXMLStatics {
 
 	
 
-	/** I_ThinExtByRefPart Implementations **/
+	/** I_ExtendByRefPart Implementations **/
 	/** RefSetValue **/
 	public static String REFSET_VAL_ENAME = "refSetValue";
 	/** value **/

@@ -25,8 +25,8 @@ package org.dwfa.mojo.epicexport;
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.mojo.epicexport.I_RefsetUsageInterpreter.I_RefsetApplication;
 
 public interface I_ExportValueConverter {
@@ -44,8 +44,8 @@ public interface I_ExportValueConverter {
 	 * @throws Exception
 	 */
 	public void populateValues(I_RefsetApplication refsetUsage, I_GetConceptData conceptForDescription, 
-			I_DescriptionVersioned description, I_ThinExtByRefTuple extensionTuple, 
-			I_ThinExtByRefPart previousPart) throws Exception;
+			I_DescriptionVersioned description, I_ExtendByRefVersion extensionTuple, 
+			I_ExtendByRefPart previousPart) throws Exception;
 	
     /**
      * The starting version number
@@ -91,7 +91,7 @@ public interface I_ExportValueConverter {
 	 * @param record - the record so far, after populating from the extensions
 	 * @throws Exception
 	 */
-	public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
+	public void addRecordIds(I_ExtendByRefVersion extensionTuple, I_GetConceptData rootConcept,
 			ExternalTermRecord record) throws Exception;
 	
 	/**

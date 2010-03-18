@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +21,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
+import org.ihtsdo.db.util.NidPair;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -114,7 +114,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		}
 	}
 	
-	public class SetModifiedWhenChangedList extends CopyOnWriteArrayList<Integer> {
+	public class SetModifiedWhenChangedList extends CopyOnWriteArrayList<NidPair> {
 
 		/**
 		 * 
@@ -125,48 +125,48 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 			super();
 		}
 
-		public SetModifiedWhenChangedList(Collection<? extends Integer> c) {
+		public SetModifiedWhenChangedList(Collection<NidPair> c) {
 			super(c);
 		}
 
-		public SetModifiedWhenChangedList(Integer[] toCopyIn) {
+		public SetModifiedWhenChangedList(NidPair[] toCopyIn) {
 			super(toCopyIn);
 		}
 
 		@Override
-		public void add(int index, Integer element) {
+		public void add(int index, NidPair element) {
 			super.add(index, element);
 			modified();
 		}
 
 		@Override
-		public boolean add(Integer e) {
+		public boolean add(NidPair e) {
 			boolean returnValue = super.add(e);
 			modified();
 			return returnValue;
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends Integer> c) {
+		public boolean addAll(Collection<? extends NidPair> c) {
 			boolean returnValue = super.addAll(c);
 			modified();
 			return returnValue;
 		}
 
 		@Override
-		public boolean addAll(int index, Collection<? extends Integer> c) {
+		public boolean addAll(int index, Collection<? extends NidPair> c) {
 			boolean returnValue =  super.addAll(index, c);
 			modified();
 			return returnValue;
 		}
 
 		@Override
-		public int addAllAbsent(Collection<? extends Integer> c) {
+		public int addAllAbsent(Collection<? extends NidPair> c) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean addIfAbsent(Integer e) {
+		public boolean addIfAbsent(NidPair e) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -174,11 +174,12 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		public void clear() {
 			throw new UnsupportedOperationException();
 		}
-		public synchronized void forget(int index1, int index2) {
-			assert index1 + 1 == index2: " indexes must be contiguous: index1: " + index1 + " index2: " + index2;
-			super.remove(index1);
-			super.remove(index1);
-			modified();
+		public synchronized boolean forget(NidPair pair) {
+			boolean removed = super.remove(pair);
+			if (removed) {
+	            modified();
+			}
+			return removed;
 		}
 
 		@Override
@@ -197,7 +198,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		}
 
 		@Override
-		public Integer remove(int index) {
+		public NidPair remove(int index) {
 			throw new UnsupportedOperationException();
 		}
 		
@@ -266,14 +267,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 	 * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
 	 */
 	public List<Relationship> getDestRels() throws IOException {
-		List<? extends Integer> destRelNidTypeNidList = getDestRelNidTypeNidList();
 
 		List<Relationship> destRels = new ArrayList<Relationship>();
-		Iterator<? extends Integer> itr = destRelNidTypeNidList.iterator();
-		while (itr.hasNext()) {
-			int relNid = itr.next();
-			@SuppressWarnings("unused")
-			int typeNid = itr.next();
+		for (NidPair pair: getDestRelNidTypeNidList()) {
+			int relNid = pair.getNid1();
 			int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
 			Concept c = Bdb.getConceptForComponent(conceptNid);
 			destRels.add(c.getRelationship(relNid));
@@ -307,7 +304,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		modified();
 	}
 
-	@SuppressWarnings("unchecked")
 	void processNewRel(Relationship rel) throws IOException {
 		assert rel.nid != 0 : "relNid is 0: " + this;
 		assert rel.getTypeId() != 0 : "relTypeNid is 0: " + this;
@@ -318,12 +314,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 				+ this.enclosingConcept.toLongString()
 				+ "\ndestConcept: "
 				+ dest.toLongString();
-		List<Integer> relNidTypeNidList = (List<Integer>) dest.getData()
+		List<NidPair> relNidTypeNidList = (List<NidPair>) dest.getData()
 				.getDestRelNidTypeNidList();
-		ArrayList<Integer> toAdd = new ArrayList<Integer>(2);
-		toAdd.add(rel.nid);
-		toAdd.add(rel.getTypeId());
-		relNidTypeNidList.addAll(toAdd);
+		NidPair pair = new NidPair(rel.nid, rel.getTypeId());
+		relNidTypeNidList.add(pair);
 		BdbCommitManager.addUncommittedNoChecks(dest);
 		getSrcRelNids().add(rel.nid);
 		modified();
@@ -431,21 +425,20 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		return nidData.getMutableTupleInput();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void addRefsetNidMemberNidForComponent(int refsetNid, int memberNid,
 			int componentNid) throws IOException {
-		List<Integer> list = null;
+		List<NidPair> list = null;
 		if (componentNid == enclosingConcept.getNid()) {
-			list = (List<Integer>) getRefsetNidMemberNidForConceptList();
+			list = (List<NidPair>) getRefsetNidMemberNidForConceptList();
 		} else if (getDescNids().contains(componentNid)) {
-			list = (List<Integer>) getRefsetNidMemberNidForDescriptionsList();
+			list = (List<NidPair>) getRefsetNidMemberNidForDescriptionsList();
 		} else if (getSrcRelNids().contains(componentNid)) {
-			list = (List<Integer>) getRefsetNidMemberNidForRelsList();
+			list = (List<NidPair>) getRefsetNidMemberNidForRelsList();
 		} else if (getImageNids().contains(componentNid)) {
-			list = (List<Integer>) getRefsetNidMemberNidForImagesList();
+			list = (List<NidPair>) getRefsetNidMemberNidForImagesList();
 		} else if (getMemberNids().contains(componentNid)) {
-			list = (List<Integer>) getRefsetNidMemberNidForRefsetMembersList();
+			list = (List<NidPair>) getRefsetNidMemberNidForRefsetMembersList();
 		} else {
 			AceLog.getAppLog().warning(
 					"Cannot find component nid: " + componentNid
@@ -455,7 +448,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 			ArrayList<Integer> toAdd = new ArrayList<Integer>();
 			toAdd.add(refsetNid);
 			toAdd.add(memberNid);
-			list.addAll(toAdd);
+			NidPair refsetNidMemberNidPair = new NidPair(refsetNid, memberNid);
+			list.add(refsetNidMemberNidPair);
 		}
 		modified();
 	}

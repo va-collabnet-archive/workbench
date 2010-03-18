@@ -27,7 +27,6 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
@@ -105,11 +104,6 @@ public class Bdb {
 			uuidDb = new UuidBdb(readOnly, mutable);
 			inform(activity, "loading uuid to nid map database...");
 			uuidsToNidMapDb = new UuidsToNidMapBdb(readOnly, mutable);
-
-			watchList.put(-2147483632, -2147483632);
-			watchList.put(-2142077225, -2142077225);
-			watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), 
-					ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
 
 			inform(activity, "loading nid->cid database...");
 			nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);

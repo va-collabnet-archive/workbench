@@ -12,7 +12,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.refset.XML_I_ExtendByRefPartBoolean;
 import org.ihtsdo.xml.handlers.refset.XML_I_ExtendByRefPartCid;
@@ -88,8 +88,8 @@ public class XML_I_ExtendByRefPart extends XML_basic implements I_Handle_XML {
 			else if(extRefP instanceof I_ExtendByRefPartCidCid) {
 				new XML_I_ExtendByRefPartCidCid((I_ExtendByRefPartCidCid)extRefP,localE);
 			}
-			else if(extRefP instanceof I_ExtendRefPartCidCidCid) {
-				new XML_I_ExtendByRefPartCidCidCid((I_ExtendRefPartCidCidCid)extRefP,localE);
+			else if(extRefP instanceof I_ExtendByRefPartCidCidCid) {
+				new XML_I_ExtendByRefPartCidCidCid((I_ExtendByRefPartCidCidCid)extRefP,localE);
 			}
 			else if(extRefP instanceof I_ExtendByRefPartCidCidString) {
 				new XML_I_ExtendByRefPartCidCidString((I_ExtendByRefPartCidCidString)extRefP,localE);

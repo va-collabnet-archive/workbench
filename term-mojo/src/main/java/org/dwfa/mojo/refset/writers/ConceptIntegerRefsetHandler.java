@@ -20,18 +20,18 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctid)
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctid)
             throws TerminologyException, IOException {
-        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) tuple.getMutablePart();
+        I_ExtendByRefPartCidInt conceptIntegerPart = (I_ExtendByRefPartCidInt) tuple.getMutablePart();
 
         return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
             + toId(tf, conceptIntegerPart.getConceptId(), sctid) + MemberRefsetHandler.FILE_DELIMITER
@@ -39,9 +39,9 @@ public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
     }
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
             int componentId, boolean sctId) throws TerminologyException, IOException {
-        I_ThinExtByRefPartConceptInt conceptIntegerPart = (I_ThinExtByRefPartConceptInt) part;
+        I_ExtendByRefPartCidInt conceptIntegerPart = (I_ExtendByRefPartCidInt) part;
 
         return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
             + MemberRefsetHandler.FILE_DELIMITER + toId(tf, conceptIntegerPart.getConceptId(), sctId)
@@ -55,11 +55,11 @@ public class ConceptIntegerRefsetHandler extends MemberRefsetHandler {
     }
 
     @Override
-    protected I_ThinExtByRefPart processLine(String line) {
-        I_ThinExtByRefPartConceptInt part;
+    protected I_ExtendByRefPart processLine(String line) {
+        I_ExtendByRefPartCidInt part;
         try {
 
-            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line,
+            I_ExtendByRef versioned = getExtensionVersioned(line,
                 RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION);
 
             part = getTermFactory().newConceptIntExtensionPart();

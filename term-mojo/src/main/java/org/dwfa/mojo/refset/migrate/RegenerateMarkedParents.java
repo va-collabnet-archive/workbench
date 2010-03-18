@@ -28,9 +28,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.MarkedParentRefsetHelper;
 import org.dwfa.ace.refset.MemberRefsetHelper;
@@ -105,16 +105,16 @@ public class RegenerateMarkedParents extends AbstractMojo {
         int refsetId = memberRefsetConcept.getConceptId();
 
         Set<Integer> normalMemberIds = new HashSet<Integer>();
-        List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+        List<I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+        for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
 
-            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+            for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
+                    I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) thinExtByRefTuple.getMutablePart();
                     if (part.getConceptId() == concepts.get("NORMAL_MEMBER").getConceptId()) {
                         normalMemberIds.add(thinExtByRefTuple.getComponentId());
                     }

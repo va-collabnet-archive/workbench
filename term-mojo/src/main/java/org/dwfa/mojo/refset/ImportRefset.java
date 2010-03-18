@@ -23,8 +23,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.maven.MojoUtil;
 import org.dwfa.mojo.ImportFromFile;
 
@@ -53,7 +53,7 @@ public class ImportRefset extends ImportFromFile {
      * An internal cache of the new uncommitted extensions, indexed by the
      * member id
      */
-    private HashMap<Integer, I_ThinExtByRefVersioned> extensions = new HashMap<Integer, I_ThinExtByRefVersioned>();
+    private HashMap<Integer, I_ExtendByRef> extensions = new HashMap<Integer, I_ExtendByRef>();
 
     /**
      * Location of the build directory.
@@ -75,7 +75,7 @@ public class ImportRefset extends ImportFromFile {
                 return;
             }
 
-            for (I_ThinExtByRefVersioned extension : fileHandler) {
+            for (I_ExtendByRef extension : fileHandler) {
 
                 Integer memberId = extension.getMemberId();
                 if (extensions.containsKey(memberId)) {
@@ -84,9 +84,9 @@ public class ImportRefset extends ImportFromFile {
                     // parts
                     // we have already encountered
 
-                    I_ThinExtByRefVersioned existingExt = extensions.get(memberId);
-                    I_ThinExtByRefPart extPart = existingExt.getMutableParts().get(0);
-                    I_ThinExtByRefPart newPart = extension.getMutableParts().get(0);
+                    I_ExtendByRef existingExt = extensions.get(memberId);
+                    I_ExtendByRefPart extPart = existingExt.getMutableParts().get(0);
+                    I_ExtendByRefPart newPart = extension.getMutableParts().get(0);
                     if (extPart.getVersion() <= newPart.getVersion()) {
                         existingExt.getMutableParts().clear();
                         existingExt.addVersion(newPart);
@@ -103,12 +103,12 @@ public class ImportRefset extends ImportFromFile {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             // Add all extensions to be committed
-            for (I_ThinExtByRefVersioned extension : extensions.values()) {
+            for (I_ExtendByRef extension : extensions.values()) {
 
                 // Modify the version part (there should be only one) and set it
                 // back anew
 
-                I_ThinExtByRefPart extPart = extension.getMutableParts().get(0);
+                I_ExtendByRefPart extPart = extension.getMutableParts().get(0);
                 extension.getMutableParts().remove(0);
                 extPart.setVersion(Integer.MAX_VALUE); // uncommitted
 

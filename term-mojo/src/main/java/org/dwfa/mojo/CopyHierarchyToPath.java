@@ -44,9 +44,9 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.mojo.refset.ExportSpecification;
 
 /**
@@ -207,7 +207,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
 
             processConceptAttributes(concept.getConceptAttributes());
             processDescription(concept.getDescriptions());
-            for (I_ThinExtByRefVersioned ext : tf.getRefsetExtensionMembers(concept.getConceptId())) {
+            for (I_ExtendByRef ext : tf.getRefsetExtensionMembers(concept.getConceptId())) {
                 processExtensionByReference(ext);
             }
             processId(concept.getIdentifier());
@@ -308,15 +308,15 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         getLog().info("concept description part copied " + t);
     }
 
-    public void processExtensionByReference(I_ThinExtByRefVersioned extByRef) throws Exception {
+    public void processExtensionByReference(I_ExtendByRef extByRef) throws Exception {
 
         if (++extCount % 1000 == 0) {
             getLog().info("processed extension " + extCount);
         }
 
         boolean datachanged = false;
-        I_ThinExtByRefTuple latestPart = null;
-        for (I_ThinExtByRefTuple t : extByRef.getTuples(null, null, true)) {
+        I_ExtendByRefVersion latestPart = null;
+        for (I_ExtendByRefVersion t : extByRef.getTuples(null, null, true)) {
             if (latestStateOnly) {
                 if (latestPart == null || t.getVersion() > latestPart.getVersion()) {
                     latestPart = t;
@@ -337,8 +337,8 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         }
     }
 
-    private void duplicateExtensionTuple(I_ThinExtByRefTuple t) {
-        I_ThinExtByRefPart newPart = (I_ThinExtByRefPart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
+    private void duplicateExtensionTuple(I_ExtendByRefVersion t) {
+        I_ExtendByRefPart newPart = (I_ExtendByRefPart) t.makeAnalog(t.getStatusId(), toPathId, t.getVersion());
         newPart.setPathId(toPathId);
         t.getCore().addVersion(newPart);
 

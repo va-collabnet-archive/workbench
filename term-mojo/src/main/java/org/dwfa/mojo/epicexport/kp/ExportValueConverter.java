@@ -28,11 +28,11 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.mojo.epicexport.ExportToEpicLoadFilesMojo;
 import org.dwfa.mojo.epicexport.ExternalTermPublisher;
@@ -78,10 +78,10 @@ public class ExportValueConverter implements I_ExportValueConverter{
 	}
 	
 	public void populateValues(I_RefsetApplication refsetUsage, I_GetConceptData conceptForDescription, 
-			I_DescriptionVersioned description, I_ThinExtByRefTuple extensionTuple, 
-			I_ThinExtByRefPart previousPart) throws Exception {
+			I_DescriptionVersioned description, I_ExtendByRefVersion extensionTuple, 
+			I_ExtendByRefPart previousPart) throws Exception {
 		
-		I_ThinExtByRefPart extensionTuplePart = extensionTuple.getMutablePart();
+		I_ExtendByRefPart extensionTuplePart = extensionTuple.getMutablePart();
 		this.itemValue = null;
 		this.previousItemValue = null;
 		this.region = null;
@@ -103,7 +103,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
 			}
 			else if (refsetUsage.getItemNumber().equals("50")){
 			
-	    		I_ThinExtByRefPartBoolean doAdd = (I_ThinExtByRefPartBoolean) extensionTuplePart;
+	    		I_ExtendByRefPartBoolean doAdd = (I_ExtendByRefPartBoolean) extensionTuplePart;
 	    		if (doAdd.getBooleanValue() && description != null) {
 	    			itemValue = description.getLastTuple().getMutablePart().getText();
 	    			previousItemValue = getPreviousDisplayName(description);
@@ -141,23 +141,23 @@ public class ExportValueConverter implements I_ExportValueConverter{
 		return region;
 	}
 
-	public String getValueAsString(I_ThinExtByRefPart thinExtByRefPart) {
+	public String getValueAsString(I_ExtendByRefPart thinExtByRefPart) {
     	String value = null;
     	if (thinExtByRefPart != null) {
-	    	if (I_ThinExtByRefPartString.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-	    		I_ThinExtByRefPartString str = (I_ThinExtByRefPartString) thinExtByRefPart;
+	    	if (I_ExtendByRefPartString.class.isAssignableFrom(thinExtByRefPart.getClass())) {
+	    		I_ExtendByRefPartString str = (I_ExtendByRefPartString) thinExtByRefPart;
 	    		value = str.getStringValue();
 	    	}
-	    	else if (I_ThinExtByRefPartInteger.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-	    		I_ThinExtByRefPartInteger str = (I_ThinExtByRefPartInteger) thinExtByRefPart;
+	    	else if (I_ExtendByRefPartInteger.class.isAssignableFrom(thinExtByRefPart.getClass())) {
+	    		I_ExtendByRefPartInteger str = (I_ExtendByRefPartInteger) thinExtByRefPart;
 	    		value = new Integer(str.getIntValue()).toString();
 	    	}
-	    	else if (I_ThinExtByRefPartBoolean.class.isAssignableFrom(thinExtByRefPart.getClass())) {
-	    		I_ThinExtByRefPartBoolean str = (I_ThinExtByRefPartBoolean) thinExtByRefPart;
+	    	else if (I_ExtendByRefPartBoolean.class.isAssignableFrom(thinExtByRefPart.getClass())) {
+	    		I_ExtendByRefPartBoolean str = (I_ExtendByRefPartBoolean) thinExtByRefPart;
 	    		value = (str.getBooleanValue()) ? "1" : "0";
 	    	}
 	    	else
-	    		AceLog.getAppLog().warning("Unhandled refset data type for I_ThinExtByRefPart: " + thinExtByRefPart);
+	    		AceLog.getAppLog().warning("Unhandled refset data type for I_ExtendByRefPart: " + thinExtByRefPart);
     	}
     	return value;
 
@@ -223,7 +223,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	return ret;
     }
     
-    public void addRecordIds(I_ThinExtByRefTuple extensionTuple, I_GetConceptData rootConcept,
+    public void addRecordIds(I_ExtendByRefVersion extensionTuple, I_GetConceptData rootConcept,
     		ExternalTermRecord record) 
     	throws Exception {
 
@@ -269,7 +269,7 @@ public class ExportValueConverter implements I_ExportValueConverter{
     	ret = ret || getInterpretedStatus(getConceptStatus(record.getRootConcept(), this.startingVersion)) 
     		== ExternalTermRecord.status.RETIRED;
     	ExternalTermRecord.Item i = record.getFirstItem("2");
-    	I_ThinExtByRefPart prevExt = ExternalTermPublisher.getPreviousVersionOfExtension(
+    	I_ExtendByRefPart prevExt = ExternalTermPublisher.getPreviousVersionOfExtension(
     			i.getExtensionTuple(), this.startingVersion);
     	if (prevExt != null)
     		ret = ret || getInterpretedStatus(prevExt.getStatusId()) == ExternalTermRecord.status.RETIRED;

@@ -20,26 +20,26 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidConcept;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class ConceptConceptRefsetHandler extends ConceptRefsetHandler {
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple part, boolean sctid)
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion part, boolean sctid)
             throws TerminologyException, IOException {
         return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid);
     }
 
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
             int componentId, boolean sctId) throws TerminologyException, IOException {
-        I_ThinExtByRefPartConceptConcept conceptPart = (I_ThinExtByRefPartConceptConcept) part;
+        I_ExtendByRefPartCidConcept conceptPart = (I_ExtendByRefPartCidConcept) part;
 
         return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
             + MemberRefsetHandler.FILE_DELIMITER + toId(tf, conceptPart.getConceptId(), sctId);
@@ -51,11 +51,11 @@ public class ConceptConceptRefsetHandler extends ConceptRefsetHandler {
     }
 
     @Override
-    protected I_ThinExtByRefPart processLine(String line) {
-        I_ThinExtByRefPartConcept part;
+    protected I_ExtendByRefPart processLine(String line) {
+        I_ExtendByRefPartCid part;
         try {
 
-            I_ThinExtByRefVersioned versioned = getExtensionVersioned(line,
+            I_ExtendByRef versioned = getExtensionVersioned(line,
                 RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION);
 
             part = getTermFactory().newConceptConceptExtensionPart();

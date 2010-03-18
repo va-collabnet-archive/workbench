@@ -36,13 +36,13 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -52,7 +52,7 @@ import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 
-public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtByRefPart> {
+public abstract class MemberRefsetHandler extends IterableFileReader<I_ExtendByRefPart> {
 
     protected static final String COMPONENT_ID = "COMPONENT_ID";
     protected static final String STATUS_ID = "STATUS_ID";
@@ -88,7 +88,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws IOException
      * @throws TerminologyException
      */
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefTuple tuple, boolean sctId)
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctId)
             throws TerminologyException, IOException {
         return formatRefsetLine(tf, tuple, tuple.getMemberId(), tuple.getRefsetId(), tuple.getComponentId(), sctId);
     }
@@ -106,25 +106,25 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws TerminologyException
      * @throws IOException
      */
-    public String formatRefsetLineRF2(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, int refsetNid,
+    public String formatRefsetLineRF2(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetNid,
             int componentId, boolean sctId) throws TerminologyException, IOException {
         String formattedLine = getRefsetAndReferencePart(tf, part, memberId, refsetNid, componentId, sctId);
 
         try {
-            if (part instanceof I_ThinExtByRefPartConcept) {
-                I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
+            if (part instanceof I_ExtendByRefPartCid) {
+                I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) part;
 
                 formattedLine += toId(tf, conceptPart.getC1id(), sctId);
-            } else if (part instanceof I_ThinExtByRefPartString) {
-                I_ThinExtByRefPartString stringPart = (I_ThinExtByRefPartString) part;
+            } else if (part instanceof I_ExtendByRefPartString) {
+                I_ExtendByRefPartString stringPart = (I_ExtendByRefPartString) part;
 
                 formattedLine += stringPart.getStringValue();
-            } else if (part instanceof I_ThinExtByRefPartInteger) {
-                I_ThinExtByRefPartInteger stringPart = (I_ThinExtByRefPartInteger) part;
+            } else if (part instanceof I_ExtendByRefPartInteger) {
+                I_ExtendByRefPartInteger stringPart = (I_ExtendByRefPartInteger) part;
 
                 formattedLine += stringPart.getValue();
-            } else if (part instanceof I_ThinExtByRefPartBoolean) {
-                I_ThinExtByRefPartBoolean stringPart = (I_ThinExtByRefPartBoolean) part;
+            } else if (part instanceof I_ExtendByRefPartBoolean) {
+                I_ExtendByRefPartBoolean stringPart = (I_ExtendByRefPartBoolean) part;
 
                 formattedLine += stringPart.getBooleanValue();
             } else {
@@ -142,7 +142,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * Returns the first 6 columns for a refset file.
      * 
      * @param tf I_TermFactory DB access
-     * @param part I_ThinExtByRefPart the concept extension
+     * @param part I_ExtendByRefPart the concept extension
      * @param memberId Integer member id, may be null or not exists in the DB.
      * @param refsetNid int refset id
      * @param componentId int referenced component id
@@ -152,7 +152,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws TerminologyException DB errors
      * @throws IOException DB errors
      */
-    private String getRefsetAndReferencePart(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId,
+    private String getRefsetAndReferencePart(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId,
             int refsetNid, int componentId, boolean useSctId) throws TerminologyException, IOException {
         StringBuffer formattedLine = new StringBuffer();
 
@@ -204,13 +204,13 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
      * @throws TerminologyException
      * @throws IOException
      */
-    public String formatRefsetAsSubset(I_TermFactory tf, I_ThinExtByRefPart part, Integer memberId, String subsetId,
+    public String formatRefsetAsSubset(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, String subsetId,
             int componentNid, boolean sctId) throws TerminologyException, IOException {
 
         try {
 
-            if (part instanceof I_ThinExtByRefPartConcept) {
-                I_ThinExtByRefPartConcept conceptPart = (I_ThinExtByRefPartConcept) part;
+            if (part instanceof I_ExtendByRefPartCid) {
+                I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) part;
                 Collection<UUID> statusUuids = tf.getUids(conceptPart.getStatusId());
 
                 int statusInt;
@@ -255,7 +255,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return "SUBSETID" + FILE_DELIMITER + "MEMBERID" + FILE_DELIMITER + "MEMBERSTATUS" + FILE_DELIMITER + "LINKEDID";
     }
 
-    public String formatRefsetLine(I_TermFactory tf, I_ThinExtByRefPart tuple, Integer memberId, int refsetId,
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart tuple, Integer memberId, int refsetId,
             int componentId, boolean sctId) throws TerminologyException, IOException {
         return getMemberId(memberId, sctId, componentId, refsetId) + FILE_DELIMITER
             + toId(tf, tuple.getPathId(), sctId) + FILE_DELIMITER + getDate(tf, tuple.getVersion()) + FILE_DELIMITER
@@ -360,7 +360,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     }
 
     @Override
-    protected abstract I_ThinExtByRefPart processLine(String line);
+    protected abstract I_ExtendByRefPart processLine(String line);
 
     protected Map<String, Object> parseLine(String line) throws ParseException {
         st = new StringTokenizer(line, FILE_DELIMITER);
@@ -392,13 +392,13 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return st.nextToken();
     }
 
-    protected void setGenericExtensionPartFields(I_ThinExtByRefPart part) throws Exception {
+    protected void setGenericExtensionPartFields(I_ExtendByRefPart part) throws Exception {
         part.setPathId(getNid((UUID) currentRow.get(MemberRefsetHandler.PATH_ID)));
         part.setStatusId(getNid((UUID) currentRow.get(MemberRefsetHandler.STATUS_ID)));
         part.setVersion((Integer) currentRow.get(MemberRefsetHandler.VERSION));
     }
 
-    protected I_ThinExtByRefVersioned getExtensionVersioned(String line, RefsetAuxiliary.Concept refsetType)
+    protected I_ExtendByRef getExtensionVersioned(String line, RefsetAuxiliary.Concept refsetType)
             throws Exception {
         Map<String, Object> currentRow = parseLine(line);
 
@@ -406,16 +406,16 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         UUID componentUuid = (UUID) currentRow.get(MemberRefsetHandler.COMPONENT_ID);
         UUID memberUuid = (UUID) currentRow.get(MemberRefsetHandler.ID);
         int componentNid = getNid(componentUuid);
-        List<? extends I_ThinExtByRefVersioned> extensions = Terms.get().getAllExtensionsForComponent(componentNid, true);
+        List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(componentNid, true);
 
-        I_ThinExtByRefVersioned versioned = null;
+        I_ExtendByRef versioned = null;
         int refsetNid = getNid(refsetUuid);
 
         Integer memberNid = null;
         if (getTermFactory().hasId(memberUuid)) {
             memberNid = getNid(memberUuid);
 
-            for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+            for (I_ExtendByRef thinExtByRefVersioned : extensions) {
                 if (thinExtByRefVersioned.getMemberId() == memberNid) {
                     versioned = thinExtByRefVersioned;
                     break;

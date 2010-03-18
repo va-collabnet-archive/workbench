@@ -45,10 +45,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
@@ -312,18 +312,18 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * 
      * @param componentId refset member concept
      * @param relationshipRefinabilityExtension refset.
-     * @return I_ThinExtByRefTuple the latest extension, may be null
+     * @return I_ExtendByRefVersion the latest extension, may be null
      * @throws IOException DB error
      * @throws TerminologyException
      */
-    I_ThinExtByRefTuple getCurrentExtension(int componentId, ConceptSpec relationshipRefinabilityExtension)
+    I_ExtendByRefVersion getCurrentExtension(int componentId, ConceptSpec relationshipRefinabilityExtension)
             throws IOException, TerminologyException {
         int refsetId = relationshipRefinabilityExtension.localize().getNid();
 
-        I_ThinExtByRefTuple latest = null;
-        for (I_ThinExtByRefVersioned ext : tf.getAllExtensionsForComponent(componentId)) {
+        I_ExtendByRefVersion latest = null;
+        for (I_ExtendByRef ext : tf.getAllExtensionsForComponent(componentId)) {
             if (ext.getRefsetId() == refsetId) {
-                for (I_ThinExtByRefTuple tuple : ext.getTuples(allowedStatuses, positions, false, false)) {
+                for (I_ExtendByRefVersion tuple : ext.getTuples(allowedStatuses, positions, false, false)) {
                     if (latest == null || latest.getVersion() < tuple.getVersion()) {
                         latest = tuple;
                     }
@@ -341,10 +341,10 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int componentId) throws TerminologyException, Exception {
-        List<? extends I_ThinExtByRefVersioned> extensions = tf.getAllExtensionsForComponent(componentId);
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+        List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(componentId);
+        for (I_ExtendByRef thinExtByRefVersioned : extensions) {
             if (testSpecification(thinExtByRefVersioned.getRefsetId())) {
-                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
+                for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
                     positions, false, false)) {
                     export(thinExtByRefTuple);
                 }
@@ -352,7 +352,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         }
     }
 
-    void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
+    void export(I_ExtendByRefVersion thinExtByRefTuple) throws Exception {
         export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId());
     }
@@ -366,7 +366,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * @param componentId the referenced component
      * @throws Exception on DB errors or file write errors.
      */
-    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
+    void export(I_ExtendByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
         RefsetType refsetType = refsetTypeMap.get(refsetId);
         if (refsetType == null) {
             try {
@@ -476,9 +476,9 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 int pathVersionRefsetNid =
                         tf.uuidToNative(org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getUuids()[0]);
                 int currentStatusId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-                for (I_ThinExtByRefVersioned extension : tf.getAllExtensionsForComponent(pathid)) {
+                for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(pathid)) {
                     if (extension.getRefsetId() == pathVersionRefsetNid) {
-                        I_ThinExtByRefPart latestPart = getLatestVersion(extension);
+                        I_ExtendByRefPart latestPart = getLatestVersion(extension);
                         if (latestPart.getStatusId() == currentStatusId) {
 
                             if (pathVersion != null) {
@@ -486,7 +486,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                                     + org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getDescription());
                             }
 
-                            pathVersion = ((I_ThinExtByRefPartString) latestPart).getStringValue();
+                            pathVersion = ((I_ExtendByRefPartString) latestPart).getStringValue();
                         }
                     }
                 }
@@ -509,12 +509,12 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
     /**
      * Gets the latest version for this extension.
      * 
-     * @param extension I_ThinExtByRefVersioned
-     * @return I_ThinExtByRefPart latest version. may be null
+     * @param extension I_ExtendByRef
+     * @return I_ExtendByRefPart latest version. may be null
      */
-    private I_ThinExtByRefPart getLatestVersion(I_ThinExtByRefVersioned extension) {
-        I_ThinExtByRefPart latestPart = null;
-        for (I_ThinExtByRefPart part : extension.getMutableParts()) {
+    private I_ExtendByRefPart getLatestVersion(I_ExtendByRef extension) {
+        I_ExtendByRefPart latestPart = null;
+        for (I_ExtendByRefPart part : extension.getMutableParts()) {
             if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
                 latestPart = part;
             }

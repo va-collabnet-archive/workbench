@@ -29,9 +29,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
@@ -49,7 +49,7 @@ public class ExternalTermPublisher {
 	private EpicExportManager exportManager;
 	private int startingVersion;
 	private List<String> masterFilesImpacted;
-	private I_ThinExtByRefTuple idTuple;
+	private I_ExtendByRefVersion idTuple;
 	private List<DisplayName> displayNames;
 	private I_RefsetUsageInterpreter interpreter;
 	private List<ValuePair> wildcardItems;
@@ -175,15 +175,15 @@ public class ExternalTermPublisher {
 	}
 
     private int processDescriptionConcept(I_GetConceptData concept, I_DescriptionVersioned description) throws TerminologyException, Exception {
-    	List<? extends I_ThinExtByRefVersioned> extensions;
+    	List<? extends I_ExtendByRef> extensions;
     	this.descConcept = concept;
     	if (description != null)
     		extensions = Terms.get().getAllExtensionsForComponent(description.getDescId());
     	else
     		extensions = Terms.get().getAllExtensionsForComponent(concept.getConceptId());
-    	for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
+    	for (I_ExtendByRef thinExtByRefVersioned : extensions) {
         	if (Terms.get().hasConcept(thinExtByRefVersioned.getRefsetId())) {
-                for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
+                for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(statusValues,
                     positions, false, false)) {
                 	processExtension(thinExtByRefTuple, concept, description);
                 }
@@ -195,7 +195,7 @@ public class ExternalTermPublisher {
         return extensions.size();
     }
 
-    private void processExtension(I_ThinExtByRefTuple extensionTuple, I_GetConceptData extendedConcept, 
+    private void processExtension(I_ExtendByRefVersion extensionTuple, I_GetConceptData extendedConcept, 
     		I_DescriptionVersioned description) throws Exception {
     	
     	int refsetId = extensionTuple.getRefsetId();
@@ -204,18 +204,18 @@ public class ExternalTermPublisher {
     			getPreviousVersion(extensionTuple));
     }
     
-    private I_ThinExtByRefPart getPreviousVersion(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
+    private I_ExtendByRefPart getPreviousVersion(I_ExtendByRefVersion thinExtByRefTuple) throws Exception {
     	    	
     	return ExternalTermPublisher.getPreviousVersionOfExtension(thinExtByRefTuple, startingVersion);
     }
 
-    public static I_ThinExtByRefPart getPreviousVersionOfExtension(I_ThinExtByRefTuple thinExtByRefTuple,
+    public static I_ExtendByRefPart getPreviousVersionOfExtension(I_ExtendByRefVersion thinExtByRefTuple,
     		int startingVersion) throws Exception {
-    	List<? extends I_ThinExtByRefPart> versions = thinExtByRefTuple.getVersions();
+    	List<? extends I_ExtendByRefPart> versions = thinExtByRefTuple.getVersions();
     	
-    	I_ThinExtByRefPart newestOldVersion  = null;
-    	for (Iterator<? extends I_ThinExtByRefPart> i = versions.iterator(); i.hasNext(); ) {
-    		I_ThinExtByRefPart v = i.next();
+    	I_ExtendByRefPart newestOldVersion  = null;
+    	for (Iterator<? extends I_ExtendByRefPart> i = versions.iterator(); i.hasNext(); ) {
+    		I_ExtendByRefPart v = i.next();
     		if (v.getVersion() <= startingVersion) {
 	    		if (newestOldVersion == null) {
 	    			newestOldVersion = v;
@@ -230,8 +230,8 @@ public class ExternalTermPublisher {
     
     
     private void mineRefsetsForItems(I_GetConceptData refsetConcept, 
-    		I_ThinExtByRefTuple extensionTuple, I_GetConceptData conceptForDescription,
-    		I_DescriptionVersioned description, I_ThinExtByRefPart previousPart) throws Exception {
+    		I_ExtendByRefVersion extensionTuple, I_GetConceptData conceptForDescription,
+    		I_DescriptionVersioned description, I_ExtendByRefPart previousPart) throws Exception {
     	// this.currentItem = null;
     	String refsetName = refsetConcept.getInitialText();
     	// System.out.println("Processing refset " + refsetName);
@@ -303,7 +303,7 @@ public class ExternalTermPublisher {
 
     
     private void addItem(String masterFile, String item, Object value, Object previousValue,
-    		I_ThinExtByRefTuple extensionTuple) {
+    		I_ExtendByRefVersion extensionTuple) {
     	ExternalTermRecord record = getExternalRecordForMasterfile(masterFile);
     	record.addItem(item, value, previousValue, extensionTuple);
     }
@@ -394,9 +394,9 @@ public class ExternalTermPublisher {
     	String itemNumber;
     	String value;
     	String previousValue;
-    	I_ThinExtByRefTuple extensionTuple;
+    	I_ExtendByRefVersion extensionTuple;
     	
-    	public ValuePair(String item, String val, String previousVal, I_ThinExtByRefTuple extensionTuple) {
+    	public ValuePair(String item, String val, String previousVal, I_ExtendByRefVersion extensionTuple) {
     		setItemNumber(item);
     		setValue(val);
     		setPreviousValue(previousVal);
@@ -422,11 +422,11 @@ public class ExternalTermPublisher {
 			this.previousValue = previousValue;
 		}
 
-		public I_ThinExtByRefTuple getExtensionTuple() {
+		public I_ExtendByRefVersion getExtensionTuple() {
 			return extensionTuple;
 		}
 
-		public void setExtensionTuple(I_ThinExtByRefTuple extensionTuple) {
+		public void setExtensionTuple(I_ExtendByRefVersion extensionTuple) {
 			this.extensionTuple = extensionTuple;
 		}
 		

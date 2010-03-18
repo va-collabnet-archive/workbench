@@ -177,9 +177,9 @@ public class ConflictManagementStrategyTest {
         relationshipWithConflcit = createMock(I_RelVersioned.class);
         expect(relationshipWithConflcit.getNid()).andReturn(0);
 
-        extensionWithoutConflcit = createMock(I_ThinExtByRefVersioned.class);
+        extensionWithoutConflcit = createMock(I_ExtendByRef.class);
         expect(extensionWithoutConflcit.getNid()).andReturn(1);
-        extensionWithConflcit = createMock(I_ThinExtByRefVersioned.class);
+        extensionWithConflcit = createMock(I_ExtendByRef.class);
         expect(extensionWithConflcit.getNid()).andReturn(0);
 
         idWithoutConflict = createMock(I_IdVersioned.class);
@@ -207,7 +207,7 @@ public class ConflictManagementStrategyTest {
         Assert.assertTrue(conflictResloutionStrategy.isInConflict(conceptWithConflict, true));
         expect(conceptWithoutConflict.getDescriptions()).andReturn(new ArrayList<I_DescriptionVersioned>());
         expect(conceptWithoutConflict.getSourceRels()).andReturn(new ArrayList<I_RelVersioned>());
-        expect(conceptWithoutConflict.getExtensions()).andReturn(new ArrayList<I_ThinExtByRefVersioned>());
+        expect(conceptWithoutConflict.getExtensions()).andReturn(new ArrayList<I_ExtendByRef>());
         expect(conceptWithoutConflict.getImages()).andReturn(new ArrayList<I_ImageVersioned>());
         expect(conceptWithoutConflict.getId()).andReturn(idWithoutConflict);
         replay(conceptWithoutConflict, idWithoutConflict);
@@ -254,7 +254,7 @@ public class ConflictManagementStrategyTest {
         }
         expect(concept.getSourceRels()).andReturn(relationships);
 
-        ArrayList<I_ThinExtByRefVersioned> extensions = new ArrayList<I_ThinExtByRefVersioned>();
+        ArrayList<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
         extensions.add(extensionWithoutConflcit);
         replay(extensionWithoutConflcit);
         if (extensionConflict) {

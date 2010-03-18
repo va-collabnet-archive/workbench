@@ -39,9 +39,9 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.mojo.refset.spec.RefsetInclusionSpec;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
@@ -238,16 +238,16 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      * @throws Exception on DB or file error.
      */
     private void exportRefsets(int refsetId) throws TerminologyException, Exception {
-        List<I_ThinExtByRefVersioned> extensions = tf.getRefsetExtensionMembers(refsetId);
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extensions) {
-            for (I_ThinExtByRefTuple thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
+        List<I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetId);
+        for (I_ExtendByRef thinExtByRefVersioned : extensions) {
+            for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses, positions,
                 true, true)) {
                 export(thinExtByRefTuple);
             }
         }
     }
 
-    void export(I_ThinExtByRefTuple thinExtByRefTuple) throws Exception {
+    void export(I_ExtendByRefVersion thinExtByRefTuple) throws Exception {
         export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
             thinExtByRefTuple.getComponentId());
     }
@@ -261,7 +261,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      * @param componentId the referenced component
      * @throws Exception on DB errors or file write errors.
      */
-    void export(I_ThinExtByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
+    void export(I_ExtendByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
         RefsetType refsetType = refsetTypeMap.get(refsetId);
         if (refsetType == null) {
             try {

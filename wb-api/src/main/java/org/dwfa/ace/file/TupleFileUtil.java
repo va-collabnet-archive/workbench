@@ -50,7 +50,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -485,7 +485,7 @@ public class TupleFileUtil {
                 I_ExtendByRefVersion thinTuple = tuples.get(0);
                 I_ExtendByRefPart thinPart = thinTuple.getMutablePart();
 
-                if (thinPart instanceof I_ExtendRefPartCidCidCid) {
+                if (thinPart instanceof I_ExtendByRefPartCidCidCid) {
                     outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
                     cccTupleCount++;
                 } else if (thinPart instanceof I_ExtendByRefPartCidCid) {
@@ -539,7 +539,7 @@ public class TupleFileUtil {
                 I_ExtendByRefVersion thinTuple = extensions.get(0);
                 I_ExtendByRefPart thinPart = thinTuple.getMutablePart();
 
-                if (thinPart instanceof I_ExtendRefPartCidCidCid) {
+                if (thinPart instanceof I_ExtendByRefPartCidCidCid) {
                     outputFileWriter.append(ConceptConceptConceptExtTupleFileUtil.exportTuple(thinTuple));
                     cccTupleCount++;
                 } else if (thinPart instanceof I_ExtendByRefPartCidCid) {

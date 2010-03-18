@@ -28,8 +28,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.mojo.ConceptConstants;
@@ -89,8 +89,8 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
      * @throws Exception cannot create or export the concept.
      */
     private void exportCtv3IdMap(I_AmPart latest, int conceptId) throws Exception {
-        I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.CTV3_ID_MAP_EXTENSION);
-        I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
+        I_ExtendByRefVersion tuple = getCurrentExtension(conceptId, ConceptConstants.CTV3_ID_MAP_EXTENSION);
+        I_ExtendByRefPartString part = (I_ExtendByRefPartString) tuple;
         I_IdPart ctv3IdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID);
         if (part == null && ctv3IdPart != null) {
@@ -102,7 +102,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
             export(part, null, ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid(), conceptId);
         } else if (part.getStringValue().equals(latest.getPartComponentNids()) && ctv3IdPart != null) {
             part.setStringValue(ctv3IdPart.getDenotation().toString());
-            export((I_ThinExtByRefTuple) part);
+            export((I_ExtendByRefVersion) part);
         }
     }
 
@@ -115,8 +115,8 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
      * @throws Exception cannot create or export the concept.
      */
     private void exportSnomedIdMap(I_AmPart latest, int conceptId) throws Exception {
-        I_ThinExtByRefTuple tuple = getCurrentExtension(conceptId, ConceptConstants.SNOMED_ID_MAP_EXTENSION);
-        I_ThinExtByRefPartString part = (I_ThinExtByRefPartString) tuple;
+        I_ExtendByRefVersion tuple = getCurrentExtension(conceptId, ConceptConstants.SNOMED_ID_MAP_EXTENSION);
+        I_ExtendByRefPartString part = (I_ExtendByRefPartString) tuple;
         I_IdPart snomedIdPart = getLatestVersion(tf.getConcept(conceptId).getIdentifier().getMutableIdParts(),
             ArchitectonicAuxiliary.Concept.SNOMED_INT_ID);
         if (part == null && snomedIdPart != null) {
@@ -128,7 +128,7 @@ public class Ctv3SnomedIdMapReferenceSetExport extends ReferenceSetExport {
             export(part, null, ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid(), conceptId);
         } else if (part.getStringValue().equals(latest.getPartComponentNids()) && snomedIdPart != null) {
             part.setStringValue(snomedIdPart.getDenotation().toString());
-            export((I_ThinExtByRefTuple) part);
+            export((I_ExtendByRefVersion) part);
         }
     }
 

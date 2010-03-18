@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.file.IterableFileReader;
 
 /**
@@ -85,13 +85,13 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
 
             for (File file : files) {
                 if (notExcluded(file.getName())) {
-                    IterableFileReader<I_ThinExtByRefPart> handler = RefsetType.getHandlerForFile(file);
+                    IterableFileReader<I_ExtendByRefPart> handler = RefsetType.getHandlerForFile(file);
                     handler.setTransactional(transactional);
                     handler.setSourceFile(file);
                     handler.setHasHeader(hasHeader);
 
                     int i = 0;
-                    for (I_ThinExtByRefPart thinExtByRefPart : handler) {
+                    for (I_ExtendByRefPart thinExtByRefPart : handler) {
                         if (i % 1000 == 0) {
                             getLog().info("Imported " + ++i + " extensions from file " + file);
                         }

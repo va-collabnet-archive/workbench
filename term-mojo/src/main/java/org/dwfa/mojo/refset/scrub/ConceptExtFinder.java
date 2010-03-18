@@ -16,7 +16,7 @@
  */
 package org.dwfa.mojo.refset.scrub;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 
 /**
  * Interface for various implementations that will identify candidate concept
@@ -25,6 +25,6 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
  * concept extensions be passed to
  * an appropriate {@link ConceptExtHandler}
  */
-public interface ConceptExtFinder extends Iterable<I_ThinExtByRefVersioned> {
+public interface ConceptExtFinder extends Iterable<I_ExtendByRef> {
 
 }

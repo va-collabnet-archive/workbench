@@ -43,16 +43,16 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_GetExtensionData;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguage;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartLanguageScoped;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLanguage;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartLanguageScoped;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -141,11 +141,11 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
     UUID fsn_uuid = null;
     UUID pft_uuid = null;
 
-    Set<I_ThinExtByRefVersioned> concept_extensions = new HashSet<I_ThinExtByRefVersioned>();
-    Set<I_ThinExtByRefVersioned> desc_extensions = new HashSet<I_ThinExtByRefVersioned>();
-    Set<I_ThinExtByRefVersioned> rel_extensions = new HashSet<I_ThinExtByRefVersioned>();
+    Set<I_ExtendByRef> concept_extensions = new HashSet<I_ExtendByRef>();
+    Set<I_ExtendByRef> desc_extensions = new HashSet<I_ExtendByRef>();
+    Set<I_ExtendByRef> rel_extensions = new HashSet<I_ExtendByRef>();
 
-    HashMap<Integer, List<I_ThinExtByRefVersioned>> members = new HashMap<Integer, List<I_ThinExtByRefVersioned>>();
+    HashMap<Integer, List<I_ExtendByRef>> members = new HashMap<Integer, List<I_ExtendByRef>>();
 
     /**
      * Location of the build directory.
@@ -187,13 +187,13 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                 termFactory.iterateRelationships(this);
             }
             getLog().info("Iteration complete...writing refsets");
-            for (I_ThinExtByRefVersioned ext : concept_extensions) {
+            for (I_ExtendByRef ext : concept_extensions) {
                 writeRefsetFile(ext);
             }
-            for (I_ThinExtByRefVersioned ext : desc_extensions) {
+            for (I_ExtendByRef ext : desc_extensions) {
                 writeRefsetFile(ext);
             }
-            for (I_ThinExtByRefVersioned ext : rel_extensions) {
+            for (I_ExtendByRef ext : rel_extensions) {
                 writeRefsetFile(ext);
             }
 
@@ -208,7 +208,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
     int idCounter = 0;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public void processId(I_Identify id, Set<I_ThinExtByRefVersioned> extensions) throws Exception {
+    public void processId(I_Identify id, Set<I_ExtendByRef> extensions) throws Exception {
         idCounter++;
         if (idCounter % 10000 == 0) {
             getLog().info("Processed: " + idCounter + " identifiers");
@@ -219,7 +219,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         List<I_GetExtensionData> extensionData = termFactory.getExtensionsForComponent(nativeId);
 
         for (I_GetExtensionData data : extensionData) {
-            I_ThinExtByRefVersioned ext = data.getExtension();
+            I_ExtendByRef ext = data.getExtension();
 
             I_GetConceptData refsetConcept = termFactory.getConcept(ext.getRefsetId());
             if (testExportSpecification(refsetConcept)) {
@@ -228,9 +228,9 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                     getLog().debug("Exporting UUID to refset:" + bean.getComponentUid());
                 }
 
-                for (I_ThinExtByRefPart version : ext.getMutableParts()) {
+                for (I_ExtendByRefPart version : ext.getMutableParts()) {
                     boolean found = false;
-                    for (I_ThinExtByRefVersioned previous : extensions) {
+                    for (I_ExtendByRef previous : extensions) {
                         if (previous.getRefsetId() == ext.getRefsetId()) {
                             found = true;
                             break;
@@ -240,9 +240,9 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                         extensions.add(ext);
                     }
 
-                    List<I_ThinExtByRefVersioned> ext_members = members.get(ext.getRefsetId());
+                    List<I_ExtendByRef> ext_members = members.get(ext.getRefsetId());
                     if (ext_members == null) {
-                        ext_members = new ArrayList<I_ThinExtByRefVersioned>();
+                        ext_members = new ArrayList<I_ExtendByRef>();
                         members.put(ext.getRefsetId(), ext_members);
                     }
                     ext_members.add(ext);
@@ -275,7 +275,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
      * }
      */
 
-    private void writeRefsetFile(I_ThinExtByRefVersioned ext) throws IOException, TerminologyException {
+    private void writeRefsetFile(I_ExtendByRef ext) throws IOException, TerminologyException {
         String fsn = null;
         String pft = null;
 
@@ -304,7 +304,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         refsetWriter.write("Refset uuid\tEffectiveTime\tStatus\tName\tShortName\tRefSetType\t");
         refsetWriter.newLine();
 
-        for (I_ThinExtByRefPart version : ext.getMutableParts()) {
+        for (I_ExtendByRefPart version : ext.getMutableParts()) {
             // Id SCTID
             refsetWriter.write(termFactory.getUids(ext.getRefsetId()).iterator().next().toString());
             refsetWriter.write("\t");
@@ -338,7 +338,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
     public void writeMembers(int refsetId, String fsn, I_GetConceptData type) throws IOException, TerminologyException {
 
-        List<I_ThinExtByRefVersioned> ext_members = members.get(refsetId);
+        List<I_ExtendByRef> ext_members = members.get(refsetId);
 
         int extensiontype = -1;
         String fileextension = "";
@@ -421,8 +421,8 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
 
         memberWriter.newLine();
 
-        for (I_ThinExtByRefVersioned ext : ext_members) {
-            List<? extends I_ThinExtByRefPart> versions = ext.getMutableParts();
+        for (I_ExtendByRef ext : ext_members) {
+            List<? extends I_ExtendByRefPart> versions = ext.getMutableParts();
 
             /*
              * Probably should be able to filter on versions here based on
@@ -430,39 +430,39 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
              * values etc.
              */
 
-            for (I_ThinExtByRefPart version : versions) {
+            for (I_ExtendByRefPart version : versions) {
                 writeStandard(ext, version);
 
                 switch (extensiontype) {
                 case LANGUAGE:
                     memberWriter.write("\t");
                     // Acceptability
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartLanguage) version).getAcceptabilityId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartLanguage) version).getAcceptabilityId())
                         .iterator()
                         .next()
                         .toString());
                     memberWriter.write("\t");
                     // Correctness
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartLanguage) version).getCorrectnessId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartLanguage) version).getCorrectnessId())
                         .iterator()
                         .next()
                         .toString());
                     memberWriter.write("\t");
                     // DegreeOfSynonymy
                     memberWriter.write(termFactory.getUids(
-                        ((I_ThinExtByRefPartLanguage) version).getDegreeOfSynonymyId()).iterator().next().toString());
+                        ((I_ExtendByRefPartLanguage) version).getDegreeOfSynonymyId()).iterator().next().toString());
                     memberWriter.newLine();
                     break;
                 case BOOLEAN:
                     memberWriter.write("\t");
                     // BOOLEAN
-                    memberWriter.write(new Boolean(((I_ThinExtByRefPartBoolean) version).getBooleanValue()).toString());
+                    memberWriter.write(new Boolean(((I_ExtendByRefPartBoolean) version).getBooleanValue()).toString());
                     memberWriter.newLine();
                     break;
                 case CONCEPT:
                     memberWriter.write("\t");
                     // CONCEPT
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartConcept) version).getConceptId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartCid) version).getConceptId())
                         .iterator()
                         .next()
                         .toString());
@@ -471,59 +471,59 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                 case CONCEPT_INTEGER:
                     memberWriter.write("\t");
                     // CONCEPT
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartConceptInt) version).getConceptId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartCidInt) version).getConceptId())
                         .iterator()
                         .next()
                         .toString());
                     memberWriter.write("\t");
                     // INTEGER
-                    memberWriter.write(new Integer(((I_ThinExtByRefPartConceptInt) version).getIntValue()).toString());
+                    memberWriter.write(new Integer(((I_ExtendByRefPartCidInt) version).getIntValue()).toString());
                     memberWriter.newLine();
                     break;
                 case INTEGER:
                     memberWriter.write("\t");
                     // INTEGER
-                    memberWriter.write(new Integer(((I_ThinExtByRefPartInteger) version).getValue()).toString());
+                    memberWriter.write(new Integer(((I_ExtendByRefPartInteger) version).getValue()).toString());
                     memberWriter.newLine();
                     break;
                 case MEASUREMENT:
                     memberWriter.write("\t");
                     // MEASUREMENT
-                    memberWriter.write(new Double(((I_ThinExtByRefPartMeasurement) version).getMeasurementValue()).toString());
+                    memberWriter.write(new Double(((I_ExtendByRefPartMeasurement) version).getMeasurementValue()).toString());
                     memberWriter.write("\t");
                     // UNIT OF MEAUSURE
                     memberWriter.write(termFactory.getUids(
-                        ((I_ThinExtByRefPartMeasurement) version).getUnitsOfMeasureId()).iterator().next().toString());
+                        ((I_ExtendByRefPartMeasurement) version).getUnitsOfMeasureId()).iterator().next().toString());
                     memberWriter.newLine();
                     break;
                 case SCOPED:
                     memberWriter.write("\t");
                     // Acceptability
                     memberWriter.write(termFactory.getUids(
-                        ((I_ThinExtByRefPartLanguageScoped) version).getAcceptabilityId()).iterator().next().toString());
+                        ((I_ExtendByRefPartLanguageScoped) version).getAcceptabilityId()).iterator().next().toString());
                     memberWriter.write("\t");
                     // Correctness
                     memberWriter.write(termFactory.getUids(
-                        ((I_ThinExtByRefPartLanguageScoped) version).getCorrectnessId()).iterator().next().toString());
+                        ((I_ExtendByRefPartLanguageScoped) version).getCorrectnessId()).iterator().next().toString());
                     memberWriter.write("\t");
                     // DegreeOfSynonymy
                     memberWriter.write(termFactory.getUids(
-                        ((I_ThinExtByRefPartLanguageScoped) version).getDegreeOfSynonymyId())
+                        ((I_ExtendByRefPartLanguageScoped) version).getDegreeOfSynonymyId())
                         .iterator()
                         .next()
                         .toString());
                     memberWriter.write("\t");
                     // PRIORITY
-                    memberWriter.write(new Integer(((I_ThinExtByRefPartLanguageScoped) version).getPriority()).toString());
+                    memberWriter.write(new Integer(((I_ExtendByRefPartLanguageScoped) version).getPriority()).toString());
                     memberWriter.write("\t");
                     // SCOPE
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartLanguageScoped) version).getScopeId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartLanguageScoped) version).getScopeId())
                         .iterator()
                         .next()
                         .toString());
                     memberWriter.write("\t");
                     // TAG
-                    memberWriter.write(termFactory.getUids(((I_ThinExtByRefPartLanguageScoped) version).getTagId())
+                    memberWriter.write(termFactory.getUids(((I_ExtendByRefPartLanguageScoped) version).getTagId())
                         .iterator()
                         .next()
                         .toString());
@@ -533,7 +533,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
                 case STRING:
                     memberWriter.write("\t");
                     // MEASUREMENT
-                    memberWriter.write(((I_ThinExtByRefPartString) version).getStringValue().toString());
+                    memberWriter.write(((I_ExtendByRefPartString) version).getStringValue().toString());
                     memberWriter.newLine();
                     break;
                 }
@@ -544,7 +544,7 @@ public class ExportRefSet extends AbstractMojo implements I_ProcessConcepts, I_P
         memberWriter.close();
     }
 
-    public void writeStandard(I_ThinExtByRefVersioned ext, I_ThinExtByRefPart version) throws IOException,
+    public void writeStandard(I_ExtendByRef ext, I_ExtendByRefPart version) throws IOException,
             TerminologyException {
         // Id
         memberWriter.write(termFactory.getUids(ext.getRefsetId()).iterator().next().toString());

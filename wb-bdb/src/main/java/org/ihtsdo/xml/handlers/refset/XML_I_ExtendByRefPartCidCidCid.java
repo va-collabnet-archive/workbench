@@ -1,6 +1,6 @@
 package org.ihtsdo.xml.handlers.refset;
 
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.I_Handle_XML;
@@ -8,13 +8,13 @@ import org.w3c.dom.Element;
 
 public class XML_I_ExtendByRefPartCidCidCid extends XML_RefSetBasic implements I_Handle_XML {
 
-	I_ExtendRefPartCidCidCid rpcc = null;
+	I_ExtendByRefPartCidCidCid rpcc = null;
 	int c1id = -1;
 	int c2id = -1;
 	int c3id = -1;
 
 	public XML_I_ExtendByRefPartCidCidCid(
-			I_ExtendRefPartCidCidCid rpcc, Element parent) {
+			I_ExtendByRefPartCidCidCid rpcc, Element parent) {
 		super();
 		this.rpcc = rpcc;
 		this.parent = parent;

@@ -24,15 +24,15 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartBoolean;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptConceptConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptInt;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidConcept;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidConceptConcept;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInteger;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartMeasurement;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartString;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.mojo.refset.writers.BooleanRefsetHandler;
@@ -72,22 +72,22 @@ enum RefsetType {
         this.fileExtension = fileExtension;
     }
 
-    public static RefsetType findByExtension(I_ThinExtByRefPart part) {
-        if (part instanceof I_ThinExtByRefPartBoolean) {
+    public static RefsetType findByExtension(I_ExtendByRefPart part) {
+        if (part instanceof I_ExtendByRefPartBoolean) {
             return BOOLEAN;
-        } else if (part instanceof I_ThinExtByRefPartConcept) {
+        } else if (part instanceof I_ExtendByRefPartCid) {
             return CONCEPT;
-        } else if (part instanceof I_ThinExtByRefPartConceptConcept) {
+        } else if (part instanceof I_ExtendByRefPartCidConcept) {
             return CONCEPT_CONCEPT;
-        } else if (part instanceof I_ThinExtByRefPartConceptConceptConcept) {
+        } else if (part instanceof I_ExtendByRefPartCidConceptConcept) {
             return CONCEPT_CONCEPT_CONCEPT;
-        } else if (part instanceof I_ThinExtByRefPartConceptInt) {
+        } else if (part instanceof I_ExtendByRefPartCidInt) {
             return CONCEPT_INTEGER;
-        } else if (part instanceof I_ThinExtByRefPartInteger) {
+        } else if (part instanceof I_ExtendByRefPartInteger) {
             return INTEGER;
-        } else if (part instanceof I_ThinExtByRefPartString) {
+        } else if (part instanceof I_ExtendByRefPartString) {
             return STRING;
-        } else if (part instanceof I_ThinExtByRefPartMeasurement) {
+        } else if (part instanceof I_ExtendByRefPartMeasurement) {
             return CONCEPT_DOUBLE;
         }
 
@@ -154,7 +154,7 @@ enum RefsetType {
         };
     }
 
-    public static IterableFileReader<I_ThinExtByRefPart> getHandlerForFile(File file) throws InstantiationException,
+    public static IterableFileReader<I_ExtendByRefPart> getHandlerForFile(File file) throws InstantiationException,
             IllegalAccessException {
         return findByFilename(file.getName()).getRefsetHandler();
     }

@@ -26,8 +26,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -165,10 +165,10 @@ public class VodbCreateExtension extends AbstractMojo {
             }
 
             if (!skipExtension) {
-                I_ThinExtByRefVersioned extension = termFactory.newExtension(referenceSetId, memberId, conceptId,
+                I_ExtendByRef extension = termFactory.newExtension(referenceSetId, memberId, conceptId,
                     conceptTypeId);
 
-                I_ThinExtByRefPartConcept conceptExtension = termFactory.newConceptExtensionPart();
+                I_ExtendByRefPartCid conceptExtension = termFactory.newConceptExtensionPart();
 
                 conceptExtension.setPathId(memberSetPath.getConceptId());
                 conceptExtension.setStatus(currentStatusId);

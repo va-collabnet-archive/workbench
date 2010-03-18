@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
@@ -32,7 +32,7 @@ public class ERefsetCidCidCidMember extends ERefsetMember<ERefsetCidCidCidRevisi
         refsetUuid = nidToUuid(m.getRefsetId());
         componentUuid = nidToUuid(m.getComponentId());
 
-        I_ExtendRefPartCidCidCid part = (I_ExtendRefPartCidCidCid) m.getMutableParts()
+        I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) m.getMutableParts()
             .get(0);
         c1Uuid = nidToUuid(part.getC1id());
         c2Uuid = nidToUuid(part.getC2id());
@@ -44,7 +44,7 @@ public class ERefsetCidCidCidMember extends ERefsetMember<ERefsetCidCidCidRevisi
             revisions = new ArrayList<ERefsetCidCidCidRevision>(partCount - 1);
             for (int i = 1; i < partCount; i++) {
                 revisions.add(new ERefsetCidCidCidRevision(
-                    (I_ExtendRefPartCidCidCid) m.getMutableParts().get(i)));
+                    (I_ExtendByRefPartCidCidCid) m.getMutableParts().get(i)));
             }
         }
     }
@@ -57,7 +57,7 @@ public class ERefsetCidCidCidMember extends ERefsetMember<ERefsetCidCidCidRevisi
         convert(nidToIdentifier(m.getMemberId()));
         refsetUuid = nidToUuid(m.getRefsetId());
         componentUuid = nidToUuid(m.getComponentId());
-        I_ExtendRefPartCidCidCid part = (I_ExtendRefPartCidCidCid) m.getMutablePart();
+        I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) m.getMutablePart();
         c1Uuid = nidToUuid(part.getC1id());
         c2Uuid = nidToUuid(part.getC2id());
         c3Uuid = nidToUuid(part.getC3id());

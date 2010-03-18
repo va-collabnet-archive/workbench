@@ -2,79 +2,42 @@ package org.ihtsdo.concept;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntIterator;
-import org.dwfa.util.HashFunction;
+import org.ihtsdo.db.util.NidPair;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IntListPairsBinder extends TupleBinding<List<? extends Integer>> {
+public class IntListPairsBinder extends TupleBinding<List<? extends NidPair>> {
 	
-	private static class Pair {
-		int first;
-		int second;
-		public Pair(int first, int second) {
-			super();
-			this.first = first;
-			this.second = second;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (Pair.class.isAssignableFrom(obj.getClass())) {
-				Pair another = (Pair) obj;
-				return first == another.first && second == another.second;
-			}
-			return super.equals(obj);
-		}
-		
-		@Override
-		public int hashCode() {
-			return HashFunction.hashCode(new int[] { first, second });
-		}
-		
-		public String toString() {
-			return "first: " + first + " second: " + second;
-		}
-	}
-	
-	private HashSet<Pair> priorEntries;
+	private HashSet<NidPair> priorEntries;
 
 	@Override
-	public List<Integer> entryToObject(TupleInput input) {
+	public List<NidPair> entryToObject(TupleInput input) {
 		int size = input.readInt();
-		HashSet<Pair> newPairs = new HashSet<Pair>(size);
+		HashSet<NidPair> newPairs = new HashSet<NidPair>(size);
 		for (int i = 0; i < size; i = i + 2) {
-			newPairs.add(new Pair(input.readInt(), input.readInt()));
+			newPairs.add(new NidPair(input.readInt(), input.readInt()));
 		}
 		if (priorEntries != null) {
 			newPairs.addAll(priorEntries);
 		} 
 		priorEntries = null;
-		List<Integer> newList = new ArrayList<Integer>(newPairs.size() * 2);
-		for (Pair p: newPairs) {
-			newList.add(p.first);
-			newList.add(p.second);
-		}
-		return newList;
+		return new ArrayList<NidPair>(newPairs);
 	}
 
 	@Override
-	public void objectToEntry(List<? extends Integer> object, TupleOutput output) {
+	public void objectToEntry(List<? extends NidPair> object, TupleOutput output) {
 		if (priorEntries != null && priorEntries.size() > 0) {
-			ArrayIntList listToWrite = new ArrayIntList(object.size());
-			Iterator<? extends Integer> roListItr = object.iterator();
-			while (roListItr.hasNext()) {
-				int part1 = roListItr.next();
-				int part2 = roListItr.next();
-				if (!priorEntries.contains(new Pair(part1, part2))) {
-					listToWrite.add(part1);
-					listToWrite.add(part2);
+			ArrayIntList listToWrite = new ArrayIntList(object.size() * 2);
+			for (NidPair pair: object) {
+				if (!priorEntries.contains(pair)) {
+					listToWrite.add(pair.getNid1());
+					listToWrite.add(pair.getNid2());
 				}
 			}
 			output.writeInt(listToWrite.size());
@@ -83,28 +46,26 @@ public class IntListPairsBinder extends TupleBinding<List<? extends Integer>> {
 				output.writeInt(itr.next());
 			}
 		} else {
-			output.writeInt(object.size());
-			Iterator<? extends Integer> itr = object.iterator();
-			while (itr.hasNext()) {
-				output.writeInt(itr.next());
-			}
+			output.writeInt(object.size() * 2);
+            for (NidPair pair: object) {
+                if (!priorEntries.contains(pair)) {
+                    output.writeInt(pair.getNid1());
+                    output.writeInt(pair.getNid2());
+                }
+            }
 		}
 		priorEntries = null;
 	}
 
-	public void setReadOnlyList(List<? extends Integer> roList) {
+	public void setReadOnlyList(List<? extends NidPair> roList) {
 		if (roList == null) {
-			priorEntries = new HashSet<Pair>();
+			priorEntries = new HashSet<NidPair>();
 		} else {
-			Iterator<? extends Integer> itr = roList.iterator();
-			priorEntries = new HashSet<Pair>(roList.size() / 2);
-			while (itr.hasNext()) {
-				priorEntries.add(new Pair(itr.next(), itr.next()));
-			}
+			priorEntries = new HashSet<NidPair>(roList);
 		}
 	}
 
-	public byte[] getBytes(List<? extends Integer> roList, List<? extends Integer> rwList) {
+	public byte[] getBytes(List<? extends NidPair> roList, List<? extends NidPair> rwList) {
 		setReadOnlyList(roList);
 		TupleOutput output = new TupleOutput();
 		objectToEntry(rwList, output);

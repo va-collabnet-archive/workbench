@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
@@ -15,7 +15,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidCidMember> 
-	implements I_ExtendRefPartCidCidCid {
+	implements I_ExtendByRefPartCidCidCid {
 
 	private int c1Nid;
 	private int c2Nid;

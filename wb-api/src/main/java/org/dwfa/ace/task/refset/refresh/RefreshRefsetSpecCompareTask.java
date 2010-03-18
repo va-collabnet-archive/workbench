@@ -36,7 +36,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -305,7 +305,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        				
 	        				// Break down the tuple into it's component parts and check to see if any of 
 	        				// those parts need to be refreshed from the selected version of SNOMED. 
-	        				I_ExtendRefPartCidCidCid ccPart = (I_ExtendRefPartCidCidCid) tuple.getMutablePart();
+	        				I_ExtendByRefPartCidCidCid ccPart = (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
 	        				I_GetConceptData part1 = termFactory.getConcept(ccPart.getC1id());
 	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
 	        				I_GetConceptData part3 = termFactory.getConcept(ccPart.getC3id());

@@ -10,7 +10,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -102,7 +102,7 @@ public class RefsetPropertyMap {
 				c1part.setC1id((Integer) entry.getValue());
 				break;
 			case CID_THREE:
-				I_ExtendRefPartCidCidCid c3part = (I_ExtendRefPartCidCidCid) part;
+				I_ExtendByRefPartCidCidCid c3part = (I_ExtendByRefPartCidCidCid) part;
 				c3part.setC3id((Integer) entry.getValue());
 				break;
 			case CID_TWO:
@@ -163,10 +163,10 @@ public class RefsetPropertyMap {
 				}
 				break;
 			case CID_THREE:
-				if (!I_ExtendRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
+				if (!I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
 					return false;
 				}
-				I_ExtendRefPartCidCidCid c3part = (I_ExtendRefPartCidCidCid) part;
+				I_ExtendByRefPartCidCidCid c3part = (I_ExtendByRefPartCidCidCid) part;
 				if (!entry.getValue().equals(c3part.getC3id())) {
 					return false;
 				}

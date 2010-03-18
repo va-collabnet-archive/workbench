@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.RefsetUtilities;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
@@ -72,7 +72,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
     /**
      * Finds members which are "marked parents" and which are current.
      */
-    public Iterator<I_ThinExtByRefVersioned> iterator() {
+    public Iterator<I_ExtendByRef> iterator() {
         try {
             injectValidTypeIds();
             candidateWriter = new CandidateWriter(reportFile, termFactory);
@@ -80,7 +80,7 @@ public final class DuplicateMarkedParentFinder implements ConceptExtFinder {
 
             processRefsets();
 
-            List<I_ThinExtByRefVersioned> siftedResults = duplicateMarketParentSifter.sift(markedParentProcessor);
+            List<I_ExtendByRef> siftedResults = duplicateMarketParentSifter.sift(markedParentProcessor);
             System.out.println("Found " + siftedResults.size() + " candidate extensions.");
             return siftedResults.iterator();
         } catch (Exception e) {

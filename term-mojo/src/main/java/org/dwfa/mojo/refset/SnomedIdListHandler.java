@@ -21,8 +21,8 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.ace.refset.MemberRefsetHelper;
@@ -40,7 +40,7 @@ import org.dwfa.mojo.ConceptDescriptor;
  *             {@link MemberRefsetHelper}
  */
 @Deprecated
-public class SnomedIdListHandler extends IterableFileReader<I_ThinExtByRefVersioned> {
+public class SnomedIdListHandler extends IterableFileReader<I_ExtendByRef> {
 
     protected I_TermFactory termFactory = LocalVersionedTerminology.get();
 
@@ -51,7 +51,7 @@ public class SnomedIdListHandler extends IterableFileReader<I_ThinExtByRefVersio
     protected ConceptDescriptor refsetType;
 
     @Override
-    protected I_ThinExtByRefVersioned processLine(String line) {
+    protected I_ExtendByRef processLine(String line) {
 
         String[] tokens = line.split("\t");
 
@@ -71,11 +71,11 @@ public class SnomedIdListHandler extends IterableFileReader<I_ThinExtByRefVersio
 
             int specTypeId = getRefsetType().getVerifiedConcept().getIdentifier().getNid();
 
-            I_ThinExtByRefPartConcept extPart = termFactory.newConceptExtensionPart();
+            I_ExtendByRefPartCid extPart = termFactory.newConceptExtensionPart();
             extPart.setConceptId(specTypeId);
             extPart.setStatusId(statusId);
 
-            I_ThinExtByRefVersioned extension = termFactory.newExtension(0, memberId, concept.getConceptId(),
+            I_ExtendByRef extension = termFactory.newExtension(0, memberId, concept.getConceptId(),
                 refsetTypeId);
             extension.addVersion(extPart);
 

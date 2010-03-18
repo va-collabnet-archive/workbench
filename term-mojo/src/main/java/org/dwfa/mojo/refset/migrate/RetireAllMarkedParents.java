@@ -27,10 +27,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
@@ -96,20 +96,20 @@ public class RetireAllMarkedParents extends AbstractMojo {
 
         int refsetId = memberRefsetConcept.getConceptId();
 
-        List<I_ThinExtByRefVersioned> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
+        List<I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
-        for (I_ThinExtByRefVersioned thinExtByRefVersioned : extVersions) {
+        for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 
-            List<I_ThinExtByRefTuple> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
 
-            for (I_ThinExtByRefTuple thinExtByRefTuple : extensions) {
+            for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
-                    I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) thinExtByRefTuple.getMutablePart();
+                    I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) thinExtByRefTuple.getMutablePart();
                     if (part.getConceptId() == concepts.get("PARENT_MARKER").getConceptId()
                         && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
 
-                        I_ThinExtByRefPart clone = (I_ThinExtByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptId(), part.getPathId(), Long.MAX_VALUE);
+                        I_ExtendByRefPart clone = (I_ExtendByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptId(), part.getPathId(), Long.MAX_VALUE);
                         thinExtByRefVersioned.addVersion(clone);
 
                         termFactory.addUncommitted(thinExtByRefVersioned);

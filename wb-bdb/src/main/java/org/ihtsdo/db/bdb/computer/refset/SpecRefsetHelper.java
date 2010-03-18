@@ -32,7 +32,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -415,10 +415,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // confirm its the right extension value and its status is
                 // current
                 if (latestPart.getStatusId() == statusId) {
-                    if (latestPart instanceof I_ExtendRefPartCidCidCid) {
-                        int c1Value = ((I_ExtendRefPartCidCidCid) latestPart).getC1id();
-                        int c2Value = ((I_ExtendRefPartCidCidCid) latestPart).getC2id();
-                        int c3Value = ((I_ExtendRefPartCidCidCid) latestPart).getC3id();
+                    if (latestPart instanceof I_ExtendByRefPartCidCidCid) {
+                        int c1Value = ((I_ExtendByRefPartCidCidCid) latestPart).getC1id();
+                        int c2Value = ((I_ExtendByRefPartCidCidCid) latestPart).getC2id();
+                        int c3Value = ((I_ExtendByRefPartCidCidCid) latestPart).getC3id();
                         if (c1Value == c1Id && c2Value == c2Id && c3Value == c3Id) {
                             return true;
                         }

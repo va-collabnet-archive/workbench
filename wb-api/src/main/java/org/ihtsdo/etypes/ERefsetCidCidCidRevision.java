@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 
@@ -22,7 +22,7 @@ public class ERefsetCidCidCidRevision extends ERevision {
         readExternal(in);
     }
 
-    public ERefsetCidCidCidRevision(I_ExtendRefPartCidCidCid part) throws TerminologyException,
+    public ERefsetCidCidCidRevision(I_ExtendByRefPartCidCidCid part) throws TerminologyException,
             IOException {
         c1Uuid = nidToUuid(part.getC1id());
         c2Uuid = nidToUuid(part.getC2id());

@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.refset.scrub.util.TerminologyFactoryUtil;
 
 /**
- * Members <code>I_ThinExtByRefVersioned</code> supplied through the
- * {@link #put(I_ThinExtByRefVersioned)} mehtod are sorted by component and
+ * Members <code>I_ExtendByRef</code> supplied through the
+ * {@link #put(I_ExtendByRef)} mehtod are sorted by component and
  * referenceset.
  * 
  * This list of members is then processed when {@link #getDuplicates()} is
@@ -53,7 +53,7 @@ public final class DuplicateMarkedParentMarker {
      * 
      * @param member The marked parent.
      */
-    public void put(final I_ThinExtByRefVersioned member) {
+    public void put(final I_ExtendByRef member) {
         ComponentRefsetKey key = new ComponentRefsetKey(member);
 
         if (!memberMap.containsKey(key)) {
@@ -82,8 +82,8 @@ public final class DuplicateMarkedParentMarker {
     }
 
     private void removeRetiredMembers(final ComponentRefsetMembers componentRefsetMembers) {
-        for (I_ThinExtByRefVersioned member : componentRefsetMembers.getMembers()) {
-            TreeSet<I_ThinExtByRefPart> sortedVersionsSet = new TreeSet<I_ThinExtByRefPart>(
+        for (I_ExtendByRef member : componentRefsetMembers.getMembers()) {
+            TreeSet<I_ExtendByRefPart> sortedVersionsSet = new TreeSet<I_ExtendByRefPart>(
                 new LatestVersionComparator());
             sortedVersionsSet.addAll(member.getMutableParts());
             if (sortedVersionsSet.last().getStatus() != currentStatusId) { // ignore

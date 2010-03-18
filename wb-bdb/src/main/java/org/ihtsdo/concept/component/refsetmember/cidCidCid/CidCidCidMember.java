@@ -8,7 +8,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
@@ -24,7 +24,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMember>
-	implements I_ExtendRefPartCidCidCid {
+	implements I_ExtendByRefPartCidCidCid {
 
 	private static VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> computer = 
 		new VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version>();
@@ -37,7 +37,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 	
 	public class Version 
 	extends RefsetMember<CidCidCidRevision, CidCidCidMember>.Version 
-	implements I_ExtendByRefVersion, I_ExtendRefPartCidCidCid {
+	implements I_ExtendByRefVersion, I_ExtendByRefPartCidCidCid {
 
 		private Version() {
 			super();
@@ -47,8 +47,8 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 			super(index);
 		}
 		public int compareTo(I_ExtendByRefPart o) {
-			if (I_ExtendRefPartCidCidCid.class.isAssignableFrom(o.getClass())) {
-				I_ExtendRefPartCidCidCid another = (I_ExtendRefPartCidCidCid) o;
+			if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(o.getClass())) {
+				I_ExtendByRefPartCidCidCid another = (I_ExtendByRefPartCidCidCid) o;
 				if (this.getC1id() != another.getC1id()) {
 					return this.getC1id() - another.getC1id();
 				}

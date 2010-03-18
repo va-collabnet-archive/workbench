@@ -19,38 +19,38 @@ package org.dwfa.mojo.refset.scrub.markedparents;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 
 /**
  * Captures information about a <code>ComponentRefsetKey</code>. Stores
- * <code>I_ThinExtByRefVersioned</code> members
+ * <code>I_ExtendByRef</code> members
  * for this component-refset combination.
  */
 public final class ComponentRefsetMembers {
 
     private final ComponentRefsetKey componentRefsetKey;
-    private final List<I_ThinExtByRefVersioned> members;
+    private final List<I_ExtendByRef> members;
 
     public ComponentRefsetMembers(final ComponentRefsetKey componentRefsetKey) {
         this.componentRefsetKey = componentRefsetKey;
-        members = new ArrayList<I_ThinExtByRefVersioned>();
+        members = new ArrayList<I_ExtendByRef>();
     }
 
     public ComponentRefsetKey getComponentRefsetKey() {
         return componentRefsetKey;
     }
 
-    public void addMember(final I_ThinExtByRefVersioned member) {
+    public void addMember(final I_ExtendByRef member) {
         members.add(member);
     }
 
-    public void removeMember(final I_ThinExtByRefVersioned member) {
+    public void removeMember(final I_ExtendByRef member) {
         members.remove(member);
     }
 
-    public List<I_ThinExtByRefVersioned> getMembers() {
+    public List<I_ExtendByRef> getMembers() {
         // return a copy.
-        return new ArrayList<I_ThinExtByRefVersioned>(members);
+        return new ArrayList<I_ExtendByRef>(members);
     }
 
     public int getMemberCount() {

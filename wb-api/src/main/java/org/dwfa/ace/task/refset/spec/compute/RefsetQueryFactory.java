@@ -37,7 +37,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -94,7 +94,7 @@ public class RefsetQueryFactory {
      * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
      * ParseException {
      * // create tree object that corresponds to the database's refset spec
-     * List<I_ThinExtByRefVersioned> extensions =
+     * List<I_ExtendByRef> extensions =
      * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
      * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
      * HashSet<Integer> fetchedComponents = new HashSet<Integer>();
@@ -102,7 +102,7 @@ public class RefsetQueryFactory {
      * addExtensionsToMap(extensions, extensionMap, fetchedComponents);
      * DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
      * for (DefaultMutableTreeNode extNode : extensionMap.values()) {
-     * I_ThinExtByRefVersioned ext = (I_ThinExtByRefVersioned) extNode.getUserObject();
+     * I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
      * if (ext.getComponentId() == refsetSpec.getConceptId()) {
      * root.add(extNode);
      * } else {
@@ -159,10 +159,10 @@ public class RefsetQueryFactory {
             if (extensions.size() > 0) {
                 I_ExtendByRefPart thinPart = extensions.get(0).getMutablePart();
 
-                if (thinPart instanceof I_ExtendRefPartCidCidCid) {
+                if (thinPart instanceof I_ExtendByRefPartCidCidCid) {
 
                     // structural query e.g. true : is-concept : height
-                    I_ExtendRefPartCidCidCid part = (I_ExtendRefPartCidCidCid) thinPart;
+                    I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) thinPart;
 
                     I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
                     I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
