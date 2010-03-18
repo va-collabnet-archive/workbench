@@ -22,13 +22,17 @@
 			<url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
 		</repository>
 	</distributionManagement> -->
+	
+		<properties>
+		<org.ihtsdo.wb-mojo.version>0.0.1-SNAPSHOT</org.ihtsdo.wb-mojo.version>
+		</properties>
 
 	<build>
 		<plugins>
 			 <plugin>
                 <groupId>org.ihtsdo</groupId>
                 <artifactId>wb-mojo</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${org.ihtsdo.wb-mojo.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -251,7 +255,7 @@
             <plugin>
                 <groupId>org.ihtsdo</groupId>
                 <artifactId>wb-mojo</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>${org.ihtsdo.wb-mojo.version}</version>
                 <executions>
                     <execution>
                         <id>vodb-open</id>
