@@ -191,7 +191,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     rootDir = this.outputDirectory;
 
                 }
-                URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
+                //URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
+                ClassLoader libLoader = this.getClass().getClassLoader();
                 Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 
                 for (Artifact artifact : artifacts) {

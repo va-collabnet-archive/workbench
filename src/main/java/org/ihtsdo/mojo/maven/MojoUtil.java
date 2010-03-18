@@ -95,7 +95,7 @@ public class MojoUtil {
     public static URLClassLoader getProjectClassLoader(List<Dependency> dependencies, String localRepository)
             throws IOException {
         List<URL> libs = addDependencies(dependencies, localRepository);
-        return new URLClassLoader(libs.toArray(new URL[libs.size()]));
+        return new URLClassLoader(libs.toArray(new URL[libs.size()]), dependencies.getClass().getClassLoader());
     }
 
     /**
@@ -108,7 +108,7 @@ public class MojoUtil {
         for (Artifact a : artifacts) {
             libs.add(a.getFile().toURI().toURL());
         }
-        return new URLClassLoader(libs.toArray(new URL[libs.size()]));
+        return new URLClassLoader(libs.toArray(new URL[libs.size()]), artifacts.getClass().getClassLoader());
     }
 
     private static List<URL> addDependencies(List<Dependency> dependencies, String localRepository)
@@ -130,7 +130,7 @@ public class MojoUtil {
             String classesDir) throws IOException {
         List<URL> libs = addDependencies(dependencies, localRepository);
         libs.add(new File(classesDir).toURI().toURL());
-        return new URLClassLoader(libs.toArray(new URL[libs.size()]));
+        return new URLClassLoader(libs.toArray(new URL[libs.size()]), dependencies.getClass().getClassLoader());
     }
 
     public static URLClassLoader getProjectClassLoaderWithoutProvided(List<Artifact> dependencies) throws IOException {
