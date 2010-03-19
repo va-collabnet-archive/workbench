@@ -448,20 +448,51 @@ public abstract class RefsetUtilities {
     public int getRelTypeTarget(int conceptId, ConceptSpec relType) throws Exception {
         I_GetConceptData concept = getConcept(conceptId);
 
-        Set<I_GetConceptData> membershipTypes = concept.getSourceRelTargets(
-            getIntSet(ArchitectonicAuxiliary.Concept.CURRENT), getIntSet(relType), null, false);
+        List<I_RelTuple> srcRels = concept.getSourceRelTuples(null, getIntSet(relType), null, false, true);
 
-        if (membershipTypes.size() == 0) {
-            throw new TerminologyException("A source relationship of type '" + relType.getDescription()
+        // ConceptId, Version
+        HashMap<Integer, Integer> targets = new HashMap<Integer, Integer>();
+        
+        for (I_RelTuple srcRel : srcRels) {
+            int srcRelTargetId = srcRel.getC2Id();
+            int srcRelVersion = srcRel.getVersion();
+            if (targets.containsKey(srcRelTargetId)) {
+                int latestVersion = targets.get(srcRelTargetId);
+                if (srcRel.getVersion() > latestVersion) {
+                    if (srcRel.getStatusId() == currentStatusId) {
+                        targets.put(srcRelTargetId, latestVersion);
+                    } else {
+                        targets.remove(srcRelTargetId);
+                    }
+                }
+            } else {
+                if (srcRel.getStatusId() == currentStatusId) {
+                    targets.put(srcRelTargetId, srcRelVersion);
+                }
+            }
+        }
+        
+        if (targets.size() == 0) {
+            throw new TerminologyException("A current source relationship of type '" + relType.getDescription()
                 + "' was not found for concept " + concept.getId().getUIDs().iterator().next());
         }
 
-        if (membershipTypes.size() > 1) {
-            throw new TerminologyException("More than one source relationship of type '" + relType.getDescription()
+        if (targets.size() > 1) {
+            System.out.println("More than one current source relationship of type '" + relType.getDescription()
                 + "' was found for concept " + concept.getId().getUIDs().iterator().next());
         }
 
-        return membershipTypes.iterator().next().getConceptId();
+        int latestVersion = 0;
+        int latestTargetId = ID_NOT_FOUND;
+        for (Integer targetId : targets.keySet()) {
+            int version = targets.get(targetId);
+            if ((version > latestVersion) || (latestTargetId == ID_NOT_FOUND)) {
+                latestTargetId = targetId;
+                latestVersion = version;
+            }
+        }
+        
+        return latestTargetId;
     }
 
     public int getMembershipType(int includeTypeConceptId) throws Exception {
