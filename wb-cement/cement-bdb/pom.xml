@@ -43,6 +43,7 @@
 				<!--<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
 				<version>${org.ihtsdo.wb-mojo.version}</version> -->
+				
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
@@ -64,9 +65,13 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.ihtsdo</groupId>
+			
+				<!--  <groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<version>${org.ihtsdo.wb-mojo.version}</version> -->
+				<groupId>org.dwfa</groupId>
+				<artifactId>term-mojo</artifactId>
+				<version>1.43-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>vodb-open</id>
