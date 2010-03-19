@@ -155,8 +155,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         }
     }
 
-    private static final String authFailureMsg = "Username and password do not match.";
-
     @SuppressWarnings("unchecked")
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();

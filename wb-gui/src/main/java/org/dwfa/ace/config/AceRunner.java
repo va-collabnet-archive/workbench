@@ -346,6 +346,7 @@ public class AceRunner {
         boolean newFrame = false;
         private File aceConfigFile;
         private Properties aceProperties;
+        @SuppressWarnings("unused")
         private Configuration jiniConfig;
         private File lastProfileDir;
         private String password;
