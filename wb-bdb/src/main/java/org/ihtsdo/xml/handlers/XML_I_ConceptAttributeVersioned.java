@@ -7,7 +7,7 @@ import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_ConceptAttributeVersioned extends XML_basic implements
+public class XML_I_ConceptAttributeVersioned extends XML_basic_econ implements
 		I_Handle_XML {
 
 	public I_ConceptAttributeVersioned conAttV;
@@ -15,38 +15,39 @@ public class XML_I_ConceptAttributeVersioned extends XML_basic implements
 	int numVer = -1;
 	
 	
+	public XML_I_ConceptAttributeVersioned() {
+		super();
+	}
+
 	public XML_I_ConceptAttributeVersioned(I_ConceptAttributeVersioned conAttV, Element parent) {
 		super();
 		this.conAttV = conAttV;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ConceptAttributeVersioned(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
+
 	
-	public XML_I_ConceptAttributeVersioned(EConcept econcept, Element parent) {
-		super();
-		this.parent = parent;
-		processXML(econcept);
-	}
-	
-	public void processXML(EConcept econcept) {
+	public void setXML() {
 		EConceptAttributes eca1 = new EConceptAttributes();
 		
 		
 		//For each 
-		
+		//eca1.
 		
 		econcept.setConceptAttributes(eca1);
 		
 	}
+	
+	
 
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.CAV_ENAME);
 		
 		if (!debug) {

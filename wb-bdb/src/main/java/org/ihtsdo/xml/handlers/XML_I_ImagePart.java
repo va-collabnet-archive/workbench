@@ -15,17 +15,17 @@ public class XML_I_ImagePart extends XML_basic implements I_Handle_XML {
 		super();
 		this.imgP = imgP;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ImagePart(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.IMG_PART_ENAME);
 		
 		if (!debug) {

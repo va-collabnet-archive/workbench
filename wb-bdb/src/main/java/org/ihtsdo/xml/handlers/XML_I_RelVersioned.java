@@ -8,7 +8,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_RelVersioned extends XML_basic implements I_Handle_XML {
+public class XML_I_RelVersioned extends XML_basic_econ implements I_Handle_XML {
 
 	I_RelVersioned rel;
 	/** If False then is a src relationship **/
@@ -27,29 +27,29 @@ public class XML_I_RelVersioned extends XML_basic implements I_Handle_XML {
 		this.rel = rel;
 		this.parent = parent;
 		this.dest = dest;
-		process();
+		getXML();
 	}
 	
+	public XML_I_RelVersioned(boolean dest) {
+		super();
+		this.dest = dest;
+		
+	}
+
 	public XML_I_RelVersioned(boolean debug, Element parent, boolean dest) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
 		this.dest = dest;
-		process();
+		getXML();
 	}
 
-	public XML_I_RelVersioned(EConcept econcept, Element parent, boolean dest) {
-		super();
-		this.parent = parent;
-		this.dest = dest;
-		processXML(econcept);
-	}
 	
-	public void processXML(EConcept econcept) {
+	public void setXML() {
 		
 	}
 	
-	public void process() {
+	public void getXML() {
 		setSrcDest();
 		
 		Element localE = parent.getOwnerDocument().createElement(relN);

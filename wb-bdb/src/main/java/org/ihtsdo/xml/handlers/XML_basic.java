@@ -1,11 +1,13 @@
 package org.ihtsdo.xml.handlers;
 
+import org.ihtsdo.etypes.EConcept;
 import org.w3c.dom.Element;
 
-public class XML_basic {
+public class XML_basic implements I_Handle_XML	 {
 	
 	public boolean debug = false;
 	public Element parent;
+
 	
 	public int versionid = -1;
 	public int positionid = -1;
@@ -19,6 +21,17 @@ public class XML_basic {
 		}
 		BasicXMLStruct.getStatusIdAtts_i(statusid,localE);
 		BasicXMLStruct.getPathIdAtts_i(pathid,localE);
+	}
+
+
+	public void getXML() {
+
+		
+	}
+
+	public void setXML() {
+
+		
 	}
 
 }

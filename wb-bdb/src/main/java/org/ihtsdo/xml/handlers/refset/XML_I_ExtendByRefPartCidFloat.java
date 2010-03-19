@@ -21,17 +21,17 @@ public class XML_I_ExtendByRefPartCidFloat extends XML_RefSetBasic implements
 		super();
 		this.rpcm = rpcm;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ExtendByRefPartCidFloat(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 		refSetType = CommonXMLStatics.REFSET_TYPE_CIDFLOAT;
 		getLocalE();
 		

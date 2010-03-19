@@ -1,5 +1,6 @@
 package org.ihtsdo.xml.handlers;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -44,7 +45,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		super();
 		this.concept = concept;
 		try {
-			process();
+			getXML();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData process",
 					e);
@@ -58,7 +59,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 				.println("XML_I_GetConceptData(boolean debug) called debug = "
 						+ debug);
 		try {
-			process();
+			getXML();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData process",
 					e);
@@ -70,7 +71,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		this.concept = concept;
 		this.depth = depth;
 		try {
-			process();
+			getXML();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData process",
 					e);
@@ -82,7 +83,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		this.Doc = conceptDoc;
 		// this.concept = concept;
 		try {
-			processXML();
+			setXML();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData process",
 					e);
@@ -95,7 +96,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		System.out.println("Main finished");
 	}
 
-	public void processXML() throws Exception {
+	public void setXML() {
 		EConcept eConcept = new EConcept();
 		Vector<Element> elemV = new Vector<Element>();
 		Element el;
@@ -104,7 +105,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_Identify(eConcept, el);
+				XML_I_Identify xmlI = new XML_I_Identify();
+				xmlI.setEconXML(eConcept, el);
 			}
 		}
 		// Add attributes
@@ -112,7 +114,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_ConceptAttributeVersioned(eConcept, el);
+				XML_I_ConceptAttributeVersioned xmlIcav = new XML_I_ConceptAttributeVersioned();
+				xmlIcav.setEconXML(eConcept, el);
 			}
 		}
 		//Add Descriptions DESCRIPTIONS_ENAME XML_I_DescriptionVersioned
@@ -120,7 +123,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_DescriptionVersioned(eConcept, el);
+				XML_I_DescriptionVersioned xmlDesc = new XML_I_DescriptionVersioned();
+				xmlDesc.setEconXML(eConcept, el);
 			}
 		}
 		
@@ -129,7 +133,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_RelVersioned(eConcept, el,false);
+				XML_I_RelVersioned xmlIrelSrc = new XML_I_RelVersioned(false);
+				xmlIrelSrc.setEconXML(eConcept, el);
 			}
 		}
 		
@@ -138,7 +143,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_RelVersioned(eConcept, el,true);
+				XML_I_RelVersioned xmlIrelDest = new XML_I_RelVersioned(true);
+				xmlIrelDest.setEconXML(eConcept, el);
 			}
 		}
 		
@@ -147,7 +153,8 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_ImageVersioned(eConcept, el);
+				XML_I_ImageVersioned xmlIm = new XML_I_ImageVersioned();
+				xmlIm.setEconXML(eConcept, el);
 			}
 		}
 		
@@ -156,15 +163,22 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		if (elemV.size() > 0) {
 			for (Iterator<Element> it1 = elemV.iterator(); it1.hasNext();) {
 				el = it1.next();
-				new XML_I_ExtendByRef(eConcept, el);
+				XML_I_ExtendByRef xmlIref = new XML_I_ExtendByRef();
+				xmlIref.setEconXML(eConcept, el);
 			}
 		}
 
-		concept = Concept.get(eConcept);
+		try {
+			concept = Concept.get(eConcept);
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData setXML \n" +
+					"turning the econcept into a concept",
+					e);
+		}
 
 	}
 
-	public void process() throws Exception {
+	public void getXML() {
 		// System.out.println("process called debug = "+debug);
 		conIdi_S = "-1";
 		oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;
@@ -274,7 +288,13 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		// System.out.println("Adding to OC "+oc_key);
 
 		if (debug) {
-			System.out.println(XMLUtil.convertToStringLeaveCDATA(Doc));
+			try {
+				System.out.println(XMLUtil.convertToStringLeaveCDATA(Doc));
+			} catch (TransformerException e) {
+				log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData setXML \n" +
+						"printing out debug XML",
+						e);
+			}
 		}
 
 		ObjectCache.put(oc_key, Doc);

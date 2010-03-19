@@ -16,17 +16,21 @@ public class XML_I_ConceptAttributePart extends XML_basic implements
 		super();
 		this.cap = cap;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ConceptAttributePart(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
+	}
+	
+	public void setXML() {
+		
 	}
 
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.CAP_ENAME);
 		
 		if (!debug) {
@@ -41,10 +45,7 @@ public class XML_I_ConceptAttributePart extends XML_basic implements
 			
 		}
 		BasicXMLStruct.getBoolAtt(isDef, CommonXMLStatics.DEFINED_ATT, localE);
-
-		
 		addStdAtt(localE);
-		
 		parent.appendChild(localE);
 
 	}

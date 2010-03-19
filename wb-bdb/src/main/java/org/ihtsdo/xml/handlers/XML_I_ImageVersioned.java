@@ -7,7 +7,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_ImageVersioned extends XML_basic implements I_Handle_XML {
+public class XML_I_ImageVersioned extends XML_basic_econ implements I_Handle_XML {
 
 	I_ImageVersioned img;
 	int imageid = -1;
@@ -16,31 +16,33 @@ public class XML_I_ImageVersioned extends XML_basic implements I_Handle_XML {
 	String imgBytes="ImageByteArray";
 	
 	
+	
+	
+	public XML_I_ImageVersioned() {
+		super();	
+	}
+
 	public XML_I_ImageVersioned(I_ImageVersioned img, Element parent) {
 		super();
 		this.img = img;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ImageVersioned(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
-	public XML_I_ImageVersioned(EConcept econcept, Element parent) {
-		super();
-		this.parent = parent;
-		processXML(econcept);
-	}
+
 	
-	public void processXML(EConcept econcept) {
+	public void setXML(){
 		
 	}
 	
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.IMG_ENAME);
 		
 		if (!debug) {

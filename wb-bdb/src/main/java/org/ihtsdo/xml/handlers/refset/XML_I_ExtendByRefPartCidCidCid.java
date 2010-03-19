@@ -18,17 +18,17 @@ public class XML_I_ExtendByRefPartCidCidCid extends XML_RefSetBasic implements I
 		super();
 		this.rpcc = rpcc;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
 	public XML_I_ExtendByRefPartCidCidCid(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 
 		refSetType = CommonXMLStatics.REFSET_TYPE_CIDCIDCID;
 		getLocalE();

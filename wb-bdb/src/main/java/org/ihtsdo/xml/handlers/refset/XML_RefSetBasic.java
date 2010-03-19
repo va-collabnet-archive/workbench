@@ -1,5 +1,6 @@
 package org.ihtsdo.xml.handlers.refset;
 
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.I_Handle_XML;
@@ -11,7 +12,12 @@ public class XML_RefSetBasic extends XML_basic implements I_Handle_XML {
 	public Element localE = null;
 	public String refSetType = "refSetType";
 	
-	public void process() throws Exception {
+	public void getXML() {
+		
+
+	}
+	
+	public void setXML() {
 		
 
 	}

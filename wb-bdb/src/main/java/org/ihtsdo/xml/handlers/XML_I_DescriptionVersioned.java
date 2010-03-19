@@ -7,7 +7,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_DescriptionVersioned extends XML_basic implements
+public class XML_I_DescriptionVersioned extends XML_basic_econ implements
 		I_Handle_XML {
 
 	I_DescriptionVersioned desc;
@@ -16,31 +16,30 @@ public class XML_I_DescriptionVersioned extends XML_basic implements
 	
 	
 	
+	public XML_I_DescriptionVersioned() {
+		super();
+	}
+
 	public XML_I_DescriptionVersioned(I_DescriptionVersioned desc, Element parent) {
 		super();
 		this.desc = desc;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_DescriptionVersioned(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
+
 	
-	public XML_I_DescriptionVersioned(EConcept econcept, Element parent) {
-		super();
-		this.parent = parent;
-		processXML(econcept);
-	}
-	
-	public void processXML(EConcept econcept) {
+	public void setXML(){
 		
 	}
 	
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.DESC_ENAME);
 		
 		if (!debug) {

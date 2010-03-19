@@ -3,11 +3,10 @@ package org.ihtsdo.xml.handlers;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_ExtendByRef extends XML_basic implements
+public class XML_I_ExtendByRef extends XML_basic_econ implements
 		I_Handle_XML {
 	
 	I_ExtendByRef ext;
@@ -15,32 +14,33 @@ public class XML_I_ExtendByRef extends XML_basic implements
 	int compIDi = -1;
 	int typeIDi = -1;
 	int memberIDi = -1;
+	
+	
+
+	public XML_I_ExtendByRef() {
+		super();
+	}
 
 	public XML_I_ExtendByRef(I_ExtendByRef ext, Element parent) {
 		super();
 		this.ext = ext;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ExtendByRef(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
+
 	
-	public XML_I_ExtendByRef(EConcept econcept, Element parent) {
-		super();
-		this.parent = parent;
-		processXML(econcept);
-	}
-	
-	public void processXML(EConcept econcept) {
+	public void setXML(){
 		
 	}
 	
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.EXT_ENAME);
 		
 		if (!debug) {

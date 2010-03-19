@@ -18,17 +18,17 @@ public class XML_I_ExtendByRefPartStr extends XML_RefSetBasic implements
 		super();
 		this.rps = rps;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ExtendByRefPartStr(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 		refSetType = CommonXMLStatics.REFSET_TYPE_STR;
 		getLocalE();
 		

@@ -40,18 +40,18 @@ public class XML_I_ExtendByRefPart extends XML_basic implements I_Handle_XML {
 		super();
 		this.extRefP = extRefP;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ExtendByRefPart(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
 	
-	public void process() {
+	public void getXML() {
 		
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.REFSET_PART_ENAME);
 		

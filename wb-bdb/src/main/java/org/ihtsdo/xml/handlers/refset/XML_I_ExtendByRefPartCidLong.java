@@ -19,17 +19,17 @@ public class XML_I_ExtendByRefPartCidLong extends XML_RefSetBasic implements I_H
 		super();
 		this.rpc = rpc;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
 	public XML_I_ExtendByRefPartCidLong(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 		
 		refSetType = CommonXMLStatics.REFSET_TYPE_CIDLONG;
 		getLocalE();

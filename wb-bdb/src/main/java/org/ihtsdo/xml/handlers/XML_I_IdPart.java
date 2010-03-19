@@ -15,16 +15,16 @@ public class XML_I_IdPart extends XML_basic implements I_Handle_XML {
 		super();
 		this.id = id;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_IdPart(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.ID_ENAME);
 		
 		if (!debug) {

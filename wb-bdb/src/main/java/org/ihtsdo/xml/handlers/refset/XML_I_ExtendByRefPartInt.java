@@ -17,16 +17,16 @@ public class XML_I_ExtendByRefPartInt extends XML_RefSetBasic implements
 		super();
 		this.rpi = rpi;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_ExtendByRefPartInt(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
-	public void process() {
+	public void getXML() {
 		refSetType = CommonXMLStatics.REFSET_TYPE_INT;
 		getLocalE();
 		

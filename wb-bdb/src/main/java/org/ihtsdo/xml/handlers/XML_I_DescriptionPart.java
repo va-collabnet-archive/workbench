@@ -16,16 +16,16 @@ public class XML_I_DescriptionPart extends XML_basic implements I_Handle_XML {
 		super();
 		this.descP = descP;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_DescriptionPart(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.DESCP_ENAME);
 		
 		if (!debug) {

@@ -15,7 +15,7 @@ public class XML_I_ExtendByRefPartBoolean extends XML_RefSetBasic implements I_H
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
 	public XML_I_ExtendByRefPartBoolean(I_ExtendByRefPartBoolean rpb,
@@ -23,10 +23,10 @@ public class XML_I_ExtendByRefPartBoolean extends XML_RefSetBasic implements I_H
 		super();
 		this.rpb = rpb;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 
-	public void process() {
+	public void getXML() {
 		refSetType = CommonXMLStatics.REFSET_TYPE_BOOL;
 		getLocalE();
 

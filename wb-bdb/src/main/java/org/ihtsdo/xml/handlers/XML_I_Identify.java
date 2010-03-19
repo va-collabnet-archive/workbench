@@ -1,44 +1,40 @@
 package org.ihtsdo.xml.handlers;
 
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_Identify extends XML_basic implements I_Handle_XML {
+public class XML_I_Identify extends XML_basic_econ implements I_Handle_XML {
 
 	I_Identify id;
 	int id_id = -1;
 	int numver = -1;
-	
-	
+
+	public XML_I_Identify() {
+		super();
+	}
+
 	public XML_I_Identify(I_Identify id, Element parent) {
 		super();
 		this.id = id;
 		this.parent = parent;
-		process();
+		getXML();
 	}
 	
 	public XML_I_Identify(boolean debug, Element parent) {
 		super();
 		this.debug = debug;
 		this.parent = parent;
-		process();
+			getXML();
+
 	}
 	
-	public XML_I_Identify(EConcept econcept, Element parent) {
-		super();
-		this.parent = parent;
-		processXML(econcept);
-	}
-	
-	public void processXML(EConcept econcept) {
+	public void setXML() {
 		
 	}
 	
-	public void process() {
+	public void getXML() {
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.IDS_ENAME);
 		
 		if (!debug) {
