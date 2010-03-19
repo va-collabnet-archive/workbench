@@ -35,13 +35,14 @@
 	<build>
 		<plugins>
 			<plugin>
-				<!--
-					<groupId>org.dwfa</groupId> <artifactId>dwfa-mojo</artifactId>
+				
+					<groupId>org.dwfa</groupId> 
+					<artifactId>dwfa-mojo</artifactId>
 					<version>2.0.31-SNAPSHOT</version>
-				-->
-				<groupId>org.ihtsdo</groupId>
+				
+				<!--<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<version>${org.ihtsdo.wb-mojo.version}</version> -->
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
