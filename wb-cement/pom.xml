@@ -122,7 +122,7 @@
 		<module>cement-rf2</module>
 		<module>cement-doc</module>
 		<module>cement-assembly</module>
-		<module>cement-java-binding</module>
+		<!-- <module>cement-java-binding</module>  -->
 		<module>cement-profiles</module>
 		<module>cement-csub</module>
 		<module>cement-sab</module>
