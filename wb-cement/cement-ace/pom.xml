@@ -390,8 +390,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.dwfa</groupId>
-				<artifactId>dwfa-mojo</artifactId>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
 				<executions>
 					<execution>
 						<id>write-directories</id>
