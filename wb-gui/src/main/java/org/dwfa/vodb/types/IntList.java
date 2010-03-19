@@ -65,7 +65,9 @@ public class IntList implements ListDataListener, I_IntList {
 
         ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
         for (int i : list.getListValues()) {
-            outList.add(Terms.get().nativeToUuid(i));
+            if (i != 0 && i != Integer.MAX_VALUE) {
+                outList.add(Terms.get().nativeToUuid(i));
+            }
         }
 
         out.writeInt(outList.size());
