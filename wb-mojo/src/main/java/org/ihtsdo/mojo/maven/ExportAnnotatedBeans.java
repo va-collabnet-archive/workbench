@@ -191,8 +191,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     rootDir = this.outputDirectory;
 
                 }
-                //URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
-                ClassLoader libLoader = this.getClass().getClassLoader();
+                URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
                 Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 
                 for (Artifact artifact : artifacts) {
@@ -262,7 +261,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                     } catch (ClassNotFoundException ex) {
                                         notFoundCount++;
                                         if (notFoundCount < 10) {
-                                            getLog().info("Can't find class: " + ex.getLocalizedMessage());
+                                            getLog().info("Can't find class: " + ex.getLocalizedMessage() +
+                                            		"\nLoader: \n" + libLoader);
                                         }
                                     }
                                 }
