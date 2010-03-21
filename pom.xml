@@ -121,6 +121,8 @@
 					<preparationGoals>clean validate</preparationGoals>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<remoteTagging>true</remoteTagging>
+					<username>${relusername}</username>     
+					<password>${relpassword}</password>     
 				</configuration>
 			</plugin>
 			<plugin>
