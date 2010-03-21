@@ -236,7 +236,7 @@ public class DescriptionRevision
 	}
 
 	@Override
-	protected ArrayIntList getVariableVersionNids() {
+    public ArrayIntList getVariableVersionNids() {
 		ArrayIntList list = new ArrayIntList(3);
 		list.add(typeNid);
 		return list;

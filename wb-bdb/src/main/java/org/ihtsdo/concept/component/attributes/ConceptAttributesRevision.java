@@ -60,7 +60,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     @Override
-    protected ArrayIntList getVariableVersionNids() {
+    public ArrayIntList getVariableVersionNids() {
         return new ArrayIntList(2);
     }
 

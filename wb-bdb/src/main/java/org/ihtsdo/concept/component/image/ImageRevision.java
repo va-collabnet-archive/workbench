@@ -43,7 +43,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	}
 
 
-	protected ArrayIntList getVariableVersionNids() {
+	public ArrayIntList getVariableVersionNids() {
 		ArrayIntList partComponentNids = new ArrayIntList(3);
 		partComponentNids.add(typeNid);
 		return partComponentNids;
