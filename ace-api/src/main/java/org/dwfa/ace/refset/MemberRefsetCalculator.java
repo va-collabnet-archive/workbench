@@ -347,7 +347,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
         if (isAdditionalLogging()) {
-            System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptId());
+            System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" 
+                + conceptToString(conceptDetails.getConceptId()));
         }
         addToNestedSet(newRefsetMembers, conceptDetails, refset);
     }
@@ -355,11 +356,20 @@ public class MemberRefsetCalculator extends RefsetUtilities {
     public void addToRefsetExclusion(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
         if (isAdditionalLogging()) {
             System.out.println("*** addToRefsetExclusion refset=" + refset + " concept="
-                + conceptDetails.getConceptId());
+                + conceptToString(conceptDetails.getConceptId()));
         }
         addToNestedSet(newRefsetExclusion, conceptDetails, refset);
     }
 
+    private String conceptToString(int nid) {
+        try {
+            return Integer.toString(nid) + " " 
+                + termFactory.getConcept(nid).getInitialText();
+        } catch (Exception e) {
+            return Integer.toString(nid);
+        }
+    }
+    
     private void shutDown() throws Exception {
         reportWriter.close();
         if (useNonTxInterface) {
@@ -693,7 +703,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
                 if (isAdditionalLogging()) {
                     String conceptUuid = termFactory.getUids(conceptId.getConceptId()).iterator().next().toString();
-                    System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptId() + ")");
+                    System.out.println("* concept " + conceptUuid + " (" + conceptToString(conceptId.getConceptId()) + ")");
                 }
 
                 Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId(), concepts);
@@ -701,7 +711,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
                     if (isAdditionalLogging()) {
                         String parentUuid = termFactory.getUids(parentId).iterator().next().toString();
-                        System.out.println("    parent " + parentUuid + " (" + parentId + ")");
+                        System.out.println("    parent " + parentUuid + " (" + conceptToString(parentId) + ")");
                     }
 
                     ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId, 0, 0, 0);
