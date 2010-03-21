@@ -650,11 +650,10 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 ARCHITECTONIC_BRANCH(PrimordialId.ACE_AUXILIARY_ID, new String[] {"Workbench Auxiliary"}, null,
                         new I_ConceptualizeUniversally[] { PATH }),
         TEST("test",
-                new I_ConceptualizeUniversally[] { PATH }),
+               new I_ConceptualizeUniversally[] { PATH }),
         DEVELOPMENT("development",
                 new I_ConceptualizeUniversally[] { PATH }),
-            TGA_DATA("TGA Data", new I_ConceptualizeUniversally[] { DEVELOPMENT }),
-            AMT_SOURCE_DATA("AMT Source Data", new I_ConceptualizeUniversally[] { DEVELOPMENT }),
+            
     ID_SOURCE("identifier source",
             new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
         SNOMED_INT_ID("SNOMED integer id",
