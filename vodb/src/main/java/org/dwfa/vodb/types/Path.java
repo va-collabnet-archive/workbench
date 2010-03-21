@@ -152,8 +152,6 @@ public class Path implements I_Transact, I_Path {
         List<I_Position> origins = new ArrayList<I_Position>(1);
         origins.add(latestAceRelease);
 
-        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.TGA_DATA);
-        addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.AMT_SOURCE_DATA);
         addIfFound(vodb, basePaths, origins, ArchitectonicAuxiliary.Concept.SNOMED_CORE);
 
         return basePaths;
