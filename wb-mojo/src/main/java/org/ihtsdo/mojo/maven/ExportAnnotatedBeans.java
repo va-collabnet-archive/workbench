@@ -227,8 +227,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                                 break;
                                             }
                                         }
-                                        // getLog().info("allowed: " +
-                                        // je.getName());
+                                        getLog().info("allowed: " + je.getName());
                                         break;
                                     }
                                 }

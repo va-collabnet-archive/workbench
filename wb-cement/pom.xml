@@ -72,13 +72,13 @@
 				<groupId>org.dwfa</groupId>
 				<artifactId>ace-ide-admin-bp</artifactId>
 				<scope>runtime-directory</scope>
-				<version>1.2-SNAPSHOT</version>
+				<version>1.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.dwfa</groupId>
 				<artifactId>ace-ide-user-bp</artifactId>
 				<scope>runtime-directory</scope>
-				<version>1.3-SNAPSHOT</version>
+				<version>1.4-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -93,15 +93,6 @@
 						<target>1.6</target>
 					</configuration>
 				</plugin>
-				<!-- <plugin>
-					<groupId>org.ihtsdo</groupId>
-					<artifactId>wb-mojo</artifactId>
-					<version>1.0-SNAPSHOT</version>
-				</plugin>
-				<plugin>
-					 <groupId>org.dwfa</groupId>
-					<artifactId>pbl-mojo</artifactId>
-					<version>1.3</version> -->
 				<plugin>	
 				<groupId>org.ihtsdo</groupId>
                 <artifactId>wb-mojo</artifactId>
@@ -124,7 +115,7 @@
 		<module>cement-assembly</module>
 		<!-- <module>cement-java-binding</module>  -->
 		<module>cement-profiles</module>
-		<module>cement-csub</module>
+		<!--<module>cement-csub</module>-->
 		<module>cement-sab</module>
 		<!--<module>cement-vb</module>-->
 		<module>cement-bdb</module>
