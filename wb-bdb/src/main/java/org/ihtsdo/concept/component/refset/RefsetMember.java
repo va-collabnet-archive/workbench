@@ -22,7 +22,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetMember;
@@ -54,7 +53,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 		@Override
 		public ArrayIntList getVariableVersionNids() {
-			throw new UnsupportedOperationException();
+            if (index >= 0) {
+                return revisions.get(index).getVariableVersionNids();
+            } else {
+                return RefsetMember.this.getVariableVersionNids();
+            }
 		}
 
 		@Override

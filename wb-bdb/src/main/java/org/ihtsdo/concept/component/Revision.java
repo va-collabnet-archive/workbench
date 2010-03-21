@@ -99,7 +99,7 @@ public abstract class Revision<V extends Revision<V, C>,
 		return resultList;
 	}
 	
-	protected abstract ArrayIntList getVariableVersionNids();
+	public abstract ArrayIntList getVariableVersionNids();
 	
 	@Override
 	public int getPathId() {
@@ -196,7 +196,6 @@ public abstract class Revision<V extends Revision<V, C>,
      * validation failures. 
      * @throws IOException 
      */
-    @SuppressWarnings("unchecked")
     public String validate(Revision<?, ?> another) throws IOException {
         assert another != null;
         StringBuffer buf = new StringBuffer();

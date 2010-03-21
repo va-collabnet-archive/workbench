@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.Long;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
@@ -114,4 +115,10 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeLong(longValue);
     }
+    
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        return new ArrayIntList(2);
+    }
+
 }

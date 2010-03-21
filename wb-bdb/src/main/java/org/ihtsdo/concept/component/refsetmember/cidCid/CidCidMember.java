@@ -168,11 +168,13 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 		output.writeInt(c2Nid);
 	}
 
-	@Override
-	protected ArrayIntList getVariableVersionNids() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        ArrayIntList variableNids = new ArrayIntList(4);
+        variableNids.add(getC1id());
+        variableNids.add(getC2id());
+        return variableNids;
+    }
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {

@@ -50,11 +50,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 	}
 
 	@Override
-	protected ArrayIntList getVariableVersionNids() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public I_ExtendByRefPart duplicate() {
 		throw new UnsupportedOperationException();
 	}

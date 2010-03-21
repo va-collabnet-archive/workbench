@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.cidCidCid;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
@@ -179,6 +180,14 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
         output.writeInt(c1Nid);
         output.writeInt(c2Nid);
         output.writeInt(c3Nid);
+    }
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        ArrayIntList variableNids = new ArrayIntList(5);
+        variableNids.add(getC1id());
+        variableNids.add(getC2id());
+        variableNids.add(getC3id());
+        return variableNids;
     }
 
 }

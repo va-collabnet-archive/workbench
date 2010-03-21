@@ -150,11 +150,10 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 	}
 
 
-	@Override
-	protected ArrayIntList getVariableVersionNids() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected ArrayIntList getVariableVersionNids() {
+        return new ArrayIntList(2);
+    }
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {

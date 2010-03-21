@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.str;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -119,4 +120,10 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeString(stringValue);
     }
+    
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        return new ArrayIntList(2);
+    }
+
 }

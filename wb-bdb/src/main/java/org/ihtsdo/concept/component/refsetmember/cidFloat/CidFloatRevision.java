@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.cidFloat;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -130,4 +131,12 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         output.writeInt(c1Nid);
         output.writeFloat(floatValue);
     }
+    
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        ArrayIntList variableNids = new ArrayIntList(3);
+        variableNids.add(getC1Nid());
+        return variableNids;
+    }
+
 }

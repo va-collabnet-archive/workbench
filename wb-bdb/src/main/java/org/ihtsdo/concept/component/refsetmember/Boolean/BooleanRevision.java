@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.Boolean;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
@@ -114,4 +115,12 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeBoolean(booleanValue);
     }
+    
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        ArrayIntList variableNids = new ArrayIntList(2);
+        return variableNids;
+    }
+
+
 }

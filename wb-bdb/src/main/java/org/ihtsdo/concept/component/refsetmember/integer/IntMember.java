@@ -149,8 +149,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 
 	@Override
 	protected ArrayIntList getVariableVersionNids() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayIntList(2);
 	}
 
 	@Override

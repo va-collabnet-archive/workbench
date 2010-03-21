@@ -56,6 +56,14 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		}
 
 		@Override
+		public ArrayIntList getVariableVersionNids() {
+		    ArrayIntList variableNids = new ArrayIntList(3);
+		    variableNids.add(getC1id());
+		    return variableNids;
+		}
+
+	      
+		@Override
 		public int getC1id() {
 			if (index >= 0) {
 				return revisions.get(index).getC1id();

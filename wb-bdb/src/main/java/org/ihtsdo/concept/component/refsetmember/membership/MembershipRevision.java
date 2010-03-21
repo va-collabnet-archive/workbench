@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.refsetmember.membership;
 
 import java.io.IOException;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -94,5 +95,11 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
     protected void writeFieldsToBdb(TupleOutput output) {
         // nothing to write
     }
+    
+    @Override
+    public ArrayIntList getVariableVersionNids() {
+        return new ArrayIntList(2);
+    }
+
 
 }

@@ -46,6 +46,11 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		}
 
 		@Override
+		public ArrayIntList getVariableVersionNids() {
+		    return new ArrayIntList();
+		}
+
+		@Override
 		public int compareTo(I_ExtendByRefPart o) {
 			if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
 				I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
