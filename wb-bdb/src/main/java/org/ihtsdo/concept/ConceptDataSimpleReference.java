@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -253,6 +254,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             if (member != null) {
                 refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
             } else {
+                members.remove(pair);
+                Terms.get().addUncommittedNoChecks(enclosingConcept);
                 StringBuffer buff = new StringBuffer();
                 buff.append("Unable to find extension. RefsetNid: ");
                 buff.append(refsetNid);
@@ -281,6 +284,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                     refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
                 }
             } else {
+                members.remove(pair);
+                Terms.get().addUncommittedNoChecks(enclosingConcept);
                 StringBuffer buff = new StringBuffer();
                 buff.append("Unable to find extension. RefsetNid: ");
                 buff.append(refsetNid);
