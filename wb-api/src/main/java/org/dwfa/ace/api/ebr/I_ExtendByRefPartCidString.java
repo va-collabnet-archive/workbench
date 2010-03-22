@@ -16,14 +16,15 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartCidString extends I_ExtendByRefPart, I_ExtendByRefPartStr {
+public interface I_ExtendByRefPartCidString extends I_ExtendByRefPartCid,
+		I_ExtendByRefPartStr {
 
-    public int getC1id();
+	public int getC1id();
 
-    public void setC1id(int c1id);
+	public void setC1id(int c1id);
 
-    public String getStringValue();
+	public String getStringValue();
 
-    public void setStringValue(String value);
+	public void setStringValue(String value);
 
 }
