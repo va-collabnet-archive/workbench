@@ -24,7 +24,7 @@
 	</distributionManagement> -->
 	
 		<properties>
-		<org.ihtsdo.wb-mojo.version>0.0.1-SNAPSHOT</org.ihtsdo.wb-mojo.version>
+		<org.ihtsdo.wb-mojo.version>1.0-SNAPSHOT</org.ihtsdo.wb-mojo.version>
 		</properties>
 
 	<build>

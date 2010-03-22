@@ -5,7 +5,7 @@
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>jbin-basic-export</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>java binary export</name>
+	<name>java binary basic export</name>
    <!--   <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/jbin-export/</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/jbin-export/</developerConnection>
