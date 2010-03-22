@@ -33,18 +33,18 @@ public class Terms {
     public static void open(Class<I_ImplementTermFactory> factoryClass, Object envHome, boolean readOnly, Long cacheSize)
             throws InstantiationException, IllegalAccessException, IOException {
             I_ImplementTermFactory factory = factoryClass.newInstance();
+            set(factory);
             factory.setup(envHome, readOnly, cacheSize);
             home = envHome;
-            set(factory);
     }
 
     public static void open(Class<I_ImplementTermFactory> factoryClass, Object envHome, boolean readOnly,
             Long cacheSize, DatabaseSetupConfig databaseSetupConfig) throws InstantiationException,
             IllegalAccessException, IOException {
             I_ImplementTermFactory factory = factoryClass.newInstance();
+            set(factory);
             factory.setup(envHome, readOnly, cacheSize, databaseSetupConfig);
             home = envHome;
-            set(factory);
     }
 
     @SuppressWarnings("unchecked")

@@ -118,8 +118,12 @@ public class Bdb {
 				gVersion.set(Long.parseLong(versionString));
 			}
 			
-			BdbTermFactory tf = new BdbTermFactory();
-			Terms.set(tf);
+            BdbTermFactory tf = new BdbTermFactory();
+			if (Terms.get() != null) {
+			    tf = (BdbTermFactory) Terms.get();
+			} else {
+	            Terms.set(tf);
+			}
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 			pathManager = new BdbPathManager();
 			tf.setPathManager(pathManager);
