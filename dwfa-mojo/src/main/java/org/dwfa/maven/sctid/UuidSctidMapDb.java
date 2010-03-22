@@ -44,7 +44,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 /**
  * Database containing the Uuid-SctId mappings for an id mapping file.
  * <p>
- * Currently the class supports an arbitrary ANSI SQL relational database, and has some special handling for 
+ * Currently the class supports an arbitrary ANSI SQL relational database, and has some special handling for
  * Derby Embedded databases. It has also been tested with MySQL.
  * <p>
  * In order to use this class you must first ensure that the 4 system properties listed below are set appropriately
@@ -72,7 +72,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
  * <p>
  * Then <code>UuidSctidMapDb.getInstance()</code> can be used to aquire an instance of this class, and the open and
  * create methods can be used to open and initialise the database for use.
- * 
+ *
  * @author Ean Dungey
  */
 public class UuidSctidMapDb {
@@ -84,9 +84,9 @@ public class UuidSctidMapDb {
     public static final String SCT_ID_MAP_USER = "SctIdMap.user";
     /** System property key for the database password */
     public static final String SCT_ID_MAP_PASSWORD = "SctIdMap.password";
-    /** Driver name of the Derby Embedded driver */ 
+    /** Driver name of the Derby Embedded driver */
     public static final String DERBY_EMBEDDED_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-    
+
     /** Class logger */
     private static Logger logger = Logger.getLogger(UuidSctidMapDb.class.getName());
     /** DB connection */
@@ -143,22 +143,22 @@ public class UuidSctidMapDb {
 
         this.databaseUser = System.getProperty(SCT_ID_MAP_USER);
         this.databasePassword = System.getProperty(SCT_ID_MAP_PASSWORD);
-        
+
         if (this.databaseDriver == null) {
             throw new IllegalArgumentException("Database driver was not specified as required by the system property \"SctIdMap.driver\"");
         }
-        
+
         if (this.databaseConnectionUrl == null) {
             throw new IllegalArgumentException("Database connection url was not specified as required by the system property \"SctIdMap.databaseConnectionUrl\"");
         }
-        
+
         //this section is purely for Derby Embedded support
         if (isDerbyEmbeddedDatabase()) {
             Pattern pattern = Pattern.compile("jdbc:derby:directory:([^;]*).*");
             Matcher matcher = pattern.matcher(this.databaseConnectionUrl);
             if (!matcher.find() || matcher.groupCount() != 1) {
                 throw new IllegalArgumentException(
-                    "Derby Embedded driver specified however the directory cannot be parsed from the connection URL. Driver was '" 
+                    "Derby Embedded driver specified however the directory cannot be parsed from the connection URL. Driver was '"
                     + instance.databaseDriver + "' URL was '" + instance.databaseConnectionUrl + "'");
             }
             this.derbyDatabaseDirectory = new File(matcher.group(1));
@@ -168,10 +168,10 @@ public class UuidSctidMapDb {
     /**
      * Returns the singleton instance and initialises one if one does not exist. If one does exist and reinitialise is
      * true, then the singleton instance will be reconstructed.
-     * 
+     *
      * @param reinitialise if true the method will recreate a new UuidSctidMapDb instance regardless of whether one already exists
      * @return UuidSctidMapDb
-     * @throws IllegalArgumentException 
+     * @throws IllegalArgumentException
      */
     public static synchronized UuidSctidMapDb getInstance(boolean reinitialise) {
         if (instance == null || reinitialise) {
@@ -186,10 +186,10 @@ public class UuidSctidMapDb {
         }
         return instance;
     }
-    
+
     /**
      * Returns the singleton instance and initialises one if one does not exist.
-     * 
+     *
      * @return UuidSctidMapDb
      */
     public static UuidSctidMapDb getInstance() {
@@ -198,7 +198,7 @@ public class UuidSctidMapDb {
 
     /**
      * Convenience method to set database properties used to connect to the underlying database
-     * 
+     *
      * @param dbDriver
      * @param dbConnectionUrl
      * @param dbUsername
@@ -206,7 +206,7 @@ public class UuidSctidMapDb {
      */
     public static synchronized void setDatabaseProperties(String dbDriver, String dbConnectionUrl, String dbUsername, String dbPassword) {
         System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, dbDriver);
-        System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, 
+        System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL,
              dbConnectionUrl);
 
         if (dbUsername != null) {
@@ -216,10 +216,10 @@ public class UuidSctidMapDb {
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, dbPassword);
         }
     }
-    
+
     /**
      * Convenience method to set database properties used to connect to the underlying database
-     * 
+     *
      * @param dbDriver
      * @param dbConnectionUrl
      * @param dbUsername
@@ -228,7 +228,7 @@ public class UuidSctidMapDb {
     public static synchronized void setDatabaseProperties(String dbDriver, String dbConnectionUrl) {
         setDatabaseProperties(dbDriver, dbConnectionUrl, null, null);
     }
-    
+
     /**
      * Opens the map database and validates its presence. If the schema does not exist an IOException will be thrown.
      *
@@ -265,7 +265,7 @@ public class UuidSctidMapDb {
         openDb();
         updateDbFromMapDirectories(fixedMapDirectory, idMapDirectory);
     }
-    
+
     /**
      * Checks to see if the database specified by databaseDriver and databaseConnectionUrl exist.
      * <p>
@@ -274,22 +274,22 @@ public class UuidSctidMapDb {
      *  <li>the connection is established</li>
      *  <li>the schema exists</li>
      * </ol>
-     * 
+     *
      * @return boolean true if the database schema exists
      * @throws IOException
-     * @throws ClassNotFoundException 
-     * @throws SQLException 
-     * @throws SQLException 
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     * @throws SQLException
      */
     public boolean isDatabaseInitialised() throws IOException, ClassNotFoundException, SQLException {
         boolean disconnectAfterExecution = false;
         boolean tablesExist = false;
-        
+
         if (!isDbConnectted()) {
             connectToDataBase(false);
             disconnectAfterExecution = true;
         }
-        
+
         try {
             if (tableExists("SCT_TYPE") && tableExists("SCT_NAMESPACE") && tableExists("UUID_SCT_MAP")) {
                 conn.rollback();
@@ -315,7 +315,7 @@ public class UuidSctidMapDb {
      * Checks to see if the specified table name exists. Because the database implementation is not known a simple
      * test is done that runs a query that will fail if the table does not exists - not pretty but the best universal
      * option.
-     * 
+     *
      * @param table
      * @return true if the table exists false otherwise
      * @throws SQLException
@@ -346,10 +346,10 @@ public class UuidSctidMapDb {
         if (!isDatabaseInitialised()) {
             throw new SQLException("Expecting to open an existing database but none is present");
         }
-        
+
         if (conn == null) {
             connectToDataBase(false);
-            
+
             prepareStatements();
             updateTypeTable();
             updateNamespaceTable();
@@ -382,13 +382,13 @@ public class UuidSctidMapDb {
     public void createDb(File fixedMapDirectory, File idMapDirectory, boolean validate) throws IOException,
             SQLException, ClassNotFoundException {
         logger.info("Creating new DB in " + databaseConnectionUrl);
-        
+
         if (isDatabaseInitialised()) {
             throw new IOException("Database is already initialised - cannot create a new database");
         }
-        
+
         this.validate = validate;
-        
+
         if (isDerbyEmbeddedDatabase()) {
             File dbErrLog = new File(this.derbyDatabaseDirectory.getParentFile(), "derbyErr.log");
             dbErrLog.getParentFile().mkdirs();
@@ -396,7 +396,7 @@ public class UuidSctidMapDb {
             fw.append("Created by DerbyBackedUuidSctidMap.\n");
             fw.close();
         }
-        
+
         connectToDataBase(false);
         createTables();
         prepareStatements();
@@ -440,8 +440,8 @@ public class UuidSctidMapDb {
     /**
      * Drops the tables in the ID map schema
      * @throws SQLException
-     * @throws ClassNotFoundException 
-     * @throws IOException 
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
     public void dropDb() throws SQLException, IOException, ClassNotFoundException {
         logger.info("Dropping ID database schema");
@@ -449,7 +449,7 @@ public class UuidSctidMapDb {
         runSql("DROP TABLE SCT_NAMESPACE");
         runSql("DROP TABLE SCT_TYPE");
     }
-    
+
     /**
      * Runs the sql against the DB.
      *
@@ -462,7 +462,7 @@ public class UuidSctidMapDb {
         runSql(sql);
         conn.commit();
     }
-    
+
     private boolean isDerbyEmbeddedDatabase() {
         return this.databaseDriver.equals(DERBY_EMBEDDED_DRIVER);
     }
@@ -520,13 +520,13 @@ public class UuidSctidMapDb {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 //throw away header
                 String line = reader.readLine();
-                
+
                 while ((line = reader.readLine()) != null) {
                     String[] columns = line.split("\t");
-    
+
                     UUID uuid = UUID.fromString(columns[1]);
                     String sctid = columns[5];
-                                    
+
                     writer.append(uuid.getMostSignificantBits() + "");
                     writer.append("\t");
                     writer.append(uuid.getLeastSignificantBits() + "");
@@ -536,13 +536,13 @@ public class UuidSctidMapDb {
                     writer.append(getSctIdType(sctid) + "");
                     writer.append("\t");
                     writer.append(getSctIdNamespace(sctid) + "");
-                    writer.append(System.getProperty("line.separator"));      
+                    writer.append(System.getProperty("line.separator"));
                 }
                 reader.close();
             }
-            
+
             writer.close();
-            
+
             runSql("CALL SYSCS_UTIL.SYSCS_IMPORT_TABLE (null,'UUID_SCT_MAP','" + data.getAbsolutePath() + "','\t','\"',null,0)");
             data.delete();
         } else {
@@ -557,7 +557,7 @@ public class UuidSctidMapDb {
                         String[] columns = lineStr.split("\t");
                         UUID uuid = UUID.fromString(columns[1]);
                         Long sctId = Long.parseLong(columns[5]);
-        
+
                         if (!validate || validateFileUuid(uuid, sctId, file)) {
                             addUUIDSctIdEntry(uuid, sctId, false);
                             insertCount++;
@@ -729,7 +729,7 @@ public class UuidSctidMapDb {
      */
     private int getSctIdType(String sctId) throws NoSuchElementException, SQLException {
         int type = Integer.parseInt(sctId.substring(sctId.length() - 2, sctId.length() - 1));
-        
+
         Integer result = typeMap .get(type);
         if (result == null) {
             result = getTypeId(TYPE.fromString("" + type));
@@ -936,7 +936,7 @@ public class UuidSctidMapDb {
         runSql("ALTER TABLE UUID_SCT_MAP ADD CONSTRAINT UNIQUE_UUID UNIQUE (MSB, LSB)");
         conn.commit();
     }
-    
+
     private void runSql(String sql) throws SQLException {
         PreparedStatement prepareStatement = null;
 
@@ -984,7 +984,7 @@ public class UuidSctidMapDb {
         runSql("CREATE INDEX SCTID_IDX ON UUID_SCT_MAP (SCTID)");
         conn.commit();
     }
-    
+
     /**
      * Add referential integrity and unique constraints.
      *
@@ -1189,14 +1189,14 @@ public class UuidSctidMapDb {
         conn.commit();
         logger.info("Committed batch of " + entryList.size());
     }
-       
+
     private void bulkInsertStatementBatch(Map<UUID, Long> entryList) throws SQLException {
         logger.info("initiating batch insert " + entryList.size());
-        
+
         int count = 0;
-        
+
         StringBuffer statement = new StringBuffer("INSERT INTO UUID_SCT_MAP VALUES ");
-        
+
         Iterator<UUID> keySet = entryList.keySet().iterator();
         while (keySet.hasNext()) {
             UUID uuid = keySet.next();
@@ -1220,7 +1220,7 @@ public class UuidSctidMapDb {
                 statement.append(",");
             }
         }
-        
+
         if (!statement.toString().equals("INSERT INTO UUID_SCT_MAP VALUES ")) {
             conn.createStatement().executeUpdate(statement.toString());
         }
@@ -1266,7 +1266,7 @@ public class UuidSctidMapDb {
                 throw new SQLException("Database is of unknown type - pump not supported");
             }
             data.delete();
-            
+
         } catch (IOException e) {
             throw new SQLException("Can't create local temporary file and write data into it for import!", e);
         }
@@ -1299,7 +1299,32 @@ public class UuidSctidMapDb {
      * @see java.lang.Object#finalize()
      */
     public void finalize() throws SQLException {
-        close();
+        if (isDbConnectted()) {
+            containsUuid.close();
+            getValue.close();
+            deleteValue.close();
+            getUuidListForSctid.close();
+            count.close();
+            insertIdMapRow.close();
+            insertTypeRow.close();
+            insertNamespaceRow.close();
+            countTypeRows.close();
+            countNamespaceRows.close();
+            getTypeRow.close();
+            getNamespaceRow.close();
+            getMaxSctIdForNamespaceAndType.close();
+
+            typeMap.clear();
+            namespaceMap.clear();
+            conn.commit();
+            conn.close();
+            conn = null;
+        }
+
+        if (isDerbyEmbeddedDatabase()) {
+            deleteLockFiles();
+        }
+        logger.info("Closed DB");
     }
 
     /**

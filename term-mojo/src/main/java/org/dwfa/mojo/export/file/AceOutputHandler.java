@@ -62,11 +62,11 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         super();
 
         exportDirectory.mkdirs();
-        idsFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.ace.txt"));
-        conceptFile = new AceConceptWriter(new File(exportDirectory + File.separator + "concepts.ace.txt"));
-        descriptionFile = new AceDescriptionWriter(new File(exportDirectory + File.separator + "descriptions.ace.txt"));
+        idsFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.txt"));
+        conceptFile = new AceConceptWriter(new File(exportDirectory + File.separator + "concepts.txt"));
+        descriptionFile = new AceDescriptionWriter(new File(exportDirectory + File.separator + "descriptions.txt"));
         relationshipFile = new AceRelationshipWriter(new File(exportDirectory + File.separator
-            + "relationships.ace.txt"));
+            + "relationships.txt"));
     }
 
     /**
@@ -74,16 +74,16 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        conceptFile.write(getRf1ConceptRow(componentDto.getConceptDto()));
+        conceptFile.write(getAceConceptRow(componentDto.getConceptDto()));
         idsFile.write(getAceIdentifierRows(componentDto.getConceptDto()));
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+            descriptionFile.write(getAceDescriptionRow(descriptionDto));
             idsFile.write(getAceIdentifierRows(descriptionDto));
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+            relationshipFile.write(getAceRelationshipRow(relationshipDto));
             idsFile.write(getAceIdentifierRows(relationshipDto));
         }
     }
@@ -132,7 +132,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * @return Rf2ConceptRow
      * @throws Exception if cannot get a valid SCT id
      */
-    private AceConceptRow getRf1ConceptRow(ConceptDto conceptDto) throws Exception {
+    private AceConceptRow getAceConceptRow(ConceptDto conceptDto) throws Exception {
         AceConceptRow conceptRow = new AceConceptRow();
 
         conceptRow.setConceptUuid(conceptDto.getConceptId().toString());
@@ -151,7 +151,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * @return Rf1DescriptionRow
      * @throws Exception if cannot get a valid SCT id
      */
-    private AceDescriptionRow getRf1DescriptionRow(DescriptionDto descriptionDto) throws Exception {
+    private AceDescriptionRow getAceDescriptionRow(DescriptionDto descriptionDto) throws Exception {
         AceDescriptionRow rf2DescriptionRow = new AceDescriptionRow();
 
         rf2DescriptionRow.setDescriptionUuid(descriptionDto.getDescriptionId().toString());
@@ -174,7 +174,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * @return Rf2RelationshipRow
      * @throws Exception if cannot get a valid SCT id
      */
-    private AceRelationshipRow getRf1RelationshipRow(RelationshipDto relationshipDto) throws Exception {
+    private AceRelationshipRow getAceRelationshipRow(RelationshipDto relationshipDto) throws Exception {
         AceRelationshipRow relationshipRow = new AceRelationshipRow();
 
         relationshipRow.setRelationshipUuid(relationshipDto.getConceptId().toString());

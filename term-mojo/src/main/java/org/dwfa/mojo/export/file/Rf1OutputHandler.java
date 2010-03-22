@@ -147,7 +147,8 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setDestinationSctId(getSctId(relationshipDto, relationshipDto.getDestinationId(), TYPE.CONCEPT).toString());
         relationshipRow.setCharacteristicType(relationshipDto.getCharacteristicTypeCode().toString());
         relationshipRow.setRefinability(relationshipDto.getRefinable().toString());
-        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroupCode().toString());
+        relationshipRow.setRelationshipGroup(
+            (relationshipDto.getRelationshipGroupCode() != null)? relationshipDto.getRelationshipGroupCode().toString() : "");
 
         return relationshipRow;
     }

@@ -1,10 +1,10 @@
 package org.dwfa.mojo.export.file;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -14,25 +14,31 @@ import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.ExtensionDto;
+import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
+import org.dwfa.maven.sctid.SctIdValidator;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.sctid.UuidSnomedHandler;
+import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.export.ExportOutputHandler;
+import org.dwfa.tapi.NoMappingException;
 
 public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandler {
     /** Class logger. */
     private Logger logger = Logger.getLogger(SnomedFileFormatOutputHandler.class.getName());
 
     /** Uuid to Sct id map handler. */
-    UuidSnomedHandler snomedIdHandler;
+    static UuidSnomedHandler snomedIdHandler;
 
     /** Set to true to throw exceptions on validation errors. */
     boolean failOnError = true;
 
     public SnomedFileFormatOutputHandler() throws IOException, SQLException, ClassNotFoundException {
         //TODO add factory class to do this
-        snomedIdHandler = new UuidSnomedDbMapHandler();
+        if (snomedIdHandler == null) {
+            snomedIdHandler = new UuidSnomedDbMapHandler();
+        }
     }
 
     /**
@@ -228,19 +234,99 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @return Long SCTID
      * @throws Exception if cannot get an SCT id
      */
-    protected Long getSctId(Concept concept) throws Exception {
-        return getSctId(concept, concept.getConceptId());
+    protected Long getSctId(ConceptDto concept) throws Exception {
+        return getSctId(concept, concept.getIdentifierDtos());
     }
 
     /**
      * Gets a new or retrieves the current mapping SCT id for a UUID based on
      * the ConceptDto name space and type.
      *
+     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     *
      * @param concept Concept
      * @param uuid UUID
      * @return Long SCTID
      * @throws Exception if cannot get an SCTID
      */
+    protected Long getSctId(Concept concept, List<IdentifierDto> identifierDtos) throws Exception {
+        return getSctId(concept, concept.getConceptId(), identifierDtos, concept.getType());
+    }
+
+    /**
+     * Gets a new or retrieves the current mapping SCT id for a UUID based on
+     * the ConceptDto name space and type.
+     *
+     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     *
+     * @param concept Concept
+     * @param identifierDtos list of IdentifierDtos
+     * @param type TYPE sct id type
+     * @return Long SCTID
+     * @throws Exception if cannot get an SCTID
+     */
+    protected Long getSctId(Concept concept, UUID uuid, List<IdentifierDto> identifierDtos, TYPE type) throws Exception {
+        Long sctId;
+
+        if (!identifierDtos.isEmpty()) {
+            sctId = identifierDtos.get(0).getReferencedSctId();
+            getCheckSctIdAndAddToDb(sctId, uuid);
+        } else {
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+        }
+
+        return sctId;
+    }
+
+    /**
+     * Gets a new or retrieves the current mapping SCT id for a UUID based on
+     * the ConceptDto name space and type.
+     *
+     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     *
+     * @param concept Concept
+     * @param conceptIdMap Map UUID, Long
+     * @param type TYPE
+     * @return Object SCTID
+     * @throws Exception if cannot get an SCTID
+     */
+    protected Object getSctId(Concept concept, Map<UUID, Long> conceptIdMap, TYPE type) throws Exception {
+        Long sctId = conceptIdMap.values().iterator().next();
+        UUID uuid = conceptIdMap.keySet().iterator().next();
+
+        if (sctId == null) {
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+        } else {
+            getCheckSctIdAndAddToDb(sctId, uuid);
+        }
+
+        return sctId;
+    }
+
+    /**
+     * Checks the SCT-ID UUID mapping against the id database. if the id's are not
+     * mapped then id mapping is added to the id database.
+     *
+     * @param sctId Long
+     * @param uuid UUID
+     * @throws NoMappingException id mapping is not valid
+     * @throws Exception Cannot add them to the database
+     */
+    private void getCheckSctIdAndAddToDb(Long sctId, UUID uuid) throws NoMappingException, Exception {
+        TYPE type = SctIdValidator.getInstance().getSctIdType(sctId.toString());;
+        NAMESPACE namespace = SctIdValidator.getInstance().getSctIdNamespace(sctId.toString());
+        Long dbSctId =  snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
+
+        if (dbSctId != null && !dbSctId.equals(sctId)) {
+            String errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
+                + sctId + " database id " + dbSctId;
+            logger.severe(errorMessage);
+            throw new NoMappingException(errorMessage);
+        } else if(dbSctId == null) {
+            snomedIdHandler.addSctId(uuid, sctId, namespace, type);
+        }
+    }
+
     protected Long getSctId(Concept concept, UUID uuid) throws Exception {
         return getSctId(concept, uuid, concept.getType());
     }

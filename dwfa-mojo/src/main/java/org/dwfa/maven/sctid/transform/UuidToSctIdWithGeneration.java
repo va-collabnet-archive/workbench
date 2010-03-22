@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,13 +32,13 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 /**
  * Using <code>UuidSnomedDbMapHandler</code> manage the generated sctid for
  * types and namespaces.
- * 
+ *
  * <code>buildDirector</code> is not used but is matained for backward
  * compatibility and to
  * fullfill the contract I_ReadAndTransform
  * DB file is read/created in the source as
  * <code>sourceDirectory/UuidSnomedDb.db</code>
- * 
+ *
  * @author Ean Dungey
  */
 public abstract class UuidToSctIdWithGeneration extends AbstractTransform implements I_ReadAndTransform {
@@ -49,7 +49,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
     /**
      * Setup the handler for this Transform using the Transform source directory
      * value.
-     * 
+     *
      * @param transform Transform
      */
     @Override
@@ -60,7 +60,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
             throw new RuntimeException("Cannot load DB", e);
         }
     }
-    
+
     public void setupImpl() throws IOException, ClassNotFoundException {
         setupImpl(null);
     }
@@ -68,7 +68,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
     /**
      * Creates a new instance of <code>map</code> if it is null else does
      * nothing.
-     * 
+     *
      * @param idGeneratedDir NOT USED
      * @param sourceDirectoryToSet location for the DB file
      * @throws IOException reading files.
@@ -86,7 +86,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
 
     /**
      * Sets the last Transform values and returns a new or existing SctId.
-     * 
+     *
      * @param uuidStr String
      * @param namespace NAMESPACE
      * @return SctId as a String
@@ -101,9 +101,9 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * Similar to the transform method, however this method will process a list
      * of UUIDs
      * and find a matching sctid.
-     * 
+     *
      * If no match a new sctid is generated for the first uuid
-     * 
+     *
      * @param uuids
      * @param namespace
      * @return
@@ -128,7 +128,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
     /**
      * Namespace are no longer configured using file names so this is not
      * supported
-     * 
+     *
      * @see String transform(String uuidStr, NAMESPACE namespace)
      */
     public String transform(String input) throws Exception {
@@ -137,7 +137,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
 
     /**
      * Gets the mapped SctId for the UUID.
-     * 
+     *
      * @param uuid UUID
      * @param namespace NAMESPACE
      * @return SctId Long null is returned if no current mapping exists.
@@ -149,7 +149,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
 
     /**
      * Writes out all the new mapped SctId to the DB.
-     * 
+     *
      * @throws Exception writing to the DB
      */
     public void cleanup(Transform transformer) throws Exception {
@@ -162,7 +162,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
 
     /**
      * The Type implemented.
-     * 
+     *
      * @return
      */
     protected abstract TYPE getType();

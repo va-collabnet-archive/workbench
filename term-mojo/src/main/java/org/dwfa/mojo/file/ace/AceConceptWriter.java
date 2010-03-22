@@ -28,7 +28,6 @@ public class AceConceptWriter extends GenericFileWriter<AceConceptRow> {
         newLineChars = "\r\n";
 
         open(conceptFile, false);
-        writeHeader(new AceConceptRow().getHeader());
     }
 
     /**

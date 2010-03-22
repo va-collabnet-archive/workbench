@@ -28,7 +28,6 @@ public class AceRelationshipWriter extends GenericFileWriter<AceRelationshipRow>
         newLineChars = "\r\n";
 
         open(file, false);
-        writeHeader(new AceRelationshipRow().getHeader());
     }
 
     /**

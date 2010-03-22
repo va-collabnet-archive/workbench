@@ -64,13 +64,13 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      */
     public UuidSnomedDbMapHandler() throws IOException, SQLException, ClassNotFoundException {
         uuidSctidMapDb = UuidSctidMapDb.getInstance();
-        
+
         if (uuidSctidMapDb.isDatabaseInitialised()) {
             uuidSctidMapDb.openDb();
         } else {
             uuidSctidMapDb.createDb();
         }
-        
+
         uuidSctidMapDb.setValidate(true);
 
         nextSctSequenceMap = new HashMap<String, Long>();
@@ -110,6 +110,17 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
         return sctId;
     }
 
+
+    @Override
+    public void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type) throws Exception {
+        Long mappedId = addMap(uuid, sctId, namespace, type);
+
+        if(mappedId != null && !sctId.equals(mappedId)){
+            throw new Exception("UUID "+ uuid + " has been mapped to " + mappedId + " not " + sctId);
+        }
+
+    }
+
     /**
      * Adds the UUID to sctid mapping to the memory map
      *
@@ -119,8 +130,8 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @param type TYPE
      * @throws Exception DB error
      */
-    private void addMap(UUID uuid, Long sctID, NAMESPACE namespace, TYPE type) throws Exception {
-        memoryUuidSctidMap.put(uuid, sctID);
+    private Long addMap(UUID uuid, Long sctID, NAMESPACE namespace, TYPE type) throws Exception {
+        Long lastMapping = memoryUuidSctidMap.put(uuid, sctID);
 
         nextSctSequenceMap.put(getNamespaceTypeKey(namespace, type), Math.max(
             nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)), getSctIdSequencePart(sctID, namespace, type)));
@@ -128,6 +139,8 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
         if (memoryUuidSctidMap.size() > MAX_CACHE_SIZE) {
             writeMaps();
         }
+
+        return lastMapping;
     }
 
     /**

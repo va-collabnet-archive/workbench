@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
@@ -33,7 +32,6 @@ public class DatabaseExportTest extends ConceptMockery {
     public static final String UUID_MAP_TEST_DATABASE_USER = "uuid.map.test.database.user";
     public static final String UUID_MAP_TEST_DATABASE_URL = "uuid.map.test.database.url";
     public static final String UUID_MAP_TEST_DATABASE_DRIVER = "uuid.map.test.database.driver";
-    static File dbDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "test-id-db");
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "rf2");
 
     int exportVersion = 0;
@@ -61,7 +59,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         //mock the LocalVersionedTerminology
         setField(databaseExportClass, databaseExport, "termFactory", termFactory);
-        
+
         databaseExport.setTermFactory(termFactory);
 
         pathUuidList = new ArrayList<UUID>();
@@ -110,7 +108,6 @@ public class DatabaseExportTest extends ConceptMockery {
             setField(databaseExportClass, databaseExport, "uuidSctidDbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
             setField(databaseExportClass, databaseExport, "uuidSctidDbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
-        
 
         //set the default namespace
         setField(databaseExportClass, databaseExport, "defaultNamespace", NAMESPACE.NEHTA.getDigits());
@@ -156,6 +153,7 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdPart exportableConceptSnomedCtv3IdPart = setCtv3Id(exportIdVersioned, conceptIdParts, exportableConcept,
             incluesionRootConceptData, exclusionsRootConceptData, exportVersion);
 
+        expect(termFactory.getId(exportConceptNid)).andReturn(exportIdVersioned).anyTimes();
 
         //for concept concept refsets and relationship
         int exportConcept1Nid = 11;
@@ -197,7 +195,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         List<UUID> refsetUuidsList = new ArrayList<UUID>();
         refsetUuidsList.add(UUID.randomUUID());
-        mockExtension(refsetConcept, exportVersion, activeStatusNid, exportDate, refsetNid, refsetUuidsList, memberNid, memberNid - 1, exportConceptNid,
+        mockExtension(refsetConcept, exportVersion, activeStatusNid, exportDate, refsetNid, refsetUuidsList, memberNid, exportConcept2Nid, exportConceptNid,
             exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList, incluesionRootConceptData,
             exclusionsRootConceptData, conceptExtensions);
 
@@ -217,7 +215,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetStringUuidsList = new ArrayList<UUID>();
         refsetStringUuidsList.add(UUID.randomUUID());
         mockExtension(refsetStringConcept, exportVersion, activeStatusNid, exportDate, refsetStringNid, refsetStringUuidsList, memberStringNid,
-            exportConceptNid, memberNid - 1, "Woolie", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConceptNid, exportConcept2Nid, "Woolie", exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetStringConcept, exportStrRefsetIdVersioned);
@@ -237,7 +235,7 @@ public class DatabaseExportTest extends ConceptMockery {
         List<UUID> refsetIntegerUuidsList = new ArrayList<UUID>();
         refsetIntegerUuidsList.add(UUID.randomUUID());
         mockExtension(refsetIntegerConcept, exportVersion, activeStatusNid, exportDate, refsetIntegerNid, refsetIntegerUuidsList, memberIntegerNid,
-            exportConceptNid, memberNid - 1, new Integer("80085"), exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
+            exportConceptNid, exportConcept2Nid, new Integer("80085"), exportConceptUuidList, exportPathNid, exportPositionConceptData, pathUuidList,
             incluesionRootConceptData, exclusionsRootConceptData, conceptExtensions);
 
         replay(refsetIntegerConcept, exportIntegerRefsetIdVersioned);

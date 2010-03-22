@@ -28,7 +28,6 @@ public class AceDescriptionWriter extends GenericFileWriter<AceDescriptionRow> {
         newLineChars = "\r\n";
 
         open(file, false);
-        writeHeader(new AceDescriptionRow().getHeader());
     }
 
     /**

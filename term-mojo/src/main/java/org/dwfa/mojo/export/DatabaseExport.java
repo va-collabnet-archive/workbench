@@ -98,30 +98,30 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
     /**
      * URL used to connect to the UUID-SCTID database
-     * 
+     *
      * @parameter
      * @required
      */
     String uuidSctidDbConnectionUrl;
-    
+
     /**
      * UUID-SCTID database driver fully qualified class name
-     * 
+     *
      * @parameter
      * @required
      */
     String uuidSctidDbDriver;
-    
+
     /**
      * UUID-SCTID database user to optionally authenticate to the database
-     * 
+     *
      * @parameter
      */
     String uuidSctidDbUsername;
-    
+
     /**
      * UUID-SCTID database user's password optionally used to authenticate to the database
-     * 
+     *
      * @parameter
      */
     String uuidSctidDbPassword;
@@ -173,7 +173,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             if (uuidSctidDbPassword != null) {
                 System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, uuidSctidDbPassword);
             }
-            
+
             rf2OutputHandler = new Rf2OutputHandler(
                 new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar));
             rf1OutputHandler = new Rf1OutputHandler(
@@ -212,6 +212,8 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
             if (!testing) {
                 ((Rf2OutputHandler) rf2OutputHandler).closeFiles();
+                ((Rf1OutputHandler) rf1OutputHandler).closeFiles();
+                ((AceOutputHandler) aceOutputHandler).closeFiles();
             }
         } catch (Exception e) {
             throw new MojoExecutionException("Iterate error: ", e);

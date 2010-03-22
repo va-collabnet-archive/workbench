@@ -324,7 +324,7 @@ public class ExportSpecification {
         relationshipDto.setCharacteristicTypeCode(Character.forDigit(snomedCharacter, 10));
         relationshipDto.setCharacteristicTypeId(termFactory.getUids(tuple.getCharacteristicId()).iterator().next());
         relationshipDto.setConceptId(termFactory.getUids(tuple.getRelId()).iterator().next());
-        relationshipDto.setDestinationId(termFactory.getUids(tuple.getC2Id()).iterator().next());
+        relationshipDto.setDestinationId(getIdMap(tuple, tuple.getC2Id()));
         relationshipDto.setModifierId(ConceptConstants.MODIFIER_SOME.getUuids()[0]);
         relationshipDto.setRefinabilityId(termFactory.getUids(tuple.getRefinabilityId()).iterator().next());
         int refinableChar = ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(termFactory.getUids(tuple.getRefinabilityId()));
@@ -649,8 +649,8 @@ public class ExportSpecification {
             List<I_IdPart> idVersions, TYPE type) throws TerminologyException, IOException {
 
         I_IdPart type5UuidPart = getLatesIdtVersion(idVersions, unspecifiedUuid.getConceptId(), tuple);
-        I_IdPart sctIdPart = getLatesIdtVersion(idVersions, snomedIntId.getConceptId(), tuple);
         I_IdPart type3UidPart = getLatesIdtVersion(idVersions, snomedT3Uuid.getConceptId(), tuple);
+        I_IdPart sctIdPart = getLatesIdtVersion(idVersions, snomedIntId.getConceptId(), tuple);
 
         if (type5UuidPart != null && sctIdPart != null) {
             setIdentifier(conceptDto, tuple, idVersions, type, type5UuidPart, sctIdPart);
@@ -658,6 +658,36 @@ public class ExportSpecification {
         if (type3UidPart != null && sctIdPart != null) {
             setIdentifier(conceptDto, tuple, idVersions, type, type3UidPart, sctIdPart);
         }
+    }
+
+    /**
+     *
+     * @param tuple
+     * @param componentNid
+     * @return
+     * @throws NoMappingException
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    private Map<UUID, Long> getIdMap(I_AmPart tuple, int componentNid) throws NoMappingException,
+            TerminologyException, IOException {
+        Map<UUID, Long> map = new HashMap<UUID, Long>();;
+        List<I_IdPart> versions = termFactory.getId(componentNid).getVersions();
+
+        I_IdPart t3UuidPart = getLatesIdtVersion(versions, snomedT3Uuid.getNid(), tuple);
+        I_IdPart uuidPart = getLatesIdtVersion(versions, unspecifiedUuid.getNid(), tuple);
+        I_IdPart sctIdPart = getLatesIdtVersion(versions, snomedIntId.getConceptId(), tuple);
+
+        Long sctId = (sctIdPart != null)?Long.parseLong(sctIdPart.getSourceId().toString()):null;
+        if(t3UuidPart != null){
+            map.put(UUID.fromString(t3UuidPart.getSourceId().toString()), sctId);
+        } else if (uuidPart != null) {
+            map.put(UUID.fromString(uuidPart.getSourceId().toString()), sctId);
+        } else {
+            throw new NoMappingException("Cannot find a UUID for " + tuple);
+        }
+
+        return map;
     }
 
     /**
@@ -1037,7 +1067,14 @@ public class ExportSpecification {
             setUuidSctIdIdentifier(extensionDto, tuple, idParts, TYPE.REFSET);
 
             extensionDto.setConceptId(termFactory.getUids(thinExtByRefVersioned.getRefsetId()).iterator().next());
-            extensionDto.setReferencedConceptId(termFactory.getUids(thinExtByRefVersioned.getComponentId()).iterator().next());
+
+            Map<UUID, Long> map = getIdMap(tuple, thinExtByRefVersioned.getComponentId());
+            if(map == null){
+                map = new HashMap<UUID, Long>();
+                map.put(termFactory.getUids(thinExtByRefVersioned.getComponentId()).iterator().next(), null);
+            }
+            extensionDto.setReferencedConceptId(map);
+
             extensionDto.setMemberId(getUuid(thinExtByRefVersioned));
             extensionDto.setNamespace(getNamespace(idParts, tuple));
             extensionDto.setType(type);
@@ -1087,6 +1124,7 @@ public class ExportSpecification {
             }
             return uuid;
         }
+
     }
 
     /**
@@ -1109,7 +1147,13 @@ public class ExportSpecification {
                 I_ThinExtByRefPartConcept tuple, TYPE type) throws IOException, TerminologyException {
             ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
-            extensionDto.setConcept1Id(termFactory.getUids(tuple.getC1id()).iterator().next());
+            Map<UUID, Long> map = getIdMap(tuple, tuple.getC1id());
+            if(map == null){
+                map = new HashMap<UUID, Long>();
+                map.put(termFactory.getUids(tuple.getC1id()).iterator().next(), null);
+            }
+
+            extensionDto.setConcept1Id(map);
 
             return extensionDto;
         }
@@ -1209,7 +1253,13 @@ public class ExportSpecification {
                 I_ThinExtByRefPartConceptConcept tuple, TYPE type) throws IOException, TerminologyException {
             ExtensionDto extensionDto = conceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
-            extensionDto.setConcept2Id(termFactory.getConcept(tuple.getC2id()).getUids().get(0));
+            Map<UUID, Long> map = getIdMap(tuple, tuple.getC2id());
+            if(map == null){
+                map = new HashMap<UUID, Long>();
+                map.put(termFactory.getUids(tuple.getC2id()).iterator().next(), null);
+            }
+
+            extensionDto.setConcept2Id(map);
 
             return extensionDto;
         }
@@ -1259,7 +1309,13 @@ public class ExportSpecification {
                 I_ThinExtByRefPartConceptConceptConcept tuple, TYPE type) throws IOException, TerminologyException {
             ExtensionDto extensionDto = conceptConceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
-            extensionDto.setConcept3Id(termFactory.getConcept(tuple.getC3id()).getUids().get(0));
+            Map<UUID, Long> map = getIdMap(tuple, tuple.getC3id());
+            if(map == null){
+                map = new HashMap<UUID, Long>();
+                map.put(termFactory.getUids(tuple.getC3id()).iterator().next(), null);
+            }
+
+            extensionDto.setConcept3Id(map);
 
             return extensionDto;
         }

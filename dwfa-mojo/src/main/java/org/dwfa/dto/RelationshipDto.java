@@ -16,6 +16,7 @@
  */
 package org.dwfa.dto;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,7 +24,7 @@ import java.util.UUID;
  */
 public class RelationshipDto extends ConceptDto {
     private UUID sourceId;
-    private UUID destinationId;
+    private Map<UUID, Long> destinationId;
     private UUID typeId;
     private UUID characteristicTypeId;
     private UUID modifierId;
@@ -56,14 +57,14 @@ public class RelationshipDto extends ConceptDto {
     /**
      * @return the destinationid
      */
-    public UUID getDestinationId() {
+    public Map<UUID, Long> getDestinationId() {
         return destinationId;
     }
 
     /**
      * @param destinationid the destinationid to set
      */
-    public void setDestinationId(UUID destinationid) {
+    public void setDestinationId(Map<UUID, Long> destinationid) {
         this.destinationId = destinationid;
     }
 

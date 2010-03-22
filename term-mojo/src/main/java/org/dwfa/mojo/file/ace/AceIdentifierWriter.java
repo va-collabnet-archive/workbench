@@ -33,7 +33,6 @@ public class AceIdentifierWriter extends GenericFileWriter<AceIdentifierRow> {
         newLineChars = "\r\n";
 
         open(conceptFile, false);
-        writeHeader(new AceIdentifierRow().getHeader());
     }
 
     /**

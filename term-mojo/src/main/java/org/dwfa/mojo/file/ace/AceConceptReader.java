@@ -8,6 +8,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptRow> {
 
     public AceConceptReader(File conceptFile) {
         setSourceFile(conceptFile);
+        setHasHeader(false);
     }
 
     @Override

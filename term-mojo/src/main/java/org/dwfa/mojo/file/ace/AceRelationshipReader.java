@@ -7,6 +7,7 @@ import org.dwfa.ace.file.IterableFileReader;
 public class AceRelationshipReader extends IterableFileReader<AceRelationshipRow> {
 
     public AceRelationshipReader(File conceptFile) {
+        setHasHeader(false);
         setSourceFile(conceptFile);
     }
 

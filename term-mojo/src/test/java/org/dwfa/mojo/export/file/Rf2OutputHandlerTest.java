@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -30,7 +32,6 @@ import org.dwfa.mojo.file.rf2.Rf2ReferenceSetReader;
 import org.dwfa.mojo.file.rf2.Rf2ReferenceSetRow;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipReader;
 import org.dwfa.mojo.file.rf2.Rf2RelationshipRow;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +90,8 @@ public class Rf2OutputHandlerTest {
 
         componentDto.setConceptDto(new ConceptDto());
         setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
+        componentDto.getConceptDto().getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 32570031000036104l));
+        componentDto.getConceptDto().setConceptId(componentDto.getConceptDto().getIdentifierDtos().get(0).getConceptId());
 
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
         componentDto.getDescriptionDtos().get(0).setConceptId(componentDto.getConceptDto().getConceptId());
@@ -103,11 +105,11 @@ public class Rf2OutputHandlerTest {
         componentDto.getConceptExtensionDtos().get(1).setValue(null);
 
         componentDto.getDescriptionExtensionDtos().add(setExtensionDto(new ExtensionDto()));
-        componentDto.getDescriptionExtensionDtos().get(0).setConcept2Id(UUID.randomUUID());
+        componentDto.getDescriptionExtensionDtos().get(0).setConcept2Id(getIdMap(UUID.randomUUID(), null));
 
         componentDto.getRelationshipExtensionDtos().add(setExtensionDto(new ExtensionDto()));
-        componentDto.getRelationshipExtensionDtos().get(0).setConcept2Id(UUID.randomUUID());
-        componentDto.getRelationshipExtensionDtos().get(0).setConcept3Id(UUID.randomUUID());
+        componentDto.getRelationshipExtensionDtos().get(0).setConcept2Id(getIdMap(UUID.randomUUID(), null));
+        componentDto.getRelationshipExtensionDtos().get(0).setConcept3Id(getIdMap(UUID.randomUUID(), null));
 
         rf2OutputHandler.export(componentDto);
 
@@ -231,7 +233,7 @@ public class Rf2OutputHandlerTest {
 
         componentDto.getConceptExtensionDtos().add(setExtensionDto(new ExtensionDto()));
         componentDto.getConceptExtensionDtos().get(0).setValue(null);
-        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(UUID.randomUUID());
+        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(getIdMap(UUID.randomUUID(), null));
 
         rf2OutputHandler.export(componentDto);
 
@@ -281,8 +283,8 @@ public class Rf2OutputHandlerTest {
 
         componentDto.getConceptExtensionDtos().add(setExtensionDto(new ExtensionDto()));
         componentDto.getConceptExtensionDtos().get(0).setValue(null);
-        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(UUID.randomUUID());
-        componentDto.getConceptExtensionDtos().get(0).setConcept3Id(UUID.randomUUID());
+        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(getIdMap(UUID.randomUUID(), null));
+        componentDto.getConceptExtensionDtos().get(0).setConcept3Id(getIdMap(UUID.randomUUID(), null));
 
         rf2OutputHandler.export(componentDto);
 
@@ -332,8 +334,8 @@ public class Rf2OutputHandlerTest {
         componentDto.getRelationshipDtos().add(setRelationshipDto(new RelationshipDto()));
 
         componentDto.getConceptExtensionDtos().add(setExtensionDto(new ExtensionDto()));
-        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(UUID.randomUUID());
-        componentDto.getConceptExtensionDtos().get(0).setConcept3Id(UUID.randomUUID());
+        componentDto.getConceptExtensionDtos().get(0).setConcept2Id(getIdMap(UUID.randomUUID(), null));
+        componentDto.getConceptExtensionDtos().get(0).setConcept3Id(getIdMap(UUID.randomUUID(), null));
 
         rf2OutputHandler.export(componentDto);
 
@@ -446,6 +448,10 @@ public class Rf2OutputHandlerTest {
 
     private String getSctId(UUID id, Concept concept) throws Exception {
         return getSctId(id, concept, concept.getType());
+    }
+
+    private String getSctId(Map<UUID, Long> idMap, Concept concept) throws Exception {
+        return getSctId(idMap.keySet().iterator().next(), concept, concept.getType());
     }
 
     @Test
@@ -721,9 +727,9 @@ public class Rf2OutputHandlerTest {
         }
     }
 
-    private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto) {
+    private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto, long sctid) {
         identifierDto.setActive(true);
-        identifierDto.setReferencedSctId(900000000000960019l);
+        identifierDto.setReferencedSctId(sctid);
         identifierDto.setConceptId(UUID.randomUUID());
         identifierDto.setDateTime(new Date());
         identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
@@ -769,7 +775,7 @@ public class Rf2OutputHandlerTest {
         setConceptDtoData(relationshipDto);
 
         relationshipDto.setSourceId(UUID.randomUUID());
-        relationshipDto.setDestinationId(UUID.randomUUID());
+        relationshipDto.setDestinationId(getIdMap(UUID.randomUUID(), null));
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setCharacteristicTypeId(UUID.randomUUID());
         relationshipDto.setModifierId(UUID.randomUUID());
@@ -783,12 +789,20 @@ public class Rf2OutputHandlerTest {
     private ExtensionDto setExtensionDto(ExtensionDto extensionDto) {
         setConceptDtoData(extensionDto);
 
-        extensionDto.setReferencedConceptId(UUID.randomUUID());
-        extensionDto.setConcept1Id(UUID.randomUUID());
-        extensionDto.setMemberId(UUID.randomUUID());
+        extensionDto.setReferencedConceptId(getIdMap(UUID.randomUUID(), null));
+        extensionDto.setConcept1Id(getIdMap(UUID.randomUUID(), null));
         extensionDto.setValue("Test String");
-        extensionDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
+        extensionDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 44949371000036165l));
+        extensionDto.setMemberId(extensionDto.getIdentifierDtos().get(0).getConceptId());
 
         return extensionDto;
+    }
+
+    private Map<UUID, Long> getIdMap(UUID uuid, Long sctId) {
+        Map<UUID, Long> map = new HashMap<UUID, Long>(1);
+
+        map.put(uuid, sctId);
+
+        return map;
     }
 }

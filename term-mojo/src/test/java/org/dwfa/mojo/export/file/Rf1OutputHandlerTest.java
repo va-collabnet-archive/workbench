@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -41,13 +43,13 @@ public class Rf1OutputHandlerTest {
     @Before
     public void setUp() throws IOException, SQLException, ClassNotFoundException {
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
-            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
 
         } else {
-            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER),
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL),
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER),
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
         rf1OutputHandler = new Rf1OutputHandler(exportDirectory);
@@ -146,6 +148,10 @@ public class Rf1OutputHandlerTest {
 
     private String getSctId(UUID id, Concept concept) throws Exception {
         return getSctId(id, concept, concept.getType());
+    }
+
+    private String getSctId(Map<UUID, Long> idMap, Concept concept) throws Exception {
+        return getSctId(idMap.keySet().iterator().next(), concept, concept.getType());
     }
 
     @Test
@@ -426,7 +432,7 @@ public class Rf1OutputHandlerTest {
         setConceptDtoData(relationshipDto);
 
         relationshipDto.setSourceId(UUID.randomUUID());
-        relationshipDto.setDestinationId(UUID.randomUUID());
+        relationshipDto.setDestinationId(getIdMap(UUID.randomUUID(), null));
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setCharacteristicTypeId(UUID.randomUUID());
         relationshipDto.setModifierId(UUID.randomUUID());
@@ -438,4 +444,13 @@ public class Rf1OutputHandlerTest {
 
         return relationshipDto;
     }
+
+    private Map<UUID, Long> getIdMap(UUID uuid, Long sctId) {
+        Map<UUID, Long> map = new HashMap<UUID, Long>(1);
+
+        map.put(uuid, sctId);
+
+        return map;
+    }
+
 }

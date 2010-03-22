@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -43,13 +45,13 @@ public class AceOutputHandlerTest {
     @Before
     public void setUp() throws IOException, SQLException, ClassNotFoundException {
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
-            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
 
         } else {
-            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER),
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL),
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER),
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
         aceOutputHandler = new AceOutputHandler(exportDirectory);
@@ -78,24 +80,20 @@ public class AceOutputHandlerTest {
 
         aceOutputHandler.closeFiles();
 
-        AceIdentifierReader aceIdentifierReader = new AceIdentifierReader(new File(exportDirectory, "ids.ace.txt"));
-        aceIdentifierReader.setHasHeader(true);
+        AceIdentifierReader aceIdentifierReader = new AceIdentifierReader(new File(exportDirectory, "ids.txt"));
         assertIdentifierRow(componentDto.getConceptDto().getIdentifierDtos().get(0),
             aceIdentifierReader.iterator().next());
 
-        AceConceptReader aceConceptReader = new AceConceptReader(new File(exportDirectory, "concepts.ace.txt"));
-        aceConceptReader.setHasHeader(true);
+        AceConceptReader aceConceptReader = new AceConceptReader(new File(exportDirectory, "concepts.txt"));
         AceConceptRow aceConceptRow = aceConceptReader.iterator().next();
         assertConceptRow(componentDto, aceConceptRow);
 
-        AceDescriptionReader aceDescriptionReader = new AceDescriptionReader(new File(exportDirectory, "descriptions.ace.txt"));
-        aceDescriptionReader.setHasHeader(true);
+        AceDescriptionReader aceDescriptionReader = new AceDescriptionReader(new File(exportDirectory, "descriptions.txt"));
         Iterator<AceDescriptionRow> descriptionIterator = aceDescriptionReader.iterator();
         assertDescriptionRow(componentDto.getDescriptionDtos().get(0), descriptionIterator.next());
         assertDescriptionRow(componentDto.getDescriptionDtos().get(1), descriptionIterator.next());
 
-        AceRelationshipReader aceRelationshipReader = new AceRelationshipReader(new File(exportDirectory, "relationships.ace.txt"));
-        aceRelationshipReader.setHasHeader(true);
+        AceRelationshipReader aceRelationshipReader = new AceRelationshipReader(new File(exportDirectory, "relationships.txt"));
 
         AceRelationshipRow relationshipRow = aceRelationshipReader.iterator().next();
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
@@ -439,7 +437,7 @@ public class AceOutputHandlerTest {
         setConceptDtoData(relationshipDto);
 
         relationshipDto.setSourceId(UUID.randomUUID());
-        relationshipDto.setDestinationId(UUID.randomUUID());
+        relationshipDto.setDestinationId(getIdMap(UUID.randomUUID(), null));
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setCharacteristicTypeId(UUID.randomUUID());
         relationshipDto.setModifierId(UUID.randomUUID());
@@ -451,5 +449,13 @@ public class AceOutputHandlerTest {
         relationshipDto.setRefinable('0');
 
         return relationshipDto;
+    }
+
+    private Map<UUID, Long> getIdMap(UUID uuid, Long sctId) {
+        Map<UUID, Long> map = new HashMap<UUID, Long>(1);
+
+        map.put(uuid, sctId);
+
+        return map;
     }
 }

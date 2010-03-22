@@ -289,13 +289,13 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf2DescriptionRow getRf2DescriptionRow(DescriptionDto descriptionDto) throws Exception {
         Rf2DescriptionRow rf2DescriptionRow = new Rf2DescriptionRow();
 
+        rf2DescriptionRow.setDescriptionSctId(getSctId(descriptionDto, descriptionDto.getDescriptionId(), descriptionDto.getIdentifierDtos(), descriptionDto.getType()).toString());
         rf2DescriptionRow.setConceptSctId(getSctId(descriptionDto, descriptionDto.getConceptId(), TYPE.CONCEPT).toString());
-        rf2DescriptionRow.setDescriptionSctId(getSctId(descriptionDto, descriptionDto.getDescriptionId()).toString());
         rf2DescriptionRow.setModuleSctId(getModuleId(descriptionDto).toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
         rf2DescriptionRow.setActive(getActiveFlag(descriptionDto));
         rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId(), TYPE.CONCEPT).toString());
-        rf2DescriptionRow.setLanaguageCode(getSctId(descriptionDto, descriptionDto.getLanguageId(), TYPE.CONCEPT).toString());
+        rf2DescriptionRow.setLanaguageCode(descriptionDto.getLanguageCode());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
         rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getTypeId(), TYPE.CONCEPT).toString());
 
@@ -312,7 +312,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf2RelationshipRow getRf2RelationshipRow(RelationshipDto relationshipDto) throws Exception {
         Rf2RelationshipRow relationshipRow = new Rf2RelationshipRow();
 
-        relationshipRow.setRelationshipSctId(getSctId(relationshipDto, relationshipDto.getConceptId()).toString());
+        relationshipRow.setRelationshipSctId(getSctId(relationshipDto, relationshipDto.getIdentifierDtos()).toString());
         relationshipRow.setSourceSctId(getSctId(relationshipDto, relationshipDto.getSourceId(), TYPE.CONCEPT).toString());
         relationshipRow.setDestinationSctId(getSctId(relationshipDto, relationshipDto.getDestinationId(), TYPE.CONCEPT).toString());
         relationshipRow.setModuleSctId(getModuleId(relationshipDto).toString());
@@ -321,6 +321,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setCharacteristicSctId(getSctId(relationshipDto, relationshipDto.getCharacteristicTypeId(), TYPE.CONCEPT).toString());
         relationshipRow.setModifierSctId(getSctId(relationshipDto, relationshipDto.getModifierId(), TYPE.CONCEPT).toString());
         relationshipRow.setTypeSctId(getSctId(relationshipDto, relationshipDto.getTypeId(), TYPE.CONCEPT).toString());
+        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroupCode().toString());
 
         return relationshipRow;
     }
@@ -335,9 +336,9 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf2ReferenceSetRow getRf2ExtensionRow(ExtensionDto extensionDto) throws Exception {
         Rf2ReferenceSetRow referenceSetRow = new Rf2ReferenceSetRow();
 
+        referenceSetRow.setMemberId(getSctId(extensionDto, extensionDto.getMemberId(), extensionDto.getIdentifierDtos(), TYPE.REFSET).toString());
         referenceSetRow.setRefsetId(getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT).toString());
-        referenceSetRow.setMemberId(getSctId(extensionDto, extensionDto.getMemberId(), TYPE.REFSET).toString());
-        referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getReferencedConceptId()).toString());
+        referenceSetRow.setReferencedComponentId(getSctId(extensionDto, extensionDto.getReferencedConceptId(), extensionDto.getType()).toString());
         referenceSetRow.setModuleId(getModuleId(extensionDto).toString());
         referenceSetRow.setEffectiveTime(getReleaseDate(extensionDto));
         referenceSetRow.setActive(getActiveFlag(extensionDto));

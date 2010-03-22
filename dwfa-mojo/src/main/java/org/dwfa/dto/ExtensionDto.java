@@ -16,6 +16,7 @@
  */
 package org.dwfa.dto;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -24,10 +25,10 @@ import java.util.UUID;
 public class ExtensionDto extends ConceptDto {
     private String value;
     private UUID memberId;
-    private UUID referencedConceptId;
-    private UUID concept1Id;
-    private UUID concept2Id;
-    private UUID concept3Id;
+    private Map<UUID, Long> referencedConceptId;
+    private Map<UUID, Long> concept1Id;
+    private Map<UUID, Long> concept2Id;
+    private Map<UUID, Long> concept3Id;
     private boolean isClinical;
 
     public ExtensionDto() {
@@ -51,14 +52,14 @@ public class ExtensionDto extends ConceptDto {
     /**
      * @return the referencedConceptId
      */
-    public UUID getReferencedConceptId() {
+    public Map<UUID, Long> getReferencedConceptId() {
         return referencedConceptId;
     }
 
     /**
      * @param referencedConceptId the referencedConceptId to set
      */
-    public void setReferencedConceptId(UUID referencedConceptId) {
+    public void setReferencedConceptId(Map<UUID, Long> referencedConceptId) {
         this.referencedConceptId = referencedConceptId;
     }
 
@@ -79,42 +80,42 @@ public class ExtensionDto extends ConceptDto {
     /**
      * @return the concept1Id
      */
-    public UUID getConcept1Id() {
+    public Map<UUID, Long> getConcept1Id() {
         return concept1Id;
     }
 
     /**
      * @param concept1Id the concept1Id to set
      */
-    public void setConcept1Id(UUID concept1Id) {
+    public void setConcept1Id(Map<UUID, Long> concept1Id) {
         this.concept1Id = concept1Id;
     }
 
     /**
      * @return the concept2Id
      */
-    public UUID getConcept2Id() {
+    public Map<UUID, Long> getConcept2Id() {
         return concept2Id;
     }
 
     /**
      * @param concept2Id the concept2Id to set
      */
-    public void setConcept2Id(UUID concept2Id) {
+    public void setConcept2Id(Map<UUID, Long> concept2Id) {
         this.concept2Id = concept2Id;
     }
 
     /**
      * @return the concept3Id
      */
-    public UUID getConcept3Id() {
+    public Map<UUID, Long> getConcept3Id() {
         return concept3Id;
     }
 
     /**
      * @param concept3Id the concept3Id to set
      */
-    public void setConcept3Id(UUID concept3Id) {
+    public void setConcept3Id(Map<UUID, Long> concept3Id) {
         this.concept3Id = concept3Id;
     }
 
