@@ -7,7 +7,7 @@ import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_ConceptAttributeVersioned extends XML_basic_econ implements
+public class XML_I_ConceptAttributeVersioned extends XML_basic_getCon implements
 		I_Handle_XML {
 
 	public I_ConceptAttributeVersioned conAttV;
@@ -35,14 +35,7 @@ public class XML_I_ConceptAttributeVersioned extends XML_basic_econ implements
 
 	
 	public void setXML() {
-		EConceptAttributes eca1 = new EConceptAttributes();
-		
-		
-		//For each 
-		//eca1.
-		
-		econcept.setConceptAttributes(eca1);
-		
+
 	}
 	
 	

@@ -6,7 +6,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_ExtendByRef extends XML_basic_econ implements
+public class XML_I_ExtendByRef extends XML_basic_getCon implements
 		I_Handle_XML {
 	
 	I_ExtendByRef ext;

@@ -8,7 +8,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_RelVersioned extends XML_basic_econ implements I_Handle_XML {
+public class XML_I_RelVersioned extends XML_basic_getCon implements I_Handle_XML {
 
 	I_RelVersioned rel;
 	/** If False then is a src relationship **/

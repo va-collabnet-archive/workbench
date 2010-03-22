@@ -1,6 +1,5 @@
 package org.ihtsdo.xml.handlers;
 
-import org.ihtsdo.etypes.EConcept;
 import org.w3c.dom.Element;
 
 public class XML_basic implements I_Handle_XML	 {
@@ -14,6 +13,18 @@ public class XML_basic implements I_Handle_XML	 {
 	public int statusid = -1;
 	public int pathid = -1;
 	
+	
+	public XML_basic() {
+		super();
+
+	}	
+	
+	public XML_basic(Element parent) {
+		super();
+		this.parent = parent;
+	}
+
+
 	public void addStdAtt(Element localE){
 		BasicXMLStruct.getVersionIdAtts_i(versionid,localE);
 		if(positionid != -2){
@@ -32,6 +43,27 @@ public class XML_basic implements I_Handle_XML	 {
 	public void setXML() {
 
 		
+	}
+
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+		getXML();
+	}
+
+
+	public Element getParent() {
+		return parent;
+	}
+
+
+	public void setParent(Element parent) {
+		this.parent = parent;
 	}
 
 }

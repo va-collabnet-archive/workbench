@@ -5,7 +5,7 @@ import org.dwfa.ace.api.I_Identify;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_Identify extends XML_basic_econ implements I_Handle_XML {
+public class XML_I_Identify extends XML_basic_getCon implements I_Handle_XML {
 
 	I_Identify id;
 	int id_id = -1;

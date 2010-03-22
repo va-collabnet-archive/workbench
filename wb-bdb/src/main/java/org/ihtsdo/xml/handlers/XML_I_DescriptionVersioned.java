@@ -7,7 +7,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
-public class XML_I_DescriptionVersioned extends XML_basic_econ implements
+public class XML_I_DescriptionVersioned extends XML_basic_getCon implements
 		I_Handle_XML {
 
 	I_DescriptionVersioned desc;
