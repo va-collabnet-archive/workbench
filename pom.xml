@@ -118,6 +118,7 @@
 				<configuration>
 					<tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta</tagBase>
 					<preparationGoals>clean validate</preparationGoals>
+					<goals>clean install</goals>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<remoteTagging>true</remoteTagging>
 					<username>${relusername}</username>     
