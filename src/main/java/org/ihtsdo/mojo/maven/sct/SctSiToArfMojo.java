@@ -125,14 +125,20 @@ public class SctSiToArfMojo extends AbstractMojo {
 
     private static final String TAB_CHARACTER = "\t";
 
-    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH = FILE_SEPARATOR + "net"
-            + FILE_SEPARATOR + "nhs" + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "ukde";
+    private static final String NHS_UK_DRUG_EXTENSION_FILE_PATH = FILE_SEPARATOR
+            + "net"
+            + FILE_SEPARATOR
+            + "nhs"
+            + FILE_SEPARATOR
+            + "uktc"
+            + FILE_SEPARATOR + "ukde";
 
-    private static final String NHS_UK_EXTENSION_FILE_PATH = FILE_SEPARATOR + "net"
-            + FILE_SEPARATOR + "nhs" + FILE_SEPARATOR + "uktc" + FILE_SEPARATOR + "uke";
+    private static final String NHS_UK_EXTENSION_FILE_PATH = FILE_SEPARATOR
+            + "net" + FILE_SEPARATOR + "nhs" + FILE_SEPARATOR + "uktc"
+            + FILE_SEPARATOR + "uke";
 
-    private static final String SNOMED_FILE_PATH = FILE_SEPARATOR + "org" + FILE_SEPARATOR
-            + "snomed";
+    private static final String SNOMED_FILE_PATH = FILE_SEPARATOR + "org"
+            + FILE_SEPARATOR + "snomed";
 
     /**
      * Location of the build directory.
@@ -193,7 +199,8 @@ public class SctSiToArfMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private String outputDirectory = FILE_SEPARATOR + "classes" + FILE_SEPARATOR + "ace";
+    private String outputDirectory = FILE_SEPARATOR + "classes"
+            + FILE_SEPARATOR + "ace";
 
     /**
      * Flag if header names are to be written to files; 
@@ -202,8 +209,8 @@ public class SctSiToArfMojo extends AbstractMojo {
      */
     private boolean writeHeaders;
 
-    private static String sourceCtv3Uuid = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids()
-            .iterator().next().toString();
+    private static String sourceCtv3Uuid = ArchitectonicAuxiliary.Concept.CTV3_ID
+            .getUids().iterator().next().toString();
     private static String sourceSnomedRtUuid = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID
             .getUids().iterator().next().toString();
 
@@ -242,7 +249,8 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         // Create string to show some input fields for exception reporting
         public String toString() {
-            return id + TAB_CHARACTER + status + TAB_CHARACTER + isprimitive + LINE_TERMINATOR;
+            return id + TAB_CHARACTER + status + TAB_CHARACTER + isprimitive
+                    + LINE_TERMINATOR;
         }
 
         // Create string for concepts.txt file
@@ -251,13 +259,14 @@ public class SctSiToArfMojo extends AbstractMojo {
 
             UUID u = Type3UuidFactory.fromSNOMED(id);
 
-            return u + TAB_CHARACTER + getStatusString(status) + TAB_CHARACTER + isprimitive
-                    + TAB_CHARACTER + date + TAB_CHARACTER + path + LINE_TERMINATOR;
+            return u + TAB_CHARACTER + getStatusString(status) + TAB_CHARACTER
+                    + isprimitive + TAB_CHARACTER + date + TAB_CHARACTER + path
+                    + LINE_TERMINATOR;
         }
 
         // Create string for ids.txt file
-        public String toIdsTxt(String source, String date, String path) throws IOException,
-                TerminologyException {
+        public String toIdsTxt(String source, String date, String path)
+                throws IOException, TerminologyException {
 
             String outputStr;
             UUID u = Type3UuidFactory.fromSNOMED(id);
@@ -325,8 +334,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         private int descriptionType; // DESCRIPTIONTYPE
         private String languageCode; // LANGUAGECODE
 
-        public SCTDescriptionRecord(long dId, int s, long cId, String text, int cStat, int typeInt,
-                String lang) {
+        public SCTDescriptionRecord(long dId, int s, long cId, String text,
+                int cStat, int typeInt, String lang) {
             id = dId;
             status = s;
             conceptId = cId;
@@ -349,9 +358,10 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         // Create string to show some input fields for exception reporting
         public String toString() {
-            return id + TAB_CHARACTER + status + TAB_CHARACTER + conceptId + TAB_CHARACTER
-                    + termText + TAB_CHARACTER + capStatus + TAB_CHARACTER + descriptionType
-                    + TAB_CHARACTER + languageCode + LINE_TERMINATOR;
+            return id + TAB_CHARACTER + status + TAB_CHARACTER + conceptId
+                    + TAB_CHARACTER + termText + TAB_CHARACTER + capStatus
+                    + TAB_CHARACTER + descriptionType + TAB_CHARACTER
+                    + languageCode + LINE_TERMINATOR;
         }
 
         // Create string for descriptions.txt file
@@ -361,8 +371,8 @@ public class SctSiToArfMojo extends AbstractMojo {
             UUID u = Type3UuidFactory.fromSNOMED(id);
             UUID c = Type3UuidFactory.fromSNOMED(conceptId);
 
-            String descType = ArchitectonicAuxiliary.getSnomedDescriptionType(descriptionType)
-                    .getUids().iterator().next().toString();
+            String descType = ArchitectonicAuxiliary.getSnomedDescriptionType(
+                    descriptionType).getUids().iterator().next().toString();
 
             return u + TAB_CHARACTER // description uuid
                     + getStatusString(status) + TAB_CHARACTER // status uuid
@@ -376,8 +386,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         // Create string for ids.txt file
-        public String toIdsTxt(String source, String date, String path) throws IOException,
-                TerminologyException {
+        public String toIdsTxt(String source, String date, String path)
+                throws IOException, TerminologyException {
 
             UUID u = Type3UuidFactory.fromSNOMED(id);
 
@@ -410,8 +420,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         private int group; // RELATIONSHIPGROUP
         private boolean exceptionFlag; // to handle Concept ID change exception
 
-        public SCTRelationshipRecord(long relID, int st, long cOneID, long relType, long cTwoID,
-                int characterType, int r, int grp) {
+        public SCTRelationshipRecord(long relID, int st, long cOneID,
+                long relType, long cTwoID, int characterType, int r, int grp) {
             id = relID; // RELATIONSHIPID
             status = st; // status is computed for relationships
             conceptOneID = cOneID; // CONCEPTID1
@@ -431,9 +441,9 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         // Create string to show some input fields for exception reporting
         public String toString() {
-            return uuid + TAB_CHARACTER + id + TAB_CHARACTER + status + TAB_CHARACTER
-                    + conceptOneID + TAB_CHARACTER + roleType + TAB_CHARACTER + conceptTwoID
-                    + LINE_TERMINATOR;
+            return uuid + TAB_CHARACTER + id + TAB_CHARACTER + status
+                    + TAB_CHARACTER + conceptOneID + TAB_CHARACTER + roleType
+                    + TAB_CHARACTER + conceptTwoID + LINE_TERMINATOR;
         }
 
         // Create output string for arf relationships.txt file
@@ -444,10 +454,10 @@ public class SctSiToArfMojo extends AbstractMojo {
             UUID relType = Type3UuidFactory.fromSNOMED(roleType);
             UUID cTwo = Type3UuidFactory.fromSNOMED(conceptTwoID);
 
-            String chType = ArchitectonicAuxiliary.getSnomedCharacteristicType(characteristic)
-                    .getUids().iterator().next().toString();
-            String reType = ArchitectonicAuxiliary.getSnomedRefinabilityType(refinability)
-                    .getUids().iterator().next().toString();
+            String chType = ArchitectonicAuxiliary.getSnomedCharacteristicType(
+                    characteristic).getUids().iterator().next().toString();
+            String reType = ArchitectonicAuxiliary.getSnomedRefinabilityType(
+                    refinability).getUids().iterator().next().toString();
 
             return uuid + TAB_CHARACTER // relationship uuid
                     + getStatusString(status) + TAB_CHARACTER // status uuid
@@ -464,8 +474,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         // Create string for ids.txt file
-        public String toIdsTxt(String source, String date, String path) throws IOException,
-                TerminologyException {
+        public String toIdsTxt(String source, String date, String path)
+                throws IOException, TerminologyException {
 
             // NOTE: Path is SNOMED Core. Not inferred. Not stated. Just core.
             return this.uuid // (canonical) primary uuid
@@ -494,8 +504,8 @@ public class SctSiToArfMojo extends AbstractMojo {
             file = f;
             revDate = d;
             pathId = pid;
-            sourceUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()
-                    .toString(); // @@@
+            sourceUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
+                    .iterator().next().toString(); // @@@
             // Confirm
             // source
             // uuid
@@ -520,40 +530,47 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         // SHOW input directories from POM file
         for (int i = 0; i < sctInputDirArray.length; i++) {
-            sctInputDirArray[i] = sctInputDirArray[i].replace('/', File.separatorChar);
-            getLog().info("POM Input Directory (" + i + "): " + sctInputDirArray[i]);
+            sctInputDirArray[i] = sctInputDirArray[i].replace('/',
+                    File.separatorChar);
+            getLog().info(
+                    "POM Input Directory (" + i + "): " + sctInputDirArray[i]);
             if (!sctInputDirArray[i].startsWith(FILE_SEPARATOR)) {
                 sctInputDirArray[i] = FILE_SEPARATOR + sctInputDirArray[i];
             }
         }
 
-        executeMojo(buildDir, targetSubDir, sctInputDirArray, includeCTV3ID, includeSNOMEDRTID);
+        executeMojo(buildDir, targetSubDir, sctInputDirArray, includeCTV3ID,
+                includeSNOMEDRTID);
         getLog().info("POM PROCESSING COMPLETE ");
     }
 
-    void executeMojo(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
-            boolean snomedrtTF) throws MojoFailureException {
+    void executeMojo(String wDir, String subDir, String[] inDirs,
+            boolean ctv3idTF, boolean snomedrtTF) throws MojoFailureException {
         getLog().info("*** SctSiToArf PROCESSING STARTED ***");
         long start = System.currentTimeMillis();
         relUuidMap = new HashMap<UUID, Long>();
 
         try {
-            uuidPathSnomedCore = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator()
-                    .next().toString();
+            uuidPathSnomedCore = ArchitectonicAuxiliary.Concept.SNOMED_CORE
+                    .getUids().iterator().next().toString();
 
-            uuidPathSnomedInferred = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+            uuidPathSnomedInferred = Type5UuidFactory.get(
+                    Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                     "SNOMED Core Inferred").toString();
             getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferred);
 
-            uuidPathSnomedStated = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                    "SNOMED Core Stated").toString();
+            uuidPathSnomedStated = Type5UuidFactory
+                    .get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "SNOMED Core Stated").toString();
             getLog().info("SNOMED Core Stated = " + uuidPathSnomedStated);
         } catch (NoSuchAlgorithmException e2) {
             e2.printStackTrace();
-            throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
+            throw new MojoFailureException(
+                    "FAILED: SNOMED Core Stated/Inferred Path", e2);
         } catch (UnsupportedEncodingException e2) {
             e2.printStackTrace();
-            throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
+            throw new MojoFailureException(
+                    "FAILED: SNOMED Core Stated/Inferred Path", e2);
         }
 
         // Setup build directory
@@ -572,14 +589,17 @@ public class SctSiToArfMojo extends AbstractMojo {
             }
         } catch (Exception e) { // Catch exception if any
             getLog().info("Error: could not create output directories");
-            throw new MojoFailureException("Error: could not create output directories", e);
+            throw new MojoFailureException(
+                    "Error: could not create output directories", e);
         }
 
         // SETUP CONCEPTS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfCDirs = getSnomedFiles(wDir, subDir, inDirs, "concept");
+        List<List<SCTFile>> listOfCDirs = getSnomedFiles(wDir, subDir, inDirs,
+                "concept");
 
         // SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-        List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
+        List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs,
+                "descriptions");
 
         // SETUP INFERRED RELATIONSHIPS INPUT SCTFile ArrayList
         List<List<SCTFile>> listOfRiDirs = getSnomedFiles(wDir, subDir, inDirs,
@@ -590,21 +610,25 @@ public class SctSiToArfMojo extends AbstractMojo {
                 "relationships_stated");
 
         // SETUP "ids.txt" OUTPUT FILE
-        String idsFileName = wDir + outputDirectory + FILE_SEPARATOR + "ids.txt";
+        String idsFileName = wDir + outputDirectory + FILE_SEPARATOR
+                + "ids.txt";
         BufferedWriter idstxtWriter;
         try {
-            idstxtWriter = new BufferedWriter(new FileWriter(idsFileName, appendToArfFiles));
+            idstxtWriter = new BufferedWriter(new FileWriter(idsFileName,
+                    appendToArfFiles));
         } catch (IOException e) {
             getLog().info("FAILED: could not create " + idsFileName);
             e.printStackTrace();
-            throw new MojoFailureException("FAILED: could not create " + idsFileName, e);
+            throw new MojoFailureException("FAILED: could not create "
+                    + idsFileName, e);
         }
         getLog().info("ids.txt OUTPUT: " + idsFileName);
         if (writeHeaders) {
             try {
-                idstxtWriter.write("primary uuid" + TAB_CHARACTER + "source" + TAB_CHARACTER
-                        + "source id" + TAB_CHARACTER + "status uuid" + TAB_CHARACTER + ""
-                        + "effective date" + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
+                idstxtWriter.write("primary uuid" + TAB_CHARACTER + "source"
+                        + TAB_CHARACTER + "source id" + TAB_CHARACTER
+                        + "status uuid" + TAB_CHARACTER + "" + "effective date"
+                        + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
             } catch (IOException e) {
                 throw new MojoFailureException("FAILED: writing id headers", e);
             }
@@ -612,7 +636,8 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         // PROCESS SNOMED FILES
         try {
-            processConceptsFiles(wDir, listOfCDirs, idstxtWriter, ctv3idTF, snomedrtTF);
+            processConceptsFiles(wDir, listOfCDirs, idstxtWriter, ctv3idTF,
+                    snomedrtTF);
         } catch (Exception e1) {
             getLog().info("FAILED: processConceptsFiles()");
             e1.printStackTrace();
@@ -623,42 +648,53 @@ public class SctSiToArfMojo extends AbstractMojo {
         } catch (Exception e1) {
             getLog().info("FAILED: processDescriptionsFiles()");
             e1.printStackTrace();
-            throw new MojoFailureException("FAILED: processDescriptionsFiles()", e1);
+            throw new MojoFailureException(
+                    "FAILED: processDescriptionsFiles()", e1);
         }
-        
-        
+
         try {
             getLog().info("START RELATIONSHIPS PROCESSING...");
 
             // SETUP RELATIONSHIPS OUTPUT FILE
-            String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships.txt";
+            String outFileName = wDir + outputDirectory + FILE_SEPARATOR
+                    + "relationships.txt";
             BufferedWriter bw;
-            bw = new BufferedWriter(new FileWriter(outFileName, appendToArfFiles));
+            bw = new BufferedWriter(new FileWriter(outFileName,
+                    appendToArfFiles));
             getLog().info("RELATIONSHIPS .arf OUTPUT: " + outFileName);
             if (writeHeaders) {
-                bw.write("relationship uuid" + TAB_CHARACTER + "" + "status uuid" + TAB_CHARACTER + ""
-                        + "source concept uuid" + TAB_CHARACTER + "" + "relationship type uuid"
-                        + TAB_CHARACTER + "" + "destination concept uuid" + TAB_CHARACTER + ""
-                        + "characteristic type uuid" + TAB_CHARACTER + "" + "refinability uuid"
-                        + TAB_CHARACTER + "" + "relationship group" + TAB_CHARACTER + ""
-                        + "effective date" + TAB_CHARACTER + "" + "path uuid" + LINE_TERMINATOR);
+                bw.write("relationship uuid" + TAB_CHARACTER + ""
+                        + "status uuid" + TAB_CHARACTER + ""
+                        + "source concept uuid" + TAB_CHARACTER + ""
+                        + "relationship type uuid" + TAB_CHARACTER + ""
+                        + "destination concept uuid" + TAB_CHARACTER + ""
+                        + "characteristic type uuid" + TAB_CHARACTER + ""
+                        + "refinability uuid" + TAB_CHARACTER + ""
+                        + "relationship group" + TAB_CHARACTER + ""
+                        + "effective date" + TAB_CHARACTER + "" + "path uuid"
+                        + LINE_TERMINATOR);
             }
 
             // SETUP RELATIONSHIPS EXCEPTION REPORT FILE
-            String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "relationships_report.txt";
+            String erFileName = wDir + outputDirectory + FILE_SEPARATOR
+                    + "relationships_report.txt";
             BufferedWriter erw;
             erw = new BufferedWriter(new FileWriter(erFileName));
-            getLog().info("RELATIONSHIPS Exceptions Report OUTPUT: " + erFileName);
+            getLog().info(
+                    "RELATIONSHIPS Exceptions Report OUTPUT: " + erFileName);
 
-            processRelationshipsFiles(wDir, listOfRiDirs, false, idstxtWriter, bw, erw);
-            processRelationshipsFiles(wDir, listOfRsDirs, true, idstxtWriter, bw, erw);
-            
+            processRelationshipsFiles(wDir, listOfRiDirs, false, idstxtWriter,
+                    bw, erw);
+            processRelationshipsFiles(wDir, listOfRsDirs, true, idstxtWriter,
+                    bw, erw);
+
             bw.close(); // Need to be sure to the close file!
             erw.close(); // Need to be sure to the close file!
         } catch (Exception e1) {
             getLog().info("FAILED: processRelationshipsFiles()");
             e1.printStackTrace();
-            throw new MojoFailureException("FAILED: processRelationshipsFiles()", e1);
+            throw new MojoFailureException(
+                    "FAILED: processRelationshipsFiles()", e1);
         }
 
         try {
@@ -670,19 +706,21 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
         getLog().info("*** SctSiToArf PROCESSING COMPLETED ***");
         getLog().info(
-                "CONVERSION TIME: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
+                "CONVERSION TIME: "
+                        + ((System.currentTimeMillis() - start) / 1000)
+                        + " seconds");
     }
 
-    private List<List<SCTFile>> getSnomedFiles(String wDir, String subDir, String[] inDirs,
-            String pattern) throws MojoFailureException {
+    private List<List<SCTFile>> getSnomedFiles(String wDir, String subDir,
+            String[] inDirs, String pattern) throws MojoFailureException {
 
         List<List<SCTFile>> listOfDirs = new ArrayList<List<SCTFile>>();
         for (int ii = 0; ii < inDirs.length; ii++) {
             ArrayList<SCTFile> listOfFiles = new ArrayList<SCTFile>();
 
             getLog().info(
-                    String.format("%1$s (%2$s): %3$s%4$s%5$s", pattern.toUpperCase(), ii, wDir,
-                            subDir, inDirs[ii]));
+                    String.format("%1$s (%2$s): %3$s%4$s%5$s", pattern
+                            .toUpperCase(), ii, wDir, subDir, inDirs[ii]));
 
             File f1 = new File(new File(wDir, subDir), inDirs[ii]);
             ArrayList<File> fv = new ArrayList<File>();
@@ -698,8 +736,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                         return true;
                     } else {
                         for (String filter : inputFilters) {
-                            if (pathname.getAbsolutePath().replace(File.separatorChar, '/')
-                                    .matches(filter)) {
+                            if (pathname.getAbsolutePath().replace(
+                                    File.separatorChar, '/').matches(filter)) {
                                 return true;
                             }
                         }
@@ -716,7 +754,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                     String tmpPathID = getFilePathID(f2, wDir, subDir);
                     SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
                     listOfFiles.add(tmpObj);
-                    getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+                    getLog().info(
+                            "    FILE : " + f2.getName() + " " + tempRevDate);
                 }
 
             }
@@ -734,8 +773,9 @@ public class SctSiToArfMojo extends AbstractMojo {
      * 
      * IGNORE: FULLYSPECIFIEDNAME CTV3ID SNOMEDID
      */
-    protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv, Writer idstxt,
-            boolean ctv3idTF, boolean snomedrtTF) throws Exception {
+    protected void processConceptsFiles(String wDir, List<List<SCTFile>> sctv,
+            Writer idstxt, boolean ctv3idTF, boolean snomedrtTF)
+            throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String sourceUUID, revDate, pathID;
@@ -744,13 +784,15 @@ public class SctSiToArfMojo extends AbstractMojo {
         getLog().info("START CONCEPTS PROCESSING...");
 
         // SETUP CONCEPTS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "concepts.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR
+                + "concepts.txt";
         BufferedWriter bw;
         bw = new BufferedWriter(new FileWriter(outFileName, appendToArfFiles));
         getLog().info("ARF CONCEPTS OUTPUT: " + outFileName);
         if (writeHeaders) {
-            bw.write("concept uuid" + TAB_CHARACTER + "status uuid" + TAB_CHARACTER + "primitive"
-                    + TAB_CHARACTER + "" + "effective date" + TAB_CHARACTER + "path uuid"
+            bw.write("concept uuid" + TAB_CHARACTER + "status uuid"
+                    + TAB_CHARACTER + "primitive" + TAB_CHARACTER + ""
+                    + "effective date" + TAB_CHARACTER + "path uuid"
                     + LINE_TERMINATOR);
         }
 
@@ -813,7 +855,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                     case 3: // ADDED CONCEPT
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
-                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                pathID));
                         // Hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -843,7 +886,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                     while (r2 < count2) { // ADD CONCEPT REMAINING INPUT
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
-                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                pathID));
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;
@@ -878,8 +922,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         bw.close(); // Need to be sure to the close file!
     }
 
-    protected void processDescriptionsFiles(String wDir, List<List<SCTFile>> sctv, Writer idstxt)
-            throws Exception {
+    protected void processDescriptionsFiles(String wDir,
+            List<List<SCTFile>> sctv, Writer idstxt) throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String sourceUUID, revDate, pathID;
@@ -887,23 +931,27 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         getLog().info("START DESCRIPTIONS PROCESSING...");
         // SETUP DESCRIPTIONS EXCEPTION REPORT
-        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions_report.txt";
+        String erFileName = wDir + outputDirectory + FILE_SEPARATOR
+                + "descriptions_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
 
         // SETUP DESCRIPTIONS OUTPUT FILE
-        String outFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions.txt";
+        String outFileName = wDir + outputDirectory + FILE_SEPARATOR
+                + "descriptions.txt";
         BufferedWriter bw;
-        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFileName,
-                appendToArfFiles), "UTF-8"));
+        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                outFileName, appendToArfFiles), "UTF-8"));
         getLog().info("ARF DESCRIPTIONS OUTPUT: " + outFileName);
         if (writeHeaders) {
-            bw.write("description uuid" + TAB_CHARACTER + "status uuid" + TAB_CHARACTER + ""
-                    + "concept uuid" + TAB_CHARACTER + "" + "term" + TAB_CHARACTER + ""
-                    + "capitalization status" + TAB_CHARACTER + "" + "description type uuid"
-                    + TAB_CHARACTER + "" + "language code" + TAB_CHARACTER + "" + "effective date"
-                    + TAB_CHARACTER + "path uuid" + LINE_TERMINATOR);
+            bw.write("description uuid" + TAB_CHARACTER + "status uuid"
+                    + TAB_CHARACTER + "" + "concept uuid" + TAB_CHARACTER + ""
+                    + "term" + TAB_CHARACTER + "" + "capitalization status"
+                    + TAB_CHARACTER + "" + "description type uuid"
+                    + TAB_CHARACTER + "" + "language code" + TAB_CHARACTER + ""
+                    + "effective date" + TAB_CHARACTER + "path uuid"
+                    + LINE_TERMINATOR);
         }
 
         Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
@@ -958,11 +1006,15 @@ public class SctSiToArfMojo extends AbstractMojo {
 
                         // REPORT DESCRIPTION CHANGE EXCEPTION
                         if (a1[r1].conceptId != a2[r2].conceptId) {
-                            er.write("** CONCEPTID CHANGE ** WAS/IS " + LINE_TERMINATOR);
-                            er.write("id" + TAB_CHARACTER + "status" + TAB_CHARACTER + ""
-                                    + "conceptId" + TAB_CHARACTER + "" + "termText" + TAB_CHARACTER
-                                    + "" + "capStatus" + TAB_CHARACTER + "" + "descriptionType"
-                                    + TAB_CHARACTER + "" + "languageCode" + LINE_TERMINATOR);
+                            er.write("** CONCEPTID CHANGE ** WAS/IS "
+                                    + LINE_TERMINATOR);
+                            er.write("id" + TAB_CHARACTER + "status"
+                                    + TAB_CHARACTER + "" + "conceptId"
+                                    + TAB_CHARACTER + "" + "termText"
+                                    + TAB_CHARACTER + "" + "capStatus"
+                                    + TAB_CHARACTER + "" + "descriptionType"
+                                    + TAB_CHARACTER + "" + "languageCode"
+                                    + LINE_TERMINATOR);
                             er.write(a1[r1].toString());
                             er.write(a2[r2].toString());
                         }
@@ -977,7 +1029,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                     case 3: // ADDED DESCRIPTION
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
-                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                pathID));
                         // Hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -1000,14 +1053,16 @@ public class SctSiToArfMojo extends AbstractMojo {
 
                 // NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
                 if (r1 < count1) {
-                    getLog().info("ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
+                    getLog().info(
+                            "ERROR: MISSED DESCRIPTION RECORDS r1 < count1");
                 }
 
                 if (r2 < count2) {
                     while (r2 < count2) { // ADD REMAINING DESCRIPTION INPUT
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
-                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                        idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                pathID));
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;
@@ -1043,8 +1098,9 @@ public class SctSiToArfMojo extends AbstractMojo {
         er.close(); // Need to be sure to the close file!
     }
 
-    protected void processRelationshipsFiles(String wDir, List<List<SCTFile>> sctI,
-            boolean isStated, Writer idstxt, BufferedWriter bw, BufferedWriter er) throws Exception {
+    protected void processRelationshipsFiles(String wDir,
+            List<List<SCTFile>> sctI, boolean isStated, Writer idstxt,
+            BufferedWriter bw, BufferedWriter er) throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         String sourceUUID, revDate, pathID;
@@ -1067,7 +1123,8 @@ public class SctSiToArfMojo extends AbstractMojo {
             a1 = new SCTRelationshipRecord[count1];
             parseRelationships(fName1, a1, count1, isStated);
             writeRelationships(bw, a1, count1, revDate, pathID);
-            writeRelationshipIds(idstxt, a1, count1, sourceUUID, revDate, pathID);
+            writeRelationshipIds(idstxt, a1, count1, sourceUUID, revDate,
+                    pathID);
 
             while (fit.hasNext()) {
                 // SETUP CURRENT RELATIONSHIPS INPUT FILE
@@ -1100,10 +1157,13 @@ public class SctSiToArfMojo extends AbstractMojo {
                         // REPORT & HANDLE CHANGE EXCEPTION
                         if ((a1[r1].conceptOneID != a2[r2].conceptOneID)
                                 || (a1[r1].conceptTwoID != a2[r2].conceptTwoID)) {
-                            er.write("** CONCEPTID CHANGE ** WAS/IS " + LINE_TERMINATOR);
-                            er.write("id" + TAB_CHARACTER + "" + "status" + TAB_CHARACTER + ""
-                                    + "conceptOneID" + TAB_CHARACTER + "" + "roleType"
-                                    + TAB_CHARACTER + "" + "conceptTwoID" + LINE_TERMINATOR);
+                            er.write("** CONCEPTID CHANGE ** WAS/IS "
+                                    + LINE_TERMINATOR);
+                            er.write("id" + TAB_CHARACTER + "" + "status"
+                                    + TAB_CHARACTER + "" + "conceptOneID"
+                                    + TAB_CHARACTER + "" + "roleType"
+                                    + TAB_CHARACTER + "" + "conceptTwoID"
+                                    + LINE_TERMINATOR);
                             er.write(a1[r1].toString());
                             er.write(a2[r2].toString());
 
@@ -1131,7 +1191,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
                         if (a2[r2].id < Long.MAX_VALUE)
-                            idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                            idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                    pathID));
                         // hold pointer to append to master
                         a3[r3] = a2[r2];
                         r2++;
@@ -1154,7 +1215,8 @@ public class SctSiToArfMojo extends AbstractMojo {
 
                 // NOT MORE TO COMPARE, HANDLE REMAINING CONCEPTS
                 if (r1 < count1) {
-                    getLog().info("ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
+                    getLog().info(
+                            "ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
                 }
 
                 if (r2 < count2) {
@@ -1162,7 +1224,8 @@ public class SctSiToArfMojo extends AbstractMojo {
                         // Write history
                         bw.write(a2[r2].toStringArf(revDate, pathID));
                         if (a2[r2].id < Long.MAX_VALUE)
-                            idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate, pathID));
+                            idstxt.write(a2[r2].toIdsTxt(sourceUUID, revDate,
+                                    pathID));
                         // Add to append array
                         a3[r3] = a2[r2];
                         nAdd++;
@@ -1211,10 +1274,12 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
     }
 
-    private int compareDescription(SCTDescriptionRecord c1, SCTDescriptionRecord c2) {
+    private int compareDescription(SCTDescriptionRecord c1,
+            SCTDescriptionRecord c2) {
         if (c1.id == c2.id) {
             if ((c1.status == c2.status) && (c1.conceptId == c2.conceptId)
-                    && c1.termText.equals(c2.termText) && (c1.capStatus == c2.capStatus)
+                    && c1.termText.equals(c2.termText)
+                    && (c1.capStatus == c2.capStatus)
                     && (c1.descriptionType == c2.descriptionType)
                     && c1.languageCode.equals(c2.languageCode))
                 return 1; // SAME
@@ -1229,17 +1294,19 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
     }
 
-    private int compareRelationship(SCTRelationshipRecord c1, SCTRelationshipRecord c2) {
-        if (c1.id == c2.id) {
-            if ((c1.status == c2.status) && (c1.conceptOneID == c2.conceptOneID)
-                    && (c1.roleType == c2.roleType) && (c1.conceptTwoID == c2.conceptTwoID)
+    private int compareRelationship(SCTRelationshipRecord c1,
+            SCTRelationshipRecord c2) {
+        int result = c1.uuid.compareTo(c2.uuid);
+        if (result == 0) {
+            if ((c1.status == c2.status)
                     && (c1.characteristic == c2.characteristic)
-                    && (c1.refinability == c2.refinability) && (c1.group == c2.group))
+                    && (c1.refinability == c2.refinability))
                 return 1; // SAME
             else
                 return 2; // MODIFIED
 
-        } else if (c1.id > c2.id) {
+        } else if (result == 1) {
+            // c1.uuid > c2.uuid
             return 3; // ADDED
 
         } else {
@@ -1247,8 +1314,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
     }
 
-    protected void parseConcepts(String fName, SCTConceptRecord[] a, int count, boolean ctv3idTF,
-            boolean snomedrtTF) throws Exception {
+    protected void parseConcepts(String fName, SCTConceptRecord[] a, int count,
+            boolean ctv3idTF, boolean snomedrtTF) throws Exception {
 
         String ctv3Str;
         String snomedrtStr;
@@ -1285,8 +1352,8 @@ public class SctSiToArfMojo extends AbstractMojo {
             int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
 
             // Save to sortable array
-            a[concepts] = new SCTConceptRecord(conceptKey, conceptStatus, ctv3Str, snomedrtStr,
-                    isPrimitive);
+            a[concepts] = new SCTConceptRecord(conceptKey, conceptStatus,
+                    ctv3Str, snomedrtStr, isPrimitive);
             concepts++;
         }
 
@@ -1294,16 +1361,17 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         getLog().info(
                 "Parse & sort time: " + concepts + " concepts, "
-                        + (System.currentTimeMillis() - start) + " milliseconds");
+                        + (System.currentTimeMillis() - start)
+                        + " milliseconds");
     }
 
-    protected void parseDescriptions(String fName, SCTDescriptionRecord[] a, int count)
-            throws Exception {
+    protected void parseDescriptions(String fName, SCTDescriptionRecord[] a,
+            int count) throws Exception {
 
         long start = System.currentTimeMillis();
 
-        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
-                "UTF-8"));
+        BufferedReader r = new BufferedReader(new InputStreamReader(
+                new FileInputStream(fName), "UTF-8"));
         StreamTokenizer st = new StreamTokenizer(r);
         st.resetSyntax();
         st.wordChars('\u001F', '\u00FF');
@@ -1336,8 +1404,8 @@ public class SctSiToArfMojo extends AbstractMojo {
             String lang = st.sval;
 
             // Save to sortable array
-            a[descriptions] = new SCTDescriptionRecord(descriptionId, status, conceptId, text,
-                    capStatus, typeInt, lang);
+            a[descriptions] = new SCTDescriptionRecord(descriptionId, status,
+                    conceptId, text, capStatus, typeInt, lang);
             descriptions++;
 
             // CR
@@ -1352,11 +1420,12 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         getLog().info(
                 "Parse & sort time: " + descriptions + " descriptions, "
-                        + (System.currentTimeMillis() - start) + " milliseconds");
+                        + (System.currentTimeMillis() - start)
+                        + " milliseconds");
     }
 
-    protected void parseRelationships(String fName, SCTRelationshipRecord[] a, int count,
-            boolean isStated) throws Exception {
+    protected void parseRelationships(String fName, SCTRelationshipRecord[] a,
+            int count, boolean isStated) throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -1399,8 +1468,9 @@ public class SctSiToArfMojo extends AbstractMojo {
             int group = Integer.parseInt(st.sval);
 
             // Save to sortable array
-            a[relationships] = new SCTRelationshipRecord(relID, status, conceptOneID,
-                    relationshipTypeConceptID, conceptTwoID, characteristic, refinability, group);
+            a[relationships] = new SCTRelationshipRecord(relID, status,
+                    conceptOneID, relationshipTypeConceptID, conceptTwoID,
+                    characteristic, refinability, group);
             relationships++;
 
             // CR
@@ -1417,14 +1487,17 @@ public class SctSiToArfMojo extends AbstractMojo {
 
         getLog().info(
                 "Parse & sort time: " + relationships + " relationships, "
-                        + (System.currentTimeMillis() - start) + " milliseconds");
+                        + (System.currentTimeMillis() - start)
+                        + " milliseconds");
     }
 
-    private void computeRelationshipUuids(SCTRelationshipRecord[] a, boolean isStated)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    private void computeRelationshipUuids(SCTRelationshipRecord[] a,
+            boolean isStated) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException {
         // SORT BY [C1-Group-RoleType-C2]
         Comparator<SCTRelationshipRecord> comp = new Comparator<SCTRelationshipRecord>() {
-            public int compare(SCTRelationshipRecord o1, SCTRelationshipRecord o2) {
+            public int compare(SCTRelationshipRecord o1,
+                    SCTRelationshipRecord o2) {
                 int thisMore = 1;
                 int thisLess = -1;
                 // C1
@@ -1471,8 +1544,9 @@ public class SctSiToArfMojo extends AbstractMojo {
                 GroupListStr = getGroupListString(a, i);
 
             // SET RELATIONSHIP UUID
-            a[i].uuid = Type5UuidFactory.get(REL_ID_NAMESPACE_UUID_TYPE1 + a[i].conceptOneID
-                    + a[i].roleType + a[i].conceptTwoID + GroupListStr);
+            a[i].uuid = Type5UuidFactory.get(REL_ID_NAMESPACE_UUID_TYPE1
+                    + a[i].conceptOneID + a[i].roleType + a[i].conceptTwoID
+                    + GroupListStr);
 
             // UPDATE SNOMED ID
             if (isStated) {
@@ -1497,43 +1571,17 @@ public class SctSiToArfMojo extends AbstractMojo {
             long keepC1 = a[startIdx].conceptOneID;
             int keepGroup = a[startIdx].group;
             int i = startIdx;
-            while ((i < max - 1) && (a[i].conceptOneID == keepC1) && (a[i].group == keepGroup)) {
-                sb.append(a[i].conceptOneID + "-" + a[i].roleType + "-" + a[i].conceptTwoID + ";");
+            while ((i < max - 1) && (a[i].conceptOneID == keepC1)
+                    && (a[i].group == keepGroup)) {
+                sb.append(a[i].conceptOneID + "-" + a[i].roleType + "-"
+                        + a[i].conceptTwoID + ";");
                 i++;
             }
         }
         return sb.toString();
     }
 
-    protected void writeConcepts(Writer w, SCTConceptRecord[] a, int count, String releaseDate,
-            String path) throws Exception {
-
-        long start = System.currentTimeMillis();
-
-        for (int i = 0; i < count; i++) {
-            w.write(a[i].toStringArf(releaseDate, path));
-        }
-
-        getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
-                        + " milliseconds");
-    }
-
-    protected void writeConceptIds(Writer w, SCTConceptRecord[] a, int count, String source,
-            String releaseDate, String path) throws Exception {
-
-        long start = System.currentTimeMillis();
-
-        for (int i = 0; i < count; i++) {
-            w.write(a[i].toIdsTxt(source, releaseDate, path));
-        }
-
-        getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
-                        + " milliseconds");
-    }
-
-    protected void writeDescriptions(Writer w, SCTDescriptionRecord[] a, int count,
+    protected void writeConcepts(Writer w, SCTConceptRecord[] a, int count,
             String releaseDate, String path) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -1543,11 +1591,12 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
                         + " milliseconds");
     }
 
-    protected void writeDescriptionIds(Writer w, SCTDescriptionRecord[] a, int count,
+    protected void writeConceptIds(Writer w, SCTConceptRecord[] a, int count,
             String source, String releaseDate, String path) throws Exception {
 
         long start = System.currentTimeMillis();
@@ -1557,12 +1606,13 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
                         + " milliseconds");
     }
 
-    protected void writeRelationships(Writer w, SCTRelationshipRecord[] a, int count,
-            String releaseDate, String path) throws Exception {
+    protected void writeDescriptions(Writer w, SCTDescriptionRecord[] a,
+            int count, String releaseDate, String path) throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -1571,12 +1621,45 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
                         + " milliseconds");
     }
 
-    protected void writeRelationshipIds(Writer w, SCTRelationshipRecord[] a, int count,
-            String source, String releaseDate, String path) throws Exception {
+    protected void writeDescriptionIds(Writer w, SCTDescriptionRecord[] a,
+            int count, String source, String releaseDate, String path)
+            throws Exception {
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < count; i++) {
+            w.write(a[i].toIdsTxt(source, releaseDate, path));
+        }
+
+        getLog().info(
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
+                        + " milliseconds");
+    }
+
+    protected void writeRelationships(Writer w, SCTRelationshipRecord[] a,
+            int count, String releaseDate, String path) throws Exception {
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < count; i++) {
+            w.write(a[i].toStringArf(releaseDate, path));
+        }
+
+        getLog().info(
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
+                        + " milliseconds");
+    }
+
+    protected void writeRelationshipIds(Writer w, SCTRelationshipRecord[] a,
+            int count, String source, String releaseDate, String path)
+            throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -1586,7 +1669,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
 
         getLog().info(
-                "Output time: " + count + " records, " + (System.currentTimeMillis() - start)
+                "Output time: " + count + " records, "
+                        + (System.currentTimeMillis() - start)
                         + " milliseconds");
     }
 
@@ -1597,33 +1681,39 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
     }
 
-    private void countCheck(int count1, int count2, int same, int modified, int added, int dropped) {
+    private void countCheck(int count1, int count2, int same, int modified,
+            int added, int dropped) {
 
         // CHECK COUNTS TO MASTER FILE1 RECORD COUNT
         if ((same + modified + dropped) == count1) {
             getLog().info(
-                    "PASSED1:: SAME+MODIFIED+DROPPED = " + same + "+" + modified + "+" + dropped
-                            + " = " + (same + modified + dropped) + " == " + count1);
+                    "PASSED1:: SAME+MODIFIED+DROPPED = " + same + "+"
+                            + modified + "+" + dropped + " = "
+                            + (same + modified + dropped) + " == " + count1);
         } else {
             getLog().info(
-                    "FAILED1:: SAME+MODIFIED+DROPPED = " + same + "+" + modified + "+" + dropped
-                            + " = " + (same + modified + dropped) + " != " + count1);
+                    "FAILED1:: SAME+MODIFIED+DROPPED = " + same + "+"
+                            + modified + "+" + dropped + " = "
+                            + (same + modified + dropped) + " != " + count1);
         }
 
         // CHECK COUNTS TO UPDATE FILE2 RECORD COUNT
         if ((same + modified + added) == count2) {
             getLog().info(
-                    "PASSED2:: SAME+MODIFIED+ADDED   = " + same + "+" + modified + "+" + added
-                            + " = " + (same + modified + added) + " == " + count2);
+                    "PASSED2:: SAME+MODIFIED+ADDED   = " + same + "+"
+                            + modified + "+" + added + " = "
+                            + (same + modified + added) + " == " + count2);
         } else {
             getLog().info(
-                    "FAILED2:: SAME+MODIFIED+ADDED   = " + same + "+" + modified + "+" + added
-                            + " = " + (same + modified + added) + " != " + count2);
+                    "FAILED2:: SAME+MODIFIED+ADDED   = " + same + "+"
+                            + modified + "+" + added + " = "
+                            + (same + modified + added) + " != " + count2);
         }
 
     }
 
-    private static int countFileLines(String fileName) throws MojoFailureException {
+    private static int countFileLines(String fileName)
+            throws MojoFailureException {
         int lineCount = 0;
         BufferedReader br = null;
 
@@ -1635,13 +1725,15 @@ public class SctSiToArfMojo extends AbstractMojo {
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
-                throw new MojoFailureException("FAILED: error counting lines in " + fileName, ex);
+                throw new MojoFailureException(
+                        "FAILED: error counting lines in " + fileName, ex);
             } finally {
                 br.close();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw new MojoFailureException("FAILED: error open BufferedReader for " + fileName, ex);
+            throw new MojoFailureException(
+                    "FAILED: error open BufferedReader for " + fileName, ex);
         }
 
         // lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
@@ -1693,7 +1785,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         }
     }
 
-    private String getFilePathID(File f, String baseDir, String subDir) throws MojoFailureException {
+    private String getFilePathID(File f, String baseDir, String subDir)
+            throws MojoFailureException {
         String puuid = null;
         UUID u;
 
@@ -1711,9 +1804,11 @@ public class SctSiToArfMojo extends AbstractMojo {
             if (f.getAbsolutePath().contains("sct_relationships_stated_")) {
                 puuid = uuidPathSnomedStated;
                 getLog().info("  PATH UUID: " + "SNOMED Core Stated " + puuid);
-            } else if (f.getAbsolutePath().contains("sct_relationships_inferred")) {
+            } else if (f.getAbsolutePath().contains(
+                    "sct_relationships_inferred")) {
                 puuid = uuidPathSnomedInferred;
-                getLog().info("  PATH UUID: " + "SNOMED Core Inferred " + puuid);
+                getLog()
+                        .info("  PATH UUID: " + "SNOMED Core Inferred " + puuid);
             } else {
                 // SNOMED_CORE Path UUID
                 puuid = uuidPathSnomedCore;
@@ -1727,12 +1822,15 @@ public class SctSiToArfMojo extends AbstractMojo {
                 puuid = u.toString();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("FAILED: NHS UK Extension Path.."
-                        + "getFilePathID() NoSuchAlgorithmException", e);
+                throw new MojoFailureException(
+                        "FAILED: NHS UK Extension Path.."
+                                + "getFilePathID() NoSuchAlgorithmException", e);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("FAILED: NHS UK Extension Path.."
-                        + "getFilePathID() UnsupportedEncodingException", e);
+                throw new MojoFailureException(
+                        "FAILED: NHS UK Extension Path.."
+                                + "getFilePathID() UnsupportedEncodingException",
+                        e);
             }
             getLog().info("  PATH UUID (uke): " + s + " " + puuid);
         } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
@@ -1757,12 +1855,13 @@ public class SctSiToArfMojo extends AbstractMojo {
         } else {
             // OTHER PATH UUID: based on directory path
             try {
-                u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s);
+                u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                        s);
                 puuid = u.toString();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("FAILED: getFilePathID() NoSuchAlgorithmException",
-                        e);
+                throw new MojoFailureException(
+                        "FAILED: getFilePathID() NoSuchAlgorithmException", e);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
                 throw new MojoFailureException("FAILED: getFilePathID() "
@@ -1778,7 +1877,8 @@ public class SctSiToArfMojo extends AbstractMojo {
      * 1. build directory buildDir
      */
 
-    private static void listFilesRecursive(ArrayList<File> list, File root, String prefix) {
+    private static void listFilesRecursive(ArrayList<File> list, File root,
+            String prefix) {
         if (root.isFile()) {
             list.add(root);
             return;
@@ -1809,8 +1909,8 @@ public class SctSiToArfMojo extends AbstractMojo {
         while (j < 12) {
             String s;
             try {
-                s = ArchitectonicAuxiliary.getStatusFromId(j).getUids().iterator().next()
-                        .toString();
+                s = ArchitectonicAuxiliary.getStatusFromId(j).getUids()
+                        .iterator().next().toString();
                 statusStr[i] = new String(s);
             } catch (IOException e) {
                 statusStr[i] = null;
