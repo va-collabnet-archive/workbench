@@ -32,6 +32,8 @@ public class XML_I_Identify extends XML_basic_econ implements I_Handle_XML {
 	
 	public void setXML() {
 		
+		//econcept.
+		
 	}
 	
 	public void getXML() {
