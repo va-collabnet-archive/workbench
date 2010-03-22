@@ -347,7 +347,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
         if (isAdditionalLogging()) {
-            System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" 
+            System.out.println("*** addToRefsetMembers refset=" + refset + " concept="
                 + conceptToString(conceptDetails.getConceptId()));
         }
         addToNestedSet(newRefsetMembers, conceptDetails, refset);
@@ -363,13 +363,17 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private String conceptToString(int nid) {
         try {
-            return Integer.toString(nid) + " " 
+            if (isAdditionalLogging()){
+                return Integer.toString(nid) + " "
                 + termFactory.getConcept(nid).getInitialText();
+            } else {
+                return Integer.toString(nid);
+            }
         } catch (Exception e) {
             return Integer.toString(nid);
         }
     }
-    
+
     private void shutDown() throws Exception {
         reportWriter.close();
         if (useNonTxInterface) {
