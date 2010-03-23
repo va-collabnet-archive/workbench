@@ -158,8 +158,8 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
                 identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
             }
         } else {
-            synchronized (identifierCliniclFile) {
-                identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+            synchronized (identifierStructuralFile) {
+                identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
             }
         }
     }
