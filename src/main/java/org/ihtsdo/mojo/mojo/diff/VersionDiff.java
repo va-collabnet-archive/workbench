@@ -39,12 +39,18 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -54,6 +60,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 /**
  * Compare two version of SNOMED
@@ -589,6 +596,12 @@ public class VersionDiff extends AbstractMojo {
 
 	private int relationship_group_change;
 
+	private I_ConfigAceFrame config_ace_frame;
+
+	private RefsetPropertyMap refset_map;
+
+	private RefsetPropertyMap refset_map_member;
+
 	/*
 	 * Creates the refset concept, if member_refset != null then create a member
 	 * refset
@@ -606,15 +619,16 @@ public class VersionDiff extends AbstractMojo {
 		if (member_refset != null) {
 			member_refset_con = tf.getConcept(member_refset);
 		}
-		I_ConfigAceFrame config = tf.newAceFrameConfig();
+		// I_ConfigAceFrame config = tf.newAceFrameConfig();
 		// I_Path path = tf
 		// .getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
 		// .getUids());
-		config.addEditingPath(path);
-		config.setDefaultStatus(tf
+		config_ace_frame.addEditingPath(path);
+		config_ace_frame.setDefaultStatus(tf
 				.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 		UUID uuid = UUID.randomUUID();
-		I_GetConceptData new_refset = tf.newConcept(uuid, false, config);
+		I_GetConceptData new_refset = tf.newConcept(uuid, false,
+				config_ace_frame);
 		String refset_name = "Compare "
 				+ this.name
 				+ " "
@@ -623,10 +637,10 @@ public class VersionDiff extends AbstractMojo {
 				+ new Date();
 		// Install the FSN
 		tf.newDescription(UUID.randomUUID(), new_refset, "en", refset_name,
-				fully_specified_description_type, config);
+				fully_specified_description_type, config_ace_frame);
 		// Install the preferred term
 		tf.newDescription(UUID.randomUUID(), new_refset, "en", refset_name,
-				preferred_description_type, config);
+				preferred_description_type, config_ace_frame);
 		tf
 				.newRelationship(
 						UUID.randomUUID(),
@@ -644,7 +658,7 @@ public class VersionDiff extends AbstractMojo {
 								.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
 										.getUids()),
 						tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-								.getUids()), 0, config);
+								.getUids()), 0, config_ace_frame);
 		tf
 				.newRelationship(
 						UUID.randomUUID(),
@@ -664,7 +678,7 @@ public class VersionDiff extends AbstractMojo {
 								.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
 										.getUids()),
 						tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-								.getUids()), 0, config);
+								.getUids()), 0, config_ace_frame);
 		tf.commit();
 		if (member_refset != null) {
 			refsets.put(member_refset, new_refset);
@@ -719,64 +733,42 @@ public class VersionDiff extends AbstractMojo {
 		return newConcept;
 	}
 
+	private boolean noop = true;
+
+	private boolean noop_member = false;
+
 	/*
 	 * Adds a concept to the refset
 	 */
 	private void addToRefset(int concept_id, int change_id, String comment)
 			throws Exception {
 		I_TermFactory tf = Terms.get();
-		I_GetConceptData include_individual = tf
-				.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL
-						.getUids());
-		int typeId = include_individual.getConceptId();
-		I_GetConceptData active_status = tf
-				.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
-		int statusId = active_status.getConceptId();
-		// int memberId = tf.uuidToNative(UUID.randomUUID());
-		UUID member_uuid = UUID.randomUUID();
-		I_ExtendByRef newExtension = tf.newExtension(refset.getConceptId(),
-				member_uuid, concept_id, typeId);
-		// I_ExtendByRefPartCidConceptString ext = tf
-		// .newConceptConceptStringExtensionPart();
-		I_ExtendByRefPartCidCidString ext = tf
-				.newExtensionPart(I_ExtendByRefPartCidCidString.class);
-		ext.setC1id(concept_id);
-		ext.setC2id(change_id);
-		ext.setStringValue(comment);
-		// I_GetConceptData path = tf
-		// .getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-		// .getUids());
-		ext.setPathId(path.getConceptId());
-		ext.setStatusId(statusId);
-		// ext.setVersion(Integer.MAX_VALUE);
-		ext.setTime(Long.MAX_VALUE);
-		newExtension.addVersion(ext);
-		tf.addUncommitted(newExtension);
+		I_HelpRefsets refsetHelper = tf.getRefsetHelper(config_ace_frame);
+		if (!noop) {
+			refset_map.put(REFSET_PROPERTY.CID_ONE, concept_id);
+			refset_map.put(REFSET_PROPERTY.CID_TWO, change_id);
+			refset_map.put(REFSET_PROPERTY.STRING_VALUE, comment);
+			I_ExtendByRef new_ext = refsetHelper.getOrCreateRefsetExtension(
+					refset.getConceptId(), tf.uuidToNative(UUID.randomUUID()),
+					REFSET_TYPES.CID_CID_STR, refset_map);
+			tf.addUncommittedNoChecks(new_ext);
+		}
 		//
 		if (change_id == this.config || change_id == this.stats)
 			return;
-		I_GetConceptData member_refset = refsets.get(change_id);
-		if (member_refset == null) {
-			System.out.println("None for " + change_id);
-			return;
+		if (!noop_member) {
+			I_GetConceptData member_refset = refsets.get(change_id);
+			if (member_refset == null) {
+				System.out.println("None for " + change_id);
+				return;
+			}
+			refset_map_member.put(REFSET_PROPERTY.CID_ONE, concept_id);
+			I_ExtendByRef new_ext_member = refsetHelper
+					.getOrCreateRefsetExtension(member_refset.getConceptId(),
+							tf.uuidToNative(UUID.randomUUID()),
+							REFSET_TYPES.CID, refset_map_member);
+			tf.addUncommittedNoChecks(new_ext_member);
 		}
-		// memberId = tf.uuidToNative(UUID.randomUUID());
-		member_uuid = UUID.randomUUID();
-		newExtension = tf.newExtension(member_refset.getConceptId(),
-				member_uuid, concept_id, typeId);
-		// I_ExtendByRefPartCid member_ext = tf.newConceptExtensionPart();
-		I_ExtendByRefPartCid member_ext = tf
-				.newExtensionPart(I_ExtendByRefPartCid.class);
-		member_ext.setC1id(concept_id);
-		// path = tf
-		// .getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-		// .getUids());
-		member_ext.setPathId(path.getConceptId());
-		member_ext.setStatusId(statusId);
-		// member_ext.setVersion(Integer.MAX_VALUE);
-		ext.setTime(Long.MAX_VALUE);
-		newExtension.addVersion(member_ext);
-		tf.addUncommitted(newExtension);
 	}
 
 	private void setupConcepts() throws Exception {
@@ -1257,14 +1249,34 @@ public class VersionDiff extends AbstractMojo {
 		getLog().info(str);
 	}
 
-	private I_Path processConfig() throws Exception {
+	private void processConfig() throws Exception {
 		I_TermFactory tf = Terms.get();
-		I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
+		this.config_ace_frame = tf.newAceFrameConfig();
+		// I_Path path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
+		this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
 		this.v1_id = ThinVersionHelper.convertTz(this.v1);
 		this.v2_id = ThinVersionHelper.convertTz(this.v2);
 		I_Position pos1 = tf.newPosition(path, v1_id);
 		I_Position pos2 = tf.newPosition(path, v2_id);
 		this.createRefsetConcept(pos1, pos2, null);
+		{
+			this.refset_map = new RefsetPropertyMap(REFSET_TYPES.CID_CID_STR);
+			I_GetConceptData active_status = tf
+					.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
+			int status_id = active_status.getConceptId();
+			refset_map.put(REFSET_PROPERTY.PATH, path.getConceptId());
+			refset_map.put(REFSET_PROPERTY.STATUS, status_id);
+			refset_map.put(REFSET_PROPERTY.VERSION, Integer.MAX_VALUE);
+		}
+		{
+			this.refset_map_member = new RefsetPropertyMap(REFSET_TYPES.CID);
+			I_GetConceptData active_status = tf
+					.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
+			int status_id = active_status.getConceptId();
+			refset_map_member.put(REFSET_PROPERTY.PATH, path.getConceptId());
+			refset_map_member.put(REFSET_PROPERTY.STATUS, status_id);
+			refset_map_member.put(REFSET_PROPERTY.VERSION, Integer.MAX_VALUE);
+		}
 		ArrayList<Integer> change_cons = new ArrayList<Integer>();
 		if (this.added_concepts)
 			change_cons.add(this.added_concept_change);
@@ -1427,7 +1439,7 @@ public class VersionDiff extends AbstractMojo {
 				this.v1_relationship_type_filter, "v1_relationship_type_filter");
 		this.v2_relationship_type_filter_int = buildConceptEnum(
 				this.v2_relationship_type_filter, "v2_relationship_type_filter");
-		return path;
+		// return path;
 	}
 
 	int concepts = 0;
@@ -1436,8 +1448,8 @@ public class VersionDiff extends AbstractMojo {
 
 	private void diff() throws Exception {
 		I_TermFactory tf = Terms.get();
-		this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		I_Path path = processConfig();
+		// this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
+		processConfig();
 
 		listRoots(path);
 
@@ -1450,12 +1462,33 @@ public class VersionDiff extends AbstractMojo {
 			v2_isa_desc.addAll(getDescendants(v2_i, path, v2_id));
 		}
 
-		for (Iterator<I_GetConceptData> i = tf.getConceptIterator(); i
-				.hasNext();) {
+		ArrayList<Integer> all_concepts = new ArrayList<Integer>();
+		for (I_IterateIds i = tf.getConceptIdSet().iterator(); i.next();) {
+			all_concepts.add(i.nid());
+		}
+		long start = System.currentTimeMillis();
+		getLog().info(
+				"concepts " + concepts + " of " + all_concepts.size()
+						+ " Elapsed "
+						+ ((System.currentTimeMillis() - start) / 1000)
+						+ " secs.");
+		for (int nid : all_concepts) {
 			concepts++;
-			if (concepts % 10000 == 0)
-				getLog().info("concepts " + concepts);
-			I_GetConceptData c = i.next();
+			// if (concepts % 1000 == 0)
+			// tf.commit();
+			if (concepts % 10000 == 0) {
+				long cur = System.currentTimeMillis();
+				float elap = cur - start;
+				float done = ((float) concepts) / ((float) all_concepts.size());
+				float total = elap / done;
+				getLog().info(
+						"concepts " + concepts + " of " + all_concepts.size()
+								+ ". Elapsed " + ((int) (elap / 1000))
+								+ " secs. " + ((int) (done * 100))
+								+ "% done. Remaining "
+								+ ((int) ((total - elap) / 1000)) + " secs.");
+			}
+			I_GetConceptData c = tf.getConcept(nid);
 
 			I_ConceptAttributePart a1 = null;
 			I_ConceptAttributePart a2 = null;
@@ -1492,6 +1525,11 @@ public class VersionDiff extends AbstractMojo {
 			compareDescriptions(c, path);
 			compareRelationships(c, path);
 		}
+		getLog().info(
+				"concepts " + concepts + " of " + all_concepts.size()
+						+ " Elapsed "
+						+ ((System.currentTimeMillis() - start) / 1000)
+						+ " secs.");
 
 		logStats("concepts " + concepts);
 		logStats("concepts_filtered " + concepts_filtered);
@@ -1843,10 +1881,9 @@ public class VersionDiff extends AbstractMojo {
 	 * 
 	 * 
 	 * 
+	 * <br>&lt;path_uuid&gt;8c230474-9f11-30ce-9cad-185a96fd03a2
 	 * 
-	 * 
-	 * <br>&lt;path_uuid&gt;8c230474-9f11-30ce-9cad-185a96fd03a2&lt;/path_uuid&gt
-	 * ;
+	 * &lt;/path_uuid&gt;
 	 * 
 	 * <br>&lt;v1&gt;-612920153&lt;/v1&gt;
 	 * 
