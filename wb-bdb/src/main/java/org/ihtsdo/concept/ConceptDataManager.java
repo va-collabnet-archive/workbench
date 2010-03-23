@@ -184,7 +184,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 		@Override
 		public boolean remove(Object o) {
-			throw new UnsupportedOperationException();
+			return forget((NidPair) o);
 		}
 
 		@Override

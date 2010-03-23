@@ -1200,7 +1200,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 			List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 			SetModifiedWhenChangedList relNidTypeNidlist = data.getDestRelNidTypeNidList();
 			List<NidPair> invalidPairs = new ArrayList<NidPair>();
-			int i = 0;
 			for (NidPair pair: relNidTypeNidlist) {
 				int relNid = pair.getNid1();
 				int typeNid = pair.getNid2();
