@@ -21,7 +21,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     public ConceptAttributesRevision(I_ConceptualizeExternally another, ConceptAttributes primoridalMember) {
         super(Bdb.uuidToNid(another.getStatusUuid()), Bdb.uuidToNid(another.getPathUuid()), another.getTime(),
             primoridalMember);
-        defined = isDefined();
+        this.defined = another.isDefined();
     }
 
     public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, int pathNid, long time,
