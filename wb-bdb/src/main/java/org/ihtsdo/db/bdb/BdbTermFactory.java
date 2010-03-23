@@ -592,9 +592,28 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return Relationship.class.isAssignableFrom(c.getClass());
     }
 
+    private class IterateConceptsAdaptor implements I_ProcessConceptData {
+        private I_ProcessConcepts processor;
+
+        public IterateConceptsAdaptor(I_ProcessConcepts procesor) {
+            super();
+            this.processor = procesor;
+        }
+
+        @Override
+        public void processConceptData(Concept concept) throws Exception {
+            processor.processConcept(concept);
+        }
+
+        @Override
+        public boolean continueWork() {
+            return true;
+        }
+    }
+    
     @Override
     public void iterateConcepts(I_ProcessConcepts procesor) throws Exception {
-        throw new UnsupportedOperationException();
+        Bdb.getConceptDb().iterateConceptDataInSequence(new IterateConceptsAdaptor(procesor));
     }
 
     @Override
@@ -1129,7 +1148,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return concept.getUidsForComponent(nid);
         }
         return null;
-     }
+    }
 
     @Override
     public I_ImageVersioned getImage(UUID uuid) throws IOException {
@@ -1420,7 +1439,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     }
                 }
             }
-        }
+            }
 
         I_RepresentIdSet possibleIds;
         if (specHelper.isConceptComputeType()) {

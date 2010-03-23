@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
@@ -45,6 +47,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_WriteDirectToDb;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
@@ -57,7 +60,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
+import org.dwfa.util.bean.Spec; //import org.ihtsdo.db.bdb.Bdb;
 
 import au.csiro.snorocket.core.IFactory_123;
 import au.csiro.snorocket.snapi.Snorocket_123;
@@ -90,7 +93,6 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
  * <p>
  * <p>
  * <ul>
- * 
  */
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
@@ -128,6 +130,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
 
+    // NID SETS
+    I_IntSet statusSet = null;
+    PositionSetReadOnly cClassPosSet = null;
+    PositionSetReadOnly cEditPosSet = null;
+    I_IntSet allowedRoleTypes = null;
+
     // INPUT PATHS
     int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
     I_Path cEditIPath = null;
@@ -152,8 +160,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // INTERNAL
-    private static final boolean debug = false; // :DEBUG:
-    private static final boolean debugDump = false; // :DEBUG: save to files
+    private static boolean debug = true; // :DEBUG:
+    private static boolean debugDump = true; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -252,12 +260,15 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             long startTime = System.currentTimeMillis();
 
             // SETUP ROLE NID ARRAY
-            int[] rNidArray = getRoleNids();
+            int[] rNidArray = setupRoleNids();
             int nextRIdx = rNidArray.length;
 
-            SnoPathProcess pcEdit = new SnoPathProcess(logger, cEditSnoCons, cEditSnoRels,
-                    rNidArray, cEditPathPos, gui,false);
-            tf.iterateConcepts(pcEdit);
+            SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, cEditSnoCons,
+                    cEditSnoRels, rootNid, isaNid, allowedRoleTypes, statusSet, cEditPosSet, gui,
+                    false);
+            tf.iterateConcepts(pcEdit); // :!!!:
+            // Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
+
             logger
                     .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
                             + pcEdit.getStats(startTime));
@@ -265,6 +276,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             if (debugDump) {
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
+                Collections.sort(cEditSnoCons);
+                dumpSnoCon(cEditSnoCons, "SnoConEditData_compare.txt", 5);
+                Collections.sort(cEditSnoRels);
+                dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);                
             }
 
             // SETUP CONCEPT NID ARRAY
@@ -451,8 +466,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // GET CLASSIFIER_PATH RELS
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
-            SnoPathProcess pcClass = new SnoPathProcess(logger, null, cClassSnoRels,
-                    rNidArray, cClassPathPos, gui, true);
+            // SnoPathProcess pcClass = new SnoPathProcess(logger, null,
+            // cClassSnoRels, rNidArray,
+            // cClassPathPos, gui, true);
+            SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
+                    cClassSnoRels, rootNid, isaNid, allowedRoleTypes, statusSet, cClassPosSet, gui,
+                    true);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -486,7 +505,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cClassPathNid));
             logger.info("\r\n::: *** WRITEBACK *** LAPSED TIME =\t" + toStringLapseSec(startTime)
                     + " ***");
-            
+
             if (debug) {
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
                 dumpSnoRel(SnoQuery.getIsaDropped(), "SnoRelIsaDrop_full.txt", 4);
@@ -564,7 +583,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
      */
     private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB, int classPathNid)
             throws TerminologyException, IOException {
-        I_WriteDirectToDb di = tf.getDirectInterface();
+        I_WriteDirectToDb di = null;
+        if (!debug)
+            di = tf.getDirectInterface();
         long vTime;
         vTime = System.currentTimeMillis();
 
@@ -831,7 +852,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         }
 
         // CHECKPOINT DATABASE
-        tf.getDirectInterface().sync();
+        if (!debug)
+            tf.getDirectInterface().sync();
 
         StringBuilder s = new StringBuilder();
         s.append("\r\n::: [SnorocketTask] compareAndWriteBack()");
@@ -855,6 +877,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, I_WriteDirectToDb di,
             long versionTime) throws IOException {
+        if (rel_A.typeId == isaNid)
+            SnoQuery.isaDropped.add(rel_A);
+        else
+            SnoQuery.roleDropped.add(rel_A);
+        if (debug)
+            return;
+
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         I_RelPart relPart3 = tf.newRelPart(); // I_RelPart
         relPart3.setTypeId(rel_A.typeId); // from classifier
@@ -866,15 +895,17 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         relPart3.setPathId(writeToNid); // via preferences
         rel_A.relVers.addVersionNoRedundancyCheck(relPart3);
         di.writeRel(rel_A.relVers); // WRITE TO DB
-
-        if (rel_A.typeId == isaNid)
-            SnoQuery.isaDropped.add(rel_A);
-        else
-            SnoQuery.roleDropped.add(rel_A);
     }
 
     private void writeBackCurrent(SnoRel rel_B, int writeToNid, I_WriteDirectToDb di,
             long versionTime) throws TerminologyException, IOException {
+        if (rel_B.typeId == isaNid)
+            SnoQuery.isaAdded.add(rel_B);
+        else
+            SnoQuery.roleAdded.add(rel_B);
+        if (debug)
+            return;
+
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // GENERATE NEW REL ID -- AND WRITE TO DB
         Collection<UUID> rUids = new ArrayList<UUID>();
@@ -898,10 +929,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         newRel.addVersionNoRedundancyCheck(newRelPart);
         di.writeRel(newRel); // WRITE TO DB
 
-        if (rel_B.typeId == isaNid)
-            SnoQuery.isaAdded.add(rel_B);
-        else
-            SnoQuery.roleAdded.add(rel_B);
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {
@@ -995,12 +1022,14 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
                     .getUids());
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            return Condition.STOP;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            return Condition.STOP;
         }
+        statusSet = tf.newIntSet();
+        statusSet.add(isCURRENT);
         return Condition.CONTINUE;
     }
 
@@ -1054,6 +1083,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        cClassPosSet = new PositionSetReadOnly(new HashSet<I_Position>(cClassPathPos));
+        cEditPosSet = new PositionSetReadOnly(new HashSet<I_Position>(cEditPathPos));
         return Condition.CONTINUE;
     }
 
@@ -1229,7 +1261,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     }
 
     // 
-    private int[] getRoleNids() throws TerminologyException, IOException {
+    private int[] setupRoleNids() throws TerminologyException, IOException {
         int countRelDuplVersion = 0;
         LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
 
@@ -1292,6 +1324,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         }
         Arrays.sort(resultInt);
 
+        allowedRoleTypes = tf.newIntSet();
+        allowedRoleTypes.addAll(resultInt);
         return resultInt;
     }
 
@@ -1436,7 +1470,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     bw.write(c.getInitialText() + "\t" + d + "\r\n");
                 }
             }
-            if (format == 4) { // UUIDS, NIDS, **_index, Initial Text
+            if (format == 4) { // "FULL" UUIDs, NIDs, **_index, Initial Text
                 int index = 0;
                 for (SnoCon sc : scl) {
                     I_GetConceptData c = tf.getConcept(sc.id);
@@ -1448,12 +1482,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     index += 1;
                 }
             }
-            if (format == 5) { // UUIDS, Initial Text
+            if (format == 5) { // "COMPARE" UUIDs, //NIDs, Initial Text
                 int index = 0;
                 for (SnoCon sc : scl) {
                     I_GetConceptData c = tf.getConcept(sc.id);
                     boolean d = sc.isDefined;
                     bw.write(c.getUids().iterator().next() + "\t" + d + "\t");
+                    // bw.write(sc.id + "\t");
                     bw.write(c.getInitialText() + "\r\n");
                     index += 1;
                 }
@@ -1531,7 +1566,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private void dumpSnoRel(List<SnoRel> srl, String fName, int format) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
-            if (format == 1) { // RAW NIDS
+            if (format == 1) { // RAW NIDs
                 for (SnoRel sr : srl) {
                     bw
                             .write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group
@@ -1558,7 +1593,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                             + c2.getInitialText() + "\t" + g + "\r\n");
                 }
             }
-            if (format == 4) { // "FULL": UUIDS, NIDS, **_index, Initial Text
+            if (format == 4) { // "FULL": UUIDs, NIDs, **_index, Initial Text
                 int index = 0;
                 for (SnoRel sr : srl) {
                     I_GetConceptData c1 = tf.getConcept(sr.c1Id);
@@ -1574,7 +1609,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     index += 1;
                 }
             }
-            if (format == 5) { // "COMPARE": UUIDS, Initial Text
+            if (format == 5) { // "COMPARE": UUIDs, //NIDs, Initial Text
                 int index = 0;
                 for (SnoRel sr : srl) {
                     I_GetConceptData c1 = tf.getConcept(sr.c1Id);
@@ -1583,6 +1618,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     int g = sr.group;
                     bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
                             + "\t" + c2.getUids().iterator().next() + "\t" + g + "\t");
+                    //bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
                     bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
                             + c2.getInitialText() + "\r\n");
                     index += 1;

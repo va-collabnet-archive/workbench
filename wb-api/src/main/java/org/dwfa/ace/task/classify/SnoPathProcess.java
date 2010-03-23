@@ -99,6 +99,27 @@ public class SnoPathProcess implements I_ProcessConcepts {
         setupCoreNids();
         this.allowedRoles = allowedRoles;
         this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
+        
+        // STATISTICS COUNTERS
+        countConSeen = 0;
+        countConRoot = 0;
+        countConDuplVersion = 0;
+        countSnoCon = 0;
+        countConAdded = 0; // ADDED TO SNOROCKET
+        countRelAdded = 0; // ADDED TO SNOROCKET
+        countRelAddedGroups = 0; // Count rels with
+        // non-zero group
+        countRelDuplVersion = 0; // SAME PATH, SAME
+        // VERSION
+
+        countRelCharStated = 0;
+        countRelCharDefining = 0;
+        countRelCharStatedInferred = 0;
+        countRelCharStatedSubsumed = 0;
+
+        countRelRefNot = 0;
+        countRelRefOpt = 0;
+        countRelRefMand = 0;
     }
 
     public void processConcept(I_GetConceptData concept) throws Exception {
