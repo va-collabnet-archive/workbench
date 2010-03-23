@@ -353,6 +353,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   SYNONYM_DESCRIPTION_TYPE(new String[] {"synonym (description type)", "synonym"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
+                  DESCRIPTION_DESCRIPTION_TYPE(new String[] {"description (description type)", "description"}, null,
+                          new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   UNSPECIFIED_DESCRIPTION_TYPE("unspecified  (description type)",
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   PREFERRED_DESCRIPTION_TYPE(PrimordialId.PREFERED_TERM_ID, new String[] {"preferred term (description type)", "preferred term"}, null,
