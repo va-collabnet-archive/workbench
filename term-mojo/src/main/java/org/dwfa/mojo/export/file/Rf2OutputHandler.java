@@ -100,17 +100,28 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        conceptFile.write(getRf2ConceptRow(componentDto.getConceptDto()));
-        identifierFile.write(getRf2IdentifierRows(componentDto.getConceptDto()));
-
+        synchronized (conceptFile) {
+            conceptFile.write(getRf2ConceptRow(componentDto.getConceptDto()));
+        }
+        synchronized (identifierFile) {
+            identifierFile.write(getRf2IdentifierRows(componentDto.getConceptDto()));
+        }
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            descriptionFile.write(getRf2DescriptionRow(descriptionDto));
-            identifierFile.write(getRf2IdentifierRows(descriptionDto));
+            synchronized (descriptionFile) {
+                descriptionFile.write(getRf2DescriptionRow(descriptionDto));
+            }
+            synchronized (identifierFile) {
+                identifierFile.write(getRf2IdentifierRows(descriptionDto));
+            }
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            relationshipFile.write(getRf2RelationshipRow(relationshipDto));
-            identifierFile.write(getRf2IdentifierRows(relationshipDto));
+            synchronized (relationshipFile) {
+                relationshipFile.write(getRf2RelationshipRow(relationshipDto));
+            }
+            synchronized (identifierFile) {
+                identifierFile.write(getRf2IdentifierRows(relationshipDto));
+            }
         }
 
         for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
@@ -136,11 +147,20 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      */
     private void writeExtensionRow(ExtensionDto extensionDto) throws Exception, IOException, TerminologyException {
         Rf2ReferenceSetRow referenceSetRow = getRf2ExtensionRow(extensionDto);
-        getReferenceSetWriter(extensionDto).write(referenceSetRow);
-        if(extensionDto.isClinical()){
-            identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+
+        Rf2ReferenceSetWriter referenceSetWriter = getReferenceSetWriter(extensionDto);
+        synchronized (referenceSetWriter) {
+            referenceSetWriter.write(referenceSetRow);
+        }
+
+        if (extensionDto.isClinical()) {
+            synchronized (identifierCliniclFile) {
+                identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+            }
         } else {
-            identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
+            synchronized (identifierCliniclFile) {
+                identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+            }
         }
     }
 

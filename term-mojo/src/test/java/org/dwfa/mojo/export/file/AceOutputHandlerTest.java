@@ -385,7 +385,7 @@ public class AceOutputHandlerTest {
     private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto) {
         identifierDto.setActive(true);
         identifierDto.setReferencedSctId(900000000000960019l);
-        identifierDto.setConceptId(UUID.randomUUID());
+        identifierDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         identifierDto.setDateTime(new Date());
         identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
         identifierDto.setPathId(UUID.randomUUID());
@@ -398,7 +398,7 @@ public class AceOutputHandlerTest {
 
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
-        conceptDto.setConceptId(UUID.randomUUID());
+        conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(new Date());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);

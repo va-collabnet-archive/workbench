@@ -153,8 +153,6 @@ public class DatabaseExportTest extends ConceptMockery {
         I_IdPart exportableConceptSnomedCtv3IdPart = setCtv3Id(exportIdVersioned, conceptIdParts, exportableConcept,
             incluesionRootConceptData, exclusionsRootConceptData, exportVersion);
 
-        expect(termFactory.getId(exportConceptNid)).andReturn(exportIdVersioned).anyTimes();
-
         //for concept concept refsets and relationship
         int exportConcept1Nid = 11;
         List<UUID> exportConcept1UuidList = new ArrayList<UUID>();

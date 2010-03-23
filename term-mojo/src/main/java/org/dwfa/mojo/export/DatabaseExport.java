@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.process.I_ProcessQueue;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
@@ -127,6 +128,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     String uuidSctidDbPassword;
 
     /**
+     * The number of threads to use.
+     *
+     * @parameter
+     */
+    int numberOfThreads = 1;
+
+    /**
      * Export file output handler for RF2
      */
     ExportOutputHandler rf2OutputHandler;
@@ -150,10 +158,22 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private int processedConceptCount = 0;
 
     /**
+     * Thread pool for processing concepts.
+     */
+    private I_ProcessQueue workQueue;
+
+    /**
+     * The current Batch of concepts to process.
+     */
+    private List<I_GetConceptData> currentBatch = new ArrayList<I_GetConceptData>();
+
+    /**
      * TODO need to mock this out.
      * For testing
      */
     private boolean testing = false;
+
+
 
     /**
      * Iterate concepts.
@@ -173,6 +193,8 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             if (uuidSctidDbPassword != null) {
                 System.setProperty(UuidSctidMapDb.SCT_ID_MAP_PASSWORD, uuidSctidDbPassword);
             }
+
+            workQueue = LocalVersionedTerminology.get().newProcessQueue(numberOfThreads);
 
             rf2OutputHandler = new Rf2OutputHandler(
                 new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar));
@@ -210,6 +232,9 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         try {
             getTermFactory().iterateConcepts(this);
 
+            workQueue.execute(new RunnableProcessConcept(currentBatch));
+            workQueue.awaitCompletion();
+
             if (!testing) {
                 ((Rf2OutputHandler) rf2OutputHandler).closeFiles();
                 ((Rf1OutputHandler) rf1OutputHandler).closeFiles();
@@ -229,20 +254,11 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
-        processedConceptCount++;
-        if(processedConceptCount % 10000 == 0){
-            logger.info("Concepts processed: " + processedConceptCount);
-        }
+        currentBatch.add(concept);
 
-        ComponentDto componentDto = exportSpecification.getDataForExport(concept);
-        if(componentDto != null){
-            try{
-                rf2OutputHandler.export(componentDto);
-                rf1OutputHandler.export(componentDto);
-                aceOutputHandler.export(componentDto);
-            } catch (ValidationException ve) {
-                logger.severe(ve.getMessage());
-            }
+        if(currentBatch.size() % 1000 == 0){
+            workQueue.execute(new RunnableProcessConcept(currentBatch));
+            currentBatch.clear();
         }
     }
 
@@ -261,5 +277,42 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     public void setTermFactory(I_TermFactory termFactory) {
         this.termFactory = termFactory;
+    }
+
+    class RunnableProcessConcept implements Runnable {
+        private List<I_GetConceptData> conceptsToProcess = new ArrayList<I_GetConceptData>();
+
+        RunnableProcessConcept(List<I_GetConceptData> conceptsToProcess) {
+            this.conceptsToProcess = new ArrayList<I_GetConceptData>(conceptsToProcess);
+        }
+
+        @Override
+        public void run() {
+            for(I_GetConceptData concept : conceptsToProcess){
+                processedConceptCount++;
+                if(processedConceptCount % 10000 == 0){
+                    logger.info("Concepts processed: " + processedConceptCount);
+                }
+
+                ComponentDto componentDto;
+                try {
+                    componentDto = exportSpecification.getDataForExport(concept);
+                    if(componentDto != null){
+                        try{
+                            rf2OutputHandler.export(componentDto);
+                            rf1OutputHandler.export(componentDto);
+                            aceOutputHandler.export(componentDto);
+                        } catch (ValidationException ve) {
+                            logger.severe(ve.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.severe(e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
     }
 }

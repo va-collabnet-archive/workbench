@@ -74,17 +74,29 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        conceptFile.write(getAceConceptRow(componentDto.getConceptDto()));
-        idsFile.write(getAceIdentifierRows(componentDto.getConceptDto()));
+        synchronized (conceptFile) {
+            conceptFile.write(getAceConceptRow(componentDto.getConceptDto()));
+        }
+        synchronized (idsFile) {
+            idsFile.write(getAceIdentifierRows(componentDto.getConceptDto()));
+        }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            descriptionFile.write(getAceDescriptionRow(descriptionDto));
-            idsFile.write(getAceIdentifierRows(descriptionDto));
+            synchronized (descriptionFile) {
+                descriptionFile.write(getAceDescriptionRow(descriptionDto));
+            }
+            synchronized (idsFile) {
+                idsFile.write(getAceIdentifierRows(descriptionDto));
+            }
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            relationshipFile.write(getAceRelationshipRow(relationshipDto));
-            idsFile.write(getAceIdentifierRows(relationshipDto));
+            synchronized (relationshipFile) {
+                relationshipFile.write(getAceRelationshipRow(relationshipDto));
+            }
+            synchronized (idsFile) {
+                idsFile.write(getAceIdentifierRows(relationshipDto));
+            }
         }
     }
 

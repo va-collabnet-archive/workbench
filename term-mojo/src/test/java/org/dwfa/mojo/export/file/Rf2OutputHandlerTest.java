@@ -91,7 +91,8 @@ public class Rf2OutputHandlerTest {
         componentDto.setConceptDto(new ConceptDto());
         setConceptDtoData(componentDto.getConceptDto());
         componentDto.getConceptDto().getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 32570031000036104l));
-        componentDto.getConceptDto().setConceptId(componentDto.getConceptDto().getIdentifierDtos().get(0).getConceptId());
+        componentDto.getConceptDto().setConceptId(getIdMap(
+            componentDto.getConceptDto().getIdentifierDtos().get(0).getConceptId().keySet().iterator().next(), null));
 
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
         componentDto.getDescriptionDtos().get(0).setConceptId(componentDto.getConceptDto().getConceptId());
@@ -730,7 +731,7 @@ public class Rf2OutputHandlerTest {
     private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto, long sctid) {
         identifierDto.setActive(true);
         identifierDto.setReferencedSctId(sctid);
-        identifierDto.setConceptId(UUID.randomUUID());
+        identifierDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         identifierDto.setDateTime(new Date());
         identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
         identifierDto.setPathId(UUID.randomUUID());
@@ -743,7 +744,7 @@ public class Rf2OutputHandlerTest {
 
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
-        conceptDto.setConceptId(UUID.randomUUID());
+        conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(new Date());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);
@@ -793,7 +794,7 @@ public class Rf2OutputHandlerTest {
         extensionDto.setConcept1Id(getIdMap(UUID.randomUUID(), null));
         extensionDto.setValue("Test String");
         extensionDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 44949371000036165l));
-        extensionDto.setMemberId(extensionDto.getIdentifierDtos().get(0).getConceptId());
+        extensionDto.setMemberId(extensionDto.getIdentifierDtos().get(0).getConceptId().keySet().iterator().next());
 
         return extensionDto;
     }

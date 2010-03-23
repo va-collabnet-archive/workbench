@@ -250,7 +250,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getSctId(Concept concept, List<IdentifierDto> identifierDtos) throws Exception {
-        return getSctId(concept, concept.getConceptId(), identifierDtos, concept.getType());
+        UUID uuid = concept.getConceptId().keySet().iterator().next();
+
+        return getSctId(concept, uuid, identifierDtos, concept.getType());
     }
 
     /**
@@ -272,7 +274,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             sctId = identifierDtos.get(0).getReferencedSctId();
             getCheckSctIdAndAddToDb(sctId, uuid);
         } else {
-            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            synchronized (snomedIdHandler) {
+                sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            }
         }
 
         return sctId;
@@ -290,12 +294,14 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @return Object SCTID
      * @throws Exception if cannot get an SCTID
      */
-    protected Object getSctId(Concept concept, Map<UUID, Long> conceptIdMap, TYPE type) throws Exception {
+    protected Long getSctId(Concept concept, Map<UUID, Long> conceptIdMap, TYPE type) throws Exception {
         Long sctId = conceptIdMap.values().iterator().next();
         UUID uuid = conceptIdMap.keySet().iterator().next();
 
         if (sctId == null) {
-            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            synchronized (snomedIdHandler) {
+                sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            }
         } else {
             getCheckSctIdAndAddToDb(sctId, uuid);
         }
@@ -315,18 +321,29 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     private void getCheckSctIdAndAddToDb(Long sctId, UUID uuid) throws NoMappingException, Exception {
         TYPE type = SctIdValidator.getInstance().getSctIdType(sctId.toString());;
         NAMESPACE namespace = SctIdValidator.getInstance().getSctIdNamespace(sctId.toString());
-        Long dbSctId =  snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
+        synchronized (snomedIdHandler) {
+            Long dbSctId =  snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
 
-        if (dbSctId != null && !dbSctId.equals(sctId)) {
-            String errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
-                + sctId + " database id " + dbSctId;
-            logger.severe(errorMessage);
-            throw new NoMappingException(errorMessage);
-        } else if(dbSctId == null) {
-            snomedIdHandler.addSctId(uuid, sctId, namespace, type);
+            if (dbSctId != null && !dbSctId.equals(sctId)) {
+                String errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
+                    + sctId + " database id " + dbSctId;
+                logger.severe(errorMessage);
+                throw new NoMappingException(errorMessage);
+            } else if(dbSctId == null) {
+                snomedIdHandler.addSctId(uuid, sctId, namespace, type);
+            }
         }
     }
 
+    /**
+     * Gets a new or retrieves the current mapping SCT id for a UUID based on
+     * the ConceptDto name space and type.
+     *
+     * @param concept Concept
+     * @param uuid UUID
+     * @return Long sct id
+     * @throws Exception
+     */
     protected Long getSctId(Concept concept, UUID uuid) throws Exception {
         return getSctId(concept, uuid, concept.getType());
     }
@@ -342,7 +359,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getSctId(Concept concept, UUID uuid, TYPE type) throws Exception {
-        return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+        synchronized (snomedIdHandler) {
+            return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+        }
     }
 
     /**
@@ -353,7 +372,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getModuleId(Concept concept) throws Exception {
-        return snomedIdHandler.getWithGeneration(concept.getPathId(), concept.getNamespace(), TYPE.CONCEPT);
+        synchronized (snomedIdHandler) {
+            return snomedIdHandler.getWithGeneration(concept.getPathId(), concept.getNamespace(), TYPE.CONCEPT);
+        }
     }
 
     /**

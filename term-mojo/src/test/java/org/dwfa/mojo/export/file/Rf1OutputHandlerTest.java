@@ -393,7 +393,7 @@ public class Rf1OutputHandlerTest {
 
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
-        conceptDto.setConceptId(UUID.randomUUID());
+        conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(new Date());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);

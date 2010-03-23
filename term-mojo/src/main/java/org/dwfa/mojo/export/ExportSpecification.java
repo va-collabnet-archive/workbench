@@ -323,7 +323,7 @@ public class ExportSpecification {
         int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(termFactory.getUids(tuple.getCharacteristicId()));
         relationshipDto.setCharacteristicTypeCode(Character.forDigit(snomedCharacter, 10));
         relationshipDto.setCharacteristicTypeId(termFactory.getUids(tuple.getCharacteristicId()).iterator().next());
-        relationshipDto.setConceptId(termFactory.getUids(tuple.getRelId()).iterator().next());
+        relationshipDto.setConceptId(getIdMap(tuple, tuple.getRelId()));
         relationshipDto.setDestinationId(getIdMap(tuple, tuple.getC2Id()));
         relationshipDto.setModifierId(ConceptConstants.MODIFIER_SOME.getUuids()[0]);
         relationshipDto.setRefinabilityId(termFactory.getUids(tuple.getRefinabilityId()).iterator().next());
@@ -360,7 +360,7 @@ public class ExportSpecification {
         setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.CONCEPT);
 
         descriptionDto.setCaseSignificanceId(getInitialCaseSignificant(tuple.getInitialCaseSignificant()));
-        descriptionDto.setConceptId(termFactory.getUids(tuple.getConceptId()).iterator().next());
+        descriptionDto.setConceptId(getIdMap(tuple, tuple.getConceptId()));
         descriptionDto.setDescription(tuple.getText());
         descriptionDto.setDescriptionId(termFactory.getUids(tuple.getDescId()).iterator().next());
         descriptionDto.setDescriptionTypeCode(Character.forDigit(
@@ -390,7 +390,7 @@ public class ExportSpecification {
     private ComponentDto updateComponentDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple)
             throws IOException, TerminologyException {
         I_GetConceptData conceptData = termFactory.getConcept(tuple.getConId());
-        componentDto.getConceptDto().setConceptId(conceptData.getUids().get(0));
+        componentDto.getConceptDto().setConceptId(getIdMap(tuple, tuple.getConId()));
 
         getBaseConceptDto(componentDto.getConceptDto(), tuple, conceptData.getId().getVersions());
 
@@ -671,7 +671,7 @@ public class ExportSpecification {
      */
     private Map<UUID, Long> getIdMap(I_AmPart tuple, int componentNid) throws NoMappingException,
             TerminologyException, IOException {
-        Map<UUID, Long> map = new HashMap<UUID, Long>();;
+        Map<UUID, Long> map = new HashMap<UUID, Long>();
         List<I_IdPart> versions = termFactory.getId(componentNid).getVersions();
 
         I_IdPart t3UuidPart = getLatesIdtVersion(versions, snomedT3Uuid.getNid(), tuple);
@@ -704,12 +704,15 @@ public class ExportSpecification {
      */
     private void setIdentifier(ConceptDto conceptDto, I_AmPart tuple, List<I_IdPart> idVersions, TYPE type,
             I_IdPart uuidPart, I_IdPart sctIdPart) throws IOException, TerminologyException {
+        Map<UUID, Long> idMap = new HashMap<UUID, Long>();;
         IdentifierDto identifierDto = new IdentifierDto();
-        getBaseConceptDto(identifierDto, tuple, idVersions);
-        identifierDto.setType(type);
 
+        getBaseConceptDto(identifierDto, tuple, idVersions);
+
+        idMap.put(UUID.fromString(uuidPart.getSourceId().toString()), Long.valueOf(sctIdPart.getSourceId().toString()));
+        identifierDto.setConceptId(idMap);
+        identifierDto.setType(type);
         identifierDto.setActive(isActive(sctIdPart.getStatusId()));
-        identifierDto.setConceptId(UUID.fromString(uuidPart.getSourceId().toString()));
         identifierDto.setReferencedSctId(Long.valueOf(sctIdPart.getSourceId().toString()));
         identifierDto.setIdentifierSchemeUuid(snomedIntId.getUids().get(0));
 
@@ -1066,7 +1069,7 @@ public class ExportSpecification {
 
             setUuidSctIdIdentifier(extensionDto, tuple, idParts, TYPE.REFSET);
 
-            extensionDto.setConceptId(termFactory.getUids(thinExtByRefVersioned.getRefsetId()).iterator().next());
+            extensionDto.setConceptId(getIdMap(tuple, thinExtByRefVersioned.getRefsetId()));
 
             Map<UUID, Long> map = getIdMap(tuple, thinExtByRefVersioned.getComponentId());
             if(map == null){

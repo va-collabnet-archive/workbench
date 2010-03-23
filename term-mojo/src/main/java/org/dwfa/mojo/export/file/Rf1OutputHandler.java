@@ -68,14 +68,20 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        conceptFile.write(getRf1ConceptRow(componentDto.getConceptDto()));
+        synchronized (conceptFile) {
+            conceptFile.write(getRf1ConceptRow(componentDto.getConceptDto()));
+        }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+            synchronized (descriptionFile) {
+                descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+            }
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+            synchronized (relationshipFile) {
+                relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+            }
         }
     }
 
@@ -141,7 +147,7 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf1RelationshipRow getRf1RelationshipRow(RelationshipDto relationshipDto) throws Exception {
         Rf1RelationshipRow relationshipRow = new Rf1RelationshipRow();
 
-        relationshipRow.setRelationshipSctId(getSctId(relationshipDto, relationshipDto.getConceptId()).toString());
+        relationshipRow.setRelationshipSctId(getSctId(relationshipDto, relationshipDto.getConceptId(), relationshipDto.getType()).toString());
         relationshipRow.setSourceSctId(getSctId(relationshipDto, relationshipDto.getSourceId(), TYPE.CONCEPT).toString());
         relationshipRow.setRelationshipType(getSctId(relationshipDto, relationshipDto.getTypeId(), TYPE.CONCEPT).toString());
         relationshipRow.setDestinationSctId(getSctId(relationshipDto, relationshipDto.getDestinationId(), TYPE.CONCEPT).toString());

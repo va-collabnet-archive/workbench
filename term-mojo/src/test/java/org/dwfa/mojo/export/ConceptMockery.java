@@ -49,6 +49,7 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.spec.ConceptSpec;
+import org.dwfa.vodb.process.ProcessQueue;
 import org.easymock.EasyMock;
 
 /**
@@ -164,7 +165,7 @@ public class ConceptMockery {
         System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
         System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
         UuidSctidMapDb.getInstance().openDb();
-        
+
         snomedIsAUuuidList.add(ConceptConstants.SNOMED_IS_A.getUuids()[0]);
 
         // mock the LocalVersionedTerminology
@@ -174,6 +175,8 @@ public class ConceptMockery {
         factoryField.set(null, termFactory);
 
         databaseExport.setTermFactory(termFactory);
+
+        expect(termFactory.newProcessQueue(1)).andReturn(new ProcessQueue(1));
 
         //mock in inclusion and exclusion roots
         incluesionRootConceptData = createMock(I_GetConceptData.class);
@@ -703,7 +706,7 @@ public class ConceptMockery {
             exportableConceptIdPart, exportableConceptUuidIdPart, sourceUuidNid, exportConceptUuidList, TYPE.CONCEPT);
         expect(exportableConcept.getId()).andReturn(exportIdVersioned).times(6);
         expect(exportableConcept.getNid()).andReturn(exportConceptNid).anyTimes();
-        expect(termFactory.getId(exportConceptNid)).andReturn(exportIdVersioned).times(8);
+        expect(termFactory.getId(exportConceptNid)).andReturn(exportIdVersioned).anyTimes();
 
 
         // Details.
@@ -1276,7 +1279,9 @@ public class ConceptMockery {
         Long sctId = mockConceptId(conceptTuple, 0, new Date(), idParts, idVersioned, idPart, uuidIdPart, sourceUuidNid, uuidList,
             TYPE.CONCEPT);
 
-        UuidSctidMapDb.getInstance().addUUIDSctIdEntry(uuidList.get(0), sctId);
+        if ( ! UuidSctidMapDb.getInstance().containsUuid(uuidList.get(0))) {
+            UuidSctidMapDb.getInstance().addUUIDSctIdEntry(uuidList.get(0), sctId);
+        }
         expect(termFactory.getId(nid)).andReturn(idVersioned).anyTimes();
 
         replay(conceptualizeLocally, conceptTuple, idPart, uuidIdPart, idVersioned);
@@ -1313,7 +1318,9 @@ public class ConceptMockery {
             Arrays.asList(conceptSpec.getUuids()), TYPE.CONCEPT);
         expect(termFactory.getId(nid)).andReturn(idVersioned).anyTimes();
 
-        UuidSctidMapDb.getInstance().addUUIDSctIdEntry(conceptSpec.getUuids()[0], sctId);
+        if ( ! UuidSctidMapDb.getInstance().containsUuid(conceptSpec.getUuids()[0])) {
+            UuidSctidMapDb.getInstance().addUUIDSctIdEntry(conceptSpec.getUuids()[0], sctId);
+        }
 
         replay(conceptualizeLocally, describeConceptLocally, conceptTuple, idPart, uuidIdPart, idVersioned);
 

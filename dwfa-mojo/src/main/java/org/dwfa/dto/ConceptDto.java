@@ -18,13 +18,14 @@ package org.dwfa.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Concept details for exporting.
  */
 public class ConceptDto extends BaseConceptDto implements Concept {
-    private UUID conceptId;
+    private Map<UUID, Long> conceptId;
     private String fullySpecifiedName;
     private String ctv3Id;
     private String snomedId;
@@ -41,14 +42,14 @@ public class ConceptDto extends BaseConceptDto implements Concept {
     /**
      * @return the conceptId
      */
-    public UUID getConceptId() {
+    public Map<UUID, Long> getConceptId() {
         return conceptId;
     }
 
     /**
      * @param conceptId the conceptId to set
      */
-    public void setConceptId(UUID conceptId) {
+    public void setConceptId(Map<UUID, Long> conceptId) {
         this.conceptId = conceptId;
     }
 

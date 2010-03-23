@@ -1,6 +1,7 @@
 package org.dwfa.dto;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
@@ -10,7 +11,7 @@ public interface Concept {
     /**
      * @return the conceptId
      */
-    public UUID getConceptId();
+    public Map<UUID, Long> getConceptId();
 
     /**
      * @return the pathId
