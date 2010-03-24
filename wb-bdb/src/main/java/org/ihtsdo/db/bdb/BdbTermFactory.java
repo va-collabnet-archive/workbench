@@ -411,7 +411,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_Identify getId(int nid) throws TerminologyException, IOException {
-        return Bdb.getConceptForComponent(nid).getComponent(nid);
+        Concept concept = Bdb.getConceptForComponent(nid);
+        if (concept != null) {
+            return concept.getComponent(nid);
+        }
+
+        return null;
     }
 
     @Override
