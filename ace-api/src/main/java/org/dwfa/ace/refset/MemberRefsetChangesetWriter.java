@@ -41,7 +41,7 @@ public class MemberRefsetChangesetWriter {
 
     private I_TermFactory termFactory;
 
-    private static final DateFormat DATE_FORMAT = AceDateFormat.getRf2DateFormat();
+    private static final DateFormat DATE_FORMAT = AceDateFormat.getRf2TimezoneDateFormat();
 
     public MemberRefsetChangesetWriter(File changeSetOutputDirectory, I_TermFactory termFactory, UUID editPathUUID) {
         if (!changeSetOutputDirectory.exists()) {
