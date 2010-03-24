@@ -363,8 +363,138 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 
         DOCUMENT_SECTION_ORDER(new String[] { "document section order", "document section order", "ORG_DWFA_DOC_SECTION_ORDER" }, 
         		     new I_ConceptualizeUniversally[] { REFSET_IDENTITY, RELATIONSHIP_ORDER, INT_EXTENSION }, 
-        		     new I_ConceptualizeUniversally[] { ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }),  
+        		     new I_ConceptualizeUniversally[] { ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), 
 
+		SNCT_RELEASED_BOOL(new String[] { "SNOMED Released ",
+				"SNOMED released flag", "ORG_DWFA_SNCT_RELEASED_BOOL" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						SUBJECT_TYPE, BOOLEAN_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_WORD_KEYS(new String[] { "Clinical Terms Version 3 Word Key",
+				"CTV3 word key", "ORG_DWFA_CTV3_WORD_KEYS" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY, INDEX_KEYS,
+						STRING_EXTENSION }, new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_RELEASED_BOOL(new String[] {
+				"Clinical Terms Version 2 and 3 Released ",
+				"CTV2-3 released flag", "ORG_DWFA_CTV3_RELEASED_BOOL" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						SUBJECT_TYPE, BOOLEAN_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_BROWSE_VALUE(new String[] {
+				"Clinical Terms Version 3 Template Browse Value Order",
+				"template browse value order",
+				"ORG_DWFA_CTV3_TEMPLATE_BROWSE_VALUE" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, INT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_CARDINALITY(new String[] {
+				"Clinical Terms Version 3 Template Cardinality",
+				"template cardinality", "ORG_DWFA_CTV3_TEMPLATE_CARDINALITY" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, INT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_BROWSE_ATTRIBUTE(new String[] {
+				"Clinical Terms Version 3 Template Browse Attribute Order",
+				"template browse attribute order",
+				"ORG_DWFA_CTV3_TEMPLATE_BROWSE_ATTRIBUTE" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, INT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_NOTES_SCREEN(new String[] {
+				"Clinical Terms Version 3 Template Notes Screen Order",
+				"template notes screen order",
+				"ORG_DWFA_CTV3_TEMPLATE_NOTES_SCREEN" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, INT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_VALUE_TYPE(new String[] {
+				"Clinical Terms Version 3 Template Value Type",
+				"template value type", "ORG_DWFA_CTV3_TEMPLATE_VALUE_TYPE" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_SEMANTIC_STATUS(new String[] {
+				"Clinical Terms Version 3 Template Semantic Status",
+				"template semantic status",
+				"ORG_DWFA_CTV3_TEMPLATE_SEMANTIC_STATUS" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_DISPLAY_STATUS(new String[] {
+				"Clinical Terms Version 3 Template Attribute Display Status",
+				"template attribute display status",
+				"ORG_DWFA_CTV3_TEMPLATE_DISPLAY_STATUS" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_TEMPLATE_CHARACTERISTIC_STATUS(
+				new String[] {
+						"Clinical Terms Version 3 Template Characteristic Display Status",
+						"template characteristic status",
+						"ORG_DWFA_CTV3_TEMPLATE_CHARACTERISTIC_STATUS" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						ANCILLARY_DATA, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_LINGUISTIC_ROLE(new String[] {
+				"Clinical Terms Version 3 linguistic role",
+				"CTV3 linguistic role", "ORG_DWFA_CTV3_LINGUISTIC_ROLE" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						LINGUISTIC_ROLE, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_REL_ORDER(new String[] {
+				"Clinical Terms Version 3 relationship order",
+				"CTV3 rel order", "ORG_DWFA_CTV3_REL_ORDER" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						RELATIONSHIP_ORDER, INT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+
+		CTV3_SUBJECT_TYPE(new String[] {
+				"Clinical Terms Version 3 subject type", "CTV3 subject type",
+				"ORG_DWFA_CTV3_SUBJECT_TYPE" },
+				new I_ConceptualizeUniversally[] { REFSET_IDENTITY,
+						SUBJECT_TYPE, CONCEPT_EXTENSION },
+				new I_ConceptualizeUniversally[] {
+						ArchitectonicAuxiliary.Concept.IS_A_REL,
+						REFSET_PURPOSE_REL, REFSET_TYPE_REL }),
+				                                                        
         REFSET_PATHS(new String[] { "Path reference set", "Path reference set" }, new I_ConceptualizeUniversally[] {
             REFSET_IDENTITY, REFSET_PURPOSE_PATH, CONCEPT_EXTENSION }, new I_ConceptualizeUniversally[] {
             ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL, REFSET_TYPE_REL }), REFSET_PATH_ORIGINS(new String[] {
