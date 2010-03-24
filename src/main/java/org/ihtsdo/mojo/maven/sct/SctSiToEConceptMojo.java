@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +46,6 @@ import org.ihtsdo.etypes.EDescriptionRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * <b>DESCRIPTION: </b><br>
@@ -1241,6 +1241,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             throw new MojoFailureException("FAILED: processRelationshipsFiles()", e1);
         }
 
+        relUuidMap = null; // memory not needed any more.
+        System.gc();
         getLog().info(
                 "VERSIONING TIME: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
         getLog().info("*** SctSiToEConcept STEP #1 COMPLETED ***");
