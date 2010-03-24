@@ -76,7 +76,7 @@ public class ProcessQueue implements I_ProcessQueue {
             }
             if (queue.size() > maxQueuSize) {
                 try {
-                    logger.info("Waiting producer thread as queue size is over " + maxQueuSize);
+                    logger.finest("Waiting producer thread as queue size is over " + maxQueuSize);
                     queue.wait();
                 } catch (InterruptedException egnored) {
                 }
@@ -183,7 +183,7 @@ public class ProcessQueue implements I_ProcessQueue {
             while (true) {
                 synchronized (queue) {
                     if (latch != null) {
-                        logger.info("Worker thread " + name + "_" + System.identityHashCode(this)
+                        logger.finest("Worker thread " + name + "_" + System.identityHashCode(this)
                             + " about to count down latch " + latch.getCount());
                         latch.countDown();
                     }
@@ -206,7 +206,7 @@ public class ProcessQueue implements I_ProcessQueue {
                         if (queue.size() == maxQueuSize) {
                             queue.notifyAll();
                         }
-                        logger.info("Worker thread " + name + "_" + System.identityHashCode(this) + " dequeued " + r
+                        logger.finest("Worker thread " + name + "_" + System.identityHashCode(this) + " dequeued " + r
                             + " for processing, " + queue.size() + " remaining");
                     }
                 }

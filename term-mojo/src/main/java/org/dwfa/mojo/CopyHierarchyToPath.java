@@ -180,7 +180,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
                 hierarchyStatuses = new ConceptDescriptor[] { activeStatus, currentStatus };
 
                 Set<I_GetConceptData> children = activeStatus.getVerifiedConcept().getDestRelOrigins(
-                    toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false, true);
+                    toIntSet(hierarchyStatuses), toIntSet(hierarchyRelationshipTypes), null, false, false);
 
                 ArrayList<ConceptDescriptor> statusDescriptors = new ArrayList<ConceptDescriptor>();
                 statusDescriptors.add(activeStatus);
@@ -226,7 +226,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             throws Exception {
         processConcept(concept);
 
-        Set<I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false, true);
+        Set<I_GetConceptData> children = concept.getDestRelOrigins(allowedStatus, allowedType, null, false, false);
         for (I_GetConceptData getConceptData : children) {
             processAllChildren(getConceptData, allowedType, allowedStatus);
         }
@@ -283,7 +283,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
         Map<Integer, T> map = new HashMap<Integer, T>();
         for (T tuple : tuples) {
             if (pathid != null && tuple.getPathId() == pathid) {
-                int termComponentId = tuple.getFixedPart().getTermComponentId();
+                int termComponentId = tuple.getFixedPart().getNid();
                 if (map.containsKey(termComponentId)) {
                     if (map.get(termComponentId).getVersion() < tuple.getVersion()) {
                         map.put(termComponentId, tuple);
@@ -333,7 +333,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             if (latestPart != null
                 && latestPart.getPathId() != toPathId
                 && (copyInactiveVersionsNotInTarget
-                    || latestInTargetPath.containsKey(latestPart.getFixedPart().getTermComponentId()) || isActive(latestPart.getStatusId()))) {
+                    || latestInTargetPath.containsKey(latestPart.getFixedPart().getNid()) || isActive(latestPart.getStatusId()))) {
                 duplicateTuple(latestPart);
                 datachanged = true;
             }
@@ -382,7 +382,7 @@ public class CopyHierarchyToPath extends AbstractMojo implements I_ProcessConcep
             getLog().info("processed extension " + extCount);
         }
 
-        List<I_ThinExtByRefTuple> allTuples = extByRef.getTuples(null, null, true, true);
+        List<I_ThinExtByRefTuple> allTuples = extByRef.getTuples(null, null, true, false);
 
         boolean datachanged = processEntity(extByRef, allTuples);
 

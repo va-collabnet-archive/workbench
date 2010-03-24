@@ -241,7 +241,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
             Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
             rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
-            rf2IdentifierRow.setAlternateIdentifier(identifierDto.getConceptId().toString());
+            rf2IdentifierRow.setAlternateIdentifier(identifierDto.getConceptId().keySet().iterator().next().toString());
             rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
             rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto, identifierDto.getIdentifierSchemeUuid()).toString());
             rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());

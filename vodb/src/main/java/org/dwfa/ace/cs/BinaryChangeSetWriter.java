@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +21,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_AmVersioned;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -43,7 +51,7 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
     }
 
     /**
-    * 
+    *
     */
     private static final long serialVersionUID = 1L;
 
@@ -107,6 +115,14 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
     public void writeChanges(I_Transact change, long time) throws IOException {
         if (ConceptBean.class.isAssignableFrom(change.getClass())) {
             ConceptBean conceptChange = (ConceptBean) change;
+
+            List<I_ConceptAttributeVersioned> conceptAttributes = new ArrayList<I_ConceptAttributeVersioned>();
+            conceptAttributes.add(conceptChange.getUncommittedConceptAttributes());
+            removeDuplicateParts(conceptAttributes);
+
+            removeDuplicateParts(conceptChange.getUncommittedDescriptions());
+            removeDuplicateParts(conceptChange.getUncommittedSourceRels());
+
             if (conceptChange.isUncommitted()) {
                 tempOut.writeLong(time);
                 writeChanges(conceptChange, time);
@@ -179,4 +195,35 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
         }
     }
 
+    /**
+     * Check all the versioned parts for duplicates and remove, if no parts left in
+     * versioned remove the versioned from the <code>versionedList</code> list
+     *
+     * NB relies on the I_AmPart's equals method.
+     *
+     * @param versionedList List<? extends I_AmVersioned>
+     */
+    private <P extends I_AmPart> void removeDuplicateParts(List<? extends I_AmVersioned<P>> versionedList) {
+        /** Version to iterate over */
+        List<I_AmVersioned<P>> versions = new ArrayList<I_AmVersioned<P>>();
+        /** Parts to iterate over */
+        List<P> partList = new ArrayList<P>();
+        /** Unique parts */
+        Set<P> partSet = new HashSet<P>();
+
+        versions.addAll((Collection<? extends I_AmVersioned<P>>) versionedList);
+        for (I_AmVersioned<P> versioned : versions) {
+            partList.addAll(versioned.getVersions());
+            for (P part : partList) {
+                //If we have see this part before remove it from the versioned
+                if (!partSet.add(part)) {
+                    versioned.getVersions().remove(part);
+                }
+            }
+            //If there are no parts in the versioned (all duplicates) remove versioned.
+            if (versioned.getVersions().isEmpty()) {
+                versionedList.remove(versioned);
+            }
+        }
+    }
 }

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public interface I_DescriptionVersioned extends I_AmTermComponent {
+public interface I_DescriptionVersioned extends I_AmVersioned<I_DescriptionPart> {
 
     public boolean addVersion(I_DescriptionPart newPart);
 
@@ -65,7 +65,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     /**
      * Returns the last description of a tuple.
-     * 
+     *
      * @return The last description of a tuple.
      * @throws DescriptionHasNoVersionsException If the tuple has 0 versions.
      */
@@ -78,7 +78,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions -
      * tuples are returned in the supplied returnTuples List parameter
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes

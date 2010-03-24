@@ -12,6 +12,7 @@ import org.dwfa.util.AceDateFormat;
 public class Position {
     private static final String LATEST_VERSION_STR = "latest";
     private Date timePoint;
+    private List<Integer> statusNids = new ArrayList<Integer>();
     private I_GetConceptData path;
 
     public Position(PositionDescriptor positionDescriptor) throws Exception {
@@ -30,9 +31,17 @@ public class Position {
         List<T> matchingTuples = new ArrayList<T>();
 
         for (T tuple : list) {
-            if(tuple.getPathId() == path.getConceptId()
-                    && tuple.getTime() <= timePoint.getTime()){
-                matchingTuples.add(tuple);
+            if (tuple.getPathId() == path.getConceptId() && tuple.getTime() <= timePoint.getTime()) {
+                if (!statusNids.isEmpty()) {
+                    for (Integer niInteger : statusNids) {
+                        if (niInteger.intValue() == tuple.getStatusId()) {
+                            matchingTuples.add(tuple);
+                            break;
+                        }
+                    }
+                } else {
+                    matchingTuples.add(tuple);
+                }
             }
         }
         return matchingTuples;

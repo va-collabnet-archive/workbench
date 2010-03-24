@@ -24,9 +24,7 @@ import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 
-public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
-
-    public boolean addVersion(I_ConceptAttributePart part);
+public interface I_ConceptAttributeVersioned extends I_AmVersioned<I_ConceptAttributePart> {
 
     public List<I_ConceptAttributePart> getVersions();
 

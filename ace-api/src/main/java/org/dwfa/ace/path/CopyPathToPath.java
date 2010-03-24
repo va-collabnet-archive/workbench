@@ -240,7 +240,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
             if (latestPart != null
                 && latestPart.getPathId() != targetPathId
                 && (copyInactiveVersionsNotInTarget
-                    || latestInTargetPath.containsKey(latestPart.getFixedPart().getTermComponentId()) || isActive(latestPart.getStatusId()))) {
+                    || latestInTargetPath.containsKey(latestPart.getFixedPart().getNid()) || isActive(latestPart.getStatusId()))) {
                 duplicateTuple(latestPart);
                 datachanged = true;
             }
@@ -404,8 +404,8 @@ public class CopyPathToPath implements I_ProcessConcepts {
         for (I_ImageVersioned imageVersioned : images) {
             processImages(imageVersioned);
 
-            processId(tf.getId(imageVersioned.getTermComponentId()));
-            processExtensions(imageVersioned.getTermComponentId());
+            processId(tf.getId(imageVersioned.getNid()));
+            processExtensions(imageVersioned.getNid());
         }
     }
 
@@ -425,8 +425,8 @@ public class CopyPathToPath implements I_ProcessConcepts {
     private void processRelationship(List<I_RelVersioned> sourceRels) throws Exception {
         for (I_RelVersioned relVersioned : sourceRels) {
             processRelationship(relVersioned);
-            processId(tf.getId(relVersioned.getTermComponentId()));
-            processExtensions(relVersioned.getTermComponentId());
+            processId(tf.getId(relVersioned.getNid()));
+            processExtensions(relVersioned.getNid());
         }
     }
 
@@ -491,7 +491,7 @@ public class CopyPathToPath implements I_ProcessConcepts {
         Map<Integer, T> map = new HashMap<Integer, T>();
         for (T tuple : tuples) {
             if (pathid != null && tuple.getPathId() == pathid) {
-                int termComponentId = tuple.getFixedPart().getTermComponentId();
+                int termComponentId = tuple.getFixedPart().getNid();
                 if (map.containsKey(termComponentId)) {
                     if (map.get(termComponentId).getVersion() < tuple.getVersion()) {
                         map.put(termComponentId, tuple);

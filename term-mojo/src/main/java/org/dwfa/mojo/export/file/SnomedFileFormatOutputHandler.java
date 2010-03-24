@@ -3,6 +3,7 @@ package org.dwfa.mojo.export.file;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     /** Uuid to Sct id map handler. */
     static UuidSnomedHandler snomedIdHandler;
 
+    private Map<UUID, Long> uuidIgnorList = new HashMap<UUID, Long>();
+
     /** Set to true to throw exceptions on validation errors. */
     boolean failOnError = true;
 
@@ -39,6 +42,13 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         if (snomedIdHandler == null) {
             snomedIdHandler = new UuidSnomedDbMapHandler();
         }
+
+        uuidIgnorList.put(UUID.fromString("cc624429-b17d-4ac5-a69e-0b32448aaf3c"), 900000000000335009l);
+        uuidIgnorList.put(UUID.fromString("125f3d04-de17-490e-afec-1431c2a39e29"), 900000000000336005l);
+        uuidIgnorList.put(UUID.fromString("c2c710d1-5757-33ea-9be3-4cce55f6be35"), 108642051000036118l);
+        uuidIgnorList.put(UUID.fromString("58e33018-e99e-3859-a5a5-62b0ee29a05c"), 108642061000036115l);
+        uuidIgnorList.put(UUID.fromString("05f27978-6783-351c-91a5-c5dc39a37299") ,900000000000416022l);
+        uuidIgnorList.put(UUID.fromString("fa28e447-d635-49b1-9b55-86254a7a2f97"), 32570041000036109l);
     }
 
     /**
@@ -65,7 +75,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validationErrors.append(System.getProperty("line.separator"));
             }
 
-            logger.warning(componentDto.getConceptDto().getConceptId() + " Validation Errors:" + validationErrors.toString());
+            logger.warning(componentDto.getConceptDto().getConceptId().keySet().iterator().next() + " Validation Errors:" + validationErrors.toString());
             if (failOnError) {
                 throw new ValidationException("Validation Errors:" + validationErrors);
             }
@@ -110,13 +120,13 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validateConceptDto(validationErrorList, extensionDto);
 
                 if (extensionDto.getMemberId() == null) {
-                    validationErrorList.add(extensionDto.getConceptId() + " No member id");
+                    validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " No member id");
                 }
                 if (extensionDto.getReferencedConceptId() == null) {
-                    validationErrorList.add(extensionDto.getConceptId() + " No referenced component id");
+                    validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " No referenced component id");
                 }
                 if (extensionDto.getConcept1Id() == null && extensionDto.getValue() == null) {
-                    validationErrorList.add(extensionDto.getConceptId() + " value");
+                    validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " value");
                 }
             }
 
@@ -135,25 +145,25 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validateConceptDto(validationErrorList, relationshipDto);
 
                 if (relationshipDto.getCharacteristicTypeCode() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No characteristic type code");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No characteristic type code");
                 }
                 if (relationshipDto.getCharacteristicTypeId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No characteristic type id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No characteristic type id");
                 }
                 if (relationshipDto.getModifierId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No modifier id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No modifier id");
                 }
                 if (relationshipDto.getRelationshipGroupCode() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No group code");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No group code");
                 }
                 if (relationshipDto.getSourceId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No source id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No source id");
                 }
                 if (relationshipDto.getDestinationId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No destination id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No destination id");
                 }
                 if (relationshipDto.getTypeId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId() + " No type id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No type id");
                 }
             }
         }
@@ -170,28 +180,28 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             for (DescriptionDto descriptionDto : descriptionDtos) {
                 validateConceptDto(validationErrorList, descriptionDto);
                 if (descriptionDto.getDescriptionId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No description id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No description id");
                 }
                 if (descriptionDto.getDescription() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No description text");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No description text");
                 }
                 if (descriptionDto.getCaseSignificanceId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No case significance id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No case significance id");
                 }
                 if (descriptionDto.getDescriptionTypeCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No case description type code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No case description type code");
                 }
                 if (descriptionDto.getInitialCapitalStatusCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No initial capital status code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No initial capital status code");
                 }
                 if (descriptionDto.getLanguageCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No language code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No language code");
                 }
                 if (descriptionDto.getLanguageId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No language id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No language id");
                 }
                 if (descriptionDto.getTypeId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId() + " No type id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No type id");
                 }
             }
         } else {
@@ -272,7 +282,18 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
 
         if (!identifierDtos.isEmpty()) {
             sctId = identifierDtos.get(0).getReferencedSctId();
-            getCheckSctIdAndAddToDb(sctId, uuid);
+            try{
+                getCheckSctIdAndAddToDb(sctId, uuid);
+            } catch (NoMappingException nme) {
+//                if (uuidIgnorList.containsKey(uuid)) {
+                    synchronized (snomedIdHandler) {
+                        sctId = snomedIdHandler.getWithoutGeneration(uuid,
+                                SctIdValidator.getInstance().getSctIdNamespace(sctId.toString()), type);
+                    }
+//                } else {
+//                    throw nme;
+//                }
+            }
         } else {
             synchronized (snomedIdHandler) {
                 sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
@@ -303,7 +324,18 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
             }
         } else {
-            getCheckSctIdAndAddToDb(sctId, uuid);
+            try{
+                getCheckSctIdAndAddToDb(sctId, uuid);
+            } catch (NoMappingException nme) {
+//                if (uuidIgnorList.containsKey(uuid)) {
+                    synchronized (snomedIdHandler) {
+                        sctId = snomedIdHandler.getWithoutGeneration(uuid,
+                                SctIdValidator.getInstance().getSctIdNamespace(sctId.toString()), type);
+                    }
+//                } else {
+//                    throw nme;
+//                }
+            }
         }
 
         return sctId;
@@ -325,9 +357,12 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             Long dbSctId =  snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
 
             if (dbSctId != null && !dbSctId.equals(sctId)) {
-                String errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
-                    + sctId + " database id " + dbSctId;
-                logger.severe(errorMessage);
+                String errorMessage = null;
+                if (!uuidIgnorList.containsKey(uuid)) {
+                    errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
+                        + sctId + " database id " + dbSctId;
+                    logger.severe(errorMessage);
+                }
                 throw new NoMappingException(errorMessage);
             } else if(dbSctId == null) {
                 snomedIdHandler.addSctId(uuid, sctId, namespace, type);

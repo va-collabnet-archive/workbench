@@ -102,8 +102,8 @@ public class AceOutputHandlerTest {
 
     private void assetRelationshipRow(AceRelationshipRow relationshipRow, RelationshipDto relationshipDto)
             throws Exception {
-        Assert.assertEquals(relationshipDto.getConceptId().toString(), relationshipRow.getRelationshipUuid());
-        Assert.assertEquals(relationshipDto.getDestinationId().toString(), relationshipRow.getConceptUuid2());
+        Assert.assertEquals(relationshipDto.getConceptId().keySet().iterator().next().toString(), relationshipRow.getRelationshipUuid());
+        Assert.assertEquals(relationshipDto.getDestinationId().keySet().iterator().next().toString(), relationshipRow.getConceptUuid2());
         Assert.assertEquals(relationshipDto.getSourceId().toString(), relationshipRow.getConceptUuid1());
         Assert.assertEquals(relationshipDto.getTypeId().toString(), relationshipRow.getRelationshiptypeUuid());
         Assert.assertEquals(relationshipDto.getPathId().toString(), relationshipRow.getPathUuid());
@@ -116,7 +116,7 @@ public class AceOutputHandlerTest {
 
     private void assertDescriptionRow(DescriptionDto descriptionDto, AceDescriptionRow descriptionRow) throws Exception {
 
-        Assert.assertEquals(descriptionDto.getConceptId().toString(), descriptionRow.getConceptUuid());
+        Assert.assertEquals(descriptionDto.getConceptId().keySet().iterator().next().toString(), descriptionRow.getConceptUuid());
         Assert.assertEquals(descriptionDto.getDescriptionId().toString(), descriptionRow.getDescriptionUuid());
         Assert.assertEquals(descriptionDto.getDescription(), descriptionRow.getTerm());
         Assert.assertEquals(descriptionDto.getStatusId().toString(), descriptionRow.getDescriptionstatusUuid());
@@ -129,7 +129,7 @@ public class AceOutputHandlerTest {
     private void assertConceptRow(ComponentDto componentDto, AceConceptRow aceConceptRow) throws Exception {
         ConceptDto conceptDto = componentDto.getConceptDto();
 
-        Assert.assertEquals(conceptDto.getConceptId().toString(), aceConceptRow.getConceptUuid());
+        Assert.assertEquals(conceptDto.getConceptId().keySet().iterator().next().toString(), aceConceptRow.getConceptUuid());
         Assert.assertEquals(conceptDto.getStatusId().toString(), aceConceptRow.getConceptStatusUuid());
         Assert.assertEquals(aceOutputHandler.getReleaseDate(conceptDto), aceConceptRow.getEffectiveTime());
         Assert.assertEquals(conceptDto.getPathId().toString(), aceConceptRow.getPathUuid());
@@ -137,7 +137,7 @@ public class AceOutputHandlerTest {
     }
 
     private void assertIdentifierRow(IdentifierDto identifierDto, AceIdentifierRow aceIdentifierRow) throws Exception {
-        Assert.assertEquals(identifierDto.getConceptId().toString(), aceIdentifierRow.getPrimaryUuid());
+        Assert.assertEquals(identifierDto.getConceptId().keySet().iterator().next().toString(), aceIdentifierRow.getPrimaryUuid());
         Assert.assertEquals(aceOutputHandler.getReleaseDate(identifierDto), aceIdentifierRow.getEffectiveDate());
         Assert.assertEquals(identifierDto.getPathId().toString(), aceIdentifierRow.getPathUuid());
         Assert.assertEquals(identifierDto.getReferencedSctId().toString(), aceIdentifierRow.getSourceId());

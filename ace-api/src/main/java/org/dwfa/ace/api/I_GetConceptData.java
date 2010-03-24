@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,9 +43,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #getConceptAttributeTuples(I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -58,7 +58,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -81,9 +81,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #getConceptAttributeTuples(I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param positions
@@ -99,7 +99,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     /**
      * Retrieves tuples using the conflict strategy if specified
-     * 
+     *
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
@@ -116,9 +116,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #getDescriptionTuples(I_IntSet, I_IntSet, Set, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -134,7 +134,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -152,7 +152,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions configured in the current profile
-     * 
+     *
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
@@ -171,7 +171,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -188,7 +188,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -207,7 +207,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions configured in the current profile
-     * 
+     *
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
@@ -227,9 +227,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * <strong>NOTE: this does not use the conflict management
      * strategy</strong>. It is strongly recommended that you use a method that
      * does use a conflict management strategy.
-     * 
+     *
      * @see #getSourceRelTuples(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            set of allowed status values that the I_RelTuple must conform
      *            with
@@ -252,7 +252,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * If you want to get all the is-a relationships for this concept, pass in
      * only is-a relationship types in the allowed types field.
-     * 
+     *
      * @param allowedStatus
      *            set of allowed status values that the I_RelTuple must conform
      *            with
@@ -278,7 +278,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions configured in the current profile
-     * 
+     *
      * @param addUncommitted
      *            include uncommitted relationships in the return values
      * @param returnConflictResolvedLatestState
@@ -297,9 +297,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #getDestRelTuples(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -318,7 +318,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions
-     * 
+     *
      * @param allowedStatus
      *            statuses tuples must match to be returned
      * @param allowedTypes
@@ -339,7 +339,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions configured in the current profile
-     * 
+     *
      * @param allowedTypes
      *            types tuples must match to be returned
      * @param addUncommitted
@@ -360,9 +360,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @see #getSourceRelTargets(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
+     *
      * @param allowedStatus
      *            set of allowed status values that the I_RelTuple must conform
      *            with
@@ -385,7 +385,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * If you want to get all the is-a immediate parents for this concept, pass
      * in only is-a relationship types in the allowed types field.
-     * 
+     *
      * @param allowedStatus
      *            set of allowed status values that the I_RelTuple must conform
      *            with
@@ -410,7 +410,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     /**
      * returns source rel targets based on the current profile settings
-     * 
+     *
      * @param allowedTypes
      *            types of relationships for which the targets will be returned
      * @param addUncommitted
@@ -433,7 +433,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * strategy</strong>.
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
-     * 
+     *
      * @param allowedStatus
      *            allowed statuses when matching relationships
      * @param allowedTypes
@@ -455,7 +455,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Gets the relationship origins based on the passed statuses, relationship
      * types and positions
-     * 
+     *
      * @param allowedStatus
      *            allowed statuses when matching relationships
      * @param allowedTypes
@@ -481,7 +481,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     /**
      * Gets the relationship origins based on the passed relationship
      * types
-     * 
+     *
      * @param allowedTypes
      *            allowed relationship types
      * @param addUncommitted
@@ -504,7 +504,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public List<I_RelVersioned> getDestRels() throws IOException;
 
     /**
-     * 
+     *
      * @return all relationships originating at this concept, regardless of type
      *         of status.
      * @throws IOException
@@ -559,7 +559,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * useful
      * for pre-processing queries to limit number of concepts that the
      * full query spec must be tested for...
-     * 
+     *
      * @param config
      * @return A collection of the native identifiers of all possible children
      *         of this concept

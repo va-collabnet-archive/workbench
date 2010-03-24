@@ -126,7 +126,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
             AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
             aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
             aceIdentifierRow.setPathUuid(identifierDto.getPathId().toString());
-            aceIdentifierRow.setPrimaryUuid(identifierDto.getConceptId().toString());
+            aceIdentifierRow.setPrimaryUuid(identifierDto.getConceptId().keySet().iterator().next().toString());
             aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
             aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
             aceIdentifierRow.setStatusUuid(identifierDto.getStatusId().toString());
@@ -147,7 +147,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     private AceConceptRow getAceConceptRow(ConceptDto conceptDto) throws Exception {
         AceConceptRow conceptRow = new AceConceptRow();
 
-        conceptRow.setConceptUuid(conceptDto.getConceptId().toString());
+        conceptRow.setConceptUuid(conceptDto.getConceptId().keySet().iterator().next().toString());
         conceptRow.setConceptStatusUuid(conceptDto.getStatusId().toString());
         conceptRow.setEffectiveTime(getReleaseDate(conceptDto));
         conceptRow.setIsPrimitve(getPrimitiveFlag(conceptDto));
@@ -167,7 +167,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         AceDescriptionRow rf2DescriptionRow = new AceDescriptionRow();
 
         rf2DescriptionRow.setDescriptionUuid(descriptionDto.getDescriptionId().toString());
-        rf2DescriptionRow.setConceptUuid(descriptionDto.getConceptId().toString());
+        rf2DescriptionRow.setConceptUuid(descriptionDto.getConceptId().keySet().iterator().next().toString());
         rf2DescriptionRow.setCasesensitivityUuid(descriptionDto.getCaseSignificanceId().toString());
         rf2DescriptionRow.setDescriptionstatusUuid(descriptionDto.getStatusId().toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
@@ -189,9 +189,9 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     private AceRelationshipRow getAceRelationshipRow(RelationshipDto relationshipDto) throws Exception {
         AceRelationshipRow relationshipRow = new AceRelationshipRow();
 
-        relationshipRow.setRelationshipUuid(relationshipDto.getConceptId().toString());
+        relationshipRow.setRelationshipUuid(relationshipDto.getConceptId().keySet().iterator().next().toString());
         relationshipRow.setConceptUuid1(relationshipDto.getSourceId().toString());
-        relationshipRow.setConceptUuid2(relationshipDto.getDestinationId().toString());
+        relationshipRow.setConceptUuid2(relationshipDto.getDestinationId().keySet().iterator().next().toString());
         relationshipRow.setCharacteristicTypeUuid(relationshipDto.getCharacteristicTypeId().toString());
         relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
         relationshipRow.setPathUuid(relationshipDto.getPathId().toString());

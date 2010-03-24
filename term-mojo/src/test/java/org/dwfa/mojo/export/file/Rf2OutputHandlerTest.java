@@ -422,7 +422,7 @@ public class Rf2OutputHandlerTest {
 
 
     private void assertIdentifierRow(IdentifierDto identifierDto, Rf2IdentifierRow rf2IdentifierRow) throws Exception {
-        Assert.assertEquals(identifierDto.getConceptId().toString(), rf2IdentifierRow.getAlternateIdentifier().toString());
+        Assert.assertEquals(identifierDto.getConceptId().keySet().iterator().next().toString(), rf2IdentifierRow.getAlternateIdentifier().toString());
         Assert.assertEquals(rf2OutputHandler.getReleaseDate(identifierDto), rf2IdentifierRow.getEffectiveTime());
         Assert.assertEquals((identifierDto.isActive())?"1":"0", rf2IdentifierRow.getActive());
         Assert.assertEquals(getSctId(identifierDto.getPathId(), identifierDto), rf2IdentifierRow.getModuleSctId());

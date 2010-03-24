@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -85,7 +86,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /**
      * Clears the <code>cbeans</code> map.
-     * 
+     *
      * This is used when connecting to another DB as the native id will be
      * different
      */
@@ -213,7 +214,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getConcept()
      */
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
@@ -233,7 +234,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getConceptId()
      */
     public int getConceptId() {
@@ -246,7 +247,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getConceptTuples(org.dwfa.ace.IntSet
      * ,
@@ -375,7 +376,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getSourceRelTuples(org.dwfa.ace.
      * IntSet,
@@ -418,7 +419,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dwfa.vodb.types.I_GetConceptData#getDestRelTuples(org.dwfa.ace.IntSet
      * ,
@@ -436,7 +437,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getDescriptions()
      */
     public List<I_DescriptionVersioned> getDescriptions() throws IOException {
@@ -457,7 +458,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getDestRels()
      */
     public List<I_RelVersioned> getDestRels() throws IOException {
@@ -473,7 +474,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getSourceRels()
      */
     public List<I_RelVersioned> getSourceRels() throws IOException {
@@ -501,7 +502,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getInitialText()
      */
     public String getInitialText() throws IOException {
@@ -579,7 +580,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.dwfa.vodb.types.I_GetConceptData#isLeaf(org.dwfa.ace.config.
      * AceFrameConfig)
      */
@@ -666,7 +667,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getImages()
      */
     public List<I_ImageVersioned> getImages() throws IOException {
@@ -735,7 +736,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_Transact#abort()
      */
     public void abort() throws IOException {
@@ -836,7 +837,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.vodb.types.I_GetConceptData#getUid()
      */
     public List<UUID> getUids() throws IOException {
@@ -999,7 +1000,7 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
                             return getLangPreferredDesc(
                                 matchedList, typePrefOrder, langPrefOrder, allowedStatus, positionSet, typeSet, sortPref);
                         } else {
-                            return matchedList.get(0); 
+                            return matchedList.get(0);
                         }
                     }
                 }
