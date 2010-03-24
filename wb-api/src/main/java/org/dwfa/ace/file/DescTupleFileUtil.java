@@ -160,62 +160,64 @@ public class DescTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(typeUuid, pathUuid);
             }
 
-            int conceptId = termFactory.getId(conceptUuid).getNid();
-            I_IntSet allowedStatus = termFactory.newIntSet();
-            allowedStatus.add(termFactory.getId(statusUuid).getNid());
-            I_IntSet allowedTypes = termFactory.newIntSet();
-            allowedTypes.add(termFactory.getId(typeUuid).getNid());
-            I_GetConceptData concept = termFactory.getConcept(conceptId);
-            // Set<I_Position> positions =
-            // termFactory.getActiveAceFrameConfig().getViewPositionSet();
-            boolean returnConflictResolvedLatestState = true;
+            if (termFactory.getId(conceptUuid) != null) {
+                int conceptId = termFactory.getId(conceptUuid).getNid();
+                I_IntSet allowedStatus = termFactory.newIntSet();
+                allowedStatus.add(termFactory.getId(statusUuid).getNid());
+                I_IntSet allowedTypes = termFactory.newIntSet();
+                allowedTypes.add(termFactory.getId(typeUuid).getNid());
+                I_GetConceptData concept = termFactory.getConcept(conceptId);
+                boolean returnConflictResolvedLatestState = true;
 
-            // check if the part exists
-            List<? extends I_DescriptionTuple> parts = concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
-                returnConflictResolvedLatestState);
-            I_DescriptionTuple latestTuple = null;
-            for (I_DescriptionTuple part : parts) {
-                if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
-                    latestTuple = part;
+                // check if the part exists
+                List<? extends I_DescriptionTuple> parts =
+                        concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
+                            returnConflictResolvedLatestState);
+                I_DescriptionTuple latestTuple = null;
+                for (I_DescriptionTuple part : parts) {
+                    if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
+                        latestTuple = part;
+                    }
                 }
-            }
 
-            if (latestTuple == null) {
-                Collection<I_Path> paths = termFactory.getPaths();
-                paths.clear();
-                paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                termFactory.uuidToNative(descUuid);
+                if (latestTuple == null) {
+                    Collection<I_Path> paths = termFactory.getPaths();
+                    paths.clear();
+                    paths.add(termFactory.getPath(new UUID[] { pathUuid }));
+                    termFactory.uuidToNative(descUuid);
 
-                I_DescriptionVersioned v = termFactory.newDescription(descUuid, concept, lang, text,
-                    termFactory.getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
+                    I_DescriptionVersioned v =
+                            termFactory.newDescription(descUuid, concept, lang, text, termFactory
+                                .getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
 
-                I_DescriptionPart newLastPart = v.getLastTuple().getMutablePart();
-                newLastPart.setLang(lang);
-                newLastPart.setText(text);
-                newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
-                newLastPart.setStatusId(termFactory.getId(statusUuid).getNid());
-                newLastPart.setPathId(termFactory.getId(pathUuid).getNid());
-                newLastPart.setTime(effectiveDate);
+                    I_DescriptionPart newLastPart =
+                            (I_DescriptionPart) v.getLastTuple().makeAnalog(termFactory.getId(statusUuid).getNid(),
+                                termFactory.getId(pathUuid).getNid(), effectiveDate);
+                    newLastPart.setLang(lang);
+                    newLastPart.setText(text);
+                    newLastPart.setInitialCaseSignificant(initialCapSignificant);
+                    newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
 
-                v.addVersion(newLastPart);
-                termFactory.addUncommittedNoChecks(concept);
-            } else {
-                I_DescriptionPart newLastPart = (I_DescriptionPart) latestTuple.getDescVersioned().getLastTuple().getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), 
-                		termFactory.getId(pathUuid).getNid(), effectiveDate);
-                newLastPart.setLang(lang);
-                newLastPart.setText(text);
-                newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
-  
+                    v.addVersion(newLastPart);
+                    termFactory.addUncommittedNoChecks(concept);
+                } else {
+                    I_DescriptionPart newLastPart =
+                            (I_DescriptionPart) latestTuple.getDescVersioned().getLastTuple().getMutablePart()
+                                .makeAnalog(termFactory.getId(statusUuid).getNid(),
+                                    termFactory.getId(pathUuid).getNid(), effectiveDate);
+                    newLastPart.setLang(lang);
+                    newLastPart.setText(text);
+                    newLastPart.setInitialCaseSignificant(initialCapSignificant);
+                    newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
 
-                latestTuple.getDescVersioned().addVersion(newLastPart);
-                termFactory.addUncommittedNoChecks(concept);
+                    latestTuple.getDescVersioned().addVersion(newLastPart);
+                    termFactory.addUncommittedNoChecks(concept);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing desc tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing desc tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

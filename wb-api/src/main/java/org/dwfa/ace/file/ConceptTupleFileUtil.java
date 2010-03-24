@@ -134,7 +134,8 @@ public class ConceptTupleFileUtil {
                 IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
             }
 
-            if (termFactory.hasConcept(termFactory.getId(conceptUuid).getNid())) {
+            if (termFactory.getId(conceptUuid) != null
+                && termFactory.hasConcept(termFactory.getId(conceptUuid).getNid())) {
 
                 int conceptId = termFactory.getId(conceptUuid).getNid();
                 I_IntSet allowedStatus = termFactory.newIntSet();
@@ -179,20 +180,17 @@ public class ConceptTupleFileUtil {
 
                 // edit the existing part's effectiveDate/version
                 int index = v.getMutableParts().size() - 1;
-                I_ConceptAttributePart part;
+
                 if (index >= 0) {
-                    part =
+                    I_ConceptAttributePart part =
                             (I_ConceptAttributePart) v.getMutableParts().get(index).makeAnalog(
                                 termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(),
                                 effectiveDate);
-                } else {
-                    part = termFactory.newConceptAttributePart();
-                    part.setTime(effectiveDate);
+                    part.setDefined(isDefined);
+
+                    v.addVersion(part);
                 }
-                part.setStatusId(termFactory.getId(statusUuid).getNid());
-                part.setDefined(isDefined);
-                part.setPathId(termFactory.getId(pathUuid).getNid());
-                v.addVersion(part);
+
                 termFactory.addUncommittedNoChecks(newConcept);
 
             }

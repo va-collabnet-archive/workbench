@@ -32,6 +32,10 @@ public interface I_Identify extends I_AmTermComponent {
 
     public List<UUID> getUUIDs();
 
+    @Deprecated
+    /**
+     * @deprecated Use addStringId(), addIntId(), addUuidId, and addLongId() instead.
+     */
     public boolean addMutableIdPart(I_IdPart srcId);
 
     public boolean hasMutableIdPart(I_IdPart newPart);
@@ -41,5 +45,11 @@ public interface I_Identify extends I_AmTermComponent {
     public List<? extends I_IdVersion> getIdVersions();
 
     public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException;
+
+    public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time);
+
+    public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int pathNid, long time);
+
+    public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time);
 
 }

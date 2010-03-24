@@ -36,9 +36,8 @@ public class ConceptConceptConceptExtTupleFileUtil {
         try {
             I_TermFactory termFactory = Terms.get();
 
-            UUID tupleUuid = ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE.getUids()
-                .iterator()
-                .next();
+            UUID tupleUuid =
+                    ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE.getUids().iterator().next();
 
             UUID memberUuid = termFactory.getUids(tuple.getMemberId()).iterator().next();
             UUID refsetUuid = termFactory.getUids(tuple.getRefsetId()).iterator().next();
@@ -178,12 +177,14 @@ public class ConceptConceptConceptExtTupleFileUtil {
 
             try {
                 refsetHelper.newConceptConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNid(),
-                    termFactory.getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(),
-                    termFactory.getId(c2Uuid).getNid(), termFactory.getId(c3Uuid).getNid(), memberUuid,
-                    pathUuid, statusUuid, effectiveDate);
+                    termFactory.getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(
+                        c2Uuid).getNid(), termFactory.getId(c3Uuid).getNid(), memberUuid, pathUuid, statusUuid,
+                    effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new concept-concept-concept refset extension : "
-                    + e.getLocalizedMessage();
+                e.printStackTrace();
+                String errorMessage =
+                        "Exception thrown while creating new concept-concept-concept refset extension : "
+                            + e.getLocalizedMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
@@ -101,25 +102,32 @@ public class IDTupleFileUtil {
             }
 
             I_Identify versioned = termFactory.getId(primaryUuid);
-            I_IdPart part =
-                    versioned.getMutableIdParts().get(0).makeIdAnalog(termFactory.uuidToNative(statusUuid),
-                        termFactory.uuidToNative(pathUuid), convert(effectiveDate));
 
-            part.setAuthorityNid(termFactory.uuidToNative(sourceSystemUuid));
-            if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
-                part.setDenotation(UUID.fromString(sourceId));
-            } else if (sourceSystemUuid
-                .equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())) {
-                part.setDenotation(new Long(sourceId));
+            if (versioned != null) {
+
+                if (sourceSystemUuid
+                    .equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
+                    versioned.addUuidId(UUID.fromString(sourceId), termFactory.uuidToNative(sourceSystemUuid),
+                        termFactory.uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid),
+                        convert(effectiveDate));
+                } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator()
+                    .next())) {
+                    versioned.addLongId(new Long(sourceId), termFactory.uuidToNative(sourceSystemUuid), termFactory
+                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+                } else {
+                    versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid), termFactory
+                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+                    // use string as default
+                }
+
+                if (termFactory.hasConcept(versioned.getNid())) {
+                    I_GetConceptData concept = termFactory.getConcept(versioned.getNid());
+                    termFactory.addUncommitted(concept);
+                }
+
             } else {
-                part.setDenotation(sourceId); // use string
+                throw new Exception("UUID did not exist in database: " + primaryUuid);
             }
-
-            if (!versioned.hasMutableIdPart(part)) {
-                versioned.addMutableIdPart(part);
-            }
-
-            termFactory.writeId(versioned);
         } catch (Exception e) {
             e.printStackTrace();
             String errorMessage = "Exception while importing ID tuple : " + e.getLocalizedMessage();

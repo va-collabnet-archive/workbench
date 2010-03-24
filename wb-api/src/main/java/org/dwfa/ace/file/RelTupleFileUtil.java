@@ -193,8 +193,9 @@ public class RelTupleFileUtil {
             boolean addUncommitted = true;
 
             // check if the part exists
-            List<? extends I_RelTuple> parts = concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
-                returnConflictResolvedLatestState);
+            List<? extends I_RelTuple> parts =
+                    concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
+                        returnConflictResolvedLatestState);
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {
                 if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
@@ -208,39 +209,40 @@ public class RelTupleFileUtil {
                 paths.add(termFactory.getPath(new UUID[] { pathUuid }));
                 termFactory.uuidToNative(relUuid);
 
-                I_RelVersioned v = termFactory.newRelationship(relUuid, concept,
-                    termFactory.getConcept(new UUID[] { relTypeUuid }), termFactory.getConcept(new UUID[] { c2Uuid }),
-                    termFactory.getConcept(new UUID[] { charUuid }), termFactory.getConcept(new UUID[] { refUuid }),
-                    termFactory.getConcept(new UUID[] { statusUuid }), group, termFactory.getActiveAceFrameConfig());
+                I_RelVersioned v =
+                        termFactory.newRelationship(relUuid, concept, termFactory
+                            .getConcept(new UUID[] { relTypeUuid }), termFactory.getConcept(new UUID[] { c2Uuid }),
+                            termFactory.getConcept(new UUID[] { charUuid }), termFactory
+                                .getConcept(new UUID[] { refUuid }), termFactory.getConcept(new UUID[] { statusUuid }),
+                            group, termFactory.getActiveAceFrameConfig());
 
-                I_RelPart newPart = v.getLastTuple().getMutablePart();
+                I_RelPart newPart =
+                        (I_RelPart) v.getLastTuple().makeAnalog(termFactory.getId(statusUuid).getNid(),
+                            termFactory.getId(pathUuid).getNid(), effectiveDate);
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
-                newPart.setPathId(termFactory.getId(pathUuid).getNid());
                 newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
                 newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
-                newPart.setStatusId(termFactory.getId(statusUuid).getNid());
-                newPart.setTime(effectiveDate);
-
                 v.addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
 
-                I_RelPart newPart = (I_RelPart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(), effectiveDate);
+                I_RelPart newPart =
+                        (I_RelPart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(),
+                            termFactory.getId(pathUuid).getNid(), effectiveDate);
                 newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
                 newPart.setGroup(group);
-              
+
                 newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
                 newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
- 
 
                 latestTuple.getRelVersioned().addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing rel tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing rel tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
