@@ -665,12 +665,10 @@ public class ExportSpecification {
      * @param tuple
      * @param componentNid
      * @return
-     * @throws NoMappingException
      * @throws TerminologyException
      * @throws IOException
      */
-    private Map<UUID, Long> getIdMap(I_AmPart tuple, int componentNid) throws NoMappingException,
-            TerminologyException, IOException {
+    private Map<UUID, Long> getIdMap(I_AmPart tuple, int componentNid) throws TerminologyException, IOException {
         Map<UUID, Long> map = new HashMap<UUID, Long>();
         List<I_IdPart> versions = termFactory.getId(componentNid).getVersions();
 
@@ -684,7 +682,7 @@ public class ExportSpecification {
         } else if (uuidPart != null) {
             map.put(UUID.fromString(uuidPart.getSourceId().toString()), sctId);
         } else {
-            throw new NoMappingException("Cannot find a UUID for " + tuple);
+            map.put(termFactory.getUids(componentNid).iterator().next(), sctId);
         }
 
         return map;
