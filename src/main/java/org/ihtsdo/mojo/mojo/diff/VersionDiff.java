@@ -733,7 +733,7 @@ public class VersionDiff extends AbstractMojo {
 		return newConcept;
 	}
 
-	private boolean noop = true;
+	private boolean noop = false;
 
 	private boolean noop_member = false;
 
@@ -751,7 +751,6 @@ public class VersionDiff extends AbstractMojo {
 			I_ExtendByRef new_ext = refsetHelper.getOrCreateRefsetExtension(
 					refset.getConceptId(), tf.uuidToNative(UUID.randomUUID()),
 					REFSET_TYPES.CID_CID_STR, refset_map, UUID.randomUUID());
-			tf.addUncommittedNoChecks(new_ext);
 		}
 		//
 		if (change_id == this.config || change_id == this.stats)
@@ -766,8 +765,8 @@ public class VersionDiff extends AbstractMojo {
 			I_ExtendByRef new_ext_member = refsetHelper
 					.getOrCreateRefsetExtension(member_refset.getConceptId(),
 							tf.uuidToNative(UUID.randomUUID()),
-							REFSET_TYPES.CID, refset_map_member, UUID.randomUUID());
-			tf.addUncommittedNoChecks(new_ext_member);
+							REFSET_TYPES.CID, refset_map_member, UUID
+									.randomUUID());
 		}
 	}
 
@@ -1474,8 +1473,10 @@ public class VersionDiff extends AbstractMojo {
 						+ " secs.");
 		for (int nid : all_concepts) {
 			concepts++;
-			// if (concepts % 1000 == 0)
-			// tf.commit();
+			// if (concepts == 20001) {
+			// getLog().info("BREAK concepts " + concepts);
+			// break;
+			// }
 			if (concepts % 10000 == 0) {
 				long cur = System.currentTimeMillis();
 				float elap = cur - start;
@@ -1524,6 +1525,10 @@ public class VersionDiff extends AbstractMojo {
 			compareAttributes(c, path);
 			compareDescriptions(c, path);
 			compareRelationships(c, path);
+		}
+		tf.addUncommittedNoChecks(this.refset);
+		for (I_GetConceptData c : this.refsets.values()) {
+			tf.addUncommittedNoChecks(c);
 		}
 		getLog().info(
 				"concepts " + concepts + " of " + all_concepts.size()
