@@ -15,7 +15,23 @@ public class Position {
     private List<Integer> statusNids = new ArrayList<Integer>();
     private I_GetConceptData path;
 
+    public Position(I_GetConceptData path) throws Exception {
+        this. path = path;
+    }
+
+    public Position(I_GetConceptData path, Date timePoint) throws Exception {
+        this(path);
+
+        if(timePoint.equals(LATEST_VERSION_STR)) {
+            timePoint = new Date();
+            timePoint.setTime(Long.MAX_VALUE);
+        } else {
+            this.timePoint = timePoint;
+        }
+    }
+
     public Position(PositionDescriptor positionDescriptor) throws Exception {
+        this(positionDescriptor.getPath().getVerifiedConcept());
 
         if(positionDescriptor.getTimeString().equals(LATEST_VERSION_STR)) {
             timePoint = new Date();
@@ -23,8 +39,6 @@ public class Position {
         } else {
             timePoint = AceDateFormat.getRf2DateFormat().parse(positionDescriptor.getTimeString());
         }
-
-        path = positionDescriptor.getPath().getVerifiedConcept();
     }
 
     public <T extends I_AmTuple> List<T> getMatchingTuples(List<T> list) {

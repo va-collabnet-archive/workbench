@@ -49,6 +49,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         uuidIgnorList.put(UUID.fromString("58e33018-e99e-3859-a5a5-62b0ee29a05c"), 108642061000036115l);
         uuidIgnorList.put(UUID.fromString("05f27978-6783-351c-91a5-c5dc39a37299") ,900000000000416022l);
         uuidIgnorList.put(UUID.fromString("fa28e447-d635-49b1-9b55-86254a7a2f97"), 32570041000036109l);
+        uuidIgnorList.put(UUID.fromString("8578034a-0b2f-3ef1-900c-250d1b1ef877"), 32570701000036108l);
+        uuidIgnorList.put(UUID.fromString("4859053b-8137-364f-9c4b-3f794572aa75"), 32570371000036100l);
     }
 
     /**

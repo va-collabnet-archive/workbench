@@ -18,6 +18,7 @@ package org.dwfa.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 /**
  * Class used to get handles on <code>DateFormat</code>ters without using
@@ -63,7 +64,9 @@ public class AceDateFormat {
     }
 
     public synchronized static DateFormat getRf2TimezoneDateFormat() {
-        return new SimpleDateFormat(RF2_TZ_FORMAT);
+        DateFormat dateFormat = new SimpleDateFormat(RF2_TZ_FORMAT);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat;
     }
 
     public synchronized static DateFormat getRf2DateFormat() {
@@ -71,7 +74,9 @@ public class AceDateFormat {
     }
 
     public synchronized static DateFormat getOldAceExportDateFormat() {
-        return new SimpleDateFormat(OLD_ACE_EXPORT_FORMAT);
+        DateFormat dateFormat = new SimpleDateFormat(OLD_ACE_EXPORT_FORMAT);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat;
     }
 
     public synchronized static DateFormat getRf1DateOnlyDateFormat() {

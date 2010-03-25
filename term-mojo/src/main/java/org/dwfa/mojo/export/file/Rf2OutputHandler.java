@@ -218,11 +218,13 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * @return String
      */
     private String convertToCamelCase(String string) {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer("");
         String[] str = string.replaceAll("/", "").split(" ");
         for (String temp : str) {
-            sb.append(Character.toUpperCase(temp.charAt(0)));
-            sb.append(temp.substring(1).toLowerCase());
+            if (temp.length() > 1) {
+                sb.append(Character.toUpperCase(temp.charAt(0)));
+                sb.append(temp.substring(1).toLowerCase());
+            }
         }
         return sb.toString();
     }

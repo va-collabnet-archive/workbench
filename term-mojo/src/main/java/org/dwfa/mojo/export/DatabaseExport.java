@@ -20,18 +20,24 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.process.I_ProcessQueue;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.commit.validator.ValidationException;
+import org.dwfa.ace.task.path.PromoteToPath;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
@@ -48,6 +54,7 @@ import org.dwfa.mojo.export.file.Rf2OutputHandler;
  * @goal database-export
  */
 public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
+
     /**
      * Class logger.
      */
@@ -65,6 +72,14 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @required
      */
     private PositionDescriptor[] positionsForExport;
+
+    /**
+     * Origins for export
+     *
+     * @parameter
+     * @required
+     */
+    private PositionDescriptor[] originsForExport;
 
     /**
      * Included hierarchy
@@ -103,7 +118,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      * @required
      */
-    String uuidSctidDbConnectionUrl;
+    private String uuidSctidDbConnectionUrl;
 
     /**
      * UUID-SCTID database driver fully qualified class name
@@ -111,43 +126,43 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      * @required
      */
-    String uuidSctidDbDriver;
+    private String uuidSctidDbDriver;
 
     /**
      * UUID-SCTID database user to optionally authenticate to the database
      *
      * @parameter
      */
-    String uuidSctidDbUsername;
+    private String uuidSctidDbUsername;
 
     /**
      * UUID-SCTID database user's password optionally used to authenticate to the database
      *
      * @parameter
      */
-    String uuidSctidDbPassword;
+    private String uuidSctidDbPassword;
 
     /**
      * The number of threads to use.
      *
      * @parameter
      */
-    int numberOfThreads = 1;
+    private int numberOfThreads = 1;
 
     /**
      * Export file output handler for RF2
      */
-    ExportOutputHandler rf2OutputHandler;
+    private ExportOutputHandler rf2OutputHandler;
 
     /**
      * Export file output handler for RF1
      */
-    ExportOutputHandler rf1OutputHandler;
+    private ExportOutputHandler rf1OutputHandler;
 
     /**
      * Export file output handler for Ace
      */
-    AceOutputHandler aceOutputHandler;;
+    private AceOutputHandler aceOutputHandler;;
 
     /** Da factory */
     private I_TermFactory termFactory;
@@ -168,12 +183,15 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private List<I_GetConceptData> currentBatch = new ArrayList<I_GetConceptData>();
 
     /**
+     * Promotes to concepts for calculating promotion origins.
+     */
+    private I_GetConceptData promotesToConcept;
+
+    /**
      * TODO need to mock this out.
      * For testing
      */
     private boolean testing = false;
-
-
 
     /**
      * Iterate concepts.
@@ -185,6 +203,8 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         logger.info("Start exporting concepts");
 
         try {
+            promotesToConcept = getTermFactory().getConcept(ConceptConstants.PROMOTES_TO.localize().getNid());
+
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
             if (uuidSctidDbUsername != null) {
@@ -204,13 +224,29 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar));
 
             List<Position> positions = new ArrayList<Position>();
+            //Used for testing releases, simulates promote(copy) to release path
+            if (originsForExport != null) {
+                Set<I_Position> positionOrigins = new HashSet<I_Position>();
+                for (PositionDescriptor positionDescriptor : originsForExport) {
+                    positionOrigins.addAll(
+                        PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, getTermFactory()));
+                }
+
+                for (I_Position iPosition : positionOrigins) {
+                    Date timePoint = new Date();
+                    timePoint.setTime(iPosition.getTime());
+                    positions.add(new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()), timePoint));
+                }
+            }
             for (PositionDescriptor positionDescriptor : positionsForExport) {
                 positions.add(new Position(positionDescriptor));
             }
+
             List<I_GetConceptData> inclusionRoots = new ArrayList<I_GetConceptData>();
             for (ConceptDescriptor conceptDescriptor : inclusions) {
                 inclusionRoots.add(conceptDescriptor.getVerifiedConcept());
             }
+
             List<I_GetConceptData> exclusionRoots = new ArrayList<I_GetConceptData>();
             if (exclusions != null) {
                 for (ConceptDescriptor conceptDescriptor : exclusions) {
@@ -279,13 +315,24 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         this.termFactory = termFactory;
     }
 
+    /**
+     * Class to use with Work Queue.
+     */
     class RunnableProcessConcept implements Runnable {
         private List<I_GetConceptData> conceptsToProcess = new ArrayList<I_GetConceptData>();
 
+        /**
+         * Create a runnable with the list of jobs
+         *
+         * @param conceptsToProcess List of I_GetConceptData
+         */
         RunnableProcessConcept(List<I_GetConceptData> conceptsToProcess) {
             this.conceptsToProcess = new ArrayList<I_GetConceptData>(conceptsToProcess);
         }
 
+        /**
+         * Process the list of concepts in the thread.
+         */
         @Override
         public void run() {
             for(I_GetConceptData concept : conceptsToProcess){

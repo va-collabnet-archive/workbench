@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import junit.framework.Assert;
@@ -33,7 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class AceOutputHandlerTest {
-
+    private Calendar aceTime = new GregorianCalendar();
     public static final String UUID_MAP_TEST_DATABASE_PASSWORD = "uuid.map.test.database.password";
     public static final String UUID_MAP_TEST_DATABASE_USER = "uuid.map.test.database.user";
     public static final String UUID_MAP_TEST_DATABASE_URL = "uuid.map.test.database.url";
@@ -386,7 +389,7 @@ public class AceOutputHandlerTest {
         identifierDto.setActive(true);
         identifierDto.setReferencedSctId(900000000000960019l);
         identifierDto.setConceptId(getIdMap(UUID.randomUUID(), null));
-        identifierDto.setDateTime(new Date());
+        identifierDto.setDateTime(getDate());
         identifierDto.setIdentifierSchemeUuid(UUID.randomUUID());
         identifierDto.setPathId(UUID.randomUUID());
         identifierDto.setNamespace(NAMESPACE.NEHTA);
@@ -399,7 +402,7 @@ public class AceOutputHandlerTest {
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
         conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
-        conceptDto.setDateTime(new Date());
+        conceptDto.setDateTime(getDate());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);
         conceptDto.setPathId(UUID.randomUUID());
@@ -457,5 +460,15 @@ public class AceOutputHandlerTest {
         map.put(uuid, sctId);
 
         return map;
+    }
+    
+    private Date getDate() {
+        aceTime.setTime(new Date());
+        aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+        aceTime.set(Calendar.HOUR, 0);
+        aceTime.set(Calendar.MINUTE, 0);
+        aceTime.set(Calendar.SECOND, 0);
+
+        return aceTime.getTime();
     }
 }

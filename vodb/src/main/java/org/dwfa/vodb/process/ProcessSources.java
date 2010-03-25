@@ -360,7 +360,12 @@ public abstract class ProcessSources {
             Object refinability = getRefinability(st);
             // RELATIONSHIPGROUP
             tokenType = st.nextToken();
-            int group = Integer.parseInt(st.sval);
+            int group = 0;
+            try{
+                group = Integer.parseInt(st.sval);
+            } catch (NumberFormatException nfe) {
+                System.out.print("######################not a number " + st.sval + " " + relID);
+            }
 
             tokenType = st.nextToken();
             Date statusDate = getDate(st);

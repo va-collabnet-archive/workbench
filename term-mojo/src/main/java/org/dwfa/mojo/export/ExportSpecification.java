@@ -139,9 +139,11 @@ public class ExportSpecification {
     int movedElsewhereStatusNId;
     /** History relationship types to History relationship reference set map. */
     Map<Integer, Integer> historyStatusRefsetMap = new HashMap<Integer, Integer>();
+
     /** relationship refinablility reference set */
     int relationshipRefinabilityExtensionNid;
 
+    /** inactivation indicators. */
     int descriptionInactivationIndicatorNid;
     int relationshipInactivationIndicatorNid;
     int conceptInactivationIndicatorNid;
@@ -149,6 +151,7 @@ public class ExportSpecification {
     /** Da factory. */
     private I_TermFactory termFactory;
 
+    /** Component extension processor. */
     private ExtensionProcessor<I_ThinExtByRefPart> extensionProcessor;
 
     /**
@@ -329,7 +332,7 @@ public class ExportSpecification {
         relationshipDto.setRefinabilityId(termFactory.getUids(tuple.getRefinabilityId()).iterator().next());
         int refinableChar = ArchitectonicAuxiliary.getSnomedRefinabilityTypeId(termFactory.getUids(tuple.getRefinabilityId()));
         relationshipDto.setRefinable(Character.forDigit(refinableChar, 10));
-        relationshipDto.setRelationshipGroupCode(Character.forDigit(tuple.getGroup(), 10));
+        relationshipDto.setRelationshipGroupCode((tuple.getGroup() < 9) ? Character.forDigit(tuple.getGroup(), 10) : '0');
         relationshipDto.setSourceId(termFactory.getUids(tuple.getC1Id()).iterator().next());
         relationshipDto.setType(TYPE.RELATIONSHIP);
         relationshipDto.setTypeId(termFactory.getUids(tuple.getTypeId()).iterator().next());

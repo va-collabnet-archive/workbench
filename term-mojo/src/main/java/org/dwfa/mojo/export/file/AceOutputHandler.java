@@ -20,14 +20,19 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
+import org.dwfa.dto.ExtensionDto;
 import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
+import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.ace.AceConceptRow;
 import org.dwfa.mojo.file.ace.AceConceptWriter;
 import org.dwfa.mojo.file.ace.AceDescriptionRow;
@@ -36,6 +41,7 @@ import org.dwfa.mojo.file.ace.AceIdentifierRow;
 import org.dwfa.mojo.file.ace.AceIdentifierWriter;
 import org.dwfa.mojo.file.ace.AceRelationshipRow;
 import org.dwfa.mojo.file.ace.AceRelationshipWriter;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.AceDateFormat;
 
 /**
@@ -43,10 +49,13 @@ import org.dwfa.util.AceDateFormat;
  */
 public class AceOutputHandler extends SnomedFileFormatOutputHandler {
 
+    private Calendar aceTime = new GregorianCalendar();
     private AceIdentifierWriter idsFile;
     private AceConceptWriter conceptFile;
     private AceDescriptionWriter descriptionFile;
     private AceRelationshipWriter relationshipFile;
+    private AceIdentifierWriter aceIdentifierCliniclFile;
+    private AceIdentifierWriter aceIdentifierStructuralFile;
 
     /**
      * Constructor
@@ -67,6 +76,8 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         descriptionFile = new AceDescriptionWriter(new File(exportDirectory + File.separator + "descriptions.txt"));
         relationshipFile = new AceRelationshipWriter(new File(exportDirectory + File.separator
             + "relationships.txt"));
+        aceIdentifierCliniclFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.clinical.txt"));
+        aceIdentifierStructuralFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.structural.txt"));
     }
 
     /**
@@ -98,6 +109,18 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
                 idsFile.write(getAceIdentifierRows(relationshipDto));
             }
         }
+
+        for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
+            writeExtensionIdentifierRow(extensionDto);
+        }
+
+        for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
+            writeExtensionIdentifierRow(extensionDto);
+        }
+
+        for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
+            writeExtensionIdentifierRow(extensionDto);
+        }
     }
 
     /**
@@ -110,6 +133,8 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         conceptFile.close();
         descriptionFile.close();
         relationshipFile.close();
+        aceIdentifierCliniclFile.close();
+        aceIdentifierStructuralFile.close();
     }
 
     /**
@@ -136,6 +161,33 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
 
         return aceIdentifierRows;
     }
+
+    /**
+     * Sets the member sctid, if one exists otherwise one is generated.
+     *
+     * @param extensionDto ExtensionDto
+     * @return AceIdentifierRow
+     * @throws Exception
+     */
+    private AceIdentifierRow getAceMemberIdentifierRow(ExtensionDto extensionDto) throws Exception {
+        AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
+
+        aceIdentifierRow.setEffectiveDate(getReleaseDate(extensionDto));
+        aceIdentifierRow.setPathUuid(extensionDto.getPathId().toString());
+        aceIdentifierRow.setPrimaryUuid(extensionDto.getMemberId().toString());
+        if (!extensionDto.getIdentifierDtos().isEmpty()) {
+            aceIdentifierRow.setSourceId(
+                extensionDto.getIdentifierDtos().get(0).getReferencedSctId().toString());
+        } else {
+            aceIdentifierRow.setSourceId(
+                getSctId(extensionDto, extensionDto.getMemberId(), TYPE.REFSET).toString());
+        }
+        aceIdentifierRow.setSourceSystemUuid(AceIdentifierRow.SCT_ID_IDENTIFIER_SCHEME.toString());
+        aceIdentifierRow.setStatusUuid(extensionDto.getStatusId().toString());
+
+        return aceIdentifierRow;
+    }
+
 
     /**
      * Copy the details from ConceptDto to a Rf2ConceptRow
@@ -204,6 +256,27 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     }
 
     /**
+     * Write the ids for the extension for importing back into the ACE Berkeley database.
+     *
+     * @param extensionDto ExtensionDto
+     * @throws IOException
+     * @throws TerminologyException
+     * @throws Exception
+     */
+    private void writeExtensionIdentifierRow(ExtensionDto extensionDto) throws IOException, TerminologyException,
+            Exception {
+        if (extensionDto.isClinical()) {
+            synchronized (aceIdentifierCliniclFile) {
+                aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
+            }
+        } else {
+            synchronized (aceIdentifierStructuralFile) {
+                aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
+            }
+        }
+    }
+
+    /**
      * Gets the rf1 primitive flag for the ConceptDto
      *
      * @param concept Concept
@@ -218,6 +291,11 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     String getReleaseDate(Concept concept) {
-        return AceDateFormat.getRf2TimezoneDateFormat().format(concept.getDateTime());
+        aceTime.setTime(concept.getDateTime());
+        aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+        aceTime.set(Calendar.HOUR, 0);
+        aceTime.set(Calendar.MINUTE, 0);
+        aceTime.set(Calendar.SECOND, 0);
+        return AceDateFormat.getRf2TimezoneDateFormat().format(aceTime.getTime());
     }
 }

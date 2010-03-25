@@ -1,8 +1,11 @@
 package org.dwfa.mojo.file.ace;
 
+import java.util.UUID;
+
 import org.dwfa.ace.file.GenericFileWriter;
 
 public class AceIdentifierRow extends GenericFileWriter<AceIdentifierRow> {
+    public static UUID SCT_ID_IDENTIFIER_SCHEME = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
 
     private static final int CONCEPT_COLUMNS = 6;
     String primaryUuid;

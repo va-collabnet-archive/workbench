@@ -127,6 +127,7 @@ public class ConceptMockery {
     int sourceUuidNid = Integer.MAX_VALUE - 59;
     int relationshipRefinabilityExtensionNid = Integer.MAX_VALUE - 60;
     int stringExtensionNid = Integer.MAX_VALUE - 61;
+    int promotesToNid = Integer.MAX_VALUE - 62;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -364,8 +365,16 @@ public class ConceptMockery {
         expect(incluesionRootConceptData.isParentOf(relationshipRefinabilityExtensionConceptData, null, null, null, false)).andReturn(true).anyTimes();
         expect(exclusionsRootConceptData.isParentOf(relationshipRefinabilityExtensionConceptData, null, null, null, false)).andReturn(false).anyTimes();
         expect(relationshipRefinabilityExtensionConceptData.getInitialText()).andReturn("RELATIONSHIP_REFINABILITY_EXTENSION").anyTimes();
-
         replay(relationshipRefinabilityExtensionConceptData);
+
+        I_GetConceptData promotesToConceptData = mockConceptSpec(org.dwfa.ace.refset.ConceptConstants.PROMOTES_TO,
+            promotesToNid);
+        expect(termFactory.getConcept(promotesToNid)).andReturn(promotesToConceptData).anyTimes();
+        expect(incluesionRootConceptData.isParentOf(promotesToConceptData, null, null, null, false)).andReturn(true).anyTimes();
+        expect(exclusionsRootConceptData.isParentOf(promotesToConceptData, null, null, null, false)).andReturn(false).anyTimes();
+        expect(promotesToConceptData.getInitialText()).andReturn("PROMOTES_TO").anyTimes();
+        replay(promotesToConceptData);
+
 
         List<UUID> duplicateUuidList = new ArrayList<UUID>();
         duplicateUuidList.add(UUID.randomUUID());
