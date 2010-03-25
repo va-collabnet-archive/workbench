@@ -27,12 +27,12 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -570,7 +570,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
             }
             I_ExtendByRef newExtension =
-                    getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID, refsetMap);
+                    getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID, refsetMap, memberUuid);
             if (isAutocommitActive()) {
                 Terms.get().addUncommittedNoChecks(newExtension);
                 Terms.get().commit();
@@ -623,7 +623,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             if (effectiveTime != Integer.MAX_VALUE) {
                 refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
             }
-            I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap);
+            I_ExtendByRef newExtension =
+                    getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
             if (isAutocommitActive()) {
                 Terms.get().addUncommittedNoChecks(newExtension);
                 Terms.get().commit();
@@ -676,7 +677,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             if (effectiveTime != Integer.MAX_VALUE) {
                 refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
             }
-            I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap);
+            I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
             if (isAutocommitActive()) {
                 Terms.get().addUncommittedNoChecks(newExtension);
                 Terms.get().commit();
@@ -725,7 +726,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         if (effectiveTime != Integer.MAX_VALUE) {
             refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
         }
-        I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.INT, refsetMap);
+        I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.INT, refsetMap, memberUuid);
         if (isAutocommitActive()) {
             Terms.get().addUncommittedNoChecks(newExtension);
             Terms.get().commit();
@@ -822,7 +823,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
         }
         I_ExtendByRef newExtension =
-                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_CID, refsetMap);
+                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_CID, refsetMap, memberUuid);
         if (isAutocommitActive()) {
             Terms.get().addUncommittedNoChecks(newExtension);
             Terms.get().commit();
@@ -876,7 +877,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
         }
         I_ExtendByRef newExtension =
-                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_STR, refsetMap);
+                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_STR, refsetMap, memberUuid);
         if (isAutocommitActive()) {
             Terms.get().addUncommittedNoChecks(newExtension);
             Terms.get().commit();

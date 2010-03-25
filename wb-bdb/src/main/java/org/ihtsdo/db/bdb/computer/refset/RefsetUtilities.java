@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -440,7 +441,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			refsetMap.put(REFSET_PROPERTY.CID_ONE,
 					getMembershipType(includeTypeConceptId));
 			ext = getOrCreateRefsetExtension(refsetId, componentId,
-					REFSET_TYPES.CID_CID, refsetMap);
+					REFSET_TYPES.CID_CID, refsetMap, UUID.randomUUID());
 		}
     	if (isAutocommitActive()) {
     		Terms.get().addUncommittedNoChecks(ext);
@@ -474,7 +475,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			refsetMap.put(REFSET_PROPERTY.CID_ONE,
 					getMembershipType(parentMarker));
 			ext = getOrCreateRefsetExtension(memberSetId, conceptId,
-					REFSET_TYPES.CID_CID, refsetMap);
+					REFSET_TYPES.CID_CID, refsetMap, UUID.randomUUID());
 		}
     	if (isAutocommitActive()) {
     		termFactory.addUncommitted(ext);
