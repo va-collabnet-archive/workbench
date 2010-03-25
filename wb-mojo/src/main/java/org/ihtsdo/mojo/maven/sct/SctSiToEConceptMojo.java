@@ -50,9 +50,9 @@ import org.ihtsdo.etypes.ERelationshipRevision;
 /**
  * <b>DESCRIPTION: </b><br>
  * 
- * SctSiToArfMojo is a maven mojo which converts SNOMED stated and inferred
+ * SctSiToEConceptMojo is a maven mojo which converts SNOMED stated and inferred
  * (Distribution Normal Form) release files to IHTSDO Workbench 
- * versioned import reference file format in historical sequence.
+ * versioned import eConcepts format.
  * <p>
  * 
  * <code><pre>
@@ -199,20 +199,14 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     private boolean includeSNOMEDRTID;
 
     /**
-     * Appends to the arf output files if they exist.
-     * 
-     * @parameter default-value="false"
-     */
-    private boolean appendToArfFiles;
-    // :!!!:???: appendToEConceptFiles if exist 
-
-    /**
-     * Directory used to output the ARF format files
-     * Default value "/classes/ace" set programmatically due to file separator
+     * Directory used to output the econcept format files
+     * Default value "/classes" set programmatically due to file separator
      * 
      * @parameter
      */
-    private String outputDirectory = FILE_SEPARATOR + "classes" + FILE_SEPARATOR + "ace";
+    private String outputDirectory = FILE_SEPARATOR + "classes";
+    
+    private String scratchDirectory =  FILE_SEPARATOR + "tmp_steps";
 
     private static final String REL_ID_NAMESPACE_UUID_TYPE1 = "84fd0460-2270-11df-8a39-0800200c9a66";
     private HashMap<UuidMinimal, Long> relUuidMap; // :yyy:
@@ -379,7 +373,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             i = 0;
             for (String s : xRevDateList) {
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-                df.setTimeZone(TimeZone.getTimeZone("GMT")); // :@@@:
+                // df.setTimeZone(TimeZone.getTimeZone("GMT"));
                 xRevDateArray[i] = df.parse(s).getTime();
                 i++;
             }
@@ -448,13 +442,13 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
     void executeMojo(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
             boolean snomedrtTF) throws MojoFailureException {
-        fNameStep1Con = wDir + outputDirectory + FILE_SEPARATOR + "step1_concepts.ser";
-        fNameStep1Rel = wDir + outputDirectory + FILE_SEPARATOR + "step1_relationships.ser";
-        fNameStep1Des = wDir + outputDirectory + FILE_SEPARATOR + "step1_descriptions.ser";
-        fNameStep2Con = wDir + outputDirectory + FILE_SEPARATOR + "step2_concepts.ser";
-        fNameStep2Rel = wDir + outputDirectory + FILE_SEPARATOR + "step2_relationships.ser";
-        fNameStep2Des = wDir + outputDirectory + FILE_SEPARATOR + "step2_descriptions.ser";
-        fNameStep3ECon = wDir + outputDirectory + FILE_SEPARATOR + "eConcepts.jbin";
+        fNameStep1Con = wDir + scratchDirectory + FILE_SEPARATOR + "step1_concepts.ser";
+        fNameStep1Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step1_relationships.ser";
+        fNameStep1Des = wDir + scratchDirectory + FILE_SEPARATOR + "step1_descriptions.ser";
+        fNameStep2Con = wDir + scratchDirectory + FILE_SEPARATOR + "step2_concepts.ser";
+        fNameStep2Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step2_relationships.ser";
+        fNameStep2Des = wDir + scratchDirectory + FILE_SEPARATOR + "step2_descriptions.ser";
+        fNameStep3ECon = wDir + outputDirectory + FILE_SEPARATOR + "sctSiEConcepts.jbin";
 
         xPathMap = new HashMap<String, Integer>();
         xPathList = new ArrayList<String>();
@@ -1171,10 +1165,16 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         // SETUP OUTPUT directory
         try {
             // Create multiple directories
-            String arfOutDir = outputDirectory;
-            boolean success = (new File(wDir + arfOutDir)).mkdirs();
+            String outDir = outputDirectory;
+            boolean success = (new File(wDir + outDir)).mkdirs();
             if (success) {
-                getLog().info("OUTPUT DIRECTORY: " + wDir + arfOutDir);
+                getLog().info("OUTPUT DIRECTORY: " + wDir + outDir);
+            }
+            
+            String tmpDir = scratchDirectory;
+            success = (new File(wDir + tmpDir)).mkdirs();
+            if (success) {
+                getLog().info("SCRATCH DIRECTORY: " + wDir + tmpDir);
             }
         } catch (Exception e) { // Catch exception if any
             getLog().info("Error: could not create output directories");
@@ -1224,7 +1224,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("RELATIONSHIPS Step 1 OUTPUT: " + fNameStep1Rel);
 
             // SETUP RELATIONSHIPS EXCEPTION REPORT FILE
-            String erFileName = wDir + outputDirectory + FILE_SEPARATOR
+            String erFileName = wDir + scratchDirectory + FILE_SEPARATOR
                     + "relationships_report.txt";
             BufferedWriter erw;
             erw = new BufferedWriter(new FileWriter(erFileName));
@@ -1468,7 +1468,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         getLog().info("START DESCRIPTIONS PROCESSING...");
         // SETUP DESCRIPTIONS EXCEPTION REPORT
-        String erFileName = wDir + outputDirectory + FILE_SEPARATOR + "descriptions_report.txt";
+        String erFileName = wDir + scratchDirectory + FILE_SEPARATOR + "descriptions_report.txt";
         BufferedWriter er;
         er = new BufferedWriter(new FileWriter(erFileName));
         getLog().info("exceptions report OUTPUT: " + erFileName);
@@ -2226,7 +2226,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
     private void stateSave(String wDir) {
         try {
-            String fNameState = wDir + outputDirectory + FILE_SEPARATOR + "state.ser";
+            String fNameState = wDir + scratchDirectory + FILE_SEPARATOR + "state.ser";
             ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(
                     new FileOutputStream(fNameState)));
 
@@ -2252,7 +2252,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     @SuppressWarnings("unchecked")
     private void stateRestore(String wDir) {
         try {
-            String fNameState = wDir + outputDirectory + FILE_SEPARATOR + "state.ser";
+            String fNameState = wDir + scratchDirectory + FILE_SEPARATOR + "state.ser";
             ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
                     new FileInputStream(fNameState)));
 
