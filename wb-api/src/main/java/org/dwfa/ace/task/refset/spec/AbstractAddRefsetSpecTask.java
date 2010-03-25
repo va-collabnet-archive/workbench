@@ -62,10 +62,10 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.CONTINUE;
     protected I_DescriptionVersioned c3Description;
-    
+
     protected static Integer trueNid = Integer.MIN_VALUE;
-    protected static Integer falseNid  = Integer.MIN_VALUE;
-    protected static Integer refsetOrGroupingNid  = Integer.MIN_VALUE;
+    protected static Integer falseNid = Integer.MIN_VALUE;
+    protected static Integer refsetOrGroupingNid = Integer.MIN_VALUE;
     protected static Integer conceptContainsRelGrouping = Integer.MIN_VALUE;
     protected static Integer conceptContainsDescGrouping = Integer.MIN_VALUE;
     protected static Integer refsetAndGroupingNid = Integer.MIN_VALUE;
@@ -108,20 +108,19 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
             throws TaskFailedException {
 
         try {
-        	if (trueNid == Integer.MIN_VALUE || falseNid == Integer.MIN_VALUE ||
-        			refsetOrGroupingNid == Integer.MIN_VALUE || 
-        			conceptContainsRelGrouping == Integer.MIN_VALUE || 
-        			conceptContainsDescGrouping == Integer.MIN_VALUE ||
-        			refsetAndGroupingNid == Integer.MIN_VALUE) {
-        		trueNid = RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid();
-        		falseNid = RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid();
-        		refsetOrGroupingNid = RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid();
-        		refsetAndGroupingNid = RefsetAuxiliary.Concept.REFSET_AND_GROUPING.localize().getNid();
-        		conceptContainsRelGrouping = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.localize().getNid();
-        		conceptContainsDescGrouping = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
-        	}
-        	
-        	ex = null;
+            if (trueNid == Integer.MIN_VALUE || falseNid == Integer.MIN_VALUE
+                || refsetOrGroupingNid == Integer.MIN_VALUE || conceptContainsRelGrouping == Integer.MIN_VALUE
+                || conceptContainsDescGrouping == Integer.MIN_VALUE || refsetAndGroupingNid == Integer.MIN_VALUE) {
+                trueNid = RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid();
+                falseNid = RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.localize().getNid();
+                refsetOrGroupingNid = RefsetAuxiliary.Concept.REFSET_OR_GROUPING.localize().getNid();
+                refsetAndGroupingNid = RefsetAuxiliary.Concept.REFSET_AND_GROUPING.localize().getNid();
+                conceptContainsRelGrouping = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING.localize().getNid();
+                conceptContainsDescGrouping =
+                        RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+            }
+
+            ex = null;
             if (SwingUtilities.isEventDispatchThread()) {
                 doRun(process, worker);
             } else {
@@ -139,9 +138,9 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IOException e) {
             throw new TaskFailedException(e);
-		} catch (TerminologyException e) {
+        } catch (TerminologyException e) {
             throw new TaskFailedException(e);
-		}
+        }
         if (ex != null) {
             throw new TaskFailedException(ex);
         }
@@ -187,7 +186,9 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     I_TermFactory tf = Terms.get();
                     I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
                     RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
-                    I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(refsetId, componentId, propMap.getMemberType(), propMap);
+                    I_ExtendByRef ext =
+                            refsetHelper.getOrCreateRefsetExtension(refsetId, componentId, propMap.getMemberType(),
+                                propMap, UUID.randomUUID());
                     tf.addUncommitted(ext);
                     configFrame.fireRefsetSpecChanged(ext);
                 } else {

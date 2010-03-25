@@ -144,8 +144,8 @@ public class IDTupleFileUtil {
         return true;
     }
 
-    public static void generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
-        Terms.get().uuidToNative(uuidToGenerate);
+    public static int generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
+        return Terms.get().uuidToNative(uuidToGenerate);
     }
 
     /**

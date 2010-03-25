@@ -3,6 +3,7 @@ package org.dwfa.ace.api;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -77,7 +78,7 @@ public interface I_HelpRefsets extends I_HelpLineage {
 	
 	public <T extends I_ExtendByRefPart> I_ExtendByRef getOrCreateRefsetExtension(
 			int refsetId, int conceptId, REFSET_TYPES type,
-			RefsetPropertyMap extProps) throws Exception;
+			RefsetPropertyMap extProps, UUID memberUuid) throws Exception;
 
 
 
