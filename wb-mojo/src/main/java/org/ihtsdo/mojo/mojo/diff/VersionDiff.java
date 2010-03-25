@@ -750,7 +750,7 @@ public class VersionDiff extends AbstractMojo {
 			refset_map.put(REFSET_PROPERTY.STRING_VALUE, comment);
 			I_ExtendByRef new_ext = refsetHelper.getOrCreateRefsetExtension(
 					refset.getConceptId(), tf.uuidToNative(UUID.randomUUID()),
-					REFSET_TYPES.CID_CID_STR, refset_map);
+					REFSET_TYPES.CID_CID_STR, refset_map, UUID.randomUUID());
 			tf.addUncommittedNoChecks(new_ext);
 		}
 		//
@@ -766,7 +766,7 @@ public class VersionDiff extends AbstractMojo {
 			I_ExtendByRef new_ext_member = refsetHelper
 					.getOrCreateRefsetExtension(member_refset.getConceptId(),
 							tf.uuidToNative(UUID.randomUUID()),
-							REFSET_TYPES.CID, refset_map_member);
+							REFSET_TYPES.CID, refset_map_member, UUID.randomUUID());
 			tf.addUncommittedNoChecks(new_ext_member);
 		}
 	}
