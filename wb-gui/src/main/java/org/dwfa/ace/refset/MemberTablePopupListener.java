@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -69,7 +70,7 @@ public class MemberTablePopupListener extends MouseAdapter {
                 	    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, commentText);
                 	    	I_ExtendByRef newExtension = 
                 	    		refsetHelper.getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(), 
-                	    				selectedObject.getTuple().getComponentId(), REFSET_TYPES.STR, refsetMap);
+                	    				selectedObject.getTuple().getComponentId(), REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
                 			Terms.get().addUncommittedNoChecks(newExtension);
                     	}
                         for (ReflexiveTableModel m : commentTableModels) {

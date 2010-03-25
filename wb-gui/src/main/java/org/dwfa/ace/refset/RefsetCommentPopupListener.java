@@ -22,6 +22,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -83,7 +84,7 @@ public class RefsetCommentPopupListener extends MouseAdapter {
 											commentRefsetIdentityConcept
 													.getNid(),
 											conceptForComment.getConceptId(),
-											REFSET_TYPES.STR, refsetMap);
+											REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
 							Terms.get().addUncommitted(newExtension);
 						}
 					}

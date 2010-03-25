@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -244,7 +245,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 											commentRefsetIdentityConcept
 													.getNid(),
 											thinExtByRefTuple.getMemberId(),
-											REFSET_TYPES.STR, refsetMap);
+											REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
 							Terms.get().addUncommitted(newExtension);
 						}
 					}

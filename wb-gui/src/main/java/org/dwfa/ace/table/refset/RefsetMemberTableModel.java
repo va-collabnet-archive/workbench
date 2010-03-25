@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -917,7 +918,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             }
             I_ExtendByRef extension =
                     refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptId(),
-                        tableComponentId, extProps.getMemberType(), extProps);
+                        tableComponentId, extProps.getMemberType(), extProps, UUID.randomUUID());
             Terms.get().addUncommitted(extension);
             propertyChange(null);
         } catch (TerminologyException e) {
