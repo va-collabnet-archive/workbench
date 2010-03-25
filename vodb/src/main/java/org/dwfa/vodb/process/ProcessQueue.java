@@ -214,10 +214,10 @@ public class ProcessQueue implements I_ProcessQueue {
                 if (r != null) {
                     try {
                         r.run();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         logger.severe("Error: Processing." + r + " on " + getWorkerName() + ". " + "Latch count : "
                             + getLatchCount() + " Queue size : " + queue.size());
-                        errorsList.add(e);
+                        errorsList.add(new Exception(e));
 
                         if (failFast) {
                             for (; latch.getCount() > 0;) {
