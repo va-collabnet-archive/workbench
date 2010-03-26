@@ -114,60 +114,41 @@ public class ConceptConceptExtTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage = "pathUuid has no identifier - skipping import of this concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
+                String errorMessage =
+                        "Refset UUID has no identifier - skipping import of this concept-concept ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
+                String errorMessage =
+                        "Component UUID has no identifier - skipping import of this concept-concept ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "c1Uuid UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c1Uuid, pathUuid);
+                String errorMessage =
+                        "c1Uuid UUID has no identifier - skipping import of this concept-concept ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "c2Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c2Uuid, pathUuid);
+                String errorMessage = "c2Uuid has no identifier - skipping import of this concept-concept ext tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage =
+                        "statusUuid has no identifier - skipping import of this concept-concept ext tuple.";
+                throw new Exception(errorMessage);
             }
 
             try {
-                refsetHelper.newConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNid(),
-                    termFactory.getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(),
-                    termFactory.getId(c2Uuid).getNid(), memberUuid, pathUuid, statusUuid, effectiveDate);
+                refsetHelper.newConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory
+                    .getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(c2Uuid)
+                    .getNid(), memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -178,8 +159,9 @@ public class ConceptConceptExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing concept-concept ext tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing concept-concept ext tuple : "
+                        + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

@@ -55,6 +55,7 @@ public class IDTupleFileUtil {
 
         return tupleUuid + "\t" + primaryUuid + "\t" + sourceSystemUuid + "\t" + sourceId + "\t" + pathUuid + "\t"
             + statusUuid + "\t" + effectiveDate + "\n";
+
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
@@ -81,20 +82,12 @@ public class IDTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                String errorMessage = "pathUuid has no identifier - skipping import of this ID tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage = "statusUuid has no identifier - skipping import of this ID tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(primaryUuid)) {

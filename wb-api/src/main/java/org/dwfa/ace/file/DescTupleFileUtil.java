@@ -118,46 +118,23 @@ public class DescTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                String errorMessage = "pathUuid has no identifier - skipping import of this desc tuple.";
+                throw new Exception(errorMessage);
             }
-            if (!termFactory.hasId(descUuid)) {
-                String errorMessage = "descUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
 
-                IDTupleFileUtil.generateIdFromUuid(descUuid, pathUuid);
-            }
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage = "conceptUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(conceptUuid, pathUuid);
+                String errorMessage = "conceptUuid has no identifier - skipping import of this desc tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage = "statusUuid has no identifier - skipping import of this desc tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(typeUuid)) {
-                String errorMessage = "typeUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(typeUuid, pathUuid);
+                String errorMessage = "typeUuid has no identifier - skipping import of this desc tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (termFactory.getId(conceptUuid) != null) {

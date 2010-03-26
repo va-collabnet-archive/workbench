@@ -36,9 +36,8 @@ public class ConceptConceptStringExtTupleFileUtil {
         try {
             I_TermFactory termFactory = Terms.get();
 
-            UUID tupleUuid = ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE.getUids()
-                .iterator()
-                .next();
+            UUID tupleUuid =
+                    ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE.getUids().iterator().next();
 
             UUID memberUuid = termFactory.getUids(tuple.getMemberId()).iterator().next();
             UUID refsetUuid = termFactory.getUids(tuple.getRefsetId()).iterator().next();
@@ -121,58 +120,40 @@ public class ConceptConceptStringExtTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                String errorMessage =
+                        "pathUuid has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
+                String errorMessage =
+                        "Refset UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
+                String errorMessage =
+                        "Component UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "c1Uuid UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c1Uuid, pathUuid);
+                String errorMessage =
+                        "c1Uuid UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "c2Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c2Uuid, pathUuid);
+                String errorMessage =
+                        "c2Uuid has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage =
+                        "statusUuid has no identifier - skipping import of this concept-concept-string ext tuple.";
+                throw new Exception(errorMessage);
             }
 
             try {
-                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(),
-                    termFactory.getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(),
-                    termFactory.getId(c2Uuid).getNid(), strValue, memberUuid, pathUuid, statusUuid, effectiveDate);
+                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory
+                    .getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(c2Uuid)
+                    .getNid(), strValue, memberUuid, pathUuid, statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept-string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -183,8 +164,9 @@ public class ConceptConceptStringExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing concept-concept-string ext tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing concept-concept-string ext tuple : "
+                        + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

@@ -110,28 +110,12 @@ public class ConceptTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
-            }
-            if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage = "conceptUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(conceptUuid, pathUuid);
+                String errorMessage = "pathUuid has no identifier - skipping import of this concept tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage = "statusUuid has no identifier - skipping import of this concept tuple.";
+                throw new Exception(errorMessage);
             }
 
             if (termFactory.getId(conceptUuid) != null
@@ -142,8 +126,6 @@ public class ConceptTupleFileUtil {
                 allowedStatus.add(termFactory.getId(statusUuid).getNid());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 lastConcept = concept;
-                // Set<I_Position> positions =
-                // termFactory.getActiveAceFrameConfig().getViewPositionSet();
                 boolean addUncommitted = true;
                 boolean returnConflictResolvedLatestState = true;
 

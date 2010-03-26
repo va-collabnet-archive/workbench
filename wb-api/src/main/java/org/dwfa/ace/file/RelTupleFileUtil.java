@@ -117,68 +117,33 @@ public class RelTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                String errorMessage = "pathUuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
-            if (!termFactory.hasId(relUuid)) {
-                String errorMessage = "relUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
 
-                IDTupleFileUtil.generateIdFromUuid(relUuid, pathUuid);
-            }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "c1Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c1Uuid, pathUuid);
+                String errorMessage = "c1Uuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "c2Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(c2Uuid, pathUuid);
+                String errorMessage = "c2Uuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(charUuid)) {
-                String errorMessage = "charUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(charUuid, pathUuid);
+                String errorMessage = "charUuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(refUuid)) {
-                String errorMessage = "refUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(refUuid, pathUuid);
+                String errorMessage = "refUuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(relTypeUuid)) {
-                String errorMessage = "relTypeUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(relTypeUuid, pathUuid);
+                String errorMessage = "relTypeUuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage = "statusUuid has no identifier - skipping import of this relationship.";
+                throw new Exception(errorMessage);
             }
 
             I_IntSet allowedStatus = termFactory.newIntSet();
@@ -187,8 +152,6 @@ public class RelTupleFileUtil {
             allowedTypes.add(termFactory.getId(relTypeUuid).getNid());
 
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
-            // Set<I_Position> positions =
-            // termFactory.getActiveAceFrameConfig().getViewPositionSet();
             boolean returnConflictResolvedLatestState = true;
             boolean addUncommitted = true;
 
@@ -199,7 +162,10 @@ public class RelTupleFileUtil {
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {
                 if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
-                    latestTuple = part;
+                    if (part.getC1Id() == termFactory.getId(c1Uuid).getNid()
+                        && part.getC2Id() == termFactory.getId(c2Uuid).getNid()) {
+                        latestTuple = part;
+                    }
                 }
             }
 
@@ -207,7 +173,6 @@ public class RelTupleFileUtil {
                 Collection<I_Path> paths = termFactory.getPaths();
                 paths.clear();
                 paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                termFactory.uuidToNative(relUuid);
 
                 I_RelVersioned v =
                         termFactory.newRelationship(relUuid, concept, termFactory
@@ -226,7 +191,6 @@ public class RelTupleFileUtil {
                 v.addVersion(newPart);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
-
                 I_RelPart newPart =
                         (I_RelPart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(),
                             termFactory.getId(pathUuid).getNid(), effectiveDate);

@@ -109,36 +109,20 @@ public class IntExtTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                String errorMessage = "pathUuid has no identifier - skipping import of this int ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
+                String errorMessage = "Refset UUID has no identifier - skipping import of this int ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
+                String errorMessage = "Component UUID has no identifier - skipping import of this int ext tuple.";
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
-
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                String errorMessage = "statusUuid has no identifier - skipping import of this int ext tuple.";
+                throw new Exception(errorMessage);
             }
 
             try {
@@ -154,8 +138,8 @@ public class IntExtTupleFileUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            String errorMessage = "Exception of unknown cause thrown while importing int ext tuple : "
-                + e.getLocalizedMessage();
+            String errorMessage =
+                    "Exception of unknown cause thrown while importing int ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

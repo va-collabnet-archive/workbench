@@ -118,61 +118,47 @@ public class ConceptConceptConceptExtTupleFileUtil {
             TupleFileUtil.pathUuids.add(pathUuid);
 
             if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "pathUuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(pathUuid, pathUuid);
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "Refset UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(refsetUuid, pathUuid);
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "Component UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(componentUuid, pathUuid);
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "c1Uuid UUID has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "c1Uuid UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(c1Uuid, pathUuid);
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "c2Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "c2Uuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(c2Uuid, pathUuid);
+                throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c3Uuid)) {
-                String errorMessage = "c3Uuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "c3Uuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(c3Uuid, pathUuid);
+                throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - importing with temporary assigned ID.";
-                outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage);
-                outputFileWriter.newLine();
+                String errorMessage =
+                        "statusUuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
 
-                IDTupleFileUtil.generateIdFromUuid(statusUuid, pathUuid);
+                throw new Exception(errorMessage);
             }
 
             try {
