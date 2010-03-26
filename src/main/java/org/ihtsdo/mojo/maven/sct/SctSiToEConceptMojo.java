@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -45,7 +44,6 @@ import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-
 
 /**
  * <b>DESCRIPTION: </b><br>
@@ -205,8 +203,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
      * @parameter
      */
     private String outputDirectory = FILE_SEPARATOR + "classes";
-    
-    private String scratchDirectory =  FILE_SEPARATOR + "tmp_steps";
+
+    private String scratchDirectory = FILE_SEPARATOR + "tmp_steps";
 
     private static final String REL_ID_NAMESPACE_UUID_TYPE1 = "84fd0460-2270-11df-8a39-0800200c9a66";
     private HashMap<UuidMinimal, Long> relUuidMap; // :yyy:
@@ -219,12 +217,34 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     private String fNameStep2Des;
     private String fNameStep3ECon;
 
+    // UUIDs
+    private static UUID uuidPathWbAux;
+    private static String uuidPathWbAuxStr;
+    private static UUID uuidDescPrefTerm;
+    private static UUID uuidDescFullSpec;
+    private static UUID uuidRelCharStated;
+    private static UUID uuidRelNotRefinable;
+    private static UUID uuidWbAuxIsa;
+
+    UUID uuidStatedDescFs;
+    UUID uuidStatedDescPt;
+    UUID uuidStatedRel;
+    UUID uuidInferredDescFs;
+    UUID uuidInferredDescPt;
+    UUID uuidInferredRel;
+
     private static UUID uuidPathSnomedCore;
     private static String uuidPathSnomedCoreStr;
+    private static UUID uuidRootSnomed;
+    private static String uuidRootSnomedStr;
     private static UUID uuidPathSnomedInferred;
     private static String uuidPathSnomedInferredStr;
     private static UUID uuidPathSnomedStated;
     private static String uuidPathSnomedStatedStr;
+
+    private static UUID uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
+            .next();
+
     private static final UUID uuidSourceCtv3 = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids()
             .iterator().next();
     private static final UUID uuidSourceSnomedRt = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID
@@ -373,13 +393,13 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             i = 0;
             for (String s : xRevDateList) {
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-                // df.setTimeZone(TimeZone.getTimeZone("GMT"));
                 xRevDateArray[i] = df.parse(s).getTime();
                 i++;
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new MojoFailureException("FAILED: SctSiToEConcept -- lookupConverion(), date parse error");
+            throw new MojoFailureException(
+                    "FAILED: SctSiToEConcept -- lookupConverion(), date parse error");
         }
 
         // SNOMED_INT ... :FYI: soft code in SctXConRecord
@@ -462,10 +482,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         xSourceUuidList = new ArrayList<String>();
         xSourceUuidIdxCounter = -1;
 
+        setupUuids();
+
         // STEP 1. Convert to versioned binary objects file.  
         // Also computes algorithmic relationship uuid.
         executeMojoStep1(wDir, subDir, inDirs, ctv3idTF, snomedrtTF);
-        // stateSave(wDir);
+        stateSave(wDir);
         System.gc();
 
         // STEP 2. Sort in concept order
@@ -474,7 +496,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         System.gc();
 
         // STEP 3. Convert to EConcepts
-        countEConWritten = 0;
         // stateRestore(wDir);
         lookupConverion();
         executeMojoStep3();
@@ -712,6 +733,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     void executeMojoStep3() throws MojoFailureException {
         getLog().info("*** SctSiToEConcept BEGIN STEP #3 ***");
         long start = System.currentTimeMillis();
+        countEConWritten = 0;
+
         // Lists hold records for the immediate operations 
         ArrayList<SctXConRecord> conList = new ArrayList<SctXConRecord>();
         ArrayList<SctXDesRecord> desList = new ArrayList<SctXDesRecord>();
@@ -745,6 +768,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             throw new MojoFailureException("IO Exception -- Step 3");
         }
 
+        createSctSiEConcept(dos);
+        
         int countCon = 0;
         int countDes = 0;
         int countRel = 0;
@@ -805,7 +830,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             prevDes = theDes;
             prevRel = theRel;
         }
-        getLog().info("RECORD COUNT = " + countCon + "(Con) " + countDes + "(Des) " + countRel+"(Rel)");
+        getLog().info(
+                "RECORD COUNT = " + countCon + "(Con) " + countDes + "(Des) " + countRel + "(Rel)");
 
         // CLOSE FILES
         try {
@@ -873,10 +899,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             for (SctXDesRecord dRec : desList) {
                 if (dRec.id != theDesId) {
                     // CLOSE OUT OLD RELATIONSHIP
-                    if (des != null && revisions.size() > 0) {
-                        des.revisions = revisions;
+                    if (des != null) {
+                        if (revisions.size() > 0) {
+                            des.revisions = revisions;
+                            revisions = new ArrayList<EDescriptionRevision>();                            
+                        }
                         eDesList.add(des);
-                        revisions = new ArrayList<EDescriptionRevision>();
                     }
 
                     // CREATE NEW DESCRIPTION
@@ -922,10 +950,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             for (SctXRelRecord rRec : relList) {
                 if (rRec.uuidLeastSigBits != theRelMsb || rRec.uuidLeastSigBits != theRelLsb) {
                     // CLOSE OUT OLD RELATIONSHIP
-                    if (rel != null && revisions.size() > 0) {
-                        rel.revisions = revisions;
+                    if (rel != null) {
+                        if (revisions.size() > 0) {
+                            rel.revisions = revisions;
+                            revisions = new ArrayList<ERelationshipRevision>();                            
+                        }
                         eRelList.add(rel);
-                        revisions = new ArrayList<ERelationshipRevision>();
                     }
 
                     // CREATE NEW RELATIONSHIP
@@ -966,13 +996,175 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         try {
             ec.writeExternal(dos);
             countEConWritten++;
-            if (countEConWritten % 50000 == 0) 
+            if (countEConWritten % 50000 == 0)
                 getLog().info("  ... econcepts written " + countEConWritten);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+    }
+
+    private void createSctSiEConcept(DataOutputStream dos) throws MojoFailureException {
+        try {
+            // **************
+            // *** STATED ***
+            // **************
+            EConcept ec = new EConcept();
+
+            // ADD CONCEPT ATTRIBUTES        
+            EConceptAttributes ca = new EConceptAttributes();
+            ca.primordialUuid = uuidPathSnomedStated;
+            ca.setDefined(false);
+            ca.additionalIds = null;
+            ca.setStatusUuid(uuidCurrent);
+            ca.setPathUuid(uuidPathWbAux);
+            ca.setTime(Long.MIN_VALUE); // Beginning of time
+            ca.revisions = null; // no revisions
+            ec.setConceptAttributes(ca);
+            // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
+
+            // CREATE & ADD DESCRIPTIONS
+            List<EDescription> eDesList = new ArrayList<EDescription>();
+
+            // add full specified term
+            EDescription des = new EDescription();
+            des.additionalIds = null;
+            des.primordialUuid = uuidStatedDescFs;
+            des.setConceptUuid(uuidPathSnomedStated);
+            des.setText("SNOMED Core Stated");
+            des.setInitialCaseSignificant(true);
+            des.setLang("en");
+            des.setTypeUuid(uuidDescFullSpec);
+            des.setStatusUuid(uuidCurrent);
+            des.setPathUuid(uuidPathWbAux);
+            des.setTime(Long.MIN_VALUE);
+            des.revisions = null;
+            eDesList.add(des);
+
+            // add preferred term
+            des = new EDescription();
+            des.additionalIds = null;
+            des.primordialUuid = uuidStatedDescPt;
+            des.setConceptUuid(uuidPathSnomedStated);
+            des.setText("SNOMED Core Stated");
+            des.setInitialCaseSignificant(true);
+            des.setLang("en");
+            des.setTypeUuid(uuidDescPrefTerm);
+            des.setStatusUuid(uuidCurrent);
+            des.setPathUuid(uuidPathWbAux);
+            des.setTime(Long.MIN_VALUE);
+            des.revisions = null;
+            eDesList.add(des);
+
+            ec.setDescriptions(eDesList);
+
+            // CREATE & ADD RELATIONSHIPS
+            List<ERelationship> eRelList = new ArrayList<ERelationship>();
+            ERelationship rel = new ERelationship();
+            rel = new ERelationship();
+            rel.additionalIds = null;
+            rel.setAdditionalIdComponents(null);
+
+            rel.setPrimordialComponentUuid(uuidStatedRel);
+            rel.setC1Uuid(uuidPathSnomedStated);
+            rel.setC2Uuid(uuidPathSnomedCore);
+            rel.setTypeUuid(uuidWbAuxIsa);
+            rel.setRelGroup(0);
+            rel.setCharacteristicUuid(uuidRelCharStated);
+            rel.setRefinabilityUuid(uuidRelNotRefinable);
+            rel.setStatusUuid(uuidCurrent);
+            rel.setPathUuid(uuidPathWbAux);
+            rel.setTime(Long.MIN_VALUE);
+            rel.revisions = null;
+            eRelList.add(rel);
+            ec.setRelationships(eRelList);
+
+            ec.writeExternal(dos);
+            countEConWritten++;
+            getLog().info("\"SNOMED Core Stated\" econcept written");
+
+            // ****************
+            // *** INFERRED ***
+            // ****************
+            ec = new EConcept();
+
+            // ADD CONCEPT ATTRIBUTES        
+            ca = new EConceptAttributes();
+            ca.primordialUuid = uuidPathSnomedInferred;
+            ca.setDefined(false);
+            ca.additionalIds = null;
+            ca.setStatusUuid(uuidCurrent);
+            ca.setPathUuid(uuidPathWbAux);
+            ca.setTime(Long.MIN_VALUE); // Beginning of time
+            ca.revisions = null; // no revisions
+            ec.setConceptAttributes(ca);
+            // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
+
+            // CREATE & ADD DESCRIPTIONS
+            eDesList = new ArrayList<EDescription>();
+
+            // add full specified term
+            des = new EDescription();
+            des.additionalIds = null;
+            des.primordialUuid = uuidInferredDescFs;
+            des.setConceptUuid(uuidPathSnomedInferred);
+            des.setText("SNOMED Core Inferred");
+            des.setInitialCaseSignificant(true);
+            des.setLang("en");
+            des.setTypeUuid(uuidDescFullSpec);
+            des.setStatusUuid(uuidCurrent);
+            des.setPathUuid(uuidPathWbAux);
+            des.setTime(Long.MIN_VALUE);
+            des.revisions = null;
+            eDesList.add(des);
+
+            // add preferred term
+            des = new EDescription();
+            des.additionalIds = null;
+            des.primordialUuid = uuidInferredDescPt;
+            des.setConceptUuid(uuidPathSnomedInferred);
+            des.setText("SNOMED Core Inferred");
+            des.setInitialCaseSignificant(true);
+            des.setLang("en");
+            des.setTypeUuid(uuidDescPrefTerm);
+            des.setStatusUuid(uuidCurrent);
+            des.setPathUuid(uuidPathWbAux);
+            des.setTime(Long.MIN_VALUE);
+            des.revisions = null;
+            eDesList.add(des);
+
+            ec.setDescriptions(eDesList);
+
+            // CREATE & ADD RELATIONSHIPS
+            eRelList = new ArrayList<ERelationship>();
+            rel = new ERelationship();
+            rel = new ERelationship();
+            rel.additionalIds = null;
+            rel.setAdditionalIdComponents(null);
+
+            rel.setPrimordialComponentUuid(uuidInferredRel);
+            rel.setC1Uuid(uuidPathSnomedInferred);
+            rel.setC2Uuid(uuidPathSnomedCore);
+            rel.setTypeUuid(uuidWbAuxIsa);
+            rel.setRelGroup(0);
+            rel.setCharacteristicUuid(uuidRelCharStated);
+            rel.setRefinabilityUuid(uuidRelNotRefinable);
+            rel.setStatusUuid(uuidCurrent);
+            rel.setPathUuid(uuidPathWbAux);
+            rel.setTime(Long.MIN_VALUE);
+            rel.revisions = null;
+            eRelList.add(rel);
+            ec.setRelationships(eRelList);
+
+            ec.writeExternal(dos);
+            countEConWritten++;
+            getLog().info("\"SNOMED Core Inferred\" econcept written");
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private SctXConRecord readNextCon(ObjectInputStream ois, ArrayList<SctXConRecord> conList,
@@ -1132,12 +1324,19 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         return relNext; // first record of next concept id
     }
 
-    void executeMojoStep1(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
-            boolean snomedrtTF) throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept BEGIN STEP #1 ***");
-        long start = System.currentTimeMillis();
-
+    private void setupUuids() throws MojoFailureException {
         try {
+            uuidPathWbAuxStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
+            uuidPathWbAux = UUID.fromString(uuidPathWbAuxStr);
+            uuidDescPrefTerm = UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44");
+            uuidDescFullSpec = UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66");
+            uuidRelCharStated = UUID.fromString("3fde38f6-e079-3cdc-a819-eda3ec74732d");
+            uuidRelNotRefinable = UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66");
+            uuidWbAuxIsa = UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66");
+
+            uuidRootSnomedStr = "ee9ac5d2-a07c-3981-a57a-f7f26baf38d8";
+            uuidRootSnomed = UUID.fromString(uuidRootSnomedStr);
+
             uuidPathSnomedCore = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids().iterator()
                     .next();
             uuidPathSnomedCoreStr = uuidPathSnomedCore.toString();
@@ -1150,7 +1349,33 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             uuidPathSnomedStated = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                     "SNOMED Core Stated");
             uuidPathSnomedStatedStr = uuidPathSnomedStated.toString();
-            getLog().info("SNOMED Core Stated = " + uuidPathSnomedStatedStr);
+
+            uuidStatedDescFs = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidPathWbAux + uuidDescFullSpec.toString() + "SNOMED Core Stated");
+
+            uuidStatedDescPt = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidWbAuxIsa + uuidDescPrefTerm.toString() + "SNOMED Core Stated");
+
+            uuidStatedRel = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidWbAuxIsa + uuidStatedDescFs.toString() + uuidStatedDescPt.toString());
+
+            uuidInferredDescFs = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidPathWbAux + uuidDescFullSpec.toString() + "SNOMED Core Inferred");
+
+            uuidInferredDescPt = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidWbAuxIsa + uuidDescPrefTerm.toString() + "SNOMED Core Inferred");
+
+            uuidInferredRel = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                    uuidWbAuxIsa + uuidInferredDescFs.toString() + uuidInferredDescPt.toString());
+
+            getLog().info("SNOMED CT Root       = " + uuidRootSnomedStr);
+            getLog().info("SNOMED Core          = " + uuidPathSnomedCore);
+            getLog().info("SNOMED Core Stated   = " + uuidPathSnomedStatedStr);
+            getLog().info("  ... Stated rel     = " + uuidStatedRel.toString());
+            
+            getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
+            getLog().info("  ... Inferred rel   = " + uuidInferredRel.toString());
+
         } catch (NoSuchAlgorithmException e2) {
             e2.printStackTrace();
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
@@ -1158,6 +1383,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             e2.printStackTrace();
             throw new MojoFailureException("FAILED: SNOMED Core Stated/Inferred Path", e2);
         }
+    }
+
+    void executeMojoStep1(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
+            boolean snomedrtTF) throws MojoFailureException {
+        getLog().info("*** SctSiToEConcept BEGIN STEP #1 ***");
+        long start = System.currentTimeMillis();
 
         // Setup build directory
         getLog().info("Build Directory: " + wDir);
@@ -1170,7 +1401,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             if (success) {
                 getLog().info("OUTPUT DIRECTORY: " + wDir + outDir);
             }
-            
+
             String tmpDir = scratchDirectory;
             success = (new File(wDir + tmpDir)).mkdirs();
             if (success) {
