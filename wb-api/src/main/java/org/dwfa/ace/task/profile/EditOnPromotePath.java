@@ -1096,4 +1096,24 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionCheckBoxes(Boolean show) {
         config.setShowPromotionCheckBoxes(show);
     }
+
+    @Override
+    public Boolean getShowPromotionFilters() {
+        return config.getShowPromotionFilters();
+    }
+
+    @Override
+    public Boolean getShowPromotionTab() {
+        return config.getShowPromotionTab();
+    }
+
+    @Override
+    public void setShowPromotionFilters(Boolean show) {
+        config.setShowPromotionFilters(show);
+    }
+
+    @Override
+    public void setShowPromotionTab(Boolean show) {
+        config.setShowPromotionTab(show);
+    }
 }

@@ -486,6 +486,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public Boolean getShowPromotionCheckBoxes();
 
+    public void setShowPromotionFilters(Boolean show);
+
+    public Boolean getShowPromotionFilters();
+
+    public void setShowPromotionTab(Boolean show);
+
+    public Boolean getShowPromotionTab();
+
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException;
 
     public JTree getTreeInSpecEditor();
