@@ -223,6 +223,19 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		super.close();
 	}
 
+	public boolean hasUuid(UUID uuid) {
+        r.lock();
+        if (readOnlyUuidsToNidMap.containsKey(uuid)) {
+            r.unlock();
+            return true;
+        }
+        if (mutableUuidsToNidMap.containsKey(uuid)) {
+            r.unlock();
+            return true;
+        }
+        r.unlock();
+	    return false;
+	}
 	public int uuidToNid(UUID uuid)  {
 		r.lock();
 		if (readOnlyUuidsToNidMap.containsKey(uuid)) {

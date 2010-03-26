@@ -560,12 +560,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public boolean hasId(Collection<UUID> uuids) throws IOException {
-        return Bdb.uuidsToNid(uuids) != Integer.MAX_VALUE;
+        for (UUID uuid: uuids) {
+            if (Bdb.hasUuid(uuid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean hasId(UUID uuid) throws IOException {
-        return Bdb.uuidToNid(uuid) != Integer.MAX_VALUE;
+        return Bdb.hasUuid(uuid);
     }
 
     @Override

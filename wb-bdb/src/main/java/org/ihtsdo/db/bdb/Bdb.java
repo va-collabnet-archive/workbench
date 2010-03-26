@@ -465,4 +465,8 @@ public class Bdb {
 		assert cNid == Bdb.getConceptNid(cNid): " Not a concept nid: " + cNid;
 		return conceptDb.getConcept(cNid);
 	}
+
+    public static boolean hasUuid(UUID uuid) {
+        return uuidsToNidMapDb.hasUuid(uuid);
+    }
 }
