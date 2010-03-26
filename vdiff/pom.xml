@@ -4,6 +4,7 @@
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>version-diff</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<name>Example project to generate a difference report based on a spec provided in the pom file.</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -71,7 +72,7 @@
 							<path_uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</path_uuid>
 							<v1>2009.01.31 00:00:00 PST</v1>
 							<v2>2009.07.31 00:00:00 PDT</v2>
-							<list_file>diffs.txt</list_file>
+							<list_file>target/diffs.txt</list_file>
 						</configuration>
 					</execution>
 
