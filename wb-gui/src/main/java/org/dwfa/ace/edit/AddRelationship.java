@@ -39,15 +39,22 @@ public class AddRelationship extends AddComponent {
             AceLog.getAppLog().alertAndLogException(
                 new Exception("Cannot add a relationship while the component viewer is empty..."));
         } else {
-            Terms.get().newRelationship(UUID.randomUUID(), cb, 
-            		config.getDefaultRelationshipType(),
-            		config.getHierarchySelection(),
-            		config.getDefaultRelationshipCharacteristic(),
-            		config.getDefaultRelationshipRefinability(), 
-        			config.getDefaultStatus(),
-        			0, config);
+            I_GetConceptData parent = config.getHierarchySelection();
+            if (parent.getNid() == cb.getNid()) {
+                AceLog.getAppLog().alertAndLogException(
+                    new Exception("Cannot create a self-referencing relationship (heirarchy slelection concept and " +
+                    		"and viewer concept are the same: " + cb.getInitialText()));
+            } else {
+                Terms.get().newRelationship(UUID.randomUUID(), cb, 
+                    config.getDefaultRelationshipType(),
+                    parent,
+                    config.getDefaultRelationshipCharacteristic(),
+                    config.getDefaultRelationshipRefinability(), 
+                    config.getDefaultStatus(),
+                    0, config);
             Terms.get().addUncommitted(cb);
             termContainer.setTermComponent(cb);
+            }
         }
     }
 
