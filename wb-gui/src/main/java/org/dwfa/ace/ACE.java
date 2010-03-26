@@ -1665,7 +1665,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         ConceptPanel c4panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, this, LINK_TYPE.UNLINKED, conceptTabs, 4);
         conceptPanels.add(c4panel);
         conceptTabs.addTab("empty", null, c4panel, "Unlinked");
-        
+
         // LIST TAB
         conceptTabs.addTab("   list   ", new ImageIcon(ACE.class.getResource("/16x16/plain/notebook.png")),
             getConceptListEditor());
@@ -1680,8 +1680,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         // CLASSIFIER TAB
         snoRocketPanel = new SnoRocketTabPanel(this);
         conceptTabs.addTab("Classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
-                snoRocketPanel);
-        
+            snoRocketPanel);
+
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
@@ -2756,9 +2756,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (bp.getName().equals("Synchronize with Subversion")) {
                         synchronizeButton = pluginButton;
                         synchronizeButton.setEnabled(Svn.isConnectedToSvn());
+                    }
                 }
             }
-        }
         }
 
         c.gridx++;
@@ -3566,5 +3566,21 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         if (synchronizeButton != null) {
             synchronizeButton.setEnabled(enabled);
         }
+    }
+
+    public Boolean getShowPromotionFilters() {
+        return refsetSpecPanel.getShowPromotionFilters();
+    }
+
+    public Boolean getShowPromotionTab() {
+        return refsetSpecPanel.getShowPromotionTab();
+    }
+
+    public void setShowPromotionFilters(Boolean show) {
+        refsetSpecPanel.setShowPromotionFilters(show);
+    }
+
+    public void setShowPromotionTab(Boolean show) {
+        refsetSpecPanel.setShowPromotionTab(show);
     }
 }

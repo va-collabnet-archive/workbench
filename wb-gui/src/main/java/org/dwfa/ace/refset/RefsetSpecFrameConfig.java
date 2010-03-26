@@ -431,14 +431,14 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             I_IntList refsets = getRefsetsToShowInTaxonomy();
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
                 I_GetConceptData rootConcept = Terms.get().getConcept(rootNid);
-                	for (int memberNid: rootConcept.getConceptMemberNidsForRefset(new IntSet(refsets.getListArray()))) {
-                		I_ExtendByRef ext = Terms.get().getExtension(memberNid);
-                        List<? extends I_ExtendByRefVersion> tuples =
-                            ext.getTuples(frameConfig.getAllowedStatus(), 
-                            		frameConfig.getViewPositionSetReadOnly(), true);
-                        if (tuples != null && tuples.size() > 0) {
-                        	refsetRoots.add(rootNid);
-                        }
+                for (int memberNid : rootConcept.getConceptMemberNidsForRefset(new IntSet(refsets.getListArray()))) {
+                    I_ExtendByRef ext = Terms.get().getExtension(memberNid);
+                    List<? extends I_ExtendByRefVersion> tuples =
+                            ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
+                                true);
+                    if (tuples != null && tuples.size() > 0) {
+                        refsetRoots.add(rootNid);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -514,7 +514,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
             relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : destRels) {
-            	I_GetConceptData child = Terms.get().getConcept(rt.getC1Id());
+                I_GetConceptData child = Terms.get().getConcept(rt.getC1Id());
                 if (notMarkedParent(child)) {
                     relsToRemove.add(rt);
                 }
@@ -1214,5 +1214,25 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     @Override
     public void setShowPromotionCheckBoxes(Boolean show) {
         frameConfig.setShowPromotionCheckBoxes(show);
+    }
+
+    @Override
+    public Boolean getShowPromotionFilters() {
+        return frameConfig.getShowPromotionFilters();
+    }
+
+    @Override
+    public Boolean getShowPromotionTab() {
+        return frameConfig.getShowPromotionTab();
+    }
+
+    @Override
+    public void setShowPromotionFilters(Boolean show) {
+        frameConfig.setShowPromotionFilters(show);
+    }
+
+    @Override
+    public void setShowPromotionTab(Boolean show) {
+        frameConfig.setShowPromotionTab(show);
     }
 }

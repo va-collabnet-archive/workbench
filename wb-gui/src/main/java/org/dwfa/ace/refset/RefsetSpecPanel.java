@@ -122,6 +122,8 @@ public class RefsetSpecPanel extends JPanel {
     private Box horizontalBox;
 
     private boolean showPromotionCheckBoxes = false;
+    private boolean showPromotionFilters = false;
+    private boolean showPromotionTab = false;
     private JButton approveButton;
     private JButton disapproveButton;
     private JLabel filterLabel = new JLabel("Filter view:");
@@ -756,6 +758,44 @@ public class RefsetSpecPanel extends JPanel {
             refsetTableModel.setShowPromotionCheckBoxes(show);
             setShowButtons(show);
         }
+    }
+
+    public Boolean getShowPromotionFilters() {
+        return showPromotionFilters;
+    }
+
+    public Boolean getShowPromotionTab() {
+        return showPromotionTab;
+    }
+
+    public void setShowPromotionFilters(Boolean show) {
+        showPromotionFilters = show;
+        filterLabel.setVisible(show);
+        filterComboBox.setVisible(show);
+        horizontalBox.setMaximumSize(null);
+        horizontalBox.setMinimumSize(null);
+        horizontalBox.setPreferredSize(null);
+    }
+
+    public void setShowPromotionTab(Boolean show) {
+        if (show) {
+            for (int i = 0; i < bottomTabs.getTabCount(); i++) {
+                if (bottomTabs.getTitleAt(i).equals(TABLE_VIEW)) {
+                    bottomTabs.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < bottomTabs.getTabCount(); i++) {
+                if (bottomTabs.getTitleAt(i).equals(HIERARCHICAL_VIEW)) {
+                    bottomTabs.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        horizontalBox.setMaximumSize(null);
+        horizontalBox.setMinimumSize(null);
+        horizontalBox.setPreferredSize(null);
     }
 
     public void setShowButtons(boolean show) {

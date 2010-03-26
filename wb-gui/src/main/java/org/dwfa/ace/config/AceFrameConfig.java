@@ -2951,4 +2951,24 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void refreshRefsetTab() {
         aceFrame.getCdePanel().refreshRefsetTab();
     }
+
+    @Override
+    public Boolean getShowPromotionFilters() {
+        return aceFrame.getCdePanel().getShowPromotionFilters();
+    }
+
+    @Override
+    public Boolean getShowPromotionTab() {
+        return aceFrame.getCdePanel().getShowPromotionTab();
+    }
+
+    @Override
+    public void setShowPromotionFilters(Boolean show) {
+        aceFrame.getCdePanel().setShowPromotionFilters(show);
+    }
+
+    @Override
+    public void setShowPromotionTab(Boolean show) {
+        aceFrame.getCdePanel().setShowPromotionTab(show);
+    }
 }

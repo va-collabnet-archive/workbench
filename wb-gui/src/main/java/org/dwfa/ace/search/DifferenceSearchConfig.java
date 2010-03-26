@@ -70,6 +70,7 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+
     public void refreshRefsetTab() {
         frameConfig.refreshRefsetTab();
     }
@@ -1099,6 +1100,26 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     @Override
     public void setShowPromotionCheckBoxes(Boolean show) {
         frameConfig.setShowPromotionCheckBoxes(show);
+    }
+
+    @Override
+    public Boolean getShowPromotionFilters() {
+        return frameConfig.getShowPromotionFilters();
+    }
+
+    @Override
+    public Boolean getShowPromotionTab() {
+        return frameConfig.getShowPromotionTab();
+    }
+
+    @Override
+    public void setShowPromotionFilters(Boolean show) {
+        frameConfig.setShowPromotionFilters(show);
+    }
+
+    @Override
+    public void setShowPromotionTab(Boolean show) {
+        frameConfig.setShowPromotionTab(show);
     }
 
 }

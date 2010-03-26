@@ -1232,4 +1232,24 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public void setShowPromotionCheckBoxes(Boolean show) {
         baseFrame.setShowPromotionCheckBoxes(show);
     }
+
+    @Override
+    public Boolean getShowPromotionFilters() {
+        return baseFrame.getShowPromotionFilters();
+    }
+
+    @Override
+    public Boolean getShowPromotionTab() {
+        return baseFrame.getShowPromotionTab();
+    }
+
+    @Override
+    public void setShowPromotionFilters(Boolean show) {
+        baseFrame.setShowPromotionFilters(show);
+    }
+
+    @Override
+    public void setShowPromotionTab(Boolean show) {
+        baseFrame.setShowPromotionTab(show);
+    }
 }
