@@ -21,11 +21,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.Concept;
@@ -50,17 +48,19 @@ import org.dwfa.util.AceDateFormat;
  * Writes out RF2 format files for both core files and reference sets.
  */
 public class AceOutputHandler extends SnomedFileFormatOutputHandler {
-    /**
-     * Class logger.
-     */
-    private Logger logger = Logger.getLogger(AceOutputHandler.class.getName());
-
+    /** For converting to midnight UTC. */
     private Calendar aceTime = new GregorianCalendar();
+    /** Concept ids file. */
     private AceIdentifierWriter idsFile;
+    /** Concepts file. */
     private AceConceptWriter conceptFile;
+    /** Descriptions file. */
     private AceDescriptionWriter descriptionFile;
+    /** Relationship file. */
     private AceRelationshipWriter relationshipFile;
+    /** Clinical refset member id file. */
     private AceIdentifierWriter aceIdentifierCliniclFile;
+    /** Structural refset member id file. */
     private AceIdentifierWriter aceIdentifierStructuralFile;
 
     /**
@@ -293,25 +293,20 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     }
 
     /**
+     * Creates a UTC time from the <code>Concept</code> time, this insures that
+     * the time is exported at midnight Zulu time.
+     *
      * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#getReleaseDate(org.dwfa.dto.ConceptDto)
      */
     @Override
     String getReleaseDate(Concept concept) {
-        String releaseDate
-        ;
-        aceTime.setTime(concept.getDateTime());
-        aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
-        aceTime.set(Calendar.HOUR, 0);
-        aceTime.set(Calendar.MINUTE, 0);
-        aceTime.set(Calendar.SECOND, 0);
-
-        try{
-            releaseDate = AceDateFormat.getRf2TimezoneDateFormat().format(aceTime.getTime());
-        } catch (Exception e) {
-            logger.severe("Cannot process data: " + concept.getConceptId().keySet().iterator().next());
-            releaseDate = AceDateFormat.getRf2TimezoneDateFormat().format(new Date());
+        synchronized (aceTime) {
+            aceTime.setTime(concept.getDateTime());
+            aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+            aceTime.set(Calendar.HOUR, 0);
+            aceTime.set(Calendar.MINUTE, 0);
+            aceTime.set(Calendar.SECOND, 0);
+            return AceDateFormat.getRf2TimezoneDateFormat().format(aceTime.getTime());
         }
-
-        return releaseDate;
     }
 }
