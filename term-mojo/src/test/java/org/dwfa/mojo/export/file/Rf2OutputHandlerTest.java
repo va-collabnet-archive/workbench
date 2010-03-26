@@ -77,7 +77,7 @@ public class Rf2OutputHandlerTest {
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
 
-        rf2OutputHandler = new Rf2OutputHandler(exportDirectory);
+        rf2OutputHandler = new Rf2OutputHandler(exportDirectory, new HashMap<UUID, Map<UUID, Date>>(0));
     }
 
     @AfterClass

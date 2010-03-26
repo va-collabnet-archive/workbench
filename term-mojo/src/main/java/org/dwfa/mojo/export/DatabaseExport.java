@@ -19,11 +19,15 @@ package org.dwfa.mojo.export;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -43,9 +47,12 @@ import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
+import org.dwfa.mojo.Rf2ModuleDescriptor;
 import org.dwfa.mojo.export.file.AceOutputHandler;
 import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.AceDateFormat;
 
 
 /**
@@ -66,6 +73,14 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private ExportSpecification exportSpecification;
 
     /**
+     * The release position...
+     *
+     * @parameter
+     * @required
+     */
+    private PositionDescriptor releasePosition;
+
+    /**
      * Positions for export
      *
      * @parameter
@@ -77,9 +92,15 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * Origins for export
      *
      * @parameter
-     * @required
      */
     private PositionDescriptor[] originsForExport;
+
+    /**
+     * Positions mapped to release modules.
+     *
+     * @parameter
+     */
+    private Rf2ModuleDescriptor[] moduleDescriptors;
 
     /**
      * Included hierarchy
@@ -216,31 +237,22 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
             workQueue = LocalVersionedTerminology.get().newProcessQueue(numberOfThreads);
 
-            rf2OutputHandler = new Rf2OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar));
-            rf1OutputHandler = new Rf1OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar));
-            aceOutputHandler = new AceOutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar));
+            Map<UUID, Map<UUID, Date>> releasePathDateMap = getReleasePathDateMap();
 
             List<Position> positions = new ArrayList<Position>();
-            //Used for testing releases, simulates promote(copy) to release path
-            if (originsForExport != null) {
-                Set<I_Position> positionOrigins = new HashSet<I_Position>();
-                for (PositionDescriptor positionDescriptor : originsForExport) {
-                    positionOrigins.addAll(
-                        PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, getTermFactory()));
-                }
+            setTestOriginPositions(releasePathDateMap, positions);
 
-                for (I_Position iPosition : positionOrigins) {
-                    Date timePoint = new Date();
-                    timePoint.setTime(iPosition.getTime());
-                    positions.add(new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()), timePoint));
-                }
-            }
             for (PositionDescriptor positionDescriptor : positionsForExport) {
                 positions.add(new Position(positionDescriptor));
             }
+            positions.add(new Position(releasePosition));
+
+            rf2OutputHandler = new Rf2OutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar), releasePathDateMap);
+            rf1OutputHandler = new Rf1OutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar), releasePathDateMap);
+            aceOutputHandler = new AceOutputHandler(
+                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar), releasePathDateMap);
 
             List<I_GetConceptData> inclusionRoots = new ArrayList<I_GetConceptData>();
             for (ConceptDescriptor conceptDescriptor : inclusions) {
@@ -284,6 +296,50 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     }
 
     /**
+     * Adds to the <code>positions</code> List all the paths that have been
+     * promoted to test.
+     *
+     * Adds release position Map to the <code>releasePathDateMap</code> Map for
+     * each test path so the correct module id and time stamp are export for the
+     * test paths.
+     *
+     * @param releasePathDateMap Map of UUID Date maps.
+     * @param positions list of export Positions
+     * @throws Exception
+     * @throws TerminologyException
+     * @throws IOException
+     * @throws ParseException
+     */
+    private void setTestOriginPositions(Map<UUID, Map<UUID, Date>> releasePathDateMap, List<Position> positions)
+            throws Exception, TerminologyException, IOException, ParseException {
+        if (originsForExport != null) {
+            Set<I_Position> positionOrigins = new HashSet<I_Position>();
+            for (PositionDescriptor positionDescriptor : originsForExport) {
+                positionOrigins.addAll(
+                    PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, getTermFactory()));
+            }
+
+            for (I_Position iPosition : positionOrigins) {
+                Date timePoint = new Date();
+                timePoint.setTime(iPosition.getTime());
+                positions.add(new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()), timePoint));
+
+                UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
+
+                Map<UUID, Date> mappedModuleDate;
+                if (releasePathDateMap.containsKey(pathUuid)) {
+                    mappedModuleDate = releasePathDateMap.get(pathUuid);
+                } else {
+                    mappedModuleDate = new HashMap<UUID, Date>(1);
+                    releasePathDateMap.put(pathUuid, mappedModuleDate);
+                }
+                mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
+                    AceDateFormat.getRf2DateFormat().parse(releasePosition.getTimeString()));
+            }
+        }
+    }
+
+    /**
      * Process a concept.
      *
      * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
@@ -313,6 +369,38 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     public void setTermFactory(I_TermFactory termFactory) {
         this.termFactory = termFactory;
+    }
+
+    /**
+     * Gets the list of mapped Paths to release Modules and time stamps.
+     *
+     * Allows mapping of a path to a release module and time.
+     *
+     * @return Map of UUID modules, Date time stamp maps.
+     *
+     * @throws ParseException
+     */
+    private Map<UUID, Map<UUID, Date>> getReleasePathDateMap() throws ParseException {
+        Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
+
+        if (moduleDescriptors != null) {
+            for (Rf2ModuleDescriptor rf2ModuleDescriptor : moduleDescriptors) {
+                UUID pathUuid = UUID.fromString(rf2ModuleDescriptor.getPath().getUuid());
+
+                Map<UUID, Date> mappedModuleDate;
+                if (releasePathDateMap.containsKey(pathUuid)) {
+                    mappedModuleDate = releasePathDateMap.get(pathUuid);
+                } else {
+                    mappedModuleDate = new HashMap<UUID, Date>(1);
+                    releasePathDateMap.put(pathUuid, mappedModuleDate);
+                }
+
+                mappedModuleDate.put(UUID.fromString(rf2ModuleDescriptor.getModule().getUuid()),
+                    AceDateFormat.getRf2DateFormat().parse(rf2ModuleDescriptor.getModuleTimeString()));
+            }
+        }
+
+        return releasePathDateMap;
     }
 
     /**

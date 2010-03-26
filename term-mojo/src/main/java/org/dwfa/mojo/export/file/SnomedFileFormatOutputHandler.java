@@ -3,6 +3,7 @@ package org.dwfa.mojo.export.file;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,16 +33,21 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     /** Uuid to Sct id map handler. */
     static UuidSnomedHandler snomedIdHandler;
 
+    private Map<UUID, Map<UUID, Date>> releasePathDateMap;
+
+    /** Until the baseline database is used with have to handle concepts with multiple/wrong sct id in the berkeley database. */
     private Map<UUID, Long> uuidIgnorList = new HashMap<UUID, Long>();
 
     /** Set to true to throw exceptions on validation errors. */
     boolean failOnError = true;
 
-    public SnomedFileFormatOutputHandler() throws IOException, SQLException, ClassNotFoundException {
+    public SnomedFileFormatOutputHandler(Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException, ClassNotFoundException {
         //TODO add factory class to do this
         if (snomedIdHandler == null) {
             snomedIdHandler = new UuidSnomedDbMapHandler();
         }
+
+        this.releasePathDateMap = releasePathDateMap;
 
         uuidIgnorList.put(UUID.fromString("cc624429-b17d-4ac5-a69e-0b32448aaf3c"), 900000000000335009l);
         uuidIgnorList.put(UUID.fromString("125f3d04-de17-490e-afec-1431c2a39e29"), 900000000000336005l);
@@ -409,18 +415,62 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getModuleId(Concept concept) throws Exception {
+        Long moduleSctId;
+        UUID moduleUuid = getModuleUuid(concept);
+
         synchronized (snomedIdHandler) {
-            return snomedIdHandler.getWithGeneration(concept.getPathId(), concept.getNamespace(), TYPE.CONCEPT);
+            moduleSctId = snomedIdHandler.getWithGeneration(moduleUuid, concept.getNamespace(), TYPE.CONCEPT);
         }
+
+        return moduleSctId;
     }
 
     /**
-     * The release date for the component.
+     * The component release path/module UUID
+     *
+     * @param concept Concept
+     * @return UUID module UUID
+     * @throws Exception if cannot get an UUID
+     */
+    protected UUID getModuleUuid(Concept concept) {
+        UUID moduleUuid;
+
+        Map<UUID, Date> moduleDateMap = releasePathDateMap.get(concept.getPathId());
+        if(moduleDateMap != null){
+            moduleUuid = moduleDateMap.keySet().iterator().next();
+        } else {
+            moduleUuid = concept.getPathId();
+        }
+
+        return moduleUuid;
+    }
+
+    /**
+     * The component release path/module Date.
+     *
+     * @param concept Concept
+     * @return String
+     */
+    protected String getReleaseDate(Concept concept){
+        Date releaseDate;
+
+        Map<UUID, Date> moduleDateMap = releasePathDateMap.get(concept.getPathId());
+        if(moduleDateMap != null){
+            releaseDate = moduleDateMap.values().iterator().next();
+        } else {
+            releaseDate = concept.getDateTime();
+        }
+
+        return getReleaseDateString(releaseDate);
+    }
+
+    /**
+     * The release date (version) for the component.
      *
      * @param Concept concept
-     * @return Date
+     * @return String
      */
-    abstract String getReleaseDate(Concept concept);
+    abstract String getReleaseDateString(Date conceptVersion);
 
     /**
      * Close all files.

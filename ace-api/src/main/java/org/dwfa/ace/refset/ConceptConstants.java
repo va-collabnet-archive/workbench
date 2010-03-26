@@ -28,6 +28,8 @@ public class ConceptConstants {
 
     public static final ConceptSpec AU_CT_EDIT_PATH = new ConceptSpec("SCT-AU development path",
         "c65b08ce-8512-52fa-be06-0844bd7310d6");
+    public static final ConceptSpec AU_CT_RELEASE_PATH = new ConceptSpec("SNOMED Clinical Terms Australian Extension",
+        "850495d2-61c0-593e-bc74-46ed297a8923");
     public static final ConceptSpec GENERATES_REL = new ConceptSpec("generates", "ca77a82c-ffa8-4dc1-8d31-6b137b4607ca");
     public static final ConceptSpec CREATES_MEMBERSHIP_TYPE = new ConceptSpec("creates membership type",
         "adccc8cc-cfe0-4947-b2b2-2c493034ac3a");

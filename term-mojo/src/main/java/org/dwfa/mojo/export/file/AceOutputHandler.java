@@ -21,9 +21,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.Concept;
@@ -72,9 +75,9 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public AceOutputHandler(File exportDirectory) throws IOException, SQLException,
+    public AceOutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException,
             ClassNotFoundException {
-        super();
+        super(releasePathDateMap);
 
         exportDirectory.mkdirs();
         idsFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.txt"));
@@ -156,7 +159,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
             AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
             aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
-            aceIdentifierRow.setPathUuid(identifierDto.getPathId().toString());
+            aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
             aceIdentifierRow.setPrimaryUuid(identifierDto.getConceptId().keySet().iterator().next().toString());
             aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
             aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
@@ -179,7 +182,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
 
         aceIdentifierRow.setEffectiveDate(getReleaseDate(extensionDto));
-        aceIdentifierRow.setPathUuid(extensionDto.getPathId().toString());
+        aceIdentifierRow.setPathUuid(getModuleUuid(extensionDto).toString());
         aceIdentifierRow.setPrimaryUuid(extensionDto.getMemberId().toString());
         if (!extensionDto.getIdentifierDtos().isEmpty()) {
             aceIdentifierRow.setSourceId(
@@ -209,7 +212,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         conceptRow.setConceptStatusUuid(conceptDto.getStatusId().toString());
         conceptRow.setEffectiveTime(getReleaseDate(conceptDto));
         conceptRow.setIsPrimitve(getPrimitiveFlag(conceptDto));
-        conceptRow.setPathUuid(conceptDto.getPathId().toString());
+        conceptRow.setPathUuid(getModuleUuid(conceptDto).toString());
 
         return conceptRow;
     }
@@ -230,7 +233,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setDescriptionstatusUuid(descriptionDto.getStatusId().toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
         rf2DescriptionRow.setLanguageUuid(descriptionDto.getLanguageId().toString());
-        rf2DescriptionRow.setPathUuid(descriptionDto.getPathId().toString());
+        rf2DescriptionRow.setPathUuid(getModuleUuid(descriptionDto).toString());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
         rf2DescriptionRow.setDescriptiontypeUuid(descriptionDto.getTypeId().toString());
 
@@ -252,7 +255,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setConceptUuid2(relationshipDto.getDestinationId().keySet().iterator().next().toString());
         relationshipRow.setCharacteristicTypeUuid(relationshipDto.getCharacteristicTypeId().toString());
         relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
-        relationshipRow.setPathUuid(relationshipDto.getPathId().toString());
+        relationshipRow.setPathUuid(getModuleUuid(relationshipDto).toString());
         relationshipRow.setRefinabilityUuid(relationshipDto.getRefinabilityId().toString());
         relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroupCode().toString());
         relationshipRow.setRelationshipstatusUuid(relationshipDto.getStatusId().toString());
@@ -296,12 +299,12 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      * Creates a UTC time from the <code>Concept</code> time, this insures that
      * the time is exported at midnight Zulu time.
      *
-     * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#getReleaseDate(org.dwfa.dto.ConceptDto)
+     * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#getReleaseDateString(org.dwfa.dto.ConceptDto)
      */
     @Override
-    String getReleaseDate(Concept concept) {
+    String getReleaseDateString(Date concept) {
         synchronized (aceTime) {
-            aceTime.setTime(concept.getDateTime());
+            aceTime.setTime(concept);
             aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
             aceTime.set(Calendar.HOUR, 0);
             aceTime.set(Calendar.MINUTE, 0);

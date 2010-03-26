@@ -74,8 +74,10 @@ public class DatabaseExportTest extends ConceptMockery {
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getPath()).andReturn(conceptDescriptor);
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getTimeString()).andReturn("latest").times(1, 2);
 
-        PositionDescriptor[] exportPositions = new PositionDescriptor[]{positionDescriptor};
+        PositionDescriptor[] exportPositions = new PositionDescriptor[0];
         setField(databaseExportClass, databaseExport, "positionsForExport", exportPositions);
+
+        setField(databaseExportClass, databaseExport, "releasePosition", positionDescriptor);
 
         //mock the include root
         ConceptDescriptor incluesionRoot = createMock(ConceptDescriptor.class);

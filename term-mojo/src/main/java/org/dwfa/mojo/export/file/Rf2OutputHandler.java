@@ -20,9 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.dto.Concept;
@@ -70,9 +72,9 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public Rf2OutputHandler(File exportDirectory) throws IOException, SQLException,
+    public Rf2OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException,
             ClassNotFoundException {
-        super();
+        super(releasePathDateMap);
 
         this.exportDirectory = exportDirectory;
         this.exportDirectory.mkdirs();
@@ -411,10 +413,10 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     }
 
     /**
-     * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#getReleaseDate(org.dwfa.dto.ConceptDto)
+     * @see org.dwfa.mojo.export.file.SnomedFileFormatOutputHandler#getReleaseDateString(org.dwfa.dto.ConceptDto)
      */
     @Override
-    String getReleaseDate(Concept concept) {
-        return AceDateFormat.getRf2DateFormat().format(concept.getDateTime());
+    String getReleaseDateString(Date concept) {
+        return AceDateFormat.getRf2DateFormat().format(concept);
     }
 }

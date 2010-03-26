@@ -57,7 +57,7 @@ public class AceOutputHandlerTest {
                 System.getProperty(UUID_MAP_TEST_DATABASE_USER),
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
-        aceOutputHandler = new AceOutputHandler(exportDirectory);
+        aceOutputHandler = new AceOutputHandler(exportDirectory, new HashMap<UUID, Map<UUID, Date>>(0));
     }
 
     @AfterClass
@@ -461,7 +461,7 @@ public class AceOutputHandlerTest {
 
         return map;
     }
-    
+
     private Date getDate() {
         aceTime.setTime(new Date());
         aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));

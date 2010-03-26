@@ -74,9 +74,7 @@ import org.dwfa.vodb.types.ThinIdPart;
  * Contains the hierarchy to be exports and optionally not exported that are on the exportable positions.
  */
 public class ExportSpecification {
-    /**
-     * Class logger.
-     */
+    /** Class logger. */
     private Logger logger = Logger.getLogger(ExportSpecification.class.getName());
 
     /** Export positions */
@@ -85,7 +83,7 @@ public class ExportSpecification {
     public List<I_GetConceptData> inclusions;
     /** Excluded hierarchy - within one or more included hierarchy */
     public List<I_GetConceptData> exclusions;
-    /**The default namespace to use for export*/
+    /** The default namespace to use for export */
     private NAMESPACE defaultNamespace;
 
     /** The active concept. */

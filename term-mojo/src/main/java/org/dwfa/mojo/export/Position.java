@@ -21,13 +21,7 @@ public class Position {
 
     public Position(I_GetConceptData path, Date timePoint) throws Exception {
         this(path);
-
-        if(timePoint.equals(LATEST_VERSION_STR)) {
-            timePoint = new Date();
-            timePoint.setTime(Long.MAX_VALUE);
-        } else {
-            this.timePoint = timePoint;
-        }
+        this.timePoint = timePoint;
     }
 
     public Position(PositionDescriptor positionDescriptor) throws Exception {
