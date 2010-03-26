@@ -21,7 +21,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dwfa</groupId>
 	<artifactId>term-mojo</artifactId>
-	<version>1.44-SNAPSHOT</version>
+	<version>1.47-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>term mojo</name>
 	<url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-mojo/site/index.html</url>
