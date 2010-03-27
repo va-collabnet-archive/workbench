@@ -73,7 +73,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
                     if (part instanceof I_ExtendByRefPartCid && (latestPart == null)
-                        || (part.getVersion() >= latestPart.getVersion())) {
+                        || (part.getTime() >= latestPart.getTime())) {
                         latestPart = (I_ExtendByRefPartCid) part;
                     }
                 }
@@ -103,7 +103,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -243,7 +243,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -279,7 +279,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -308,7 +308,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -338,7 +338,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -373,7 +373,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -407,7 +407,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -444,7 +444,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -534,10 +534,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * (non-Javadoc)
      * @see
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptConceptRefsetExtension
-     * (int, int, int, int, java.util.UUID, java.util.UUID, java.util.UUID, int)
+     * (int, int, int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
         try {
             Collection<I_Path> paths = Terms.get().getPaths();
@@ -566,8 +566,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID);
             refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
             refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
-            if (effectiveTime != Integer.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            if (effectiveTime != Long.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
             }
             I_ExtendByRef newExtension =
                     getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID, refsetMap, memberUuid);
@@ -588,10 +588,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * @see
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newStringRefsetExtension(int,
      * int, java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID,
-     * int)
+     * long)
      */
     public boolean newStringRefsetExtension(int refsetId, int componentId, String extString, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
         try {
             Collection<I_Path> paths = Terms.get().getPaths();
             paths.clear();
@@ -620,8 +620,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.STR);
             refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
             refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-            if (effectiveTime != Integer.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            if (effectiveTime != Long.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
             }
             I_ExtendByRef newExtension =
                     getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
@@ -642,10 +642,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * @see
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptStringRefsetExtension
      * (int, int, int, java.lang.String, java.util.UUID, java.util.UUID,
-     * java.util.UUID, int)
+     * java.util.UUID, long)
      */
     public boolean newConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, String extString,
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
         try {
             Collection<I_Path> paths = Terms.get().getPaths();
             paths.clear();
@@ -674,10 +674,11 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
             refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
             refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-            if (effectiveTime != Integer.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+            if (effectiveTime != Long.MAX_VALUE) {
+                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
             }
-            I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
+            I_ExtendByRef newExtension =
+                    getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
             if (isAutocommitActive()) {
                 Terms.get().addUncommittedNoChecks(newExtension);
                 Terms.get().commit();
@@ -693,10 +694,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     /*
      * (non-Javadoc)
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newIntRefsetExtension(int,
-     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, int)
+     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newIntRefsetExtension(int refsetId, int componentId, int value, UUID memberUuid, UUID pathUuid,
-            UUID statusUuid, int effectiveTime) throws Exception {
+            UUID statusUuid, long effectiveTime) throws Exception {
 
         Collection<I_Path> paths = Terms.get().getPaths();
         paths.clear();
@@ -723,10 +724,11 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         // editing)
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.INT);
         refsetMap.put(REFSET_PROPERTY.INTEGER_VALUE, value);
-        if (effectiveTime != Integer.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Long.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
         }
-        I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.INT, refsetMap, memberUuid);
+        I_ExtendByRef newExtension =
+                getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.INT, refsetMap, memberUuid);
         if (isAutocommitActive()) {
             Terms.get().addUncommittedNoChecks(newExtension);
             Terms.get().commit();
@@ -738,10 +740,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * (non-Javadoc)
      * @see
      * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptRefsetExtension(int,
-     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, int)
+     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptRefsetExtension(int refsetId, int componentId, int conceptId, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
         Collection<I_Path> paths = Terms.get().getPaths();
         paths.clear();
@@ -771,8 +773,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         // editing)
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
         refsetMap.put(REFSET_PROPERTY.CID_ONE, conceptId);
-        if (effectiveTime != Integer.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Long.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
         }
         I_ExtendByRef newExtension = makeMemberAndSetup(refsetId, componentId, REFSET_TYPES.CID, refsetMap, memberUuid);
         if (isAutocommitActive()) {
@@ -786,10 +788,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * (non-Javadoc)
      * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
      * newConceptConceptConceptRefsetExtension(int, int, int, int, int,
-     * java.util.UUID, java.util.UUID, java.util.UUID, int)
+     * java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, int c3Id,
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
         Collection<I_Path> paths = Terms.get().getPaths();
         paths.clear();
@@ -819,8 +821,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
         refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
         refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Id);
-        if (effectiveTime != Integer.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Long.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
         }
         I_ExtendByRef newExtension =
                 getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_CID, refsetMap, memberUuid);
@@ -836,10 +838,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * (non-Javadoc)
      * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
      * newConceptConceptStringRefsetExtension(int, int, int, int,
-     * java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID, int)
+     * java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id,
-            String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception {
+            String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
         Collection<I_Path> paths = Terms.get().getPaths();
         paths.clear();
@@ -873,8 +875,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
         refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
         refsetMap.put(REFSET_PROPERTY.STRING_VALUE, stringValue);
-        if (effectiveTime != Integer.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.VERSION, effectiveTime);
+        if (effectiveTime != Long.MAX_VALUE) {
+            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
         }
         I_ExtendByRef newExtension =
                 getOrCreateRefsetExtension(refsetId, componentId, REFSET_TYPES.CID_CID_STR, refsetMap, memberUuid);
@@ -901,7 +903,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -1137,7 +1139,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -1175,7 +1177,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -1372,7 +1374,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(descriptionType.getConceptId());
         String latestDescription = null;
-        int latestVersion = Integer.MIN_VALUE;
+        long latestVersion = Long.MIN_VALUE;
 
         I_HelpSpecRefset helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         I_IntSet activeStatuses = helper.getCurrentStatusIntSet();
@@ -1381,8 +1383,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
                     .getViewPositionSetReadOnly(), true);
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
-            if (descriptionTuple.getVersion() > latestVersion) {
-                latestVersion = descriptionTuple.getVersion();
+            if (descriptionTuple.getTime() > latestVersion) {
+                latestVersion = descriptionTuple.getTime();
                 latestDescription = descriptionTuple.getText();
             }
         }
@@ -1402,7 +1404,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // get the latest version
                 I_ExtendByRefPart latestPart = null;
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
-                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                    if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                         latestPart = part;
                     }
                 }
@@ -1429,7 +1431,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) {
         I_ExtendByRefPart latestPart = null;
         for (I_ExtendByRefPart part : memberExtension.getMutableParts()) {
-            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+            if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
                 latestPart = part;
             }
         }
