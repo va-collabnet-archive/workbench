@@ -1148,7 +1148,6 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 }
 
                 if (latestPart instanceof I_ExtendByRefPartCid) {
-                    // found a member to retire
                     for (I_Path editPath : getEditPaths()) {
                         I_ExtendByRefPartCid clone =
                                 (I_ExtendByRefPartCid) latestPart.makeAnalog(statusId, editPath.getConceptId(),
