@@ -50,7 +50,7 @@ public class StringExtTupleFileUtil {
 
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
-            int effectiveDate = tuple.getVersion();
+            long effectiveDate = tuple.getTime();
             String extString = part.getStringValue();
 
             return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
@@ -72,7 +72,7 @@ public class StringExtTupleFileUtil {
             UUID componentUuid;
             UUID pathUuid;
             UUID statusUuid;
-            int effectiveDate;
+            long effectiveDate;
             String extString;
 
             try {
@@ -95,9 +95,9 @@ public class StringExtTupleFileUtil {
             }
 
             try {
-                effectiveDate = Integer.parseInt(lineParts[8]);
+                effectiveDate = Long.parseLong(lineParts[8]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
+                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -105,6 +105,7 @@ public class StringExtTupleFileUtil {
             }
 
             I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
@@ -137,7 +138,6 @@ public class StringExtTupleFileUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage =
                     "Exception of unknown cause thrown while importing string ext tuple : " + e.getLocalizedMessage();
             try {

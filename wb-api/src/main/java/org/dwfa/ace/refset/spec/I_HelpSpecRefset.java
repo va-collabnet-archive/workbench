@@ -89,25 +89,25 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
     public UUID generateUuid(UUID uuid, UUID uuid2, UUID uuid3);
 
     public boolean newConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newStringRefsetExtension(int refsetId, int componentId, String extString, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, String extString,
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newIntRefsetExtension(int refsetId, int componentId, int value, UUID memberUuid, UUID pathUuid,
-            UUID statusUuid, int effectiveTime) throws Exception;
+            UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newConceptRefsetExtension(int refsetId, int componentId, int conceptId, UUID memberUuid,
-            UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newConceptConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, int c3Id,
-            UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     public boolean newConceptConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id,
-            String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, int effectiveTime) throws Exception;
+            String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception;
 
     /**
      * Remove a concept from a refset

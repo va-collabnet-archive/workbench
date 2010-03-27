@@ -151,10 +151,7 @@ public class TupleFileUtil {
                             intTupleCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next())) {
-                        // if (IDTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                        // pathToOverrideUuid)) {
-                        // idTupleCount++;
-                        // }
+                        // skip as we'll process them in the second pass
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_STRING_TUPLE.getUids().iterator()
                         .next())) {
                         if (StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
@@ -186,7 +183,7 @@ public class TupleFileUtil {
                 }
             }
 
-            // second pass - process additional ID tuples
+            // second pass - process ID tuples
             inputFileReader.close();
             inputFileReader = new BufferedReader(new FileReader(importFile));
             currentLine = inputFileReader.readLine();
@@ -588,7 +585,7 @@ public class TupleFileUtil {
             throws Exception {
 
         I_GetConceptData latestTarget = null;
-        int latestVersion = Integer.MIN_VALUE;
+        long latestVersion = Long.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
@@ -597,8 +594,8 @@ public class TupleFileUtil {
                 concept.getSourceRelTuples(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes,
                     Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
         for (I_RelTuple rel : relationships) {
-            if (rel.getVersion() > latestVersion) {
-                latestVersion = rel.getVersion();
+            if (rel.getTime() > latestVersion) {
+                latestVersion = rel.getTime();
                 latestTarget = Terms.get().getConcept(rel.getC2Id());
             }
         }

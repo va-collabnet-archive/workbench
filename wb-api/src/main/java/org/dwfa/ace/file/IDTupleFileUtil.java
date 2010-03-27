@@ -36,7 +36,7 @@ public class IDTupleFileUtil {
         List<? extends I_IdPart> parts = iIdVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
-            if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
+            if (latestPart == null || part.getTime() >= latestPart.getTime()) {
                 latestPart = part;
             }
         }
@@ -51,7 +51,7 @@ public class IDTupleFileUtil {
 
         UUID pathUuid = termFactory.getUids(latestPart.getPathId()).iterator().next();
         UUID statusUuid = termFactory.getUids(latestPart.getStatusId()).iterator().next();
-        int effectiveDate = latestPart.getVersion();
+        long effectiveDate = latestPart.getTime();
 
         return tupleUuid + "\t" + primaryUuid + "\t" + sourceSystemUuid + "\t" + sourceId + "\t" + pathUuid + "\t"
             + statusUuid + "\t" + effectiveDate + "\n";
@@ -77,7 +77,7 @@ public class IDTupleFileUtil {
                 pathUuid = pathToOverrideUuid;
             }
             UUID statusUuid = UUID.fromString(lineParts[5]);
-            int effectiveDate = Integer.parseInt(lineParts[6]);
+            long effectiveDate = Long.parseLong(lineParts[6]);
 
             TupleFileUtil.pathUuids.add(pathUuid);
 
@@ -101,15 +101,14 @@ public class IDTupleFileUtil {
                 if (sourceSystemUuid
                     .equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
                     versioned.addUuidId(UUID.fromString(sourceId), termFactory.uuidToNative(sourceSystemUuid),
-                        termFactory.uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid),
-                        convert(effectiveDate));
+                        termFactory.uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), effectiveDate);
                 } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator()
                     .next())) {
                     versioned.addLongId(new Long(sourceId), termFactory.uuidToNative(sourceSystemUuid), termFactory
-                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), effectiveDate);
                 } else {
                     versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid), termFactory
-                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), convert(effectiveDate));
+                        .uuidToNative(statusUuid), termFactory.uuidToNative(pathUuid), effectiveDate);
                     // use string as default
                 }
 
@@ -122,7 +121,6 @@ public class IDTupleFileUtil {
                 throw new Exception("UUID did not exist in database: " + primaryUuid);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage = "Exception while importing ID tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
@@ -139,23 +137,5 @@ public class IDTupleFileUtil {
 
     public static int generateIdFromUuid(UUID uuidToGenerate, UUID pathUuid) throws TerminologyException, IOException {
         return Terms.get().uuidToNative(uuidToGenerate);
-    }
-
-    /**
-     * Adapted from ThinVersionHelper in VODB - not accessible in ace-api.
-     * 
-     * @param version
-     * @return
-     */
-    public static long convert(int version) {
-        int timeZeroInt = 1830407753;
-        if (version == Integer.MAX_VALUE) {
-            return Long.MAX_VALUE;
-        }
-        if (version == Integer.MIN_VALUE) {
-            return Long.MIN_VALUE;
-        }
-        long added = timeZeroInt + version;
-        return added * 1000;
     }
 }

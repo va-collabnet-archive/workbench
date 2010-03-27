@@ -96,9 +96,9 @@ public class ConceptTupleFileUtil {
             }
 
             try {
-                effectiveDate = Terms.get().convertToThickVersion(Integer.parseInt(lineParts[5]));
+                effectiveDate = Long.parseLong(lineParts[5]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse integer from string -> integer " + e.getMessage();
+                String errorMessage = "Cannot parse integer from string -> Long " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -136,7 +136,7 @@ public class ConceptTupleFileUtil {
 
                 I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {
-                    if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
+                    if (latestTuple == null || part.getTime() >= latestTuple.getTime()) {
                         latestTuple = part;
                     }
                 }
@@ -177,7 +177,6 @@ public class ConceptTupleFileUtil {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage =
                     "Exception of unknown cause thrown while importing concept tuple : " + e.getLocalizedMessage();
             try {

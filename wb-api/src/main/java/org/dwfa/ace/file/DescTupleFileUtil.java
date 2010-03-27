@@ -71,7 +71,7 @@ public class DescTupleFileUtil {
             UUID typeUuid;
             UUID pathUuid;
             UUID statusUuid;
-            int effectiveDate;
+            long effectiveDate;
 
             try {
                 conceptUuid = UUID.fromString(lineParts[1]);
@@ -104,9 +104,9 @@ public class DescTupleFileUtil {
             }
 
             try {
-                effectiveDate = Integer.parseInt(lineParts[9]);
+                effectiveDate = Long.parseLong(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
+                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -152,7 +152,7 @@ public class DescTupleFileUtil {
                             returnConflictResolvedLatestState);
                 I_DescriptionTuple latestTuple = null;
                 for (I_DescriptionTuple part : parts) {
-                    if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
+                    if (latestTuple == null || part.getTime() >= latestTuple.getTime()) {
                         latestTuple = part;
                     }
                 }
@@ -192,7 +192,6 @@ public class DescTupleFileUtil {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage =
                     "Exception of unknown cause thrown while importing desc tuple : " + e.getLocalizedMessage();
             try {

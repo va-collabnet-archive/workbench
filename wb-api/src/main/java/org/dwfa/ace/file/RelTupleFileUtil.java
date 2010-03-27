@@ -50,7 +50,7 @@ public class RelTupleFileUtil {
             UUID relTypeUuid = termFactory.getUids(relTuple.getTypeId()).iterator().next();
             UUID pathUuid = termFactory.getUids(relTuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(relTuple.getStatusId()).iterator().next();
-            int effectiveDate = relTuple.getVersion();
+            long effectiveDate = relTuple.getTime();
 
             String idTuple = IDTupleFileUtil.exportTuple(termFactory.getId(relUuid));
 
@@ -103,9 +103,18 @@ public class RelTupleFileUtil {
 
             try {
                 group = Integer.parseInt(lineParts[5]);
-                effectiveDate = Terms.get().convertToThickVersion(Integer.parseInt(lineParts[10]));
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
+                String errorMessage = "Cannot parse Integer from string: " + e.getMessage();
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write(errorMessage);
+                outputFileWriter.newLine();
+                return false;
+            }
+
+            try {
+                effectiveDate = Long.parseLong(lineParts[10]);
+            } catch (Exception e) {
+                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -161,7 +170,7 @@ public class RelTupleFileUtil {
                         returnConflictResolvedLatestState);
             I_RelTuple latestTuple = null;
             for (I_RelTuple part : parts) {
-                if (latestTuple == null || part.getVersion() >= latestTuple.getVersion()) {
+                if (latestTuple == null || part.getTime() >= latestTuple.getTime()) {
                     if (part.getC1Id() == termFactory.getId(c1Uuid).getNid()
                         && part.getC2Id() == termFactory.getId(c2Uuid).getNid()) {
                         latestTuple = part;
@@ -204,7 +213,6 @@ public class RelTupleFileUtil {
                 termFactory.addUncommittedNoChecks(concept);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage =
                     "Exception of unknown cause thrown while importing rel tuple : " + e.getLocalizedMessage();
             try {

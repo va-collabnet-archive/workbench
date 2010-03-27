@@ -53,7 +53,7 @@ public class ConceptConceptExtTupleFileUtil {
 
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
-            int version = tuple.getVersion();
+            long version = tuple.getTime();
 
             return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
                 + c1Uuid + "\t" + c2Uuid + "\t" + pathUuid + "\t" + statusUuid + "\t" + version + "\n";
@@ -76,7 +76,7 @@ public class ConceptConceptExtTupleFileUtil {
             UUID c2Uuid;
             UUID pathUuid;
             UUID statusUuid;
-            int effectiveDate;
+            long effectiveDate;
 
             try {
                 memberUuid = UUID.fromString(lineParts[1]);
@@ -99,9 +99,9 @@ public class ConceptConceptExtTupleFileUtil {
             }
 
             try {
-                effectiveDate = Integer.parseInt(lineParts[9]);
+                effectiveDate = Long.parseLong(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string -> Integer " + e.getMessage();
+                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -109,6 +109,7 @@ public class ConceptConceptExtTupleFileUtil {
             }
 
             I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             TupleFileUtil.pathUuids.add(pathUuid);
@@ -158,7 +159,6 @@ public class ConceptConceptExtTupleFileUtil {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             String errorMessage =
                     "Exception of unknown cause thrown while importing concept-concept ext tuple : "
                         + e.getLocalizedMessage();
