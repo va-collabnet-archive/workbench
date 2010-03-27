@@ -18,6 +18,7 @@ package org.ihtsdo.mojo.maven.sct;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1007,6 +1008,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
     private void createSctSiEConcept(DataOutputStream dos) throws MojoFailureException {
         try {
+            java.util.Date today = new java.util.Date();
+            long timeToday = today.getTime();
             // **************
             // *** STATED ***
             // **************
@@ -1019,7 +1022,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ca.additionalIds = null;
             ca.setStatusUuid(uuidCurrent);
             ca.setPathUuid(uuidPathWbAux);
-            ca.setTime(Long.MIN_VALUE); // Beginning of time
+            ca.setTime(timeToday);
             ca.revisions = null; // no revisions
             ec.setConceptAttributes(ca);
             // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
@@ -1038,7 +1041,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             des.setTypeUuid(uuidDescFullSpec);
             des.setStatusUuid(uuidCurrent);
             des.setPathUuid(uuidPathWbAux);
-            des.setTime(Long.MIN_VALUE);
+            des.setTime(timeToday);
             des.revisions = null;
             eDesList.add(des);
 
@@ -1053,7 +1056,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             des.setTypeUuid(uuidDescPrefTerm);
             des.setStatusUuid(uuidCurrent);
             des.setPathUuid(uuidPathWbAux);
-            des.setTime(Long.MIN_VALUE);
+            des.setTime(timeToday);
             des.revisions = null;
             eDesList.add(des);
 
@@ -1075,7 +1078,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             rel.setRefinabilityUuid(uuidRelNotRefinable);
             rel.setStatusUuid(uuidCurrent);
             rel.setPathUuid(uuidPathWbAux);
-            rel.setTime(Long.MIN_VALUE);
+            rel.setTime(timeToday);
             rel.revisions = null;
             eRelList.add(rel);
             ec.setRelationships(eRelList);
@@ -1096,7 +1099,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ca.additionalIds = null;
             ca.setStatusUuid(uuidCurrent);
             ca.setPathUuid(uuidPathWbAux);
-            ca.setTime(Long.MIN_VALUE); // Beginning of time
+            ca.setTime(timeToday);
             ca.revisions = null; // no revisions
             ec.setConceptAttributes(ca);
             // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
@@ -1115,7 +1118,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             des.setTypeUuid(uuidDescFullSpec);
             des.setStatusUuid(uuidCurrent);
             des.setPathUuid(uuidPathWbAux);
-            des.setTime(Long.MIN_VALUE);
+            des.setTime(timeToday);
             des.revisions = null;
             eDesList.add(des);
 
@@ -1130,7 +1133,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             des.setTypeUuid(uuidDescPrefTerm);
             des.setStatusUuid(uuidCurrent);
             des.setPathUuid(uuidPathWbAux);
-            des.setTime(Long.MIN_VALUE);
+            des.setTime(timeToday);
             des.revisions = null;
             eDesList.add(des);
 
@@ -1152,7 +1155,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             rel.setRefinabilityUuid(uuidRelNotRefinable);
             rel.setStatusUuid(uuidCurrent);
             rel.setPathUuid(uuidPathWbAux);
-            rel.setTime(Long.MIN_VALUE);
+            rel.setTime(timeToday);
             rel.revisions = null;
             eRelList.add(rel);
             ec.setRelationships(eRelList);
@@ -1997,7 +2000,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                         r1++;
                         nDrop++;
                     }
-                    getLog().info("ERROR: MISSED RELATIONSHIP RECORDS r1 < count1");
                 }
 
                 if (r2 < count2) {
