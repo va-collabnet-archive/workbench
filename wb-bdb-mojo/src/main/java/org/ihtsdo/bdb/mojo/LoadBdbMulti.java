@@ -62,7 +62,7 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private String generatedResources;
-    
+
     /**
      * Generated resources directory.
      * 
@@ -70,7 +70,7 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private File luceneDir;
-    
+
     /**
      * Generated resources directory.
      * 
@@ -78,7 +78,6 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private File berkeleyDir;
-
 
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
@@ -89,6 +88,12 @@ public class LoadBdbMulti extends AbstractMojo {
     private int converterSize = 1;
 
     public void execute() throws MojoExecutionException {
+        executeMojo(conceptsFileNames, generatedResources, luceneDir, berkeleyDir);
+
+    }
+
+    void executeMojo(String[] conceptsFileNames, String generatedResources, File luceneDir,
+            File berkeleyDir) throws MojoExecutionException {
         try {
             for (int i = 0; i < converterSize; i++) {
                 converters.put(new ConvertConcept());
@@ -98,7 +103,7 @@ public class LoadBdbMulti extends AbstractMojo {
             FileIO.recursiveDelete(berkeleyDir);
             Bdb.setup(berkeleyDir.getAbsolutePath());
 
-            for (String fname: conceptsFileNames) {
+            for (String fname : conceptsFileNames) {
                 File conceptsFile = new File(generatedResources, fname);
 
                 FileInputStream fis = new FileInputStream(conceptsFile);
@@ -117,7 +122,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     in.close();
                 }
             }
-            
+
             // See if any exceptions in the last converters;
             while (converters.isEmpty() == false) {
                 I_ProcessEConcept conceptConverter = converters.take();
@@ -131,20 +136,16 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("finished load, start sync");
             getLog().info("Concept count: " + Bdb.getConceptDb().getCount());
             getLog().info(
-                    "Concept attributes encountered: "
-                            + ConceptAttributesBinder.encountered
+                    "Concept attributes encountered: " + ConceptAttributesBinder.encountered
                             + " written: " + ConceptAttributesBinder.written);
             getLog().info(
-                    "Descriptions encountered: "
-                            + DescriptionBinder.encountered + " written: "
+                    "Descriptions encountered: " + DescriptionBinder.encountered + " written: "
                             + DescriptionBinder.written);
             getLog().info(
-                    "Relationships encountered: "
-                            + RelationshipBinder.encountered + " written: "
+                    "Relationships encountered: " + RelationshipBinder.encountered + " written: "
                             + RelationshipBinder.written);
             getLog().info(
-                    "Reset members encountered: "
-                            + RefsetMemberBinder.encountered + " written: "
+                    "Reset members encountered: " + RefsetMemberBinder.encountered + " written: "
                             + RefsetMemberBinder.written);
 
             getLog().info("Starting db sync.");
@@ -154,8 +155,7 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("Finished create index, starting close.");
             Bdb.close();
             getLog().info("db closed");
-            getLog().info("elapsed time: "
-                                    + (System.currentTimeMillis() - startTime));
+            getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
 
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
             File dirToMove = new File(berkeleyDir, "mutable");
@@ -190,7 +190,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 Bdb.getConceptDb().writeConcept(newConcept);
                 Collection<Integer> nids = newConcept.getAllNids();
                 assert nidCnidMap.getCNid(newConcept.getNid()) == newConcept.getNid();
-                for (int nid: nids) {
+                for (int nid : nids) {
                     assert nidCnidMap.getCNid(nid) == newConcept.getNid();
                 }
                 conceptsProcessed.incrementAndGet();
@@ -219,7 +219,6 @@ public class LoadBdbMulti extends AbstractMojo {
         }
     }
 
-    
     public void createLuceneDescriptionIndex() throws Exception {
         LuceneManager.setLuceneDirFile(luceneDir);
         LuceneManager.createLuceneDescriptionIndex();
