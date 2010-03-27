@@ -18,6 +18,7 @@ package org.dwfa.ace.task.refset.spec;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -345,6 +346,7 @@ public class RefsetSpec {
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            Set<Integer> currentIds = helper.getCurrentStatusIds();
 
             if (promotionRefsetConcept != null && memberRefsetConcept != null) {
                 Collection<? extends I_ExtendByRef> promotionExtensions =
@@ -352,14 +354,15 @@ public class RefsetSpec {
                 for (I_ExtendByRef promotionExtension : promotionExtensions) {
                     if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
                         I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
-
-                        if (latestPart instanceof I_ExtendByRefPartCid) {
-                            I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
-                            I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
-                            if (status.getConceptId() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()
-                                || status.getConceptId() == ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.localize()
-                                    .getNid()) {
-                                return true;
+                        if (currentIds.contains(latestPart.getStatusId())) {
+                            if (latestPart instanceof I_ExtendByRefPartCid) {
+                                I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
+                                I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
+                                if (status.getConceptId() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()
+                                    || status.getConceptId() == ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT
+                                        .localize().getNid()) {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -377,14 +380,25 @@ public class RefsetSpec {
         try {
 
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            helper.setAutocommitActive(true);
             I_GetConceptData memberRefsetConcept = getMemberRefsetConcept();
             I_GetConceptData promotionRefsetConcept = getPromotionRefsetConcept();
 
             if (memberRefsetConcept != null && promotionRefsetConcept != null) {
                 helper
                     .retireConceptExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept.getConceptId());
-                helper.newRefsetExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept.getConceptId(),
-                    newStatus.getConceptId());
+                Terms.get().commit();
+                if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptId(),
+                    memberRefsetConcept.getConceptId())) {
+                    helper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), memberRefsetConcept
+                        .getConceptId(), newStatus.getConceptId(), ArchitectonicAuxiliary.Concept.CURRENT.localize()
+                        .getNid());
+                    Terms.get().commit();
+                } else {
+                    helper.newRefsetExtension(promotionRefsetConcept.getConceptId(),
+                        memberRefsetConcept.getConceptId(), newStatus.getConceptId());
+                    Terms.get().commit();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

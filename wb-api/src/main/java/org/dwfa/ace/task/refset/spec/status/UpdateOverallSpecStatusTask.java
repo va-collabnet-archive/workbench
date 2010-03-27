@@ -86,6 +86,8 @@ public class UpdateOverallSpecStatusTask extends AbstractTask {
             RefsetSpec spec = new RefsetSpec(termFactory.getConcept(refsetUuid), true);
             spec.modifyOverallSpecStatus(termFactory.getConcept(statusUuid));
 
+            Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
+
             return Condition.ITEM_COMPLETE;
         } catch (Exception e) {
             e.printStackTrace();
