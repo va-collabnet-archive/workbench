@@ -282,7 +282,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
-        Concept c = Bdb.getConceptDb().getConcept(Bdb.getNidCNidMap().getCNid(nid));
+        int cNid = Bdb.getNidCNidMap().getCNid(nid);
+        if (cNid == Integer.MAX_VALUE) {
+            return new ArrayList<I_ExtendByRef>(0);
+        }
+        Concept c = Bdb.getConceptDb().getConcept(cNid);
         return c.getExtensionsForComponent(nid);
     }
 
@@ -818,6 +822,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Class<? extends I_ExtendByRefPart> partType) throws IOException {
         Concept refsetConcept = Concept.get(refsetId);
         I_ConfigAceFrame config = getActiveAceFrameConfig();
+        Bdb.getNidCNidMap().setCidForNid(refsetId, memberId);
+
         RefsetMember<?, ?> member =
                 createMember(memberId, componentId, EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
         addUncommitted(refsetConcept);

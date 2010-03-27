@@ -184,10 +184,10 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#getRefsetExtension
      * (int, int, org.dwfa.ace.api.RefsetPropertyMap)
      */
-    public I_ExtendByRef getRefsetExtension(int refsetId, int conceptId, final RefsetPropertyMap extProps)
+    public I_ExtendByRef getRefsetExtension(int refsetId, int componentId, final RefsetPropertyMap extProps)
             throws Exception {
         access();
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(conceptId, true)) {
+        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(componentId, true)) {
 
             if (extension.getRefsetId() == refsetId && extProps.validate((I_ExtendByRefPart) extension)) {
                 return extension;
