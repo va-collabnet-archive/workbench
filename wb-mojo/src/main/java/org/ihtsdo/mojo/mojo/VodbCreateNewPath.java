@@ -43,6 +43,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.status.TupleListUtil;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -134,8 +135,7 @@ public class VodbCreateNewPath extends AbstractMojo {
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
             if (activeConfig == null) {
-                activeConfig = NewDefaultProfile.newProfile("defaultProfile", "", "", "", "");
-                tf.setActiveAceFrameConfig(activeConfig);
+                throw new TaskFailedException("Use the vodb-set-default-config and vodb-set-ace-edit-path goals prior to calling this goal.");
             }
             Set<I_Position> pathOrigins = null;
             if (origins != null) {
