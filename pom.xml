@@ -5,7 +5,7 @@
 	<artifactId>wb-mojo</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
-	<name>Workbench Maven Java Objects</name>
+	<name>Workbench Mojo</name>
 	<description>Workbench Maven Java Objects (mojo)</description>
 	<!--
 		<scm>
