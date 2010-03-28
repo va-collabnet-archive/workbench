@@ -112,8 +112,9 @@ import org.ihtsdo.etypes.ERelationshipRevision;
  * Step 1. Versioning & Relationship Generated IDs.  Merge time series of releases into 
  * a versioned intermediate concept, description, and relationship files.  This step 
  * also adds an algorithmically computed relationship ids.<br>
- * Step 2. Sort. Sorts concepts, descriptions, and relationships to be in concept order.<br>
- * Step 3. Create EConcepts.  <br>
+ * Step 2. Destination Rels.  Build list for destination rels.<br>
+ * Step 3. Sort. Sorts concepts, descriptions, and source/destination relationships to be in concept order.<br>
+ * Step 4. Create EConcepts.  <br>
  * <p>
  * <b>NOTES:</b><br>
  * Records are NOT VERSIONED between files under DIFFERENT
@@ -211,12 +212,14 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     private HashMap<UuidMinimal, Long> relUuidMap; // :yyy:
 
     private String fNameStep1Con;
+    private String fNameStep1Desc;
     private String fNameStep1Rel;
-    private String fNameStep1Des;
-    private String fNameStep2Con;
-    private String fNameStep2Rel;
-    private String fNameStep2Des;
-    private String fNameStep3ECon;
+    private String fNameStep2RelDest;
+    private String fNameStep3Con;
+    private String fNameStep3Desc;
+    private String fNameStep3Rel;
+    private String fNameStep3RelDest;
+    private String fNameStep4ECon;
 
     // UUIDs
     private static UUID uuidPathWbAux;
@@ -465,11 +468,16 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             boolean snomedrtTF) throws MojoFailureException {
         fNameStep1Con = wDir + scratchDirectory + FILE_SEPARATOR + "step1_concepts.ser";
         fNameStep1Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step1_relationships.ser";
-        fNameStep1Des = wDir + scratchDirectory + FILE_SEPARATOR + "step1_descriptions.ser";
-        fNameStep2Con = wDir + scratchDirectory + FILE_SEPARATOR + "step2_concepts.ser";
-        fNameStep2Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step2_relationships.ser";
-        fNameStep2Des = wDir + scratchDirectory + FILE_SEPARATOR + "step2_descriptions.ser";
-        fNameStep3ECon = wDir + outputDirectory + FILE_SEPARATOR + "sctSiEConcepts.jbin";
+        fNameStep1Desc = wDir + scratchDirectory + FILE_SEPARATOR + "step1_descriptions.ser";
+
+        fNameStep2RelDest = wDir + scratchDirectory + FILE_SEPARATOR + "step2_rel_dest.ser";
+
+        fNameStep3Con = wDir + scratchDirectory + FILE_SEPARATOR + "step3_concepts.ser";
+        fNameStep3Desc = wDir + scratchDirectory + FILE_SEPARATOR + "step3_descriptions.ser";
+        fNameStep3Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step3_relationships.ser";
+        fNameStep3RelDest = wDir + scratchDirectory + FILE_SEPARATOR + "step3_rel_dest.ser";
+
+        fNameStep4ECon = wDir + outputDirectory + FILE_SEPARATOR + "sctSiEConcepts.jbin";
 
         xPathMap = new HashMap<String, Integer>();
         xPathList = new ArrayList<String>();
@@ -491,19 +499,85 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         stateSave(wDir);
         System.gc();
 
-        // STEP 2. Sort in concept order
-        // ... check size of just reading in.
+        // stateRestore(wDir);
+        lookupConverion();
+
+        // STEP 2. Create destination relationship lists
         executeMojoStep2();
         System.gc();
 
-        // STEP 3. Convert to EConcepts
-        // stateRestore(wDir);
-        lookupConverion();
+        // STEP 3. Sort in concept order
+        // ... check size of just reading in.
         executeMojoStep3();
+        System.gc();
+
+        // STEP 4. Convert to EConcepts
+        executeMojoStep4();
     }
 
     void executeMojoStep2() throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept BEGIN STEP #1 ***");
+        getLog().info("*** SctSiToEConcept STEP #2 BEGINNING ***");
+        long start = System.currentTimeMillis();
+
+        try {
+            // read in relationships, sort by C2-ROLETYPE
+            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+                    new FileInputStream(fNameStep1Rel)));
+            ArrayList<SctXRelRecord> aRel = new ArrayList<SctXRelRecord>();
+
+            int count = 0;
+            Object obj = null;
+            try {
+                while ((obj = ois.readObject()) != null) {
+                    if (obj instanceof SctXRelRecord) {
+                        aRel.add((SctXRelRecord) obj);
+                        count++;
+                        if (count % 100000 == 0)
+                            getLog().info(" relationship count = " + count);
+                    }
+                }
+            } catch (EOFException ex) {
+                getLog().info(" relationship count = " + count + "\r\n");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new MojoFailureException("ClassNotFoundException -- Step 2 reading file");
+            }
+            ois.close();
+
+            Collections.sort(aRel);
+
+            ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(
+                    new FileOutputStream(fNameStep2RelDest)));
+            long lastRelMsb = Long.MIN_VALUE;
+            long lastRelLsb = Long.MIN_VALUE;
+            for (SctXRelRecord r : aRel) {
+                if (r.uuidMostSigBits != lastRelMsb || r.uuidLeastSigBits != lastRelLsb) {
+                    long typeMsb = lookupRoleType(r.roleType).getMostSignificantBits();
+                    long typeLsb = lookupRoleType(r.roleType).getLeastSignificantBits();
+                    oos.writeUnshared(new SctXRelDestRecord(r.uuidMostSigBits, r.uuidLeastSigBits,
+                            r.conceptTwoID, r.roleType, typeMsb, typeLsb));
+                }
+                lastRelMsb = r.uuidMostSigBits;
+                lastRelLsb = r.uuidLeastSigBits;
+            }
+            oos.flush();
+            oos.close();
+            aRel = null;
+            System.gc();
+
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        getLog().info("*** SctSiToEConcept STEP #2 COMPLETED ***");
+    }
+
+    void executeMojoStep3() throws MojoFailureException {
+        getLog().info("*** SctSiToEConcept STEP #3 BEGINNING ***");
         long start = System.currentTimeMillis();
         try {
 
@@ -560,7 +634,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             Collections.sort(aCon, compCon);
 
             ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(fNameStep2Con)));
+                    new FileOutputStream(fNameStep3Con)));
             for (SctXConRecord r : aCon)
                 oos.writeUnshared(r);
             oos.flush();
@@ -569,7 +643,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             System.gc();
 
             // *** DESCRIPTIONS ***
-            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fNameStep1Des)));
+            ois = new ObjectInputStream(
+                    new BufferedInputStream(new FileInputStream(fNameStep1Desc)));
             ArrayList<SctXDesRecord> aDes = new ArrayList<SctXDesRecord>();
 
             count = 0;
@@ -627,7 +702,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             Collections.sort(aDes, compDes);
 
             oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
-                    fNameStep2Des)));
+                    fNameStep3Desc)));
             for (SctXDesRecord r : aDes)
                 oos.writeUnshared(r);
             oos.flush();
@@ -708,31 +783,85 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             Collections.sort(aRel, compRel);
 
             oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
-                    fNameStep2Rel)));
+                    fNameStep3Rel)));
             for (SctXRelRecord r : aRel)
                 oos.writeUnshared(r);
             oos.flush();
             oos.close();
-            aCon = null;
+            aRel = null;
+
+            // ** DESTINATION RELATIONSHIPS **
+            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+                    fNameStep2RelDest)));
+            ArrayList<SctXRelDestRecord> aRelDest = new ArrayList<SctXRelDestRecord>();
+
+            count = 0;
+            obj = null;
+            try {
+                while ((obj = ois.readObject()) != null) {
+                    if (obj instanceof SctXRelDestRecord) {
+                        aRelDest.add((SctXRelDestRecord) obj);
+                        count++;
+                        if (count % 100000 == 0)
+                            getLog().info(" destination relationships count = " + count);
+                    }
+                }
+            } catch (EOFException ex) {
+                getLog().info(" destination relationships count = " + count + "\r\n");
+            }
+            ois.close();
+
+            // SORT BY [C1-Group-RoleType-Path-RevisionVersion]
+            Comparator<SctXRelDestRecord> compRelDest = new Comparator<SctXRelDestRecord>() {
+                public int compare(SctXRelDestRecord o1, SctXRelDestRecord o2) {
+                    int thisMore = 1;
+                    int thisLess = -1;
+                    // C2
+                    if (o1.conceptTwoID > o2.conceptTwoID) {
+                        return thisMore;
+                    } else if (o1.conceptTwoID < o2.conceptTwoID) {
+                        return thisLess;
+                    } else {
+                        // ROLE TYPE
+                        if (o1.roleType > o2.roleType) {
+                            return thisMore;
+                        } else if (o1.roleType < o2.roleType) {
+                            return thisLess;
+                        } else {
+                            return 0; // EQUAL
+                        }
+                    }
+                } // compare()
+            };
+            Collections.sort(aRelDest, compRelDest);
+
+            oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
+                    fNameStep3RelDest)));
+            for (SctXRelDestRecord r : aRelDest)
+                oos.writeUnshared(r);
+            oos.flush();
+            oos.close();
+            aRelDest = null;
+
             System.gc();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            throw new MojoFailureException("File Not Found -- Step 2");
+            throw new MojoFailureException("File Not Found -- Step 3");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 2");
+            throw new MojoFailureException("IO Exception -- Step 3");
         } catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         getLog().info(
                 "MASTER SORT TIME: " + ((System.currentTimeMillis() - start) / 1000) + " seconds");
-        getLog().info("*** SctSiToEConcept STEP #2 COMPLETED ***");
+        getLog().info("*** SctSiToEConcept STEP #3 COMPLETED ***");
     }
 
-    void executeMojoStep3() throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept BEGIN STEP #3 ***");
+    void executeMojoStep4() throws MojoFailureException {
+        getLog().info("*** SctSiToEConcept STEP #4 BEGINNING ***");
         long start = System.currentTimeMillis();
         countEConWritten = 0;
 
@@ -740,47 +869,55 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         ArrayList<SctXConRecord> conList = new ArrayList<SctXConRecord>();
         ArrayList<SctXDesRecord> desList = new ArrayList<SctXDesRecord>();
         ArrayList<SctXRelRecord> relList = new ArrayList<SctXRelRecord>();
+        ArrayList<SctXRelDestRecord> relDestList = new ArrayList<SctXRelDestRecord>();
 
         // Since readObject must look one record ahead,
         // the look ahead record is stored as "Next"
         SctXConRecord conNext = null;
         SctXDesRecord desNext = null;
         SctXRelRecord relNext = null;
+        SctXRelDestRecord relDestNext = null;
 
         // Open Input and Output Streams
         ObjectInputStream oisCon = null;
         ObjectInputStream oisDes = null;
         ObjectInputStream oisRel = null;
+        ObjectInputStream oisRelDest = null;
         DataOutputStream dos = null;
         try {
             oisCon = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-                    fNameStep2Con)));
+                    fNameStep3Con)));
             oisDes = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-                    fNameStep2Des)));
+                    fNameStep3Desc)));
             oisRel = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
-                    fNameStep2Rel)));
+                    fNameStep3Rel)));
+            oisRelDest = new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+                    fNameStep3RelDest)));
             dos = new DataOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(fNameStep3ECon)));
+                    new FileOutputStream(fNameStep4ECon)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            throw new MojoFailureException("File Not Found -- Step 3");
+            throw new MojoFailureException("File Not Found -- Step 4");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3");
+            throw new MojoFailureException("IO Exception -- Step 4");
         }
 
         createSctSiEConcept(dos);
-        
+
         int countCon = 0;
         int countDes = 0;
         int countRel = 0;
+        int countRelDest = 0;
         boolean notDone = true;
         long theCon;
         long theDes = Long.MIN_VALUE;
         long theRel = Long.MIN_VALUE;
+        long theRelDest = Long.MIN_VALUE;
         long prevCon = Long.MIN_VALUE;
         long prevDes = Long.MIN_VALUE;
         long prevRel = Long.MIN_VALUE;
+        long prevRelDest = Long.MIN_VALUE;
         while (notDone) {
             // Get next Concept record(s) for 1 id.
             conNext = readNextCon(oisCon, conList, conNext);
@@ -797,31 +934,62 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
             while (theRel < theCon) {
                 relNext = readNextRel(oisRel, relList, relNext);
-                theRel = relList.get(0).conceptOneID;
-                countRel++;
-                if (theRel < theCon)
-                    getLog().info(
-                            "ORPHAN RELATIONSHIP :: relid=" + relList.get(0).id + " c1=="
-                                    + relList.get(0).conceptOneID);
+                if (relNext == null && relList.size() == 0)
+                    theRel = Long.MAX_VALUE;
+                else {
+                    theRel = relList.get(0).conceptOneID;
+                    countRel++;
+                    if (theRel < theCon)
+                        getLog().info(
+                                "ORPHAN RELATIONSHIP :: relid=" + relList.get(0).id + " c1=="
+                                        + relList.get(0).conceptOneID);
+                }
+            }
+
+            while (theRelDest < theCon) {
+                relDestNext = readNextRelDest(oisRelDest, relDestList, relDestNext);
+                if (relDestNext == null && relDestList.size() == 0)
+                    theRelDest = Long.MAX_VALUE;
+                else {
+                    theRelDest = relDestList.get(0).conceptTwoID;
+                    countRelDest++;
+                    if (theRelDest < theCon)
+                        getLog().info(
+                                "ORPHAN DEST. RELATIONSHIP :: relid=" + relList.get(0).id + " c2=="
+                                        + relDestList.get(0).conceptTwoID);
+                }
             }
 
             // Check for next sync
-            if (theCon != theDes || theCon != theRel) {
-                getLog().info("CAUTION: non-matching ids ");
-                getLog().info(" ...prev... " + prevCon + " " + prevDes + " " + prevRel);
-                getLog().info(" ...-is-... " + theCon + " " + theDes + " " + theRel);
-                getLog().info(
-                        " ..\"next\".. " + conNext.id + " " + desNext.conceptId + " "
-                                + relNext.conceptOneID);
+            if (theCon != theDes || theCon != theRel /*|| theCon != theRelDest*/) {
+                getLog().info("CONFIRM: ROOT CONCEPT ");
+                getLog().info(" -is- concept SNOMED id =" + conList.get(0).id);
+                getLog().info(" -is- concept counter #" + countCon);
                 getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
+                getLog().info(
+                        " ...prev... " + prevCon + " " + prevDes + " " + prevRel + " "
+                                + prevRelDest);
+                getLog().info(
+                        " ...-is-... " + theCon + " " + theDes + " " + theRel + " " + theRelDest);
+                String cnStr = conNext != null ? Long.toString(conNext.id) : "*null*";
+                String dnStr = desNext != null ? Long.toString(desNext.conceptId) : "*null*";
+                String rnStr = relNext != null ? Long.toString(relNext.conceptOneID) : "*null*";
+                String rdnStr = relDestNext != null ? Long.toString(relDestNext.conceptTwoID)
+                        : "*null*";
+                getLog().info(" ..\"next\".. " + cnStr + " " + dnStr + " " + rnStr + " " + rdnStr);
             }
 
-            if (theCon == theDes && theCon == theRel) {
-                createEConcept(conList, desList, relList, dos);
-            } else if (theCon == theDes && theCon != theRel) {
-                createEConcept(conList, desList, null, dos);
+            if (theCon == theDes && theCon == theRel && theCon == theRelDest) {
+                // MIDDLE CASE
+                createEConcept(conList, desList, relList, relDestList, dos);
+            } else if (theCon == theDes && theCon != theRel && theCon == theRelDest) {
+                // TOP CASE
+                createEConcept(conList, desList, null, relDestList, dos);
+            } else if (theCon == theDes && theCon == theRel && theCon != theRelDest) {
+                // BOTTOM CASE
+                createEConcept(conList, desList, relList, null, dos);
             } else {
-                throw new MojoFailureException("Case not implemented -- Step 3");
+                throw new MojoFailureException("Case not implemented -- Step 4");
             }
 
             if (conNext == null && desNext == null && relNext == null)
@@ -830,6 +998,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             prevCon = theCon;
             prevDes = theDes;
             prevRel = theRel;
+            prevRelDest = theRelDest;
         }
         getLog().info(
                 "RECORD COUNT = " + countCon + "(Con) " + countDes + "(Des) " + countRel + "(Rel)");
@@ -842,17 +1011,18 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             dos.close();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3, closing files");
+            throw new MojoFailureException("IO Exception -- Step 4, closing files");
         }
         getLog().info(
                 "ECONCEPT CREATION TIME: " + ((System.currentTimeMillis() - start) / 1000)
                         + " seconds");
         getLog().info("ECONCEPTS WRITTEN TO FILE = " + countEConWritten);
-        getLog().info("*** SctSiToEConcept STEP #3 COMPLETED ***");
+        getLog().info("*** SctSiToEConcept STEP #4 COMPLETED ***");
     }
 
     private void createEConcept(ArrayList<SctXConRecord> conList, ArrayList<SctXDesRecord> desList,
-            ArrayList<SctXRelRecord> relList, DataOutputStream dos) throws MojoFailureException {
+            ArrayList<SctXRelRecord> relList, ArrayList<SctXRelDestRecord> relDestList,
+            DataOutputStream dos) throws MojoFailureException {
         if (conList.size() < 1)
             throw new MojoFailureException("createEConcept(), empty conList");
 
@@ -888,7 +1058,18 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         else
             ca.revisions = null; // :!!!:???:
         ec.setConceptAttributes(ca);
-        // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
+
+        if (relDestList == null)
+            ec.setDestRelUuidTypeUuids(null);
+        else {
+            List<UUID> destRelOriginUuidTypeUuids = new ArrayList<UUID>(relDestList.size() * 2);
+            Collections.sort(relDestList);
+            for (SctXRelDestRecord r : relDestList) {
+                destRelOriginUuidTypeUuids.add(new UUID(r.uuidMostSigBits, r.uuidLeastSigBits));
+                destRelOriginUuidTypeUuids.add(lookupRoleType(r.roleType));
+            }
+            ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids);
+        }
 
         // ADD DESCRIPTIONS
         if (desList != null) {
@@ -903,7 +1084,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     if (des != null) {
                         if (revisions.size() > 0) {
                             des.revisions = revisions;
-                            revisions = new ArrayList<EDescriptionRevision>();                            
+                            revisions = new ArrayList<EDescriptionRevision>();
                         }
                         eDesList.add(des);
                     }
@@ -954,7 +1135,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     if (rel != null) {
                         if (revisions.size() > 0) {
                             rel.revisions = revisions;
-                            revisions = new ArrayList<ERelationshipRevision>();                            
+                            revisions = new ArrayList<ERelationshipRevision>();
                         }
                         eRelList.add(rel);
                     }
@@ -1025,7 +1206,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ca.setTime(timeToday);
             ca.revisions = null; // no revisions
             ec.setConceptAttributes(ca);
-            // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
+            List<UUID> destRelOriginUuidTypeUuids = new ArrayList<UUID>(2);
+            destRelOriginUuidTypeUuids.add(uuidStatedRel);
+            destRelOriginUuidTypeUuids.add(uuidWbAuxIsa);
+            ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids);
 
             // CREATE & ADD DESCRIPTIONS
             List<EDescription> eDesList = new ArrayList<EDescription>();
@@ -1102,7 +1286,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ca.setTime(timeToday);
             ca.revisions = null; // no revisions
             ec.setConceptAttributes(ca);
-            // ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids); :!!!:???:
+            List<UUID> destRelOriginUuidTypeUuidsInferred = new ArrayList<UUID>(2);
+            destRelOriginUuidTypeUuidsInferred.add(uuidInferredRel);
+            destRelOriginUuidTypeUuidsInferred.add(uuidWbAuxIsa);
+            ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuidsInferred);
 
             // CREATE & ADD DESCRIPTIONS
             eDesList = new ArrayList<EDescription>();
@@ -1187,10 +1374,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("IO Exception -- Step 3, reading conNext");
+                throw new MojoFailureException("IO Exception -- Step 4, reading conNext");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("ClassNotFoundException -- Step 3, reading conNext");
+                throw new MojoFailureException("ClassNotFoundException -- Step 4, reading conNext");
             }
         }
 
@@ -1213,10 +1400,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             return null; // end reached, no more records
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3, reading concepts");
+            throw new MojoFailureException("IO Exception -- Step 4, reading concepts");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new MojoFailureException("ClassNotFoundException -- Step 3, reading concepts");
+            throw new MojoFailureException("ClassNotFoundException -- Step 4, reading concepts");
         }
 
         return conNext; // first record of next concept id
@@ -1239,10 +1426,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("IO Exception -- Step 3, reading desNext");
+                throw new MojoFailureException("IO Exception -- Step 4, reading desNext");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("ClassNotFoundException -- Step 3, reading desNext");
+                throw new MojoFailureException("ClassNotFoundException -- Step 4, reading desNext");
             }
         }
 
@@ -1265,10 +1452,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             return null; // end reached, no more records
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3, reading descriptions");
+            throw new MojoFailureException("IO Exception -- Step 4, reading descriptions");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new MojoFailureException("ClassNotFoundException -- Step 3, reading descriptions");
+            throw new MojoFailureException("ClassNotFoundException -- Step 4, reading descriptions");
         }
 
         return desNext; // first record of next concept id
@@ -1291,10 +1478,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("IO Exception -- Step 3, reading relNext");
+                throw new MojoFailureException("IO Exception -- Step 4, reading relNext");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                throw new MojoFailureException("ClassNotFoundException -- Step 3, reading relNext");
+                throw new MojoFailureException("ClassNotFoundException -- Step 4, reading relNext");
             }
         }
 
@@ -1317,14 +1504,69 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             return null; // end reached, no more records
         } catch (IOException e) {
             e.printStackTrace();
-            throw new MojoFailureException("IO Exception -- Step 3, reading relationships");
+            throw new MojoFailureException("IO Exception -- Step 4, reading relationships");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new MojoFailureException(
-                    "ClassNotFoundException -- Step 3, reading relationships");
+                    "ClassNotFoundException -- Step 4, reading relationships");
         }
 
         return relNext; // first record of next concept id
+    }
+
+    private SctXRelDestRecord readNextRelDest(ObjectInputStream ois,
+            ArrayList<SctXRelDestRecord> relDestList, SctXRelDestRecord relDestNext)
+            throws MojoFailureException {
+        relDestList.clear();
+        if (relDestNext != null) {
+            relDestList.add(relDestNext);
+        } else {
+            try { // CHECK FOR FIRST RECORD SITUATION
+                Object obj = ois.readObject();
+                if (obj instanceof SctXRelDestRecord) {
+                    relDestNext = (SctXRelDestRecord) obj;
+                    relDestList.add(relDestNext);
+                } else
+                    return null;
+            } catch (EOFException ex) {
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new MojoFailureException("IO Exception -- Step 4, reading relDestNext");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new MojoFailureException(
+                        "ClassNotFoundException -- Step 4, reading relDestNext");
+            }
+        }
+
+        try {
+            boolean notDone = true;
+            while (notDone) {
+                Object obj = ois.readObject();
+                if (obj instanceof SctXRelDestRecord) {
+                    SctXRelDestRecord rec = (SctXRelDestRecord) obj;
+                    if (rec.conceptTwoID == relDestNext.conceptTwoID) {
+                        relDestList.add(rec);
+                    } else {
+                        relDestNext = rec;
+                        notDone = false;
+                    }
+                }
+            }
+        } catch (EOFException ex) {
+            relDestNext = null;
+            return null; // end reached, no more records
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MojoFailureException("IO Exception -- Step 4, reading relationships");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new MojoFailureException(
+                    "ClassNotFoundException -- Step 4, reading relationships");
+        }
+
+        return relDestNext; // first record of next concept id
     }
 
     private void setupUuids() throws MojoFailureException {
@@ -1375,7 +1617,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("SNOMED Core          = " + uuidPathSnomedCore);
             getLog().info("SNOMED Core Stated   = " + uuidPathSnomedStatedStr);
             getLog().info("  ... Stated rel     = " + uuidStatedRel.toString());
-            
+
             getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
             getLog().info("  ... Inferred rel   = " + uuidInferredRel.toString());
 
@@ -1390,7 +1632,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
     void executeMojoStep1(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
             boolean snomedrtTF) throws MojoFailureException {
-        getLog().info("*** SctSiToEConcept BEGIN STEP #1 ***");
+        getLog().info("*** SctSiToEConcept STEP #1 BEGINNING ***");
         long start = System.currentTimeMillis();
 
         // Setup build directory
@@ -1709,8 +1951,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         // SETUP DESCRIPTIONS OUTPUT FILE
         ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(
-                new FileOutputStream(fNameStep1Des)));
-        getLog().info("Step 1 DESCRIPTIONS OUTPUT: " + fNameStep1Des);
+                new FileOutputStream(fNameStep1Desc)));
+        getLog().info("Step 1 DESCRIPTIONS OUTPUT: " + fNameStep1Desc);
 
         Iterator<List<SCTFile>> dit = sctv.iterator(); // Directory Iterator
         while (dit.hasNext()) {
