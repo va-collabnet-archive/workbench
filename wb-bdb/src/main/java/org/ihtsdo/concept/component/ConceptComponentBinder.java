@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
@@ -97,6 +98,9 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	                                nidToConceptComponentMap.put(nid, oldComponent);
 	                            }
 	                        }
+						} else {
+                            AceLog.getAppLog().warning("\n########## Suppressing concept component:\n     " + conceptComponent +
+                            "\n##########");
 						}
 					} else {
 					    conceptComponent.merge(factory.create(enclosingConcept, input));

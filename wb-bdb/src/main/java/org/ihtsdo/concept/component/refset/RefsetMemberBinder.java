@@ -90,6 +90,9 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 	                                nidToRefsetMemberMap.put(nid, refsetMember);
 	                            }
 	                        }
+						} else {
+						    AceLog.getAppLog().warning("\n########## Suppressing refset member:\n     " + refsetMember +
+						        "\n##########");
 						}
 					} else {
 					    refsetMember.merge(factory.create(nid, typeNid, enclosingConcept, input));

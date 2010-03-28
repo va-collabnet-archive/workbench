@@ -67,19 +67,14 @@ public class VodbCommit extends AbstractMojo {
         I_TermFactory termFactory = Terms.get();
         getLog().info("commiting (id: " + execution.getExecutionId() + "): " + termFactory);
         if (termFactory != null) {
-            if (termFactory.getUncommitted() != null && termFactory.getUncommitted().size() > 0) {
-                try {
-
-                    termFactory.commit();
-                } catch (Exception e) {
-                    throw new MojoExecutionException(e.getLocalizedMessage(), e);
-                }
-            } else {
-                getLog().info("termfactory.getUncommitted().size() = " + termFactory.getUncommitted().size());
+            try {
+                termFactory.commit();
+            } catch (Exception e) {
+                throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
         } else {
-            Exception ex = new Exception("Attempting commit with null term factory (id: " + execution.getExecutionId()
-                + "): " + termFactory);
+            Exception ex = new Exception("Attempting commit with null term factory (id: " + 
+                execution.getExecutionId() + "): " + termFactory);
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         }
 
