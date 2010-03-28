@@ -35,15 +35,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				
-					<groupId>org.dwfa</groupId> 
-					<artifactId>dwfa-mojo</artifactId>
-					<version>2.0.31-SNAPSHOT</version>
-				
-				<!--<groupId>org.ihtsdo</groupId>
-				<artifactId>wb-mojo</artifactId>
-				<version>${org.ihtsdo.wb-mojo.version}</version> -->
-				
+				<groupId>org.dwfa</groupId>
+				<artifactId>dwfa-mojo</artifactId>
+				<version>2.0.31-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
@@ -59,16 +53,12 @@
 								<String>HL7</String>
 								<String>QUEUE_TYPE</String>
 							</taxonomies>
-							<output>${project.build.directory}/generated-resources/ace </output>
+							<output>${project.build.directory}/generated-resources/ace</output>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-			
-				<!--  <groupId>org.ihtsdo</groupId>
-				<artifactId>wb-mojo</artifactId>
-				<version>${org.ihtsdo.wb-mojo.version}</version> -->
 				<groupId>org.dwfa</groupId>
 				<artifactId>term-mojo</artifactId>
 				<version>1.43-SNAPSHOT</version>
@@ -80,8 +70,7 @@
 							<goal>vodb-open</goal>
 						</goals>
 						<configuration>
-							<vodbDirectory>${project.build.directory}/generated-resources/berkeley-db
-              </vodbDirectory>
+							<vodbDirectory>${project.build.directory}/generated-resources/berkeley-db</vodbDirectory>
 						</configuration>
 					</execution>
 					<execution>

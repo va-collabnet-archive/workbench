@@ -234,7 +234,7 @@
 							<goal>write-directories</goal>
 						</goals>
 						<configuration>
-							<targetSubDir>generated-resources/ </targetSubDir>
+							<targetSubDir>generated-resources/</targetSubDir>
 						</configuration>
 					</execution>
 				</executions>

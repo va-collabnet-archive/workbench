@@ -40,12 +40,13 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.status.TupleListUtil;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
  * 
@@ -130,8 +131,12 @@ public class VodbCreateNewPath extends AbstractMojo {
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeConfig = tf.getActiveAceFrameConfig();
+            if (activeConfig == null) {
+                activeConfig = NewDefaultProfile.newProfile("defaultProfile", "", "", "", "");
+                tf.setActiveAceFrameConfig(activeConfig);
+            }
             Set<I_Position> pathOrigins = null;
             if (origins != null) {
                 pathOrigins = new HashSet<I_Position>(origins.length);
@@ -145,12 +150,12 @@ public class VodbCreateNewPath extends AbstractMojo {
             activeConfig.setHierarchySelection(parent);
 
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
-            getLog().error("VodbCreateNewPath pathUUID= "+pathUUID);	
+            getLog().info("VodbCreateNewPath pathUUID= "+pathUUID);	
 
             I_GetConceptData pathConcept;
 
             if (tf.hasId(pathUUID)) {
-            	 getLog().error("VodbCreateNewPath tf has pathUUID ");
+            	getLog().info("VodbCreateNewPath tf has pathUUID ");
                 pathConcept = tf.getConcept(new UUID[] { pathUUID });
 
                 /**
@@ -162,13 +167,13 @@ public class VodbCreateNewPath extends AbstractMojo {
                  * anyway... as the existing concept is not complete/usable
                  */
                 if (pathConcept.getDescriptions() == null || pathConcept.getDescriptions().isEmpty()) {
-                	getLog().error("VodbCreateNewPath tf has pathUUID but no desc");
+                	getLog().warn("VodbCreateNewPath tf has pathUUID but no desc");
                     pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
                 }
             } else {
-            	getLog().error("VodbCreateNewPath tf has NO pathUUID So creating NEW");
+            	getLog().info("VodbCreateNewPath tf has NO pathUUID So creating NEW");
                 pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
-                getLog().error("VodbCreateNewPath createNewPathConcept called new concept ID = "+pathConcept.getConceptId());
+                getLog().info("VodbCreateNewPath createNewPathConcept called new concept ID = "+pathConcept.getConceptId());
             }
 
             tf.newPath(pathOrigins, pathConcept);

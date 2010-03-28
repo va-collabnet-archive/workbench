@@ -25,7 +25,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
@@ -64,7 +64,7 @@ public class VodbCommit extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         getLog().info("commiting (id: " + execution.getExecutionId() + "): " + termFactory);
         if (termFactory != null) {
             if (termFactory.getUncommitted() != null && termFactory.getUncommitted().size() > 0) {
