@@ -138,11 +138,10 @@ public class StringExtTupleFileUtil {
             }
 
         } catch (Exception e) {
-            String errorMessage =
-                    "Exception of unknown cause thrown while importing string ext tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Exception thrown while importing string ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
-                outputFileWriter.write(errorMessage + e.getLocalizedMessage());
+                outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
                 return false;
             } catch (IOException e1) {

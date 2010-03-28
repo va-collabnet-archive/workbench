@@ -160,8 +160,7 @@ public class ConceptConceptExtTupleFileUtil {
 
         } catch (Exception e) {
             String errorMessage =
-                    "Exception of unknown cause thrown while importing concept-concept ext tuple : "
-                        + e.getLocalizedMessage();
+                    "Exception thrown while importing concept-concept ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
