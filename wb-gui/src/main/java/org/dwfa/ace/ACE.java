@@ -183,6 +183,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
+import org.ihtsdo.custom.statics.CustomStatics;
+import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
@@ -1199,19 +1201,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JPanel topPanel;
 
-    private JTabbedPane conceptTabs = new JTabbedPane();
+    public JTabbedPane conceptTabs = new JTabbedPane();
 
     private ConceptPanel c1Panel;
 
     private ConceptPanel c2Panel;
 
-    private JComponent termTree;
+    public JComponent termTree;
 
-    private SearchPanel searchPanel;
+    public SearchPanel searchPanel;
 
-    private JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    public JSplitPane upperLowerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-    private JSplitPane termTreeConceptSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    public JSplitPane termTreeConceptSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
     private JToggleButton showComponentButton;
 
@@ -1248,9 +1250,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static Timer timer = new Timer();
 
-    AceFrameConfig aceFrameConfig;
+    public AceFrameConfig aceFrameConfig;
 
-    private static AceConfig aceConfig;
+    public static AceConfig aceConfig;
 
     public static boolean editMode = true;
 
@@ -1347,7 +1349,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel dataCheckListPanel;
     private RefsetSpecPanel refsetSpecPanel;
     private SnoRocketTabPanel snoRocketPanel;
-    private TermTreeHelper treeHelper;
+    public TermTreeHelper treeHelper;
     private JFrame frame;
 
     public String getPluginRoot() {
@@ -1639,8 +1641,25 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(newProcess, c);
         c.gridx++;
     }
-
+    
+    //TODO check if custom UI defined
     private JComponent getContentPanel() throws Exception {
+    	System.out.println("BBBBOOOOBBBB getContentPanel called");
+    	
+    	String custUI = (String)ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
+    	
+    	if(custUI != null && custUI.length() > 0) {
+    		I_ReturnMainPanel cp = (I_ReturnMainPanel)ObjectCache.get(custUI);
+    		return cp.getContentPanel(this);
+    	}
+    	
+    	else {
+    	return getDefaultContentPanel();
+    	}
+    }
+    
+
+    private JComponent getDefaultContentPanel() throws Exception {
         treeHelper = new TermTreeHelper(this.aceFrameConfig, this);
         termTree = treeHelper.getHierarchyPanel();
         conceptPanels = new ArrayList<ConceptPanel>();

@@ -142,9 +142,11 @@ public class AceRunner {
             // setBerkeleyDbAsTransactional();
 
             File acePropertiesFile = new File("config", "ace.properties");
+            
+            AceLog.getAppLog().info("looking for ace.properties ");
             boolean acePropertiesFileExists = acePropertiesFile.exists();
             aceProperties = new Properties();
-
+            AceLog.getAppLog().info("looking for ace.properties Exists = "+acePropertiesFileExists);
             boolean initialized = false;
             if (acePropertiesFileExists) {
                 aceProperties.loadFromXML(new FileInputStream(acePropertiesFile));
