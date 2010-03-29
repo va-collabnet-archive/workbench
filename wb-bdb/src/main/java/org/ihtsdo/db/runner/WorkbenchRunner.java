@@ -60,7 +60,10 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.cs.ChangeSetPolicy;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
+import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.objectCache.ObjectCache;
+import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -172,7 +175,6 @@ public class WorkbenchRunner {
 			AceLog.getAppLog().info("BBBBOBBBB looking for wb.properties Exists = "+acePropertiesFileExists);
 			wbProperties = new Properties();
 			
-
 			boolean initialized = false;
 			if (acePropertiesFileExists) {
 				wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
@@ -191,6 +193,8 @@ public class WorkbenchRunner {
 			}
 
 			wbProperties.put("initialized", "true");
+			//Check to see if there is a custom Properties file
+			checkCustom();
 
 			if (jiniConfig != null) {
 				wbConfigFile = (File) jiniConfig.getEntry(this.getClass()
@@ -710,6 +714,33 @@ public class WorkbenchRunner {
 					processFile(f, lc);
 				}
 			}
+		}
+	}
+	
+	private void checkCustom() {
+		String custPropFN = null;
+		try {
+		if(wbProperties.getProperty(CustomStatics.CUSTOMPROPS) != null) {
+			custPropFN = wbProperties.getProperty(CustomStatics.CUSTOMPROPS);
+			AceLog.getAppLog().info("checkCustom custPropFN = "+custPropFN);
+			File custPropertiesFile = new File("config",custPropFN );
+			if(custPropertiesFile.exists() && custPropertiesFile.canRead()) {
+				Properties custProps = new Properties();
+				custProps.loadFromXML(new FileInputStream(custPropertiesFile));
+				if(custProps.getProperty(CustomStatics.CUSTOM_UI_CLASSNAME) != null) {
+					String custCN = custProps.getProperty(CustomStatics.CUSTOM_UI_CLASSNAME);
+					AceLog.getAppLog().info("checkCustom custCN = "+custCN);
+					Object obj = ObjectCacheClassHandler.getInstClass(custCN);
+					if(obj != null) {
+						ObjectCache.put(CustomStatics.CUSTOMPROPS, custPropFN);
+						ObjectCache.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
+					}	
+				}	
+			}
+		}
+	}
+		catch(Exception E) {
+			AceLog.getAppLog().severe("checkCustom threw an error trying to get "+custPropFN,E);
 		}
 	}
 
