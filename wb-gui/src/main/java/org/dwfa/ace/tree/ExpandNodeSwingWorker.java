@@ -18,7 +18,6 @@ package org.dwfa.ace.tree;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -202,14 +201,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                 	if (Terms.get().hasConcept(conceptId)) {
                         I_GetConceptData cb = ConceptBeanForTree.get(conceptId, relId, 0, false,
                                 ExpandNodeSwingWorker.this.config);
-                            boolean leaf = false;
-                            if ((config.getDestRelTypes().getSetValues().length == 0)
-                                && (config.getSourceRelTypes().getSetValues().length == 0)) {
-                                leaf = cb.isLeaf(null, false);
-                            } else {
-                                leaf = cb.isLeaf(config, false);
-                            }
-
+                            boolean leaf =  cb.isLeaf(config, false);;
                             child = new DefaultMutableTreeNode(cb, !leaf);
                             sortedNodes.add(child);
                 	}
