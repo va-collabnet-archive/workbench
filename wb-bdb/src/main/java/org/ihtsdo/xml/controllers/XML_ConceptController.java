@@ -8,9 +8,8 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.ihtsdo.xml.cache.ObjectCache;
+import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
-import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.XML_I_GetConceptData;
 import org.ihtsdo.xml.util.XMLUtil;
 import org.w3c.dom.Document;

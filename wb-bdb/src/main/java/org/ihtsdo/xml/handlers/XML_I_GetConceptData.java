@@ -15,7 +15,7 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.ihtsdo.xml.cache.ObjectCache;
+import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.util.XMLUtil;
 
