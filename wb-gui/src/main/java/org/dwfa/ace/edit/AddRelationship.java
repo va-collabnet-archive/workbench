@@ -43,7 +43,7 @@ public class AddRelationship extends AddComponent {
             if (parent.getNid() == cb.getNid()) {
                 AceLog.getAppLog().alertAndLogException(
                     new Exception("Cannot create a self-referencing relationship (hierarchy selection concept and " +
-                    		"and viewer concept are the same: " + cb.getInitialText()));
+                    		"and viewer concept are the same: " + cb.getInitialText() + ")."));
             } else {
                 Terms.get().newRelationship(UUID.randomUUID(), cb, 
                     config.getDefaultRelationshipType(),
