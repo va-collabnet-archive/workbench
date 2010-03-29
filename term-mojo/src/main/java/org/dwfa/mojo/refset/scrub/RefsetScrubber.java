@@ -28,7 +28,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Example configuration:
  * 
  * <pre>
- * @code
+ * {@code
  * 
  * <configuration>
  * 	<conceptFinder implementation="org.dwfa.mojo.refset.scrub.MemberSpecFinder">
