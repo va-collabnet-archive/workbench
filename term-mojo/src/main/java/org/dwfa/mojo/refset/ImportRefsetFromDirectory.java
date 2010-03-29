@@ -145,25 +145,20 @@ public class ImportRefsetFromDirectory extends AbstractMojo {
     }
 
     private List<File> recursivelyGetFiles(File directory) {
-        if (filenameFilter == null) {
-            filenameFilter = RefsetType.getFileNameFilter();
+        List<File> allFiles = new ArrayList<File>();
+
+        if (!directory.isDirectory()) {
+            allFiles.add(directory);
+        } else {
+            for (File file : directory.listFiles()) {
+                if (file.isDirectory()) {
+                    allFiles.addAll(recursivelyGetFiles(file));
+                } else {
+                    allFiles.add(file);
+                }
+            }
         }
 
-        List<File> allFiles = new ArrayList<File>();
-        ;
-        if (!directory.isDirectory()) {
-            if (filenameFilter.accept(directory.getParentFile(), directory.getName())) {
-                allFiles.add(directory);
-            }
-            return allFiles;
-        }
-        for (File file : directory.listFiles(filenameFilter)) {
-            if (file.isDirectory()) {
-                allFiles.addAll(recursivelyGetFiles(file));
-            } else {
-                allFiles.add(file);
-            }
-        }
         return allFiles;
     }
 
