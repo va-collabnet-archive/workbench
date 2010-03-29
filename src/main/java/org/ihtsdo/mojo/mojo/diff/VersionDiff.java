@@ -55,6 +55,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
@@ -669,7 +670,7 @@ public class VersionDiff extends AbstractMojo {
 								.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
 										.getUids())
 								: tf
-										.getConcept(RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION
+										.getConcept(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION
 												.getUids())),
 						tf
 								.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
@@ -745,12 +746,13 @@ public class VersionDiff extends AbstractMojo {
 		I_TermFactory tf = Terms.get();
 		I_HelpRefsets refsetHelper = tf.getRefsetHelper(config_ace_frame);
 		if (!noop) {
-			refset_map.put(REFSET_PROPERTY.CID_ONE, concept_id);
-			refset_map.put(REFSET_PROPERTY.CID_TWO, change_id);
+			// refset_map.put(REFSET_PROPERTY.CID_ONE, concept_id);
+			// refset_map.put(REFSET_PROPERTY.CID_TWO, change_id);
+			refset_map.put(REFSET_PROPERTY.CID_ONE, change_id);
 			refset_map.put(REFSET_PROPERTY.STRING_VALUE, comment);
-			I_ExtendByRef new_ext = refsetHelper.getOrCreateRefsetExtension(
-					refset.getConceptId(), tf.uuidToNative(UUID.randomUUID()),
-					REFSET_TYPES.CID_CID_STR, refset_map, UUID.randomUUID());
+			refsetHelper.getOrCreateRefsetExtension(refset.getConceptId(),
+					concept_id, REFSET_TYPES.CID_STR, refset_map, UUID
+							.randomUUID());
 		}
 		//
 		if (change_id == this.config || change_id == this.stats)
@@ -762,11 +764,9 @@ public class VersionDiff extends AbstractMojo {
 				return;
 			}
 			refset_map_member.put(REFSET_PROPERTY.CID_ONE, concept_id);
-			I_ExtendByRef new_ext_member = refsetHelper
-					.getOrCreateRefsetExtension(member_refset.getConceptId(),
-							tf.uuidToNative(UUID.randomUUID()),
-							REFSET_TYPES.CID, refset_map_member, UUID
-									.randomUUID());
+			refsetHelper.getOrCreateRefsetExtension(member_refset
+					.getConceptId(), concept_id, REFSET_TYPES.CID,
+					refset_map_member, UUID.randomUUID());
 		}
 	}
 
@@ -1259,7 +1259,7 @@ public class VersionDiff extends AbstractMojo {
 		I_Position pos2 = tf.newPosition(path, v2_id);
 		this.createRefsetConcept(pos1, pos2, null);
 		{
-			this.refset_map = new RefsetPropertyMap(REFSET_TYPES.CID_CID_STR);
+			this.refset_map = new RefsetPropertyMap(REFSET_TYPES.CID_STR);
 			I_GetConceptData active_status = tf
 					.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 			int status_id = active_status.getConceptId();
@@ -1473,10 +1473,10 @@ public class VersionDiff extends AbstractMojo {
 						+ " secs.");
 		for (int nid : all_concepts) {
 			concepts++;
-			// if (concepts == 20001) {
-			// getLog().info("BREAK concepts " + concepts);
-			// break;
-			// }
+//			if (concepts == 20001) {
+//				getLog().info("BREAK concepts " + concepts);
+//				break;
+//			}
 			if (concepts % 10000 == 0) {
 				long cur = System.currentTimeMillis();
 				float elap = cur - start;
@@ -1569,21 +1569,21 @@ public class VersionDiff extends AbstractMojo {
 				getLog().info("diffs " + diffs);
 			I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
 			I_ExtendByRefPart p = mem.getMutableParts().get(0);
-			if (p instanceof I_ExtendByRefPartCidCidString) {
-				I_ExtendByRefPartCidCidString pccs = (I_ExtendByRefPartCidCidString) p;
-				if (description_changes.contains(pccs.getC2id())) {
+			if (p instanceof I_ExtendByRefPartCidString) {
+				I_ExtendByRefPartCidString pccs = (I_ExtendByRefPartCidString) p;
+				if (description_changes.contains(pccs.getC1id())) {
 					String[] comments = pccs.getStringValue().split("\t");
 					int id = Integer.parseInt(comments[0]);
-					I_DescriptionVersioned descr = tf.getDescription(id, pccs
-							.getC1id());
-					out.println(tf.getConcept(pccs.getC2id()).getInitialText()
+					// I_DescriptionVersioned descr = tf.getDescription(id, pccs
+					// .getC1id());
+					out.println(tf.getConcept(pccs.getC1id()).getInitialText()
 							+ "\t" + "<" + id + ">" + comments[1] + "\t"
-							+ tf.getConcept(pccs.getC1id()).getInitialText());
+							+ mem_con.getInitialText());
 					continue;
 				}
-				out.println(tf.getConcept(pccs.getC2id()).getInitialText()
+				out.println(tf.getConcept(pccs.getC1id()).getInitialText()
 						+ "\t" + pccs.getStringValue() + "\t"
-						+ tf.getConcept(pccs.getC1id()).getInitialText());
+						+ mem_con.getInitialText());
 			} else {
 				getLog().info("Wrong type: " + mem_con.getInitialText());
 			}
