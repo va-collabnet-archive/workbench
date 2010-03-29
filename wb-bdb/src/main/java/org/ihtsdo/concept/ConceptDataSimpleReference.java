@@ -3,12 +3,14 @@ package org.ihtsdo.concept;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
@@ -34,6 +36,8 @@ import org.ihtsdo.db.util.NidPair;
 import com.sleepycat.bind.tuple.TupleInput;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
+
+    private static HashMap<I_ConfigAceFrame, IsLeafBinder> isLeafBinders = new HashMap<I_ConfigAceFrame, IsLeafBinder>();
 
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelList> srcRels = new AtomicReference<AddSrcRelList>();
@@ -646,6 +650,42 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
+        boolean isLeaf = true;
+        IsLeafBinder leafBinder = isLeafBinders.get(aceConfig);
+        if (leafBinder == null) {
+            leafBinder = new IsLeafBinder(aceConfig);
+            if (isLeafBinders.size() > 5) {
+                isLeafBinders.clear();
+            }
+            isLeafBinders.put(aceConfig, leafBinder);
+        }
+        
+        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+        if (readOnlyInput.available() > 4) {
+            readOnlyInput.mark(128);
+            readOnlyInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
+            int dataOffset = readOnlyInput.readInt();
+            readOnlyInput.reset();
+            readOnlyInput.skipFast(dataOffset);
+            isLeaf = leafBinder.entryToObject(readOnlyInput);
+        }
+        
+        if (isLeaf) {
+            TupleInput mutableInput = nidData.getMutableTupleInput();
+            if (mutableInput.available() > 4) {
+                mutableInput.mark(128);
+                mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
+                int dataOffset = readOnlyInput.readInt();
+                mutableInput.reset();
+                mutableInput.skipFast(dataOffset);
+                isLeaf = leafBinder.entryToObject(mutableInput);
+            }
+        }
+        return isLeaf;
     }
 
 }

@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
-import org.apache.commons.collections.primitives.IntIterator;
-import org.apache.commons.collections.primitives.IntList;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -79,7 +76,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public static GCValueConceptMap concepts = new GCValueConceptMap(refType);
 	public static GCValueComponentMap componentMap = new GCValueComponentMap(refType);
-
+	
 
 	public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
@@ -1078,45 +1075,19 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
 			throws IOException {
-		I_IntSet destRelTypes = aceConfig.getDestRelTypes();
-		List<? extends NidPair> relNidTypeNid = data.getDestRelNidTypeNidList();
-		IntList possibleChildRels = new ArrayIntList();
-		for (NidPair pair: relNidTypeNid) {
-			int relNid = pair.getNid1();
-			int typeNid = pair.getNid2();
-			if (destRelTypes.contains(typeNid)) {
-				possibleChildRels.add(relNid);
-			}
-		}
-		if (possibleChildRels.size() == 0
-				&& aceConfig.getSourceRelTypes().getSetValues().length == 0) {
-			return true;
-		}
-		IntIterator relNids = possibleChildRels.iterator();
-		while (relNids.hasNext()) {
-			int relNid = relNids.next();
-			Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(
-					relNid);
-			if (r != null) {
-				List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-				r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-						.getViewPositionSetReadOnly(), currentVersions, true);
-				if (currentVersions.size() > 0) {
-					return false;
-				}
-			}
-		}
-
-		I_IntSet srcRelTypes = aceConfig.getSourceRelTypes();
-		for (Relationship r : getSourceRels()) {
-			List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-			r.addTuples(aceConfig.getAllowedStatus(), srcRelTypes, aceConfig
-					.getViewPositionSetReadOnly(), currentVersions, true);
-			if (currentVersions.size() > 0) {
-				return false;
-			}
-		}
-		return true;
+		
+        I_IntSet srcRelTypes = aceConfig.getSourceRelTypes();
+        if (srcRelTypes.size() > 0) {
+            for (Relationship r : getSourceRels()) {
+                List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+                r.addTuples(aceConfig.getAllowedStatus(), srcRelTypes, aceConfig
+                        .getViewPositionSetReadOnly(), currentVersions, true);
+                if (currentVersions.size() > 0) {
+                    return false;
+                }
+            }
+        }
+	    return data.isLeafByDestRels(aceConfig);
 	}
 
 	public boolean promote(I_Position viewPosition,

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.concept.ConceptDataManager.SetModifiedWhenChangedList;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -142,5 +143,7 @@ public interface I_ManageConceptData {
 	public boolean isUnwritten();
 
 	public boolean isPrimordial() throws IOException;
+
+    public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
 
 }

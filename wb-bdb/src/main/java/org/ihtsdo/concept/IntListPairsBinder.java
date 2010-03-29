@@ -19,15 +19,17 @@ public class IntListPairsBinder extends TupleBinding<List<? extends NidPair>> {
 	@Override
 	public List<NidPair> entryToObject(TupleInput input) {
 		int size = input.readInt();
-		HashSet<NidPair> newPairs = new HashSet<NidPair>(size);
+		List<NidPair> newPairs = new ArrayList<NidPair>(size);
 		for (int i = 0; i < size; i = i + 2) {
 			newPairs.add(new NidPair(input.readInt(), input.readInt()));
 		}
 		if (priorEntries != null) {
+		    priorEntries.addAll(newPairs);
+		    newPairs.clear();
 			newPairs.addAll(priorEntries);
-		} 
-		priorEntries = null;
-		return new ArrayList<NidPair>(newPairs);
+	        priorEntries = null;
+		}
+		return newPairs;
 	}
 
 	@Override
