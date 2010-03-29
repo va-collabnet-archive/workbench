@@ -40,6 +40,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.TerminologyRuntimeException;
 import org.dwfa.tapi.UnknownComponentException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
@@ -353,7 +354,7 @@ public abstract class RefsetUtilities {
      * @throws Exception
      */
     public void addToMemberSet(int conceptId, int includeTypeConceptId, int memberSetId) throws Exception {
-        I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
+        I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId, getMembershipType(includeTypeConceptId));
         if (ext != null) {
 
             I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
@@ -395,9 +396,10 @@ public abstract class RefsetUtilities {
      */
     public void addToMemberSetAsParent(int conceptId, int memberSetId) throws Exception {
 
-        I_ThinExtByRefVersioned ext = getExtensionForComponent(conceptId, memberSetId);
+        I_ThinExtByRefVersioned ext = 
+            getExtensionForComponent(conceptId, memberSetId, ConceptConstants.PARENT_MARKER.localize().getNid());
+        
         if (ext != null) {
-
             I_ThinExtByRefPart clone = getLatestVersion(ext).duplicatePart();
             I_ThinExtByRefPartConcept conceptClone = (I_ThinExtByRefPartConcept) clone;
             conceptClone.setPathId(pathConcept.getConceptId());
@@ -429,15 +431,27 @@ public abstract class RefsetUtilities {
 
     }
 
-    protected I_ThinExtByRefVersioned getExtensionForComponent(int conceptId, Integer refset) throws IOException {
+    protected I_ThinExtByRefVersioned getExtensionForComponent(int conceptId, int refset, int extType) throws IOException {
 
         List<I_ThinExtByRefVersioned> exts = termFactory.getAllExtensionsForComponent(conceptId);
+        I_ThinExtByRefVersioned candidate = null; 
         for (I_ThinExtByRefVersioned ext : exts) {
-            if (ext.getRefsetId() == refset.intValue()) {
-                return ext;
+            if (ext.getRefsetId() == refset) {
+                // make sure the extension is not retired
+                I_ThinExtByRefPartConcept latestVersion = (I_ThinExtByRefPartConcept) getLatestVersion(ext);
+                if ((latestVersion.getC1id() == extType) && 
+                    (latestVersion.getStatusId() != retiredConceptId)) {
+                    if (candidate != null) {
+                        // cannot handle more than one (we already have a candidate)
+                        throw new TerminologyRuntimeException( 
+                            "Found more than one active extension for refset '" +
+                            conceptToString(refset) + "' on concept '" + conceptToString(conceptId) + "'.");
+                    }
+                    candidate = ext;
+                }
             }
         }
-        return null;
+        return candidate;
     }
 
     /**
@@ -535,4 +549,13 @@ public abstract class RefsetUtilities {
         name.append(",\"").append(conceptData).append("\"]");
         return name.toString();
     }
+    
+    private String conceptToString(int id) {
+        try {
+            return termFactory.getConcept(id).getInitialText();
+        } catch (Exception e) {
+            return Integer.toString(id);
+        }
+    }
+    
 }

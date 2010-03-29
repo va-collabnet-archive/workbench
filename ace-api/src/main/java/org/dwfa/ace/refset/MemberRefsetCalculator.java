@@ -105,6 +105,10 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private MemberRefsetChangesetWriter nonTxWriter;
 
+    private int normalMemberId;
+
+    private int markedParentMemberId;
+
     public void run() {
 
         termFactory = LocalVersionedTerminology.get();
@@ -361,11 +365,13 @@ public class MemberRefsetCalculator extends RefsetUtilities {
         addToNestedSet(newRefsetExclusion, conceptDetails, refset);
     }
 
-    private String conceptToString(int nid) {
+    protected String conceptToString(int nid) {
         try {
             if (isAdditionalLogging()){
+                I_GetConceptData concept = termFactory.getConcept(nid);
                 return Integer.toString(nid) + " "
-                + termFactory.getConcept(nid).getInitialText();
+                        + concept.getUids().iterator().next().toString() 
+                        + concept.getInitialText();
             } else {
                 return Integer.toString(nid);
             }
@@ -397,6 +403,9 @@ public class MemberRefsetCalculator extends RefsetUtilities {
         retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
         currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 
+        normalMemberId = RefsetAuxiliary.Concept.NORMAL_MEMBER.localize().getNid();
+        markedParentMemberId = RefsetAuxiliary.Concept.MARKED_PARENT.localize().getNid();
+        
         reportFile = new File(outputDirectory.getAbsolutePath() + File.separatorChar + "classes",
             "conceptsAddedToRefset.txt");
         reportFile.getParentFile().mkdirs();
@@ -600,7 +609,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                 reportWriter.write(getConcept(i.getConceptId()).toString());
                 reportWriter.newLine();
                 if (!validateOnly) {
-                    I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(), refset);
+                    I_ThinExtByRefVersioned ext = getExtensionForComponent(i.getConceptId(), refset, normalMemberId);
                     if (ext != null) {
                         if (!newestPartRetired(ext)) {
                             if (useNonTxInterface) {
@@ -653,8 +662,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                 if (oldparents != null) {
                     oldparents.removeAll(parents);
                     for (ConceptRefsetInclusionDetails existingParent : oldparents.values()) {
-                        I_ThinExtByRefVersioned ext = getExtensionForComponent(existingParent.getConceptId(),
-                            refset);
+                        I_ThinExtByRefVersioned ext = 
+                            getExtensionForComponent(existingParent.getConceptId(), refset, markedParentMemberId);
                         if (ext != null) {
                             if (!newestPartRetired(ext)) {
                                 if (useNonTxInterface) {
