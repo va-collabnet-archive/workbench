@@ -272,19 +272,23 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         String revDate;
         String pathId;
         String sourceUuid;
+        Boolean hasSnomedId;
+        Boolean doCrossMap; // Cross map inferred id to stated.
         int xRevDate;
         int xPathId;
         int xSourceUuid;
 
-        public SCTFile(File f, String d, String pid) {
-            file = f;
-            revDate = d;
-            pathId = pid;
-            sourceUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()
-                    .toString();
-            xRevDate = lookupXRevDateIdx(revDate);
-            xPathId = lookupXPathIdx(pathId);
-            xSourceUuid = lookupXSourceUuidIdx(sourceUuid);
+        public SCTFile(File f, String d, String pid, Boolean hasSnomedId, Boolean doCrossMap) {
+            this.file = f;
+            this.revDate = d;
+            this.pathId = pid;
+            this.sourceUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator()
+                    .next().toString();
+            this.hasSnomedId = hasSnomedId;
+            this.doCrossMap = doCrossMap;
+            this.xRevDate = lookupXRevDateIdx(revDate);
+            this.xPathId = lookupXPathIdx(pathId);
+            this.xSourceUuid = lookupXSourceUuidIdx(sourceUuid);
         }
 
         public String toString() {
@@ -1186,7 +1190,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         }
 
     }
-    
+
     private SctXConRecord readNextCon(ObjectInputStream ois, ArrayList<SctXConRecord> conList,
             SctXConRecord conNext) throws MojoFailureException {
         conList.clear();
@@ -1502,9 +1506,9 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         try {
             // SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-            List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
-            processDescriptionsFiles(wDir, listOfDDirs);
-            listOfDDirs = null;
+         List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
+         processDescriptionsFiles(wDir, listOfDDirs);
+         listOfDDirs = null;
             System.gc();
         } catch (Exception e1) {
             getLog().info("FAILED: processDescriptionsFiles()");
@@ -1536,8 +1540,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             erw = new BufferedWriter(new FileWriter(erFileName));
             getLog().info("RELATIONSHIPS Exceptions Report OUTPUT: " + erFileName);
 
-            processRelationshipsFiles(wDir, listOfRiDirs, false, oos, erw);
-            processRelationshipsFiles(wDir, listOfRsDirs, true, oos, erw);
+            processRelationshipsFiles(wDir, listOfRiDirs, oos, erw);
+            processRelationshipsFiles(wDir, listOfRsDirs, oos, erw);
 
             oos.close(); // Need to be sure to the close file!
             erw.close(); // Need to be sure to the close file!
@@ -1593,11 +1597,13 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
                 if (filter.accept(f2)) {
                     // ADD SCTFile Entry
-                    String tempRevDate = getFileRevDate(f2);
-                    String tmpPathID = getFilePathID(f2, wDir, subDir);
-                    SCTFile tmpObj = new SCTFile(f2, tempRevDate, tmpPathID);
-                    listOfFiles.add(tmpObj);
-                    getLog().info("    FILE : " + f2.getName() + " " + tempRevDate);
+                    String revDate = getFileRevDate(f2);
+
+                    SCTFile fo = createNewSctFile(f2, wDir, subDir, revDate);
+                    listOfFiles.add(fo);
+                    getLog().info(
+                            "    FILE : " + f2.getName() + " " + revDate + " hasSnomedId="
+                                    + fo.hasSnomedId + " doCrossMap=" + fo.doCrossMap);
                 }
 
             }
@@ -1936,7 +1942,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     protected void processRelationshipsFiles(String wDir, List<List<SCTFile>> sctI,
-            boolean isStated, ObjectOutputStream oos, BufferedWriter er) throws Exception {
+            ObjectOutputStream oos, BufferedWriter er) throws Exception {
         int count1, count2; // records in arrays 1 & 2
         String fName1, fName2; // file path name
         int xSourceUUID, xRevDate, xPathID;
@@ -1946,6 +1952,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         while (dit.hasNext()) {
             List<SCTFile> fl = dit.next(); // File List
             Iterator<SCTFile> fit = fl.iterator(); // File Iterator
+            if (fit.hasNext() == false)
+                continue;
 
             // READ file1 as MASTER FILE
             SCTFile f1 = fit.next();
@@ -1957,7 +1965,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             count1 = countFileLines(fName1);
             getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
             a1 = new SctXRelRecord[count1];
-            parseRelationships(fName1, a1, count1, isStated);
+            parseRelationships(fName1, a1, count1, f1.hasSnomedId, f1.doCrossMap);
             writeRelationships(oos, a1, count1, xRevDate, xPathID);
 
             while (fit.hasNext()) {
@@ -1973,7 +1981,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
                 // Parse in file2
                 a2 = new SctXRelRecord[count2];
-                parseRelationships(fName2, a2, count2, isStated);
+                parseRelationships(fName2, a2, count2, f2.hasSnomedId, f2.doCrossMap);
 
                 int r1 = 0, r2 = 0, r3 = 0; // reset record indices
                 int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
@@ -2276,8 +2284,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                         + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    protected void parseRelationships(String fName, SctXRelRecord[] a, int count, boolean isStated)
-            throws Exception {
+    protected void parseRelationships(String fName, SctXRelRecord[] a, int count,
+            boolean hasSnomedId, boolean doCrossMap) throws Exception {
 
         long start = System.currentTimeMillis();
 
@@ -2294,7 +2302,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         while ((tokenType != StreamTokenizer.TT_EOF) && (relationships < count)) {
             // RELATIONSHIPID
             long relID = Long.MAX_VALUE;
-            if (isStated == false) {
+            if (hasSnomedId) {
                 relID = Long.parseLong(st.sval);
                 tokenType = st.nextToken();
             }
@@ -2333,7 +2341,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         }
 
-        computeRelationshipUuids(a, isStated);
+        computeRelationshipUuids(a, hasSnomedId, doCrossMap);
         Arrays.sort(a);
 
         getLog().info(
@@ -2341,7 +2349,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                         + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-    private void computeRelationshipUuids(SctXRelRecord[] a, boolean isStated)
+    private void computeRelationshipUuids(SctXRelRecord[] a, boolean hasSnomedId, boolean doCrossMap)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // SORT BY [C1-Group-RoleType-C2]
         Comparator<SctXRelRecord> comp = new Comparator<SctXRelRecord>() {
@@ -2400,15 +2408,16 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             UuidMinimal uuidMinimal = new UuidMinimal(a[i].uuidMostSigBits, a[i].uuidMostSigBits);
 
             // UPDATE SNOMED ID
-            if (isStated) {
-                // get (check for existing) relationship id
-                Long tmp = relUuidMap.get(uuidMinimal); // :yyy:
-                if (tmp != null)
-                    a[i].id = tmp.longValue();
-            } else {
-                relUuidMap.put(uuidMinimal, Long.valueOf(a[i].id));
-                // :yyy: relUuidMap.put(a[i].uuid, Long.valueOf(a[i].id));
-            }
+            if (doCrossMap)
+                if (hasSnomedId) {
+                    relUuidMap.put(uuidMinimal, Long.valueOf(a[i].id));
+                    // :yyy: relUuidMap.put(a[i].uuid, Long.valueOf(a[i].id));
+                } else {
+                    // get (check for existing) relationship id
+                    Long tmp = relUuidMap.get(uuidMinimal); // :yyy:
+                    if (tmp != null)
+                        a[i].id = tmp.longValue();
+                }
 
             lastC1 = a[i].conceptOneID;
             lastGroup = a[i].group;
@@ -2676,9 +2685,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    private String getFilePathID(File f, String baseDir, String subDir) throws MojoFailureException {
+    private SCTFile createNewSctFile(File f, String baseDir, String subDir, String revDate)
+            throws MojoFailureException {
         String puuid = null;
         UUID u;
+        boolean hasSnomedId = true;
+        boolean doCrossMap = false;
 
         String s;
         if (subDir.equals("")) {
@@ -2691,12 +2703,15 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         // :NYI: (Maybe) Additional checks if last directory branch is a date
         // @@@ (Maybe just use the directory branch for UUID)
         if (f.getAbsolutePath().contains(SNOMED_FILE_PATH)) {
-            if (f.getAbsolutePath().contains("sct_relationships_stated_")) {
+            if (f.getAbsolutePath().contains("sct_relationships_stated")) {
                 puuid = uuidPathSnomedStatedStr;
                 getLog().info("  PATH UUID: " + "SNOMED Core Stated " + puuid);
+                hasSnomedId = false;
+                doCrossMap = true;
             } else if (f.getAbsolutePath().contains("sct_relationships_inferred")) {
                 puuid = uuidPathSnomedInferredStr;
                 getLog().info("  PATH UUID: " + "SNOMED Core Inferred " + puuid);
+                doCrossMap = true;
             } else {
                 // SNOMED_CORE Path UUID
                 puuid = uuidPathSnomedCoreStr;
@@ -2705,8 +2720,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         } else if (s.startsWith(NHS_UK_EXTENSION_FILE_PATH)) {
             // "UK Extensions" Path UUID
             try {
-                u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                        "NHS UK Extension Path");
+                if (f.getAbsolutePath().contains("sct_relationships_stated"))
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path Stated");
+                else
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Extension Path");
                 puuid = u.toString();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -2721,8 +2740,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         } else if (s.startsWith(NHS_UK_DRUG_EXTENSION_FILE_PATH)) {
             // "UK Drug Extensions" Path UUID
             try {
-                u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                        "NHS UK Drug Extension Path");
+                if (f.getAbsolutePath().contains("sct_relationships_stated"))
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path Stated");
+                else
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                            "NHS UK Drug Extension Path");
                 puuid = u.toString();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -2740,7 +2763,13 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         } else {
             // OTHER PATH UUID: based on directory path
             try {
-                u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s);
+                if (f.getAbsolutePath().contains("sct_relationships_stated"))
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s + " Stated");
+                else if (f.getAbsolutePath().contains("sct_relationships_inferred"))
+                    u = Type5UuidFactory
+                            .get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s + " Inferred");
+                else
+                    u = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, s);
                 puuid = u.toString();
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -2754,7 +2783,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("  PATH UUID: " + s + " " + puuid);
         }
 
-        return puuid;
+        return new SCTFile(f, revDate, puuid, hasSnomedId, doCrossMap);
     }
 
     /*
