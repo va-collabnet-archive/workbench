@@ -115,10 +115,13 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     if (langs.get(lang) != null) {
                         for (I_DescriptionVersioned d : langs.get(lang)) {
                             if (d.getDescId() != desc.getDescId()) {
-                                alertList.add(new AlertToDataConstraintFailure(
-                                    (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                              : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                    "<html>More than one FSN for " + lang, concept));
+                            	//TODO: edited because it does not allow one retired fsn + one current fsn for a lang
+                            	// is not easy to solve because lang base uniquenes may not be the way to go
+                            	// meanwhile is the check is skipped
+//                                alertList.add(new AlertToDataConstraintFailure(
+//                                    (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+//                                              : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+//                                    "<html>More than one FSN for " + lang, concept));
                             }
                         }
                         langs.get(lang).add(desc);
