@@ -976,6 +976,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (revisions == null) {
             revisions = new ArrayList<R>(1);
             returnValue = revisions.add(r);
+        } else if (revisions.size() == 0) {
+            returnValue = revisions.add(r);
         } else if (revisions.get(revisions.size() - 1) != r) {
             returnValue = revisions.add(r);
         }

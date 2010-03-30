@@ -103,7 +103,7 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
                 for (I_ConceptAttributeTuple t : tuples) {
                     if (t.getConceptStatus() != newStatusConcept.getConceptId()) {
                         I_ConceptAttributePart newPart = 
-                        	(I_ConceptAttributePart) t.makeAnalog(t.getStatusId(), editPath.getConceptId(), Long.MAX_VALUE);
+                        	(I_ConceptAttributePart) t.makeAnalog(newStatusConcept.getNid(), editPath.getConceptId(), Long.MAX_VALUE);
                         partsToAdd.add(newPart);
                     }
                 }
