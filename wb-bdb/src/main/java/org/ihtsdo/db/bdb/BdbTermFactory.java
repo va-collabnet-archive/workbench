@@ -259,6 +259,28 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         BdbCommitManager.forget(desc);
     }
 
+
+    @Override
+    public void forget(I_DescriptionVersioned desc, I_DescriptionPart part) throws IOException {
+        if (part.getTime() == Long.MAX_VALUE) {
+            if (part == desc) {
+                forget(desc);
+            } else {
+                Description d = (Description) desc;
+                if (Description.Version.class.isAssignableFrom(part.getClass())) {
+                    Description.Version dv = (Description.Version) part;
+                    if (dv.getRevision() == null) {
+                        forget(d);
+                    } else {
+                        d.removeRevision(dv.getRevision());
+                    }
+                } else {
+                    d.removeRevision((DescriptionRevision) part);
+                }
+            }
+        } 
+    }
+
     @Override
     public void forget(I_RelVersioned rel) throws IOException {
         BdbCommitManager.forget(rel);

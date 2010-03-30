@@ -58,9 +58,6 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
             for (I_DescriptionVersioned desc : concept.getDescriptions()) {
                 alerts.addAll(testDescription(concept, desc, forCommit));
             }
-            for (I_DescriptionVersioned desc : concept.getUncommittedDescriptions()) {
-                alerts.addAll(testDescription(concept, desc, forCommit));
-            }
         } catch (IOException e) {
             throw new TaskFailedException(e);
         }

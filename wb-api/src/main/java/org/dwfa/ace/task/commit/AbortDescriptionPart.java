@@ -35,13 +35,9 @@ public class AbortDescriptionPart implements I_Fixup {
     }
 
     public void fix() throws Exception {
-    	if (desc.getMutableParts().size() == 0) {
-    		concept.getUncommittedDescriptions().remove(desc);
-    	} else {
-            desc.getMutableParts().remove(part);
-    	}
+        Terms.get().forget(desc, part);
         Terms.get().addUncommitted(concept);
-        AceLog.getAppLog().info("Aborted add desc part: " + part);
+        AceLog.getAppLog().info("Canceled add desc part: " + part);
     }
 
     public String toString() {

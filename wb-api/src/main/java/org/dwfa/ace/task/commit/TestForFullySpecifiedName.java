@@ -103,63 +103,64 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusId()))
                     continue;
-                if (part.getTypeId() == fsn_type.getConceptId()) {
-                    if (part.getText().matches(".*\\(\\?+\\).*")) {
-                        alertList.add(new AlertToDataConstraintFailure(
-                            (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                            "<html>Unedited semantic tag", concept));
-                    }
-                    String lang = part.getLang();
-                    if (langs.get(lang) != null) {
-                        for (I_DescriptionVersioned d : langs.get(lang)) {
-                            if (d.getDescId() != desc.getDescId()) {
-                                alertList.add(new AlertToDataConstraintFailure(
-                                    (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                              : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                    "<html>More than one FSN for " + lang, concept));
+                if (part.getTypeId() == fsn_type.getConceptId()) {               
+                        if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
+                            alertList.add(new AlertToDataConstraintFailure(
+                                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                                "<html>Unedited semantic tag: " + part.getText(), concept));
+                        }
+                        String lang = part.getLang();
+                        if (langs.get(lang) != null) {
+                            for (I_DescriptionVersioned d : langs.get(lang)) {
+                                if (d.getDescId() != desc.getDescId()) {
+                                    alertList.add(new AlertToDataConstraintFailure(
+                                        (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                  : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                                        "<html>More than one FSN for " + lang, concept));
+                                }
+                            }
+                            langs.get(lang).add(desc);
+                        } else {
+                            ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
+                            dl.add(desc);
+                            langs.put(lang, dl);
+                        }
+                     if (part.getTime() == Long.MAX_VALUE) {
+                        Hits hits = Terms.get().doLuceneSearch(
+                            "\"" + part.getText().replace("(", "\\(").replace(")", "\\)") + "\"");
+                        // System.out.println("Found " + hits.length());
+                        search: for (int i = 0; i < hits.length(); i++) {
+                            // if (i == 10000)
+                            // break;
+                            Document doc = hits.doc(i);
+                            int cnid = Integer.parseInt(doc.get("cnid"));
+                            int dnid = Integer.parseInt(doc.get("dnid"));
+                            if (cnid == concept.getConceptId())
+                                continue;
+                            try {
+                                I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
+                                if (potential_fsn != null) {
+                                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                                        // System.out.println("Hit: "
+                                        // + part_search.getVersion() + "\t"
+                                        // + part_search.getText());
+                                        if (actives.contains(part_search.getStatusId())
+                                            && part_search.getTypeId() == fsn_type.getConceptId()
+                                            && part_search.getText().equals(part.getText())
+                                            && part_search.getLang().equals(part.getLang())) {
+                                            alertList.add(new AlertToDataConstraintFailure(
+                                                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                                                "<html>FSN already used: " + part.getText(), concept));
+                                            break search;
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                AceLog.getAppLog().alertAndLogException(e);
                             }
                         }
-                        langs.get(lang).add(desc);
-                    } else {
-                        ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
-                        dl.add(desc);
-                        langs.put(lang, dl);
-                    }
-
-                    Hits hits = Terms.get().doLuceneSearch("\""
-                        + part.getText().replace("(", "\\(").replace(")", "\\)") + "\"");
-                    // System.out.println("Found " + hits.length());
-                    search: for (int i = 0; i < hits.length(); i++) {
-                        // if (i == 10000)
-                        // break;
-                        Document doc = hits.doc(i);
-                        int cnid = Integer.parseInt(doc.get("cnid"));
-                        int dnid = Integer.parseInt(doc.get("dnid"));
-                        if (cnid == concept.getConceptId())
-                            continue;
-                        try {
-							I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
-							if (potential_fsn != null) {
-								for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-								    // System.out.println("Hit: "
-								    // + part_search.getVersion() + "\t"
-								    // + part_search.getText());
-								    if (actives.contains(part_search.getStatusId())
-								        && part_search.getTypeId() == fsn_type.getConceptId()
-								        && part_search.getText().equals(part.getText())
-								        && part_search.getLang().equals(part.getLang())) {
-								        alertList.add(new AlertToDataConstraintFailure(
-								            (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-								                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-								            "<html>FSN already used", concept));
-								        break search;
-								    }
-								}
-							}
-						} catch (Exception e) {
-							AceLog.getAppLog().alertAndLogException(e);
-						}
                     }
                 }
             }

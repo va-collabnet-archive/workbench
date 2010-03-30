@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -57,9 +58,6 @@ public class TestForSelfReferencingRelationships extends AbstractConceptTest {
             for (I_RelVersioned rel : concept.getSourceRels()) {
                 alerts.addAll(testRel(concept, rel, forCommit));
             }
-            for (I_RelVersioned rel : concept.getUncommittedSourceRels()) {
-                alerts.addAll(testRel(concept, rel, forCommit));
-            }
         } catch (IOException e) {
             throw new TaskFailedException(e);
         }
@@ -69,8 +67,16 @@ public class TestForSelfReferencingRelationships extends AbstractConceptTest {
     private List<AlertToDataConstraintFailure> testRel(I_GetConceptData concept, I_RelVersioned rel, boolean forCommit) {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
         if (rel.getC1Id() == rel.getC2Id()) {
-            String alertString = "<html>Self-referencing relationship found for concept<br> <font color='blue'>"
-                + "</font><br>Please edit this relationship before commit...";
+            String initialText;
+            try {
+                initialText = concept.getInitialText();
+            } catch (IOException e) {
+                initialText = e.getLocalizedMessage();
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+            String alertString = "<html>Self-referencing rel found for:<br><font color='blue'>"
+                +  initialText
+                + "</font><br>Please edit before commit...";
             AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
             if (forCommit) {
                 alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;

@@ -448,8 +448,7 @@ public class BdbCommitManager {
 		            "Cannot forget a committed component.");
 		    } else {
 		        synchronized (d.revisions) {
-		            Iterator<DescriptionRevision> di = d.revisions
-		            .iterator();
+		            Iterator<DescriptionRevision> di = d.revisions.iterator();
 		            while (di.hasNext()) {
 		                DescriptionRevision dr = di.next();
 		                if (dr.getTime() == Long.MAX_VALUE) {

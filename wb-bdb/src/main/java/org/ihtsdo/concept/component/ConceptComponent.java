@@ -221,6 +221,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.index = index;
         }
 
+        public R getRevision() {
+            if (index >= 0) {
+                return revisions.get(index);
+            }
+            return null;
+        }
+
         @Override
         public I_AmPart getMutablePart() {
             if (index >= 0) {
@@ -507,6 +514,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     private ArrayList<IdentifierVersion> additionalIdentifierParts;
 
     private ArrayList<IdVersion> idVersions;
+    
+    public boolean removeRevision(R r) {
+        boolean changed = false;
+        if (revisions != null) {
+            synchronized (revisions) {
+                changed = revisions.remove(r);
+                clearVersions();
+            }
+        }
+        return changed;
+    }
 
     public String toString() {
         StringBuffer buf = new StringBuffer();

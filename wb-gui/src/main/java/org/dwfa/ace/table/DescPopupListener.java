@@ -88,20 +88,19 @@ public class DescPopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            I_GetConceptData sourceBean;
 			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+	            I_DescriptionTuple tuple = selectedObject.getTuple();
+	            I_DescriptionVersioned versioned = tuple.getDescVersioned();
+	            Terms.get().forget(versioned, tuple.getMutablePart());
+	            Terms.get().addUncommitted(sourceBean);
+	            model.allTuples = null;
+	            model.fireTableDataChanged();
 			} catch (TerminologyException e1) {
 				throw new RuntimeException(e1);
 			} catch (IOException e1) {
 				throw new RuntimeException(e1);
 			}
-            I_DescriptionTuple tuple = selectedObject.getTuple();
-            I_DescriptionVersioned versioned = tuple.getDescVersioned();
-            versioned.getMutableParts().remove(tuple.getMutablePart());
-            Terms.get().addUncommitted(sourceBean);
-            model.allTuples = null;
-            model.fireTableDataChanged();
         }
     }
 

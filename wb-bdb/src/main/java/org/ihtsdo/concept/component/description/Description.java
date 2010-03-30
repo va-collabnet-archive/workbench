@@ -417,7 +417,7 @@ public class Description
 	}
 
 	@Override
-	protected List<Version> getVersions() {
+    public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {

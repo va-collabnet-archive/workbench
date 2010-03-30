@@ -218,6 +218,8 @@ public interface I_TermFactory {
 
     void forget(I_DescriptionVersioned desc) throws IOException;
 
+    void forget(I_DescriptionVersioned desc, I_DescriptionPart part) throws IOException;
+
     void forget(I_RelVersioned rel) throws IOException;
 
     void forget(I_ExtendByRef ext) throws IOException;
@@ -576,5 +578,5 @@ public interface I_TermFactory {
 	I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid,
 			byte[] image, String textDescription, String format,
 			I_ConfigAceFrame aceConfig) throws IOException;
-
+	
 }
