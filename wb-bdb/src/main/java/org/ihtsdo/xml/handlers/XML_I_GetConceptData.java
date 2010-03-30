@@ -283,6 +283,25 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 
 		ObjectCache.put(oc_key, Doc);
 	}
+	
+	public String getConceptXMLAsString() {
+		String XML_S = "Doc is null";
+		
+		if(Doc != null) {
+			try {
+				XML_S = XMLUtil.convertToStringLeaveCDATA(Doc);
+			} catch (TransformerException e) {
+				log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData getConceptXMLAsString \n" +
+						"printing out XML",
+						e);
+			}
+		}
+		
+		return XML_S;
+		
+		
+	}
+	
 
 	public int getConIdi() {
 		return conIdi;
