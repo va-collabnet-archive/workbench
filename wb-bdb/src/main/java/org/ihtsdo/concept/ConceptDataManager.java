@@ -219,6 +219,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		this.lastChange = getDataVersion();
 		this.lastWrite = this.lastChange;
 	}
+	
+	public void resetNidData() {
+		this.nidData.reset();
+	}
 
 	private long getDataVersion() throws IOException {
 		TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();

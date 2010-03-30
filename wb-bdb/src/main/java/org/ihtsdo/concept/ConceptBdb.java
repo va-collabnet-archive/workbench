@@ -91,6 +91,7 @@ public class ConceptBdb extends ComponentBdb {
                 writeVersion = Bdb.gVersion.incrementAndGet();
             }
             binder.objectToEntry(concept, value);
+            concept.resetNidData();
             mutable.put(null, key, value);
             concept.setLastWrite(writeVersion);
         }

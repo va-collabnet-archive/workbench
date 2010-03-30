@@ -40,4 +40,8 @@ public class NidDataInMemory implements I_GetNidData {
 		return readOnlyBytes != null || readWriteBytes != null;
 	}
 
+	public void reset() {
+		// nothing to do...
+	}
+
 }

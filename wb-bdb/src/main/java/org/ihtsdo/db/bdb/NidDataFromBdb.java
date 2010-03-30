@@ -27,6 +27,7 @@ public class NidDataFromBdb implements I_GetNidData {
 	
 	private int nid;
 	private Database readOnly;
+	private Database readWrite;
 	private Reference<byte[]> readOnlyBytes;
 	private byte[] readWriteBytes;
 	private static ThreadGroup nidDataThreadGroup  = 
@@ -53,6 +54,7 @@ public class NidDataFromBdb implements I_GetNidData {
 		super();
 		this.nid = nid;
 		this.readOnly = readOnly;
+		this.readWrite = readWrite;
 		
 		if (executorPool == null) {
 			executorPool = Executors.newCachedThreadPool(new NamedThreadFactory(nidDataThreadGroup,
@@ -61,6 +63,11 @@ public class NidDataFromBdb implements I_GetNidData {
 
 		readOnlyFuture = executorPool.submit(new GetNidData(nid, readOnly));
 		readWriteFuture = executorPool.submit(new GetNidData(nid, readWrite));
+	}
+	
+	public synchronized void reset() {
+		readWriteFuture = executorPool.submit(new GetNidData(nid, readWrite));	
+		readWriteBytes = null;
 	}
 
 	/* (non-Javadoc)

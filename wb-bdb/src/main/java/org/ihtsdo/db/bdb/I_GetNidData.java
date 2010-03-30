@@ -15,5 +15,7 @@ public interface I_GetNidData {
 	public TupleInput getMutableTupleInput() throws IOException;
 
 	public boolean isPrimordial() throws IOException;
+	
+	public void reset();
 
 }

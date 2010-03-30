@@ -22,6 +22,8 @@ import com.sleepycat.bind.tuple.TupleInput;
 public interface I_ManageConceptData {
 
 	public int getNid();
+	
+	public void resetNidData();
 
 	public int getReadWriteDataVersion() throws InterruptedException,
 			ExecutionException, IOException;
