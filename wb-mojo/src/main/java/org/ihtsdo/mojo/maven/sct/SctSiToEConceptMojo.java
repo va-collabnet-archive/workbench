@@ -43,6 +43,9 @@ import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
+import org.ihtsdo.etypes.EIdentifier;
+import org.ihtsdo.etypes.EIdentifierLong;
+import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
 
@@ -249,10 +252,9 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     private static UUID uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator()
             .next();
 
-    private static final UUID uuidSourceCtv3 = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids()
-            .iterator().next();
-    private static final UUID uuidSourceSnomedRt = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID
-            .getUids().iterator().next();
+    private static UUID uuidSourceCtv3;
+    private static UUID uuidSourceSnomedRt;
+    private static UUID uuidSourceSnomedInteger;
 
     private class UuidMinimal {
         @SuppressWarnings("unused")
@@ -1039,12 +1041,42 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         EConceptAttributes ca = new EConceptAttributes();
         ca.primordialUuid = theConUUID;
         ca.setDefined(cRec0.isprimitive == 0 ? true : false);
-        ca.additionalIds = null; // :!!!:
+
+        ca.additionalIds = new ArrayList<EIdentifier>();
+        EIdentifierLong cid = new EIdentifierLong();
+        cid.setAuthorityUuid(uuidSourceSnomedInteger);
+        cid.setDenotation(cRec0.id);
+        cid.setPathUuid(xPathArray[cRec0.xPath]);
+        cid.setStatusUuid(uuidCurrent);
+        cid.setTime(xRevDateArray[cRec0.xRevision]);
+        ca.additionalIds.add(cid);
+        EIdentifierString cids;
+        if (cRec0.ctv3id != null) {
+            cids = new EIdentifierString();
+            cids.setAuthorityUuid(uuidSourceCtv3);
+            cids.setDenotation(cRec0.ctv3id);
+            cids.setPathUuid(xPathArray[cRec0.xPath]);
+            cids.setStatusUuid(uuidCurrent);
+            cids.setTime(xRevDateArray[cRec0.xRevision]);
+            ca.additionalIds.add(cids);
+        }
+        if (cRec0.snomedrtid != null) {
+            cids = new EIdentifierString();
+            cids.setAuthorityUuid(uuidSourceSnomedRt);
+            cids.setDenotation(cRec0.snomedrtid);
+            cids.setPathUuid(xPathArray[cRec0.xPath]);
+            cids.setStatusUuid(uuidCurrent);
+            cids.setTime(xRevDateArray[cRec0.xRevision]);
+            ca.additionalIds.add(cids);
+        }
+
         ca.setStatusUuid(lookupXStatus(cRec0.status));
         ca.setPathUuid(xPathArray[cRec0.xPath]);
         ca.setTime(xRevDateArray[cRec0.xRevision]); // long
 
         int max = conList.size();
+        String idCtv3IdFirst = cRec0.ctv3id;
+        String idSnomedRtFirst = cRec0.snomedrtid;
         List<EConceptAttributesRevision> caRevisions = new ArrayList<EConceptAttributesRevision>();
         for (int i = 1; i < max; i++) {
             EConceptAttributesRevision rev = new EConceptAttributesRevision();
@@ -1054,13 +1086,21 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             rev.setPathUuid(xPathArray[cRec.xPath]);
             rev.setTime(xRevDateArray[cRec.xRevision]);
             caRevisions.add(rev);
-            // :!!!: new records have possible new "additional" ids???
+            // Check to see if the ids changed
+
+//            if (idCtv3IdFirst != null && cRec.ctv3id != null
+//                    && cRec.ctv3id.equals(idCtv3IdFirst) == false)
+//                getLog().info("CONCEPT CTV3 ID " + idCtv3IdFirst + " changed to " + cRec.ctv3id);
+//            if (idSnomedRtFirst != null && cRec.snomedrtid != null
+//                    && cRec.snomedrtid.equals(idSnomedRtFirst) == false)
+//                getLog()
+//                        .info("CONCEPT RT ID " + idSnomedRtFirst + " changed to " + cRec.snomedrtid);
         }
 
         if (caRevisions.size() > 0)
             ca.revisions = caRevisions;
         else
-            ca.revisions = null; // :!!!:???:
+            ca.revisions = null;
         ec.setConceptAttributes(ca);
 
         if (relDestList == null)
@@ -1096,7 +1136,16 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     // CREATE NEW DESCRIPTION
                     des = new EDescription();
                     theDesId = dRec.id;
-                    des.additionalIds = null; // :!!!:
+
+                    des.additionalIds = new ArrayList<EIdentifier>();
+                    EIdentifierLong did = new EIdentifierLong();
+                    did.setAuthorityUuid(uuidSourceSnomedInteger);
+                    did.setDenotation(dRec.id);
+                    did.setPathUuid(xPathArray[dRec.xPath]);
+                    did.setStatusUuid(uuidCurrent);
+                    did.setTime(xRevDateArray[dRec.xRevision]);
+                    des.additionalIds.add(did);
+
                     des.primordialUuid = Type3UuidFactory.fromSNOMED(theDesId);
                     des.setConceptUuid(theConUUID);
                     des.setText(dRec.termText);
@@ -1125,7 +1174,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ec.setDescriptions(eDesList);
         }
 
-        // ADD ROLES
+        // ADD RELATIONSHIPS
         if (relList != null) {
             Collections.sort(relList);
             List<ERelationship> eRelList = new ArrayList<ERelationship>();
@@ -1146,8 +1195,20 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
                     // CREATE NEW RELATIONSHIP
                     rel = new ERelationship();
-                    rel.additionalIds = null; // :!!!:
-                    rel.setAdditionalIdComponents(null); // :!!!:
+
+                    if (rRec.id == Long.MAX_VALUE)
+                        rel.additionalIds = null;
+                    else {
+                        rel.additionalIds = new ArrayList<EIdentifier>();
+                        EIdentifierLong rid = new EIdentifierLong();
+                        rid.setAuthorityUuid(uuidSourceSnomedInteger);
+                        rid.setDenotation(rRec.id);
+                        rid.setPathUuid(xPathArray[rRec.xPath]);
+                        rid.setStatusUuid(uuidCurrent);
+                        rid.setTime(xRevDateArray[rRec.xRevision]);
+                        rel.additionalIds.add(rid);
+                    }
+
                     theRelMsb = rRec.uuidMostSigBits;
                     theRelLsb = rRec.uuidLeastSigBits;
                     rel.setPrimordialComponentUuid(new UUID(theRelMsb, theRelLsb));
@@ -1447,6 +1508,14 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             uuidInferredRel = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                     uuidWbAuxIsa + uuidInferredDescFs.toString() + uuidInferredDescPt.toString());
 
+            uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
+
+            uuidSourceCtv3 = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids().iterator().next();
+            uuidSourceSnomedRt = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getUids().iterator()
+                    .next();
+            uuidSourceSnomedInteger = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
+                    .iterator().next();
+
             getLog().info("SNOMED CT Root       = " + uuidRootSnomedStr);
             getLog().info("SNOMED Core          = " + uuidPathSnomedCore);
             getLog().info("SNOMED Core Stated   = " + uuidPathSnomedStatedStr);
@@ -1454,6 +1523,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
             getLog().info("SNOMED Core Inferred = " + uuidPathSnomedInferredStr);
             getLog().info("  ... Inferred rel   = " + uuidInferredRel.toString());
+
+            getLog().info("SNOMED integer id UUID = " + uuidSourceSnomedInteger);
+            getLog().info("SNOMED CTV3 id UUID    = " + uuidSourceCtv3);
+            getLog().info("SNOMED RT id UUID      = " + uuidSourceSnomedRt);
 
         } catch (NoSuchAlgorithmException e2) {
             e2.printStackTrace();
@@ -1506,9 +1579,9 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         try {
             // SETUP DESCRIPTIONS INPUT SCTFile ArrayList
-         List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
-         processDescriptionsFiles(wDir, listOfDDirs);
-         listOfDDirs = null;
+            List<List<SCTFile>> listOfDDirs = getSnomedFiles(wDir, subDir, inDirs, "descriptions");
+            processDescriptionsFiles(wDir, listOfDDirs);
+            listOfDDirs = null;
             System.gc();
         } catch (Exception e1) {
             getLog().info("FAILED: processDescriptionsFiles()");
