@@ -11,6 +11,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
@@ -655,34 +657,57 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
         boolean isLeaf = true;
-        IsLeafBinder leafBinder = isLeafBinders.get(aceConfig);
-        if (leafBinder == null) {
-            leafBinder = new IsLeafBinder(aceConfig);
-            if (isLeafBinders.size() > 5) {
-                isLeafBinders.clear();
+        if (destRelNidTypeNidList != null && destRelNidTypeNidList.get() != null) {
+            I_IntSet destRelTypes = aceConfig.getDestRelTypes();
+            for (NidPair pair: destRelNidTypeNidList.get()) {
+                int relNid = pair.getNid1();
+                int typeId = pair.getNid2();
+                if (destRelTypes.contains(typeId)) {
+                    try {
+                        Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(relNid);
+                        if (r != null) {
+                            List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+                            r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
+                                    .getViewPositionSetReadOnly(), currentVersions, true);
+                            if (currentVersions.size() > 0) {
+                                return false;
+                            }
+                        }
+                    } catch (IOException e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
+                }
             }
-            isLeafBinders.put(aceConfig, leafBinder);
-        }
-        
-        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-        if (readOnlyInput.available() > 4) {
-            readOnlyInput.mark(128);
-            readOnlyInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
-            int dataOffset = readOnlyInput.readInt();
-            readOnlyInput.reset();
-            readOnlyInput.skipFast(dataOffset);
-            isLeaf = leafBinder.entryToObject(readOnlyInput);
-        }
-        
-        if (isLeaf) {
-            TupleInput mutableInput = nidData.getMutableTupleInput();
-            if (mutableInput.available() > 4) {
-                mutableInput.mark(128);
-                mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
+        } else {
+            IsLeafBinder leafBinder = isLeafBinders.get(aceConfig);
+            if (leafBinder == null) {
+                leafBinder = new IsLeafBinder(aceConfig);
+                if (isLeafBinders.size() > 5) {
+                    isLeafBinders.clear();
+                }
+                isLeafBinders.put(aceConfig, leafBinder);
+            }
+            
+            TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+            if (readOnlyInput.available() > 4) {
+                readOnlyInput.mark(128);
+                readOnlyInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
                 int dataOffset = readOnlyInput.readInt();
-                mutableInput.reset();
-                mutableInput.skipFast(dataOffset);
-                isLeaf = leafBinder.entryToObject(mutableInput);
+                readOnlyInput.reset();
+                readOnlyInput.skipFast(dataOffset);
+                isLeaf = leafBinder.entryToObject(readOnlyInput);
+            }
+            
+            if (isLeaf) {
+                TupleInput mutableInput = nidData.getMutableTupleInput();
+                if (mutableInput.available() > 4) {
+                    mutableInput.mark(128);
+                    mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
+                    int dataOffset = readOnlyInput.readInt();
+                    mutableInput.reset();
+                    mutableInput.skipFast(dataOffset);
+                    isLeaf = leafBinder.entryToObject(mutableInput);
+                }
             }
         }
         return isLeaf;
