@@ -36,6 +36,7 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalIdList;
+import org.ihtsdo.time.TimeUtil;
 
 public class UniversalChangeSetReader implements I_ReadChangeSet {
 
@@ -93,8 +94,9 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
 
     public void readUntil(long endTime) throws IOException, ClassNotFoundException {
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+            
             AceLog.getEditLog().info(
-                "Reading from log " + changeSetFile.getName() + " until " + new Date(endTime).toString());
+                "Reading from log " + changeSetFile.getName() + " until " + TimeUtil.formatDate(endTime));
         }
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {

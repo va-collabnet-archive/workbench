@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
-import org.apache.commons.collections.primitives.IntIterator;
-import org.apache.commons.collections.primitives.IntList;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -133,10 +130,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 				for (EDescription ed: eConcept.getDescriptions()) {
 					int dNid = Bdb.uuidToNid(ed.primordialUuid);
 					Description d = c.getDescription(dNid);
-					if (currentDNids.contains(dNid)) {
+					if (currentDNids.contains(dNid) && d != null) {
 						d.merge(new Description(ed, c));
 					} else {
-						c.getDescriptions().add(d);
+						c.getDescriptions().add(new Description(ed, c));
 					}
 				}
 			}
@@ -151,10 +148,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 				for (ERelationship er: eConcept.getRelationships()) {
 					int rNid = Bdb.uuidToNid(er.primordialUuid);
 					Relationship r = c.getSourceRel(rNid);
-					if (currentSrcRelNids.contains(rNid)) {
+					if (currentSrcRelNids.contains(rNid) && r != null) {
 						r.merge(new Relationship(er, c));
 					} else {
-						c.getSourceRels().add(r);
+						c.getSourceRels().add(new Relationship(er, c));
 					}
 				}
 			}
@@ -165,13 +162,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 				setImagesFromEConcept(eConcept, c);
 			} else {
 				Set<Integer> currentImageNids = c.data.getImageNids();
-				for (EImage er: eConcept.getImages()) {
-					int iNid = Bdb.uuidToNid(er.primordialUuid);
-					Image r = c.getImage(iNid);
-					if (currentImageNids.contains(iNid)) {
-						r.merge(new Image(er, c));
+				for (EImage eImg: eConcept.getImages()) {
+					int iNid = Bdb.uuidToNid(eImg.primordialUuid);
+					Image img = c.getImage(iNid);
+					if (currentImageNids.contains(iNid) && img != null) {
+						img.merge(new Image(eImg, c));
 					} else {
-						c.getImages().add(r);
+						c.getImages().add(new Image(eImg, c));
 					}
 				}
 			}
@@ -1079,41 +1076,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		return uab;
 	}
-
-	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
-			throws IOException {
-		I_IntSet destRelTypes = aceConfig.getDestRelTypes();
-		List<? extends NidPair> relNidTypeNid = data.getDestRelNidTypeNidList();
-		IntList possibleChildRels = new ArrayIntList();
-		for (NidPair pair: relNidTypeNid) {
-			int relNid = pair.getNid1();
-			int typeNid = pair.getNid2();
-			if (destRelTypes.contains(typeNid)) {
-				possibleChildRels.add(relNid);
-			}
-		}
-		if (possibleChildRels.size() == 0
-				&& aceConfig.getSourceRelTypes().getSetValues().length == 0) {
-			return true;
-		}
-		IntIterator relNids = possibleChildRels.iterator();
-		while (relNids.hasNext()) {
-			int relNid = relNids.next();
-			Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(
-					relNid);
-			if (r != null) {
-				List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-				r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-						.getViewPositionSetReadOnly(), currentVersions, true);
-				if (currentVersions.size() > 0) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 	
-	public boolean isLeafFast(I_ConfigAceFrame aceConfig, boolean addUncommitted)
+	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
 			throws IOException {
 		
         I_IntSet srcRelTypes = aceConfig.getSourceRelTypes();

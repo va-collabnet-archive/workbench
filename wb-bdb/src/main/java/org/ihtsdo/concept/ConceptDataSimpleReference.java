@@ -70,8 +70,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
 
     public ConceptDataSimpleReference(Concept enclosingConcept) throws IOException {
-        super(new NidDataFromBdb(enclosingConcept.getNid(), Bdb.getConceptDb().getReadOnly(), Bdb.getConceptDb()
-            .getReadWrite()));
+        super(new NidDataFromBdb(enclosingConcept.getNid()));
         assert enclosingConcept != null : "enclosing concept cannot be null.";
         this.enclosingConcept = enclosingConcept;
     }

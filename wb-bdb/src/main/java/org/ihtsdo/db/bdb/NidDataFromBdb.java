@@ -14,7 +14,6 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.je.Database;
 
 public class NidDataFromBdb implements I_GetNidData {
 
@@ -26,12 +25,9 @@ public class NidDataFromBdb implements I_GetNidData {
 	private Future<byte[]> readWriteFuture;
 	
 	private int nid;
-	private Database readOnly;
-	private Database readWrite;
 	private Reference<byte[]> readOnlyBytes;
 	private byte[] readWriteBytes;
-	private static ThreadGroup nidDataThreadGroup  = 
-		new ThreadGroup("nid data threads");
+	private static ThreadGroup nidDataThreadGroup  = new ThreadGroup("nid data threads");
 
 	private static ExecutorService executorPool;
 	
@@ -50,24 +46,21 @@ public class NidDataFromBdb implements I_GetNidData {
         executorPool = null;
 	}
 
-	public NidDataFromBdb(int nid, Database readOnly, Database readWrite) {
+	public NidDataFromBdb(int nid) {
 		super();
 		this.nid = nid;
-		this.readOnly = readOnly;
-		this.readWrite = readWrite;
 		
 		if (executorPool == null) {
 			executorPool = Executors.newCachedThreadPool(new NamedThreadFactory(nidDataThreadGroup,
 			"Nid data service"));
 		}
-
-		readOnlyFuture = executorPool.submit(new GetNidData(nid, readOnly));
-		readWriteFuture = executorPool.submit(new GetNidData(nid, readWrite));
+		readOnlyFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadOnly()));
+		readWriteFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadWrite()));
 	}
 	
 	public synchronized void reset() {
-		readWriteFuture = executorPool.submit(new GetNidData(nid, readWrite));	
 		readWriteBytes = null;
+		readWriteFuture = null;
 	}
 
 	/* (non-Javadoc)
@@ -75,6 +68,9 @@ public class NidDataFromBdb implements I_GetNidData {
 	 */
 	public synchronized byte[] getReadOnlyBytes() throws IOException {
 		if (readOnlyBytes == null) {
+		    if (readOnlyFuture == null) {
+		        readOnlyFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadOnly()));
+		    }
 			try {
 				byte[] bytes = readOnlyFuture.get();
 				switch (refType) {
@@ -87,6 +83,7 @@ public class NidDataFromBdb implements I_GetNidData {
 					default:
 						throw new RuntimeException("Don't know how to handle: " + refType);
 				}
+				readOnlyFuture = null;
 				return bytes;
 			} catch (InterruptedException e) {
 				throw new IOException(e);
@@ -95,11 +92,11 @@ public class NidDataFromBdb implements I_GetNidData {
 			}
 		}
 		byte[] bytes = readOnlyBytes.get();
-		if (bytes == null) {
-			GetNidData getter = new GetNidData(nid, readOnly);
-			bytes = getter.call();
+		if (bytes != null) {
+		    return bytes;
 		}
-		return bytes;
+		readOnlyBytes = null;
+		return getReadOnlyBytes();
 	}
 
 	/* (non-Javadoc)
@@ -107,8 +104,13 @@ public class NidDataFromBdb implements I_GetNidData {
 	 */
 	public  synchronized byte[] getReadWriteBytes() throws IOException {
 		if (readWriteBytes == null) {
+            if (readWriteFuture == null) {
+                readWriteFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadWrite()));
+                return getReadWriteBytes();
+            }
 			try {
 				readWriteBytes = readWriteFuture.get();
+				readWriteFuture = null;
 			} catch (InterruptedException e) {
 				throw new IOException(e);
 			} catch (ExecutionException e) {

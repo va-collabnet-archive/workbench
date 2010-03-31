@@ -64,6 +64,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 		@Override
 		public boolean add(Relationship e) {
 			try {
+			    if (e == null) {
+			        AceLog.getAppLog().info("found it");
+			    }
+			    assert e != null: "Relationship is null processing:\n" + this;
 				boolean returnValue = super.add(e);
 				processNewRel(e);
 				return returnValue;
@@ -309,6 +313,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 	}
 
 	void processNewRel(Relationship rel) throws IOException {
+        assert rel != null : "rel is null: " + this;
 		assert rel.nid != 0 : "relNid is 0: " + this;
 		assert rel.getTypeId() != 0 : "relTypeNid is 0: " + this;
 		Concept dest = Concept.get(rel.getC2Id());
