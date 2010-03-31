@@ -1,7 +1,6 @@
 package org.dwfa.mojo.export.file;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,16 +34,19 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
 
     private Map<UUID, Map<UUID, Date>> releasePathDateMap;
 
-    /** Until the baseline database is used with have to handle concepts with multiple/wrong sct id in the berkeley database. */
+    /**
+     * Until the baseline database is used with have to handle concepts with
+     * multiple/wrong sct id in the berkeley database.
+     */
     private Map<UUID, Long> uuidIgnorList = new HashMap<UUID, Long>();
 
     /** Set to true to throw exceptions on validation errors. */
     boolean failOnError = true;
 
-    public SnomedFileFormatOutputHandler(Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException, ClassNotFoundException {
-        //TODO add factory class to do this
+    public SnomedFileFormatOutputHandler(Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
+        // TODO add factory class to do this
         if (snomedIdHandler == null) {
-            snomedIdHandler = new UuidSnomedDbMapHandler();
+            snomedIdHandler = UuidSnomedDbMapHandler.getInstance();
         }
 
         this.releasePathDateMap = releasePathDateMap;
@@ -53,7 +55,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         uuidIgnorList.put(UUID.fromString("125f3d04-de17-490e-afec-1431c2a39e29"), 900000000000336005l);
         uuidIgnorList.put(UUID.fromString("c2c710d1-5757-33ea-9be3-4cce55f6be35"), 108642051000036118l);
         uuidIgnorList.put(UUID.fromString("58e33018-e99e-3859-a5a5-62b0ee29a05c"), 108642061000036115l);
-        uuidIgnorList.put(UUID.fromString("05f27978-6783-351c-91a5-c5dc39a37299") ,900000000000416022l);
+        uuidIgnorList.put(UUID.fromString("05f27978-6783-351c-91a5-c5dc39a37299"), 900000000000416022l);
         uuidIgnorList.put(UUID.fromString("fa28e447-d635-49b1-9b55-86254a7a2f97"), 32570041000036109l);
         uuidIgnorList.put(UUID.fromString("8578034a-0b2f-3ef1-900c-250d1b1ef877"), 32570701000036108l);
         uuidIgnorList.put(UUID.fromString("4859053b-8137-364f-9c4b-3f794572aa75"), 32570371000036100l);
@@ -83,7 +85,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validationErrors.append(System.getProperty("line.separator"));
             }
 
-            logger.warning(componentDto.getConceptDto().getConceptId().keySet().iterator().next() + " Validation Errors:" + validationErrors.toString());
+            logger.warning(componentDto.getConceptDto().getConceptId().keySet().iterator().next()
+                + " Validation Errors:" + validationErrors.toString());
             if (failOnError) {
                 throw new ValidationException("Validation Errors:" + validationErrors);
             }
@@ -112,7 +115,6 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         validationExtensions(validationErrorList, descriptionExtensionDtos);
         validationExtensions(validationErrorList, relationshipExtensionDtos);
 
-
         return validationErrorList;
     }
 
@@ -131,7 +133,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                     validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " No member id");
                 }
                 if (extensionDto.getReferencedConceptId() == null) {
-                    validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " No referenced component id");
+                    validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next()
+                        + " No referenced component id");
                 }
                 if (extensionDto.getConcept1Id() == null && extensionDto.getValue() == null) {
                     validationErrorList.add(extensionDto.getConceptId().keySet().iterator().next() + " value");
@@ -144,7 +147,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     /**
      * Validate the relationship details.
      *
-     * @param validationErrorList  List of String
+     * @param validationErrorList List of String
      * @param relationshipDtos List<RelationshipDto>
      */
     private void validationRelationships(List<String> validationErrorList, List<RelationshipDto> relationshipDtos) {
@@ -153,22 +156,27 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validateConceptDto(validationErrorList, relationshipDto);
 
                 if (relationshipDto.getCharacteristicTypeCode() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No characteristic type code");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
+                        + " No characteristic type code");
                 }
                 if (relationshipDto.getCharacteristicTypeId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No characteristic type id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
+                        + " No characteristic type id");
                 }
                 if (relationshipDto.getModifierId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No modifier id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
+                        + " No modifier id");
                 }
                 if (relationshipDto.getRelationshipGroupCode() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No group code");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
+                        + " No group code");
                 }
                 if (relationshipDto.getSourceId() == null) {
                     validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No source id");
                 }
                 if (relationshipDto.getDestinationId() == null) {
-                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No destination id");
+                    validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
+                        + " No destination id");
                 }
                 if (relationshipDto.getTypeId() == null) {
                     validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next() + " No type id");
@@ -188,25 +196,32 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             for (DescriptionDto descriptionDto : descriptionDtos) {
                 validateConceptDto(validationErrorList, descriptionDto);
                 if (descriptionDto.getDescriptionId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No description id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No description id");
                 }
                 if (descriptionDto.getDescription() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No description text");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No description text");
                 }
                 if (descriptionDto.getCaseSignificanceId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No case significance id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No case significance id");
                 }
                 if (descriptionDto.getDescriptionTypeCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No case description type code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No case description type code");
                 }
                 if (descriptionDto.getInitialCapitalStatusCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No initial capital status code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No initial capital status code");
                 }
                 if (descriptionDto.getLanguageCode() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No language code");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No language code");
                 }
                 if (descriptionDto.getLanguageId() == null) {
-                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No language id");
+                    validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
+                        + " No language id");
                 }
                 if (descriptionDto.getTypeId() == null) {
                     validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No type id");
@@ -218,7 +233,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     }
 
     /**
-     * Validate the concept details (concept, description, relationship or extension)
+     * Validate the concept details (concept, description, relationship or
+     * extension)
      *
      * @param validationErrorList List of String
      * @param concept ConceptDto
@@ -260,7 +276,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * Gets a new or retrieves the current mapping SCT id for a UUID based on
      * the ConceptDto name space and type.
      *
-     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     * Validates the sct id in the id database against the sct id in the
+     * IdentifierDto.
      *
      * @param concept Concept
      * @param uuid UUID
@@ -277,7 +294,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * Gets a new or retrieves the current mapping SCT id for a UUID based on
      * the ConceptDto name space and type.
      *
-     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     * Validates the sct id in the id database against the sct id in the
+     * IdentifierDto.
      *
      * @param concept Concept
      * @param identifierDtos list of IdentifierDtos
@@ -290,22 +308,18 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
 
         if (!identifierDtos.isEmpty()) {
             sctId = identifierDtos.get(0).getReferencedSctId();
-            try{
+            try {
                 getCheckSctIdAndAddToDb(sctId, uuid);
             } catch (NoMappingException nme) {
-//                if (uuidIgnorList.containsKey(uuid)) {
-                    synchronized (snomedIdHandler) {
-                        sctId = snomedIdHandler.getWithoutGeneration(uuid,
-                                SctIdValidator.getInstance().getSctIdNamespace(sctId.toString()), type);
-                    }
-//                } else {
-//                    throw nme;
-//                }
+                //if (uuidIgnorList.containsKey(uuid)) {
+                    sctId = snomedIdHandler.getWithoutGeneration(uuid, SctIdValidator.getInstance().getSctIdNamespace(
+                        sctId.toString()), type);
+                //} else {
+                //    throw nme;
+                //}
             }
         } else {
-            synchronized (snomedIdHandler) {
-                sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
-            }
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
         }
 
         return sctId;
@@ -315,7 +329,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * Gets a new or retrieves the current mapping SCT id for a UUID based on
      * the ConceptDto name space and type.
      *
-     * Validates the sct id in the id database against the sct id in the IdentifierDto.
+     * Validates the sct id in the id database against the sct id in the
+     * IdentifierDto.
      *
      * @param concept Concept
      * @param conceptIdMap Map UUID, Long
@@ -328,21 +343,17 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         UUID uuid = conceptIdMap.keySet().iterator().next();
 
         if (sctId == null) {
-            synchronized (snomedIdHandler) {
-                sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
-            }
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
         } else {
-            try{
+            try {
                 getCheckSctIdAndAddToDb(sctId, uuid);
             } catch (NoMappingException nme) {
-//                if (uuidIgnorList.containsKey(uuid)) {
-                    synchronized (snomedIdHandler) {
-                        sctId = snomedIdHandler.getWithoutGeneration(uuid,
-                                SctIdValidator.getInstance().getSctIdNamespace(sctId.toString()), type);
-                    }
-//                } else {
-//                    throw nme;
-//                }
+                //if (uuidIgnorList.containsKey(uuid)) {
+                    sctId = snomedIdHandler.getWithoutGeneration(uuid, SctIdValidator.getInstance().getSctIdNamespace(
+                        sctId.toString()), type);
+                //} else {
+                //    throw nme;
+                //}
             }
         }
 
@@ -350,7 +361,8 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     }
 
     /**
-     * Checks the SCT-ID UUID mapping against the id database. if the id's are not
+     * Checks the SCT-ID UUID mapping against the id database. if the id's are
+     * not
      * mapped then id mapping is added to the id database.
      *
      * @param sctId Long
@@ -359,22 +371,21 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception Cannot add them to the database
      */
     private void getCheckSctIdAndAddToDb(Long sctId, UUID uuid) throws NoMappingException, Exception {
-        TYPE type = SctIdValidator.getInstance().getSctIdType(sctId.toString());;
-        NAMESPACE namespace = SctIdValidator.getInstance().getSctIdNamespace(sctId.toString());
-        synchronized (snomedIdHandler) {
-            Long dbSctId =  snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
+        TYPE type = SctIdValidator.getInstance().getSctIdType(sctId.toString());
 
-            if (dbSctId != null && !dbSctId.equals(sctId)) {
-                String errorMessage = null;
-                if (!uuidIgnorList.containsKey(uuid)) {
-                    errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id "
-                        + sctId + " database id " + dbSctId;
-                    logger.severe(errorMessage);
-                }
-                throw new NoMappingException(errorMessage);
-            } else if(dbSctId == null) {
-                snomedIdHandler.addSctId(uuid, sctId, namespace, type);
+        NAMESPACE namespace = SctIdValidator.getInstance().getSctIdNamespace(sctId.toString());
+        Long dbSctId = snomedIdHandler.getWithoutGeneration(uuid, namespace, type);
+
+        if (dbSctId != null && !dbSctId.equals(sctId)) {
+            String errorMessage = null;
+            if (!uuidIgnorList.containsKey(uuid)) {
+                errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id " + sctId + " database id "
+                    + dbSctId;
+                logger.severe(errorMessage);
             }
+            throw new NoMappingException(errorMessage);
+        } else if (dbSctId == null) {
+            snomedIdHandler.addSctId(uuid, sctId, namespace, type);
         }
     }
 
@@ -402,9 +413,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getSctId(Concept concept, UUID uuid, TYPE type) throws Exception {
-        synchronized (snomedIdHandler) {
-            return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
-        }
+        return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
     }
 
     /**
@@ -418,9 +427,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         Long moduleSctId;
         UUID moduleUuid = getModuleUuid(concept);
 
-        synchronized (snomedIdHandler) {
-            moduleSctId = snomedIdHandler.getWithGeneration(moduleUuid, concept.getNamespace(), TYPE.CONCEPT);
-        }
+        moduleSctId = snomedIdHandler.getWithGeneration(moduleUuid, concept.getNamespace(), TYPE.CONCEPT);
 
         return moduleSctId;
     }
@@ -436,7 +443,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         UUID moduleUuid;
 
         Map<UUID, Date> moduleDateMap = releasePathDateMap.get(concept.getPathId());
-        if(moduleDateMap != null){
+        if (moduleDateMap != null) {
             moduleUuid = moduleDateMap.keySet().iterator().next();
         } else {
             moduleUuid = concept.getPathId();
@@ -451,11 +458,11 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @param concept Concept
      * @return String
      */
-    protected String getReleaseDate(Concept concept){
+    protected String getReleaseDate(Concept concept) {
         Date releaseDate;
 
         Map<UUID, Date> moduleDateMap = releasePathDateMap.get(concept.getPathId());
-        if(moduleDateMap != null){
+        if (moduleDateMap != null) {
             releaseDate = moduleDateMap.values().iterator().next();
         } else {
             releaseDate = concept.getDateTime();
@@ -477,5 +484,5 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      *
      * @throws IOException on file errors
      */
-    abstract void closeFiles() throws IOException ;
+    abstract void closeFiles() throws IOException;
 }

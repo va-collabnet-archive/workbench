@@ -50,7 +50,8 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     private Map<String, Long> nextSctSequenceMap;
     /** Maximum number of ids to cache before writing to DB. */
     private int MAX_CACHE_SIZE = Integer.parseInt(System.getProperty(UUID_SNOMED_DB_MAP_HANDLER_MAX_CACHE_SIZE, "50000"));
-
+    /** Singleton. */
+    private static UuidSnomedDbMapHandler instance;
     /**
      * Create or reads the database.
      *
@@ -62,7 +63,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws SQLException Running and setting setup SQL statements
      * @throws ClassNotFoundException error creating the DB.
      */
-    public UuidSnomedDbMapHandler() throws IOException, SQLException, ClassNotFoundException {
+    private UuidSnomedDbMapHandler() throws IOException, SQLException, ClassNotFoundException {
         uuidSctidMapDb = UuidSctidMapDb.getInstance();
 
         if (uuidSctidMapDb.isDatabaseInitialised()) {
@@ -85,6 +86,23 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     }
 
     /**
+     * Get the singleton.
+     *
+     * @return UuidSnomedDbMapHandler
+     * @throws Exception cannot open the id database.
+     */
+    public static UuidSnomedDbMapHandler getInstance() throws Exception {
+        if(instance == null){
+            try {
+                instance = new UuidSnomedDbMapHandler();
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+        return instance;
+    }
+
+    /**
      * If no mapping is found generate a new SctId and store in the memory map.
      *
      * Once the memory map is greater than <code>MAX_CACHE_SIZE</code> the map
@@ -98,9 +116,10 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
         Long sctId = getWithoutGeneration(uuid, namespace, type);
 
         if (sctId == null) {
-            sctId = Long.valueOf(SctIdGenerator.generate(
-                nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)) + 1, namespace, type));
-
+            synchronized (nextSctSequenceMap) {
+                sctId = Long.valueOf(SctIdGenerator.generate(
+                    nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)) + 1, namespace, type));
+            }
             if (!SctIdValidator.getInstance().isValidSctId(sctId.toString(), namespace, type)) {
                 throw new Exception("BAD sctid " + namespace + " " + type + " " + sctId);
             }
@@ -110,7 +129,9 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
         return sctId;
     }
 
-
+    /**
+     * @see org.dwfa.maven.sctid.UuidSnomedHandler#addSctId(java.util.UUID, java.lang.Long, org.dwfa.maven.transform.SctIdGenerator.NAMESPACE, org.dwfa.maven.transform.SctIdGenerator.TYPE)
+     */
     @Override
     public void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type) throws Exception {
         Long mappedId = addMap(uuid, sctId, namespace, type);
@@ -131,10 +152,15 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws Exception DB error
      */
     private Long addMap(UUID uuid, Long sctID, NAMESPACE namespace, TYPE type) throws Exception {
-        Long lastMapping = memoryUuidSctidMap.put(uuid, sctID);
+        Long lastMapping;
+        synchronized (memoryUuidSctidMap) {
+            lastMapping = memoryUuidSctidMap.put(uuid, sctID);
+        }
 
-        nextSctSequenceMap.put(getNamespaceTypeKey(namespace, type), Math.max(
-            nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)), getSctIdSequencePart(sctID, namespace, type)));
+        synchronized (nextSctSequenceMap) {
+            nextSctSequenceMap.put(getNamespaceTypeKey(namespace, type), Math.max(
+                nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)), getSctIdSequencePart(sctID, namespace, type)));
+        }
 
         if (memoryUuidSctidMap.size() > MAX_CACHE_SIZE) {
             writeMaps();
@@ -152,10 +178,16 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      *      org.dwfa.maven.transform.SctIdGenerator.TYPE)
      */
     public Long getWithoutGeneration(UUID uuid, NAMESPACE namespace, TYPE type) throws Exception {
-        Long sctId = uuidSctidMapDb.getSctId(uuid);
+        Long sctId;
+
+        synchronized (uuidSctidMapDb) {
+            sctId = uuidSctidMapDb.getSctId(uuid);
+        }
 
         if (sctId == null) {
-            sctId = memoryUuidSctidMap.get(uuid);
+            synchronized (memoryUuidSctidMap) {
+                sctId = memoryUuidSctidMap.get(uuid);
+            }
         }
         if (sctId != null && !SctIdValidator.getInstance().getSctIdType(sctId.toString()).equals(type)) {
             logger.severe("Invalid sctid " + sctId + " for type " + type);
@@ -175,8 +207,12 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws Exception if cannot write maps to the DB.
      */
     public void writeMaps() throws Exception {
-        uuidSctidMapDb.addUUIDSctIdEntryList(memoryUuidSctidMap);
-        memoryUuidSctidMap.clear();
+        synchronized (uuidSctidMapDb) {
+            synchronized (memoryUuidSctidMap) {
+                uuidSctidMapDb.addUUIDSctIdEntryList(memoryUuidSctidMap);
+                memoryUuidSctidMap.clear();
+            }
+        }
         logger.info("Committed memory map to DB");
     }
 
@@ -186,7 +222,9 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @throws Exception on close error
      */
     public void close() throws Exception {
-        uuidSctidMapDb.close();
+        synchronized (uuidSctidMapDb) {
+            uuidSctidMapDb.close();
+        }
     }
 
     /**

@@ -1298,7 +1298,7 @@ public class UuidSctidMapDb {
     /**
      * @see java.lang.Object#finalize()
      */
-    public void finalize() throws SQLException {
+    protected void finalize() throws Throwable {
         if (isDbConnectted()) {
             containsUuid.close();
             getValue.close();
@@ -1336,25 +1336,7 @@ public class UuidSctidMapDb {
      */
     public void close() throws SQLException {
         if (isDbConnectted()) {
-            containsUuid.close();
-            getValue.close();
-            deleteValue.close();
-            getUuidListForSctid.close();
-            count.close();
-            insertIdMapRow.close();
-            insertTypeRow.close();
-            insertNamespaceRow.close();
-            countTypeRows.close();
-            countNamespaceRows.close();
-            getTypeRow.close();
-            getNamespaceRow.close();
-            getMaxSctIdForNamespaceAndType.close();
-
-            typeMap.clear();
-            namespaceMap.clear();
             conn.commit();
-            conn.close();
-            conn = null;
         }
 
         if (isDerbyEmbeddedDatabase()) {

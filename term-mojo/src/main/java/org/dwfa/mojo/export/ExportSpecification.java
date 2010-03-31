@@ -58,6 +58,7 @@ import org.dwfa.dto.ExtensionDto;
 import org.dwfa.dto.IdentifierDto;
 import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.sctid.SctIdValidator;
+import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
@@ -85,6 +86,8 @@ public class ExportSpecification {
     public List<I_GetConceptData> exclusions;
     /** The default namespace to use for export */
     private NAMESPACE defaultNamespace;
+    /** Mapping of UUID's to SCT ids. */
+    private UuidSnomedDbMapHandler uuidSnomedDbMapHandler;
 
     /** The active concept. */
     private I_GetConceptData activeConcept;
@@ -222,6 +225,8 @@ public class ExportSpecification {
 
         this.defaultNamespace = defaultNamespace;
 
+        uuidSnomedDbMapHandler = UuidSnomedDbMapHandler.getInstance();
+
         extensionProcessor = new ExtensionProcessor<I_ThinExtByRefPart>();
     }
 
@@ -240,7 +245,7 @@ public class ExportSpecification {
         ComponentDto componentDto = null;
         boolean exportableConcept = false;
 
-        if (isIncluded(concept) && !isExcluded(concept)) {
+        if (isExportableConcept(concept)) {
             componentDto = new ComponentDto();
             for (Position position : positions) {
                 List<I_ConceptAttributeTuple> matchingConceptTuples = position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, true));
@@ -274,7 +279,7 @@ public class ExportSpecification {
                     concept.getSourceRelTuples(null, null, null, false, true));
                 for (I_RelTuple tuple : matchingRelationshipTuples) {
                     I_GetConceptData destinationConcept = termFactory.getConcept(tuple.getC2Id());
-                    if (isIncluded(destinationConcept) && !isExcluded(destinationConcept)) {
+                    if (isExportableConcept(destinationConcept)) {
                         updateComponentDto(componentDto, tuple);
                         for (I_ThinExtByRefVersioned thinExtByRefVersioned : termFactory.getAllExtensionsForComponent(tuple.getRelId())) {
                             for (Position extPosition : positions) {
@@ -291,6 +296,27 @@ public class ExportSpecification {
         }
 
         return (exportableConcept) ? componentDto : null;
+    }
+
+    /**
+     * Is the concept in the include hierarchy or in the excluded hierarchy and also in the included hierarchy.
+     *
+     * @param concept I_GetConceptData
+     * @return boolean
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean isExportableConcept(I_GetConceptData concept)
+            throws IOException, TerminologyException {
+        boolean exportable = false;
+
+        if (isExcluded(concept) && isIncluded(concept)) {
+            exportable = true;
+        } else if (isIncluded(concept)) {
+            exportable = true;
+        }
+
+        return exportable;
     }
 
     /**
@@ -319,7 +345,7 @@ public class ExportSpecification {
         setConceptHistory(componentDto, tuple.getRelVersioned());
         setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple);
 
-        setUuidSctIdIdentifier(relationshipDto, tuple, idParts, TYPE.CONCEPT);
+        setUuidSctIdIdentifier(relationshipDto, tuple, idParts, TYPE.RELATIONSHIP, tuple.getRelId());
 
         int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(termFactory.getUids(tuple.getCharacteristicId()));
         relationshipDto.setCharacteristicTypeCode(Character.forDigit(snomedCharacter, 10));
@@ -345,11 +371,9 @@ public class ExportSpecification {
      *
      * @param componentDto ComponentDto - updated with the description details
      * @param tuple I_DescriptionTuple - to add to the ComponentDto
-     * @throws IOException DB errors
-     * @throws TerminologyException DB errors
+     * @throws Exception
      */
-    private void updateComponentDto(ComponentDto componentDto, I_DescriptionTuple tuple) throws IOException,
-            TerminologyException {
+    private void updateComponentDto(ComponentDto componentDto, I_DescriptionTuple tuple) throws Exception {
         DescriptionDto descriptionDto = new DescriptionDto();
         List<I_IdPart> idParts = termFactory.getId(tuple.getDescId()).getVersions();
 
@@ -358,7 +382,7 @@ public class ExportSpecification {
         setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
             conceptInactivationIndicatorNid, TYPE.DESCRIPTION);
 
-        setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.CONCEPT);
+        setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId());
 
         descriptionDto.setCaseSignificanceId(getInitialCaseSignificant(tuple.getInitialCaseSignificant()));
         descriptionDto.setConceptId(getIdMap(tuple, tuple.getConceptId()));
@@ -385,11 +409,10 @@ public class ExportSpecification {
      *
      * @param componentDto ComponentDto - updated with the concept details
      * @param tuple I_ConceptAttributeTuple - to add to the ComponentDto
-     * @throws IOException DB errors
-     * @throws TerminologyException DB errors
+     * @throws Exception
      */
     private ComponentDto updateComponentDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple)
-            throws IOException, TerminologyException {
+            throws Exception {
         I_GetConceptData conceptData = termFactory.getConcept(tuple.getConId());
         componentDto.getConceptDto().setConceptId(getIdMap(tuple, tuple.getConId()));
 
@@ -414,7 +437,7 @@ public class ExportSpecification {
         setComponentInactivationReferenceSet(componentDto.getConceptExtensionDtos(), tuple.getConId(), tuple,
             conceptInactivationIndicatorNid, TYPE.CONCEPT);
 
-        setUuidSctIdIdentifier(componentDto.getConceptDto(), tuple, conceptData.getId().getVersions(), TYPE.CONCEPT);
+        setUuidSctIdIdentifier(componentDto.getConceptDto(), tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId());
 
         List<I_DescriptionTuple> descriptionTuples = conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true);
 
@@ -475,7 +498,7 @@ public class ExportSpecification {
      * @throws TerminologyException
      */
     private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid, I_AmTuple tuple,
-            int inactivationIndicatorRefsetNid, TYPE type) throws IOException,TerminologyException {
+            int inactivationIndicatorRefsetNid, TYPE type) throws Exception {
         int rf2InactiveStatus = getRf2Status(tuple.getStatusId());
         if (rf2InactiveStatus != -1) {
             // if the status is INACTIVE or ACTIVE there is no need for a
@@ -523,7 +546,7 @@ public class ExportSpecification {
      * @throws TerminologyException
      */
     private void setCtv3ReferenceSet(ComponentDto componentDto, I_ConceptAttributeTuple tuple, I_IdPart ctv3IdPart)
-            throws IOException, TerminologyException {
+            throws Exception {
         List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
 
         I_ThinExtByRefTuple ctv3tuple = createThinExtByRefTuple(ctv3IdMapExtension.getConceptId(), 0, tuple.getConId(),
@@ -544,7 +567,7 @@ public class ExportSpecification {
      * @throws TerminologyException
      */
     private void setSnomedRtIdReferenceSet(ComponentDto componentDto, I_ConceptAttributeTuple tuple, I_IdPart snomedIdPart)
-            throws IOException, TerminologyException {
+            throws Exception {
         List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
 
         I_ThinExtByRefTuple snomedIdtuple = createThinExtByRefTuple(snomedRtIdMapExtension.getConceptId(), 0,
@@ -636,27 +659,43 @@ public class ExportSpecification {
     /**
      * Adds an identifier row for UUID (type 3 and 5) to SCTID to the ConceptDto.
      *
-     * If not SCTID then no identifier row is added
+     * If there is no SCTID in the Berkeley database a new identifierDto is created and added to the concept.
      *
      * @param conceptDto ConceptDto
      * @param tuple I_ConceptAttributeTuple
      * @param conceptData I_GetConceptData
      * @param type
-
-     * @throws IOException DB errors
-     * @throws TerminologyException DB errors
+     * @throws Exception
      */
     private void setUuidSctIdIdentifier(ConceptDto conceptDto, I_AmPart tuple,
-            List<I_IdPart> idVersions, TYPE type) throws TerminologyException, IOException {
+            List<I_IdPart> idVersions, TYPE type, int componentNid) throws Exception {
 
         I_IdPart type5UuidPart = getLatesIdtVersion(idVersions, unspecifiedUuid.getConceptId(), tuple);
         I_IdPart type3UidPart = getLatesIdtVersion(idVersions, snomedT3Uuid.getConceptId(), tuple);
         I_IdPart sctIdPart = getLatesIdtVersion(idVersions, snomedIntId.getConceptId(), tuple);
 
-        if (type5UuidPart != null && sctIdPart != null) {
+        if (sctIdPart == null) {
+            sctIdPart = new ThinIdPart();
+            UUID uuid;
+            if(type5UuidPart != null){
+                uuid = UUID.fromString(type5UuidPart.getSourceId().toString());
+            } else if(type3UidPart != null) {
+                uuid = UUID.fromString(type3UidPart.getSourceId().toString());
+            } else {
+                uuid = termFactory.getUids(componentNid).iterator().next();
+            }
+
+            sctIdPart.setPathId(tuple.getPathId());
+            sctIdPart.setSource(snomedIntId.getConceptId());
+            sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type));
+            sctIdPart.setStatusId(activeConcept.getConceptId());
+            sctIdPart.setVersion(tuple.getVersion());
+        }
+
+        if (type5UuidPart != null) {
             setIdentifier(conceptDto, tuple, idVersions, type, type5UuidPart, sctIdPart);
         }
-        if (type3UidPart != null && sctIdPart != null) {
+        if (type3UidPart != null) {
             setIdentifier(conceptDto, tuple, idVersions, type, type3UidPart, sctIdPart);
         }
     }
@@ -972,10 +1011,9 @@ public class ExportSpecification {
          * @param tuple <T>
          * @param type TYPE
          * @return ExtensionDto
-         * @throws IOException ye'old DB errors
-         * @throws TerminologyException ye'old DB errors
+         * @throws Exception ye'old DB errors
          */
-        ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned, T tuple, TYPE type)  throws IOException, TerminologyException;
+        ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned, T tuple, TYPE type)  throws Exception;
     }
 
     /**
@@ -1015,12 +1053,12 @@ public class ExportSpecification {
          * @throws TerminologyException DB errors
          */
         @SuppressWarnings("unchecked")
-        public List<ExtensionDto> processList(I_ThinExtByRefVersioned thinExtByRefVersioned, List<I_ThinExtByRefTuple> list, TYPE type, boolean isClinical) throws IOException, TerminologyException {
+        public List<ExtensionDto> processList(I_ThinExtByRefVersioned thinExtByRefVersioned, List<I_ThinExtByRefTuple> list, TYPE type, boolean isClinical) throws Exception {
             List<ExtensionDto> extensionDtos = new ArrayList<ExtensionDto>();
 
             for (I_ThinExtByRefTuple t : list) {
                 I_GetConceptData refsetConcept = termFactory.getConcept(t.getRefsetId());
-                if (isIncluded(refsetConcept) && !isExcluded(refsetConcept)) {
+                if (isExportableConcept(refsetConcept)) {
                     I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(t.getTypeId());
                     if(extensionProcessor != null){
                         ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t.getPart(), type);
@@ -1047,13 +1085,14 @@ public class ExportSpecification {
             I_AmExtensionProcessor<I_ThinExtByRefPart> {
 
         /**
+         * @throws Exception
          * @see org.dwfa.mojo.export.ExportSpecification.I_AmExtensionProcessor#getExtensionDto(org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned, org.dwfa.ace.api.ebr.I_ThinExtByRefPart, org.dwfa.maven.transform.SctIdGenerator.TYPE)
          *
          * Creates the ExtensionDto for a Concept extension.
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPart tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPart tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = new ExtensionDto();
             List<I_IdPart> idParts;
 
@@ -1066,7 +1105,7 @@ public class ExportSpecification {
 
             getBaseConceptDto(extensionDto, tuple, idParts);
 
-            setUuidSctIdIdentifier(extensionDto, tuple, idParts, TYPE.REFSET);
+            setUuidSctIdIdentifier(extensionDto, tuple, idParts, TYPE.REFSET, thinExtByRefVersioned.getMemberId());
 
             extensionDto.setConceptId(getIdMap(tuple, thinExtByRefVersioned.getRefsetId()));
 
@@ -1099,7 +1138,7 @@ public class ExportSpecification {
             I_IdPart sctUuidPart = new ThinIdPart();
             sctUuidPart.setStatusId(currentConcept.getNid());
             sctUuidPart.setPathId(tuple.getPathId());
-            sctUuidPart.setSource(ctv3IdMapExtension.getNid());
+            sctUuidPart.setSource(unspecifiedUuid.getNid());
             sctUuidPart.setVersion(tuple.getVersion());
             sctUuidPart.setSourceId(getUuid(thinExtByRefVersioned));
 
@@ -1146,7 +1185,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConcept tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConcept tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             Map<UUID, Long> map = getIdMap(tuple, tuple.getC1id());
@@ -1177,7 +1216,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConceptString tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConceptString tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = conceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             extensionDto.setValue(tuple.getStr());
@@ -1202,7 +1241,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartString tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartString tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             extensionDto.setValue(tuple.getStringValue());
@@ -1227,7 +1266,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConceptInt tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConceptInt tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = conceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             extensionDto.setValue(tuple.getIntValue() + "");
@@ -1252,7 +1291,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConceptConcept tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConceptConcept tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = conceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             Map<UUID, Long> map = getIdMap(tuple, tuple.getC2id());
@@ -1283,7 +1322,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConceptConceptString tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConceptConceptString tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = conceptConceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             extensionDto.setValue(tuple.getStringValue());
@@ -1308,7 +1347,7 @@ public class ExportSpecification {
          */
         @Override
         public ExtensionDto getExtensionDto(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                I_ThinExtByRefPartConceptConceptConcept tuple, TYPE type) throws IOException, TerminologyException {
+                I_ThinExtByRefPartConceptConceptConcept tuple, TYPE type) throws Exception {
             ExtensionDto extensionDto = conceptConceptExtensionProcessor.getExtensionDto(thinExtByRefVersioned, tuple, type);
 
             Map<UUID, Long> map = getIdMap(tuple, tuple.getC3id());

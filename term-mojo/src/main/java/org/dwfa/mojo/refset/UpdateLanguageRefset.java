@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -46,7 +45,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 
 /**
- * 
+ *
  * @author ean
  * @goal update-language-refset
  */
@@ -55,7 +54,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Refset to create lanaguage extensions for.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -63,7 +62,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Path to create the extensions on
-     * 
+     *
      * @parameter
      * @required
      */
@@ -118,6 +117,11 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
      * A factory of terms.
      */
     private I_TermFactory termFactory = LocalVersionedTerminology.get();
+
+    /**
+     * Retired status.
+     */
+    private int retiredNId;
 
     /**
      * Using the exportSpecifications create a language reference set.
@@ -180,7 +184,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Initialise the mojo variables.
-     * 
+     *
      * @throws TerminologyException DB error
      * @throws IOException DB error
      * @throws Exception DB error
@@ -197,6 +201,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
             ArchitectonicAuxiliary.Concept.UNSPECIFIED_DESCRIPTION_TYPE.getUids()).getConceptId();
         activeNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid();
         currentNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+        retiredNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
         memberRefsetHelper = new MemberRefsetHelper(referencesetConcept.getConceptId(),
             RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
         acceptableDescriptionTypeNid = termFactory.getConcept(ConceptConstants.ACCEPTABLE.getUuids()).getConceptId();
@@ -205,7 +210,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Gets the latest version.
-     * 
+     *
      * @param concept I_GetConceptData
      * @return I_ConceptAttributePart
      * @throws IOException database error
@@ -223,7 +228,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Is the concept status one of the allowed status
-     * 
+     *
      * @param concept I_GetConceptData
      * @return boolean true if concept status in an allowed status
      * @throws IOException database error
@@ -245,16 +250,16 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
     /**
      * Updates the concept extension for the refset.
-     * 
+     *
      * If the concept extension exists for the refset and description
      * this will be retired if the extension type is different to the language
      * subset type and a new extension is created.
-     * 
+     *
      * @param monitor used to inform the user of any errors or warnings.
      * @param refsetId int the reset to update the extension with
      * @param conceptDescription LanguageSubsetMemberLine the current line in
      *            the subset file
-     * 
+     *
      * @throws IOException file read errors
      * @throws TerminologyException looking up concepts etc.
      * @throws Exception MemberRefsetHelper errors
@@ -272,9 +277,8 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
                 export(currentRefsetExtension, null, refsetId, currentRefsetExtension.getC1id(), TYPE.DESCRIPTION);
             }
         } else {
-            I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();// stunt
-                                                                           // extension
-                                                                           // part.
+            // stunt extension part.
+            I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
             part.setC1id(extensionTypeId);
             part.setPathId(exportPath.getConceptId());
             part.setStatusId(activeNId);
@@ -287,13 +291,15 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
     /**
      * Go over all concepts and add a language extension for both the latest
      * synonym and preferred term.
-     * 
-     * If there is no en en-GB preferred term then the latest unspecified
+     *
+     * If there is no en-GB preferred term then the latest unspecified
      * description is used.
-     * 
-     * Excludes en-US descriptions.
      */
     class ConceptIterator implements I_ProcessConcepts {
+        private static final String EN_US = "en-US";
+        private static final String EN = "en";
+        private static final String EN_GB = "en-GB";
+        private static final String EN_AU = "en-AU";
         int processedLineCount = 0;
 
         @Override
@@ -311,28 +317,34 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
                     unSpecifiedDescriptionType = null;
                     I_DescriptionPart latest;
                     for (I_DescriptionVersioned descriptionVersioned : descriptions) {
+                        I_ThinExtByRefPartConcept currentLanguageExtension = memberRefsetHelper.getFirstCurrentRefsetExtension(
+                            referencesetConcept.getConceptId(), descriptionVersioned.getDescId());
+
                         latest = getLatest(descriptionVersioned);
-                        if (latest.getStatusId() == currentNId
-                            && (latest.getLang().equals("en-GB") || latest.getLang().equals("en"))) {
+
+                        if (currentLanguageExtension != null) {
+                            retireOldExtension(latest, descriptionVersioned, currentLanguageExtension);
+                        }
+
+                        if (latest.getStatusId() == activeNId || latest.getStatusId() == currentNId) {
                             if (latest.getTypeId() == prefferredTermNid) {
-                                latestPreferredTerm = descriptionVersioned;
+                                latestPreferredTerm = getAdrsVersion(descriptionVersioned, latestPreferredTerm);
                             } else if (latest.getTypeId() == synonymNid) {
-                                latestSynonym = descriptionVersioned;
+                                latestSynonym = getAdrsVersion(descriptionVersioned, latestSynonym);
                             } else if (latest.getTypeId() == unSpecifiedDescriptionTypeNid) {
-                                unSpecifiedDescriptionType = descriptionVersioned;
+                                unSpecifiedDescriptionType = getAdrsVersion(descriptionVersioned, unSpecifiedDescriptionType);
                             }
                         }
                     }
-                    // Mimic UK subset, use the latest en/GB unspecified
-                    // description if no en/GB preferred term
+
                     if (latestPreferredTerm != null) {
                         exportResetExtentions(latestPreferredTerm.getDescId(), preferredDescriptionTypeNid);
-                    } else if (unSpecifiedDescriptionType != null) {
-                        exportResetExtentions(unSpecifiedDescriptionType.getDescId(), preferredDescriptionTypeNid);
                     }
 
                     if (latestSynonym != null) {
                         exportResetExtentions(latestSynonym.getDescId(), acceptableDescriptionTypeNid);
+                    } else if (unSpecifiedDescriptionType != null) {
+                        exportResetExtentions(unSpecifiedDescriptionType.getDescId(), acceptableDescriptionTypeNid);
                     }
                 }
             }
@@ -343,6 +355,70 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
             }
         }
 
+        /**
+         * Adds a retired member row to the refset file
+         *
+         * @param latest I_DescriptionPart
+         * @param descriptionVersioned I_DescriptionPart
+         * @param currentLanguageExtension I_ThinExtByRefPartConcept
+         * @throws Exception
+         */
+        private void retireOldExtension(I_DescriptionPart latest, I_DescriptionVersioned descriptionVersioned,
+                I_ThinExtByRefPartConcept currentLanguageExtension) throws Exception {
+            if(currentLanguageExtension.getVersion() != latest.getVersion()){
+                I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
+                part.setC1id(currentLanguageExtension.getC1id());
+                part.setPathId(exportPath.getConceptId());
+                part.setStatusId(retiredNId);
+                part.setVersion(referencesetConceptLatestVersion.getVersion());
+                export(part, null, referencesetConcept.getConceptId(), descriptionVersioned.getDescId(), TYPE.DESCRIPTION);
+            }
+        }
+
+        /**
+         * Gets the Language I_DescriptionVersioned to use for the refset.
+         *
+         * Order of language type preference is en_AU, en_GB, en then en_US.
+         *
+         * @param descriptionVersioned I_DescriptionVersioned
+         * @param currentAdrsVersioned I_DescriptionVersioned can be null
+         * @return I_DescriptionVersioned
+         */
+        private I_DescriptionVersioned getAdrsVersion(I_DescriptionVersioned descriptionVersioned, I_DescriptionVersioned currentAdrsVersioned) {
+            I_DescriptionVersioned adrsVersion = currentAdrsVersioned;
+
+            if (currentAdrsVersioned != null) {
+                I_DescriptionPart currentPart = getLatest(descriptionVersioned);
+                I_DescriptionPart adrsPart = getLatest(currentAdrsVersioned);
+
+                if(currentPart.getLang().equals(EN_AU)) {
+                    adrsVersion = descriptionVersioned;
+                } else if (currentPart.getLang().equals(EN_GB)
+                        && adrsPart.getLang().equals(EN_AU)) {
+                    adrsVersion = descriptionVersioned;
+                } else if (currentPart.getLang().equals(EN)
+                        && adrsPart.getLang().equals(EN_GB)
+                        && adrsPart.getLang().equals(EN_AU)) {
+                    adrsVersion = descriptionVersioned;
+                } else if (currentPart.getLang().equals(EN_US)
+                        && adrsPart.getLang().equals(EN)
+                        && adrsPart.getLang().equals(EN_GB)
+                        && adrsPart.getLang().equals(EN_AU)) {
+                    adrsVersion = descriptionVersioned;
+                }
+            } else {
+                adrsVersion = descriptionVersioned;
+            }
+
+            return adrsVersion;
+        }
+
+        /**
+         * Yea ol' get latest part
+         *
+         * @param descriptionVersioned I_DescriptionVersioned
+         * @return I_DescriptionPart latest part
+         */
         private I_DescriptionPart getLatest(I_DescriptionVersioned descriptionVersioned) {
             I_DescriptionPart latestDescriptionPart = null;
 
@@ -357,7 +433,7 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
 
         /**
          * Is this the latest version of the description type.
-         * 
+         *
          * @param typeNid int
          * @param currentLatest I_DescriptionTuple
          * @param description I_DescriptionTuple

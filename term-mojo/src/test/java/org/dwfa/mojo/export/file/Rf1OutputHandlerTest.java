@@ -41,7 +41,7 @@ public class Rf1OutputHandlerTest {
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "rf1");
 
     @Before
-    public void setUp() throws IOException, SQLException, ClassNotFoundException {
+    public void setUp() throws Exception {
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
             UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");

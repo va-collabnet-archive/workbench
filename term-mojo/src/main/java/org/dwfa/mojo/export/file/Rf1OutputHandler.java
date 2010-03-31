@@ -51,12 +51,9 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      *
      * @param exportDirectory File
      * @param sctIdDbDirectory File
-     * @throws IOException
-     * @throws SQLException
-     * @throws ClassNotFoundException
+     * @throws Exception
      */
-    public Rf1OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException,
-            ClassNotFoundException {
+    public Rf1OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
         super(releasePathDateMap);
 
         exportDirectory.mkdirs();

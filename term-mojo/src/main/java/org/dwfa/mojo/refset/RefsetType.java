@@ -40,6 +40,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartInteger;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartMeasurement;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.file.IterableFileReader;
+import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.writers.BooleanRefsetHandler;
@@ -59,7 +60,8 @@ enum RefsetType {
     CONCEPT(Concept.CONCEPT_EXTENSION, ConceptRefsetHandler.class, new ConceptDescriptor(
         "be7b2b7e-b397-4cb4-83e1-e443d3c53998", "Attribute value type reference set (foundation metadata concept)"), new ConceptDescriptor(
         "98ffd934-9564-49f3-93c3-954b56b5da89", "Language type reference set (foundation metadata concept)"), new ConceptDescriptor(
-        "6298198d-dbe3-4343-893b-3e06d34330d7", "Association type reference set (foundation metadata concept)")),
+        "6298198d-dbe3-4343-893b-3e06d34330d7", "Association type reference set (foundation metadata concept)")
+        , new ConceptDescriptor("d815700e-dd66-3f91-8f05-99c60b995eb4", "concept extension by reference")),
 
     CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_EXTENSION, ConceptConceptRefsetHandler.class),
 
@@ -217,6 +219,7 @@ enum RefsetType {
             types = iTermFactory.newIntSet();
             types.add(new ConceptDescriptor("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25", "Is a (attribute)").getVerifiedConcept()
                 .getConceptId());
+            types.add(ConceptConstants.REFSET_TYPE_REL.localize().getNid());
         }
     }
 }

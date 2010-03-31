@@ -56,7 +56,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
     public void setupImpl(Transform transformer) throws IOException, ClassNotFoundException {
         try {
             initMap();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Cannot load DB", e);
         }
     }
@@ -75,11 +75,11 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * @throws ClassNotFoundException error opening DB.
      * @throws SQLException creating DB object
      */
-    private static synchronized void initMap() throws IOException,
+    private static synchronized void initMap() throws Exception,
             ClassNotFoundException, SQLException {
         logger.info("initMap");
         if (map == null) {
-            map = new UuidSnomedDbMapHandler();
+            map = UuidSnomedDbMapHandler.getInstance();
             logger.info("new UuidSnomedDbMapHandler");
         }
     }

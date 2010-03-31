@@ -421,10 +421,10 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return id;
     }
 
-    private static synchronized UuidSnomedDbMapHandler getSctGenerator() throws IOException, SQLException,
+    private static synchronized UuidSnomedDbMapHandler getSctGenerator() throws Exception,
             ClassNotFoundException {
         if (sctGenerator == null) {
-            sctGenerator = new UuidSnomedDbMapHandler();
+            sctGenerator = UuidSnomedDbMapHandler.getInstance();
         }
         return sctGenerator;
     }

@@ -245,7 +245,6 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             for (PositionDescriptor positionDescriptor : positionsForExport) {
                 positions.add(new Position(positionDescriptor));
             }
-            positions.add(new Position(releasePosition));
 
             rf2OutputHandler = new Rf2OutputHandler(
                 new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar), releasePathDateMap);
@@ -325,16 +324,17 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 positions.add(new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()), timePoint));
 
                 UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
-
-                Map<UUID, Date> mappedModuleDate;
-                if (releasePathDateMap.containsKey(pathUuid)) {
-                    mappedModuleDate = releasePathDateMap.get(pathUuid);
-                } else {
-                    mappedModuleDate = new HashMap<UUID, Date>(1);
-                    releasePathDateMap.put(pathUuid, mappedModuleDate);
+                if (!releasePosition.getPath().getUuid().equals(pathUuid)) {
+                    Map<UUID, Date> mappedModuleDate;
+                    if (releasePathDateMap.containsKey(pathUuid)) {
+                        mappedModuleDate = releasePathDateMap.get(pathUuid);
+                    } else {
+                        mappedModuleDate = new HashMap<UUID, Date>(1);
+                        releasePathDateMap.put(pathUuid, mappedModuleDate);
+                    }
+                    mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
+                            AceDateFormat.getRf2DateFormat().parse(releasePosition.getTimeString()));
                 }
-                mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
-                    AceDateFormat.getRf2DateFormat().parse(releasePosition.getTimeString()));
             }
         }
     }

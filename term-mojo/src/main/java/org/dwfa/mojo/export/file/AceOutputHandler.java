@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -71,12 +72,9 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      *
      * @param exportDirectory File
      * @param sctIdDbDirectory File
-     * @throws IOException
-     * @throws SQLException
-     * @throws ClassNotFoundException
+     * @throws Exception
      */
-    public AceOutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException,
-            ClassNotFoundException {
+    public AceOutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
         super(releasePathDateMap);
 
         exportDirectory.mkdirs();
@@ -119,17 +117,9 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
             }
         }
 
-        for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
-            writeExtensionIdentifierRow(extensionDto);
-        }
-
-        for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
-            writeExtensionIdentifierRow(extensionDto);
-        }
-
-        for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
-            writeExtensionIdentifierRow(extensionDto);
-        }
+        writeExtensionIdRows(componentDto.getConceptExtensionDtos());
+        writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
+        writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
     }
 
     /**
@@ -265,24 +255,32 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     }
 
     /**
-     * Write the ids for the extension for importing back into the ACE Berkeley database.
+     * Writes a row into the id file for the extension member
+     *
+     * Checks that the id row has not been written before to avoid duplicates.
      *
      * @param extensionDto ExtensionDto
-     * @throws IOException
-     * @throws TerminologyException
+     *
      * @throws Exception
      */
-    private void writeExtensionIdentifierRow(ExtensionDto extensionDto) throws IOException, TerminologyException,
-            Exception {
-        if (extensionDto.isClinical()) {
-            synchronized (aceIdentifierCliniclFile) {
-                aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
+    private void writeExtensionIdRows(List<ExtensionDto> extensionDtos) throws Exception {
+        Collections.sort(extensionDtos);
+        ExtensionDto lastExtensionDto = null;
+        for (ExtensionDto extensionDto : extensionDtos) {
+            if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
+                if (extensionDto.isClinical()) {
+                    synchronized (aceIdentifierCliniclFile) {
+                        aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
+                    }
+                } else {
+                    synchronized (aceIdentifierStructuralFile) {
+                        aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
+                    }
+                }
             }
-        } else {
-            synchronized (aceIdentifierStructuralFile) {
-                aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
-            }
+            lastExtensionDto = extensionDto;
         }
+
     }
 
     /**

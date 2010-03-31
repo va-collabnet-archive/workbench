@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  *  Refset details for export
  */
-public class ExtensionDto extends ConceptDto {
+public class ExtensionDto extends ConceptDto implements Comparable<ExtensionDto> {
     private String value;
     private UUID memberId;
     private Map<UUID, Long> referencedConceptId;
@@ -132,5 +132,14 @@ public class ExtensionDto extends ConceptDto {
      */
     public void setIsClinical(boolean isClinicalToSet) {
         isClinical = isClinicalToSet;
+    }
+
+    @Override
+    public int compareTo(ExtensionDto extensionDto) {
+        if (this.getMemberId().equals(extensionDto.getMemberId())) {
+            return 0;
+        } else {
+            return this.getMemberId().compareTo(extensionDto.getMemberId());
+        }
     }
 }

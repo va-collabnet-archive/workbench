@@ -18,8 +18,8 @@ package org.dwfa.mojo.export.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -68,12 +68,9 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      *
      * @param exportDirectory File
      * @param SctIdDbDirectory File
-     * @throws IOException
-     * @throws SQLException
-     * @throws ClassNotFoundException
+     * @throws Exception
      */
-    public Rf2OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws IOException, SQLException,
-            ClassNotFoundException {
+    public Rf2OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
         super(releasePathDateMap);
 
         this.exportDirectory = exportDirectory;
@@ -126,17 +123,21 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
             }
         }
 
+        // group all the matching members together.
         for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
             writeExtensionRow(extensionDto);
         }
+        writeExtensionIdRows(componentDto.getConceptExtensionDtos());
 
         for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
             writeExtensionRow(extensionDto);
         }
+        writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
 
         for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
             writeExtensionRow(extensionDto);
         }
+        writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
     }
 
     /**
@@ -154,16 +155,35 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         synchronized (referenceSetWriter) {
             referenceSetWriter.write(referenceSetRow);
         }
+    }
 
-        if (extensionDto.isClinical()) {
-            synchronized (identifierCliniclFile) {
-                identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+    /**
+     * Writes a row into the id file for the extension member.
+     *
+     * Checks that the id row has not been written before to avoid duplicates.
+     *
+     * @param extensionDto ExtensionDto
+
+     * @throws Exception
+     */
+    private void writeExtensionIdRows(List<ExtensionDto> extensionDtos) throws Exception {
+        Collections.sort(extensionDtos);
+        ExtensionDto lastExtensionDto = null;
+        for (ExtensionDto extensionDto : extensionDtos) {
+            if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
+                if (extensionDto.isClinical()) {
+                    synchronized (identifierCliniclFile) {
+                        identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+                    }
+                } else {
+                    synchronized (identifierStructuralFile) {
+                        identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
+                    }
+                }
             }
-        } else {
-            synchronized (identifierStructuralFile) {
-                identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
-            }
+            lastExtensionDto = extensionDto;
         }
+
     }
 
     /**
@@ -200,10 +220,10 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
             Rf2ReferenceSetWriter newReferenceSetWriter;
             if (extensionDto.isClinical()) {
                 newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportClinicalRefsetDirectory
-                    + File.separator + sctId + "." + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
+                    + File.separator + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
             } else {
                 newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportStructuralRefsetDirectory
-                    + File.separator + sctId + "." + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
+                    + File.separator + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
             }
 
             referenceSetFileMap.put(sctId, newReferenceSetWriter);
@@ -247,7 +267,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
             rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
             rf2IdentifierRow.setAlternateIdentifier(identifierDto.getConceptId().keySet().iterator().next().toString());
             rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
-            rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto, identifierDto.getIdentifierSchemeUuid()).toString());
+            rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto, identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
             rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
             rf2IdentifierRow.setReferencedComponentSctId(identifierDto.getReferencedSctId().toString());
 

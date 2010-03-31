@@ -1,8 +1,6 @@
 package org.dwfa.mojo.export.file;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -46,7 +44,7 @@ public class AceOutputHandlerTest {
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "ace");
 
     @Before
-    public void setUp() throws IOException, SQLException, ClassNotFoundException {
+    public void setUp() throws Exception {
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
             UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + dbDirectory.getCanonicalPath() + ";create=true;");
