@@ -16,18 +16,22 @@
  */
 package org.dwfa.mojo.refset.scrub.markedparents;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
+
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.refset.MemberRefsetChangesetWriter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.refset.scrub.ConceptExtFinder;
 import org.dwfa.mojo.refset.scrub.ConceptExtHandler;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * This scrubber removes duplicate "marked parents" changing their status to
@@ -36,19 +40,29 @@ import java.util.TreeSet;
 public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
     /**
-     * TODO: REMOVE.
-     * This is not used. This has been introduced to get around a maven problem
-     * of not allowing implementations
-     * without parameters. Remove once this is sorted out.
+     * Specify the path that changes will be written to
      * 
      * @parameter
+     * @required
      */
-    private ConceptDescriptor[] validTypeConcepts;
-
+    private ConceptDescriptor writeToPath;
+    
+    /**
+     * The directory where new CMRSCS change set file(s) will be created
+     * 
+     * @parameter
+     * @required
+     */
+    private File changeSetOutputDirectory;
+    
+    private MemberRefsetChangesetWriter changesetWriter;
+    
     private final I_TermFactory termFactory;
 
     private final int retiredStatusId;
 
+    private HashMap<Integer, String> conceptDescCache = new HashMap<Integer, String>();
+    
     public DuplicateMarkedParentScrubber() throws Exception {
         termFactory = LocalVersionedTerminology.get();
         retiredStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
@@ -56,12 +70,25 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
 
     public void process(final ConceptExtFinder finder) {
         try {
+            // This initialisation cannot be done in the class constructor because the mojo parameters
+            // are not set until after the object is initialised
+            UUID pathUuid = writeToPath.getVerifiedConcept().getUids().iterator().next();
+            changesetWriter = new MemberRefsetChangesetWriter(changeSetOutputDirectory, termFactory, pathUuid);
+
             for (Object aFinder : finder) {
                 processExtension((I_ThinExtByRefVersioned) aFinder);
             }
             termFactory.commit();
         } catch (Exception e) {
             throw new RuntimeException("Unable to complete the scrub.", e);
+        } finally {
+            if (changesetWriter != null) {
+                try {
+                    changesetWriter.close();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -71,10 +98,24 @@ public final class DuplicateMarkedParentScrubber implements ConceptExtHandler {
         sortedVersions.addAll(member.getVersions());
 
         // Get the latest version.
-        I_ThinExtByRefPartConcept newPart = (I_ThinExtByRefPartConcept) sortedVersions.last().duplicatePart();
-        newPart.setStatus(retiredStatusId);
-        newPart.setVersion(Integer.MAX_VALUE);
-        member.addVersion(newPart);
-        termFactory.addUncommitted(member);
+        I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) sortedVersions.last();
+        
+        changesetWriter.addToRefset(member.getMemberId(), member.getComponentId(), latestPart.getC1id(), member.getRefsetId(), retiredStatusId);
+        
+        // System.out.printf("Scrubbed duplicate ext: refset='%1$s', component='%2$s', concept='%3$s'\n", 
+        //    getConceptDesc(member.getRefsetId()), getConceptDesc(member.getComponentId()), latestPart.getC1id());
+    }
+
+    @SuppressWarnings("unused")
+    private String getConceptDesc(int nid) {
+        if (!conceptDescCache.containsKey(nid)) {
+            try {
+                conceptDescCache.put(nid, termFactory.getConcept(nid).getInitialText());
+            } catch (Exception e) {
+                conceptDescCache.put(nid, Integer.toString(nid));
+            }
+        } 
+        
+        return conceptDescCache.get(nid);
     }
 }
