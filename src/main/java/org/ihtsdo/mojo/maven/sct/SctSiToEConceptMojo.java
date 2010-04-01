@@ -95,11 +95,6 @@ import org.ihtsdo.etypes.ERelationshipRevision;
  * the CTV3 IDs and SNOMED RT IDs.
  * <p>
  * <b>OUTPUTS:</b><br>
- * The following files are generated in {project.build.directory}/classes/ace:
- * <p>
- * <code>
- * &#160;&#160;&#160;&#160;concepts.txt, descriptions.txt, descriptions_report.txt<br>
- * &#160;&#160;&#160;&#160;ids.txt, relationships.txt, relationships_report.txt</code>
  * <p>
  * 
  * <b>REQUIRMENTS:</b><br>
@@ -205,9 +200,9 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
      * Directory used to output the econcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
-     * @parameter
+     * @parameter default-value=FILE_SEPARATOR + "classes"
      */
-    private String outputDirectory = FILE_SEPARATOR + "classes";
+    private String outputDirectory;
 
     private String scratchDirectory = FILE_SEPARATOR + "tmp_steps";
 
