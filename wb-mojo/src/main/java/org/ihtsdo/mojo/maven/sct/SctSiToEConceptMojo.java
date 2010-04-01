@@ -53,7 +53,7 @@ import org.ihtsdo.etypes.ERelationshipRevision;
  * <b>DESCRIPTION: </b><br>
  * 
  * SctSiToEConceptMojo is a maven mojo which converts SNOMED stated and inferred
- * (Distribution Normal Form) release files to IHTSDO Workbench 
+ * (Distribution Normal Form) RF1 release files to IHTSDO Workbench 
  * versioned import eConcepts format.
  * <p>
  * 
@@ -94,25 +94,34 @@ import org.ihtsdo.etypes.ERelationshipRevision;
  * <code>ids.txt</code> output file. The default value is false to not include
  * the CTV3 IDs and SNOMED RT IDs.
  * <p>
- * <b>OUTPUTS:</b><br>
+ * <b>OUTPUTS:</b> EConcept jbin file. (default name: sctSiEConcept.jbin) <br>
  * <p>
- * 
  * <b>REQUIRMENTS:</b><br>
  * 
  * 1. RELEASE DATE must be in either the SNOMED file name or the parent folder
  * name. The date must have the format of <code>yyyy-MM-dd</code> or
  * <code>yyyyMMdd</code>. <br>
- * 
+ * <br>
  * 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE and each
- * other; and, placed under separate <code>sctInputDirArray</code> directories.
+ * other; and, placed under separate <code>sctInputDirArray</code> directories.<br>
+ * <br>
+ * 3. STATED & INFERRED. Stated relationship files names must begin with "sct_relationships_stated". 
+ * Inferred relationship file names must begin with "sct_relationships_inferred".  
+ * Relationship file names without "_stated" or "_inferred" are not supported.
  * <p>
  * <b>PROCESSING:</b><br>
  * Step 1. Versioning & Relationship Generated IDs.  Merge time series of releases into 
  * a versioned intermediate concept, description, and relationship files.  This step 
- * also adds an algorithmically computed relationship ids.<br>
- * Step 2. Destination Rels.  Build list for destination rels.<br>
- * Step 3. Sort. Sorts concepts, descriptions, and source/destination relationships to be in concept order.<br>
- * Step 4. Create EConcepts.  <br>
+ * also adds an algorithmically computed relationship ids.  Ids are kept directly with each primary 
+ * (concept, description & relationship) component. <br>
+ * <br>
+ * Step 2. Destination Rels.  Build file for destination rels. Non-required fields are dropped.<br>
+ * <br>
+ * Step 3. Sort. Sort concept, description, source relationship and destination relationship files
+ *  to be in concept order.<br>
+ *  <br>
+ * Step 4. Create EConcepts.  Concurrently read pre-sorted concept, description, source relationship
+ *  and destination relationship files and creates eConcepts.<br>
  * <p>
  * <b>NOTES:</b><br>
  * Records are NOT VERSIONED between files under DIFFERENT
@@ -200,7 +209,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
      * Directory used to output the econcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
-     * @parameter default-value=FILE_SEPARATOR + "classes"
+     * @parameter default-value="classes"
      */
     private String outputDirectory;
 
@@ -459,6 +468,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             if (!sctInputDirArray[i].startsWith(FILE_SEPARATOR)) {
                 sctInputDirArray[i] = FILE_SEPARATOR + sctInputDirArray[i];
             }
+        }
+
+        // SHOW input sub directory from POM file
+        if (!outputDirectory.equals("")) {
+            outputDirectory = FILE_SEPARATOR + outputDirectory;
+            getLog().info("POM Output Directory: " + outputDirectory);
         }
 
         executeMojo(buildDir, targetSubDir, sctInputDirArray, includeCTV3ID, includeSNOMEDRTID);
