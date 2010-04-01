@@ -67,9 +67,9 @@ public class IdentifierVersionUuid extends IdentifierVersion {
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" uNid:" + getUuid());
-        buf.append(" }=> ");
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append("uuid:" + getUuid());
+        buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
     }

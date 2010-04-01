@@ -57,9 +57,9 @@ public class IdentifierVersionLong extends IdentifierVersion {
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" longDenotation:" + this.longDenotation);
-        buf.append(" }=> ");
+        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append("denotation:" + this.longDenotation);
+        buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
     }

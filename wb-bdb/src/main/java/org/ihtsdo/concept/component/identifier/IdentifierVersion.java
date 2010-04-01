@@ -188,7 +188,6 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
         buf.append("sap:" + statusAtPositionNid);
         buf.append(" conceptComponent:" + conceptComponent);
         buf.append(" authority:");
@@ -199,7 +198,6 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
         buf.append(Revision.fileDateFormat.format(new Date(getTime())));
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
-        buf.append(" };");
         return buf.toString();
     }
 
