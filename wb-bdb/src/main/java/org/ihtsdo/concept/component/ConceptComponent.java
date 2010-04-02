@@ -550,7 +550,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 buf.append("uncommitted");
             } else if (getTime() == Long.MIN_VALUE) {
                 buf.append("bot/canceled");
-            } {
+            } else {
                 buf.append(Revision.fileDateFormat.format(new Date(getTime())));
             }
             buf.append(" status: ");

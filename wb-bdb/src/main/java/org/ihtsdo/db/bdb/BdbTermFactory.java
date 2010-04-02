@@ -272,7 +272,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     if (dv.getRevision() == null) {
                         forget(d);
                     } else {
-                        d.removeRevision(dv.getRevision());
+                        d.removeRevision((DescriptionRevision) dv.getRevision());
                     }
                 } else {
                     d.removeRevision((DescriptionRevision) part);
@@ -389,12 +389,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_DescriptionVersioned getDescription(int dNid, int cNid) throws TerminologyException, IOException {
-        return Bdb.getConcept(cNid).getDescription(dNid);
+        if (hasConcept(cNid)) {
+            return Bdb.getConcept(cNid).getDescription(dNid);
+        }
+        return null;
     }
 
     @Override
     public I_DescriptionVersioned getDescription(int dNid) throws TerminologyException, IOException {
         return getDescription(dNid, Bdb.getConceptNid(dNid));
+    }
+
+
+    @Override
+    public I_RelVersioned getRelationship(int rNid) throws IOException {
+        if (Bdb.getNidCNidMap().hasMap(rNid)) {
+            return Bdb.getConcept(Bdb.getConceptNid(rNid)).getSourceRel(rNid);
+        } 
+        return null;
     }
 
     @Override
@@ -756,6 +768,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public I_GetConceptData newConcept(UUID newConceptUuid, boolean defined, I_ConfigAceFrame aceFrameConfig,
             int statusNid) throws TerminologyException, IOException {
+        return newConcept(newConceptUuid, defined, aceFrameConfig, statusNid,
+            Long.MAX_VALUE);
+    }
+
+
+    @Override
+    public I_GetConceptData newConcept(UUID newConceptUuid, boolean isDefined, I_ConfigAceFrame aceFrameConfig, int statusNid,
+            long time) throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         int cNid = Bdb.uuidToNid(newConceptUuid);
         Bdb.getNidCNidMap().setCidForNid(cNid, cNid);
@@ -764,18 +784,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.nid = cNid;
         a.enclosingConceptNid = cNid;
         newC.setConceptAttributes(a);
-        a.setDefined(defined);
+        a.setDefined(isDefined);
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
-                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
+                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
             } else {
                 if (a.revisions == null) {
                     a.revisions =
                             new ArrayList<ConceptAttributesRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
                 }
-                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptId(), Long.MAX_VALUE));
+                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptId(), time));
             }
         }
         BdbCommitManager.addUncommitted(newC);
@@ -805,6 +825,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public Description newDescription(UUID descUuid, I_GetConceptData concept, String lang, String text,
             I_GetConceptData descriptionType, I_ConfigAceFrame aceFrameConfig, int statusNid)
             throws TerminologyException, IOException {
+        return newDescription(descUuid, concept, lang,
+            text, descriptionType, aceFrameConfig, Bdb.getConcept(statusNid),
+            Long.MAX_VALUE);
+    }
+
+
+    @Override
+    public Description newDescription(UUID descUuid, I_GetConceptData concept, String lang,
+            String text, I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status,
+            long effectiveDate) throws TerminologyException, IOException {
 
         canEdit(aceFrameConfig);
         Concept c = (Concept) concept;
@@ -817,16 +847,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.setLang(lang);
         d.setText(text);
         d.setInitialCaseSignificant(false);
-        d.setTypeId(descriptionType.getNid());
+        d.setTypeId(descType.getNid());
         d.primordialSapNid = Integer.MIN_VALUE;
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
-                d.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
+                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), p.getConceptId(), effectiveDate);
             } else {
                 if (d.revisions == null) {
                     d.revisions = new ArrayList<DescriptionRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
                 }
-                d.revisions.add(d.makeAnalog(statusNid, p.getConceptId(), Long.MAX_VALUE));
+                d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptId(), effectiveDate));
             }
         }
         c.getDescriptions().add(d);
@@ -1062,7 +1092,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_RelVersioned newRelationship(UUID newRelUid, I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
+    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_ConfigAceFrame aceFrameConfig)
             throws TerminologyException, IOException {
         return newRelationship(newRelUid, concept, aceFrameConfig.getDefaultRelationshipType(), aceFrameConfig
             .getHierarchySelection(), aceFrameConfig.getDefaultRelationshipCharacteristic(), aceFrameConfig
@@ -1070,10 +1100,20 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_RelVersioned newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
+    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
             I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability,
             I_GetConceptData relStatus, int relGroup, I_ConfigAceFrame aceFrameConfig) throws TerminologyException,
             IOException {
+        return  newRelationship(newRelUid, concept, relType,
+             relDestination,  relCharacteristic,  relRefinability,  relStatus,
+             relGroup, aceFrameConfig, Long.MAX_VALUE);
+    }
+
+
+    @Override
+    public Relationship newRelationship(UUID newRelUid, I_GetConceptData concept, I_GetConceptData relType,
+            I_GetConceptData relDestination, I_GetConceptData relCharacteristic, I_GetConceptData relRefinability, I_GetConceptData relStatus,
+            int group, I_ConfigAceFrame aceFrameConfig, long effectiveDate) throws TerminologyException, IOException {
         canEdit(aceFrameConfig);
         if (concept == null) {
             AceLog.getAppLog().alertAndLogException(
@@ -1090,24 +1130,23 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int parentId = relDestination.getNid();
         r.setC2Id(parentId);
         r.setTypeId(relType.getNid());
-        r.setRefinabilityId(relRefinability.getNid());
+        r.setRefinabilityId(relRefinability.getNid()); 
         r.setCharacteristicId(relCharacteristic.getNid());
         r.primordialSapNid = Integer.MIN_VALUE;
         r.setGroup(0);
         int statusNid = relStatus.getNid();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
-                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
+                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new ArrayList<RelationshipRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
                 }
-                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptId(), Long.MAX_VALUE));
+                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptId(), effectiveDate));
             }
         }
         c.getSourceRels().add(r);
-        Terms.get().addUncommitted(c);
-        return r;
+        return r;    
     }
 
     @Override
