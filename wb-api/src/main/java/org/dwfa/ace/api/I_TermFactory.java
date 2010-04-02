@@ -79,7 +79,11 @@ public interface I_TermFactory {
     
 	I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined,
 			I_ConfigAceFrame aceConfig, int statusNid)
-	throws TerminologyException, IOException;
+	            throws TerminologyException, IOException;
+
+    I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined,
+            I_ConfigAceFrame aceConfig, int statusNid, long time)
+                throws TerminologyException, IOException;
 
     I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException;
 
@@ -138,6 +142,9 @@ public interface I_TermFactory {
 
     I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
             I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
+
+    I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
+            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveData) throws TerminologyException, IOException;
 
     /**
      * Gets a description given a description native ID and a concept native ID
@@ -578,5 +585,10 @@ public interface I_TermFactory {
 	I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid,
 			byte[] image, String textDescription, String format,
 			I_ConfigAceFrame aceConfig) throws IOException;
+	
+    I_RelVersioned getRelationship(int rNid) throws IOException;
+    I_RelVersioned newRelationship(UUID relUuid, I_GetConceptData concept, I_GetConceptData concept2,
+            I_GetConceptData concept3, I_GetConceptData concept4, I_GetConceptData concept5, I_GetConceptData concept6,
+            int group, I_ConfigAceFrame importConfig, long effectiveDate) throws IOException, TerminologyException;
 	
 }

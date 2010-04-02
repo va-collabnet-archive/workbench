@@ -18,13 +18,10 @@ package org.dwfa.ace.file;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -64,7 +61,7 @@ public class RelTupleFileUtil {
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
-            UUID pathToOverrideUuid) throws TerminologyException {
+            I_ConfigAceFrame importConfig) throws TerminologyException {
 
         try {
             String[] lineParts = inputLine.split("\t");
@@ -76,7 +73,6 @@ public class RelTupleFileUtil {
             int group;
             UUID refUuid;
             UUID relTypeUuid;
-            UUID pathUuid;
             UUID statusUuid;
             long effectiveDate;
 
@@ -87,10 +83,15 @@ public class RelTupleFileUtil {
                 charUuid = UUID.fromString(lineParts[4]);
                 refUuid = UUID.fromString(lineParts[6]);
                 relTypeUuid = UUID.fromString(lineParts[7]);
-                if (pathToOverrideUuid == null) {
-                    pathUuid = UUID.fromString(lineParts[8]);
-                } else {
-                    pathUuid = pathToOverrideUuid;
+                if ((Boolean) importConfig.getProperty("override") == false) {
+                    UUID pathUuid = UUID.fromString(lineParts[8]);
+                    if (!Terms.get().hasId(pathUuid)) {
+                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                        throw new Exception(errorMessage);
+                    }
+                    importConfig.getEditingPathSet().clear();
+                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                    importConfig.setProperty("pathUuid", pathUuid);
                 }
                 statusUuid = UUID.fromString(lineParts[9]);
             } catch (Exception e) {
@@ -123,13 +124,6 @@ public class RelTupleFileUtil {
 
             I_TermFactory termFactory = Terms.get();
 
-            TupleFileUtil.pathUuids.add(pathUuid);
-
-            if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
-            }
-
             if (!termFactory.hasId(c1Uuid)) {
                 String errorMessage = "c1Uuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
@@ -155,62 +149,48 @@ public class RelTupleFileUtil {
                 throw new Exception(errorMessage);
             }
 
-            I_IntSet allowedStatus = termFactory.newIntSet();
-            allowedStatus.add(termFactory.getId(statusUuid).getNid());
-            I_IntSet allowedTypes = termFactory.newIntSet();
-            allowedTypes.add(termFactory.getId(relTypeUuid).getNid());
+            I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 
 
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
-            boolean returnConflictResolvedLatestState = true;
-            boolean addUncommitted = true;
-
-            // check if the part exists
-            List<? extends I_RelTuple> parts =
-                    concept.getSourceRelTuples(allowedStatus, allowedTypes, null, addUncommitted,
-                        returnConflictResolvedLatestState);
-            I_RelTuple latestTuple = null;
-            for (I_RelTuple part : parts) {
-                if (latestTuple == null || part.getTime() >= latestTuple.getTime()) {
-                    if (part.getC1Id() == termFactory.getId(c1Uuid).getNid()
-                        && part.getC2Id() == termFactory.getId(c2Uuid).getNid()) {
-                        latestTuple = part;
-                    }
-                }
-            }
-
-            if (latestTuple == null) {
-                Collection<I_Path> paths = termFactory.getPaths();
-                paths.clear();
-                paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-
-                I_RelVersioned v =
-                        termFactory.newRelationship(relUuid, concept, termFactory
-                            .getConcept(new UUID[] { relTypeUuid }), termFactory.getConcept(new UUID[] { c2Uuid }),
-                            termFactory.getConcept(new UUID[] { charUuid }), termFactory
-                                .getConcept(new UUID[] { refUuid }), termFactory.getConcept(new UUID[] { statusUuid }),
-                            group, termFactory.getActiveAceFrameConfig());
-
-                I_RelPart newPart =
-                        (I_RelPart) v.getLastTuple().makeAnalog(termFactory.getId(statusUuid).getNid(),
-                            termFactory.getId(pathUuid).getNid(), effectiveDate);
-                newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
-                newPart.setGroup(group);
-                newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
-                newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
-                v.addVersion(newPart);
+            int rNid = termFactory.uuidToNative(relUuid);
+            assert rNid != Integer.MAX_VALUE;
+            I_RelVersioned irv = termFactory.getRelationship(rNid);
+            
+            if (irv == null) {
+                irv = termFactory.newRelationship(relUuid, concept, 
+                    termFactory.getConcept(relTypeUuid), 
+                    termFactory.getConcept(c2Uuid), 
+                    termFactory.getConcept(charUuid), 
+                    termFactory.getConcept(refUuid), 
+                    termFactory.getConcept(statusUuid), 
+                    group, 
+                    importConfig, 
+                    effectiveDate);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
-                I_RelPart newPart =
-                        (I_RelPart) latestTuple.getMutablePart().makeAnalog(termFactory.getId(statusUuid).getNid(),
-                            termFactory.getId(pathUuid).getNid(), effectiveDate);
-                newPart.setCharacteristicId(termFactory.getId(charUuid).getNid());
-                newPart.setGroup(group);
-
-                newPart.setRefinabilityId(termFactory.getId(refUuid).getNid());
-                newPart.setTypeId(termFactory.getId(relTypeUuid).getNid());
-
-                latestTuple.getRelVersioned().addVersion(newPart);
-                termFactory.addUncommittedNoChecks(concept);
+                boolean found = false;
+                for (I_RelTuple irt: irv.getTuples()) {
+                    if (termFactory.getConcept(relTypeUuid).getNid() == irt.getTypeId() &&
+                            termFactory.getConcept(c2Uuid).getNid() == irt.getC2Id() &&
+                            termFactory.getConcept(charUuid).getNid() == irt.getCharacteristicId() && 
+                            termFactory.getConcept(refUuid).getNid() == irt.getRefinabilityId() &&
+                            termFactory.getConcept(statusUuid).getNid() == irt.getStatusId() &&
+                            group == irt.getGroup() &&
+                            pathConcept.getNid() == irt.getPathId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    I_RelPart newPart = (I_RelPart) irv.getTuples().iterator().next().makeAnalog(termFactory.getConcept(statusUuid).getNid(), 
+                        pathConcept.getNid(), effectiveDate);
+                    newPart.setTypeId(termFactory.getConcept(relTypeUuid).getNid());
+                    newPart.setCharacteristicId(termFactory.getConcept(charUuid).getNid());
+                    newPart.setRefinabilityId(termFactory.getConcept(refUuid).getNid());
+                    newPart.setGroup(group);
+                    termFactory.addUncommittedNoChecks(concept);
+                }
             }
         } catch (Exception e) {
             String errorMessage = "Exception thrown while importing rel tuple : " + e.getLocalizedMessage();

@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -62,7 +63,7 @@ public class StringExtTupleFileUtil {
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
-            UUID pathToOverrideUuid) throws TerminologyException {
+            I_ConfigAceFrame importConfig) throws TerminologyException {
 
         try {
             String[] lineParts = inputLine.split("\t");
@@ -70,7 +71,6 @@ public class StringExtTupleFileUtil {
             UUID memberUuid;
             UUID refsetUuid;
             UUID componentUuid;
-            UUID pathUuid;
             UUID statusUuid;
             long effectiveDate;
             String extString;
@@ -80,11 +80,15 @@ public class StringExtTupleFileUtil {
                 refsetUuid = UUID.fromString(lineParts[2]);
                 componentUuid = UUID.fromString(lineParts[3]);
                 extString = lineParts[5];
-                if (pathToOverrideUuid == null) {
-                    pathUuid = UUID.fromString(lineParts[6]);
-                } else {
-                    pathUuid = pathToOverrideUuid;
-                }
+                if ((Boolean) importConfig.getProperty("override") == false) {
+                    UUID pathUuid = UUID.fromString(lineParts[6]);
+                    if (!Terms.get().hasId(pathUuid)) {
+                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                        throw new Exception(errorMessage);
+                    }
+                    importConfig.getEditingPathSet().clear();
+                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                } 
                 statusUuid = UUID.fromString(lineParts[7]);
             } catch (Exception e) {
                 String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -108,12 +112,6 @@ public class StringExtTupleFileUtil {
             refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
-            TupleFileUtil.pathUuids.add(pathUuid);
-
-            if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
-                throw new Exception(errorMessage);
-            }
             if (!termFactory.hasId(refsetUuid)) {
                 String errorMessage = "Refset UUID has no identifier - skipping import of this string ext tuple.";
                 throw new Exception(errorMessage);
@@ -128,7 +126,7 @@ public class StringExtTupleFileUtil {
             }
             try {
                 refsetHelper.newStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
-                    componentUuid).getNid(), extString, memberUuid, pathUuid, statusUuid, effectiveDate);
+                    componentUuid).getNid(), extString, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

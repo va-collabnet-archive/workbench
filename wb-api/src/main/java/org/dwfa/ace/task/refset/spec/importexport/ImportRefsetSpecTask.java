@@ -23,11 +23,13 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -99,11 +101,16 @@ public class ImportRefsetSpecTask extends AbstractTask {
             String importFileName = (String) process.getProperty(inputFilePropName);
             String outputFileName = (String) process.getProperty(outputFilePropName);
             Object pathObj = process.getProperty(pathUuidPropName);
-            UUID pathUuid;
-            if (pathObj == null) {
-                pathUuid = null;
+            I_ConfigAceFrame importConfig = NewDefaultProfile.newProfile("", "", "", "", "");
+            importConfig.getEditingPathSet().clear();
+            
+            if (pathObj != null) {
+                UUID pathUuid  = (UUID) pathObj;
+                importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                importConfig.setProperty("override", true);
+                importConfig.setProperty("pathUuid", pathUuid);
             } else {
-                pathUuid = (UUID) pathObj;
+                importConfig.setProperty("override", false);
             }
 
             activityPanel.setIndeterminate(true);
@@ -112,7 +119,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
             I_GetConceptData memberRefset = tupleImporter.importFile(new File(importFileName),
-                new File(outputFileName), pathUuid);
+                new File(outputFileName), importConfig);
 
             Terms.get().commit();
 

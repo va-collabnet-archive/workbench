@@ -23,9 +23,10 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
@@ -57,7 +58,7 @@ public class ConceptTupleFileUtil {
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
-            UUID pathToOverrideUuid) throws TerminologyException {
+            I_ConfigAceFrame importConfig) throws TerminologyException {
 
         try {
 
@@ -65,17 +66,17 @@ public class ConceptTupleFileUtil {
 
             UUID conceptUuid;
             boolean isDefined;
-            UUID pathUuid;
             UUID statusUuid;
             long effectiveDate;
 
             try {
                 conceptUuid = UUID.fromString(lineParts[1]);
-                if (pathToOverrideUuid == null) {
-                    pathUuid = UUID.fromString(lineParts[3]);
-                } else {
-                    pathUuid = pathToOverrideUuid;
-                }
+                if ((Boolean) importConfig.getProperty("override") == false) {
+                    UUID pathUuid = UUID.fromString(lineParts[3]);
+                    importConfig.getEditingPathSet().clear();
+                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                    importConfig.setProperty("pathUuid", pathUuid);
+                } 
                 statusUuid = UUID.fromString(lineParts[4]);
             } catch (Exception e) {
                 String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -107,19 +108,12 @@ public class ConceptTupleFileUtil {
 
             I_TermFactory termFactory = Terms.get();
 
-            TupleFileUtil.pathUuids.add(pathUuid);
-
-            if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - skipping import of this concept tuple.";
-                throw new Exception(errorMessage);
-            }
             if (!termFactory.hasId(statusUuid)) {
                 String errorMessage = "statusUuid has no identifier - skipping import of this concept tuple.";
                 throw new Exception(errorMessage);
             }
 
-            if (termFactory.getId(conceptUuid) != null
-                && termFactory.hasConcept(termFactory.getId(conceptUuid).getNid())) {
+            if (termFactory.hasConcept(termFactory.uuidToNative(conceptUuid))) {
 
                 int conceptId = termFactory.getId(conceptUuid).getNid();
                 I_IntSet allowedStatus = termFactory.newIntSet();
@@ -144,37 +138,23 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    I_ConceptAttributePart newPart =
+                    for (I_Path p: importConfig.getEditingPathSet()) {
+                        I_ConceptAttributePart newPart =
                             (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
-                                termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(),
-                                Long.MAX_VALUE);
-                    newPart.setDefined(isDefined);
-                    latestTuple.getConVersioned().addVersion(newPart);
+                                termFactory.getId(statusUuid).getNid(), 
+                                p.getConceptId(),
+                                effectiveDate);
+                        newPart.setDefined(isDefined);
+                    }
                     termFactory.addUncommittedNoChecks(concept);
                 }
             } else {
-                // need to create concept + part
+                // need to create concept
                 I_GetConceptData newConcept =
-                        termFactory.newConcept(conceptUuid, isDefined, termFactory.getActiveAceFrameConfig());
-                I_ConceptAttributeVersioned v = newConcept.getConceptAttributes();
-
+                        termFactory.newConcept(conceptUuid, isDefined, importConfig, 
+                            termFactory.getId(statusUuid).getNid(), effectiveDate);
                 lastConcept = newConcept;
-
-                // edit the existing part's effectiveDate/version
-                int index = v.getMutableParts().size() - 1;
-
-                if (index >= 0) {
-                    I_ConceptAttributePart part =
-                            (I_ConceptAttributePart) v.getMutableParts().get(index).makeAnalog(
-                                termFactory.getId(statusUuid).getNid(), termFactory.getId(pathUuid).getNid(),
-                                effectiveDate);
-                    part.setDefined(isDefined);
-
-                    v.addVersion(part);
-                }
-
                 termFactory.addUncommittedNoChecks(newConcept);
-
             }
         } catch (Exception e) {
             String errorMessage = "Exception thrown while importing concept tuple : " + e.getLocalizedMessage();

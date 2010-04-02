@@ -36,8 +36,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -51,6 +49,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
@@ -58,16 +57,16 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
+
 public class TupleFileUtil {
 
-    protected static Set<UUID> pathUuids = new HashSet<UUID>();
-
-    public I_GetConceptData importFile(File importFile, File reportFile, UUID pathToOverrideUuid)
+    public I_GetConceptData importFile(File importFile, File reportFile, I_ConfigAceFrame importConfig)
             throws TerminologyException {
 
         try {
             // pathUuids.clear();
 
+            
             BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
             BufferedReader inputFileReader = new BufferedReader(new FileReader(importFile));
 
@@ -87,61 +86,81 @@ public class TupleFileUtil {
 
                     if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next())) {
                         if (ConceptTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.conceptTupleCount++;
                             concepts.add(ConceptTupleFileUtil.getLastConcept());
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next())) {
-                        if (DescTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                        if (DescTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig)) {
                             tupleCounter.descTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.REL_TUPLE.getUids().iterator().next())) {
-                        if (RelTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                        if (RelTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig)) {
                             tupleCounter.relTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_TUPLE.getUids()
                         .iterator().next())) {
                         if (ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.ccTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE
                         .getUids().iterator().next())) {
                         if (ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.cccTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE
                         .getUids().iterator().next())) {
                         if (ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.ccsTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE.getUids().iterator()
                         .next())) {
                         if (ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.conceptExtTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE.getUids().iterator()
                         .next())) {
                         if (IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.intTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next())) {
                         // skip as we'll process them in the second pass
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_STRING_TUPLE.getUids().iterator()
                         .next())) {
                         if (StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.stringTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_STRING_TUPLE.getUids()
                         .iterator().next())) {
                         if (ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            pathToOverrideUuid)) {
+                            importConfig)) {
                             tupleCounter.csTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     } else {
                         throw new TerminologyException("Unimplemented tuple UUID : " + tupleUuid);
@@ -173,8 +192,10 @@ public class TupleFileUtil {
 
                     UUID tupleUuid = UUID.fromString(lineParts[0]);
                     if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.ID_TUPLE.getUids().iterator().next())) {
-                        if (IDTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, pathToOverrideUuid)) {
+                        if (IDTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig)) {
                             tupleCounter.idTupleCount++;
+                        } else {
+                            tupleCounter.errorCount++;
                         }
                     }
                     lineCount++;
@@ -208,10 +229,16 @@ public class TupleFileUtil {
             outputFileWriter.newLine();
             outputFileWriter.write("Concept-string ext tuples imported: " + tupleCounter.csTupleCount);
             outputFileWriter.newLine();
+            outputFileWriter.write("Errors encountered: " + tupleCounter.errorCount);
+            outputFileWriter.newLine();
 
             outputFileWriter.flush();
             outputFileWriter.close();
             inputFileReader.close();
+            
+            if (tupleCounter.errorCount > 0) {
+                AceLog.getAppLog().alertAndLogException(new IOException(tupleCounter.errorCount + " errors during import. Please examine error log."));
+            }
 
             return memberRefset;
         } catch (FileNotFoundException e) {
@@ -225,19 +252,6 @@ public class TupleFileUtil {
             e.printStackTrace();
             throw new TerminologyException("Failed to import file - Exception occurred while reading file: "
                 + importFile + " " + e.getLocalizedMessage());
-        }
-    }
-
-    private void addPaths() throws TerminologyException, IOException {
-        // make sure that imported path being used is viewable.
-        I_TermFactory termFactory = Terms.get();
-
-        for (UUID pathUuid : pathUuids) {
-            I_Path path = termFactory.getPath(new UUID[] { pathUuid });
-            I_Position position = termFactory.newPosition(path, Integer.MAX_VALUE);
-            if (!termFactory.getActiveAceFrameConfig().getViewPositionSet().contains(position)) {
-                termFactory.getActiveAceFrameConfig().addViewPosition(position);
-            }
         }
     }
 
@@ -623,7 +637,6 @@ public class TupleFileUtil {
                 latestSource = Terms.get().getConcept(rel.getC1Id());
             }
         }
-
         return latestSource;
     }
 }

@@ -18,16 +18,13 @@ package org.dwfa.ace.file;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -58,7 +55,7 @@ public class DescTupleFileUtil {
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
-            UUID pathToOverrideUuid) throws TerminologyException {
+            I_ConfigAceFrame importConfig) throws TerminologyException {
 
         try {
             String[] lineParts = inputLine.split("\t");
@@ -69,7 +66,6 @@ public class DescTupleFileUtil {
             String lang;
             boolean initialCapSignificant;
             UUID typeUuid;
-            UUID pathUuid;
             UUID statusUuid;
             long effectiveDate;
 
@@ -77,11 +73,16 @@ public class DescTupleFileUtil {
                 conceptUuid = UUID.fromString(lineParts[1]);
                 descUuid = UUID.fromString(lineParts[2]);
                 typeUuid = UUID.fromString(lineParts[6]);
-                if (pathToOverrideUuid == null) {
-                    pathUuid = UUID.fromString(lineParts[7]);
-                } else {
-                    pathUuid = pathToOverrideUuid;
-                }
+                if ((Boolean) importConfig.getProperty("override") == false) {
+                    UUID pathUuid = UUID.fromString(lineParts[7]);
+                    if (!Terms.get().hasId(pathUuid)) {
+                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                        throw new Exception(errorMessage);
+                    }
+                    importConfig.getEditingPathSet().clear();
+                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                    importConfig.setProperty("pathUuid", pathUuid);
+                } 
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
                 String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -115,13 +116,6 @@ public class DescTupleFileUtil {
 
             I_TermFactory termFactory = Terms.get();
 
-            TupleFileUtil.pathUuids.add(pathUuid);
-
-            if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - skipping import of this desc tuple.";
-                throw new Exception(errorMessage);
-            }
-
             if (!termFactory.hasId(conceptUuid)) {
                 String errorMessage = "conceptUuid has no identifier - skipping import of this desc tuple.";
                 throw new Exception(errorMessage);
@@ -137,59 +131,46 @@ public class DescTupleFileUtil {
                 throw new Exception(errorMessage);
             }
 
-            if (termFactory.getId(conceptUuid) != null) {
-                int conceptId = termFactory.getId(conceptUuid).getNid();
-                I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(termFactory.getId(statusUuid).getNid());
-                I_IntSet allowedTypes = termFactory.newIntSet();
-                allowedTypes.add(termFactory.getId(typeUuid).getNid());
+            if (termFactory.hasId(conceptUuid)) {
+                int conceptId = termFactory.uuidToNative(conceptUuid);
+                int dNid = termFactory.uuidToNative(descUuid);
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
-                boolean returnConflictResolvedLatestState = true;
-
-                // check if the part exists
-                List<? extends I_DescriptionTuple> parts =
-                        concept.getDescriptionTuples(allowedStatus, allowedTypes, null,
-                            returnConflictResolvedLatestState);
-                I_DescriptionTuple latestTuple = null;
-                for (I_DescriptionTuple part : parts) {
-                    if (latestTuple == null || part.getTime() >= latestTuple.getTime()) {
-                        latestTuple = part;
-                    }
-                }
-
-                if (latestTuple == null) {
-                    Collection<I_Path> paths = termFactory.getPaths();
-                    paths.clear();
-                    paths.add(termFactory.getPath(new UUID[] { pathUuid }));
-                    termFactory.uuidToNative(descUuid);
-
-                    I_DescriptionVersioned v =
-                            termFactory.newDescription(descUuid, concept, lang, text, termFactory
-                                .getConcept(new UUID[] { typeUuid }), termFactory.getActiveAceFrameConfig());
-
-                    I_DescriptionPart newLastPart =
-                            (I_DescriptionPart) v.getLastTuple().makeAnalog(termFactory.getId(statusUuid).getNid(),
-                                termFactory.getId(pathUuid).getNid(), effectiveDate);
-                    newLastPart.setLang(lang);
-                    newLastPart.setText(text);
-                    newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                    newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
-
-                    v.addVersion(newLastPart);
+                
+                I_DescriptionVersioned idv = termFactory.getDescription(dNid);
+                I_GetConceptData typeConcept = termFactory.getConcept(typeUuid);
+                I_GetConceptData statusConcept = termFactory.getConcept(statusUuid);
+                I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 
+                if (idv == null) {
+                    idv = termFactory.newDescription(descUuid, concept, lang, text, typeConcept, importConfig, statusConcept, effectiveDate);
                     termFactory.addUncommittedNoChecks(concept);
                 } else {
-                    I_DescriptionPart newLastPart =
-                            (I_DescriptionPart) latestTuple.getDescVersioned().getLastTuple().getMutablePart()
-                                .makeAnalog(termFactory.getId(statusUuid).getNid(),
-                                    termFactory.getId(pathUuid).getNid(), effectiveDate);
-                    newLastPart.setLang(lang);
-                    newLastPart.setText(text);
-                    newLastPart.setInitialCaseSignificant(initialCapSignificant);
-                    newLastPart.setTypeId(termFactory.getId(typeUuid).getNid());
-
-                    latestTuple.getDescVersioned().addVersion(newLastPart);
-                    termFactory.addUncommittedNoChecks(concept);
+                    boolean found = false;
+                    for (I_DescriptionTuple idt: idv.getTuples()) {
+                        if (lang.equals(idt.getLang()) &&
+                                text.equals(idt.getText()) &&
+                                typeConcept.getNid() == idt.getTypeId() &&
+                                statusConcept.getNid() == idt.getStatusId() &&
+                                pathConcept.getNid() == idt.getPathId()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        I_DescriptionPart newPart = (I_DescriptionPart) idv.getTuples().iterator().next().makeAnalog(statusConcept.getNid(), 
+                            pathConcept.getNid(), effectiveDate);
+                        newPart.setLang(lang);
+                        newPart.setText(text);
+                        newPart.setTypeId(typeConcept.getNid());
+                        newPart.setInitialCaseSignificant(initialCapSignificant);
+                        termFactory.addUncommittedNoChecks(concept);
+                    }
                 }
+            } else {
+                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write("No concept id : " + conceptUuid + " for desc: " + descUuid + "\nLind: " + inputLine);
+                outputFileWriter.newLine();
+                return false;
             }
         } catch (Exception e) {
             String errorMessage = "Exception thrown while importing desc tuple : " + e.getLocalizedMessage();

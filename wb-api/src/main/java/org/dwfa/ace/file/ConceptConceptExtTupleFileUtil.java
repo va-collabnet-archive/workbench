@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
@@ -64,7 +65,7 @@ public class ConceptConceptExtTupleFileUtil {
     }
 
     public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
-            UUID pathToOverrideUuid) throws TerminologyException {
+            I_ConfigAceFrame importConfig) throws TerminologyException {
 
         try {
             String[] lineParts = inputLine.split("\t");
@@ -74,7 +75,6 @@ public class ConceptConceptExtTupleFileUtil {
             UUID componentUuid;
             UUID c1Uuid;
             UUID c2Uuid;
-            UUID pathUuid;
             UUID statusUuid;
             long effectiveDate;
 
@@ -84,11 +84,16 @@ public class ConceptConceptExtTupleFileUtil {
                 componentUuid = UUID.fromString(lineParts[3]);
                 c1Uuid = UUID.fromString(lineParts[5]);
                 c2Uuid = UUID.fromString(lineParts[6]);
-                if (pathToOverrideUuid == null) {
-                    pathUuid = UUID.fromString(lineParts[7]);
-                } else {
-                    pathUuid = pathToOverrideUuid;
-                }
+                if ((Boolean) importConfig.getProperty("override") == false) {
+                    UUID pathUuid = UUID.fromString(lineParts[7]);
+                    if (!Terms.get().hasId(pathUuid)) {
+                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                        throw new Exception(errorMessage);
+                    }
+                    importConfig.getEditingPathSet().clear();
+                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                    importConfig.setProperty("pathUuid", pathUuid);
+                } 
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
                 String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -111,14 +116,6 @@ public class ConceptConceptExtTupleFileUtil {
             I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
-
-            TupleFileUtil.pathUuids.add(pathUuid);
-
-            if (!termFactory.hasId(pathUuid)) {
-                String errorMessage = "pathUuid has no identifier - skipping import of this concept-concept ext tuple.";
-
-                throw new Exception(errorMessage);
-            }
 
             if (!termFactory.hasId(refsetUuid)) {
                 String errorMessage =
@@ -149,7 +146,7 @@ public class ConceptConceptExtTupleFileUtil {
             try {
                 refsetHelper.newConceptConceptRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory
                     .getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(c2Uuid)
-                    .getNid(), memberUuid, pathUuid, statusUuid, effectiveDate);
+                    .getNid(), memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Exception thrown while creating new concept-concept refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
