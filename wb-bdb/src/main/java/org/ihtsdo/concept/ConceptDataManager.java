@@ -281,7 +281,12 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 			int relNid = pair.getNid1();
 			int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
 			Concept c = Bdb.getConceptForComponent(conceptNid);
-			destRels.add(c.getRelationship(relNid));
+			if (c != null) {
+			    Relationship r = c.getRelationship(relNid);
+			    if (r != null) {
+		            destRels.add(r);
+			    }
+			}
 		}
 		return destRels;
 	}

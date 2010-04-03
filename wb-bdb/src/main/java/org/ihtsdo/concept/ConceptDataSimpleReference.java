@@ -663,13 +663,16 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 int typeId = pair.getNid2();
                 if (destRelTypes.contains(typeId)) {
                     try {
-                        Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(relNid);
-                        if (r != null) {
-                            List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-                            r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-                                    .getViewPositionSetReadOnly(), currentVersions, true);
-                            if (currentVersions.size() > 0) {
-                                return false;
+                        Concept c = Bdb.getConceptForComponent(relNid);
+                        if (c != null) {
+                            Relationship r = c.getSourceRel(relNid);
+                            if (r != null) {
+                                List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+                                r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
+                                        .getViewPositionSetReadOnly(), currentVersions, true);
+                                if (currentVersions.size() > 0) {
+                                    return false;
+                                }
                             }
                         }
                     } catch (IOException e) {

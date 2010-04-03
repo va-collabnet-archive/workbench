@@ -798,7 +798,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptId(), time));
             }
         }
-        BdbCommitManager.addUncommitted(newC);
         return newC;
     }
 

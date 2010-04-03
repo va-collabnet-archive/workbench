@@ -45,7 +45,6 @@ import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -145,6 +144,10 @@ public class BdbCommitManager {
 	private static ExecutorService changeSetWriterService;
 	private static ExecutorService luceneWriterService;
 	
+	private static boolean performCreationTests = true;
+	
+	private static boolean performCommitTest = false;
+	
 	static {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 		"Change set writer"));
@@ -219,21 +222,24 @@ public class BdbCommitManager {
 							+ " ---@@@ ");
 		}
 		try {
-			List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-			dataCheckMap.put(concept, warningsAndErrors);
-			for (I_TestDataConstraints test : creationTests) {
-				try {
-                    warningsAndErrors.addAll(test.test(concept, false));
-                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
-                    for (RefsetMember<?, ?> extension : extensions) {
-                        if (extension.isUncommitted()) {
-                            warningsAndErrors.addAll(test.test(extension, false));
-                        }
-                    }
-				} catch (Exception e) {
-					AceLog.getEditLog().alertAndLogException(e);
-				}
-			}
+		    
+		    if (performCreationTests) {
+	            List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+	            dataCheckMap.put(concept, warningsAndErrors);
+	            for (I_TestDataConstraints test : creationTests) {
+	                try {
+	                    warningsAndErrors.addAll(test.test(concept, false));
+	                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
+	                    for (RefsetMember<?, ?> extension : extensions) {
+	                        if (extension.isUncommitted()) {
+	                            warningsAndErrors.addAll(test.test(extension, false));
+	                        }
+	                    }
+	                } catch (Exception e) {
+	                    AceLog.getEditLog().alertAndLogException(e);
+	                }
+	            }
+		    }
 			
 			uncommittedCNids.setMember(concept.getNid());
 			dbWriterPermit.acquire();
@@ -242,7 +248,6 @@ public class BdbCommitManager {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		
 		SwingUtilities.invokeLater(new UpdateFrames(concept));
 	}
 
