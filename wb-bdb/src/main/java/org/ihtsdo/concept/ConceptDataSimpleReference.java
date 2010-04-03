@@ -691,8 +691,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
             
             TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-            if (readOnlyInput.available() > 4) {
-                readOnlyInput.mark(128);
+            if (readOnlyInput.available() > OFFSETS.getHeaderSize()) {
+                readOnlyInput.mark(OFFSETS.getHeaderSize());
                 readOnlyInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
                 int dataOffset = readOnlyInput.readInt();
                 readOnlyInput.reset();
@@ -702,8 +702,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             
             if (isLeaf) {
                 TupleInput mutableInput = nidData.getMutableTupleInput();
-                if (mutableInput.available() > 4) {
-                    mutableInput.mark(128);
+                if (mutableInput.available() > OFFSETS.getHeaderSize()) {
+                    mutableInput.mark(OFFSETS.getHeaderSize());
                     mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
                     int dataOffset = readOnlyInput.readInt();
                     mutableInput.reset();
