@@ -288,7 +288,6 @@ public class Bdb {
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
-			    NidDataFromBdb.close();
                 AceLog.getAppLog().info("Closing all JFrames.");
                 System.out.println("Closing all JFrames.");
 		        for (JFrame f: OpenFrames.getFrames()) {
@@ -312,6 +311,7 @@ public class Bdb {
                 AceLog.getAppLog().info("Starting BdbCommitManager shutdown.");
                 System.out.println("Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
+                NidDataFromBdb.close();
                 AceLog.getAppLog().info("Starting last sync.");
                 System.out.println("Starting last sync.");
 				new Sync().run();
