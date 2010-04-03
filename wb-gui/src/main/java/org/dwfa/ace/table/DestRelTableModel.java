@@ -63,10 +63,12 @@ public class DestRelTableModel extends RelTableModel {
             if (tableChangedSwingWorker.isWorkStopped()) {
                 return selectedTuples;
             }
-            try {
-                rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
-            } catch (TerminologyException e) {
-                throw new ToIoException(e);
+            if (rel != null) {
+                try {
+                    rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
+                } catch (TerminologyException e) {
+                    throw new ToIoException(e);
+                }
             }
         }
 
