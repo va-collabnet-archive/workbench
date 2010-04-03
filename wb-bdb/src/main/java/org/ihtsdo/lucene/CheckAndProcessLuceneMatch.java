@@ -48,31 +48,41 @@ public class CheckAndProcessLuceneMatch implements Runnable {
             int nid = Integer.parseInt(doc.get("dnid"));
             int cnid = Integer.parseInt(doc.get("cnid"));
             try {
-                Description descV = Concept.get(cnid).getDescription(nid);
-                LuceneMatch match = new LuceneMatch(descV, score);
-                if (checkList == null || checkList.size() == 0) {
-                    matches.add(match);
-                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                        AceLog.getAppLog().fine("processing match: " + descV + " new match size: " + matches.size());
-                    }
-                } else {
-                    try {
-                        boolean failed = false;
-                        for (I_TestSearchResults test : checkList) {
-                            if (test != null) {
-                                if (test.test(descV, config) == false) {
-                                    failed = true;
-                                    break;
+                Concept c = Concept.get(cnid);
+                if (c != null) {
+                    Description descV = c.getDescription(nid);
+                    if (descV != null) {
+                        LuceneMatch match = new LuceneMatch(descV, score);
+                        if (checkList == null || checkList.size() == 0) {
+                            matches.add(match);
+                            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                                AceLog.getAppLog().fine("processing match: " + descV + " new match size: " + matches.size());
+                            }
+                        } else {
+                            try {
+                                boolean failed = false;
+                                for (I_TestSearchResults test : checkList) {
+                                    if (test != null) {
+                                        if (test.test(descV, config) == false) {
+                                            failed = true;
+                                            break;
+                                        }
+                                    }
                                 }
+
+                                if (failed == false) {
+                                    matches.add(match);
+                                }
+                            } catch (TaskFailedException e) {
+                                AceLog.getAppLog().alertAndLogException(e);
                             }
                         }
-
-                        if (failed == false) {
-                            matches.add(match);
-                        }
-                    } catch (TaskFailedException e) {
-                        AceLog.getAppLog().alertAndLogException(e);
+                    } else {
+                        AceLog.getAppLog().alertAndLogException(new Exception("Attempt to test missing description on concept: " + c.toString()));
+                        AceLog.getAppLog().warning("Exception on concept: " + c.toLongString());
                     }
+                } else {
+                    AceLog.getAppLog().alertAndLogException(new Exception("Attempt to test  description on null: " + doc));
                 }
             } catch (IOException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);

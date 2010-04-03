@@ -28,32 +28,43 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 
 public class ActiveConceptAndDescTest implements I_TestSearchResults {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
-			I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
-			I_GetConceptData concept = Terms.get().getConcept(descV.getConceptId());
-            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
-                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), true, false);
-            if (attributes == null || attributes.size() == 0) {
-                return false;
-            }
-            List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
-            I_IntSet allowedTypes = null;
-            if (frameConfig.searchWithDescTypeFilter()) {
-                allowedTypes = frameConfig.getDescTypes();
-            }
-            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
-            		frameConfig.getViewPositionSetReadOnly(), matchingTuples, true);
-            if (matchingTuples.size() == 0) {
-                return false;
-            }
-            return true;
+		    if (component != null) {
+	            I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
+	            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptId());
+	            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
+	                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), true, false);
+	            if (attributes == null || attributes.size() == 0) {
+	                return false;
+	            }
+	            List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+	            I_IntSet allowedTypes = null;
+	            if (frameConfig.searchWithDescTypeFilter()) {
+	                allowedTypes = frameConfig.getDescTypes();
+	            }
+	            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
+	                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, true);
+	            if (matchingTuples.size() == 0) {
+	                return false;
+	            }
+	            return true;
+		    } else {
+		        AceLog.getAppLog().alertAndLogException(new Exception("Attempting to test a null component"));
+		        return false;
+		    }
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
