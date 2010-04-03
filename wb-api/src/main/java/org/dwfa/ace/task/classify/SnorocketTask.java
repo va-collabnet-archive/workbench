@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -160,8 +159,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // INTERNAL
-    private static boolean debug = true; // :DEBUG:
-    private static boolean debugDump = true; // :DEBUG: save to files
+    private static boolean debug = false; // :DEBUG:
+    private static boolean debugDump = false; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -1059,6 +1058,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             cEditPathNid = cEditPathObj.getConceptId();
             cEditIPath = tf.getPath(cEditPathObj.getUids());
+            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+            // cEditPosSet = new PositionSetReadOnly(cEditIPath.getOrigins().get(0));
+
             cEditPathPos = new ArrayList<I_Position>();
             cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
             getPathOrigins(cEditPathPos, cEditIPath);
@@ -1072,6 +1074,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
             cClassPathNid = cClassPathObj.getConceptId();
             cClassIPath = tf.getPath(cClassPathObj.getUids());
+            cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+            // cClassPosSet = new PositionSetReadOnly(cClassIPath.getOrigins().get(0));
+
             cClassPathPos = new ArrayList<I_Position>();
             cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
             getPathOrigins(cClassPathPos, cClassIPath);
@@ -1084,8 +1089,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             e.printStackTrace();
         }
 
-        cClassPosSet = new PositionSetReadOnly(new HashSet<I_Position>(cClassPathPos));
-        cEditPosSet = new PositionSetReadOnly(new HashSet<I_Position>(cEditPathPos));
         return Condition.CONTINUE;
     }
 
