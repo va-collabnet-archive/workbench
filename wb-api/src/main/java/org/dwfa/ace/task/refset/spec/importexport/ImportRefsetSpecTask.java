@@ -135,7 +135,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
             Terms.get().getActiveAceFrameConfig().setBuilderToggleVisible(true);
             Terms.get().getActiveAceFrameConfig().setInboxToggleVisible(true);
-
+            Terms.get().commit();
             return Condition.CONTINUE;
         } catch (Exception ex) {
             try {
