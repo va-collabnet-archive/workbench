@@ -118,10 +118,15 @@ public class ImportRefsetSpecTask extends AbstractTask {
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();
+            boolean checkCreationTestsEnabled = Terms.get().isCheckCreationDataEnabled();
+            boolean checkCommitTestsEnabled = Terms.get().isCheckCommitDataEnabled();
             I_GetConceptData memberRefset = tupleImporter.importFile(new File(importFileName),
                 new File(outputFileName), importConfig);
 
             Terms.get().commit();
+            
+            Terms.get().setCheckCommitDataEnabled(checkCommitTestsEnabled);
+            Terms.get().setCheckCreationDataEnabled(checkCreationTestsEnabled);
 
             activityPanel.setProgressInfoUpper("Importing refset spec from file : " + importFileName);
             activityPanel.setProgressInfoLower("<html><font color='red'> COMPLETE. <font color='black'>");

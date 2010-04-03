@@ -196,10 +196,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         IntListPairsBinder binder = new IntListPairsBinder();
         binder.setReadOnlyList(roList);
         TupleInput readWriteInput = nidData.getMutableTupleInput();
-        if (readWriteInput.available() < 4) {
+        if (readWriteInput.available() < OFFSETS.getHeaderSize()) {
             return roList;
         }
-        readWriteInput.mark(128);
+        readWriteInput.mark(OFFSETS.getHeaderSize());
         readWriteInput.skipFast(offset.offset);
         int dataOffset = readWriteInput.readInt();
         readWriteInput.reset();
@@ -209,10 +209,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     protected SetModifiedWhenChangedList getReadOnlyArrayIntList(OFFSETS offset) throws IOException {
         TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-        if (readOnlyInput.available() < 4) {
+        if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
             return new SetModifiedWhenChangedList();
         }
-        readOnlyInput.mark(128);
+        readOnlyInput.mark(OFFSETS.getHeaderSize());
         readOnlyInput.skipFast(offset.offset);
         int dataOffset = readOnlyInput.readInt();
         readOnlyInput.reset();
@@ -223,10 +223,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     protected CopyOnWriteArraySet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
         TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-        if (readOnlyInput.available() < 4) {
+        if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
             return new CopyOnWriteArraySet<Integer>();
         }
-        readOnlyInput.mark(128);
+        readOnlyInput.mark(OFFSETS.getHeaderSize());
         readOnlyInput.skipFast(offset.offset);
         int dataOffset = readOnlyInput.readInt();
         readOnlyInput.reset();
@@ -237,10 +237,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     protected CopyOnWriteArraySet<Integer> getMutableIntSet(OFFSETS offset) throws IOException {
         TupleInput mutableInput = nidData.getMutableTupleInput();
-        if (mutableInput.available() < 4) {
+        if (mutableInput.available() < OFFSETS.getHeaderSize()) {
             return new CopyOnWriteArraySet<Integer>();
         }
-        mutableInput.mark(128);
+        mutableInput.mark(OFFSETS.getHeaderSize());
         mutableInput.skipFast(offset.offset);
         int dataOffset = mutableInput.readInt();
         mutableInput.reset();
@@ -705,7 +705,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 if (mutableInput.available() > OFFSETS.getHeaderSize()) {
                     mutableInput.mark(OFFSETS.getHeaderSize());
                     mutableInput.skipFast(OFFSETS.DEST_REL_NID_TYPE_NIDS.offset);
-                    int dataOffset = readOnlyInput.readInt();
+                    int dataOffset = mutableInput.readInt();
                     mutableInput.reset();
                     mutableInput.skipFast(dataOffset);
                     isLeaf = leafBinder.entryToObject(mutableInput);

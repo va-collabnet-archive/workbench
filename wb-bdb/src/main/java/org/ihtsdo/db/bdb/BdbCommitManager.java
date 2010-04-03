@@ -146,7 +146,7 @@ public class BdbCommitManager {
 	
 	private static boolean performCreationTests = true;
 	
-	private static boolean performCommitTest = false;
+	private static boolean performCommitTests = true;
 	
 	static {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
@@ -700,4 +700,20 @@ public class BdbCommitManager {
 	public static void writeImmediate(Concept concept) {
 		new ConceptWriter(concept).run();
 	}
+
+    public static boolean isCheckCreationDataEnabled() {
+        return performCreationTests;
+    }
+
+    public static boolean isCheckCommitDataEnabled() {
+        return performCommitTests;
+    }
+
+    public static void setCheckCreationDataEnabled(boolean enabled) {
+        performCreationTests = enabled;
+    }
+
+    public static void setCheckCommitDataEnabled(boolean enabled) {
+        performCommitTests = enabled;
+    }
 }

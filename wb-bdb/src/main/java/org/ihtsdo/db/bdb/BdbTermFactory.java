@@ -1562,4 +1562,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Terms.get().addUncommitted(c);
         return img;
     }
+
+    @Override
+    public boolean isCheckCreationDataEnabled() {
+        return BdbCommitManager.isCheckCreationDataEnabled();
+    }
+
+    @Override
+    public boolean isCheckCommitDataEnabled() {
+        return BdbCommitManager.isCheckCommitDataEnabled();
+    }
+
+    @Override
+    public void setCheckCreationDataEnabled(boolean enabled) {
+        BdbCommitManager.setCheckCreationDataEnabled(enabled);
+    }
+
+    @Override
+    public void setCheckCommitDataEnabled(boolean enabled) {
+        BdbCommitManager.setCheckCommitDataEnabled(enabled);
+    }
 }

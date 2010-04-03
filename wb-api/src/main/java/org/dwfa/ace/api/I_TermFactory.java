@@ -591,4 +591,10 @@ public interface I_TermFactory {
             I_GetConceptData concept3, I_GetConceptData concept4, I_GetConceptData concept5, I_GetConceptData concept6,
             int group, I_ConfigAceFrame importConfig, long effectiveDate) throws IOException, TerminologyException;
 	
+    public void setCheckCreationDataEnabled(boolean enabled);
+    public boolean isCheckCreationDataEnabled();
+    
+    public void setCheckCommitDataEnabled(boolean enabled);
+    public boolean isCheckCommitDataEnabled();
+    
 }
