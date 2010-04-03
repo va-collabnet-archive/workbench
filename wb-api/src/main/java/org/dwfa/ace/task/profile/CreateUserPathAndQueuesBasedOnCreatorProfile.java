@@ -357,6 +357,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
             tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, creatorConfig);
         newConfig.getDbConfig().setUserConcept(userConcept);
+        tf.addUncommitted(userConcept);
     }
 
     private void createDevPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
@@ -409,6 +410,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
         // Needs a concept record...
         I_GetConceptData pathConcept = Terms.get().newConcept(newPathUid, false, commitConfig);
+        Terms.get().addUncommitted(pathConcept);
+
 
         // Needs a description record...
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + suffix,
