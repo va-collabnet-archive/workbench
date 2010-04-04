@@ -3,11 +3,9 @@ package org.ihtsdo.concept.component.refsetmember.cidFloat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.cidFloat.CidFloatMember;
-import org.ihtsdo.concept.component.refsetmember.cidFloat.CidFloatRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,7 +117,7 @@ public class CidFloatMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new ArrayList<CidFloatRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<CidFloatRevision>();
 
         CidFloatRevision rev = new CidFloatRevision(); 
         rev.primordialComponent = obj; 
@@ -139,7 +137,7 @@ public class CidFloatMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new ArrayList<CidFloatRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<CidFloatRevision>();
 
         CidFloatRevision rev = new CidFloatRevision(); 
         rev.primordialComponent = obj; 

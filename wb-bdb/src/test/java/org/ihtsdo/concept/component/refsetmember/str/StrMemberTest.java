@@ -5,11 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.integer.IntMember;
-import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
-import org.ihtsdo.concept.component.refsetmember.str.StrMember;
-import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -121,7 +118,7 @@ public class StrMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new ArrayList<StrRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<StrRevision>();
 
         StrRevision rev = new StrRevision(); 
         rev.primordialComponent = obj; 
@@ -143,7 +140,7 @@ public class StrMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new ArrayList<StrRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<StrRevision>();
 
         StrRevision rev = new StrRevision(); 
         rev.primordialComponent = obj; 

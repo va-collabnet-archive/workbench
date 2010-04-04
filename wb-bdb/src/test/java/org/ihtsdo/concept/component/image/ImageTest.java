@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
@@ -156,7 +157,7 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.revisions = new ArrayList<ImageRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<ImageRevision>();
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 1;
@@ -177,7 +178,7 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.revisions = new ArrayList<ImageRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<ImageRevision>();
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 2;

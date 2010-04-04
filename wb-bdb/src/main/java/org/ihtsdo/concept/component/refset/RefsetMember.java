@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -247,11 +248,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
 	        if (revisions == null) {
-	            revisions = new ArrayList<R>(additionalVersionCount);
-	        } else {
-	            revisions.ensureCapacity(revisions.size()
-	                    + additionalVersionCount);
-	        }
+	            revisions = new CopyOnWriteArrayList<R>();
+	        } 
 	        for (int i = 0; i < additionalVersionCount; i++) {
 	            R r = readMemberRevision(input);
 	            if (r.getTime() != Long.MIN_VALUE) {

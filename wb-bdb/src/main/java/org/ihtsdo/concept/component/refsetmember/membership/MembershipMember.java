@@ -1,7 +1,7 @@
 package org.ihtsdo.concept.component.refsetmember.membership;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -33,7 +33,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 	public MembershipMember(ERefsetMemberMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<MembershipRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<MembershipRevision>();
 			for (ERefsetRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new MembershipRevision(eVersion, this));
 			}

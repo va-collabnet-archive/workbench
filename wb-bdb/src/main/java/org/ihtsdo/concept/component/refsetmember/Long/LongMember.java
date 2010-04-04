@@ -1,7 +1,7 @@
 package org.ihtsdo.concept.component.refsetmember.Long;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -36,7 +36,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		super(refsetMember, enclosingConcept);
 		longValue =refsetMember.getLongValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<LongRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<LongRevision>();
 			for (ERefsetLongRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new LongRevision(eVersion, this));
 			}

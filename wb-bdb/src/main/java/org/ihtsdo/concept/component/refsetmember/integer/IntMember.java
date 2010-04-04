@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.refsetmember.integer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -96,7 +97,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 		super(refsetMember, enclosingConcept);
 		intValue =refsetMember.getIntValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<IntRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<IntRevision>();
 			for (ERefsetIntRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new IntRevision(eVersion, this));
 			}

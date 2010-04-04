@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.refsetmember.str;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -99,7 +100,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<StrRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<StrRevision>();
 			for (ERefsetStrRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new StrRevision(eVersion, this));
 			}

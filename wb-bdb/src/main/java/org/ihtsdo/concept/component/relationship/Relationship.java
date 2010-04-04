@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IntSet;
@@ -205,7 +206,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
 		primordialSapNid = Bdb.getSapNid(eRel);
 		if (eRel.getRevisionList() != null) {
-			revisions = new ArrayList<RelationshipRevision>(eRel.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<RelationshipRevision>();
 			for (ERelationshipRevision erv: eRel.getRevisionList()) {
 				revisions.add(new RelationshipRevision(erv, this));
 			}
@@ -316,7 +317,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		typeNid = input.readInt();
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
-			revisions = new ArrayList<RelationshipRevision>(additionalVersionCount);
+			revisions = new CopyOnWriteArrayList<RelationshipRevision>();
 			for (int i = 0; i < additionalVersionCount; i++) {
 				revisions.add(new RelationshipRevision(input, this));
 			}

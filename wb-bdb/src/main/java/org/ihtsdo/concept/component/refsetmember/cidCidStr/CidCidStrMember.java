@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.refsetmember.cidCidStr;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -138,7 +139,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		strValue = refsetMember.getStrValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<CidCidStrRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<CidCidStrRevision>();
 			for (ERefsetCidCidStrRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidCidStrRevision(eVersion, this));
 			}

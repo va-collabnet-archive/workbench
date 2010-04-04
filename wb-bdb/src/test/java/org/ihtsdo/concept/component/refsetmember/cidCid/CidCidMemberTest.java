@@ -5,9 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidMember;
-import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,7 +114,7 @@ public class CidCidMemberTest {
         CidCidMember obj = new CidCidMember();
         obj.setC1Nid(1);
         obj.setC2Nid(1);
-        obj.revisions = new ArrayList<CidCidRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<CidCidRevision>();
         CidCidRevision rev = new CidCidRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
@@ -135,7 +134,7 @@ public class CidCidMemberTest {
         CidCidMember obj = new CidCidMember();
         obj.setC1Nid(2);
         obj.setC2Nid(2);
-        obj.revisions = new ArrayList<CidCidRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<CidCidRevision>();
         CidCidRevision rev = new CidCidRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;

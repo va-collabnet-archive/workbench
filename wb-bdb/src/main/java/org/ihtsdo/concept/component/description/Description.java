@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -196,7 +197,7 @@ public class Description
 		typeNid = Bdb.uuidToNid(eDesc.getTypeUuid());
 		primordialSapNid = Bdb.getSapNid(eDesc);
 		if (eDesc.getRevisionList() != null) {
-			revisions = new ArrayList<DescriptionRevision>(eDesc.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<DescriptionRevision>();
 			for (EDescriptionRevision edv: eDesc.getRevisionList()) {
 				revisions.add(new DescriptionRevision(edv, this));
 			}
@@ -293,7 +294,7 @@ public class Description
 		// nid, list size, and conceptNid are read already by the binder...
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
-			revisions = new ArrayList<DescriptionRevision>(additionalVersionCount);
+			revisions = new CopyOnWriteArrayList<DescriptionRevision>();
 			for (int i = 0; i < additionalVersionCount; i++) {
 				DescriptionRevision dr = new DescriptionRevision(input, this);
 				if (dr.getTime() != Long.MIN_VALUE) {

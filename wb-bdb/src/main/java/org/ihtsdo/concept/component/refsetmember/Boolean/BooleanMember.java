@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.refsetmember.Boolean;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -108,8 +109,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		super(refsetMember, enclosingConcept);
 		booleanValue = refsetMember.getBooleanValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<BooleanRevision>(refsetMember
-					.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<BooleanRevision>();
 			for (ERefsetBooleanRevision eVersion : refsetMember
 					.getRevisionList()) {
 				revisions.add(new BooleanRevision(eVersion, this));

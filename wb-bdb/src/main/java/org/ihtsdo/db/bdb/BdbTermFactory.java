@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -794,7 +795,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 if (a.revisions == null) {
                     a.revisions =
-                            new ArrayList<ConceptAttributesRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
+                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
                 }
                 a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptId(), time));
             }
@@ -854,7 +855,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), p.getConceptId(), effectiveDate);
             } else {
                 if (d.revisions == null) {
-                    d.revisions = new ArrayList<DescriptionRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
+                    d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
                 }
                 d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptId(), effectiveDate));
             }
@@ -1140,7 +1141,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), effectiveDate);
             } else {
                 if (r.revisions == null) {
-                    r.revisions = new ArrayList<RelationshipRevision>(aceFrameConfig.getEditingPathSet().size() - 1);
+                    r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
                 }
                 r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptId(), effectiveDate));
             }
@@ -1581,7 +1582,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
-                    img.revisions = new ArrayList<ImageRevision>(aceConfig.getEditingPathSet().size() - 1);
+                    img.revisions = new CopyOnWriteArrayList<ImageRevision>();
                 }
                 img.revisions.add(img.makeAnalog(statusNid, p.getConceptId(), Long.MAX_VALUE));
             }

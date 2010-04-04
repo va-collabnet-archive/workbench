@@ -3,12 +3,13 @@ package org.ihtsdo.concept.component.refsetmember.cidCidCid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
@@ -137,7 +138,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		c3Nid = Bdb.uuidToNid(refsetMember.getC3Uuid());
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<CidCidCidRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<CidCidCidRevision>();
 			for (ERefsetCidCidCidRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidCidCidRevision(eVersion, this));
 			}

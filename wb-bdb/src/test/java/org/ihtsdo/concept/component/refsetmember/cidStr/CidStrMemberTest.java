@@ -3,11 +3,9 @@ package org.ihtsdo.concept.component.refsetmember.cidStr;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrMember;
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,7 +117,7 @@ public class CidStrMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new ArrayList<CidStrRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<CidStrRevision>();
 
         CidStrRevision rev = new CidStrRevision(); 
         rev.primordialComponent = obj; 
@@ -142,7 +140,7 @@ public class CidStrMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new ArrayList<CidStrRevision>(2);
+        obj.revisions = new CopyOnWriteArrayList<CidStrRevision>();
 
         CidStrRevision rev = new CidStrRevision(); 
         rev.primordialComponent = obj; 

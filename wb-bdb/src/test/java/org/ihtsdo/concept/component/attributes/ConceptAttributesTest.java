@@ -8,11 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -173,7 +172,7 @@ public class ConceptAttributesTest {
         vers.setDefined(true);
         obj.versions.add(vers);
         
-        obj.revisions = new ArrayList<ConceptAttributesRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
         ConceptAttributesRevision car = new ConceptAttributesRevision(1, obj); 
         car.primordialComponent = obj;
         car.sapNid = 21;
@@ -199,7 +198,7 @@ public class ConceptAttributesTest {
         vers.setDefined(false);
         obj.versions.add(vers);
         
-        obj.revisions = new ArrayList<ConceptAttributesRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
         ConceptAttributesRevision car = new ConceptAttributesRevision(2, obj); 
         car.primordialComponent = obj;
         car.sapNid = 22;

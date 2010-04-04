@@ -3,13 +3,9 @@ package org.ihtsdo.concept.component.refsetmember.membership;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.integer.IntMember;
-import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
-import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
-import org.ihtsdo.concept.component.refsetmember.membership.MembershipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,7 +116,7 @@ public class MembershipMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new ArrayList<MembershipRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<MembershipRevision>();
 
         MembershipRevision rev = new MembershipRevision(); 
         rev.primordialComponent = obj; 
@@ -140,7 +136,7 @@ public class MembershipMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new ArrayList<MembershipRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<MembershipRevision>();
 
         MembershipRevision rev = new MembershipRevision(); 
         rev.primordialComponent = obj; 

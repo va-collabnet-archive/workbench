@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -54,7 +55,7 @@ public class ConceptAttributes
 		super(eAttr, c);
 		defined = eAttr.isDefined();
 		if (eAttr.getRevisionList() != null) {
-			revisions = new ArrayList<ConceptAttributesRevision>(eAttr.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
 			for (EConceptAttributesRevision ear: eAttr.getRevisionList()) {
 				revisions.add(new ConceptAttributesRevision(ear, this));
 			}
@@ -148,9 +149,7 @@ public class ConceptAttributes
 			int additionalVersionCount = input.readShort();
 			if (additionalVersionCount > 0) {
 				if (revisions == null) {
-					revisions = new ArrayList<ConceptAttributesRevision>(additionalVersionCount);
-				} else {
-					revisions.ensureCapacity(revisions.size() + additionalVersionCount);
+					revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
 				}
 				for (int i = 0; i < additionalVersionCount; i++) {
 					ConceptAttributesRevision car = new ConceptAttributesRevision(input, this);

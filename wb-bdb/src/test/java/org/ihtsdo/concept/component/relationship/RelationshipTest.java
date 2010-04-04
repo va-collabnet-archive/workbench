@@ -8,11 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -175,7 +174,7 @@ public class RelationshipTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new ArrayList<RelationshipRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
 
         RelationshipRevision rev = new RelationshipRevision(); 
         rev.primordialComponent = obj; 
@@ -210,7 +209,7 @@ public class RelationshipTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new ArrayList<RelationshipRevision>(1);
+        obj.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
 
         RelationshipRevision rev = new RelationshipRevision(); 
         rev.primordialComponent = obj; 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -509,7 +510,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     public int primordialUNid = Integer.MIN_VALUE;
 
-    public ArrayList<R> revisions;
+    public CopyOnWriteArrayList<R> revisions;
 
     private ArrayList<IdentifierVersion> additionalIdentifierParts;
 
@@ -974,7 +975,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         boolean returnValue = false;
         Concept c = getEnclosingConcept();
         if (revisions == null) {
-            revisions = new ArrayList<R>(1);
+            revisions = new CopyOnWriteArrayList<R>();
             returnValue = revisions.add(r);
         } else if (revisions.size() == 0) {
             returnValue = revisions.add(r);

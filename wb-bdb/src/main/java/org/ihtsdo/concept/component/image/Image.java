@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
@@ -162,7 +163,7 @@ public class Image
 		typeNid = Bdb.uuidToNid(eImage.getTypeUuid());
 		primordialSapNid = Bdb.getSapNid(eImage);
 		if (eImage.getRevisionList() != null) {
-			revisions = new ArrayList<ImageRevision>(eImage.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<ImageRevision>();
 			for (EImageRevision eiv: eImage.getRevisionList()) {
 				revisions.add(new ImageRevision(eiv, this));
 			}

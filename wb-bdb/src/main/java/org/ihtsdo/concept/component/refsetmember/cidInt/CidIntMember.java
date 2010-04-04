@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.refsetmember.cidInt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -119,7 +120,7 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		intValue = refsetMember.getIntValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<CidIntRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<CidIntRevision>();
 			for (ERefsetCidIntRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidIntRevision(eVersion, this));
 			}

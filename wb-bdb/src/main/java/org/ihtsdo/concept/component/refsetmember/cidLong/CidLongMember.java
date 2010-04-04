@@ -1,7 +1,7 @@
 package org.ihtsdo.concept.component.refsetmember.cidLong;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -40,7 +40,7 @@ public class CidLongMember
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		longValue = refsetMember.getLongValue();
 		if (refsetMember.getRevisionList() != null) {
-			revisions = new ArrayList<CidLongRevision>(refsetMember.getRevisionList().size());
+			revisions = new CopyOnWriteArrayList<CidLongRevision>();
 			for (ERefsetCidLongRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidLongRevision(eVersion, this));
 			}
