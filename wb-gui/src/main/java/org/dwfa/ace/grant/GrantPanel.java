@@ -71,6 +71,7 @@ public class GrantPanel extends JPanel {
                                     .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
                                     .getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, grantorConfig);
                         uncommittedGrants.add(grantRel);
+                        Terms.get().addUncommitted(userConcept);
 
                     }
                 }
@@ -157,7 +158,7 @@ public class GrantPanel extends JPanel {
             try {
                 I_RelVersioned grant = (I_RelVersioned) addedGrantList.getSelectedValue();
                 uncommittedGrants.remove(grant);
-                userConcept.getUncommittedSourceRels().remove(grant);
+                Terms.get().forget(grant);
                 Terms.get().addUncommitted(userConcept);
 
             } catch (Exception ex) {
