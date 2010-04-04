@@ -298,7 +298,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	 * TODO make this trim algorithm more intelligent.
 	 */
 	private static void trimCache() {
-		while (mapperCache.size() >= 4) {
+	    boolean continueTrim = mapperCache.size() > 1;
+	    long now = System.currentTimeMillis();
+		while (continueTrim) {
 			Entry<I_Position, PositionMapper> looser = null;
 			for (Entry<I_Position, PositionMapper> entry : mapperCache
 					.entrySet()) {
@@ -316,7 +318,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
 					}
 				}
 			}
-			mapperCache.remove(looser.getKey());
+			if (now - looser.getValue().getLastRequestTime() > 1000) {
+	            mapperCache.remove(looser.getKey());
+	            continueTrim = mapperCache.size() > 1;
+			} else {
+			    continueTrim = false;
+			}
 		}
 	}
 

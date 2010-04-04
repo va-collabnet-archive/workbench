@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -249,7 +249,7 @@ public class PositionMapper {
 	
 	private static BdbPathManager pathManager;
 	
-	private static ArrayBlockingQueue<PositionMapper> mappersToSetup = new ArrayBlockingQueue<PositionMapper>(10);
+	private static LinkedBlockingQueue<PositionMapper> mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
 	
 	@SuppressWarnings("unused")
 	private static PositionMapperSetupManager setupManager = new PositionMapperSetupManager();

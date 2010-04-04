@@ -46,6 +46,7 @@ import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -1139,6 +1140,22 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
         this.viewPositions = positions;
         this.changeSupport.firePropertyChange("viewPositions", null, positions);
+        Terms.get().resetViewPositions();
+        toManyViewsWarning();
+    }
+
+    private void toManyViewsWarning() {
+        if (this.viewPositions.size() > 2 && aceFrame != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    JOptionPane.showMessageDialog(aceFrame, "<html>Selecting to many view positions may <br>"+
+                                                                  "cause the application to run out of memory.",
+                        "warning",
+                        JOptionPane.WARNING_MESSAGE);
+                }
+            });
+        }
     }
 
     /*
@@ -1300,6 +1317,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
         viewPositions.add(p);
         this.changeSupport.firePropertyChange("viewPositions", null, p);
+        toManyViewsWarning();
     }
 
     /*
@@ -1313,6 +1331,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             return;
         }
         viewPositions.remove(p);
+        Terms.get().resetViewPositions();
         this.changeSupport.firePropertyChange("viewPositions", p, null);
     }
 
@@ -1328,6 +1347,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         }
         this.viewPositions.remove(oldPosition);
         this.viewPositions.add(newPosition);
+        Terms.get().resetViewPositions();
         this.changeSupport.firePropertyChange("viewPositions", oldPosition, newPosition);
     }
 

@@ -599,4 +599,6 @@ public interface I_TermFactory {
     
     public List<I_Position> getPathChildren(int nid) throws TerminologyException;
     
+    public void resetViewPositions();
+    
 }

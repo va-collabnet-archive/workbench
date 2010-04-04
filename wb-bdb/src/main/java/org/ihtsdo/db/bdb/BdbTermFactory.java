@@ -1462,7 +1462,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception {
-        if (specRefsetHelper == null || specRefsetHelper.getConfig() == null) {
+        if (specRefsetHelper == null || specRefsetHelper.getConfig() != config) {
             specRefsetHelper = new SpecRefsetHelper(config);
         }
         return specRefsetHelper;
@@ -1611,4 +1611,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void setCheckCommitDataEnabled(boolean enabled) {
         BdbCommitManager.setCheckCommitDataEnabled(enabled);
     }
+    
+    public void resetViewPositions() {
+        Bdb.getSapDb().clearMapperCache();
+    }
+
 }
