@@ -353,9 +353,9 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         tf.newRelationship(UUID.randomUUID(), userConcept,
             tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
             tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+            tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
             tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, creatorConfig);
+            tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
         newConfig.getDbConfig().setUserConcept(userConcept);
         tf.addUncommitted(userConcept);
     }
