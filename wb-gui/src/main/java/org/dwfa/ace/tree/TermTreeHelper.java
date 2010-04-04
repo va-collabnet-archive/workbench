@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.ToolTipManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -97,6 +98,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         tree.setTransferHandler(new TerminologyTransferHandler(tree));
         tree.setDragEnabled(true);
+        ToolTipManager.sharedInstance().registerComponent(tree);
         renderer = new TermTreeCellRenderer(aceFrameConfig);
         tree.setCellRenderer(renderer);
         tree.setRootVisible(false);

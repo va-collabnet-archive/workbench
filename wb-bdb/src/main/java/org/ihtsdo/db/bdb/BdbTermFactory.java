@@ -1209,6 +1209,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
     }
 
+    public List<I_Position> getPathChildren(int nid) throws TerminologyException {
+        return pathManager.getPathChildren(nid);
+    }
+
     @Override
     public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
         pathManager.writeOrigin(path, origin, config);

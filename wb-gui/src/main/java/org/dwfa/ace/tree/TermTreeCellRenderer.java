@@ -188,14 +188,41 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                             }
                         }
 
+                        if (aceConfig.getClassificationRoot() != null &&
+                                aceConfig.getClassificationRoot().getConceptId() == cb.getConceptId()) {
+                            htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classification Root]</font>");
+                        }
+
+                        if (aceConfig.getClassificationRoleRoot() != null && 
+                                aceConfig.getClassificationRoleRoot().getConceptId() == cb.getConceptId()) {
+                            htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Role Root]</font>");
+                        }
+
                         if (showPathInfoInTaxonomy) {
                             if (Terms.get().pathExists(cb.getConceptId())) {
+                                addChildrenToolTipText(cb);
                                 I_Position latestInheritedViewPosition = null;
 
                                 for (I_Path editPath : aceConfig.getEditingPathSet()) {
                                     if (editPath.getConceptId() == cb.getConceptId()) {
                                         htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");
                                     }
+                                }
+
+                                for (I_Path promotionPath : aceConfig.getPromotionPathSet()) {
+                                    if (promotionPath.getConceptId() == cb.getConceptId()) {
+                                        htmlSuffixes.add("<font color='#669900'>&nbsp;[Promotion]</font>");
+                                    }
+                                }
+
+                                if (aceConfig.getClassifierInputPath() != null && 
+                                        aceConfig.getClassifierInputPath().getConceptId() == cb.getConceptId()) {
+                                    htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Input]</font>");
+                                }
+
+                                if (aceConfig.getClassifierOutputPath() != null &&
+                                        aceConfig.getClassifierOutputPath().getConceptId() == cb.getConceptId()) {
+                                    htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Output]</font>");
                                 }
 
                                 for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
@@ -411,6 +438,34 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
             AceLog.getAppLog().alertAndLogException(e);
         }
         return this;
+    }
+
+    private void addChildrenToolTipText(I_GetConceptDataForTree cb) throws TerminologyException, IOException {
+        StringBuffer toolTipText = new StringBuffer();
+        toolTipText.append("<html>");
+        int originCount = 0;
+         for (I_Position child: Terms.get().getPath(Terms.get().getUids(cb.getConceptId())).getOrigins()) {
+            originCount++;
+            toolTipText.append("<font color=blue>origin:</font> ");
+            toolTipText.append(child.toString());
+            toolTipText.append("<br>");
+        }
+        if (originCount == 0) {
+            toolTipText.append("no origins<br><br>");
+        } else {
+            toolTipText.append("<br>");
+        }
+        int childCount = 0;
+        for (I_Position child: Terms.get().getPathChildren(cb.getConceptId())) {
+            childCount++;
+            toolTipText.append("<font color=green>child:</font> ");
+            toolTipText.append(child.toString());
+            toolTipText.append("<br>");
+        }
+        if (childCount == 0) {
+            toolTipText.append("no children");
+        }
+        this.setToolTipText(toolTipText.toString());
     }
 
     public Rectangle getIconRect(int parentDepth) {

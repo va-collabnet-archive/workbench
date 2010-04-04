@@ -137,13 +137,13 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
                 		creatorConfig.getPromotionPathSet().size());
             	
             }
-            I_Path promotionPath = creatorConfig.getPromotionPathSet().iterator().next();
-            if (!creatorConfig.getEditingPathSet().contains(promotionPath)) {
-                createPromotionPath(newConfig, promotePathProfile);
+
+            if (!creatorConfig.getEditingPathSet().contains(creatorConfig.getPromotionPathSet().iterator().next())) {
+                I_Path newPromotionPath = createPromotionPath(newConfig, promotePathProfile);
                 // Add new promotion paths as origins to developer path...
-                for (I_Path devPath : newConfig.getEditingPathSet()) {
-                    for (I_Position devPathOrigin : devPath.getOrigins()) {
-                        devPathOrigin.getPath().addOrigin(tf.newPosition(promotionPath, Integer.MAX_VALUE), 
+                for (I_Path devPath : promotePathProfile.getEditingPathSet()) {
+                    for (I_Position devPathOrigin : Terms.get().getPathChildren(devPath.getConceptId())) {
+                        devPathOrigin.getPath().addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
                         		creatorConfig);
                     }
                 }
@@ -387,12 +387,14 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         return inputSet;
     }
 
-    private void createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
+    private I_Path createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
         for (I_Path promotionPath : commitConfig.getPromotionPathSet()) {
             I_Path newConfigPromotionPath = createNewPath(newConfig, commitConfig, new HashSet<I_Position>(
                 promotionPath.getOrigins()), " promotion path");
             newConfig.addPromotionPath(newConfigPromotionPath);
+            return newConfigPromotionPath;
         }
+        return null;
     }
 
     private I_Path createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<I_Position> positionSet,

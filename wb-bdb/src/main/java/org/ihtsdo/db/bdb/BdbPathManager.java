@@ -184,8 +184,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 							"Self-referencing origin in path: "
 									+ pathConcept.getDescriptions().iterator().next().getFirstTuple().getText());
 				} else {
-					HashSet<I_Position> prevOrigins = new HashSet<I_Position>();
-					Path path = getPath(conceptExtension.getC1Nid(), prevOrigins);
+					Path path = getPath(conceptExtension.getC1Nid());
 					result.add(new Position(conceptExtension.getIntValue(),
 							path));
 					result.addAll(path.getInheritedOrigins());
@@ -197,6 +196,29 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
+    
+    @SuppressWarnings("unchecked")
+    public List<I_Position> getPathChildren(int nid) throws TerminologyException {
+        try {
+            ArrayList<I_Position> children = new ArrayList<I_Position>();
+            Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
+            Concept originRefset = Bdb.getConceptDb().getConcept(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
+            for (RefsetMember extPart : originRefset.getExtensions()) {
+                assert extPart != null : "Null origin for: " + pathConcept.getNid();
+                CidIntMember cidIntExtension = (CidIntMember) extPart;
+                if (cidIntExtension.getC1Nid() == nid) {
+                    children.add(new Position(cidIntExtension.getIntValue(),
+                        getPath(cidIntExtension.getComponentId())));
+                } 
+            }
+            return children;
+        } catch (Exception e) {
+            throw new TerminologyException("Unable to retrieve path children.", e);
+        }
+    }
+
+	
+	
 	@SuppressWarnings("unchecked")
 	public List<I_Position> getPathOrigins(int nid) throws TerminologyException {
 		try {
@@ -212,9 +234,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 							"Self-referencing origin in path: "
 									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
 				} else {
-					HashSet<I_Position> prevOrigins = new HashSet<I_Position>();
 					result.add(new Position(conceptExtension.getIntValue(),
-							getPath(conceptExtension.getC1Nid(), prevOrigins)));
+							getPath(conceptExtension.getC1Nid())));
 				}
 			}
 			return result;
@@ -240,7 +261,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 				} else {
 					
 					Position anOrigin = new Position(conceptExtension.getIntValue(),
-							getPath(conceptExtension.getC1Nid(), prevOrigins));
+							getPath(conceptExtension.getC1Nid()));
 					if (prevOrigins.contains(anOrigin)) {
 						throw new TerminologyException("Cycle detected in path adding: " +
 								anOrigin + " to: " + prevOrigins);
@@ -254,7 +275,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	private Path getPath(int nid, HashSet<I_Position> prevOrigins)
+	private Path getPath(int nid)
 			throws PathNotExistsException, TerminologyException {
 		if (exists(nid)) {
 			return new Path(nid, getPathOrigins(nid));
