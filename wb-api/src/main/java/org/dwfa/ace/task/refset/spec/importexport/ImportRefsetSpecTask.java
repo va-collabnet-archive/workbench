@@ -102,14 +102,20 @@ public class ImportRefsetSpecTask extends AbstractTask {
             String outputFileName = (String) process.getProperty(outputFilePropName);
             Object pathObj = process.getProperty(pathUuidPropName);
             I_ConfigAceFrame importConfig = NewDefaultProfile.newProfile("", "", "", "", "");
-            importConfig.getEditingPathSet().clear();
             
             if (pathObj != null) {
+                importConfig.getEditingPathSet().clear();
+                importConfig.getViewPositionSet().clear();
                 UUID pathUuid  = (UUID) pathObj;
                 importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                importConfig.getViewPositionSet().add(Terms.get().newPosition(Terms.get().getPath(pathUuid), Integer.MAX_VALUE));
                 importConfig.setProperty("override", true);
                 importConfig.setProperty("pathUuid", pathUuid);
             } else {
+                importConfig.getEditingPathSet().clear();
+                importConfig.getViewPositionSet().clear();
+                importConfig.getEditingPathSet().addAll(Terms.get().getActiveAceFrameConfig().getEditingPathSet());
+                importConfig.getViewPositionSet().addAll(Terms.get().getActiveAceFrameConfig().getViewPositionSet());
                 importConfig.setProperty("override", false);
             }
 
