@@ -98,6 +98,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessConceptData;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
@@ -1531,9 +1532,32 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
         RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
-        Bdb.getConceptDb().iterateConceptDataInParallel(computer);
+        if (possibleIds.cardinality() > 500) {
+            Bdb.getConceptDb().iterateConceptDataInParallel(computer);
+        } else {
+            I_IterateIds possibleItr = possibleIds.iterator();
+            ConceptFetcher fetcher = new ConceptFetcher();
+            while (possibleItr.next()) {
+                 fetcher.setConcept(Concept.get(possibleItr.nid()));
+                computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
+            }
+        }
         computer.addUncommitted();
         BdbCommitManager.commit();
+    }
+    
+    private static class ConceptFetcher implements I_FetchConceptFromCursor {
+        Concept concept;
+
+        public void setConcept(Concept concept) {
+            this.concept = concept;
+        }
+
+        @Override
+        public Concept fetch() {
+            return concept;
+        }
+        
     }
 
     @Override

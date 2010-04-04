@@ -26,7 +26,6 @@ import org.dwfa.ace.api.I_HelpMarkedParentRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;

@@ -48,10 +48,14 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
     private int memberTypeId;
     private int memberRefsetId;
 
+    private MarkedParentRefsetHelper markedParentHelper;
+
     public MemberRefsetHelper(I_ConfigAceFrame frameConfig, int memberRefsetId, int memberTypeId) throws Exception {
         super(frameConfig);
         setMemberRefsetId(memberRefsetId);
         setMemberTypeId(memberTypeId);
+        markedParentHelper = new MarkedParentRefsetHelper(frameConfig, memberRefsetId, memberTypeId);
+
     }
 
     /* (non-Javadoc)
@@ -112,14 +116,14 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#addMarkedParents(java.lang.Integer)
 	 */
     public void addMarkedParents(Integer... conceptIds) throws Exception {
-        new MarkedParentRefsetHelper(getConfig(), memberRefsetId, memberTypeId).addParentMembers(conceptIds);
+        markedParentHelper.addParentMembers(conceptIds);
     }
 
     /* (non-Javadoc)
 	 * @see org.ihtsdo.db.bdb.computer.refset.I_HelpMemberRefsets#removeMarkedParents(java.lang.Integer)
 	 */
     public void removeMarkedParents(Integer... conceptIds) throws Exception {
-        new MarkedParentRefsetHelper(getConfig(), memberRefsetId, memberTypeId).removeParentMembers(conceptIds);
+        markedParentHelper.removeParentMembers(conceptIds);
     }
 
     /* (non-Javadoc)

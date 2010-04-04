@@ -495,7 +495,6 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     }
 
     public void windowClosing(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowClosing()");
         boolean okToClose = false;
         if (ComponentFrame.class.isAssignableFrom(this.frame.getClass())) {
             ComponentFrame cf = (ComponentFrame) this.frame;
@@ -513,36 +512,30 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     }
 
     public void windowClosed(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowClosed()");
         OpenFrames.removeFrame(null);
     }
 
     public void windowIconified(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowIconified()");
-        OpenFrames.removeFrame(null);
+         OpenFrames.removeFrame(null);
     }
 
     public void windowDeiconified(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowDeiconified()");
         if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
             OpenFrames.addFrame(frame);
         }
     }
 
     public void windowActivated(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowActivated() " + frame.getTitle());
         if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
             OpenFrames.addFrame(frame);
         }
     }
 
     public void windowDeactivated(WindowEvent e) {
-        System.out.println("ComponentFrameBean: windowDeactivated() " + frame.getTitle());
         OpenFrames.removeFrame(null);
     }
 
     public void openApplication() {
-        System.out.println("ComponentFrameBean: openApplication()");
         if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
             OpenFrames.addFrame(frame);
         }
@@ -557,7 +550,6 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     }
 
     public void reOpenApplication() {
-        System.out.println("ComponentFrameBean: reOpenApplication()");
         if (PhantomFrame.class.isAssignableFrom(frame.getClass()) == false) {
             OpenFrames.addFrame(frame);
         }

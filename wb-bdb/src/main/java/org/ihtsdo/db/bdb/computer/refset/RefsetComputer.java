@@ -48,6 +48,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
     private I_ConfigAceFrame frameConfig;
+    private RefsetSpec specHelper;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
             I_RepresentIdSet possibleIds) throws Exception {
@@ -90,6 +91,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         activity.setValue(0);
         activity.setMaximum(conceptCount);
         activity.setIndeterminate(false);
+        specHelper = new RefsetSpec(refsetConcept, true);
+
     }
 
     private I_RepresentIdSet filterNonCurrentRefsetMembers(Collection<? extends I_ExtendByRef> allRefsetMembers,
@@ -115,8 +118,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         Concept concept = fcfc.fetch();
 
-        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true);
-
         if (possibleCNids.isMember(cNid)) {
             if (specHelper.isDescriptionComputeType()) {
 
@@ -134,37 +135,39 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     }
 
     private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid) throws Exception {
-        boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
+        if (possibleCNids.isMember(componentNid)) {
+            boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-        if (query.execute(component)) {
-            members.incrementAndGet();
-            if (!containsCurrentMember) {
-                newMembers.incrementAndGet();
-                memberRefsetHelper.newRefsetExtension(refsetNid, componentNid,
-                    ReferenceConcepts.NORMAL_MEMBER.getNid(), false);
-                memberRefsetHelper.addMarkedParents(new Integer[] { conceptNid });
+            if (query.execute(component)) {
+                members.incrementAndGet();
+                if (!containsCurrentMember) {
+                    newMembers.incrementAndGet();
+                    memberRefsetHelper.newRefsetExtension(refsetNid, componentNid,
+                        ReferenceConcepts.NORMAL_MEMBER.getNid(), false);
+                    memberRefsetHelper.addMarkedParents(new Integer[] { conceptNid });
+                }
+            } else {
+                if (containsCurrentMember) {
+                    retiredMembers.incrementAndGet();
+                    memberRefsetHelper.retireRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER
+                        .getNid());
+                    memberRefsetHelper.removeMarkedParents(new Integer[] { conceptNid });
+                }
             }
-        } else {
-            if (containsCurrentMember) {
-                retiredMembers.incrementAndGet();
-                memberRefsetHelper.retireRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER
-                    .getNid());
-                memberRefsetHelper.removeMarkedParents(new Integer[] { conceptNid });
-            }
-        }
-        int completed = processedCount.incrementAndGet();
-        if (completed % 5000 == 0) {
-            activity.setValue(completed);
-            if (!canceled) {
-                long endTime = System.currentTimeMillis();
+            int completed = processedCount.incrementAndGet();
+            if (completed % 5000 == 0) {
+                activity.setValue(completed);
+                if (!canceled) {
+                    long endTime = System.currentTimeMillis();
 
-                long elapsed = endTime - startTime;
-                String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+                    long elapsed = endTime - startTime;
+                    String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
 
-                String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
+                    String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
 
-                activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
-                    + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: " + retiredMembers.get());
+                    activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
+                        + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: " + retiredMembers.get());
+                }
             }
         }
     }
