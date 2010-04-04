@@ -113,7 +113,7 @@ public class ConceptConceptExtTupleFileUtil {
                 return false;
             }
 
-            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
             refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 

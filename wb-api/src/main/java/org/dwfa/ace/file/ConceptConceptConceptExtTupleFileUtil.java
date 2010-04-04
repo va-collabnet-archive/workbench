@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
@@ -118,7 +117,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
                 return false;
             }
 
-            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
             refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
