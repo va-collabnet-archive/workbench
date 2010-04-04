@@ -244,11 +244,14 @@ public class RefsetSpec {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
-        for (I_RelTuple rel : relationships) {
-            if (rel.getVersion() > latestVersion) {
-                latestVersion = rel.getVersion();
-                latestTarget = Terms.get().getConcept(rel.getC2Id());
+        if (concept != null) {
+            //TODO should use the version computer
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+            for (I_RelTuple rel : relationships) {
+                if (rel.getVersion() > latestVersion) {
+                    latestVersion = rel.getVersion();
+                    latestTarget = Terms.get().getConcept(rel.getC2Id());
+                }
             }
         }
 
@@ -271,11 +274,14 @@ public class RefsetSpec {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
-        for (I_RelTuple rel : relationships) {
-            if (rel.getVersion() > latestVersion) {
-                latestVersion = rel.getVersion();
-                latestTarget = Terms.get().getConcept(rel.getC1Id());
+        if (concept != null) {
+            //TODO should use the version computer
+            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
+            for (I_RelTuple rel : relationships) {
+                if (rel.getVersion() > latestVersion) {
+                    latestVersion = rel.getVersion();
+                    latestTarget = Terms.get().getConcept(rel.getC1Id());
+                }
             }
         }
 
@@ -298,11 +304,14 @@ public class RefsetSpec {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
-        List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
-        for (I_RelTuple rel : relationships) {
-            if (rel.getVersion() > latestVersion) {
-                latestVersion = rel.getVersion();
-                latestRel = rel;
+        if (concept != null) {
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+            //TODO should use the version computer
+           for (I_RelTuple rel : relationships) {
+                if (rel.getVersion() > latestVersion) {
+                    latestVersion = rel.getVersion();
+                    latestRel = rel;
+                }
             }
         }
 
