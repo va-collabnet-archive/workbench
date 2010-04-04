@@ -425,9 +425,9 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         Terms.get().newRelationship(UUID.randomUUID(), pathConcept,
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
+        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, commitConfig);
 
         return Terms.get().newPath(positionSet, pathConcept, commitConfig);
     }
