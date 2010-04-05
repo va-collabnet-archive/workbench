@@ -122,9 +122,6 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	        		c.toLongString());
 		} else {
 			EConcept eC = computer.getEConcept(c);
-            AceLog.getAppLog().info("Write time: " + time + " ("
-                + TimeUtil.formatDateForFile(time)+ ")");
-            AceLog.getAppLog().info("eConcept: " + eC.toString());
             writePermit.acquireUninterruptibly();
 	        tempOut.writeLong(time);
 			eC.writeExternal(tempOut);
