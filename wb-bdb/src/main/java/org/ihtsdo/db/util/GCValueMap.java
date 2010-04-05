@@ -64,12 +64,15 @@ public abstract class GCValueMap<T> {
 
 
 	public T get(Object key) {
+	    return null;
+	    /*
 		Reference<T> ref = impl.get(key);
 		if (ref != null) {
 			T c = ref.get();
 			return c;
 		}
 		return null;
+		*/
 	}
 
 
@@ -106,6 +109,8 @@ public abstract class GCValueMap<T> {
 			Reference<T> newRef);
 	
 	public T putIfAbsent(Integer key, T c) {
+	    return null;
+	    /*
 		Reference<T> newRef = null;
 		newRef = makeReference(c, newRef);
 		Reference<T> oldRef = impl.putIfAbsent(key, newRef);
@@ -121,6 +126,7 @@ public abstract class GCValueMap<T> {
 			}
 		}
 		return oldConcept;
+		*/
 	}
 
 	public Collection<Reference<T>> values() {
