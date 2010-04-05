@@ -64,11 +64,11 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 			input.mark(8);
 			int nid = input.readInt();
 			input.reset();
-			RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) Concept.componentMap.get(nid);
+			RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) Concept.componentsCRHM.get(nid);
 			if (nidToRefsetMemberMap != null && nidToRefsetMemberMap.containsKey(nid)) {
 				if (refsetMember == null) {
 					refsetMember = nidToRefsetMemberMap.get(nid);
-					RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentMap.putIfAbsent(nid, refsetMember);
+					RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentsCRHM.putIfAbsent(nid, refsetMember);
 					if (oldMember != null) {
 						refsetMember = oldMember;
 						if (nidToRefsetMemberMap != null) {
@@ -82,8 +82,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 					if (refsetMember == null) {
 						refsetMember = factory.create(nid, typeNid, enclosingConcept, input);
 						if (refsetMember.getTime() != Long.MIN_VALUE) {
-						    Concept.componentMap.putIfAbsent(nid, refsetMember);
-	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentMap.putIfAbsent(nid, refsetMember);
+						    Concept.componentsCRHM.putIfAbsent(nid, refsetMember);
+	                        RefsetMember<?, ?> oldMember = (RefsetMember<?, ?>) Concept.componentsCRHM.putIfAbsent(nid, refsetMember);
 	                        if (oldMember != null) {
 	                            refsetMember = oldMember;
 	                            if (nidToRefsetMemberMap != null) {

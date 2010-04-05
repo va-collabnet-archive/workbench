@@ -72,12 +72,12 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			int nid = input.readInt();
 			// we have to put it back so the component can read it again...
 			input.reset();
-			C conceptComponent = (C) Concept.componentMap.get(nid);
+			C conceptComponent = (C) Concept.componentsCRHM.get(nid);
 			if (nidToConceptComponentMap != null && 
 			        nidToConceptComponentMap.containsKey(nid)) {
 				if (conceptComponent == null) {
 					conceptComponent = nidToConceptComponentMap.get(nid);
-					C oldComponent = (C) Concept.componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
+					C oldComponent = (C) Concept.componentsCRHM.putIfAbsent(conceptComponent.nid, conceptComponent);
 					if (oldComponent != null) {
 						conceptComponent = oldComponent;
 						if (nidToConceptComponentMap != null) {
@@ -91,7 +91,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 					if (conceptComponent == null) {
 						conceptComponent = factory.create(enclosingConcept, input);
 						if (conceptComponent.getTime() != Long.MIN_VALUE) {
-	                        C oldComponent = (C) Concept.componentMap.putIfAbsent(conceptComponent.nid, conceptComponent);
+	                        C oldComponent = (C) Concept.componentsCRHM.putIfAbsent(conceptComponent.nid, conceptComponent);
 	                        if (oldComponent != null) {
 	                            conceptComponent = oldComponent;
 	                            if (nidToConceptComponentMap != null) {

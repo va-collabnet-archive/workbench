@@ -1,5 +1,5 @@
 package org.ihtsdo.concept;
-
+ 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+
+import jsr166y.ConcurrentReferenceHashMap;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -58,7 +60,6 @@ import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.util.GCValueComponentMap;
-import org.ihtsdo.db.util.GCValueConceptMap;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
@@ -74,10 +75,18 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public static ReferenceType refType = ReferenceType.WEAK;
 
-	public static GCValueConceptMap concepts = new GCValueConceptMap(refType);
-	public static GCValueComponentMap componentMap = new GCValueComponentMap(refType);
+	//public static GCValueConceptMap concepts = new GCValueConceptMap(refType);
+	//public static GCValueComponentMap componentMap = new GCValueComponentMap(refType);
 	
+    public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM = 
+        new ConcurrentReferenceHashMap<Integer, Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG, 
+                ConcurrentReferenceHashMap.ReferenceType.WEAK);
 
+    public static ConcurrentReferenceHashMap<Integer, Object> componentsCRHM = 
+        new ConcurrentReferenceHashMap<Integer, Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG, 
+                ConcurrentReferenceHashMap.ReferenceType.WEAK);
+
+    
 	public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
 		int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
@@ -459,28 +468,29 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public static Concept get(int nid) throws IOException {
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
-		Concept c = concepts.get(nid);
+		Concept c = conceptsCRHM.get(nid);
 		if (c == null) {
 			Concept newC = new Concept(nid);
-			c = concepts.putIfAbsent(nid, newC);
+			c = conceptsCRHM.putIfAbsent(nid, newC);
 			if (c == null) {
 				c = newC;
 			}
 		}
+		conceptsCRHM.put(nid, c);
 		return c;
 	}
 	
 	public static Concept getIfInMap(int nid) {
-	    return concepts.get(nid);
+	    return conceptsCRHM.get(nid);
 	}
 
 	public static Concept get(int nid, byte[] roBytes, byte[] mutableBytes)
 			throws IOException {
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
-		Concept c = concepts.get(nid);
+		Concept c = conceptsCRHM.get(nid);
 		if (c == null) {
 			Concept newC = new Concept(nid, roBytes, mutableBytes);
-			c = concepts.putIfAbsent(nid, newC);
+			c = conceptsCRHM.putIfAbsent(nid, newC);
 			if (c == null) {
 				c = newC;
 			}
@@ -1648,23 +1658,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		return false;
 	}
-
-	
-	protected void finalize() throws Throwable {
-        if (isUnwritten() && !isCanceled()) {
-            try {
-            	synchronized (concepts) {
-            		if (isUnwritten()) {
-                    	concepts.remove(nid);
-                        BdbCommitManager.writeImmediate(this);
-            		}
-				}
-            }
-            finally {
-                super.finalize();
-            }
-        }
-    }
 	
 	public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
 	      throws IOException {
