@@ -130,8 +130,9 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                 countConAdded++;
 
                 for (I_RelTuple rt : relTupList) {
-                    snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeId(), rt
-                            .getGroup(), countRelAdded));
+                    if (snorels != null)
+                        snorels.add(new SnoRel(rt.getC1Id(), rt.getC2Id(), rt.getTypeId(), rt
+                                .getGroup(), countRelAdded));
                     countRelAdded++;
                 }
             }
