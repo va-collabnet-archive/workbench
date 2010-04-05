@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +75,7 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
@@ -574,180 +576,158 @@ public class RefsetSpecPanel extends JPanel {
     private class DisapproveActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            try {
-
-                I_TermFactory tf = Terms.get();
-
-                int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-                IntSet currentSet = new IntSet();
-                currentSet.add(currentNid);
-                Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
-
-                PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
-                for (Integer tupleMemberId : tupleMemberIds) {
-                    I_ExtendByRef tupleVersioned = tf.getExtension(tupleMemberId);
-                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
-                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
-                        int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
-                        if (promotionRefsetId == extForMember.getRefsetId()) {
-                            List<? extends I_ExtendByRefVersion> promotionTuples =
-                                    extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
-                                        .getViewPositionSetReadOnly(), false, false);
-                            if (promotionTuples.size() > 0) {
-                                I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
-                                if (promotionPart instanceof I_ExtendByRefPartCid) {
-
-                                    for (I_Path p : aceFrameConfig.getEditingPathSet()) {
-
-                                        int approveId;
-
-                                        I_ExtendByRefPartCid clone =
-                                                (I_ExtendByRefPartCid) promotionPart.makeAnalog(promotionPart
-                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
-
-                                        if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
-                                            .localize().getNid()) {
-                                            break;
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
-                                            .localize().getNid()) {
-                                            break;
-                                        } else {
-                                            break;
-                                        }
-
-                                        clone.setC1id(approveId);
-                                        extForMember.addVersion(clone);
-                                        tf.addUncommittedNoChecks(extForMember);
-                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
-                                            currentSet);
-                                        tf.addUncommittedNoChecks(extForMember);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                tf.commit();
-
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-
-            refsetTableModel.clearSelectedTuples();
-            selectAllCheckBox.setSelected(false);
-            refsetTable.getTableHeader().repaint();
+            Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
+            processSelection(tupleMemberIds, false);
         }
+
+
     }
 
     private class ApproveActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
+            processSelection(tupleMemberIds, true);
+        }
+    }
+    
+    private static HashMap<Integer, PROMOTION_STATUS> promotionStatusMap = new HashMap<Integer, PROMOTION_STATUS>();
+
+    private enum PROMOTION_STATUS {
+        REVIEWED_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION),
+        REVIEWED_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION),
+        REVIEWED_NOT_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION),
+        REVIEWED_NOT_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION),
+        UNREVIEWED_NEW_ADDITION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION),
+        UNREVIEWED_NEW_DELETION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION);
+        
+        private int nid;
+
+        public int getNid() {
+            return nid;
+        }
+
+        private PROMOTION_STATUS(I_ConceptualizeUniversally c){
             try {
+                nid = c.localize().getNid();
+                promotionStatusMap.put(nid, this);
+            } catch (TerminologyException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        
+        public static PROMOTION_STATUS get(int nid) {
+            return promotionStatusMap.get(nid);
+        }
+        
+    }
 
-                I_TermFactory tf = Terms.get();
+    
+    private void processSelection(Set<Integer> tupleMemberIds, boolean forApproval) {
+        try {
+            int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+            IntSet currentSet = new IntSet();
+            currentSet.add(currentNid);
+            Set<I_GetConceptData> refsetConcepts = new HashSet<I_GetConceptData>();
 
-                int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-                IntSet currentSet = new IntSet();
-                currentSet.add(currentNid);
-                Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
+            PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
+            for (Integer tupleMemberId : tupleMemberIds) {
+                
+                I_ExtendByRef tupleVersioned = Terms.get().getExtension(tupleMemberId);
+                refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
+                
+                for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
+                    RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
+                    int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
+                    if (promotionRefsetId == extForMember.getRefsetId()) {
+                        List<? extends I_ExtendByRefVersion> promotionTuples =
+                                extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
+                                    .getViewPositionSetReadOnly(), false, false);
+                        if (promotionTuples.size() > 0) {
+                            I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                            if (promotionPart instanceof I_ExtendByRefPartCid) {
+                                for (I_Path p : aceFrameConfig.getEditingPathSet()) {
 
-                PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
-                for (Integer tupleMemberId : tupleMemberIds) {
-                    I_ExtendByRef tupleVersioned = tf.getExtension(tupleMemberId);
-                    for (I_ExtendByRef extForMember : tf.getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
-                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
-                        int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
-                        if (promotionRefsetId == extForMember.getRefsetId()) {
-                            List<? extends I_ExtendByRefVersion> promotionTuples =
-                                    extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
-                                        .getViewPositionSetReadOnly(), false, false);
-                            if (promotionTuples.size() > 0) {
-                                I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
-                                if (promotionPart instanceof I_ExtendByRefPartCid) {
-                                    for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+                                    I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
+                                    PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
+                                    PROMOTION_STATUS newStatus = null;
+                                    if (forApproval) {
+                                        newStatus = getNewStatusForApproval(oldStatus);
+                                    } else {
+                                        newStatus = getNewStatusForDisapproval(oldStatus);
+                                    }
 
-                                        int approveId;
-
-                                        I_ExtendByRefPartCid clone =
-                                                (I_ExtendByRefPartCid) promotionPart.makeAnalog(promotionPart
-                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
-
-                                        if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
-                                            .localize().getNid()) {
-                                            break;
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
-                                            .localize().getNid()) {
-                                            break;
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION
-                                                        .localize().getNid();
-                                        } else if (clone.getC1id() == ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
-                                            .localize().getNid()) {
-                                            approveId =
-                                                    ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION
-                                                        .localize().getNid();
-                                        } else {
-                                            break;
-                                        }
-
-                                        clone.setC1id(approveId);
-                                        extForMember.addVersion(clone);
-                                        tf.addUncommittedNoChecks(extForMember);
+                                    if (newStatus != null) {
+                                        I_ExtendByRefPartCid analog = (I_ExtendByRefPartCid) 
+                                            partToPromote.makeAnalog(promotionPart.getStatusId(), 
+                                                p.getConceptId(), Long.MAX_VALUE);
+                                        analog.setC1id(newStatus.getNid());
+                                    
+                                        extForMember.addVersion(analog);
                                         extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
                                             currentSet);
-                                        tf.addUncommittedNoChecks(extForMember);
                                     }
                                 }
                             }
                         }
                     }
                 }
-
-                tf.commit();
-
-            } catch (Exception e1) {
-                e1.printStackTrace();
             }
 
-            refsetTableModel.clearSelectedTuples();
-            selectAllCheckBox.setSelected(false);
-            refsetTable.getTableHeader().repaint();
+            for (I_GetConceptData refset: refsetConcepts) {
+                Terms.get().addUncommittedNoChecks(refset);
+            }
+            Terms.get().commit();
+
+        } catch (Exception e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
         }
+
+        refsetTableModel.clearSelectedTuples();
+        selectAllCheckBox.setSelected(false);
+        refsetTable.getTableHeader().repaint();
     }
 
+    private PROMOTION_STATUS getNewStatusForApproval(PROMOTION_STATUS oldStatus) {
+        switch (oldStatus) {
+        case REVIEWED_APPROVED_ADDITION:
+            return null;
+        case REVIEWED_APPROVED_DELETION:
+            return null;
+        case REVIEWED_NOT_APPROVED_ADDITION:
+            return PROMOTION_STATUS.REVIEWED_APPROVED_ADDITION;
+        case REVIEWED_NOT_APPROVED_DELETION:
+            return PROMOTION_STATUS.REVIEWED_APPROVED_DELETION;
+        case UNREVIEWED_NEW_ADDITION:
+            return PROMOTION_STATUS.REVIEWED_APPROVED_ADDITION;
+        case UNREVIEWED_NEW_DELETION:
+            return PROMOTION_STATUS.REVIEWED_APPROVED_DELETION;
+        default:
+           throw new RuntimeException("Can't handle promotion status: " + oldStatus);
+        }
+    }
+    
+    private PROMOTION_STATUS getNewStatusForDisapproval(PROMOTION_STATUS oldStatus) {
+        switch (oldStatus) {
+        case REVIEWED_APPROVED_ADDITION:
+            return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_ADDITION;
+        case REVIEWED_APPROVED_DELETION:
+            return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_DELETION;
+        case REVIEWED_NOT_APPROVED_ADDITION:
+            return null;
+        case REVIEWED_NOT_APPROVED_DELETION:
+            return null;
+        case UNREVIEWED_NEW_ADDITION:
+            return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_ADDITION;
+        case UNREVIEWED_NEW_DELETION:
+            return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_DELETION;
+        default:
+           throw new RuntimeException("Can't handle promotion status: " + oldStatus);
+        }
+    }
+    
     public boolean getShowPromotionCheckBoxes() {
         return showPromotionCheckBoxes;
     }
