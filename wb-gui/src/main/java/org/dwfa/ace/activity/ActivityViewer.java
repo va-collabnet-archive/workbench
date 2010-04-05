@@ -47,6 +47,11 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.ComponentFrame;
 
+/**
+ * TODO get this viewer to work more directly with the java 6 Swing worker.  
+ * @author kec
+ *
+ */
 public class ActivityViewer {
 
     private static ActivityViewer viewer;
