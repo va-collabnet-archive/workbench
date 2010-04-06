@@ -59,7 +59,6 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-import org.ihtsdo.db.util.GCValueComponentMap;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
@@ -74,9 +73,6 @@ import org.ihtsdo.lucene.LuceneManager;
 public class Concept implements I_Transact, I_GetConceptData {
 
 	public static ReferenceType refType = ReferenceType.WEAK;
-
-	//public static GCValueConceptMap concepts = new GCValueConceptMap(refType);
-	//public static GCValueComponentMap componentMap = new GCValueComponentMap(refType);
 	
     public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM = 
         new ConcurrentReferenceHashMap<Integer, Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG, 

@@ -1,6 +1,5 @@
 package org.ihtsdo.concept;
 
-import org.ihtsdo.db.util.GCValueComponentMap;
 
 public interface I_BindConceptComponents {
 

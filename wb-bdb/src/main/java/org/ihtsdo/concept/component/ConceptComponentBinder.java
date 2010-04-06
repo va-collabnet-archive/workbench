@@ -11,7 +11,6 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_BindConceptComponents;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.util.GCValueComponentMap;
 
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;

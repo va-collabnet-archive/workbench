@@ -11,18 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponentBinder;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.util.GCValueComponentMap;
-import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
