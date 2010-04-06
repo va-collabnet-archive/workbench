@@ -90,6 +90,7 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
@@ -627,7 +628,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public boolean hasPath(int nid) throws IOException {
-        throw new UnsupportedOperationException();
+        try {
+            return pathManager.get(nid) != null;
+        } catch (PathNotExistsException e) {
+            return false;
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return false;
     }
 
     @Override
