@@ -332,6 +332,10 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         }
         return columns.length;
     }
+    
+    public int getFixedColumnCount() {
+        return columns.length;
+    }
 
     public String getColumnName(int col) {
         if (col >= columns.length) {
