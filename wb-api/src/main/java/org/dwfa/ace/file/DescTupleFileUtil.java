@@ -75,17 +75,18 @@ public class DescTupleFileUtil {
                 typeUuid = UUID.fromString(lineParts[6]);
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[7]);
-                    if (!Terms.get().hasId(pathUuid)) {
-                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                    importConfig.setProperty("pathUuid", pathUuid);
                 } 
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "Desc: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -97,7 +98,7 @@ public class DescTupleFileUtil {
                 lang = lineParts[4];
                 initialCapSignificant = Boolean.parseBoolean(lineParts[5]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse boolean " + e.getMessage();
+                String errorMessage = "Desc: Cannot parse boolean " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -107,7 +108,7 @@ public class DescTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
+                String errorMessage = "Desc: Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -117,17 +118,17 @@ public class DescTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage = "conceptUuid has no identifier - skipping import of this desc tuple.";
+                String errorMessage = "Desc: conceptUuid has no identifier - skipping import of this desc tuple.";
                 throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this desc tuple.";
+                String errorMessage = "Desc: statusUuid has no identifier - skipping import of this desc tuple.";
                 throw new Exception(errorMessage);
             }
 
             if (!termFactory.hasId(typeUuid)) {
-                String errorMessage = "typeUuid has no identifier - skipping import of this desc tuple.";
+                String errorMessage = "Desc: typeUuid has no identifier - skipping import of this desc tuple.";
                 throw new Exception(errorMessage);
             }
 
@@ -167,13 +168,13 @@ public class DescTupleFileUtil {
                     }
                 }
             } else {
-                outputFileWriter.write("Error on line " + lineCount + " : ");
+                outputFileWriter.write("Desc: Error on line " + lineCount + " : ");
                 outputFileWriter.write("No concept id : " + conceptUuid + " for desc: " + descUuid + "\nLind: " + inputLine);
                 outputFileWriter.newLine();
                 return false;
             }
         } catch (Exception e) {
-            String errorMessage = "Exception thrown while importing desc tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Desc: Exception thrown while importing desc tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

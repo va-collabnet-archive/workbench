@@ -82,16 +82,18 @@ public class StringExtTupleFileUtil {
                 extString = lineParts[5];
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[6]);
-                    if (!Terms.get().hasId(pathUuid)) {
-                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                 } 
                 statusUuid = UUID.fromString(lineParts[7]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "Str: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -101,7 +103,7 @@ public class StringExtTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[8]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
+                String errorMessage = "Str: Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -113,22 +115,22 @@ public class StringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - skipping import of this string ext tuple.";
+                String errorMessage = "Str: Refset UUID has no identifier - skipping import of this string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - skipping import of this string ext tuple.";
+                String errorMessage = "Str: Component UUID has no identifier - skipping import of this string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this string ext tuple.";
+                String errorMessage = "Str: statusUuid has no identifier - skipping import of this string ext tuple.";
                 throw new Exception(errorMessage);
             }
             try {
                 refsetHelper.newStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
                     componentUuid).getNid(), extString, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new string refset extension";
+                String errorMessage = "Str: Exception thrown while creating new string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -136,7 +138,7 @@ public class StringExtTupleFileUtil {
             }
 
         } catch (Exception e) {
-            String errorMessage = "Exception thrown while importing string ext tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Str: Exception thrown while importing string ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

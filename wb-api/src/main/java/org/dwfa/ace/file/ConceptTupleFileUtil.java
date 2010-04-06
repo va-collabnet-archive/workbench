@@ -73,13 +73,18 @@ public class ConceptTupleFileUtil {
                 conceptUuid = UUID.fromString(lineParts[1]);
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[3]);
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                    importConfig.setProperty("pathUuid", pathUuid);
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
+                        throw new Exception(errorMessage);
+                    }
                 } 
                 statusUuid = UUID.fromString(lineParts[4]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "Concept: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -89,7 +94,7 @@ public class ConceptTupleFileUtil {
             try {
                 isDefined = Boolean.parseBoolean(lineParts[2]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse boolean from string -> boolean " + e.getMessage();
+                String errorMessage = "Concept: Cannot parse boolean from string -> boolean " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -99,7 +104,7 @@ public class ConceptTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[5]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse integer from string -> Long " + e.getMessage();
+                String errorMessage = "Concept: Cannot parse integer from string -> Long " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -109,7 +114,7 @@ public class ConceptTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this concept tuple.";
+                String errorMessage = "Concept: statusUuid has no identifier - skipping import of this concept tuple.";
                 throw new Exception(errorMessage);
             }
 

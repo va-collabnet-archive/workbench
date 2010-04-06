@@ -92,17 +92,18 @@ public class ConceptConceptStringExtTupleFileUtil {
                 strValue = lineParts[7];
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[8]);
-                    if (!Terms.get().hasId(pathUuid)) {
-                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                    importConfig.setProperty("pathUuid", pathUuid);
                 } 
                 statusUuid = UUID.fromString(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "CidCidStr: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -112,7 +113,7 @@ public class ConceptConceptStringExtTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[10]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
+                String errorMessage = "CidCidStr: Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -125,27 +126,27 @@ public class ConceptConceptStringExtTupleFileUtil {
 
             if (!termFactory.hasId(refsetUuid)) {
                 String errorMessage =
-                        "Refset UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                        "CidCidStr: Refset UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
                 String errorMessage =
-                        "Component UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                        "CidCidStr: Component UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c1Uuid)) {
                 String errorMessage =
-                        "c1Uuid UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
+                        "CidCidStr: c1Uuid UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
                 String errorMessage =
-                        "c2Uuid has no identifier - skipping import of this concept-concept-string ext tuple.";
+                        "CidCidStr: c2Uuid has no identifier - skipping import of this concept-concept-string ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
                 String errorMessage =
-                        "statusUuid has no identifier - skipping import of this concept-concept-string ext tuple.";
+                        "CidCidStr: statusUuid has no identifier - skipping import of this concept-concept-string ext tuple.";
                 throw new Exception(errorMessage);
             }
 
@@ -154,7 +155,7 @@ public class ConceptConceptStringExtTupleFileUtil {
                     .getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(c2Uuid)
                     .getNid(), strValue, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new concept-concept-string refset extension";
+                String errorMessage = "CidCidStr: Exception thrown while creating new concept-concept-string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -163,7 +164,7 @@ public class ConceptConceptStringExtTupleFileUtil {
 
         } catch (Exception e) {
             String errorMessage =
-                    "Exception thrown while importing concept-concept-string ext tuple : " + e.getLocalizedMessage();
+                    "CidCidStr: Exception thrown while importing concept-concept-string ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

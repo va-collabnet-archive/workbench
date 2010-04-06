@@ -80,17 +80,18 @@ public class IntExtTupleFileUtil {
                 componentUuid = UUID.fromString(lineParts[3]);
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[6]);
-                    if (!Terms.get().hasId(pathUuid)) {
-                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                    importConfig.setProperty("pathUuid", pathUuid);
                 } 
                 statusUuid = UUID.fromString(lineParts[7]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "Int: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -100,7 +101,7 @@ public class IntExtTupleFileUtil {
             try {
                 value = Integer.parseInt(lineParts[5]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string: " + e.getMessage();
+                String errorMessage = "Int: Cannot parse Integer from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -110,7 +111,7 @@ public class IntExtTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[8]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
+                String errorMessage = "Int: Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -122,15 +123,15 @@ public class IntExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Refset UUID has no identifier - skipping import of this int ext tuple.";
+                String errorMessage = "Int: Refset UUID has no identifier - skipping import of this int ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Component UUID has no identifier - skipping import of this int ext tuple.";
+                String errorMessage = "Int: Component UUID has no identifier - skipping import of this int ext tuple.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this int ext tuple.";
+                String errorMessage = "Int: statusUuid has no identifier - skipping import of this int ext tuple.";
                 throw new Exception(errorMessage);
             }
 
@@ -138,7 +139,7 @@ public class IntExtTupleFileUtil {
                 refsetHelper.newIntRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
                     componentUuid).getNid(), value, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "Exception thrown while creating new int refset extension";
+                String errorMessage = "Int: Exception thrown while creating new int refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -146,7 +147,7 @@ public class IntExtTupleFileUtil {
             }
 
         } catch (Exception e) {
-            String errorMessage = "Exception thrown while importing int ext tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Int: Exception thrown while importing int ext tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

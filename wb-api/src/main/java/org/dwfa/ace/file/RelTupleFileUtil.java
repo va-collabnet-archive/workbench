@@ -85,17 +85,18 @@ public class RelTupleFileUtil {
                 relTypeUuid = UUID.fromString(lineParts[7]);
                 if ((Boolean) importConfig.getProperty("override") == false) {
                     UUID pathUuid = UUID.fromString(lineParts[8]);
-                    if (!Terms.get().hasId(pathUuid)) {
-                        String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
+                    if (Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
+                        importConfig.getEditingPathSet().clear();
+                        importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                        importConfig.setProperty("pathUuid", pathUuid);
+                    } else {
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                    importConfig.getEditingPathSet().clear();
-                    importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                    importConfig.setProperty("pathUuid", pathUuid);
                 }
                 statusUuid = UUID.fromString(lineParts[9]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse UUID from string -> UUID " + e.getMessage();
+                String errorMessage = "Rel: Cannot parse UUID from string -> UUID " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -105,7 +106,7 @@ public class RelTupleFileUtil {
             try {
                 group = Integer.parseInt(lineParts[5]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Integer from string: " + e.getMessage();
+                String errorMessage = "Rel: Cannot parse Integer from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -115,7 +116,7 @@ public class RelTupleFileUtil {
             try {
                 effectiveDate = Long.parseLong(lineParts[10]);
             } catch (Exception e) {
-                String errorMessage = "Cannot parse Long from string: " + e.getMessage();
+                String errorMessage = "Rel: Cannot parse Long from string: " + e.getMessage();
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -125,27 +126,27 @@ public class RelTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "c1Uuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: c1Uuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "c2Uuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: c2Uuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(charUuid)) {
-                String errorMessage = "charUuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: charUuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(refUuid)) {
-                String errorMessage = "refUuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: refUuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(relTypeUuid)) {
-                String errorMessage = "relTypeUuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: relTypeUuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this relationship.";
+                String errorMessage = "Rel: statusUuid has no identifier - skipping import of this relationship.";
                 throw new Exception(errorMessage);
             }
 
@@ -193,7 +194,7 @@ public class RelTupleFileUtil {
                 }
             }
         } catch (Exception e) {
-            String errorMessage = "Exception thrown while importing rel tuple : " + e.getLocalizedMessage();
+            String errorMessage = "Rel: Exception thrown while importing rel tuple : " + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
