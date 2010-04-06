@@ -129,5 +129,10 @@ public class TableRowSorterWithOptionalCheckbox extends DefaultRowSorter<Reflexi
         }
     }
     
+    public void toggleSortOrder(int column) {
+        if (column >= 0 && column < getModelWrapper().getColumnCount()) {
+            super.toggleSortOrder(column);
+        }
+    }
  
 }
