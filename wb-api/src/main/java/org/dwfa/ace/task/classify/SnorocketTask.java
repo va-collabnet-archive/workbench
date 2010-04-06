@@ -159,7 +159,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     // INTERNAL
     private static boolean debug = true; // :DEBUG:
-    private static boolean debugDump = false; // :DEBUG: save to files
+    private static boolean debugDump = true; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -463,8 +463,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 return Condition.CONTINUE;
             }
 
-            if (debugDump)
+            if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
+                Collections.sort(cRocketSnoRels);
+                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);                
+            }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
             gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
@@ -527,10 +530,25 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     + " ***");
 
             if (debugDump) {
+                ArrayList<SnoRel> sqrl = SnoQuery.getIsaAdded();
+                Collections.sort(sqrl);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
-                dumpSnoRel(SnoQuery.getIsaDropped(), "SnoRelIsaDrop_full.txt", 4);
-                dumpSnoRel(SnoQuery.getRoleAdded(), "SnoRelRoleAdd_full.txt", 4);
-                dumpSnoRel(SnoQuery.getRoleDropped(), "SnoRelRoleDrop_full.txt", 4);
+                dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_compare.txt", 5);
+                
+                sqrl = SnoQuery.getIsaDropped();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelIsaDrop_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelIsaDrop_compare.txt", 5);
+
+                sqrl = SnoQuery.getRoleAdded();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelRoleAdd_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelRoleAdd_compare.txt", 5);
+
+                sqrl = SnoQuery.getRoleDropped();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelRoleDrop_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelRoleDrop_compare.txt", 5);
             }
 
             // ** GUI: 5 COMPLETE **

@@ -68,7 +68,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 
 /**
  * 
- * SnorocketTask retrieves concepts and relationship from the stated edit path
+ * SnorocketTaskOld retrieves concepts and relationship from the stated edit path
  * and load the same to the IHTSDO (Snorocket) classifier.
  * 
  * Classification is run and the resulting inferred relationships is written
@@ -160,7 +160,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
 
     // INTERNAL
     private static boolean debug = true; // :DEBUG:
-    private static boolean debugDump = false; // :DEBUG: save to files
+    private static boolean debugDump = true; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -227,7 +227,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         logger = worker.getLogger();
-        logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
+        logger.info("\r\n::: [SnorocketTaskOld] evaluate() -- begin");
 
         tf = Terms.get();
         SnoQuery.initAll();
@@ -267,7 +267,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                     rNidArray, cEditPathPos, gui, false);
             tf.iterateConcepts(pcEdit);
             logger
-                    .info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
+                    .info("\r\n::: [SnorocketTaskOld] GET STATED PATH DATA"
                             + pcEdit.getStats(startTime));
 
             
@@ -332,7 +332,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 for (SnoDL sdl : dll) {
                     rocket_123.addRoleComposition(sdl.getLhsNids(), sdl.getRhsNid());
                 }
-                logger.info("\r\n::: [SnorocketTask] Logic Added");
+                logger.info("\r\n::: [SnorocketTaskOld] Logic Added");
             }
             // 
             ArrayList<SnoConSer> ngl = SnoDLSet.getNeverGroup();
@@ -340,10 +340,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 for (SnoConSer scs : ngl)
                     rocket_123.setRoleNeverGrouped(scs.id);
 
-                logger.info("\r\n::: [SnorocketTask] \"Never-Grouped\" Added");
+                logger.info("\r\n::: [SnorocketTaskOld] \"Never-Grouped\" Added");
             }
 
-            logger.info("\r\n::: [SnorocketTask] SORTED & ADDED CONs, RELs" + " *** LAPSE TIME = "
+            logger.info("\r\n::: [SnorocketTaskOld] SORTED & ADDED CONs, RELs" + " *** LAPSE TIME = "
                     + toStringLapseSec(startTime) + " ***");
 
             // ** GUI: 1. LOAD DATA -- done **
@@ -399,7 +399,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             startTime = System.currentTimeMillis();
             ProcessEquiv pe = new ProcessEquiv();
             rocket_123.getEquivalents(pe);
-            logger.info("\r\n::: [SnorocketTask] ProcessEquiv() count=" + pe.countConSet
+            logger.info("\r\n::: [SnorocketTaskOld] ProcessEquiv() count=" + pe.countConSet
                     + " time= " + toStringLapseSec(startTime));
 
             // ** GUI: * -- done
@@ -430,7 +430,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             startTime = System.currentTimeMillis();
             ProcessResults pr = new ProcessResults(cRocketSnoRels);
             rocket_123.getDistributionFormRelationships(pr);
-            logger.info("\r\n::: [SnorocketTask] GET CLASSIFIER RESULTS count=" + pr.countRel
+            logger.info("\r\n::: [SnorocketTaskOld] GET CLASSIFIER RESULTS count=" + pr.countRel
                     + " time= " + toStringLapseSec(startTime));
 
             // ** GUI: 3 -- done
@@ -468,7 +468,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             SnoPathProcess pcClass = new SnoPathProcess(logger, null, cClassSnoRels, rNidArray,
                     cClassPathPos, gui, true);
             tf.iterateConcepts(pcClass);
-            logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
+            logger.info("\r\n::: [SnorocketTaskOld] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
 
             if (debugDump) {
@@ -612,13 +612,13 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
         boolean done_A = false;
         boolean done_B = false;
 
-        logger.info("\r\n::: [SnorocketTask]" + "\r\n::: snorelA.size() = \t" + snorelA.size()
+        logger.info("\r\n::: [SnorocketTaskOld]" + "\r\n::: snorelA.size() = \t" + snorelA.size()
                 + "\r\n::: snorelB.size() = \t" + snorelB.size());
 
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
             if (++countConSeen % 25000 == 0) {
-                logger.info("::: [SnorocketTask] compareAndWriteBack @ #\t" + countConSeen);
+                logger.info("::: [SnorocketTaskOld] compareAndWriteBack @ #\t" + countConSeen);
             }
             // Actual write back approximately 16,380 per minute
 
@@ -852,7 +852,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             tf.getDirectInterface().sync();
 
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketTask] compareAndWriteBack()");
+        s.append("\r\n::: [SnorocketTaskOld] compareAndWriteBack()");
         long lapseTime = System.currentTimeMillis() - startTime;
         s.append("\r\n::: [Time] Sort/Compare Input & Output: \t" + lapseTime + "\t(mS)\t"
                 + (((float) lapseTime / 1000) / 60) + "\t(min)");
@@ -1090,7 +1090,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
     private String toStringPathPos(List<I_Position> pathPos, String pStr) {
         // BUILD STRING
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr + "\r\n");
+        s.append("\r\n::: [SnorocketTaskOld] PATH ID -- " + pStr + "\r\n");
         for (I_Position position : pathPos) {
             s.append("::: ... PATH:\t" + toStringCNid(position.getPath().getConceptId()) + "\r\n");
         }
@@ -1144,7 +1144,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
 
     private String toStringNids() {
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketTask]");
+        s.append("\r\n::: [SnorocketTaskOld]");
         s.append("\r\n:::\t" + isaNid + "\t : isaNid");
         s.append("\r\n:::\t" + rootNid + "\t : rootNid");
         s.append("\r\n:::\t" + isCURRENT + "\t : isCURRENT");
@@ -1166,7 +1166,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
     @SuppressWarnings("unused")
     private String toStringFocusSet(I_TermFactory tf) {
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketTask] FOCUS SET");
+        s.append("\r\n::: [SnorocketTaskOld] FOCUS SET");
         // LOG SPECIFIC RELATIONS SET
         // VIEW *ALL* CASE1 RELS, BASED ON C1
         int focusCase1OutNid[] = { -2147481934, -2147458073, -2147481931, -2147255612, -2144896203,
@@ -1230,7 +1230,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
     @SuppressWarnings("unused")
     private String toStringSnoRel(List<SnoRel> list, int start, int count, String comment) {
         StringBuilder s = new StringBuilder(250 + count * 110);
-        s.append("\r\n::: [SnorocketTask] SnoRel Listing -- " + comment);
+        s.append("\r\n::: [SnorocketTaskOld] SnoRel Listing -- " + comment);
         if (list.size() > 0 && start >= 0 && ((start + count) < list.size())) {
             s.append("\r\n::: \t" + list.get(0).toStringHdr());
             for (int i = start; i < start + count; i++) {
@@ -1378,7 +1378,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             }
             lastRole = sr.typeId;
         }
-        logger.info("\r\n::: [SnorocketTask] COUNTED ROLES == " + roleCount + "\r\n" + sb);
+        logger.info("\r\n::: [SnorocketTaskOld] COUNTED ROLES == " + roleCount + "\r\n" + sb);
         return results;
     }
 
@@ -1437,7 +1437,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 }
                 lastRole = sr.typeId;
             }
-            logger.info("\r\n::: [SnorocketTask] COUNTED ROLES == " + countRoles + "\r\n" + sb);
+            logger.info("\r\n::: [SnorocketTaskOld] COUNTED ROLES == " + countRoles + "\r\n" + sb);
         }
     }
 
