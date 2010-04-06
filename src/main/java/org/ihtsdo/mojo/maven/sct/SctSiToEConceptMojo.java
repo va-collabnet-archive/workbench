@@ -515,7 +515,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         stateSave(wDir);
         System.gc();
 
-        // stateRestore(wDir);
+        //stateRestore(wDir);
         lookupConverion();
 
         // STEP 2. Create destination relationship lists
@@ -1193,7 +1193,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ERelationship rel = null;
             List<ERelationshipRevision> revisions = new ArrayList<ERelationshipRevision>();
             for (SctXRelRecord rRec : relList) {
-                if (rRec.uuidLeastSigBits != theRelMsb || rRec.uuidLeastSigBits != theRelLsb) {
+                if (rRec.uuidMostSigBits != theRelMsb || rRec.uuidLeastSigBits != theRelLsb) {
                     // CLOSE OUT OLD RELATIONSHIP
                     if (rel != null) {
                         if (revisions.size() > 0) {
