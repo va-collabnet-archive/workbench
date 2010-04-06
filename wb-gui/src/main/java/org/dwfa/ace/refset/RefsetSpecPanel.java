@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +46,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -443,6 +445,15 @@ public class RefsetSpecPanel extends JPanel {
 
         refsetTable = new JTableWithDragImage(refsetTableModel);
         SortClickListener.setupSorter(refsetTable);
+        refsetTable.setAutoCreateRowSorter(false);
+        refsetTable.setRowSorter(new TableRowSorter<ReflexiveRefsetTableModel>(refsetTableModel) {
+            public Comparator<?> getComparator(int column) {
+                if (column < 0 || column >= getModelWrapper().getColumnCount()) {
+                    return null;
+                }
+                return super.getComparator(column);
+            }
+        });
         refsetTable.getTableHeader().setToolTipText("Click to specify sorting");
 
         for (int i = 0; i < columns.size(); i++) {
