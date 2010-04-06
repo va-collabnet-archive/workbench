@@ -185,7 +185,7 @@ public class TupleFileUtil {
             inputFileReader.close();
             inputFileReader = new BufferedReader(new FileReader(importFile));
             currentLine = inputFileReader.readLine();
-            lineCount++;
+            lineCount = 1;
             while (currentLine != null) {
                 if (!currentLine.trim().equals("")) {
                     String[] lineParts = currentLine.split("\t");
