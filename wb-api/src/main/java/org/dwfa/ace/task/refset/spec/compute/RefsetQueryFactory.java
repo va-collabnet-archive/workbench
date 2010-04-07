@@ -35,10 +35,11 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -89,6 +90,7 @@ public class RefsetQueryFactory {
             RefsetSpecQuery subQuery = subQueryItr.next();
             removeDangles(subQuery);
             if (subQuery.getStatements().size() == 0 && subQuery.getSubqueries().size() == 0) {
+                AceLog.getAppLog().alertAndLogException(new Exception("Warning: Removing dangling subquery: " + subQuery));
                 subQueryItr.remove();
             }
         }
