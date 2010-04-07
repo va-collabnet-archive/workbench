@@ -259,7 +259,7 @@ public interface I_TermFactory {
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
     public void commit() throws Exception;
-    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading);
+    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws Exception;
 
     void addChangeSetWriter(I_WriteChangeSet writer);
 

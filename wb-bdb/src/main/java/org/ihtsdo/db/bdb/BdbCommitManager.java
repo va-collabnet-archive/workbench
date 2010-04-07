@@ -301,6 +301,12 @@ public class BdbCommitManager {
                             commitTime);
 
                     if (writeChangeSets) {
+                        if (changeSetPolicy == null) {
+                            changeSetPolicy = ChangeSetPolicy.OFF;
+                        }
+                        if (changeSetWriterThreading == null) {
+                            changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
+                        }
                         switch (changeSetPolicy) {
                         case COMPREHENSIVE:
                         case INCREMENTAL:

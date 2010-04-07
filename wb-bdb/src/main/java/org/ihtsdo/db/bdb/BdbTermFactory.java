@@ -230,7 +230,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public void commit(ChangeSetPolicy changeSetPolicy,
-            ChangeSetWriterThreading changeSetWriterThreading) {
+            ChangeSetWriterThreading changeSetWriterThreading) throws Exception {
         BdbCommitManager.commit(changeSetPolicy, changeSetWriterThreading);
     }
     
@@ -1565,6 +1565,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         computer.addUncommitted();
+        if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
+            frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+            frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+        }
         BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), 
             frameConfig.getDbConfig().getChangeSetWriterThreading());
     }
