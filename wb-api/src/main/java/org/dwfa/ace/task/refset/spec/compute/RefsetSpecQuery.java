@@ -56,6 +56,10 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private ArrayList<RefsetSpecStatement> statements;
     private ArrayList<RefsetSpecComponent> allComponents;
 
+    public ArrayList<RefsetSpecComponent> getAllComponents() {
+        return allComponents;
+    }
+
     public enum GROUPING_TYPE {
         OR(RefsetAuxiliary.Concept.REFSET_OR_GROUPING, true),
         AND(RefsetAuxiliary.Concept.REFSET_AND_GROUPING, true),

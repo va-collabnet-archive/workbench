@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -30,6 +31,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -119,6 +121,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query =
                     RefsetQueryFactory.createQuery(configFrame, Terms.get(), refsetSpec, refset, computeType);
+
+            List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
+            for (String warning: dangleWarnings) {
+                AceLog.getAppLog().alertAndLogException(new Exception(warning + "\nClause removed from computation..."));
+            }
 
             // check validity of query
             if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {

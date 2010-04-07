@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -74,26 +74,25 @@ public class RefsetQueryFactory {
 
         RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
         query = processNode(root, query, refsetType, configFrame, termFactory);
-        
-        // Remove any dangling items...
-        
-        removeDangles(query);
-        
+                
         
         return query;
 
     }
 
-    private static void removeDangles(RefsetSpecQuery query) {
+    public static List<String> removeDangles(RefsetSpecQuery query) {
+        List<String> warningList = new ArrayList<String>();
         Iterator<RefsetSpecQuery> subQueryItr = query.getSubqueries().iterator();
         while (subQueryItr.hasNext()) {
             RefsetSpecQuery subQuery = subQueryItr.next();
-            removeDangles(subQuery);
+            warningList.addAll(removeDangles(subQuery));
             if (subQuery.getStatements().size() == 0 && subQuery.getSubqueries().size() == 0) {
-                AceLog.getAppLog().alertAndLogException(new Exception("Warning: Removing dangling subquery: " + subQuery));
+                warningList.add("Dangling subquery: " + subQuery);
+                query.getAllComponents().remove(subQuery);
                 subQueryItr.remove();
             }
         }
+        return warningList;
     }
 
     /**

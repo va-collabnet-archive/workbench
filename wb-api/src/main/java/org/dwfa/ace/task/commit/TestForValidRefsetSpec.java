@@ -30,6 +30,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
 import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -118,8 +119,13 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
         }
 
         try {
-            RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
+            RefsetSpecQuery q = RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
                 .getRefsetSpecConcept(), specHelper.getMemberRefsetConcept(), computeType);
+            List<String> dangleWarnings = RefsetQueryFactory.removeDangles(q);
+            for (String warning: dangleWarnings) {
+                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING, formatAlertMessage(warning),
+                    specHelper.getRefsetSpecConcept()));
+            }
         } catch (Exception e) {
             alertList.add(new AlertToDataConstraintFailure(alertType, formatAlertMessage(e.getLocalizedMessage()),
                 specHelper.getRefsetSpecConcept()));
