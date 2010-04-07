@@ -312,10 +312,12 @@ public class BdbCommitManager {
                         case INCREMENTAL:
                         case MUTABLE_ONLY:
                             uncommittedCNidsNoChecks.or(uncommittedCNids);
-                            ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                            if (uncommittedCNidsNoChecks.cardinality() > 0) {
+                                ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                     uncommittedCNidsNoChecks, commitTime,
                                     sapNidsFromCommit, changeSetPolicy, changeSetWriterThreading);
-                            changeSetWriterService.execute(handler);
+                                changeSetWriterService.execute(handler);
+                            }
                             break;
                         case OFF:
                             
