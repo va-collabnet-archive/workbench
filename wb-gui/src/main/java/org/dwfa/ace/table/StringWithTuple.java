@@ -39,6 +39,9 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
     }
 
     public int compareTo(T another) {
+        if (another == null) {
+            return 1;
+        }
         return cellText.compareTo(another.getCellText());
     }
 
