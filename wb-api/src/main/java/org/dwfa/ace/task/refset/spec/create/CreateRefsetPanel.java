@@ -57,6 +57,7 @@ import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.io.FileIO;
 
 /**
  * Table to support selection of more than one reviewer.
@@ -571,12 +572,15 @@ public class CreateRefsetPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             try {
                 if (e.getActionCommand().equals(openFileChooserButton.getText())) {
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    fileChooser.setDialogTitle("Attach a File");
-                    int returnValue = fileChooser.showDialog(new Frame(), "Attach file");
-                    if (returnValue == JFileChooser.APPROVE_OPTION) {
-                        File selectedFile = fileChooser.getSelectedFile();
+                    Frame f = null;
+                    for (Frame f2: Frame.getFrames()) {
+                        if (f2.isActive()) {
+                            f = f2;
+                            break;
+                        }
+                    }
+                    File selectedFile = FileIO.getFile(f, "Attach file", System.getProperty("user.dir"), null);
+                    if (selectedFile != null) {
                         if (attachmentSet.contains(selectedFile)) {
                             // Warn the user that the file is already attached
                             JOptionPane.showMessageDialog(null, "The file '" + selectedFile.getName() + "' "

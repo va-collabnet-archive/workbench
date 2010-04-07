@@ -272,6 +272,38 @@ public class FileIO {
         return returnValue.getReturnValue();
     }
 
+    public static File getFile(Frame parent, String title, String startDir,
+            FilenameFilter fileFilter) {
+        if (parent == null) {
+            parent = new JFrame();
+        }
+        FileDialog fd = new FileDialog(parent, title, FileDialog.LOAD);
+        fd.setFilenameFilter(fileFilter);
+        if (startDir.startsWith("/")) {
+
+            startDir = startDir.replace('/', File.separatorChar);
+            fd.setDirectory(startDir);
+        } else {
+            startDir = startDir.replace('/', File.separatorChar);
+            fd.setDirectory(System.getProperty("user.dir") + System.getProperty("file.separator") + startDir);
+        }
+        fd.setVisible(true); // Display dialog and wait for response
+        if (fd.getFile() != null) {
+            File f = new File(fd.getDirectory(), fd.getFile());
+            if (f.exists()) {
+                return f;                
+            }
+            File d = new File(fd.getDirectory());
+            for (File child: d.listFiles()) {
+                if (child.getName().startsWith(fd.getFile())) {
+                    return child;
+                }
+            }
+        }
+        return null;
+    }
+
+    
     private static FileAndObject getObjFromFilesystemCore(Frame parent, String title, String startDir,
             FilenameFilter fileFilter) throws FileNotFoundException, IOException, ClassNotFoundException {
         if (parent == null) {
