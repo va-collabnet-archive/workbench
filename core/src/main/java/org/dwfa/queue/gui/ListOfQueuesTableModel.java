@@ -49,7 +49,7 @@ public class ListOfQueuesTableModel extends AbstractTableModel {
         if ((rowIndex < 0) || (rowIndex >= queues.size())) {
             return null;
         }
-        return queues.get(rowIndex);
+        return queues.get(rowIndex).toString();
     }
 
     public void addQueue(QueueAdaptor q) {
@@ -72,6 +72,10 @@ public class ListOfQueuesTableModel extends AbstractTableModel {
 
     public boolean isCellEditable(int row, int col) {
         return false;
+    }
+
+    public QueueAdaptor getQueueAt(int rowIndex) {
+       return queues.get(rowIndex);
     }
 
 }

@@ -492,8 +492,8 @@ public class QueueViewerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (tableOfQueues.getSelectedRow() >= 0) {
-                QueueAdaptor qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(
-                    tableOfQueues.getSelectedRow(), 0);
+                ListOfQueuesTableModel tableModel = (ListOfQueuesTableModel) tableOfQueues.getModel();
+                QueueAdaptor qAdaptor = tableModel.getQueueAt(tableOfQueues.getSelectedRow());
 
                 if (qAdaptor == null) {
                     clearQueuePanel();
