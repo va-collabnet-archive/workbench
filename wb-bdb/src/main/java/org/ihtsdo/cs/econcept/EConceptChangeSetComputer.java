@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -131,8 +132,28 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 			if (c1 == null || c1.isCanceled() || c2 == null || c2.isCanceled()) {
 				//nothing to do...
 			} else {
-				uuidUuidList.add(Bdb.getPrimUuidForComponent(nid1));
-				uuidUuidList.add(Bdb.getPrimUuidForComponent(nid2));
+                UUID uuid1 = Bdb.getPrimUuidForComponent(nid1);
+                UUID uuid2 = Bdb.getPrimUuidForComponent(nid2);
+			    if (uuid1 != null && uuid2 != null) {
+	                uuidUuidList.add(uuid1);
+	                uuidUuidList.add(uuid2);
+			    } else {
+			        if (uuid1 == null) {
+	                    AceLog.getAppLog().warning("---------------------------------------------" 
+	                    		+ "null primordial uuid for nid1: " + nid1 
+	                    		+ " nid2: " + nid2 + 
+	                    		" concept1: " + c1.toLongString() +
+	                    		" concept2: " + c2.toLongString()
+	                        );
+			        } else {
+                        AceLog.getAppLog().warning("---------------------------------------------" 
+                            + "null primordial uuid for nid2: " + nid2 
+                            + " nid1: " + nid1 + 
+                            " concept1: " + c1.toLongString() +
+                            " concept2: " + c2.toLongString()
+                        );
+			        }
+			    }
 			}
 		}
 		return uuidUuidList;

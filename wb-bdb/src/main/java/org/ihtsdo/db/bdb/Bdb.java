@@ -457,9 +457,12 @@ public class Bdb {
 		assert cNid != Integer.MAX_VALUE: "No cNid for nid: " + nid;
 		Concept c = Concept.get(cNid);
 		ConceptComponent<?, ?> component = c.getComponent(nid);
-		assert component != null: "Can't find component: " + nid + 
-			" in concept: " + c.toLongString();
-		return component.getPrimUuid();
+		if (component != null) {
+	        return component.getPrimUuid();
+		}
+		String warning = "Can't find component: " + nid + " in concept: " + c.toLongString();
+		AceLog.getAppLog().warning(warning);
+		return null;
 	}
 	public static Concept getConcept(int cNid) throws IOException {
 		assert cNid == Bdb.getConceptNid(cNid): " Not a concept nid: " + cNid;
