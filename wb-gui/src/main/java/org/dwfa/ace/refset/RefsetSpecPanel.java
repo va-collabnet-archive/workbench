@@ -632,8 +632,13 @@ public class RefsetSpecPanel extends JPanel {
             }
         }
         
-        public static PROMOTION_STATUS get(int nid) {
-            return promotionStatusMap.get(nid);
+        public static PROMOTION_STATUS get(int nid) throws TerminologyException, IOException {
+            PROMOTION_STATUS status = promotionStatusMap.get(nid);
+            if (status != null) {
+                return status;
+            }
+            throw new IOException("Can't find promotion status for value: " + nid + " " + 
+                Terms.get().getConcept(nid)); 
         }
         
     }
