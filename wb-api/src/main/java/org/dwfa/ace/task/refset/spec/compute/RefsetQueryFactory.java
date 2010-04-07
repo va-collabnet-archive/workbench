@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -72,8 +73,25 @@ public class RefsetQueryFactory {
 
         RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
         query = processNode(root, query, refsetType, configFrame, termFactory);
+        
+        // Remove any dangling items...
+        
+        removeDangles(query);
+        
+        
         return query;
 
+    }
+
+    private static void removeDangles(RefsetSpecQuery query) {
+        Iterator<RefsetSpecQuery> subQueryItr = query.getSubqueries().iterator();
+        while (subQueryItr.hasNext()) {
+            RefsetSpecQuery subQuery = subQueryItr.next();
+            removeDangles(subQuery);
+            if (subQuery.getStatements().size() == 0 && subQuery.getSubqueries().size() == 0) {
+                subQueryItr.remove();
+            }
+        }
     }
 
     /**

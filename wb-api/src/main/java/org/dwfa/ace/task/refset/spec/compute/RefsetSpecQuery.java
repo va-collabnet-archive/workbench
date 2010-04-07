@@ -111,6 +111,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
         totalStatementCount = 0;
     }
+    
+    public ArrayList<RefsetSpecQuery> getSubqueries() {
+        return subqueries;
+    }
+
+    public ArrayList<RefsetSpecStatement> getStatements() {
+        return statements;
+    }
 
     private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
         if (concept.getConceptId() == GROUPING_TYPE.AND.nid) {
