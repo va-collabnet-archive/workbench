@@ -27,6 +27,8 @@ public interface I_WriteChangeSet extends Serializable {
     public void open(I_IntSet commitSapNids) throws IOException;
 
     public void writeChanges(I_GetConceptData change, long time) throws IOException;
+    
+    public void setPolicy(ChangeSetPolicy policy);
 
     public void commit() throws IOException;
 

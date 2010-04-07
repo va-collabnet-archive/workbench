@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -18,7 +19,6 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.cs.ChangeSetPolicy;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.util.NidPair;

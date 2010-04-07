@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.vodb.types.IntSet;
@@ -30,9 +32,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private AtomicInteger processedCount = new AtomicInteger();
     private AtomicInteger processedChangedCount = new AtomicInteger();
     private int changedCount = Integer.MIN_VALUE;
+    private ChangeSetWriterThreading changeSetWriterThreading;
+    private ChangeSetPolicy changeSetPolicy;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
-			long commitTime, IntSet sapNidsFromCommit) {
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) {
 		super();
 		assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
@@ -43,7 +47,9 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		    " gVersion: " + Bdb.gVersion.incrementAndGet() + 
 		    " (" + cNidsToWrite.cardinality() + " total concept changes)";
 		this.sapNidsFromCommit = sapNidsFromCommit;
+		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
+		this.changeSetPolicy = changeSetPolicy;
 	}
 
 	@Override
@@ -65,7 +71,16 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.setIndeterminate(false);
 
             activity.setProgressInfoLower("Iterating over concepts...");
-            Bdb.getConceptDb().iterateConceptDataInParallel(this);
+            switch (changeSetWriterThreading) {
+            case MULTI_THREAD:
+                Bdb.getConceptDb().iterateConceptDataInParallel(this);
+                break;
+            case SINGLE_THREAD:
+                Bdb.getConceptDb().iterateConceptDataInSequence(this);
+               break;
+            default:
+                throw new RuntimeException("Can't handle threading: " + changeSetWriterThreading);
+            }
 
             activity.setProgressInfoLower("Committing change set writers...");
             for (I_WriteChangeSet writer : writers) {
@@ -98,6 +113,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             processedChangedCount.incrementAndGet();
             Concept c = fcfc.fetch();
             for (I_WriteChangeSet writer: writers) {
+                writer.setPolicy(changeSetPolicy);
                 writer.writeChanges(c, commitTime);
             }
         }

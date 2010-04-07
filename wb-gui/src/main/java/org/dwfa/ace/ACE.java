@@ -1973,12 +1973,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         preferencesTab = new JTabbedPane();
         preferencesTab.addTab("View", makeViewConfig());
         preferencesTab.addTab("Edit", makeEditConfig());
-        preferencesTab.addTab("Path", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
+        JTabbedPane pathPanes = new JTabbedPane();
+        pathPanes.addTab("Configure", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
             new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
                 "getViewPositionSet", I_Position.class, aceFrameConfig)));
-        preferencesTab.addTab("New Path", new CreatePathPanel(aceFrameConfig));
-        preferencesTab.addTab("RefSet", makeRefsetConfig());
-        preferencesTab.addTab("Component Panel", makeComponentConfig());
+        pathPanes.addTab("Create", new CreatePathPanel(aceFrameConfig));
+        preferencesTab.addTab("Path", pathPanes);
+        preferencesTab.addTab("Refset", makeRefsetConfig());
+        preferencesTab.addTab("Change Set", new ChangeSetConfigPanel(aceFrameConfig));
         preferencesTab.addTab("Classifier", makeClassifierConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
@@ -2286,6 +2288,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
         tabs.addTab("conflict", makeConflictViewPanel());
+        tabs.addTab("component", makeComponentConfig());
         return tabs;
     }
 

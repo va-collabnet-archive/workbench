@@ -31,6 +31,8 @@ import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hits;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -256,7 +258,8 @@ public interface I_TermFactory {
 
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
-    void commit() throws Exception;
+    public void commit() throws Exception;
+    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading);
 
     void addChangeSetWriter(I_WriteChangeSet writer);
 

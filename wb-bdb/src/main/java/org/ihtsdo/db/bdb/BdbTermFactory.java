@@ -70,6 +70,8 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -226,6 +228,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         BdbCommitManager.commit();
     }
 
+    @Override
+    public void commit(ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading) {
+        BdbCommitManager.commit(changeSetPolicy, changeSetWriterThreading);
+    }
+    
+    
     @Override
     public void commitTransaction() throws IOException {
         // legacy operation, nothing to do...
@@ -1556,7 +1565,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         computer.addUncommitted();
-        BdbCommitManager.commit();
+        BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), 
+            frameConfig.getDbConfig().getChangeSetWriterThreading());
     }
     
     private static class ConceptFetcher implements I_FetchConceptFromCursor {

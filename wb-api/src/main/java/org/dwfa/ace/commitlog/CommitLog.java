@@ -25,6 +25,7 @@ import java.util.Date;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
@@ -92,6 +93,11 @@ public class CommitLog implements I_WriteChangeSet {
 		tempOut.append("\t");
 		tempOut.append(change.getUids().toString());
 		tempOut.append("\n");
+    }
+
+    @Override
+    public void setPolicy(ChangeSetPolicy policy) {
+        // nothing to do, does not honor policy
     }
 
 }

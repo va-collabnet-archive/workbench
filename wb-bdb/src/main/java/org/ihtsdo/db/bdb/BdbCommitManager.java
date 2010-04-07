@@ -32,6 +32,8 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
@@ -138,8 +140,6 @@ public class BdbCommitManager {
 
 	public static String pluginRoot = "plugins";
 
-	private static boolean writeChangeSets = true;
-
 	private static ExecutorService dbWriterService;
 	private static ExecutorService changeSetWriterService;
 	private static ExecutorService luceneWriterService;
@@ -147,6 +147,7 @@ public class BdbCommitManager {
 	private static boolean performCreationTests = true;
 	
 	private static boolean performCommitTests = true;
+    private static boolean writeChangeSets = true;
 	
 	static {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
@@ -288,43 +289,61 @@ public class BdbCommitManager {
 		return null;
 	}
 
-	public static void commit() {
-		// TODO add commit tests...
-		try {
-			synchronized (uncommittedCNids) {
-				synchronized (uncommittedCNidsNoChecks) {
-			        KindOfComputer.reset();
-			        long commitTime = System.currentTimeMillis();
-					IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
-							commitTime);
+    public static void commit(ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading) {
+        // TODO add commit tests...
+        try {
+            synchronized (uncommittedCNids) {
+                synchronized (uncommittedCNidsNoChecks) {
+                    KindOfComputer.reset();
+                    long commitTime = System.currentTimeMillis();
+                    IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
+                            commitTime);
 
-					if (writeChangeSets) {
-						uncommittedCNidsNoChecks.or(uncommittedCNids);
-						ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-								uncommittedCNidsNoChecks, commitTime,
-								sapNidsFromCommit);
-						changeSetWriterService.execute(handler);
-					}
-					uncommittedCNids.clear();
-					uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+                    if (writeChangeSets) {
+                        switch (changeSetPolicy) {
+                        case COMPREHENSIVE:
+                        case INCREMENTAL:
+                        case MUTABLE_ONLY:
+                            uncommittedCNidsNoChecks.or(uncommittedCNids);
+                            ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                    uncommittedCNidsNoChecks, commitTime,
+                                    sapNidsFromCommit, changeSetPolicy, changeSetWriterThreading);
+                            changeSetWriterService.execute(handler);
+                            break;
+                        case OFF:
+                            
+                            break;
 
-					luceneWriterPermit.acquire();
+                        default:
+                            throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
+                        }
+                    }
+                    uncommittedCNids.clear();
+                    uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+
+                    luceneWriterPermit.acquire();
                     IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
                     uncommittedDescNids.clear();
-					luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
-					dataCheckMap.clear();
-				}
-			}
-			Bdb.sync();
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (InterruptedException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (ExecutionException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-		fireCommit();
-		updateFrames();
+                    luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
+                    dataCheckMap.clear();
+                }
+            }
+            Bdb.sync();
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (InterruptedException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (ExecutionException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+        fireCommit();
+        updateFrames();
+    }
+
+	public static void commit() {
+	    commit(ChangeSetPolicy.INCREMENTAL,
+            ChangeSetWriterThreading.SINGLE_THREAD);
 	}
 
     private static void fireCommit() {
@@ -673,7 +692,7 @@ public class BdbCommitManager {
 	}
 
 	public static void suspendChangeSetWriters() {
-		writeChangeSets = false;
+		writeChangeSets  = false;
 	}
 
 	public static void resumeChangeSetWriters() {
@@ -716,4 +735,5 @@ public class BdbCommitManager {
     public static void setCheckCommitDataEnabled(boolean enabled) {
         performCommitTests = enabled;
     }
+
 }

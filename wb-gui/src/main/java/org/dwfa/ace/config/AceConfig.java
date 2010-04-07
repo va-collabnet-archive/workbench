@@ -45,6 +45,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
@@ -64,7 +66,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 	 */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 9;
+    private static final int dataVersion = 10;
 
     private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
 
@@ -105,7 +107,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // 9
     private I_GetConceptData userPath;
     private String fullName;
-
+    
+    //10
+    private ChangeSetPolicy userChangesChangeSetPolicy;
+    private ChangeSetPolicy classifierChangesChangeSetPolicy;
+    private ChangeSetPolicy refsetChangesChangeSetPolicy;
+    private ChangeSetWriterThreading changeSetWriterThreading;
+ 
     // transient
     private transient File profileFile;
 
@@ -153,6 +161,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         } catch (TerminologyException e) {
             throw new IOException(e);
         }
+        out.writeObject(userChangesChangeSetPolicy);
+        out.writeObject(classifierChangesChangeSetPolicy);
+        out.writeObject(refsetChangesChangeSetPolicy);
+        out.writeObject(changeSetWriterThreading);
     }
 
     @SuppressWarnings("unchecked")
@@ -231,6 +243,18 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 IOException newEx = new IOException();
                 newEx.initCause(e);
                 throw newEx;
+            }
+            
+            if (objDataVersion >= 10) {
+                userChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
+                classifierChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
+                refsetChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
+                changeSetWriterThreading = (ChangeSetWriterThreading) in.readObject();
+            } else {
+                userChangesChangeSetPolicy = ChangeSetPolicy.INCREMENTAL;
+                classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
+                refsetChangesChangeSetPolicy = ChangeSetPolicy.OFF;
+                changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -521,5 +545,45 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    @Override
+    public ChangeSetWriterThreading getChangeSetWriterThreading() {
+        return changeSetWriterThreading;
+    }
+
+    @Override
+    public ChangeSetPolicy getClassifierChangesChangeSetPolicy() {
+        return classifierChangesChangeSetPolicy;
+    }
+
+    @Override
+    public ChangeSetPolicy getRefsetChangesChangeSetPolicy() {
+        return refsetChangesChangeSetPolicy;
+    }
+
+    @Override
+    public ChangeSetPolicy getUserChangesChangeSetPolicy() {
+        return userChangesChangeSetPolicy;
+    }
+
+    @Override
+    public void setChangeSetWriterThreading(ChangeSetWriterThreading threading) {
+        this.changeSetWriterThreading = threading;
+    }
+
+    @Override
+    public void setClassifierChangesChangeSetPolicy(ChangeSetPolicy policy) {
+        this.classifierChangesChangeSetPolicy = policy;
+    }
+
+    @Override
+    public void setRefsetChangesChangeSetPolicy(ChangeSetPolicy policy) {
+        this.refsetChangesChangeSetPolicy = policy;
+    }
+
+    @Override
+    public void setUserChangesChangeSetPolicy(ChangeSetPolicy policy) {
+        this.userChangesChangeSetPolicy = policy;
     }
 }

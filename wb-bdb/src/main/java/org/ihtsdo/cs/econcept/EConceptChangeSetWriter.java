@@ -9,11 +9,11 @@ import java.util.concurrent.Semaphore;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.cs.ChangeSetPolicy;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.time.TimeUtil;
@@ -148,5 +148,10 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     @Override
     public String toString() {
         return "EConceptChangeSetWriter: changeSetFile: " + changeSetFile + " tempFile: " + tempFile;
+    }
+
+    @Override
+    public void setPolicy(ChangeSetPolicy policy) {
+        this.policy = policy;
     }
 }

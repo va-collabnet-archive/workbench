@@ -22,6 +22,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+
 public interface I_ConfigAceDb {
 
     public List<I_ConfigAceFrame> getAceFrames();
@@ -101,5 +104,16 @@ public interface I_ConfigAceDb {
      * @param fullName The user's full name (John Q. Public).
      */
     public void setFullName(String fullName);
+    
+    public void setUserChangesChangeSetPolicy(ChangeSetPolicy policy);
+    public void setClassifierChangesChangeSetPolicy(ChangeSetPolicy policy);
+    public void setRefsetChangesChangeSetPolicy(ChangeSetPolicy policy);
 
+    public ChangeSetPolicy getUserChangesChangeSetPolicy();
+    public ChangeSetPolicy getClassifierChangesChangeSetPolicy();
+    public ChangeSetPolicy getRefsetChangesChangeSetPolicy();
+    
+    public void setChangeSetWriterThreading(ChangeSetWriterThreading threading);
+    public ChangeSetWriterThreading getChangeSetWriterThreading();
+    
 }
