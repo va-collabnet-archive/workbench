@@ -119,9 +119,9 @@ public class PromoteRefset extends AbstractTask {
             I_Position viewPosition = viewPositionSet.iterator().next();
             promoteRefset(config, viewPosition, promotionPaths, tf, refsetToPromote);
 
-            for (I_GetConceptData memberRefsetIdentity : Terms.get().getRefsetHelper(config)
+            for (I_GetConceptData specificationRefsetIdentity : Terms.get().getRefsetHelper(config)
                 .getSpecificationRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, memberRefsetIdentity);
+                promoteRefset(config, viewPosition, promotionPaths, tf, specificationRefsetIdentity);
             }
             for (I_GetConceptData promotionRefsetIdentity : Terms.get().getRefsetHelper(config)
                 .getPromotionRefsetForRefset(refsetToPromote, config)) {
@@ -132,9 +132,10 @@ public class PromoteRefset extends AbstractTask {
                 promoteRefset(config, viewPosition, promotionPaths, tf, markedParentRefsetIdentity);
             }
             for (I_GetConceptData commentsRefsetIdentity : Terms.get().getRefsetHelper(config)
-                .getCommentsRefsetForRefset(refsetToPromote, config)) {
-                promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
-            }
+                    .getCommentsRefsetForRefset(refsetToPromote, config)) {
+                    promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
+           }
+            tf.commit();
 
         } catch (Exception e) {
             throw new TaskFailedException(e);
