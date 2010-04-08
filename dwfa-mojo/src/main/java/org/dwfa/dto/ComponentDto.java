@@ -23,7 +23,7 @@ import java.util.List;
  * Container for all the details for a component, that is the core details plus all concept extensions.
  */
 public class ComponentDto {
-    private ConceptDto conceptDto = new ConceptDto();
+    private List<ConceptDto> conceptDtos = new ArrayList<ConceptDto>(0);
     private List<DescriptionDto> descriptionDtos = new ArrayList<DescriptionDto>(0);
     private List<RelationshipDto> relationshipDos = new ArrayList<RelationshipDto>(0);
     private List<ExtensionDto> conceptExtensionDtos = new ArrayList<ExtensionDto>(0);
@@ -40,15 +40,15 @@ public class ComponentDto {
     /**
      * @return the conceptDto
      */
-    public ConceptDto getConceptDto() {
-        return conceptDto;
+    public List<ConceptDto> getConceptDtos() {
+        return conceptDtos;
     }
 
     /**
      * @param conceptDto the conceptDto to set
      */
-    public void setConceptDto(ConceptDto conceptDto) {
-        this.conceptDto = conceptDto;
+    public void setConceptDto(List<ConceptDto> conceptDtos) {
+        this.conceptDtos = conceptDtos;
     }
 
     /**

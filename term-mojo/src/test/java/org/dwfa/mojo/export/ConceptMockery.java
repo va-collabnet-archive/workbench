@@ -128,6 +128,7 @@ public class ConceptMockery {
     int relationshipRefinabilityExtensionNid = Integer.MAX_VALUE - 60;
     int stringExtensionNid = Integer.MAX_VALUE - 61;
     int promotesToNid = Integer.MAX_VALUE - 62;
+    int activeValueNid = Integer.MAX_VALUE - 63;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -250,6 +251,11 @@ public class ConceptMockery {
         expect(isAConceptData.getConceptId()).andReturn(isANid).anyTimes();
         replay(isAConceptData);
 
+        List<UUID> activeValueUuidList = new ArrayList<UUID>();
+        activeValueUuidList.add(UUID.randomUUID());
+        I_GetConceptData activeValueConceptData = mockConceptSpec(ConceptConstants.ACTIVE_VALUE, activeValueNid);
+        expect(termFactory.getConcept(activeValueNid)).andReturn(activeValueConceptData).anyTimes();
+        replay(activeValueConceptData);
 
         List<UUID> ctv3IdMapExtensionUuidList = new ArrayList<UUID>();
         ctv3IdMapExtensionUuidList.add(UUID.randomUUID());

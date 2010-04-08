@@ -22,19 +22,15 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_AmVersioned;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalIdList;
@@ -118,10 +114,9 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
 
             List<I_ConceptAttributeVersioned> conceptAttributes = new ArrayList<I_ConceptAttributeVersioned>();
             conceptAttributes.add(conceptChange.getUncommittedConceptAttributes());
-            removeDuplicateParts(conceptAttributes);
-
-            removeDuplicateParts(conceptChange.getUncommittedDescriptions());
-            removeDuplicateParts(conceptChange.getUncommittedSourceRels());
+            TupleVersionPart.removeDuplicateParts(conceptAttributes);
+            TupleVersionPart.removeDuplicateParts(conceptChange.getUncommittedDescriptions());
+            TupleVersionPart.removeDuplicateParts(conceptChange.getUncommittedSourceRels());
 
             if (conceptChange.isUncommitted()) {
                 tempOut.writeLong(time);
@@ -192,38 +187,6 @@ public class BinaryChangeSetWriter implements I_WriteChangeSet {
             IOException ioe = new IOException(e.getLocalizedMessage());
             ioe.initCause(e);
             throw ioe;
-        }
-    }
-
-    /**
-     * Check all the versioned parts for duplicates and remove, if no parts left in
-     * versioned remove the versioned from the <code>versionedList</code> list
-     *
-     * NB relies on the I_AmPart's equals method.
-     *
-     * @param versionedList List<? extends I_AmVersioned>
-     */
-    private <P extends I_AmPart> void removeDuplicateParts(List<? extends I_AmVersioned<P>> versionedList) {
-        /** Version to iterate over */
-        List<I_AmVersioned<P>> versions = new ArrayList<I_AmVersioned<P>>();
-        /** Parts to iterate over */
-        List<P> partList = new ArrayList<P>();
-        /** Unique parts */
-        Set<P> partSet = new HashSet<P>();
-
-        versions.addAll((Collection<? extends I_AmVersioned<P>>) versionedList);
-        for (I_AmVersioned<P> versioned : versions) {
-            partList.addAll(versioned.getVersions());
-            for (P part : partList) {
-                //If we have see this part before remove it from the versioned
-                if (!partSet.add(part)) {
-                    versioned.getVersions().remove(part);
-                }
-            }
-            //If there are no parts in the versioned (all duplicates) remove versioned.
-            if (versioned.getVersions().isEmpty()) {
-                versionedList.remove(versioned);
-            }
         }
     }
 }

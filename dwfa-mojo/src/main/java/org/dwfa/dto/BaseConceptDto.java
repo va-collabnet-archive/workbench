@@ -26,6 +26,7 @@ import org.dwfa.maven.transform.SctIdGenerator.TYPE;
  * Concept details for exporting.
  */
 public class BaseConceptDto {
+    private boolean latest = false;
     private UUID pathId;
     private UUID status;
     private String statusCode;
@@ -39,6 +40,20 @@ public class BaseConceptDto {
      */
     public BaseConceptDto() {
 
+    }
+
+    /**
+     * @return the latest
+     */
+    public boolean isLatest() {
+        return latest;
+    }
+
+    /**
+     * @param latest the latest to set
+     */
+    public void setLatest(boolean latest) {
+        this.latest = latest;
     }
 
     /**

@@ -89,6 +89,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private PositionDescriptor[] positionsForExport;
 
     /**
+     * Positions to exclude from export
+     *
+     * @parameter
+     */
+    private PositionDescriptor[] excludedPositions;
+
+    /**
      * Origins for export
      *
      * @parameter
@@ -319,21 +326,26 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             }
 
             for (I_Position iPosition : positionOrigins) {
-                Date timePoint = new Date();
-                timePoint.setTime(iPosition.getTime());
-                positions.add(new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()), timePoint));
-
                 UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
-                if (!releasePosition.getPath().getUuid().equals(pathUuid)) {
-                    Map<UUID, Date> mappedModuleDate;
-                    if (releasePathDateMap.containsKey(pathUuid)) {
-                        mappedModuleDate = releasePathDateMap.get(pathUuid);
-                    } else {
-                        mappedModuleDate = new HashMap<UUID, Date>(1);
-                        releasePathDateMap.put(pathUuid, mappedModuleDate);
-                    }
-                    mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
+                if (!isExcludedPath(pathUuid)) {
+                    Date timePoint = new Date();
+                    timePoint.setTime(iPosition.getTime());
+                    Position position = new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()),
+                        timePoint);
+                    position.setLastest(true);
+                    positions.add(position);
+
+                    if (!releasePosition.getPath().getUuid().equals(pathUuid.toString())) {
+                        Map<UUID, Date> mappedModuleDate;
+                        if (releasePathDateMap.containsKey(pathUuid)) {
+                            mappedModuleDate = releasePathDateMap.get(pathUuid);
+                        } else {
+                            mappedModuleDate = new HashMap<UUID, Date>(1);
+                            releasePathDateMap.put(pathUuid, mappedModuleDate);
+                        }
+                        mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
                             AceDateFormat.getRf2DateFormat().parse(releasePosition.getTimeString()));
+                    }
                 }
             }
         }
@@ -385,9 +397,9 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         if (moduleDescriptors != null) {
             for (Rf2ModuleDescriptor rf2ModuleDescriptor : moduleDescriptors) {
+                Map<UUID, Date> mappedModuleDate;
                 UUID pathUuid = UUID.fromString(rf2ModuleDescriptor.getPath().getUuid());
 
-                Map<UUID, Date> mappedModuleDate;
                 if (releasePathDateMap.containsKey(pathUuid)) {
                     mappedModuleDate = releasePathDateMap.get(pathUuid);
                 } else {
@@ -401,6 +413,23 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
         }
 
         return releasePathDateMap;
+    }
+
+    /**
+     * Is the path UUID in the excluded path list
+     *
+     * @param uuid UUID
+     * @return true if and excluded Path UUID
+     */
+    private boolean isExcludedPath(UUID uuid) {
+        boolean excluded = false;
+        for (PositionDescriptor positionDescriptor : excludedPositions) {
+            if (positionDescriptor.getPath().getUuid().equals(uuid.toString())) {
+                excluded = true;
+                break;
+            }
+        }
+        return excluded;
     }
 
     /**

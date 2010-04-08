@@ -8,6 +8,8 @@ import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public interface Concept {
+    /** Latest part flag. */
+    public boolean isLatest();
     /**
      * @return the conceptId
      */

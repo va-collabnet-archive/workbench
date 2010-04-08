@@ -18,12 +18,11 @@ package org.dwfa.mojo.export.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -45,7 +44,6 @@ import org.dwfa.mojo.file.ace.AceIdentifierRow;
 import org.dwfa.mojo.file.ace.AceIdentifierWriter;
 import org.dwfa.mojo.file.ace.AceRelationshipRow;
 import org.dwfa.mojo.file.ace.AceRelationshipWriter;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.AceDateFormat;
 
 /**
@@ -54,6 +52,10 @@ import org.dwfa.util.AceDateFormat;
 public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     /** For converting to midnight UTC. */
     private Calendar aceTime = new GregorianCalendar();
+    /** Full release directory */
+    private File fullExportDirectory;
+    /** Snapshot release directory */
+    private File snapshotExportDirectory;
     /** Concept ids file. */
     private AceIdentifierWriter idsFile;
     /** Concepts file. */
@@ -66,6 +68,18 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     private AceIdentifierWriter aceIdentifierCliniclFile;
     /** Structural refset member id file. */
     private AceIdentifierWriter aceIdentifierStructuralFile;
+    /** Concept ids file. */
+    private AceIdentifierWriter idsFileSnapShot;
+    /** Concepts file. */
+    private AceConceptWriter conceptFileSnapShot;
+    /** Descriptions file. */
+    private AceDescriptionWriter descriptionFileSnapShot;
+    /** Relationship file. */
+    private AceRelationshipWriter relationshipFileSnapShot;
+    /** Clinical refset member id file. */
+    private AceIdentifierWriter aceIdentifierCliniclFileSnapShot;
+    /** Structural refset member id file. */
+    private AceIdentifierWriter aceIdentifierStructuralFileSnapShot;
 
     /**
      * Constructor
@@ -78,13 +92,26 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         super(releasePathDateMap);
 
         exportDirectory.mkdirs();
-        idsFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.txt"));
-        conceptFile = new AceConceptWriter(new File(exportDirectory + File.separator + "concepts.txt"));
-        descriptionFile = new AceDescriptionWriter(new File(exportDirectory + File.separator + "descriptions.txt"));
-        relationshipFile = new AceRelationshipWriter(new File(exportDirectory + File.separator
-            + "relationships.txt"));
-        aceIdentifierCliniclFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.clinical.txt"));
-        aceIdentifierStructuralFile = new AceIdentifierWriter(new File(exportDirectory + File.separator + "ids.structural.txt"));
+
+        fullExportDirectory = new File(exportDirectory.getAbsolutePath() + File.separatorChar + "full");
+        fullExportDirectory.mkdirs();
+
+        snapshotExportDirectory = new File(exportDirectory.getAbsolutePath() + File.separatorChar + "snapshot");
+        snapshotExportDirectory.mkdirs();
+
+        idsFile = new AceIdentifierWriter(new File(fullExportDirectory + File.separator + "ids.txt"));
+        conceptFile = new AceConceptWriter(new File(fullExportDirectory + File.separator + "concepts.txt"));
+        descriptionFile = new AceDescriptionWriter(new File(fullExportDirectory + File.separator + "descriptions.txt"));
+        relationshipFile = new AceRelationshipWriter(new File(fullExportDirectory + File.separator + "relationships.txt"));
+        aceIdentifierCliniclFile = new AceIdentifierWriter(new File(fullExportDirectory + File.separator + "ids.clinical.txt"));
+        aceIdentifierStructuralFile = new AceIdentifierWriter(new File(fullExportDirectory + File.separator + "ids.structural.txt"));
+
+        idsFileSnapShot = new AceIdentifierWriter(new File(snapshotExportDirectory + File.separator + "ids.txt"));
+        conceptFileSnapShot = new AceConceptWriter(new File(snapshotExportDirectory + File.separator + "concepts.txt"));
+        descriptionFileSnapShot = new AceDescriptionWriter(new File(snapshotExportDirectory + File.separator + "descriptions.txt"));
+        relationshipFileSnapShot = new AceRelationshipWriter(new File(snapshotExportDirectory + File.separator + "relationships.txt"));
+        aceIdentifierCliniclFileSnapShot = new AceIdentifierWriter(new File(snapshotExportDirectory + File.separator + "ids.clinical.txt"));
+        aceIdentifierStructuralFileSnapShot = new AceIdentifierWriter(new File(snapshotExportDirectory + File.separator + "ids.structural.txt"));
     }
 
     /**
@@ -92,30 +119,41 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        synchronized (conceptFile) {
-            conceptFile.write(getAceConceptRow(componentDto.getConceptDto()));
+        for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
+            synchronized (conceptFile) {
+                conceptFile.write(getAceConceptRow(conceptDto));
+            }
+            if(conceptDto.isLatest()){
+                synchronized (conceptFileSnapShot) {
+                    conceptFileSnapShot.write(getAceConceptRow(conceptDto));
+                }
+            }
         }
-        synchronized (idsFile) {
-            idsFile.write(getAceIdentifierRows(componentDto.getConceptDto()));
-        }
+        writeIdRows(componentDto.getConceptDtos());
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
             synchronized (descriptionFile) {
                 descriptionFile.write(getAceDescriptionRow(descriptionDto));
             }
-            synchronized (idsFile) {
-                idsFile.write(getAceIdentifierRows(descriptionDto));
+            if(descriptionDto.isLatest()){
+                synchronized (descriptionFileSnapShot) {
+                    descriptionFileSnapShot.write(getAceDescriptionRow(descriptionDto));
+                }
             }
         }
+        writeIdRows(componentDto.getDescriptionDtos());
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
             synchronized (relationshipFile) {
                 relationshipFile.write(getAceRelationshipRow(relationshipDto));
             }
-            synchronized (idsFile) {
-                idsFile.write(getAceIdentifierRows(relationshipDto));
+            if(relationshipDto.isLatest()){
+                synchronized (relationshipFileSnapShot) {
+                    relationshipFileSnapShot.write(getAceRelationshipRow(relationshipDto));
+                }
             }
         }
+        writeIdRows(componentDto.getRelationshipDtos());
 
         writeExtensionIdRows(componentDto.getConceptExtensionDtos());
         writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
@@ -134,31 +172,13 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         relationshipFile.close();
         aceIdentifierCliniclFile.close();
         aceIdentifierStructuralFile.close();
-    }
 
-    /**
-     * Get the Rf2IdentifierRows from the ConceptDto.
-     *
-     * @param conceptDto ConceptDto
-     * @return List of Rf2IdentifierRow
-     * @throws Exception
-     */
-    private List<AceIdentifierRow> getAceIdentifierRows(ConceptDto conceptDto) throws Exception {
-        List<AceIdentifierRow> aceIdentifierRows = new ArrayList<AceIdentifierRow>(conceptDto.getIdentifierDtos().size());
-
-        for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
-            AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
-            aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
-            aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
-            aceIdentifierRow.setPrimaryUuid(identifierDto.getConceptId().keySet().iterator().next().toString());
-            aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
-            aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
-            aceIdentifierRow.setStatusUuid(identifierDto.getStatusId().toString());
-
-            aceIdentifierRows.add(aceIdentifierRow);
-        }
-
-        return aceIdentifierRows;
+        idsFileSnapShot.close();
+        conceptFileSnapShot.close();
+        descriptionFileSnapShot.close();
+        relationshipFileSnapShot.close();
+        aceIdentifierCliniclFileSnapShot.close();
+        aceIdentifierStructuralFileSnapShot.close();
     }
 
     /**
@@ -247,11 +267,48 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setEffectiveTime(getReleaseDate(relationshipDto));
         relationshipRow.setPathUuid(getModuleUuid(relationshipDto).toString());
         relationshipRow.setRefinabilityUuid(relationshipDto.getRefinabilityId().toString());
-        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroupCode().toString());
+        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroup().toString());
         relationshipRow.setRelationshipstatusUuid(relationshipDto.getStatusId().toString());
         relationshipRow.setRelationshiptypeUuid(relationshipDto.getTypeId().toString());
 
         return relationshipRow;
+    }
+
+    /**
+     * Write the unique id and snapshot id files.
+     *
+     * @param conceptDtos List of <? extends ConceptDto>
+     * @throws Exception
+     */
+    private void writeIdRows(List<? extends ConceptDto> conceptDtos) throws Exception {
+        Map<UUID, Long> exportedIds = new HashMap<UUID, Long>();
+
+        for (ConceptDto conceptDto : conceptDtos) {
+            for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
+                UUID uuid  = identifierDto.getConceptId().keySet().iterator().next();
+
+                if (!exportedIds.containsKey(uuid)) {
+                    AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
+                    aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
+                    aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
+                    aceIdentifierRow.setPrimaryUuid(uuid.toString());
+                    aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
+                    aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
+                    aceIdentifierRow.setStatusUuid(identifierDto.getStatusId().toString());
+
+                    exportedIds.put(uuid, identifierDto.getReferencedSctId());
+
+                    synchronized (idsFile) {
+                        idsFile.write(aceIdentifierRow);
+                    }
+                    if(identifierDto.isLatest()){
+                        synchronized (idsFileSnapShot) {
+                            idsFileSnapShot.write(aceIdentifierRow);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -272,15 +329,24 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
                     synchronized (aceIdentifierCliniclFile) {
                         aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
                     }
+                    if(extensionDto.isLatest()){
+                        synchronized (aceIdentifierCliniclFileSnapShot) {
+                            aceIdentifierCliniclFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+                        }
+                    }
                 } else {
                     synchronized (aceIdentifierStructuralFile) {
                         aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
+                    }
+                    if(extensionDto.isLatest()){
+                        synchronized (aceIdentifierStructuralFileSnapShot) {
+                            aceIdentifierStructuralFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+                        }
                     }
                 }
             }
             lastExtensionDto = extensionDto;
         }
-
     }
 
     /**

@@ -42,6 +42,7 @@ public class AceOutputHandlerTest {
     static AceOutputHandler aceOutputHandler;
     static File dbDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "test-id-db");
     static File exportDirectory = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "ace");
+    static File exportDirectoryFull = new File("target" + File.separatorChar + "test-classes" + File.separatorChar + "ace" + File.separatorChar + "full");
 
     @Before
     public void setUp() throws Exception {
@@ -65,15 +66,16 @@ public class AceOutputHandlerTest {
     @Test
     public void testExport() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
+        conceptDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto()));
 
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
-        componentDto.getDescriptionDtos().get(0).setConceptId(componentDto.getConceptDto().getConceptId());
+        componentDto.getDescriptionDtos().get(0).setConceptId(conceptDto.getConceptId());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
-        componentDto.getDescriptionDtos().get(1).setConceptId(componentDto.getConceptDto().getConceptId());
+        componentDto.getDescriptionDtos().get(1).setConceptId(conceptDto.getConceptId());
 
         componentDto.getRelationshipDtos().add(setRelationshipDto(new RelationshipDto()));
 
@@ -81,20 +83,20 @@ public class AceOutputHandlerTest {
 
         aceOutputHandler.closeFiles();
 
-        AceIdentifierReader aceIdentifierReader = new AceIdentifierReader(new File(exportDirectory, "ids.txt"));
-        assertIdentifierRow(componentDto.getConceptDto().getIdentifierDtos().get(0),
+        AceIdentifierReader aceIdentifierReader = new AceIdentifierReader(new File(exportDirectoryFull, "ids.txt"));
+        assertIdentifierRow(conceptDto.getIdentifierDtos().get(0),
             aceIdentifierReader.iterator().next());
 
-        AceConceptReader aceConceptReader = new AceConceptReader(new File(exportDirectory, "concepts.txt"));
+        AceConceptReader aceConceptReader = new AceConceptReader(new File(exportDirectoryFull, "concepts.txt"));
         AceConceptRow aceConceptRow = aceConceptReader.iterator().next();
         assertConceptRow(componentDto, aceConceptRow);
 
-        AceDescriptionReader aceDescriptionReader = new AceDescriptionReader(new File(exportDirectory, "descriptions.txt"));
+        AceDescriptionReader aceDescriptionReader = new AceDescriptionReader(new File(exportDirectoryFull, "descriptions.txt"));
         Iterator<AceDescriptionRow> descriptionIterator = aceDescriptionReader.iterator();
         assertDescriptionRow(componentDto.getDescriptionDtos().get(0), descriptionIterator.next());
         assertDescriptionRow(componentDto.getDescriptionDtos().get(1), descriptionIterator.next());
 
-        AceRelationshipReader aceRelationshipReader = new AceRelationshipReader(new File(exportDirectory, "relationships.txt"));
+        AceRelationshipReader aceRelationshipReader = new AceRelationshipReader(new File(exportDirectoryFull, "relationships.txt"));
 
         AceRelationshipRow relationshipRow = aceRelationshipReader.iterator().next();
         RelationshipDto relationshipDto =  componentDto.getRelationshipDtos().get(0);
@@ -109,7 +111,7 @@ public class AceOutputHandlerTest {
         Assert.assertEquals(relationshipDto.getTypeId().toString(), relationshipRow.getRelationshiptypeUuid());
         Assert.assertEquals(relationshipDto.getPathId().toString(), relationshipRow.getPathUuid());
         Assert.assertEquals(relationshipDto.getRefinabilityId().toString(), relationshipRow.getRefinabilityUuid());
-        Assert.assertEquals(relationshipDto.getRelationshipGroupCode().toString(),
+        Assert.assertEquals(relationshipDto.getRelationshipGroup().toString(),
             relationshipRow.getRelationshipGroup());
         Assert.assertEquals(relationshipDto.getStatusId().toString(), relationshipRow.getRelationshipstatusUuid());
         Assert.assertEquals(relationshipDto.getTypeId().toString(), relationshipRow.getRelationshiptypeUuid());
@@ -128,7 +130,7 @@ public class AceOutputHandlerTest {
     }
 
     private void assertConceptRow(ComponentDto componentDto, AceConceptRow aceConceptRow) throws Exception {
-        ConceptDto conceptDto = componentDto.getConceptDto();
+        ConceptDto conceptDto = componentDto.getConceptDtos().get(0);
 
         Assert.assertEquals(conceptDto.getConceptId().keySet().iterator().next().toString(), aceConceptRow.getConceptUuid());
         Assert.assertEquals(conceptDto.getStatusId().toString(), aceConceptRow.getConceptStatusUuid());
@@ -149,11 +151,12 @@ public class AceOutputHandlerTest {
     @Test
     public void testExportMissingConceptDetailsValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setConceptId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setConceptId(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a concepts id");
@@ -161,8 +164,8 @@ public class AceOutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setDateTime(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setDateTime(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a date");
@@ -170,8 +173,8 @@ public class AceOutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setPathId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setPathId(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a path id");
@@ -179,8 +182,8 @@ public class AceOutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setStatusId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setStatusId(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a status");
@@ -188,8 +191,8 @@ public class AceOutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setType(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setType(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a type");
@@ -197,8 +200,8 @@ public class AceOutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setNamespace(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setNamespace(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a Namespace");
@@ -210,9 +213,10 @@ public class AceOutputHandlerTest {
     @Test
     public void testExportMissingDescriptionValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
 
         componentDto.setDescriptionDtos(new ArrayList<DescriptionDto>());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
@@ -230,9 +234,10 @@ public class AceOutputHandlerTest {
     @Test
     public void testExportMissingDescriptionDetailsValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
 
         componentDto.setDescriptionDtos(new ArrayList<DescriptionDto>());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
@@ -347,7 +352,7 @@ public class AceOutputHandlerTest {
         }
 
         componentDto.getRelationshipDtos().set(0, setRelationshipDto(new RelationshipDto()));
-        componentDto.getRelationshipDtos().get(0).setRelationshipGroupCode(null);
+        componentDto.getRelationshipDtos().get(0).setRelationshipGroup(null);
         try{
             aceOutputHandler.export(componentDto);
             Assert.fail("Must have a Relationship Group Code");
@@ -385,6 +390,7 @@ public class AceOutputHandlerTest {
 
     private IdentifierDto setIdentifierDtoData(IdentifierDto identifierDto) {
         identifierDto.setActive(true);
+        identifierDto.setLatest(true);
         identifierDto.setReferencedSctId(900000000000960019l);
         identifierDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         identifierDto.setDateTime(getDate());
@@ -399,6 +405,7 @@ public class AceOutputHandlerTest {
 
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
         conceptDto.setActive(true);
+        conceptDto.setLatest(true);
         conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(getDate());
         conceptDto.setFullySpecifiedName("Flamingducks");
@@ -444,7 +451,7 @@ public class AceOutputHandlerTest {
         relationshipDto.setModifierId(UUID.randomUUID());
         relationshipDto.setRefinable('1');
         relationshipDto.setRefinabilityId(UUID.randomUUID());
-        relationshipDto.setRelationshipGroupCode('1');
+        relationshipDto.setRelationshipGroup(1);
         relationshipDto.setTypeId(UUID.randomUUID());
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setRefinable('0');

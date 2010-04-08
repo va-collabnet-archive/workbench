@@ -18,13 +18,11 @@ package org.dwfa.mojo.export.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 import org.dwfa.dto.ComponentDto;
-import org.dwfa.dto.Concept;
 import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.RelationshipDto;
@@ -68,19 +66,27 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        synchronized (conceptFile) {
-            conceptFile.write(getRf1ConceptRow(componentDto.getConceptDto()));
+        for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
+            if (conceptDto.isLatest() && conceptDto.isActive()) {
+                synchronized (conceptFile) {
+                    conceptFile.write(getRf1ConceptRow(conceptDto));
+                }
+            }
         }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            synchronized (descriptionFile) {
-                descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+            if (descriptionDto.isLatest() && descriptionDto.isActive()) {
+                synchronized (descriptionFile) {
+                    descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+                }
             }
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            synchronized (relationshipFile) {
-                relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+            if (relationshipDto.isLatest() && relationshipDto.isActive()) {
+                synchronized (relationshipFile) {
+                    relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+                }
             }
         }
     }
@@ -154,7 +160,7 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setCharacteristicType(relationshipDto.getCharacteristicTypeCode().toString());
         relationshipRow.setRefinability(relationshipDto.getRefinable().toString());
         relationshipRow.setRelationshipGroup(
-            (relationshipDto.getRelationshipGroupCode() != null)? relationshipDto.getRelationshipGroupCode().toString() : "");
+            (relationshipDto.getRelationshipGroup() != null)? relationshipDto.getRelationshipGroup().toString() : "");
 
         return relationshipRow;
     }
@@ -165,8 +171,8 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      * @param concept Concept
      * @return String 1 or 0 1 is active
      */
-    private String getPrimitiveFlag(Concept concept) {
-        return concept.isActive() ? "1" : "0";
+    private String getPrimitiveFlag(ConceptDto concept) {
+        return concept.isPrimative() ? "0" : "1";
     }
 
     /**

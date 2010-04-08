@@ -52,46 +52,74 @@ import org.dwfa.util.AceDateFormat;
  */
 public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
 
-    private File exportDirectory;
+    private File fullExportDirectory;
+    private File snapShotExportDirectory;
     private File exportClinicalRefsetDirectory;
+    private File exportClinicalRefsetDirectorySnapShot;
     private File exportStructuralRefsetDirectory;
-    private Rf2IdentifierWriter identifierFile;
-    private Rf2IdentifierWriter identifierCliniclFile;
-    private Rf2IdentifierWriter identifierStructuralFile;
-    private Rf2ConceptWriter conceptFile;
-    private Rf2DescriptionWriter descriptionFile;
-    private Rf2RelationshipWriter relationshipFile;
+    private File exportStructuralRefsetDirectorySnapShot;
+    private Rf2IdentifierWriter identifierFileFull;
+    private Rf2IdentifierWriter identifierCliniclFileFull;
+    private Rf2IdentifierWriter identifierStructuralFileFull;
+    private Rf2ConceptWriter conceptFileFull;
+    private Rf2DescriptionWriter descriptionFileFull;
+    private Rf2RelationshipWriter relationshipFileFull;
+    private Rf2IdentifierWriter identifierFileSnapShot;
+    private Rf2IdentifierWriter identifierCliniclFileSnapShot;
+    private Rf2IdentifierWriter identifierStructuralFileSnapShot;
+    private Rf2ConceptWriter conceptFileSnapShot;
+    private Rf2DescriptionWriter descriptionFileSnapShot;
+    private Rf2RelationshipWriter relationshipFileSnapShot;
     private Map<Long, Rf2ReferenceSetWriter> referenceSetFileMap;
+    private Map<Long, Rf2ReferenceSetWriter> referenceSetFileMapSnapShot;
 
     /**
      * Constructor
      *
-     * @param exportDirectory File
+     * @param fullExportDirectory File
      * @param SctIdDbDirectory File
      * @throws Exception
      */
-    public Rf2OutputHandler(File exportDirectory, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
+    public Rf2OutputHandler(File exportDirectoryToSet, Map<UUID, Map<UUID, Date>> releasePathDateMap) throws Exception {
         super(releasePathDateMap);
 
-        this.exportDirectory = exportDirectory;
-        this.exportDirectory.mkdirs();
+        fullExportDirectory = new File(exportDirectoryToSet.getAbsolutePath() + File.separatorChar + "full");
+        fullExportDirectory.mkdirs();
 
-        exportClinicalRefsetDirectory = new File(this.exportDirectory.getAbsolutePath() + File.separatorChar + "refsets"
+        snapShotExportDirectory = new File(exportDirectoryToSet.getAbsolutePath() + File.separatorChar + "snapshot");
+        snapShotExportDirectory.mkdirs();
+
+        exportClinicalRefsetDirectory = new File(this.fullExportDirectory.getAbsolutePath() + File.separatorChar + "refsets"
             + File.separatorChar + "clinical" + File.separatorChar);
-        exportStructuralRefsetDirectory = new File(this.exportDirectory.getAbsolutePath() + File.separatorChar
+        exportClinicalRefsetDirectorySnapShot = new File(this.snapShotExportDirectory.getAbsolutePath() + File.separatorChar + "refsets"
+                + File.separatorChar + "clinical" + File.separatorChar);
+        exportStructuralRefsetDirectory = new File(this.fullExportDirectory.getAbsolutePath() + File.separatorChar
+            + "refsets" + File.separatorChar + "structural" + File.separatorChar);
+        exportStructuralRefsetDirectorySnapShot = new File(this.snapShotExportDirectory.getAbsolutePath() + File.separatorChar
             + "refsets" + File.separatorChar + "structural" + File.separatorChar);
         exportClinicalRefsetDirectory.mkdirs();
+        exportClinicalRefsetDirectorySnapShot.mkdirs();
         exportStructuralRefsetDirectory.mkdirs();
+        exportStructuralRefsetDirectorySnapShot.mkdirs();
 
-        identifierFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.rf2.txt"));
-        identifierCliniclFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.clinical.rf2.txt"));
-        identifierStructuralFile = new Rf2IdentifierWriter(new File(exportDirectory + File.separator + "ids.structural.rf2.txt"));
-        conceptFile = new Rf2ConceptWriter(new File(exportDirectory + File.separator + "concepts.rf2.txt"));
-        descriptionFile = new Rf2DescriptionWriter(new File(exportDirectory + File.separator + "descriptions.rf2.txt"));
-        relationshipFile = new Rf2RelationshipWriter(new File(exportDirectory + File.separator
+        identifierFileFull = new Rf2IdentifierWriter(new File(fullExportDirectory + File.separator + "ids.rf2.txt"));
+        identifierCliniclFileFull = new Rf2IdentifierWriter(new File(fullExportDirectory + File.separator + "ids.clinical.rf2.txt"));
+        identifierStructuralFileFull = new Rf2IdentifierWriter(new File(fullExportDirectory + File.separator + "ids.structural.rf2.txt"));
+        conceptFileFull = new Rf2ConceptWriter(new File(fullExportDirectory + File.separator + "concepts.rf2.txt"));
+        descriptionFileFull = new Rf2DescriptionWriter(new File(fullExportDirectory + File.separator + "descriptions.rf2.txt"));
+        relationshipFileFull = new Rf2RelationshipWriter(new File(fullExportDirectory + File.separator
             + "relationships.rf2.txt"));
 
+        identifierFileSnapShot = new Rf2IdentifierWriter(new File(snapShotExportDirectory + File.separator + "ids.rf2.txt"));
+        identifierCliniclFileSnapShot = new Rf2IdentifierWriter(new File(snapShotExportDirectory + File.separator + "ids.clinical.rf2.txt"));
+        identifierStructuralFileSnapShot = new Rf2IdentifierWriter(new File(snapShotExportDirectory + File.separator + "ids.structural.rf2.txt"));
+        conceptFileSnapShot = new Rf2ConceptWriter(new File(snapShotExportDirectory + File.separator + "concepts.rf2.txt"));
+        descriptionFileSnapShot = new Rf2DescriptionWriter(new File(snapShotExportDirectory + File.separator + "descriptions.rf2.txt"));
+        relationshipFileSnapShot = new Rf2RelationshipWriter(new File(snapShotExportDirectory + File.separator
+                + "relationships.rf2.txt"));
+
         referenceSetFileMap = new HashMap<Long, Rf2ReferenceSetWriter>();
+        referenceSetFileMapSnapShot = new HashMap<Long, Rf2ReferenceSetWriter>();
     }
 
     /**
@@ -99,28 +127,55 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
-        synchronized (conceptFile) {
-            conceptFile.write(getRf2ConceptRow(componentDto.getConceptDto()));
+        for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
+            synchronized (conceptFileFull) {
+                conceptFileFull.write(getRf2ConceptRow(conceptDto));
+            }
+            if(conceptDto.isLatest()){
+                synchronized (conceptFileSnapShot) {
+                    conceptFileSnapShot.write(getRf2ConceptRow(conceptDto));
+                }
+            }
         }
-        synchronized (identifierFile) {
-            identifierFile.write(getRf2IdentifierRows(componentDto.getConceptDto()));
+        synchronized (identifierFileFull) {
+            identifierFileFull.write(getRf2IdentifierRows(componentDto.getConceptDtos(), false));
         }
+        synchronized (identifierFileSnapShot) {
+            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getConceptDtos(), true));
+        }
+
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            synchronized (descriptionFile) {
-                descriptionFile.write(getRf2DescriptionRow(descriptionDto));
+            synchronized (descriptionFileFull) {
+                descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
             }
-            synchronized (identifierFile) {
-                identifierFile.write(getRf2IdentifierRows(descriptionDto));
+            if(descriptionDto.isLatest()){
+                synchronized (descriptionFileSnapShot) {
+                    descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                }
             }
+        }
+        synchronized (identifierFileFull) {
+            identifierFileFull.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), false));
+        }
+        synchronized (identifierFileSnapShot) {
+            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), true));
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            synchronized (relationshipFile) {
-                relationshipFile.write(getRf2RelationshipRow(relationshipDto));
+            synchronized (relationshipFileFull) {
+                relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
             }
-            synchronized (identifierFile) {
-                identifierFile.write(getRf2IdentifierRows(relationshipDto));
+            if(relationshipDto.isLatest()){
+                synchronized (relationshipFileSnapShot) {
+                    relationshipFileSnapShot.write(getRf2RelationshipRow(relationshipDto));
+                }
             }
+        }
+        synchronized (identifierFileFull) {
+            identifierFileFull.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), false));
+        }
+        synchronized (identifierFileSnapShot) {
+            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), true));
         }
 
         // group all the matching members together.
@@ -151,9 +206,15 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private void writeExtensionRow(ExtensionDto extensionDto) throws Exception, IOException, TerminologyException {
         Rf2ReferenceSetRow referenceSetRow = getRf2ExtensionRow(extensionDto);
 
-        Rf2ReferenceSetWriter referenceSetWriter = getReferenceSetWriter(extensionDto);
+        Rf2ReferenceSetWriter referenceSetWriter = getReferenceSetWriter(extensionDto, false);
         synchronized (referenceSetWriter) {
             referenceSetWriter.write(referenceSetRow);
+        }
+        if (extensionDto.isLatest()) {
+            referenceSetWriter = getReferenceSetWriter(extensionDto, true);
+            synchronized (referenceSetWriter) {
+                referenceSetWriter.write(referenceSetRow);
+            }
         }
     }
 
@@ -172,18 +233,27 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         for (ExtensionDto extensionDto : extensionDtos) {
             if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
                 if (extensionDto.isClinical()) {
-                    synchronized (identifierCliniclFile) {
-                        identifierCliniclFile.write(getRf2MemberIdentifierRow(extensionDto));
+                    synchronized (identifierCliniclFileFull) {
+                        identifierCliniclFileFull.write(getRf2MemberIdentifierRow(extensionDto));
+                    }
+                    if (extensionDto.isLatest()) {
+                        synchronized (identifierCliniclFileSnapShot) {
+                            identifierCliniclFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+                        }
                     }
                 } else {
-                    synchronized (identifierStructuralFile) {
-                        identifierStructuralFile.write(getRf2MemberIdentifierRow(extensionDto));
+                    synchronized (identifierStructuralFileFull) {
+                        identifierStructuralFileFull.write(getRf2MemberIdentifierRow(extensionDto));
+                    }
+                    if (extensionDto.isLatest()) {
+                        synchronized (identifierStructuralFileSnapShot) {
+                            identifierStructuralFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+                        }
                     }
                 }
             }
             lastExtensionDto = extensionDto;
         }
-
     }
 
     /**
@@ -192,12 +262,24 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * @throws IOException if files cannot be closed.
      */
     public void closeFiles() throws IOException {
-        identifierFile.close();
-        conceptFile.close();
-        descriptionFile.close();
-        relationshipFile.close();
+        identifierFileFull.close();
+        conceptFileFull.close();
+        descriptionFileFull.close();
+        relationshipFileFull.close();
+        identifierCliniclFileFull.close();
+        identifierStructuralFileFull.close();
+
+        identifierFileSnapShot.close();
+        identifierCliniclFileSnapShot.close();
+        identifierStructuralFileSnapShot.close();
+        conceptFileSnapShot.close();
+        descriptionFileSnapShot.close();
+        relationshipFileSnapShot.close();
 
         for (Rf2ReferenceSetWriter rf2ReferenceSetWriter : referenceSetFileMap.values()) {
+            rf2ReferenceSetWriter.close();
+        }
+        for (Rf2ReferenceSetWriter rf2ReferenceSetWriter : referenceSetFileMapSnapShot.values()) {
             rf2ReferenceSetWriter.close();
         }
     }
@@ -213,23 +295,65 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      * @return Rf2ReferenceSetWriter
      * @throws Exception cannot get an SCT id
      */
-    private Rf2ReferenceSetWriter getReferenceSetWriter(ExtensionDto extensionDto) throws Exception {
+    private Rf2ReferenceSetWriter getReferenceSetWriter(ExtensionDto extensionDto, boolean latest) throws Exception {
         Long sctId = getSctId(extensionDto, extensionDto.getConceptId(), TYPE.CONCEPT);
 
-        if (!referenceSetFileMap.containsKey(sctId)) {
+        if (!getReferenceSetFileMap(latest).containsKey(sctId)) {
             Rf2ReferenceSetWriter newReferenceSetWriter;
             if (extensionDto.isClinical()) {
-                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportClinicalRefsetDirectory
+                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(getReferenceSetExportDirectory(extensionDto.isClinical(), latest)
                     + File.separator + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
             } else {
-                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(exportStructuralRefsetDirectory
+                newReferenceSetWriter = new Rf2ReferenceSetWriter(new File(getReferenceSetExportDirectory(extensionDto.isClinical(), latest)
                     + File.separator + convertToCamelCase(extensionDto.getFullySpecifiedName()) + ".txt"));
             }
 
-            referenceSetFileMap.put(sctId, newReferenceSetWriter);
+            getReferenceSetFileMap(latest).put(sctId, newReferenceSetWriter);
         }
 
-        return referenceSetFileMap.get(sctId);
+        return getReferenceSetFileMap(latest).get(sctId);
+    }
+
+    /**
+     * Get the file map for the full or snapshot
+     *
+     * @param latest boolean
+     * @return Map of Long to Rf2ReferenceSetWriter
+     */
+    private Map<Long, Rf2ReferenceSetWriter> getReferenceSetFileMap(boolean latest){
+        Map<Long, Rf2ReferenceSetWriter> refsetFileMap = referenceSetFileMap;
+        if(latest){
+            refsetFileMap = referenceSetFileMapSnapShot;
+        }
+
+        return refsetFileMap;
+    }
+
+    /**
+     * Get the directory for the refset file
+     *
+     * @param clinical boolean
+     * @param latest boolean
+     * @return File
+     */
+    private File getReferenceSetExportDirectory(boolean clinical, boolean latest){
+        File exportDirectory;
+
+        if(latest){
+            if(clinical){
+                exportDirectory = exportClinicalRefsetDirectorySnapShot;
+            } else {
+                exportDirectory = exportStructuralRefsetDirectorySnapShot;
+            }
+        } else {
+            if(clinical){
+                exportDirectory = exportClinicalRefsetDirectory;
+            } else {
+                exportDirectory = exportStructuralRefsetDirectory;
+            }
+        }
+
+        return exportDirectory;
     }
 
     /**
@@ -254,24 +378,37 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     /**
      * Get the Rf2IdentifierRows from the ConceptDto.
      *
-     * @param conceptDto ConceptDto
+     * Returns a unique list of UUID, SCTID rows.
+     *
+     * @param conceptDtos List of ConceptDto
      * @return List of Rf2IdentifierRow
      * @throws Exception
      */
-    private List<Rf2IdentifierRow> getRf2IdentifierRows(ConceptDto conceptDto) throws Exception {
-        List<Rf2IdentifierRow> rf2IdentifierRows = new ArrayList<Rf2IdentifierRow>(conceptDto.getIdentifierDtos()
-            .size());
+    private List<Rf2IdentifierRow> getRf2IdentifierRows(List<? extends ConceptDto> conceptDtos, boolean latest) throws Exception {
+        List<Rf2IdentifierRow> rf2IdentifierRows = new ArrayList<Rf2IdentifierRow>();
+        Map<UUID, Long> exportedIds = new HashMap<UUID, Long>();
 
-        for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
-            Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
-            rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
-            rf2IdentifierRow.setAlternateIdentifier(identifierDto.getConceptId().keySet().iterator().next().toString());
-            rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
-            rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto, identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
-            rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
-            rf2IdentifierRow.setReferencedComponentSctId(identifierDto.getReferencedSctId().toString());
+        for (ConceptDto conceptDto : conceptDtos) {
+            for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
+                UUID uuid  = identifierDto.getConceptId().keySet().iterator().next();
 
-            rf2IdentifierRows.add(rf2IdentifierRow);
+                if (!exportedIds.containsKey(uuid)) {
+                    Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
+                    rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
+                    rf2IdentifierRow.setAlternateIdentifier(uuid.toString());
+                    rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
+                    rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto,
+                        identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
+                    rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
+                    rf2IdentifierRow.setReferencedComponentSctId(identifierDto.getReferencedSctId().toString());
+
+                    if((latest && identifierDto.isLatest())
+                            || !latest) {
+                        rf2IdentifierRows.add(rf2IdentifierRow);
+                        exportedIds.put(uuid, identifierDto.getReferencedSctId());
+                    }
+                }
+            }
         }
 
         return rf2IdentifierRows;
@@ -365,7 +502,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         relationshipRow.setCharacteristicSctId(getSctId(relationshipDto, relationshipDto.getCharacteristicTypeId(), TYPE.CONCEPT).toString());
         relationshipRow.setModifierSctId(getSctId(relationshipDto, relationshipDto.getModifierId(), TYPE.CONCEPT).toString());
         relationshipRow.setTypeSctId(getSctId(relationshipDto, relationshipDto.getTypeId(), TYPE.CONCEPT).toString());
-        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroupCode().toString());
+        relationshipRow.setRelationshipGroup(relationshipDto.getRelationshipGroup().toString());
 
         return relationshipRow;
     }

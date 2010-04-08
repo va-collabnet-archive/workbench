@@ -28,6 +28,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.HashFunction;
 
 public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
     I_ThinExtByRefPart part;
@@ -172,6 +173,24 @@ public class ThinExtByRefTuple implements I_ThinExtByRefTuple {
      */
     public I_ThinExtByRefPart getPart() {
         return part;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        ThinExtByRefTuple other = (ThinExtByRefTuple) obj;
+        return part.equals(other.getPart()) && core.equals(other.getCore());
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] { part.hashCode(), core.hashCode() });
+
     }
 
     @Override

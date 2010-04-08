@@ -1,8 +1,6 @@
 package org.dwfa.mojo.export.file;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +16,7 @@ import org.dwfa.dto.ConceptDto;
 import org.dwfa.dto.DescriptionDto;
 import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
+import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.rf1.Rf1ConceptReader;
@@ -62,14 +61,15 @@ public class Rf1OutputHandlerTest {
     @Test
     public void testExport() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
 
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
-        componentDto.getDescriptionDtos().get(0).setConceptId(componentDto.getConceptDto().getConceptId());
+        componentDto.getDescriptionDtos().get(0).setConceptId(conceptDto.getConceptId());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
-        componentDto.getDescriptionDtos().get(1).setConceptId(componentDto.getConceptDto().getConceptId());
+        componentDto.getDescriptionDtos().get(1).setConceptId(conceptDto.getConceptId());
 
         componentDto.getRelationshipDtos().add(setRelationshipDto(new RelationshipDto()));
 
@@ -107,7 +107,7 @@ public class Rf1OutputHandlerTest {
         Assert.assertEquals(relationshipDto.getCharacteristicTypeCode().toString(),
             relationshipRow.getCharacteristicType());
         Assert.assertEquals(relationshipDto.getRefinable().toString(), relationshipRow.getRefinability());
-        Assert.assertEquals(relationshipDto.getRelationshipGroupCode().toString(),
+        Assert.assertEquals(relationshipDto.getRelationshipGroup().toString(),
             relationshipRow.getRelationshipGroup());
     }
 
@@ -124,24 +124,23 @@ public class Rf1OutputHandlerTest {
     }
 
     private void assertConceptRow(ComponentDto componentDto, Rf1ConceptRow rf1ConceptRow) throws Exception {
-        Assert.assertEquals(getSctId(componentDto.getConceptDto().getConceptId(), componentDto.getConceptDto()),
+        ConceptDto conceptDto = componentDto.getConceptDtos().get(0);
+        Assert.assertEquals(getSctId(conceptDto.getConceptId(), conceptDto),
             rf1ConceptRow.getConceptSctId());
-
-        ConceptDto conceptDto = componentDto.getConceptDto();
 
         Assert.assertEquals(getSctId(conceptDto.getConceptId(), conceptDto).toString(), rf1ConceptRow.getConceptSctId());
         Assert.assertEquals(conceptDto.getStatusCode(), rf1ConceptRow.getConceptStatus());
         Assert.assertEquals(conceptDto.getCtv3Id(), rf1ConceptRow.getCtv3Id());
         Assert.assertEquals(conceptDto.getSnomedId(), rf1ConceptRow.getSnomedId());
         Assert.assertEquals(conceptDto.getFullySpecifiedName(), rf1ConceptRow.getFullySpecifiedName());
-        Assert.assertEquals((conceptDto.isPrimative()) ? "1" : "0", rf1ConceptRow.getIsPrimitve());
+        Assert.assertEquals((conceptDto.isPrimative()) ? "0" : "1", rf1ConceptRow.getIsPrimitve());
 
     }
 
     private String getSctId(UUID id, Concept concept, TYPE type) throws Exception {
         String sctId = null;
 
-        sctId = rf1OutputHandler.snomedIdHandler.getWithoutGeneration(id, concept.getNamespace(), type).toString();
+        sctId = UuidSnomedDbMapHandler.getInstance().getWithoutGeneration(id, concept.getNamespace(), type).toString();
 
         return sctId;
     }
@@ -157,11 +156,12 @@ public class Rf1OutputHandlerTest {
     @Test
     public void testExportMissingConceptDetailsValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setConceptId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setConceptId(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a concepts id");
@@ -169,8 +169,8 @@ public class Rf1OutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setDateTime(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setDateTime(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a date");
@@ -178,8 +178,8 @@ public class Rf1OutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setPathId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setPathId(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a path id");
@@ -187,8 +187,8 @@ public class Rf1OutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setStatusId(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setStatusId(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a status");
@@ -196,8 +196,8 @@ public class Rf1OutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setType(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setType(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a type");
@@ -205,8 +205,8 @@ public class Rf1OutputHandlerTest {
 
         }
 
-        setConceptDtoData(componentDto.getConceptDto());
-        componentDto.getConceptDto().setNamespace(null);
+        setConceptDtoData(conceptDto);
+        conceptDto.setNamespace(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a Namespace");
@@ -218,9 +218,10 @@ public class Rf1OutputHandlerTest {
     @Test
     public void testExportMissingDescriptionValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
 
         componentDto.setDescriptionDtos(new ArrayList<DescriptionDto>());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
@@ -238,9 +239,10 @@ public class Rf1OutputHandlerTest {
     @Test
     public void testExportMissingDescriptionDetailsValidation() throws Throwable {
         ComponentDto componentDto = new ComponentDto();
+        ConceptDto conceptDto = new ConceptDto();
 
-        componentDto.setConceptDto(new ConceptDto());
-        setConceptDtoData(componentDto.getConceptDto());
+        componentDto.getConceptDtos().add(conceptDto);
+        setConceptDtoData(conceptDto);
 
         componentDto.setDescriptionDtos(new ArrayList<DescriptionDto>());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
@@ -355,7 +357,7 @@ public class Rf1OutputHandlerTest {
         }
 
         componentDto.getRelationshipDtos().set(0, setRelationshipDto(new RelationshipDto()));
-        componentDto.getRelationshipDtos().get(0).setRelationshipGroupCode(null);
+        componentDto.getRelationshipDtos().get(0).setRelationshipGroup(null);
         try{
             rf1OutputHandler.export(componentDto);
             Assert.fail("Must have a Relationship Group Code");
@@ -392,6 +394,7 @@ public class Rf1OutputHandlerTest {
     }
 
     private ConceptDto setConceptDtoData(ConceptDto conceptDto) {
+        conceptDto.setLatest(true);
         conceptDto.setActive(true);
         conceptDto.setConceptId(getIdMap(UUID.randomUUID(), null));
         conceptDto.setDateTime(new Date());
@@ -437,7 +440,7 @@ public class Rf1OutputHandlerTest {
         relationshipDto.setCharacteristicTypeId(UUID.randomUUID());
         relationshipDto.setModifierId(UUID.randomUUID());
         relationshipDto.setRefinable('1');
-        relationshipDto.setRelationshipGroupCode('1');
+        relationshipDto.setRelationshipGroup(1);
         relationshipDto.setTypeId(UUID.randomUUID());
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setRefinable('0');

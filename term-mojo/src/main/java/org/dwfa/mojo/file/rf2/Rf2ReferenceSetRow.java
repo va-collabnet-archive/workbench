@@ -77,7 +77,7 @@ public class Rf2ReferenceSetRow {
     public String getHeader() {
         return "id" + COLUMN_DELIMITER + "effectiveTime" + COLUMN_DELIMITER + "active" + COLUMN_DELIMITER + "moduleId"
             + COLUMN_DELIMITER + "refSetId" + COLUMN_DELIMITER + "referencedComponentId"
-            + ((componentId1 == null) ? "" : COLUMN_DELIMITER + "valueId1")
+            + ((componentId1 == null) ? "" : COLUMN_DELIMITER + "valueId")
             + ((componentId2 == null) ? "" : COLUMN_DELIMITER + "valueId2")
             + ((componentId3 == null) ? "" : COLUMN_DELIMITER + "valueId3")
             + ((value == null) ? "" : COLUMN_DELIMITER + "value");

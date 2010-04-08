@@ -30,7 +30,7 @@ public class RelationshipDto extends ConceptDto {
     private UUID modifierId;
     private UUID RefinabilityId;
     private Character refinableCode;
-    private Character relationshipGroupCode;
+    private Integer relationshipGroup;
     private Character characteristicTypeCode;
 
     /**
@@ -141,15 +141,15 @@ public class RelationshipDto extends ConceptDto {
     /**
      * @return the relationshipGroupCode
      */
-    public Character getRelationshipGroupCode() {
-        return relationshipGroupCode;
+    public Integer getRelationshipGroup() {
+        return relationshipGroup;
     }
 
     /**
      * @param relationshipGroupCode the relationshipGroupCode to set
      */
-    public void setRelationshipGroupCode(Character relationshipGroupCode) {
-        this.relationshipGroupCode = relationshipGroupCode;
+    public void setRelationshipGroup(Integer relationshipGroupCode) {
+        this.relationshipGroup = relationshipGroupCode;
     }
 
     /**

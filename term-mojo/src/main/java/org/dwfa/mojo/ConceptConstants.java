@@ -90,6 +90,10 @@ public class ConceptConstants {
         "SAME AS association reference set (foundation metadata concept)", "622aa587-2e34-43b3-b3d4-53561aa3c7be");
     public static final ConceptSpec WAS_A_HISTORY_REFSET = new ConceptSpec(
         "WAS A association reference set (foundation metadata concept)", "6c441f26-ed8a-42ff-91b7-fcb27191f9f6");
+
+    public static final ConceptSpec ACTIVE_VALUE = new ConceptSpec("Active value",
+        "5b28ff9a-0770-4bbc-8e24-6279c5d3eb23");
+
     //TODO
 //    public static final ConceptSpec MAY_BE_A_HISTORY_REFSET = new ConceptSpec(
 //        "MOVED FROM association reference set (foundation metadata concept)", "76765f82-f9cb-349c-88b0-8261e4b46421");

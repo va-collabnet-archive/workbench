@@ -85,7 +85,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validationErrors.append(System.getProperty("line.separator"));
             }
 
-            logger.warning(componentDto.getConceptDto().getConceptId().keySet().iterator().next()
+            logger.warning(componentDto.getConceptDtos().get(0).getConceptId().keySet().iterator().next()
                 + " Validation Errors:" + validationErrors.toString());
             if (failOnError) {
                 throw new ValidationException("Validation Errors:" + validationErrors);
@@ -101,14 +101,14 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      */
     private List<String> validate(ComponentDto componentDto) {
         List<String> validationErrorList = new ArrayList<String>();
-        ConceptDto conceptDto = componentDto.getConceptDto();
+        List<ConceptDto> conceptDtos = componentDto.getConceptDtos();
         List<DescriptionDto> descriptionDtos = componentDto.getDescriptionDtos();
         List<RelationshipDto> relationshipDtos = componentDto.getRelationshipDtos();
         List<ExtensionDto> componentExtensionDtos = componentDto.getConceptExtensionDtos();
         List<ExtensionDto> descriptionExtensionDtos = componentDto.getDescriptionExtensionDtos();
         List<ExtensionDto> relationshipExtensionDtos = componentDto.getRelationshipExtensionDtos();
 
-        validateConceptDto(validationErrorList, conceptDto);
+        validateConcepts(validationErrorList, conceptDtos);
         validateDescription(validationErrorList, descriptionDtos);
         validationRelationships(validationErrorList, relationshipDtos);
         validationExtensions(validationErrorList, componentExtensionDtos);
@@ -116,6 +116,18 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         validationExtensions(validationErrorList, relationshipExtensionDtos);
 
         return validationErrorList;
+    }
+
+    /**
+     * Validate the concept details.
+     *
+     * @param validationErrorList List of String
+     * @param conceptDtos List ConceptDto
+     */
+    private void validateConcepts(List<String> validationErrorList, List<ConceptDto> conceptDtos) {
+        for (ConceptDto conceptDto : conceptDtos) {
+            validateConceptDto(validationErrorList, conceptDto);
+        }
     }
 
     /**
@@ -167,7 +179,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                     validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
                         + " No modifier id");
                 }
-                if (relationshipDto.getRelationshipGroupCode() == null) {
+                if (relationshipDto.getRelationshipGroup() == null) {
                     validationErrorList.add(relationshipDto.getConceptId().keySet().iterator().next()
                         + " No group code");
                 }
