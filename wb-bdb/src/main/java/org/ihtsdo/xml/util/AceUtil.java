@@ -1,13 +1,11 @@
 package org.ihtsdo.xml.util;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_TermFactory;
-import org.ihtsdo.xml.util.AceXMLUtil;
 
 public class AceUtil {
 
