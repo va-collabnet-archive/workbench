@@ -17,6 +17,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
+import org.ihtsdo.xml.util.AceXMLUtil;
 import org.ihtsdo.xml.util.XMLUtil;
 
 import org.w3c.dom.Document;
@@ -39,7 +40,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 	public int conIdi = -1;
 	public String oc_key = "";
 	public String uuid_key = "";
-	public String conIdi_S = "";
+	//public String conIdi_S = "";
 
 	public XML_I_GetConceptData(I_GetConceptData concept) {
 			
@@ -160,117 +161,15 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 
 	}
 
-	public void getXML() {
-		// System.out.println("process called debug = "+debug);
-		conIdi_S = "-1";
-		oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;
-
-		Doc = XMLUtil.getEmptyDocument();
-		parent = Doc.createElement(CommonXMLStatics.CONCEPT_ENAME);
-		Doc.appendChild(parent);
-
-		try {
-			// System.out.println("Printing Doc");
-			// System.out.println(XMLUtil.convertToStringLeaveCDATA(Doc));
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	public void getXML() {		
+		
+		
 
 		if (!debug) {
-			conIdi = concept.getConceptId();
-			conIdi_S = Integer.toString(conIdi);
-			oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;
-			
-			
-
-			if (ObjectCache.get(conIdi_S) == null) {
-				// Add the ID
-				uuid_key = BasicXMLStruct.getNativeIdAtts(conIdi, parent);
-				// Add the identifier
-				try {
-					new XML_I_Identify(concept.getIdentifier(), parent);
-					// ConceptAttributeVersioned
-					if (concept.getConceptAttributes() != null) {
-						XML_I_ConceptAttributeVersioned icav_h = new XML_I_ConceptAttributeVersioned(
-								concept.getConceptAttributes(), parent);
-					}
-					// Descriptions
-					Element descsE = Doc
-							.createElement(CommonXMLStatics.DESCRIPTIONS_ENAME);
-
-					for (I_DescriptionVersioned desc : concept
-							.getDescriptions()) {
-						new XML_I_DescriptionVersioned(desc, descsE);
-					}
-					parent.appendChild(descsE);
-
-					// Src Rels
-					Element srcRelsE = Doc
-							.createElement(CommonXMLStatics.SRCRELS_ENAME);
-					for (I_RelVersioned srcRel : concept.getSourceRels()) {
-						new XML_I_RelVersioned(srcRel, srcRelsE, false);
-					}
-					parent.appendChild(srcRelsE);
-
-					// destRels
-					Element destRelsE = Doc
-							.createElement(CommonXMLStatics.DESTRELS_ENAME);
-					for (I_RelVersioned destRel : concept.getDestRels()) {
-						new XML_I_RelVersioned(destRel, destRelsE, true);
-					}
-					parent.appendChild(destRelsE);
-					// Images
-					Element ImagesE = Doc
-							.createElement(CommonXMLStatics.IMAGES_ENAME);
-					for (I_ImageVersioned image : concept.getImages()) {
-						new XML_I_ImageVersioned(image, ImagesE);
-					}
-					parent.appendChild(ImagesE);
-					// Extensions
-					Element ExtE = Doc
-							.createElement(CommonXMLStatics.EXTENSIONS_ENAME);
-					for (I_ExtendByRef ext : concept.getExtensions()) {
-						new XML_I_ExtendByRef(ext, ExtE);
-					}
-					parent.appendChild(ExtE);
-				} catch (Exception e) {
-					System.out
-							.println("Err thrown in XML_I_GetConceptData process");
-					log.log(Level.SEVERE,
-							"Err thrown in XML_I_GetConceptData process", e);
-					e.printStackTrace();
-				}
-
-			}
+			getConXML();	
 		} else {
-			System.out.println("process in debug method ");
-			new XML_I_Identify(true, parent);
-			new XML_I_ConceptAttributeVersioned(debug, parent);
-			Element descs = Doc
-					.createElement(CommonXMLStatics.DESCRIPTIONS_ENAME);
-			new XML_I_DescriptionVersioned(debug, descs);
-			parent.appendChild(descs);
-			Element srcRelsE = Doc
-					.createElement(CommonXMLStatics.SRCRELS_ENAME);
-			new XML_I_RelVersioned(debug, srcRelsE, false);
-			parent.appendChild(srcRelsE);
-			Element destRelsE = Doc
-					.createElement(CommonXMLStatics.DESTRELS_ENAME);
-			new XML_I_RelVersioned(debug, destRelsE, true);
-			parent.appendChild(destRelsE);
-			Element ImagesE = Doc.createElement(CommonXMLStatics.IMAGES_ENAME);
-			new XML_I_ImageVersioned(debug, ImagesE);
-			parent.appendChild(ImagesE);
-			Element ExtE = Doc.createElement(CommonXMLStatics.EXTENSIONS_ENAME);
-			new XML_I_ExtendByRef(debug, ExtE);
-			parent.appendChild(ExtE);
-
+			getDebugConXML();
 		}
-		// Doc.getDocumentElement().appendChild(parent);
-		// XMLUtil.logNode("Debug Concept Doc",Doc);
-		// System.out.println("Adding to OC "+oc_key);
-
 		if (debug) {
 			try {
 				System.out.println(XMLUtil.convertToStringLeaveCDATA(Doc));
@@ -281,7 +180,123 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 			}
 		}
 
+		
+	}
+	
+	public void getConXML(){
+		
+		conIdi = concept.getConceptId();
+		//conIdi_S = Integer.toString(conIdi);
+		oc_key = AceXMLUtil.getOc_key(conIdi);
+		//oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;
+		
+		if (ObjectCache.get(oc_key) == null) {
+			// create the new doc 
+			createNewConDoc();
+			// Add the ID
+			uuid_key = BasicXMLStruct.getNativeIdAtts(conIdi, parent);
+			// Add the identifier
+			try {
+				new XML_I_Identify(concept.getIdentifier(), parent);
+				// ConceptAttributeVersioned
+				if (concept.getConceptAttributes() != null) {
+					XML_I_ConceptAttributeVersioned icav_h = new XML_I_ConceptAttributeVersioned(
+							concept.getConceptAttributes(), parent);
+				}
+				// Descriptions
+				Element descsE = Doc
+						.createElement(CommonXMLStatics.DESCRIPTIONS_ENAME);
+
+				for (I_DescriptionVersioned desc : concept
+						.getDescriptions()) {
+					new XML_I_DescriptionVersioned(desc, descsE);
+				}
+				parent.appendChild(descsE);
+
+				// Src Rels
+				Element srcRelsE = Doc
+						.createElement(CommonXMLStatics.SRCRELS_ENAME);
+				for (I_RelVersioned srcRel : concept.getSourceRels()) {
+					new XML_I_RelVersioned(srcRel, srcRelsE, false);
+				}
+				parent.appendChild(srcRelsE);
+
+				// destRels
+				Element destRelsE = Doc
+						.createElement(CommonXMLStatics.DESTRELS_ENAME);
+				for (I_RelVersioned destRel : concept.getDestRels()) {
+					new XML_I_RelVersioned(destRel, destRelsE, true);
+				}
+				parent.appendChild(destRelsE);
+				// Images
+				Element ImagesE = Doc
+						.createElement(CommonXMLStatics.IMAGES_ENAME);
+				for (I_ImageVersioned image : concept.getImages()) {
+					new XML_I_ImageVersioned(image, ImagesE);
+				}
+				parent.appendChild(ImagesE);
+				// Extensions
+				Element ExtE = Doc
+						.createElement(CommonXMLStatics.EXTENSIONS_ENAME);
+				for (I_ExtendByRef ext : concept.getExtensions()) {
+					new XML_I_ExtendByRef(ext, ExtE);
+				}
+				parent.appendChild(ExtE);
+			} catch (Exception e) {
+				System.out
+						.println("Err thrown in XML_I_GetConceptData process");
+				log.log(Level.SEVERE,
+						"Err thrown in XML_I_GetConceptData process", e);
+				e.printStackTrace();
+			}
+			ObjectCache.put(oc_key, Doc);
+	}
+		else {
+			Doc = (Document)ObjectCache.get(oc_key); 
+		}
+	}
+	
+	
+	public void createNewConDoc() {
+		Doc = XMLUtil.getEmptyDocument();
+		parent = Doc.createElement(CommonXMLStatics.CONCEPT_ENAME);
+		Doc.appendChild(parent);
+	}
+	
+	public void getDebugConXML() {
+		System.out.println("process in debug method ");
+		conIdi = -1;
+		oc_key = AceXMLUtil.getOc_key(conIdi);
+		if (ObjectCache.get(oc_key) == null) {
+		// create the new doc 
+		createNewConDoc();	
+		
+		new XML_I_Identify(true, parent);
+		new XML_I_ConceptAttributeVersioned(debug, parent);
+		Element descs = Doc
+				.createElement(CommonXMLStatics.DESCRIPTIONS_ENAME);
+		new XML_I_DescriptionVersioned(debug, descs);
+		parent.appendChild(descs);
+		Element srcRelsE = Doc
+				.createElement(CommonXMLStatics.SRCRELS_ENAME);
+		new XML_I_RelVersioned(debug, srcRelsE, false);
+		parent.appendChild(srcRelsE);
+		Element destRelsE = Doc
+				.createElement(CommonXMLStatics.DESTRELS_ENAME);
+		new XML_I_RelVersioned(debug, destRelsE, true);
+		parent.appendChild(destRelsE);
+		Element ImagesE = Doc.createElement(CommonXMLStatics.IMAGES_ENAME);
+		new XML_I_ImageVersioned(debug, ImagesE);
+		parent.appendChild(ImagesE);
+		Element ExtE = Doc.createElement(CommonXMLStatics.EXTENSIONS_ENAME);
+		new XML_I_ExtendByRef(debug, ExtE);
+		parent.appendChild(ExtE);
+		
 		ObjectCache.put(oc_key, Doc);
+		}
+		else {
+			Doc = (Document)ObjectCache.get(oc_key); 
+		}	
 	}
 	
 	public String getConceptXMLAsString() {
@@ -327,13 +342,13 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		uuid_key = uuidKey;
 	}
 
-	public String getConIdi_S() {
+	/*public String getConIdi_S() {
 		return conIdi_S;
 	}
 
 	public void setConIdi_S(String conIdiS) {
 		conIdi_S = conIdiS;
-	}
+	} */
 	
 	public void createNewConcept() {
 		UUID uuid_id = UUID.randomUUID();
@@ -347,5 +362,13 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Err thrown in XML_I_GetConceptData createNewConcept UUID = "+uuid_id,e);
 		}
+	}
+
+	public Document getDoc() {
+		return Doc;
+	}
+
+	public void setDoc(Document doc) {
+		Doc = doc;
 	}
 }

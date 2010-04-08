@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.XML_I_GetConceptData;
+import org.ihtsdo.xml.util.AceXMLUtil;
 import org.ihtsdo.xml.util.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,7 +51,7 @@ public class XML_ConceptController {
 	}
 	
 	
-	public boolean checkProc(int conID){
+	/*public boolean checkProc(int conID){
 		//conIdi =concept.getConceptId();
 		String oc_key = CommonXMLStatics.CONCEPT_PRE+Integer.toString(conID);
 		if(ObjectCache.get(oc_key) != null){
@@ -59,7 +60,7 @@ public class XML_ConceptController {
 		else{
 			return false;
 		}
-	}
+	} */
 
 
 /**
@@ -83,7 +84,7 @@ public class XML_ConceptController {
 	
 	public Document getXMLConceptUUID(UUID uuid) throws Exception{
 		
-		if(!getUuidInt().containsKey(uuid.toString())){
+		if(!AceXMLUtil.getUuidInt().containsKey(uuid.toString())){
 		I_GetConceptData editPathConcept = tf.getConcept(uuid);
 			add_I_GetConceptData(editPathConcept);
 		}
@@ -103,7 +104,7 @@ public class XML_ConceptController {
 			Iterator<I_GetConceptData> conIt = conCol.iterator();
 			while (conIt.hasNext()) {
 				I_GetConceptData editPathConcept = conIt.next();
-				if(!checkProc(editPathConcept.getConceptId())){
+				if(!AceXMLUtil.checkProc(editPathConcept.getConceptId())){
 					add_I_GetConceptData(editPathConcept);
 				}
 			}
@@ -125,7 +126,7 @@ public class XML_ConceptController {
 	
 	public Document getXMLConceptID(String Con_id, int sourceID) throws Exception{	
 		I_GetConceptData editPathConcept = tf.getConcept(Con_id,sourceID);
-		if(!checkProc(editPathConcept.getConceptId())){
+		if(!AceXMLUtil.checkProc(editPathConcept.getConceptId())){
 			add_I_GetConceptData(editPathConcept);
 		}
 		return retDoc;
@@ -151,7 +152,7 @@ public class XML_ConceptController {
 	
 	public Document getXMLConceptInt(int conI) throws Exception{
 		
-		if(!checkProc(conI)){
+		if(!AceXMLUtil.checkProc(conI)){
 			I_GetConceptData editPathConcept = tf.getConcept(conI);
 			add_I_GetConceptData(editPathConcept);
 		}
@@ -168,10 +169,8 @@ public class XML_ConceptController {
 		String key = icX.getOc_key();	
 		 addConceptsToRoot((Document)ObjectCache.get(key));
 		 String uuid = icX.getUuid_key();
-		 String intId = icX.getConIdi_S();
-		 addtoUuidInt(uuid,intId);
-		 
-		 
+		 //String intId = icX.getConIdi_S();
+		 AceXMLUtil.addtoUuidInt(uuid,icX.getConIdi());
 		 if(relatedConcepts){
 			 addRelatedConcepts(); 
 		 }
@@ -180,7 +179,7 @@ public class XML_ConceptController {
 	
 	public Node getRelXMLConceptInt(int conI,Node parent) throws Exception{
 		
-		if(!checkProc(conI)){
+		if(!AceXMLUtil.checkProc(conI)){
 			I_GetConceptData editPathConcept = tf.getConcept(conI);
 			add_Related_I_GetConceptData(editPathConcept,parent);
 		}
@@ -293,30 +292,30 @@ public class XML_ConceptController {
 		String xpath = null;
 		//Structural
 		// destRel c1Id
-		xpath = getXpathSElemAtt(CommonXMLStatics.DEST_REL_ENAME,CommonXMLStatics.C1_ID_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.DEST_REL_ENAME,CommonXMLStatics.C1_ID_ATT);
 		//log.severe("xpath destRel = " + xpath);
 		Element destRelE = addRCbyXPathS(xpath,CommonXMLStatics.DESTRELS_ENAME);
 		//srcRec c2Id
-		xpath = getXpathSElemAtt(CommonXMLStatics.SRC_REL_ENAME,CommonXMLStatics.C2_ID_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.SRC_REL_ENAME,CommonXMLStatics.C2_ID_ATT);
 		//log.severe("xpath srcRel = " + xpath);
 		Element srcRelE = addRCbyXPathS(xpath,CommonXMLStatics.SRCRELS_ENAME);
 		//id
-		xpath = getXpathSElemAtt(CommonXMLStatics.ID_ENAME,CommonXMLStatics.NATIVE_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.ID_ENAME,CommonXMLStatics.NATIVE_ATT);
 		//log.severe("xpath srcRel = " + xpath);
 		Element idE = addRCbyXPathS(xpath,CommonXMLStatics.IDS_ENAME);
 		//relpart id
-		xpath = getXpathSElemAtt(CommonXMLStatics.REL_PART_ENAME,CommonXMLStatics.TYPE_ID_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.REL_PART_ENAME,CommonXMLStatics.TYPE_ID_ATT);
 		//log.severe("xpath srcRel = " + xpath);
 		Element reltypeidE = addRCbyXPathS(xpath,CommonXMLStatics.REL_TYPES_ENAME);
 		//descpart id
-		xpath = getXpathSElemAtt(CommonXMLStatics.DESCP_ENAME,CommonXMLStatics.TYPE_ID_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.DESCP_ENAME,CommonXMLStatics.TYPE_ID_ATT);
 		//log.severe("xpath srcRel = " + xpath);
 		Element descPtypeidE = addRCbyXPathS(xpath,CommonXMLStatics.DESCRIPTIONS_ENAME);
 		
 		//RefSets
 		Element extensionsE = retDoc.createElement(CommonXMLStatics.EXTENSIONS_ENAME);
 
-		xpath = getXpathSElemAtt(CommonXMLStatics.EXT_ENAME,CommonXMLStatics.REFSET_ID_ATT);
+		xpath = AceXMLUtil.getXpathSElemAtt(CommonXMLStatics.EXT_ENAME,CommonXMLStatics.REFSET_ID_ATT);
 		Element refSetidE = addRCbyXPathS(xpath,CommonXMLStatics.REFSET_ID_ATT);
 		
 		
@@ -382,7 +381,7 @@ public class XML_ConceptController {
 		retDoc.getDocumentElement().appendChild(relConceptsE);
 	}
 	
-	public String getXpathSElemAtt(String ename,String attname){
+/*	public String getXpathSElemAtt(String ename,String attname){
 
 		StringBuilder sb=new StringBuilder();
 		sb.append(CommonXMLStatics.XPATH_START_E_BY_NAME);
@@ -393,7 +392,7 @@ public class XML_ConceptController {
 		sb.append(CommonXMLStatics.XPATH_END_SELECT);
 		return sb.toString();
 	}
-	 
+	 */
 	
 	public void addRelatedConcept(Node idN, Node parent)throws Exception{
 		
@@ -410,17 +409,6 @@ public class XML_ConceptController {
 		}
 	}
 	
-	public HashMap<String,String> getUuidInt(){
-		if(ObjectCache.get(CommonXMLStatics.UUID_INT_HT) == null){
-			HashMap<String,String> uuidIntHT = new HashMap<String, String>();
-			ObjectCache.put(CommonXMLStatics.UUID_INT_HT, uuidIntHT);
-		}
-		return (HashMap<String, String>)ObjectCache.get(CommonXMLStatics.UUID_INT_HT);	
-	}
-	
-	public void addtoUuidInt(String uuidS, String intS){
-		getUuidInt().put(uuidS, intS);		
-	}
-	
+
 
 }
