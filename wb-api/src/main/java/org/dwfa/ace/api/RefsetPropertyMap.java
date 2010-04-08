@@ -1,5 +1,6 @@
 package org.dwfa.ace.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -8,9 +9,12 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 

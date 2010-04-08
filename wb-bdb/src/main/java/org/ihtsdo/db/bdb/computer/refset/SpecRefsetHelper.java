@@ -1123,8 +1123,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * int, int)
      */
     public boolean newConceptExtensionPart(int refsetId, int componentId, int c1Id) throws Exception {
-        return newConceptExtensionPart(refsetId, componentId, c1Id, ArchitectonicAuxiliary.Concept.CURRENT.localize()
-            .getNid());
+        return newConceptExtensionPart(refsetId, componentId, c1Id, ReferenceConcepts.CURRENT.getNid());
     }
 
     /*

@@ -66,7 +66,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private I_GetConceptData promotedStatusConcept;
     private I_GetConceptData readyToPromoteStatusConcept;
     private I_GetConceptData activeStatusConcept;
-    private I_GetConceptData promotionConcept;
+    private I_GetConceptData promotionRefsetConcept;
     private I_GetConceptData memberRefsetConcept;
     private I_GetConceptData unreviewedAdditionStatus;
     private I_GetConceptData unreviewedDeletionStatus;
@@ -143,8 +143,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             if (memberRefsetConcept == null) {
                 throw new Exception("Unable to find member refset.");
             }
-            promotionConcept = refsetSpec.getPromotionRefsetConcept();
-            if (promotionConcept == null) {
+            promotionRefsetConcept = refsetSpec.getPromotionRefsetConcept();
+            if (promotionRefsetConcept == null) {
                 throw new Exception("Unable to find promotion refset.");
             }
 
@@ -164,12 +164,12 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             Collection<? extends I_ExtendByRef> memberExtensions =
                     termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
             Collection<? extends I_ExtendByRef> promotionExtensions =
-                    termFactory.getRefsetExtensionMembers(promotionConcept.getConceptId());
+                    termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
 
             updatePromotionsRefset(memberExtensions, promotionExtensions);
 
             process.setProperty(ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey(), termFactory.getUids(
-                promotionConcept.getConceptId()).iterator().next());
+                promotionRefsetConcept.getConceptId()).iterator().next());
 
             termFactory.commit();
 
@@ -206,8 +206,9 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
-                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedAdditionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
+                            memberExtension.getComponentId(), 
+                            unreviewedAdditionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
@@ -218,26 +219,29 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                         // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
                         // memberExtension
                         // .getComponentId());
-                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedAdditionStatus.getConceptId(), currentStatusConcept
-                            .getConceptId());
+                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
+                            memberExtension.getComponentId(), 
+                            unreviewedAdditionStatus.getConceptId(), 
+                            currentStatusConcept.getConceptId());
                     }
 
                 } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptId()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed deletion
-                        refsetHelper.newRefsetExtension(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedDeletionStatus.getConceptId());
+                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
+                            memberExtension.getComponentId(), 
+                            unreviewedDeletionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
                         // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
                         // memberExtension
                         // .getComponentId());
-                        refsetHelper.newConceptExtensionPart(promotionConcept.getConceptId(), memberExtension
-                            .getComponentId(), unreviewedDeletionStatus.getConceptId(), currentStatusConcept
-                            .getConceptId());
+                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
+                            memberExtension.getComponentId(), 
+                            unreviewedDeletionStatus.getConceptId(), 
+                            currentStatusConcept.getConceptId());
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
@@ -274,6 +278,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         return null;
     }
 
+    // TODO get this to use the version computer. 
     private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) {
         I_ExtendByRefPart latestPart = null;
         for (I_ExtendByRefPart part : memberExtension.getMutableParts()) {

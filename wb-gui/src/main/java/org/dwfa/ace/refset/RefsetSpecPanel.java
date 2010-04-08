@@ -633,12 +633,7 @@ public class RefsetSpecPanel extends JPanel {
         }
         
         public static PROMOTION_STATUS get(int nid) throws TerminologyException, IOException {
-            PROMOTION_STATUS status = promotionStatusMap.get(nid);
-            if (status != null) {
-                return status;
-            }
-            throw new IOException("Can't find promotion status for value: " + nid + " " + 
-                Terms.get().getConcept(nid)); 
+           return promotionStatusMap.get(nid);
         }
         
     }
@@ -768,6 +763,9 @@ public class RefsetSpecPanel extends JPanel {
     }
     
     private PROMOTION_STATUS getNewStatusForApproval(PROMOTION_STATUS oldStatus) {
+        if (oldStatus == null) {
+            return null;
+        }
         switch (oldStatus) {
         case REVIEWED_APPROVED_ADDITION:
             return null;
@@ -787,6 +785,9 @@ public class RefsetSpecPanel extends JPanel {
     }
     
     private PROMOTION_STATUS getNewStatusForDisapproval(PROMOTION_STATUS oldStatus) {
+        if (oldStatus == null) {
+            return null;
+        }
         switch (oldStatus) {
         case REVIEWED_APPROVED_ADDITION:
             return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_ADDITION;
