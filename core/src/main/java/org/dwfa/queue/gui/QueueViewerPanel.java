@@ -348,7 +348,8 @@ public class QueueViewerPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             QueueAdaptor qAdaptor = null;
             if (tableOfQueues.getSelectedRow() >= 0) {
-                qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(), 0);
+                ListOfQueuesTableModel loqtm = (ListOfQueuesTableModel) tableOfQueues.getModel();
+                qAdaptor = loqtm.getQueueAt(tableOfQueues.getSelectedRow());
             }
             // System.out.println(" Transaction committed. Performing queue refresh. ");
 
