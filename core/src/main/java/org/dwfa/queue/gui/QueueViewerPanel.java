@@ -379,7 +379,8 @@ public class QueueViewerPanel extends JPanel {
                 get();
                 QueueAdaptor qAdaptor = null;
                 if (tableOfQueues.getSelectedRow() >= 0) {
-                    qAdaptor = (QueueAdaptor) tableOfQueues.getModel().getValueAt(tableOfQueues.getSelectedRow(), 0);
+                    ListOfQueuesTableModel loqtm = (ListOfQueuesTableModel) tableOfQueues.getModel();
+                    qAdaptor = loqtm.getQueueAt(tableOfQueues.getSelectedRow());
                 }
 
                 if (qAdaptor == null) {
