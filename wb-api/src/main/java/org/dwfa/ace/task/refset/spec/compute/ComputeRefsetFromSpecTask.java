@@ -124,7 +124,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
             for (String warning: dangleWarnings) {
-                AceLog.getAppLog().alertAndLogException(new Exception(warning + "\nClause removed from computation..."));
+                AceLog.getAppLog().info(warning + "\nClause removed from computation...");
             }
 
             // check validity of query
