@@ -160,6 +160,10 @@ public class DescStatement extends RefsetSpecStatement {
             }
 
             break;
+        case DESC_LUCENE_MATCH:
+            getPossibleDescriptions(configFrame, termFactory.getEmptyIdSet());
+            possibleConcepts.and(possibleLuceneConcMatches);
+            break;
         case DESC_STATUS_IS:
         case DESC_STATUS_IS_CHILD_OF:
         case DESC_STATUS_IS_KIND_OF:
@@ -169,7 +173,6 @@ public class DescStatement extends RefsetSpecStatement {
         case DESC_TYPE_IS_KIND_OF:
         case DESC_TYPE_IS_DESCENDENT_OF:
         case DESC_REGEX_MATCH:
-        case DESC_LUCENE_MATCH:
             possibleConcepts.or(parentPossibleConcepts);
             break;
         default:
@@ -179,10 +182,15 @@ public class DescStatement extends RefsetSpecStatement {
         return possibleConcepts;
     }
 
+    I_RepresentIdSet possibleLuceneDescMatches;
+    I_RepresentIdSet possibleLuceneConcMatches;
     public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame configFrame,
             I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
 
         I_RepresentIdSet possibleDescriptions = termFactory.getEmptyIdSet();
+        possibleLuceneDescMatches = null;
+        possibleLuceneConcMatches = null;
+        
         if (parentPossibleDescriptions == null) {
             parentPossibleDescriptions = termFactory.getConceptIdSet();
         }
@@ -244,14 +252,18 @@ public class DescStatement extends RefsetSpecStatement {
                         possibleDescriptions.or(parentPossibleDescriptions);
                         break;
                     }
-
+                    possibleLuceneConcMatches = Terms.get().getEmptyIdSet();
+                    possibleLuceneDescMatches = Terms.get().getEmptyIdSet();
                     Iterator iterator = hits.iterator();
                     while (iterator.hasNext()) {
                         Hit next = (Hit) iterator.next();
                         Document doc = next.getDocument();
                         // int dnid = Integer.parseInt(doc.get("dnid"));
                         int cnid = Integer.parseInt(doc.get("cnid"));
-                        possibleDescriptions.setMember(cnid);
+                        int dnid = Integer.parseInt(doc.get("dnid"));
+                        possibleLuceneDescMatches.setMember(dnid);
+                        possibleLuceneConcMatches.setMember(cnid);
+                        possibleDescriptions.setMember(dnid);
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -259,6 +271,7 @@ public class DescStatement extends RefsetSpecStatement {
 
                 }
             }
+            break;
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -461,6 +474,9 @@ public class DescStatement extends RefsetSpecStatement {
 
     @SuppressWarnings( { "deprecation", "unchecked" })
     private boolean descriptionLuceneMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
+        if (possibleLuceneDescMatches != null) {
+            return possibleLuceneDescMatches.isMember(descriptionBeingChecked.getDescId());
+        }
         String queryConstraintString = (String) queryConstraint;
         Hits hits;
         try {

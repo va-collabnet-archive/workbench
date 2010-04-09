@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import jsr166y.ConcurrentReferenceHashMap;
+import jsr166y.ConcurrentReferenceHashMap.Option;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -73,14 +75,23 @@ import org.ihtsdo.lucene.LuceneManager;
 public class Concept implements I_Transact, I_GetConceptData {
 
 	public static ReferenceType refType = ReferenceType.WEAK;
+	static int initialCapacity = 10000;
+	static float loadFactor = 0.75f; 
+	static int concurrencyLevel = 64;
+	static EnumSet<Option> optionSet = null;
+	
 	
     public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM = 
-        new ConcurrentReferenceHashMap<Integer, Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG, 
-                ConcurrentReferenceHashMap.ReferenceType.WEAK);
+        new ConcurrentReferenceHashMap<Integer, Concept>(initialCapacity, loadFactor, concurrencyLevel,
+                ConcurrentReferenceHashMap.ReferenceType.STRONG, 
+                ConcurrentReferenceHashMap.ReferenceType.WEAK,
+                optionSet);
 
     public static ConcurrentReferenceHashMap<Integer, Object> componentsCRHM = 
-        new ConcurrentReferenceHashMap<Integer, Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG, 
-                ConcurrentReferenceHashMap.ReferenceType.WEAK);
+        new ConcurrentReferenceHashMap<Integer, Object>(initialCapacity, loadFactor, concurrencyLevel,
+                ConcurrentReferenceHashMap.ReferenceType.STRONG, 
+                ConcurrentReferenceHashMap.ReferenceType.WEAK, 
+                optionSet);
 
     
 	public static Concept mergeAndWrite(EConcept eConcept) throws IOException {

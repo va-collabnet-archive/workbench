@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -288,6 +289,7 @@ public class Bdb {
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
+			    
                 AceLog.getAppLog().info("Closing all JFrames.");
                 System.out.println("Closing all JFrames.");
 		        for (JFrame f: OpenFrames.getFrames()) {
