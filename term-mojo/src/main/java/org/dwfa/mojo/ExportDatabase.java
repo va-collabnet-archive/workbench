@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.maven.MojoUtil;
+import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.mojo.refset.ExportSpecification;
 
@@ -137,11 +138,20 @@ public class ExportDatabase extends AbstractMojo {
     private ConceptDescriptor[] statusValuesForExport;
 
     /**
-     * @parameter default-value="${project.build.directory}"
+     * URL used to connect to the UUID-SCTID database
+     *
+     * @parameter
      * @required
-     * @readonly
      */
-    private File buildDirectory;
+    private String uuidSctidDbConnectionUrl;
+
+    /**
+     * UUID-SCTID database driver fully qualified class name
+     *
+     * @parameter
+     * @required
+     */
+    private String uuidSctidDbDriver;
 
     /**
      * Location of the build directory.
@@ -221,6 +231,8 @@ public class ExportDatabase extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
+            System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
 
             if (MojoUtil.alreadyRun(getLog(), outputDirectory + conceptDataFileName + descriptionsDataFileName
                 + relationshipsDataFileName, this.getClass(), targetDirectory)) {
