@@ -46,14 +46,17 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     }
 
     public StrRevision(int statusNid, int pathNid, long time, 
-			StrMember primoridalMember) {
+			StrMember another) {
 		super(statusNid, pathNid, time, 
-				 primoridalMember);
+		    another);
+		stringValue = another.getStringValue();
+		
 	}
 
 	public StrRevision(int statusAtPositionNid, 
-			StrMember primoridalMember) {
-		super(statusAtPositionNid, primoridalMember);
+			StrMember another) {
+		super(statusAtPositionNid, another);
+		stringValue = another.getStringValue();
 	}
 
 
