@@ -725,6 +725,7 @@ public class WorkbenchRunner {
 			AceLog.getAppLog().info("checkCustom custPropFN = "+custPropFN);
 			File custPropertiesFile = new File("config",custPropFN );
 			if(custPropertiesFile.exists() && custPropertiesFile.canRead()) {
+				String cpfn = custPropertiesFile.getCanonicalPath();
 				Properties custProps = new Properties();
 				custProps.loadFromXML(new FileInputStream(custPropertiesFile));
 				if(custProps.getProperty(CustomStatics.CUSTOM_UI_CLASSNAME) != null) {
@@ -732,8 +733,9 @@ public class WorkbenchRunner {
 					AceLog.getAppLog().info("checkCustom custCN = "+custCN);
 					Object obj = ObjectCacheClassHandler.getInstClass(custCN);
 					if(obj != null) {
-						ObjectCache.put(CustomStatics.CUSTOMPROPS, custPropFN);
+						ObjectCache.put(CustomStatics.CUSTOMPROPSFN, cpfn);
 						ObjectCache.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
+						ObjectCache.put(CustomStatics.CUSTOMPROPS, custProps);
 					}	
 				}	
 			}
