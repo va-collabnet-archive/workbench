@@ -33,6 +33,8 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
@@ -85,6 +87,10 @@ public class NewDefaultProfile extends NewProfile {
 
         I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
         newDbProfile.setUsername(username);
+        newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+        newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+        newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+        newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
         activeConfig.setDbConfig(newDbProfile);
 
         if (fullName == null || fullName.length() < 2) {

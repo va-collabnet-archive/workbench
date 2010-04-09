@@ -218,6 +218,12 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.setHighlightConflictsInTaxonomyView(creatorConfig.getHighlightConflictsInTaxonomyView());
             newConfig.setConflictResolutionStrategy(creatorConfig.getConflictResolutionStrategy());
             
+            newConfig.getDbConfig().setClassifierChangesChangeSetPolicy(creatorConfig.getDbConfig().getClassifierChangesChangeSetPolicy());
+            newConfig.getDbConfig().setRefsetChangesChangeSetPolicy(creatorConfig.getDbConfig().getRefsetChangesChangeSetPolicy());
+            newConfig.getDbConfig().setUserChangesChangeSetPolicy(creatorConfig.getDbConfig().getUserChangesChangeSetPolicy());
+            newConfig.getDbConfig().setChangeSetWriterThreading(creatorConfig.getDbConfig().getChangeSetWriterThreading());
+
+            
 
             // clear the user's path color
             if (creatorConfig.getDbConfig().getUserPath() != null) {
