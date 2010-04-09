@@ -211,8 +211,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                         column3.setPref(175);
                         column3.setMax(2000);
                         column3.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-                        column3.setReadMethod(extType.getPartClass().getMethod("getC3Nid"));
-                        column3.setWriteMethod(extType.getPartClass().getMethod("setC3Nid", int.class));
+                        column3.setReadMethod(extType.getPartClass().getMethod("getC3id"));
+                        column3.setWriteMethod(extType.getPartClass().getMethod("setC3id", int.class));
                         column3.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
                         columns.add(column3);
 
