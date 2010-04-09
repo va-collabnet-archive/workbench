@@ -230,10 +230,18 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 	public String getStringValue() {
 		return strValue;
 	}
+	
+    public String getStrValue() {
+        return strValue;
+    }
 
-	public void setStringValue(String strValue) {
-		this.strValue = strValue;
-	}
+    public void setStringValue(String strValue) {
+        this.strValue = strValue;
+    }
+    
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 
 	@Override
 	public int getTypeId() {

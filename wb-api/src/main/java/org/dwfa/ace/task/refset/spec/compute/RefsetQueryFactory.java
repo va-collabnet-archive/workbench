@@ -222,6 +222,28 @@ public class RefsetQueryFactory {
                     default:
                         throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
                     }
+                } else if (thinPart instanceof I_ExtendByRefPartCidCidString) {
+                    // structural query with string value
+                    I_ExtendByRefPartCidCidString part = (I_ExtendByRefPartCidCidString) thinPart;
+
+                    I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
+                    I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
+                    String constraint = part.getStringValue();
+
+                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
+                    switch (statementType) {
+                    case CONCEPT:
+                        throw new TerminologyException(
+                            "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
+                    case RELATIONSHIP:
+                        throw new TerminologyException(
+                            "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
+                    case DESCRIPTION:
+                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                        break;
+                    default:
+                        throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
+                    }
                 } else if (thinPart instanceof I_ExtendByRefPartCidCid) {
 
                     // logical OR, AND, CONCEPT-CONTAINS-REL, or
@@ -259,28 +281,6 @@ public class RefsetQueryFactory {
                     }
                     if (negate) {
                         subquery.negateQuery();
-                    }
-                } else if (thinPart instanceof I_ExtendByRefPartCidCidString) {
-                    // structural query with string value
-                    I_ExtendByRefPartCidCidString part = (I_ExtendByRefPartCidCidString) thinPart;
-
-                    I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
-                    I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
-                    String constraint = part.getStringValue();
-
-                    RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
-                    switch (statementType) {
-                    case CONCEPT:
-                        throw new TerminologyException(
-                            "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
-                    case RELATIONSHIP:
-                        throw new TerminologyException(
-                            "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
-                    case DESCRIPTION:
-                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
-                        break;
-                    default:
-                        throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
                     }
                 } else if (thinPart instanceof I_ExtendByRefPartStr) {
                     // ignore - comments refset
