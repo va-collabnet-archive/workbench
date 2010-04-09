@@ -100,25 +100,26 @@ public class AceXMLUtil {
 		Document doc = null;
 		XML_I_GetConceptData x_igcd = new XML_I_GetConceptData(igcd);
 		doc = x_igcd.getDoc();
-		System.out.println(x_igcd.getConceptXMLAsString());
+		
+		log.finest(x_igcd.getConceptXMLAsString());
 		return doc;
 	}
 	
 	public static String getIdFromUUID(String uuid_s) throws Exception {
 		String intI = "";
-		log.info("getIdFromUUID called");
+		//log.finest("getIdFromUUID called");
 		if(getUuidInt().containsKey(uuid_s)){
-			log.info("getIdFromUUID UUIDInt contains "+uuid_s);
+			//log.finest("getIdFromUUID UUIDInt contains "+uuid_s);
 			intI = AceXMLUtil.getUuidInt().get(uuid_s);
 		}
 		else {
-			log.info("getIdFromUUID UUIDInt doesn't contain "+uuid_s);
+			//log.finest("getIdFromUUID UUIDInt doesn't contain "+uuid_s);
 			//may as well create the xml concept as it will probably be needed
 			I_GetConceptData igcd = AceUtil.getConceptUUID_S(uuid_s);
 			XML_I_GetConceptData x_igcd = new XML_I_GetConceptData(igcd);
 			intI = getUuidInt().get(uuid_s);
 		}
-		log.info("getIdFromUUID returning intI "+intI);
+		//log.finest("getIdFromUUID returning intI "+intI);
 		return intI;
 	}
 	
@@ -135,7 +136,7 @@ public class AceXMLUtil {
 		sb.append(intI);
 		sb.append(Xpath2);
 		String Xpath = sb.toString();
-		log.info("GetIDValbyId Xpath = "+Xpath);
+		//log.finest(("GetIDValbyId Xpath = "+Xpath);
 		String idVal = null;
 		try {
 			idVal = XMLUtil.selectXPathString(Xpath,node);

@@ -2,6 +2,7 @@ package org.ihtsdo.xml.util;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
@@ -9,6 +10,7 @@ import org.dwfa.ace.api.I_TermFactory;
 
 public class AceUtil {
 
+	private static final Logger log = Logger.getLogger(AceUtil.class.getName());
 	public static I_TermFactory tf = null;
 	//public Hashtable<String,Integer>uidI = null;
 
@@ -18,7 +20,7 @@ public class AceUtil {
 
 	public static I_TermFactory getTf() {
 		if (tf == null) {
-			System.out.println("TF IS NULL!!!!!");
+			log.severe("TF IS NULL!!!!!");
 		}
 		return tf;
 	}
@@ -82,6 +84,7 @@ public class AceUtil {
 	}
 	catch(Exception E) {
 		System.out.println("Exception in AceUtil.getIdValById");
+		log.severe("Exception in AceUtil.getIdValById");
 		E.printStackTrace();
 	}
 	return idval;
