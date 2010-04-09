@@ -250,6 +250,18 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 classifierChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
                 refsetChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
                 changeSetWriterThreading = (ChangeSetWriterThreading) in.readObject();
+                if (userChangesChangeSetPolicy == null) {
+                    userChangesChangeSetPolicy = ChangeSetPolicy.INCREMENTAL;
+                }
+                if (classifierChangesChangeSetPolicy == null) {
+                     classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
+                }
+                if (refsetChangesChangeSetPolicy == null) {
+                    refsetChangesChangeSetPolicy = ChangeSetPolicy.OFF;
+                }
+                if (changeSetWriterThreading == null) {
+                    changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
+                }
             } else {
                 userChangesChangeSetPolicy = ChangeSetPolicy.INCREMENTAL;
                 classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
