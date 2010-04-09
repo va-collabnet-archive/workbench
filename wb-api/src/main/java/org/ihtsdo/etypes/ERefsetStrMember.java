@@ -73,6 +73,9 @@ public class ERefsetStrMember extends ERefsetMember<ERefsetStrRevision> {
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
+        if (strValue == null) {
+            
+        }
         out.writeUTF(strValue);
         if (revisions == null) {
             out.writeInt(0);

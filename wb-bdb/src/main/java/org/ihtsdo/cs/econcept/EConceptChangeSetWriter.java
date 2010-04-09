@@ -124,7 +124,20 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 			EConcept eC = computer.getEConcept(c);
             writePermit.acquireUninterruptibly();
 	        tempOut.writeLong(time);
-			eC.writeExternal(tempOut);
+			try {
+                eC.writeExternal(tempOut);
+            } catch (Exception e) {
+                AceLog.getAppLog().severe("\n##################################################################\n" +
+                    "Exception writing change set for concept: \n" + 
+                    c.toLongString() + 
+                    "\n\neConcept: " + 
+                    eC +
+                    "\n##################################################################\n"
+                    );
+                AceLog.getAppLog().alertAndLogException(new Exception("Exception writing change set for: " + c + 
+                    "\n See log for details"));
+                
+            }
 			if (cswcOut != null) {
                 cswcOut.writeUTF("\n*******************************\n");
                 cswcOut.writeUTF(TimeUtil.formatDateForFile(time));
