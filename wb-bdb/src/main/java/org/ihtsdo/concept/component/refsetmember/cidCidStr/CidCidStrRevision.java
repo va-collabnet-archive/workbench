@@ -118,12 +118,6 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 	}
 
 	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getStringValue() {
 		return strValue;
 	}

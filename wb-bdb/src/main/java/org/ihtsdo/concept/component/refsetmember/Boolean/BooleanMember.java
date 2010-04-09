@@ -143,11 +143,6 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
 
 	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
 		throw new UnsupportedOperationException();
 	}

@@ -98,12 +98,6 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
 	public long getLongValue() {
 		return longValue;
 	}

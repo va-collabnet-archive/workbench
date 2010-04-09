@@ -100,12 +100,6 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
 	public String getStringValue() {
 		return stringValue;
 	}

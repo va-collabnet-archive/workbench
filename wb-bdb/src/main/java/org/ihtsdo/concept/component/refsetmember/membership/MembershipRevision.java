@@ -86,11 +86,6 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         // nothing to write

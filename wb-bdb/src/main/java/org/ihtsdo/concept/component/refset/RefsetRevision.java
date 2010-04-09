@@ -39,6 +39,11 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
     }
     
     @Override
+    public final int compareTo(I_ExtendByRefPart o) {
+        return this.toString().compareTo(o.toString());
+    }
+
+    @Override
 	public final int getStatus() {
 		return getStatusId();
 	}

@@ -426,8 +426,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		return (I_ExtendByRefPart) makeAnalog(getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
 	}
 
-	public int compareTo(I_ExtendByRefPart o) {
-		throw new UnsupportedOperationException();
+	public final int compareTo(I_ExtendByRefPart o) {
+        return this.toString().compareTo(o.toString());
 	}
 
 	protected abstract VersionComputer<RefsetMember<R,C>.Version> getVersionComputer();

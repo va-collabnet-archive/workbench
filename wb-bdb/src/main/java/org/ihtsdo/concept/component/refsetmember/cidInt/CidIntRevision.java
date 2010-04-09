@@ -112,12 +112,6 @@ public class CidIntRevision
 	}
 
 	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getIntValue() {
 		return intValue;
 	}

@@ -99,12 +99,6 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	}
 
 	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getIntValue() {
 		return intValue;
 	}

@@ -105,12 +105,6 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
 	public int getC1Nid() {
 		return c1Nid;
 	}

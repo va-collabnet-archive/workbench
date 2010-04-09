@@ -102,12 +102,6 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	}
 
 	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getC1id() {
 		return c1Nid;
 	}

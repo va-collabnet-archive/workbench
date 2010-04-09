@@ -97,12 +97,6 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int compareTo(I_ExtendByRefPart o) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
-
 	public boolean getBooleanValue() {
 		return booleanValue;
 	}
