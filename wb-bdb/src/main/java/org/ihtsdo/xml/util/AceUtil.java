@@ -27,7 +27,7 @@ public class AceUtil {
 		tf = tf1;
 	}
 	
-	public I_GetConceptData getConceptUUID_S_Check(String uuidS)throws Exception{
+	public static I_GetConceptData getConceptUUID_S_Check(String uuidS)throws Exception{
 		if(AceXMLUtil.getUuidInt().containsKey(uuidS)){
 			return getConceptInt(Integer.parseInt(AceXMLUtil.getUuidInt().get(uuidS))) ;
 		}
@@ -36,13 +36,13 @@ public class AceUtil {
 		}
 	}
 	
-	public I_GetConceptData getConceptUUID_S(String uuidS)throws Exception{
+	public static I_GetConceptData getConceptUUID_S(String uuidS)throws Exception{
 		UUID uid = UUID.fromString(uuidS);
 		return getConceptUUID(uid);
 		
 	}
 
-	public I_GetConceptData getConceptUUID(UUID uuid) throws Exception {
+	public static I_GetConceptData getConceptUUID(UUID uuid) throws Exception {
 		getTf();
 		I_GetConceptData icd = tf.getConcept(uuid);
 		AceXMLUtil.addtoUuidInt(uuid.toString(),icd.getConceptId());
@@ -50,17 +50,17 @@ public class AceUtil {
 		return icd;
 	}
 
-	public I_GetConceptData getConceptInt(int conId) throws Exception {
+	public static I_GetConceptData getConceptInt(int conId) throws Exception {
 		getTf();
 		return tf.getConcept(conId);
 	}
 
-	public I_GetConceptData getConceptInt_S(String conIdS) throws Exception {
+	public static I_GetConceptData getConceptInt_S(String conIdS) throws Exception {
 		int conId = Integer.parseInt(conIdS);
 		return getConceptInt(conId);
 	}
 	
-	public int getConId_UUID(String uuidS) throws Exception{
+	public static int getConId_UUID(String uuidS) throws Exception{
 		if(AceXMLUtil.getUuidInt().containsKey(uuidS)){
 			return Integer.parseInt(AceXMLUtil.getUuidInt().get(uuidS));
 		}

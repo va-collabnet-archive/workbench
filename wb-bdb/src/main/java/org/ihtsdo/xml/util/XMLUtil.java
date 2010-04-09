@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
@@ -824,6 +825,24 @@ final public class XMLUtil {
 		return (NodeList) getNodesListXpath(Xpath, node, "", "",
 				XPathConstants.NODESET);
 	}
+	
+	public static ArrayList<String> getNodeListAttValAsStringCol(String Xpath, Node node,String attrName)throws Exception{
+		ArrayList<String> retV = new ArrayList<String>();
+		
+		NodeList nl = getNodesListXpathNode(Xpath,node);
+		int l = nl.getLength();
+		Element e = null;
+		String val = null;
+		
+		for (int i = 0; i < l; i++) {
+			e = (Element) nl.item(i);
+			if (e.getNodeType() == Node.ELEMENT_NODE) {
+				val = e.getAttribute(attrName);
+				retV.add(val);	
+			}
+		}
+		return retV;
+	}
 
 	// Return type is one of XPathConstants .BOOLEAN, .NODE, .NODESET, .NUMBER,
 	// .STRING
@@ -865,7 +884,7 @@ final public class XMLUtil {
 				XPathConstants.BOOLEAN);
 		return B.booleanValue();
 	}
-
+	
 	/*
 	 * public static Node selectSingleNode(String Xpath, Document Doc, String
 	 * nsuri, String pre) { return (Node)getNodesListXpath(Xpath, Doc, nsuri,

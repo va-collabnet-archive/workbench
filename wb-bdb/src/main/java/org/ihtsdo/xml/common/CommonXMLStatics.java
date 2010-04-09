@@ -288,7 +288,14 @@ public class CommonXMLStatics {
 	/** Start Select an Attr by name **/
 	public static String XPATH_START_ATT_BY_NAME = "/@*[name()='";
 	
+	/** Start Select by Attr val **/
+	public static String XPATH_START_ATT_BY_VAL = "[@";
+	/** Equals + singlequote **/
+	public static String XPATH_EQUAL_SINGLEQUOT = "='";
 	
+	
+	
+	//*[name()='id'][@id_int='-2147483561']/@*[name()='value']
 	
 	
 }

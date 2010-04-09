@@ -1,6 +1,8 @@
 package org.ihtsdo.xml.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -8,6 +10,7 @@ import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.XML_I_GetConceptData;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 
 public class AceXMLUtil {
@@ -101,18 +104,76 @@ public class AceXMLUtil {
 		return doc;
 	}
 	
-	public static String GetIDValbyUUID(Document doc) {
-		String idVal = null;
+	public static String getIdFromUUID(String uuid_s) throws Exception {
+		String intI = "";
+		log.info("getIdFromUUID called");
+		if(getUuidInt().containsKey(uuid_s)){
+			log.info("getIdFromUUID UUIDInt contains "+uuid_s);
+			intI = AceXMLUtil.getUuidInt().get(uuid_s);
+		}
+		else {
+			log.info("getIdFromUUID UUIDInt doesn't contain "+uuid_s);
+			//may as well create the xml concept as it will probably be needed
+			I_GetConceptData igcd = AceUtil.getConceptUUID_S(uuid_s);
+			XML_I_GetConceptData x_igcd = new XML_I_GetConceptData(igcd);
+			intI = getUuidInt().get(uuid_s);
+		}
+		log.info("getIdFromUUID returning intI "+intI);
+		return intI;
+	}
+	
+	public static String getIDValbyUUID(Node node,String uuid_s) throws Exception {
+		return getIDValbyId(node,getIdFromUUID(uuid_s));
+	}
+	
+	public static String getIDValbyId(Node node,String intI) {
 		
+		String Xpath1 = "//*[name()='id'][@id_int='";
+		String Xpath2 = "']/@*[name()='value']";
+		StringBuilder sb=new StringBuilder();
+		sb.append(Xpath1);
+		sb.append(intI);
+		sb.append(Xpath2);
+		String Xpath = sb.toString();
+		log.info("GetIDValbyId Xpath = "+Xpath);
+		String idVal = null;
+		try {
+			idVal = XMLUtil.selectXPathString(Xpath,node);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return idVal;
 	}
 	
-	public static Document getDocByID(int id) {
-	Document doc = null;	
-		
-	return doc;	
+	public static ArrayList<String> getdestRel_c1id_ByTypeUUID(Node node,String uuid_s) throws Exception {
+		return getdestRel_c1id_ByTypeID(node,getIdFromUUID(uuid_s));
 	}
+	
+	public static ArrayList<String> getdestRel_c1id_ByTypeID(Node node,String intI) throws Exception {
+		//String Xpath ="//*[name()='destRel'][./relPart/@typeId='-2147392952']";
+		String Xpath ="//*[name()='destRel'][./relPart/@typeId='"+intI+"']";
+		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.C1_ID_ATT);
+	}
+	
+	public static ArrayList<String> getDescVal_ByTypeUUID(Node node,String uuid_s) throws Exception {
+		return getdestRel_c1id_ByTypeID(node,getIdFromUUID(uuid_s));
+	}
+	
+	public static ArrayList<String> getDescVal_ByTypeID(Node node,String intI) throws Exception {
+		//String Xpath ="//*[name()='descriptionPart'][@typeId='-2147392952']";
+		String Xpath ="//*[name()='descriptionPart'][@typeId='"+intI+"']";
+		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.TEXT_ATT);
+	}
+	
+	
+	public static ArrayList<String> getAllDescVals(Node node) throws Exception{
+		String Xpath ="//*[name()='descriptionPart']";
+		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.TEXT_ATT);
+		
+		
+	}
+	
 	
 
 }

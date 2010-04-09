@@ -86,6 +86,8 @@ public class XML_ConceptController {
 		
 		if(!AceXMLUtil.getUuidInt().containsKey(uuid.toString())){
 		I_GetConceptData editPathConcept = tf.getConcept(uuid);
+		AceXMLUtil.addtoUuidInt(uuid.toString(), editPathConcept.getConceptId());
+		
 			add_I_GetConceptData(editPathConcept);
 		}
 		return retDoc;
