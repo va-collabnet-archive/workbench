@@ -981,6 +981,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			throws IOException {
 		I_IntSet isATypes = config.getDestRelTypes();
 		I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+		possibleKindOfConcepts.setMember(getNid());
 		for (NidPair pair: this.getData().getDestRelNidTypeNidList()) {
 			int relNid = pair.getNid1();
 			int typeNid = pair.getNid2();
@@ -995,6 +996,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
 			throws IOException {
+        possibleKindOfConcepts.setMember(getNid());
         for (NidPair pair: this.getData().getDestRelNidTypeNidList()) {
             int relNid = pair.getNid1();
             int typeNid = pair.getNid2();
