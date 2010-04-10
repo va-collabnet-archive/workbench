@@ -1149,7 +1149,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinability.getNid());
         r.setCharacteristicId(relCharacteristic.getNid());
         r.primordialSapNid = Integer.MIN_VALUE;
-        r.setGroup(0);
+        r.setGroup(group);
         int statusNid = relStatus.getNid();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
