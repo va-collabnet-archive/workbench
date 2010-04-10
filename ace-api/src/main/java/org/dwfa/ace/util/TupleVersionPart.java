@@ -52,16 +52,18 @@ public class TupleVersionPart {
 
         versions.addAll((Collection<? extends I_AmVersioned<P>>) versionedList);
         for (I_AmVersioned<P> versioned : versions) {
-            partList.addAll(versioned.getVersions());
-            for (P part : partList) {
-                //If we have see this part before remove it from the versioned
-                if (!partSet.add(part)) {
-                    versioned.getVersions().remove(part);
+            if(versioned != null){
+                partList.addAll(versioned.getVersions());
+                for (P part : partList) {
+                    //If we have see this part before remove it from the versioned
+                    if (!partSet.add(part)) {
+                        versioned.getVersions().remove(part);
+                    }
                 }
-            }
-            //If there are no parts in the versioned (all duplicates) remove versioned.
-            if (versioned.getVersions().isEmpty()) {
-                versionedList.remove(versioned);
+                //If there are no parts in the versioned (all duplicates) remove versioned.
+                if (versioned.getVersions().isEmpty()) {
+                    versionedList.remove(versioned);
+                }
             }
         }
     }
