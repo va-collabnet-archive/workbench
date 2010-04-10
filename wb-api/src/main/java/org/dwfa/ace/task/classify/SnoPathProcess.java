@@ -280,7 +280,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
                         tmpCountRelRefMand++;
 
                     // ADD TO STATED
-                    SnoRel relationship = new SnoRel(rel, rPart1);
+                    SnoRel relationship = new SnoRel(rel.getC1Id(), rel.getC2Id(), rPart1.getTypeId(), rPart1.getGroup(), rel.getNid());
                     keepRels.add(relationship);
                 }
             }

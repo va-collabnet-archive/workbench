@@ -269,6 +269,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             this.part = variablePart;
         }
 
+        public RelVersion(int relNid) {
+            // :NYI: needs to be implemented to construct tuple from rel nid
+            throw new UnsupportedOperationException();
+        }
+
         /*
          * (non-Javadoc)
          * 
@@ -957,7 +962,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
         for (SnoGrp sg : isaSGList)
             for (SnoRel sr : sg)
-                isaList.add(new RelVersion(sr.relVers, sr.relPart));
+                isaList.add(new RelVersion(sr.relNid));
         for (I_RelTuple t : isaList) {
             I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
                 showStatusCB.isSelected());
@@ -977,7 +982,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the non-Rels
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
-                    I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                    I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                         showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -997,7 +1002,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
-                        grpTuple.add(new RelVersion(sr.relVers, sr.relPart));
+                        grpTuple.add(new RelVersion(sr.relNid));
                     }
                     tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1007,7 +1012,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                        I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                             showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1066,7 +1071,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
         for (SnoGrp sg : isaSGList)
             for (SnoRel sr : sg)
-                isaList.add(new RelVersion(sr.relVers, sr.relPart));
+                isaList.add(new RelVersion(sr.relNid));
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1084,7 +1089,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the non-Rels
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
-                    I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                    I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                         showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1104,7 +1109,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
-                        grpTuple.add(new RelVersion(sr.relVers, sr.relPart));
+                        grpTuple.add(new RelVersion(sr.relNid));
                     }
                     tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1114,7 +1119,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                        I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                             showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1173,7 +1178,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
         for (SnoGrp sg : isaSGList)
             for (SnoRel sr : sg)
-                isaList.add(new RelVersion(sr.relVers, sr.relPart));
+                isaList.add(new RelVersion(sr.relNid));
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabel(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1191,7 +1196,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the non-Rels
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
-                    I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                    I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                         showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1212,7 +1217,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     // group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
-                        grpTuple.add(new RelVersion(sr.relVers, sr.relPart));
+                        grpTuple.add(new RelVersion(sr.relNid));
                     }
                     tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1222,7 +1227,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 relationship per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                        I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                             showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1282,7 +1287,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
         for (SnoGrp sg : isaSGList)
             for (SnoRel sr : sg)
-                isaList.add(new RelVersion(sr.relVers, sr.relPart));
+                isaList.add(new RelVersion(sr.relNid));
         for (I_RelTuple t : isaList) {
             I_ImplementActiveLabel tLabel = TermLabelMaker.newLabel(t, showDetailCB.isSelected(),
                 showStatusCB.isSelected());
@@ -1301,7 +1306,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the non-Rels
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
-                    I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                    I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                         showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1321,7 +1326,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
-                        grpTuple.add(new RelVersion(sr.relVers, sr.relPart));
+                        grpTuple.add(new RelVersion(sr.relNid));
                     }
                     tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1331,7 +1336,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                        I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                             showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1387,7 +1392,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         List<I_RelTuple> isaList = new ArrayList<I_RelTuple>();
         for (SnoGrp sg : isaSGList)
             for (SnoRel sr : sg)
-                isaList.add(new RelVersion(sr.relVers, sr.relPart));
+                isaList.add(new RelVersion(sr.relNid));
         for (I_RelTuple rTuple : isaList) {
             tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
             tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1406,7 +1411,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             // show each of the non-Rels
             if (sg.size() > 0 && sg.get(0).group == 0) {
                 for (SnoRel sr : sg) {
-                    I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                    I_RelTuple rTuple = new RelVersion(sr.relNid);
                     tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                         showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1426,7 +1431,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 if (showGroupLabels) { // true shows one label per group
                     List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
                     for (SnoRel sr : sg) {
-                        grpTuple.add(new RelVersion(sr.relVers, sr.relPart));
+                        grpTuple.add(new RelVersion(sr.relNid));
                     }
                     tmpTLabel = TermLabelMaker.newLabel(grpTuple, showDetailCB.isSelected(), showStatusCB.isSelected());
                     tLabelList.add((LabelForTuple) tmpTLabel);
@@ -1436,7 +1441,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                     c.gridy++;
                 } else { // if false, show 1 rel per label
                     for (SnoRel sr : sg) {
-                        I_RelTuple rTuple = new RelVersion(sr.relVers, sr.relPart);
+                        I_RelTuple rTuple = new RelVersion(sr.relNid);
                         tmpTLabel = TermLabelMaker.newLabelForm(rTuple, showDetailCB.isSelected(),
                             showStatusCB.isSelected());
                         tLabelList.add((LabelForTuple) tmpTLabel);

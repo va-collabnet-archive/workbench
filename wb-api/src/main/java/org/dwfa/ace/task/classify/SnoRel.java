@@ -20,25 +20,11 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 
 public class SnoRel implements Comparable<Object> {
-    public I_RelVersioned relVers; // relId, c1Id, c2Id
-    public I_RelPart relPart; // group, type, path, version, refin., character.
-
     public int relNid;
     public int c1Id; // from I_RelVersioned
     public int c2Id; // from I_RelVersioned
     public int typeId; // from I_RelPart
     public int group; // from I_RelPart
-
-    // SnoRel form a versioned "old" database perspective
-    public SnoRel(I_RelVersioned relVers, I_RelPart relPart) {
-        this.c1Id = relVers.getC1Id();
-        this.c2Id = relVers.getC2Id();
-        this.typeId = relPart.getTypeId();
-        this.group = relPart.getGroup();
-        this.relVers = relVers;
-        this.relPart = relPart;
-        this.relNid = Integer.MAX_VALUE;
-    }
 
     // SnoRel form a versioned "new" database perspective
     public SnoRel(int c1Id, int c2Id, int roleTypeId, int group, int relNid) {
@@ -46,8 +32,6 @@ public class SnoRel implements Comparable<Object> {
         this.c2Id = c2Id;
         this.typeId = roleTypeId;
         this.group = group;
-        this.relVers = null;
-        this.relPart = null;
         this.relNid = relNid;
     }
 
@@ -57,25 +41,11 @@ public class SnoRel implements Comparable<Object> {
         this.c2Id = c2Id;
         this.typeId = roleTypeId;
         this.group = group;
-        this.relVers = null;
-        this.relPart = null;
         this.relNid = Integer.MAX_VALUE;
     }
 
     public int getRelId() {
-        return relVers.getRelId();
-    }
-
-    public int getPathId() {
-        return relPart.getPathId();
-    }
-
-    public int getCharacteristicId() {
-        return relPart.getCharacteristicId();
-    }
-
-    public int getRefinabilityId() {
-        return relPart.getRefinabilityId();
+        return relNid;
     }
 
     public void setNid(int nid) {
@@ -115,10 +85,7 @@ public class SnoRel implements Comparable<Object> {
     } // SnoRel.compareTo()
 
     public String toString() {
-        StringBuilder s = new StringBuilder();
-            s.append(relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group );
-
-        return s.toString();
+        return new String(relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group);
     }
 
     public String toStringHdr() {

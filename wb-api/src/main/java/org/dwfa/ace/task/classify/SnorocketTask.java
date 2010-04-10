@@ -297,10 +297,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             Arrays.fill(cNidArray, nextCIdx, cNidArray.length, Integer.MAX_VALUE);
 
             // FILTER RELATIONSHIPS
+            /* Snorocket_123 is self filtering on C2
             int last = cEditSnoRels.size();
             for (int idx = last - 1; idx > -1; idx--)
                 if (Arrays.binarySearch(cNidArray, cEditSnoRels.get(idx).c2Id) < 0)
                     cEditSnoRels.remove(idx);
+            */
 
             if (debugDump) {
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
@@ -370,6 +372,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 gui.complete(); // PHASE 1. DONE
                 return Condition.CONTINUE;
             }
+            
+            cEditSnoCons = null; // :MEMORY:
             cEditSnoRels = null; // :MEMORY:
             pcEdit = null; // :MEMORY:
             System.gc();
@@ -490,7 +494,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     + pcClass.getStats(startTime));
 
             // FILTER RELATIONSHIPS
-            last = cClassSnoRels.size();
+            int last = cClassSnoRels.size();
             for (int idx = last - 1; idx > -1; idx--)
                 if (Arrays.binarySearch(cNidArray, cClassSnoRels.get(idx).c2Id) < 0)
                     cClassSnoRels.remove(idx);
