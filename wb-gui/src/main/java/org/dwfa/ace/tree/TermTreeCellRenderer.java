@@ -250,6 +250,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                     htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version
                                         + "]</font>");
                                 }
+                            } else {
+                                setToolTipText(null);
                             }
                         }
                         List<I_DescriptionVersioned> descriptionsWithExtensions =

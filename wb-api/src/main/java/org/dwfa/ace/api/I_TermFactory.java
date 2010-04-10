@@ -587,7 +587,7 @@ public interface I_TermFactory {
 
 	I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid,
 			byte[] image, String textDescription, String format,
-			I_ConfigAceFrame aceConfig) throws IOException;
+			I_ConfigAceFrame aceConfig) throws IOException, TerminologyException;
 	
     I_RelVersioned getRelationship(int rNid) throws IOException;
     I_RelVersioned newRelationship(UUID relUuid, I_GetConceptData concept, I_GetConceptData concept2,

@@ -1630,11 +1630,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid, byte[] image,
-            String textDescription, String format, I_ConfigAceFrame aceConfig) throws IOException {
+            String textDescription, String format, I_ConfigAceFrame aceConfig) throws IOException, TerminologyException {
 
         Concept c = Concept.get(conceptNid);
         Image img = new Image();
+        img.nid = uuidToNative(imageUuid);
+        img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
+        Bdb.getNidCNidMap().setCidForNid(conceptNid, img.nid);
         img.setImage(image);
+        img.enclosingConceptNid = c.getNid();
         img.setFormat(format);
         img.setTextDescription(textDescription);
         img.setTypeNid(typeNid);
