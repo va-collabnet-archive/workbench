@@ -42,12 +42,14 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
+//import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_WriteDirectToDb;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -158,8 +160,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // INTERNAL
-    private static boolean debug = true; // :DEBUG:
-    private static boolean debugDump = true; // :DEBUG: save to files
+    private static boolean debug = false; // :DEBUG:
+    private static boolean debugDump = false; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -197,7 +199,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
         public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
             countRel++;
-            SnoRel relationship = new SnoRel(conceptId1, conceptId2, roleId, group, countRel);
+            SnoRel relationship = new SnoRel(conceptId1, conceptId2, roleId, group);
             snorels.add(relationship);
             if (countRel % 25000 == 0) {
                 // ** GUI: ProcessResults
@@ -271,8 +273,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
             SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, cEditSnoCons,
-                    cEditSnoRels, rootNid, isaNid, allowedRoleTypes, statusSet, cEditPosSet, gui,
-                    false);
+                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, false);
             tf.iterateConcepts(pcEdit); // :!!!:
             // Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
             logger
@@ -309,7 +310,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 Collections.sort(cEditSnoRels);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);
             }
-            
+
             // SETUP CLASSIFIER
             Snorocket_123 rocket_123 = new Snorocket_123(cNidArray, nextCIdx, rNidArray, nextRIdx,
                     rootNid);
@@ -322,8 +323,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             for (int i = 0; i < cEditSnoCons.size(); i++)
                 if (cEditSnoCons.get(i).isDefined)
                     rocket_123.setConceptIdxAsDefined(i + reserved);
-
-
 
             // ADD RELATIONSHIPS
             Collections.sort(cEditSnoRels);
@@ -373,6 +372,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
             cEditSnoRels = null; // :MEMORY:
             pcEdit = null; // :MEMORY:
+            System.gc();
 
             // ** GUI: 2 RUN CLASSIFIER **
             gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
@@ -466,7 +466,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
                 Collections.sort(cRocketSnoRels);
-                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);                
+                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);
             }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
@@ -484,8 +484,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
-                    cClassSnoRels, rootNid, isaNid, allowedRoleTypes, statusSet, cClassPosSet, gui,
-                    true);
+                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, gui, true);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -497,8 +496,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     cClassSnoRels.remove(idx);
 
             if (debugDump) {
-                dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
                 Collections.sort(cClassSnoRels);
+                dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_compare.txt", 5);
             }
 
@@ -534,7 +533,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 Collections.sort(sqrl);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_compare.txt", 5);
-                
+
                 sqrl = SnoQuery.getIsaDropped();
                 Collections.sort(sqrl);
                 dumpSnoRel(sqrl, "SnoRelIsaDrop_full.txt", 4);
@@ -621,9 +620,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
      */
     private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB, int classPathNid)
             throws TerminologyException, IOException {
-        I_WriteDirectToDb di = null;
-        if (!debug)
-            di = tf.getDirectInterface();
         long vTime;
         vTime = System.currentTimeMillis();
 
@@ -699,7 +695,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         countB_Total++;
                         if (rel_B.typeId == isaNid)
                             countB_DiffISA++;
-                        writeBackCurrent(rel_B, classPathNid, di, vTime);
+                        writeBackCurrent(rel_B, classPathNid, vTime);
 
                         if (itB.hasNext())
                             rel_B = itB.next();
@@ -714,7 +710,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         countA_Total++;
                         if (rel_A.typeId == isaNid)
                             countA_DiffISA++;
-                        writeBackRetired(rel_A, classPathNid, di, vTime);
+                        writeBackRetired(rel_A, classPathNid, vTime);
 
                         if (itA.hasNext())
                             rel_A = itA.next();
@@ -730,7 +726,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     countA_Total++;
                     if (rel_A.typeId == isaNid)
                         countA_DiffISA++;
-                    writeBackRetired(rel_A, classPathNid, di, vTime);
+                    writeBackRetired(rel_A, classPathNid, vTime);
                     if (itA.hasNext())
                         rel_A = itA.next();
                     else
@@ -744,7 +740,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     countB_Total++;
                     if (rel_B.typeId == isaNid)
                         countB_DiffISA++;
-                    writeBackCurrent(rel_B, classPathNid, di, vTime);
+                    writeBackCurrent(rel_B, classPathNid, vTime);
                     if (itB.hasNext())
                         rel_B = itB.next();
                     else
@@ -798,7 +794,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     groupList_NotEqual = groupList_A.whichNotEqual(groupList_B);
                     for (SnoGrp sg : groupList_NotEqual)
                         for (SnoRel sr_A : sg)
-                            writeBackRetired(sr_A, classPathNid, di, vTime);
+                            writeBackRetired(sr_A, classPathNid, vTime);
                     countA_Total += groupList_A.countRels();
                     countA_Diff += groupList_NotEqual.countRels();
                 }
@@ -809,7 +805,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual)
                         for (SnoRel sr_B : sg)
-                            writeBackCurrent(sr_B, classPathNid, di, vTime);
+                            writeBackCurrent(sr_B, classPathNid, vTime);
                     countB_Total += groupList_A.countRels();
                     countB_Diff += groupList_NotEqual.countRels();
                 }
@@ -822,7 +818,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     countB_Total++;
                     if (rel_B.typeId == isaNid)
                         countB_DiffISA++;
-                    writeBackCurrent(rel_B, classPathNid, di, vTime);
+                    writeBackCurrent(rel_B, classPathNid, vTime);
                     if (itB.hasNext()) {
                         rel_B = itB.next();
                     } else {
@@ -840,7 +836,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     countA_Total++;
                     if (rel_A.typeId == isaNid)
                         countA_DiffISA++;
-                    writeBackRetired(rel_A, classPathNid, di, vTime);
+                    writeBackRetired(rel_A, classPathNid, vTime);
                     if (itA.hasNext()) {
                         rel_A = itA.next();
                     } else {
@@ -865,7 +861,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             if (rel_A.typeId == isaNid)
                 countA_DiffISA++;
             // COMPLETELY UPDATE ALL REMAINING REL_A AS RETIRED
-            writeBackRetired(rel_A, classPathNid, di, vTime);
+            writeBackRetired(rel_A, classPathNid, vTime);
             if (itA.hasNext()) {
                 rel_A = itA.next();
             } else {
@@ -880,7 +876,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             if (rel_B.typeId == isaNid)
                 countB_DiffISA++;
             // COMPLETELY UPDATE ALL REMAINING REL_B AS NEW, CURRENT
-            writeBackCurrent(rel_B, classPathNid, di, vTime);
+            writeBackCurrent(rel_B, classPathNid, vTime);
             if (itB.hasNext()) {
                 rel_B = itB.next();
             } else {
@@ -890,8 +886,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         }
 
         // CHECKPOINT DATABASE
-        if (!debug)
-            tf.getDirectInterface().sync();
 
         StringBuilder s = new StringBuilder();
         s.append("\r\n::: [SnorocketTask] compareAndWriteBack()");
@@ -913,60 +907,71 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         return s.toString();
     }
 
-    private void writeBackRetired(SnoRel rel_A, int writeToNid, I_WriteDirectToDb di,
-            long versionTime) throws IOException {
+    private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
+            throws IOException {
         if (rel_A.typeId == isaNid)
             SnoQuery.isaDropped.add(rel_A);
         else
             SnoQuery.roleDropped.add(rel_A);
-        if (debug)
-            return;
 
-        // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        I_RelPart relPart3 = tf.newRelPart(); // I_RelPart
-        relPart3.setTypeId(rel_A.typeId); // from classifier
-        relPart3.setGroup(rel_A.group); // from classifier
-        relPart3.setCharacteristicId(rel_A.getCharacteristicId());
-        relPart3.setRefinabilityId(rel_A.getRefinabilityId());
-        relPart3.setStatusId(isRETIRED);
-        relPart3.setTime(versionTime);
-        relPart3.setPathId(writeToNid); // via preferences
-        rel_A.relVers.addVersionNoRedundancyCheck(relPart3);
-        di.writeRel(rel_A.relVers); // WRITE TO DB
+        try {
+            I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
+            List<? extends I_RelPart> rvList = rBean.getVersions(true);
+
+            if (rvList.size() != 1)
+                logger.info("::: [SnorocketTask] ERROR: writeBackRetired() multiple last versions");
+            else {
+
+                // CREATE RELATIONSHIP PART W/ TermFactory
+                I_RelPart nextRelPart = tf.newRelPart(); // I_RelPart
+                nextRelPart.setTypeId(rel_A.typeId); // from classifier
+                nextRelPart.setGroup(rel_A.group); // from classifier
+                I_RelPart lastPart = rvList.get(0);
+                nextRelPart.setCharacteristicId(lastPart.getCharacteristicId());
+                nextRelPart.setRefinabilityId(lastPart.getRefinabilityId());
+                nextRelPart.setStatusId(isRETIRED);
+                nextRelPart.setTime(versionTime);
+                nextRelPart.setPathId(writeToNid); // via preferences
+
+                rBean.addVersionNoRedundancyCheck(nextRelPart);
+
+                // Commit
+                tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    private void writeBackCurrent(SnoRel rel_B, int writeToNid, I_WriteDirectToDb di,
+    private void writeBackCurrent(SnoRel rel_B, int writeToNid, 
             long versionTime) throws TerminologyException, IOException {
         if (rel_B.typeId == isaNid)
             SnoQuery.isaAdded.add(rel_B);
         else
             SnoQuery.roleAdded.add(rel_B);
-        if (debug)
-            return;
-
+               
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
-        // GENERATE NEW REL ID -- AND WRITE TO DB
-        Collection<UUID> rUids = new ArrayList<UUID>();
-        rUids.add(UUID.randomUUID());
-        // (Collection<UUID>, int, I_Path, int)
-        int newRelNid = Terms.get().uuidToNative(rUids);
-
-        // CREATE RELATIONSHIP OBJECT -- IN MEMORY
-        // (int relNid, int conceptNid, int relDestinationNid)
-        I_RelVersioned newRel = di.newRelationshipBypassCommit(newRelNid, rel_B.c1Id, rel_B.c2Id);
-
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        I_RelPart newRelPart = tf.newRelPart(); // I_RelPart
-        newRelPart.setTypeId(rel_B.typeId); // from classifier
-        newRelPart.setGroup(rel_B.group); // from classifier
-        newRelPart.setCharacteristicId(isCh_DEFINING_CHARACTERISTIC);
-        newRelPart.setRefinabilityId(isOPTIONAL_REFINABILITY);
-        newRelPart.setStatusId(isCURRENT);
-        newRelPart.setTime(versionTime);
-        newRelPart.setPathId(writeToNid); // via preferences
-        newRel.addVersionNoRedundancyCheck(newRelPart);
-        di.writeRel(newRel); // WRITE TO DB
-
+        tf.newRelationshipNoCheck(UUID.randomUUID(),
+                tf.getConcept(rel_B.c1Id), 
+                rel_B.typeId, 
+                rel_B.c2Id, 
+                isCh_DEFINING_CHARACTERISTIC, 
+                isOPTIONAL_REFINABILITY, 
+                isCURRENT, 
+                rel_B.group, 
+                writeToNid, 
+                versionTime);
+        
+        // Commit
+        try {
+            tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }        
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {

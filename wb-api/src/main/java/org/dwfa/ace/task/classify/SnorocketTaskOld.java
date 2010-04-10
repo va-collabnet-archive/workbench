@@ -159,8 +159,8 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
     private boolean continueThisAction = true;
 
     // INTERNAL
-    private static boolean debug = true; // :DEBUG:
-    private static boolean debugDump = true; // :DEBUG: save to files
+    private static boolean debug = false; // :DEBUG:
+    private static boolean debugDump = false; // :DEBUG: save to files
 
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -199,7 +199,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
 
         public void addRelationship(int conceptId1, int roleId, int conceptId2, int group) {
             countRel++;
-            SnoRel relationship = new SnoRel(conceptId1, conceptId2, roleId, group, countRel);
+            SnoRel relationship = new SnoRel(conceptId1, conceptId2, roleId, group);
             snorels.add(relationship);
             if (countRel % 25000 == 0) {
                 // ** GUI: ProcessResults
@@ -259,18 +259,15 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             // SETUP ROLE NID ARRAY
             int[] rNidArray = setupRoleNids();
             int nextRIdx = rNidArray.length;
-            
+
             // GET EDIT_PATH CONCEPTS AND RELATIONSHIPS
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
             SnoPathProcess pcEdit = new SnoPathProcess(logger, cEditSnoCons, cEditSnoRels,
                     rNidArray, cEditPathPos, gui, false);
             tf.iterateConcepts(pcEdit);
-            logger
-                    .info("\r\n::: [SnorocketTaskOld] GET STATED PATH DATA"
-                            + pcEdit.getStats(startTime));
-
-            
+            logger.info("\r\n::: [SnorocketTaskOld] GET STATED PATH DATA"
+                    + pcEdit.getStats(startTime));
 
             // SETUP CONCEPT NID ARRAY
             final int reserved = 2;
@@ -294,7 +291,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 Collections.sort(cEditSnoCons);
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_compare.txt", 5);
                 Collections.sort(cEditSnoRels);
-                dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);                
+                dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);
             }
 
             // SETUP CLASSIFIER
@@ -343,8 +340,8 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 logger.info("\r\n::: [SnorocketTaskOld] \"Never-Grouped\" Added");
             }
 
-            logger.info("\r\n::: [SnorocketTaskOld] SORTED & ADDED CONs, RELs" + " *** LAPSE TIME = "
-                    + toStringLapseSec(startTime) + " ***");
+            logger.info("\r\n::: [SnorocketTaskOld] SORTED & ADDED CONs, RELs"
+                    + " *** LAPSE TIME = " + toStringLapseSec(startTime) + " ***");
 
             // ** GUI: 1. LOAD DATA -- done **
             if (continueThisAction) {
@@ -448,8 +445,11 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 return Condition.CONTINUE;
             }
 
-            if (debugDump)
+            if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
+                Collections.sort(cRocketSnoRels);
+                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);
+            }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
             gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
@@ -472,7 +472,9 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                     + pcClass.getStats(startTime));
 
             if (debugDump) {
+                Collections.sort(cClassSnoRels);
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
+                dumpSnoRel(cClassSnoRels, "SnoRelCPathData_compare.txt", 5);
             }
 
             // ** GUI: 4 -- done
@@ -503,10 +505,25 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                     + " ***");
 
             if (debugDump) {
+                ArrayList<SnoRel> sqrl = SnoQuery.getIsaAdded();
+                Collections.sort(sqrl);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
-                dumpSnoRel(SnoQuery.getIsaDropped(), "SnoRelIsaDrop_full.txt", 4);
-                dumpSnoRel(SnoQuery.getRoleAdded(), "SnoRelRoleAdd_full.txt", 4);
-                dumpSnoRel(SnoQuery.getRoleDropped(), "SnoRelRoleDrop_full.txt", 4);
+                dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_compare.txt", 5);
+                
+                sqrl = SnoQuery.getIsaDropped();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelIsaDrop_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelIsaDrop_compare.txt", 5);
+
+                sqrl = SnoQuery.getRoleAdded();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelRoleAdd_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelRoleAdd_compare.txt", 5);
+
+                sqrl = SnoQuery.getRoleDropped();
+                Collections.sort(sqrl);
+                dumpSnoRel(sqrl, "SnoRelRoleDrop_full.txt", 4);
+                dumpSnoRel(sqrl, "SnoRelRoleDrop_compare.txt", 5);
             }
 
             // ** GUI: 5 COMPLETE **
@@ -877,20 +894,9 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             SnoQuery.isaDropped.add(rel_A);
         else
             SnoQuery.roleDropped.add(rel_A);
-        if (debug)
-            return;
+        return;
 
-        // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        I_RelPart relPart3 = tf.newRelPart(); // I_RelPart
-        relPart3.setTypeId(rel_A.typeId); // from classifier
-        relPart3.setGroup(rel_A.group); // from classifier
-        relPart3.setCharacteristicId(rel_A.getCharacteristicId());
-        relPart3.setRefinabilityId(rel_A.getRefinabilityId());
-        relPart3.setStatusId(isRETIRED);
-        relPart3.setTime(versionTime);
-        relPart3.setPathId(writeToNid); // via preferences
-        rel_A.relVers.addVersionNoRedundancyCheck(relPart3);
-        di.writeRel(rel_A.relVers); // WRITE TO DB
+        // NOT IMPLEMENTED
     }
 
     private void writeBackCurrent(SnoRel rel_B, int writeToNid, I_WriteDirectToDb di,
@@ -899,32 +905,9 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             SnoQuery.isaAdded.add(rel_B);
         else
             SnoQuery.roleAdded.add(rel_B);
-        if (debug)
-            return;
-
-        // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
-        // GENERATE NEW REL ID -- AND WRITE TO DB
-        Collection<UUID> rUids = new ArrayList<UUID>();
-        rUids.add(UUID.randomUUID());
-        // (Collection<UUID>, int, I_Path, int)
-        int newRelNid = Terms.get().uuidToNative(rUids);
-
-        // CREATE RELATIONSHIP OBJECT -- IN MEMORY
-        // (int relNid, int conceptNid, int relDestinationNid)
-        I_RelVersioned newRel = di.newRelationshipBypassCommit(newRelNid, rel_B.c1Id, rel_B.c2Id);
-
-        // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        I_RelPart newRelPart = tf.newRelPart(); // I_RelPart
-        newRelPart.setTypeId(rel_B.typeId); // from classifier
-        newRelPart.setGroup(rel_B.group); // from classifier
-        newRelPart.setCharacteristicId(isCh_DEFINING_CHARACTERISTIC);
-        newRelPart.setRefinabilityId(isOPTIONAL_REFINABILITY);
-        newRelPart.setStatusId(isCURRENT);
-        newRelPart.setTime(versionTime);
-        newRelPart.setPathId(writeToNid); // via preferences
-        newRel.addVersionNoRedundancyCheck(newRelPart);
-        di.writeRel(newRel); // WRITE TO DB
-
+        return;
+        
+        // NOT IMPLEMENTED
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {

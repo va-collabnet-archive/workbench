@@ -594,6 +594,21 @@ public interface I_TermFactory {
             I_GetConceptData concept3, I_GetConceptData concept4, I_GetConceptData concept5, I_GetConceptData concept6,
             int group, I_ConfigAceFrame importConfig, long effectiveDate) throws IOException, TerminologyException;
 	
+    /**
+     * <b>newRelationshipNoCheck DOESNOT use the configuration to set default values!</b>
+     * newRelationshipNoCheck provides direct access for classifier results write-back.<br>
+     * 
+     * @param newRelUid
+     * @param concept
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept,
+            int relTypeNid, int c2Nid, int relCharacteristicNid, int relRefinabilityNid,
+            int relStatusNid, int group, int pathNid,
+            long effectiveDate) throws TerminologyException, IOException;
+    
     public void setCheckCreationDataEnabled(boolean enabled);
     public boolean isCheckCreationDataEnabled();
     

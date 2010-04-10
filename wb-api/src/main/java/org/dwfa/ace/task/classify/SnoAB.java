@@ -118,7 +118,7 @@ public class SnoAB {
                     }
                     if (rp1 != null) {
                         if (rp1.getStatusId() == isCURRENT && rp1.getTypeId() == isaNid) {
-                            returnSnoRels.add(new SnoRel(rel, rp1, -1));
+                            returnSnoRels.add(new SnoRel(rel, rp1));
                         }
                         break; // IF FOUND ON THIS PATH, STOP SEARCHING
                     }

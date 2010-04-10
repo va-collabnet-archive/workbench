@@ -1098,13 +1098,13 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             caRevisions.add(rev);
             // Check to see if the ids changed
 
-//            if (idCtv3IdFirst != null && cRec.ctv3id != null
-//                    && cRec.ctv3id.equals(idCtv3IdFirst) == false)
-//                getLog().info("CONCEPT CTV3 ID " + idCtv3IdFirst + " changed to " + cRec.ctv3id);
-//            if (idSnomedRtFirst != null && cRec.snomedrtid != null
-//                    && cRec.snomedrtid.equals(idSnomedRtFirst) == false)
-//                getLog()
-//                        .info("CONCEPT RT ID " + idSnomedRtFirst + " changed to " + cRec.snomedrtid);
+            //            if (idCtv3IdFirst != null && cRec.ctv3id != null
+            //                    && cRec.ctv3id.equals(idCtv3IdFirst) == false)
+            //                getLog().info("CONCEPT CTV3 ID " + idCtv3IdFirst + " changed to " + cRec.ctv3id);
+            //            if (idSnomedRtFirst != null && cRec.snomedrtid != null
+            //                    && cRec.snomedrtid.equals(idSnomedRtFirst) == false)
+            //                getLog()
+            //                        .info("CONCEPT RT ID " + idSnomedRtFirst + " changed to " + cRec.snomedrtid);
         }
 
         if (caRevisions.size() > 0)
@@ -2049,6 +2049,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("BASE FILE:  " + count1 + " records, " + fName1);
             a1 = new SctXRelRecord[count1];
             parseRelationships(fName1, a1, count1, f1.hasSnomedId, f1.doCrossMap);
+            a1 = removeDuplRels(a1);
+            count1 = a1.length;
             writeRelationships(oos, a1, count1, xRevDate, xPathID);
 
             while (fit.hasNext()) {
@@ -2065,6 +2067,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 // Parse in file2
                 a2 = new SctXRelRecord[count2];
                 parseRelationships(fName2, a2, count2, f2.hasSnomedId, f2.doCrossMap);
+                a2 = removeDuplRels(a2);
+                count2 = a2.length;
 
                 int r1 = 0, r2 = 0, r3 = 0; // reset record indices
                 int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
@@ -2430,6 +2434,37 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         getLog().info(
                 "Parse & sort time: " + relationships + " relationships, "
                         + (System.currentTimeMillis() - start) + " milliseconds");
+    }
+
+    private SctXRelRecord[] removeDuplRels(SctXRelRecord[] a) {
+
+        // REMOVE DUPLICATES
+        int lenA = a.length;
+        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        for (int idx = 0; idx < lenA - 2; idx++)
+            if ((a[idx].uuidMostSigBits == a[idx + 1].uuidMostSigBits)
+                    && (a[idx].uuidLeastSigBits == a[idx + 1].uuidLeastSigBits)) {
+                duplIdxList.add(Integer.valueOf(idx));
+                getLog().info(
+                        "WARNING -- Duplicate relationship:" + "\r\n A:" + a[idx] + " B:"
+                                + a[idx + 1]);
+            }
+        if (duplIdxList.size() > 0) {
+            SctXRelRecord[] b = new SctXRelRecord[lenA - duplIdxList.size()];
+            int aPos = 0;
+            int bPos = 0;
+            int len;
+            for (int dropIdx : duplIdxList) {
+                len = dropIdx - aPos;
+                System.arraycopy(a, aPos, b, bPos, len);
+                bPos = bPos + len;
+                aPos = aPos + len + 1;
+            }
+            len = lenA - aPos; 
+            System.arraycopy(a, aPos, b, bPos, len);
+            return b;
+        } else
+            return a;
     }
 
     private void computeRelationshipUuids(SctXRelRecord[] a, boolean hasSnomedId, boolean doCrossMap)

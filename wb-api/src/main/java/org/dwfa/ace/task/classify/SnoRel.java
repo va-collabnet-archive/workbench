@@ -23,33 +23,43 @@ public class SnoRel implements Comparable<Object> {
     public I_RelVersioned relVers; // relId, c1Id, c2Id
     public I_RelPart relPart; // group, type, path, version, refin., character.
 
+    public int relNid;
     public int c1Id; // from I_RelVersioned
     public int c2Id; // from I_RelVersioned
     public int typeId; // from I_RelPart
     public int group; // from I_RelPart
 
-    private int cid; // unique "up counter" id number to track pre-sort sequence
-
-    // SnoRel form a versioned database perspective
-    public SnoRel(I_RelVersioned relVers, I_RelPart relPart, int i) {
+    // SnoRel form a versioned "old" database perspective
+    public SnoRel(I_RelVersioned relVers, I_RelPart relPart) {
         this.c1Id = relVers.getC1Id();
         this.c2Id = relVers.getC2Id();
         this.typeId = relPart.getTypeId();
         this.group = relPart.getGroup();
         this.relVers = relVers;
         this.relPart = relPart;
-        cid = i;
+        this.relNid = Integer.MAX_VALUE;
     }
 
-    // SnoRel from a SnoRocket perspective
-    public SnoRel(int c1Id, int c2Id, int roleTypeId, int group, int i) {
+    // SnoRel form a versioned "new" database perspective
+    public SnoRel(int c1Id, int c2Id, int roleTypeId, int group, int relNid) {
         this.c1Id = c1Id;
         this.c2Id = c2Id;
         this.typeId = roleTypeId;
         this.group = group;
         this.relVers = null;
         this.relPart = null;
-        cid = i;
+        this.relNid = relNid;
+    }
+
+    // SnoRel from a SnoRocket perspective
+    public SnoRel(int c1Id, int c2Id, int roleTypeId, int group) {
+        this.c1Id = c1Id;
+        this.c2Id = c2Id;
+        this.typeId = roleTypeId;
+        this.group = group;
+        this.relVers = null;
+        this.relPart = null;
+        this.relNid = Integer.MAX_VALUE;
     }
 
     public int getRelId() {
@@ -68,8 +78,8 @@ public class SnoRel implements Comparable<Object> {
         return relPart.getRefinabilityId();
     }
 
-    public void setCid(int uid) {
-        this.cid = uid;
+    public void setNid(int nid) {
+        this.relNid = nid;
     }
 
     // default sort order [c1-group-type-c2]
@@ -106,21 +116,13 @@ public class SnoRel implements Comparable<Object> {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (relVers != null && relPart != null) {
-            s.append(relVers.getRelId() + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group + "\t"
-                + relPart.getPathId() + "\t" + relPart.getVersion() + "\t" + relPart.getRefinabilityId() + "\t"
-                + relPart.getCharacteristicId() + "\t" + cid);
-        } else {
-            s.append("___________" + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group + "\t" + "___________"
-                + "\t" + "___________" + "\t" + "___________" + "\t" + "___________" + "\t" + cid);
-        }
+            s.append(relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group );
 
         return s.toString();
     }
 
     public String toStringHdr() {
-        return "relId     \t" + "c1Id      \t" + "c2Id      \t" + "typeId    \t" + "group\t" + "path      \t"
-            + "version   \t" + "ref.      \t" + "char.     \t" + "cid";
+        return "relId     \t" + "c1Id      \t" + "c2Id      \t" + "typeId    \t" + "group";
     }
 
 } // class SnoRel

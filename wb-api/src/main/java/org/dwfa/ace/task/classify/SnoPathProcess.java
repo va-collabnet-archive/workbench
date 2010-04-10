@@ -88,9 +88,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui = null;
 
-    public SnoPathProcess(Logger logger, List<SnoCon> snocons,
-            List<SnoRel> snorels, int[] allowedRoles, List<I_Position> fromPathPos,
-            I_ShowActivity gui, boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
+    public SnoPathProcess(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
+            int[] allowedRoles, List<I_Position> fromPathPos, I_ShowActivity gui,
+            boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
         this.logger = logger;
         this.snocons = snocons;
         this.snorels = snorels;
@@ -99,7 +99,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         setupCoreNids();
         this.allowedRoles = allowedRoles;
         this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
-        
+
         // STATISTICS COUNTERS
         countConSeen = 0;
         countConRoot = 0;
@@ -126,9 +126,16 @@ public class SnoPathProcess implements I_ProcessConcepts {
         if (++countConSeen % 25000 == 0) {
             logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
         }
-        if (concept.getConceptId() == rootNid) {
+        int cNid = concept.getNid();
+
+        // :!!!:???:
+        if (concept.getConceptId() != cNid)
+            logger.info("::: [SnoPathProcess] concept.getConceptId(" + concept.getConceptId()
+                    + ") != concept.getNid(" + cNid + ")");
+
+        if (cNid == rootNid) {
             if (snocons != null)
-                snocons.add(new SnoCon(concept.getConceptId(), false));
+                snocons.add(new SnoCon(cNid, false));
 
             countConAdded++;
             countConRoot++;
@@ -163,7 +170,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
             return; // IF (NOT_CURRENT) RETURN; "active" in "visible path"
 
         if (snocons != null) {
-            snocons.add(new SnoCon(concept.getConceptId(), cPart1.isDefined()));
+            snocons.add(new SnoCon(cNid, cPart1.isDefined()));
             countSnoCon++;
         }
 
@@ -175,14 +182,13 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
             for (SnoRel x : rels) {
                 countRelAdded++;
-                if (countRelAdded % 25000 == 0) {
+                if (gui != null && countRelAdded % 25000 == 0) {
                     // ** GUI: ProcessPath
                     gui.setValue(countRelAdded);
                     gui.setProgressInfoLower("rels processed " + countRelAdded);
                 }
                 if (x.group >= 0)
                     countRelAddedGroups++;
-                x.setCid(countRelAdded); // Update SnoRel sequential uid
                 if (snorels != null)
                     snorels.add(x); // Add to master input set
             }
@@ -274,7 +280,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
                         tmpCountRelRefMand++;
 
                     // ADD TO STATED
-                    SnoRel relationship = new SnoRel(rel, rPart1, -1);
+                    SnoRel relationship = new SnoRel(rel, rPart1);
                     keepRels.add(relationship);
                 }
             }

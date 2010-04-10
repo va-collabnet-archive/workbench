@@ -75,7 +75,7 @@ public class TestSnoPathProcessConcepts extends AbstractTask {
         try {
             setupRoleNids();
             SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, null,
-                    cEditSnoRels, rootNid, isaNid, allowedRoleTypes, statusSet, cEditPosSet, null,
+                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, null,
                     false);
             tf.iterateConcepts(pcEdit);
 
