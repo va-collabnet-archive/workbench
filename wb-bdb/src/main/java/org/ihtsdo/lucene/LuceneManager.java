@@ -119,8 +119,10 @@ public class LuceneManager {
         	IndexWriter writerCopy = writer;
         	if (writerCopy != null) {
                 for (Description desc: descriptions) {
-                	writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
-                	writerCopy.addDocument(createDoc(desc));
+                    if (desc != null) {
+                        writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
+                        writerCopy.addDocument(createDoc(desc));
+                    }
                 }
                 writerCopy.commit();
         	}
