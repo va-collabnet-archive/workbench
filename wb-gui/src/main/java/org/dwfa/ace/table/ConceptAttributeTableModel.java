@@ -437,6 +437,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             if (changed) {
                 AceLog.getAppLog().info("Attributes table changed");
                 updateDataAlerts(row);
+                Terms.get().addUncommitted(Terms.get().getConcept(getConceptTuple(row).getNid()));
             }
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);

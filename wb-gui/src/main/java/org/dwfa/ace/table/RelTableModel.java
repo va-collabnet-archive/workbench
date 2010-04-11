@@ -520,18 +520,19 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 			case PATH:
 			    break;
 			}
+	        if (changed) {
+	            AceLog.getAppLog().info("Rel table changed");
+	            updateDataAlerts(row);
+	            Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
+	        }
 		} catch (NumberFormatException e) {
-			throw new RuntimeException(e);
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			throw new RuntimeException(e);
+		    AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+		    AceLog.getAppLog().alertAndLogException(e);
 		}
         fireTableDataChanged();
-        if (changed) {
-            AceLog.getAppLog().info("Rel table changed");
-            updateDataAlerts(row);
-        }
     }
 
     private class UpdateDataAlertsTimerTask extends TimerTask {

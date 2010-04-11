@@ -248,9 +248,12 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 if (changed) {
                     AceLog.getAppLog().info("Description table changed");
                     updateDataAlerts(row);
-                }
+                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptId()));
+               }
             }
         } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
