@@ -119,6 +119,7 @@ public class RelationshipRevision
 
 	public void setCharacteristicId(int characteristicNid) {
 		this.characteristicNid = characteristicNid;
+        modified();
 	}
 
 	public int getGroup() {
@@ -127,6 +128,7 @@ public class RelationshipRevision
 
 	public void setGroup(int group) {
 		this.group = group;
+        modified();
 	}
 
 	public int getRefinabilityId() {
@@ -135,6 +137,7 @@ public class RelationshipRevision
 
 	public void setRefinabilityId(int refinabilityNid) {
 		this.refinabilityNid = refinabilityNid;
+        modified();
 	}
 
 	public int getTypeId() {
@@ -143,6 +146,7 @@ public class RelationshipRevision
 
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 	@Override

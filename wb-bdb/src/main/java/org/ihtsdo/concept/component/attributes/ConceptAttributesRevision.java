@@ -57,6 +57,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     @Override
     public void setDefined(boolean defined) {
         this.defined = defined;
+        modified();
     }
 
     @Override

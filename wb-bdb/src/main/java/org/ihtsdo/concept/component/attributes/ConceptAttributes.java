@@ -91,7 +91,7 @@ public class ConceptAttributes
 			if (index >= 0) {
 				revisions.get(index).setDefined(defined);
 			} else {
-				ConceptAttributes.this.defined = defined;
+				ConceptAttributes.this.setDefined(defined);
 			}
 		}
 
@@ -438,6 +438,7 @@ public class ConceptAttributes
 	@Override
 	public void setDefined(boolean defined) {
 		this.defined = defined;
+        modified();
 	}
 
 	@Override

@@ -217,6 +217,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public int getC2Nid() {
@@ -225,6 +226,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
 	public void setC2Nid(int c2Nid) {
 		this.c2Nid = c2Nid;
+        modified();
 	}
 
 	public int getC3Nid() {
@@ -233,6 +235,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
 	public void setC3Nid(int c3Nid) {
 		this.c3Nid = c3Nid;
+        modified();
 	}
 	@Override
 	public int getTypeId() {

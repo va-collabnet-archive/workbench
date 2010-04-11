@@ -196,16 +196,19 @@ public class DescriptionRevision
 	@Override
 	public void setInitialCaseSignificant(boolean capStatus) {
 		initialCaseSignificant = capStatus;
+        modified();
 	}
 
 	@Override
 	public void setLang(String lang) {
 		this.lang = lang;
+        modified();
 	}
 
 	@Override
 	public void setText(String text) {
 		this.text = text;
+        modified();
 	}
 
 	@Override
@@ -221,6 +224,7 @@ public class DescriptionRevision
 	@Override
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 	@Override

@@ -124,6 +124,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 	@Override
 	public void setC3id(int c3nid) {
 		this.c3Nid = c3nid;
+        modified();
 	}
 
 	public int getC1Nid() {
@@ -132,6 +133,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public int getC2Nid() {
@@ -140,6 +142,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 
 	public void setC2Nid(int c2Nid) {
 		this.c2Nid = c2Nid;
+        modified();
 	}
 
 	public int getC3Nid() {
@@ -148,6 +151,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 
 	public void setC3Nid(int c3Nid) {
 		this.c3Nid = c3Nid;
+        modified();
 	}
 
 	@Override
@@ -158,6 +162,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 	@Override
 	public void setC2id(int c2id) {
 		this.c2Nid = c2id;
+        modified();
 	}
 
 	@Override
@@ -168,6 +173,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 	@Override
 	public void setC1id(int c1id) {
 		this.c1Nid = c1id;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

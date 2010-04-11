@@ -48,7 +48,12 @@ public abstract class Revision<V extends Revision<V, C>,
     public Revision() {
         super();
     }
-    	
+   
+    protected void modified() {
+        if (primordialComponent != null) {
+            primordialComponent.modified();
+        }
+    }
 	public final void writePartToBdb(TupleOutput output) {
 		output.writeInt(sapNid);
 		writeFieldsToBdb(output);
@@ -66,6 +71,7 @@ public abstract class Revision<V extends Revision<V, C>,
 	 */
 	public void setStatusAtPositionNid(int sapNid) {
 		this.sapNid = sapNid;
+        modified();
 	}
 	
 	protected abstract void writeFieldsToBdb(TupleOutput output);
@@ -132,6 +138,7 @@ public abstract class Revision<V extends Revision<V, C>,
 
 	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
 		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
+		modified();
 	}
 
 
@@ -151,6 +158,7 @@ public abstract class Revision<V extends Revision<V, C>,
 					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
 		}
 		this.sapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
+        modified();
 	}
 
 	/* (non-Javadoc)
@@ -221,6 +229,7 @@ public abstract class Revision<V extends Revision<V, C>,
 		}
 		if (time != getTime()) {
 			this.sapNid = Bdb.getSapNid(getStatusId(), getPathId(), time);
+	        modified();
 		}
 	}
 

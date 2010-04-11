@@ -95,6 +95,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public float getFloatValue() {
@@ -103,6 +104,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 	public void setFloatValue(float floatValue) {
 		this.floatValue = floatValue;
+        modified();
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -516,6 +517,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private ArrayList<IdVersion> idVersions;
     
+    /**
+     * Call when data has changed, so concept updates it's version. 
+     */
+    protected void modified() {
+        try {
+            if (Bdb.getNidCNidMap() != null && Bdb.getNidCNidMap().hasConcept(enclosingConceptNid)) {
+                Concept c = Bdb.getConcept(enclosingConceptNid);
+                if (c != null) {
+                    c.modified();
+                }
+            }
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+    }
+    
     public boolean removeRevision(R r) {
         boolean changed = false;
         if (revisions != null) {
@@ -750,6 +767,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     public void setStatusAtPositionNid(int sapNid) {
         this.primordialSapNid = sapNid;
+        modified();
     }
 
     private void readIdentifierFromBdb(TupleInput input) {
@@ -1061,6 +1079,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         if (pathId != getPathId()) {
             this.primordialSapNid = Bdb.getSapNid(getStatusId(), pathId, Long.MAX_VALUE);
+            modified();
         }
     }
 
@@ -1072,6 +1091,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         if (time != getTime()) {
             this.primordialSapNid = Bdb.getSapNid(getStatusId(), getPathId(), time);
+            modified();
         }
     }
 
@@ -1083,6 +1103,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         if (statusId != this.getStatusId()) {
             this.primordialSapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
+            modified();
         }
     }
 

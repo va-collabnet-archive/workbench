@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_AmTermComponent;

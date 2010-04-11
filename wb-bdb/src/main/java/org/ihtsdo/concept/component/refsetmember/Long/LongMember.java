@@ -104,6 +104,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 
 	protected void setLongValue(long longValue) {
 		this.longValue = longValue;
+        modified();
 	}
 
 

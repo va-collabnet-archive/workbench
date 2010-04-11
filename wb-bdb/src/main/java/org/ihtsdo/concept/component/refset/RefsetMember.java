@@ -419,6 +419,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 	public void setReferencedComponentNid(int referencedComponentNid) {
 		this.referencedComponentNid = referencedComponentNid;
+        modified();
 	}
 	
 

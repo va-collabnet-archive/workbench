@@ -217,6 +217,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public int getC2Nid() {
@@ -225,6 +226,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
 	public void setC2Nid(int c2Nid) {
 		this.c2Nid = c2Nid;
+        modified();
 	}
 
 	public String getStringValue() {
@@ -237,10 +239,12 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
     public void setStringValue(String strValue) {
         this.strValue = strValue;
+        modified();
     }
     
     public void setStrValue(String strValue) {
         this.strValue = strValue;
+        modified();
     }
 
 	@Override

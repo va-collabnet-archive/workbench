@@ -112,6 +112,7 @@ public class CidLongMember
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public long getLongValue() {
@@ -120,6 +121,7 @@ public class CidLongMember
 
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
+        modified();
 	}
 
 	@Override

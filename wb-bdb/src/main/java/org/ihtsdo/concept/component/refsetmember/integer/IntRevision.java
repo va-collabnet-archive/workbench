@@ -106,6 +106,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 	@Override
 	public void setIntValue(int value) {
 		this.intValue = value;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

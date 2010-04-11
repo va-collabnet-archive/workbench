@@ -117,6 +117,7 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 	@Override
 	public void setC2id(int c2id) {
 		this.c2Nid = c2id;
+        modified();
 	}
 
 	public int getC1Nid() {
@@ -125,6 +126,7 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public int getC2Nid() {
@@ -133,6 +135,7 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 
 	public void setC2Nid(int c2Nid) {
 		this.c2Nid = c2Nid;
+        modified();
 	}
 
 	@Override
@@ -143,6 +146,7 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 	@Override
 	public void setC1id(int c1id) {
 		this.c1Nid = c1id;
+        modified();
 	}
     
     @Override

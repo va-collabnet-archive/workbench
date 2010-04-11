@@ -177,6 +177,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 	
 	@Override

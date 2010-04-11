@@ -193,6 +193,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
+        modified();
 	}
 
 	@Override

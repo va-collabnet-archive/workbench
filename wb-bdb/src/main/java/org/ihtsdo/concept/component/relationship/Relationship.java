@@ -96,7 +96,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			revisions.get(index).setCharacteristicId(characteristicId);
 		} else {
-			Relationship.this.characteristicNid = characteristicId;
+			Relationship.this.setCharacteristicId(characteristicId);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			revisions.get(index).setGroup(group);
 		} else {
-			Relationship.this.group = group;
+			Relationship.this.setGroup(group);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			revisions.get(index).setRefinabilityId(refinabilityId);
 		} else {
-			Relationship.this.refinabilityNid = refinabilityId;
+			Relationship.this.setRefinabilityId(refinabilityId);
 		}
 	}
 
@@ -137,7 +137,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			revisions.get(index).setTypeId(type);
 		} else {
-			Relationship.this.typeNid = type;
+			Relationship.this.setTypeId(type);
 		}		
 	}
 	
@@ -494,6 +494,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void setC2Id(int destNid) {
 		this.c2Nid = destNid;
+        modified();
 	}
 
 	@Override
@@ -571,18 +572,21 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void setCharacteristicId(int characteristicNid) {
 		this.characteristicNid = characteristicNid;
+        modified();
 	}
 
 
 	@Override
 	public void setGroup(int group) {
 		this.group = group;
+        modified();
 	}
 
 
 	@Override
 	public void setRefinabilityId(int refinabilityId) {
 		this.refinabilityNid = refinabilityId;
+        modified();
 	}
 
 	@Override
@@ -594,6 +598,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 

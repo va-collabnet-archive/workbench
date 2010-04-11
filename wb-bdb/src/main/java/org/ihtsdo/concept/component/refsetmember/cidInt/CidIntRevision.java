@@ -119,6 +119,8 @@ public class CidIntRevision
 	@Override
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
+        modified();
+        modified();
 	}
 
 	public int getC1Nid() {
@@ -127,6 +129,7 @@ public class CidIntRevision
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	@Override
@@ -137,6 +140,7 @@ public class CidIntRevision
 	@Override
 	public void setC1id(int c1id) {
 		this.c1Nid = c1id;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

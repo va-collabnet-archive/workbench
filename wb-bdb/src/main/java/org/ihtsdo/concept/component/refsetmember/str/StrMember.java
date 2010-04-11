@@ -169,6 +169,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;
+        modified();
 	}
 	@Override
 	public int getTypeId() {

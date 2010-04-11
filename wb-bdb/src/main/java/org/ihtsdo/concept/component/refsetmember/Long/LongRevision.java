@@ -104,6 +104,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

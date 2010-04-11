@@ -106,6 +106,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;
+        modified();
 	}
 
 

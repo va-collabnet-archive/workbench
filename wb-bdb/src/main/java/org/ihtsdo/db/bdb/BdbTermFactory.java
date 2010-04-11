@@ -1636,9 +1636,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Image img = new Image();
         img.nid = uuidToNative(imageUuid);
         img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(imageUuid);
+        img.enclosingConceptNid = c.getNid();
         Bdb.getNidCNidMap().setCidForNid(conceptNid, img.nid);
         img.setImage(image);
-        img.enclosingConceptNid = c.getNid();
         img.setFormat(format);
         img.setTextDescription(textDescription);
         img.setTypeNid(typeNid);

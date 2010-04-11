@@ -103,6 +103,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
+        modified();
 	}
 
     @Override

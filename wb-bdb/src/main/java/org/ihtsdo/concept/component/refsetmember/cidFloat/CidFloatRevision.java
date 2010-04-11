@@ -111,6 +111,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 
 	public void setC1Nid(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 
 	public float getFloatValue() {
@@ -119,6 +120,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 
 	public void setFloatValue(float floatValue) {
 		this.floatValue = floatValue;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

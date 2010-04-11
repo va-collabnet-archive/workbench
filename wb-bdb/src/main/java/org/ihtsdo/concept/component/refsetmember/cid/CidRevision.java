@@ -109,6 +109,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	@Override
 	public void setC1id(int c1Nid) {
 		this.c1Nid = c1Nid;
+        modified();
 	}
 	
     @Override

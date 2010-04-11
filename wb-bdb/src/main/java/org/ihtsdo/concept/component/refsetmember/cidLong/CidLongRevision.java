@@ -113,6 +113,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
+        modified();
 	}
 
 	@Override
@@ -123,6 +124,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 	@Override
 	public void setC1id(int c1id) {
 		this.c1Nid = c1id;
+        modified();
 	}
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

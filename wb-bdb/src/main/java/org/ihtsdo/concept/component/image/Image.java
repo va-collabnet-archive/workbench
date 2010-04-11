@@ -102,7 +102,7 @@ public class Image
 			if (index >= 0) {
 				revisions.get(index).setTypeId(type);
 			}
-			typeNid = type;
+			Image.this.setTypeNid(type);
 		}
 
 		public ArrayIntList getVariableVersionNids() {
@@ -137,7 +137,7 @@ public class Image
 			if (index >= 0) {
 				revisions.get(index).setTextDescription(name);
 			}
-			textDescription = name;
+			Image.this.setTextDescription(name);
 		}
 
 	}
@@ -460,6 +460,7 @@ public class Image
 	@Override
 	public void setTextDescription(String textDescription) {
 		this.textDescription = textDescription;
+        modified();
 	}
 
 	@Override
@@ -470,6 +471,7 @@ public class Image
 	@Override
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 	@Override
@@ -505,14 +507,17 @@ public class Image
 
 	public void setTypeNid(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 	public void setFormat(String format) {
 		this.format = format;
+        modified();
 	}
 
 	public void setImage(byte[] image) {
 		this.image = image;
+        modified();
 	}
 
 }

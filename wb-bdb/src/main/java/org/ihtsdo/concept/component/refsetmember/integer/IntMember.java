@@ -166,6 +166,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
+        modified();
 	}
 	@Override
 	public int getTypeId() {

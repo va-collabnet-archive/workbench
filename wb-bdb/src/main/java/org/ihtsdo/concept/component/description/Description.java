@@ -102,7 +102,7 @@ public class Description
 			if (index >= 0) {
 				revisions.get(index).setInitialCaseSignificant(capStatus);
 			} else {
-				Description.this.initialCaseSignificant = capStatus;
+				Description.this.setInitialCaseSignificant(capStatus);
 			}
 		}
 
@@ -111,7 +111,7 @@ public class Description
 			if (index >= 0) {
 				revisions.get(index).setLang(lang);
 			} else {
-				Description.this.lang = lang;
+				Description.this.setLang(lang);
 			}
 		}
 
@@ -120,7 +120,7 @@ public class Description
 			if (index >= 0) {
 				revisions.get(index).setText(text);
 			} else {
-				Description.this.text = text;
+				Description.this.setText(text);
 			}
 		}
 
@@ -146,7 +146,7 @@ public class Description
 			if (index >= 0) {
 				revisions.get(index).setTypeId(type);
 			} else {
-				Description.this.typeNid = type;
+				Description.this.setTypeId(type);
 			}
 		}
 
@@ -484,6 +484,7 @@ public class Description
 
 	public void setText(String text) {
 		this.text = text;
+        modified();
 	}
 
 	public String getLang() {
@@ -492,6 +493,7 @@ public class Description
 
 	public void setLang(String lang) {
 		this.lang = lang;
+        modified();
 	}
 
 	public boolean isInitialCaseSignificant() {
@@ -500,6 +502,7 @@ public class Description
 
 	public void setInitialCaseSignificant(boolean initialCaseSignificant) {
 		this.initialCaseSignificant = initialCaseSignificant;
+        modified();
 	}
 
 	@Override
@@ -517,6 +520,7 @@ public class Description
 	@Override
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
+        modified();
 	}
 
 	@Override

@@ -359,7 +359,8 @@ public class PositionMapper {
 								if (originMap.containsKey(p2pathId)
 										&& p2.getTime() <= originMap.get(p2pathId)
 												.getTime()) {
-									if (precedingPathIdSet.contains(p2pathId)) {
+								    Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
+									if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
 										conflictMatrix
 												.putQuick(p1index, p2index, false);
 									} else {
@@ -508,7 +509,7 @@ public class PositionMapper {
 		return destination;
 	}
 
-	int lengthToPrint = 100;
+	int lengthToPrint = 150;
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();

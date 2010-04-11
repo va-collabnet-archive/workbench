@@ -123,6 +123,7 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 
 	public void setStringValue(String strValue) {
 		this.strValue = strValue;
+        modified();
 	}
 
 	@Override
@@ -133,6 +134,7 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 	@Override
 	public void setC1id(int c1id) {
 		this.c1Nid = c1id;
+        modified();
 	}
 
 	@Override

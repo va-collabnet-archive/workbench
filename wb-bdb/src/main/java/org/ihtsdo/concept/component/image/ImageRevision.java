@@ -113,6 +113,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	 */
 	public void setTextDescription(String name) {
 		this.textDescription = name;
+        modified();
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#getTypeId()
@@ -125,6 +126,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	 */
 	public void setTypeId(int type) {
 		this.typeNid = type;
+        modified();
 	}
 	
 	/* (non-Javadoc)
