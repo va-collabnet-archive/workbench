@@ -50,6 +50,10 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException {
+        return bean.getPossibleChildOfConcepts(configFrame);
+    }
+
     int relId;
     int parentDepth;
     List<DefaultMutableTreeNode> extraParentNodes = new ArrayList<DefaultMutableTreeNode>();

@@ -582,6 +582,13 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      */
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+    /**
+     * Child of = only immediate children, not grand-children, etc. 
+     * @param configFrame
+     * @return
+     * @throws IOException
+     */
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame)  throws IOException;
 
     public List<I_Identify> getUncommittedIdVersioned();
     
@@ -601,5 +608,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
 
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException;
+
 
 }

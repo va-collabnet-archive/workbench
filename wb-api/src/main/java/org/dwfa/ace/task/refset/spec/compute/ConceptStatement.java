@@ -97,14 +97,23 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_CHILD_OF:
-        case CONCEPT_IS_DESCENDENT_OF:
-        case CONCEPT_IS_KIND_OF:
-            I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
             if (isNegated()) {
                 // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
                 // possibleConcepts.removeAll(results);
             } else {
+                I_RepresentIdSet results = queryConstraintConcept.getPossibleChildOfConcepts(configFrame);
+                possibleConcepts.or(results);
+            }
+            break;
+        case CONCEPT_IS_DESCENDENT_OF:
+        case CONCEPT_IS_KIND_OF:
+             if (isNegated()) {
+                // possibleConcepts = termFactory.getConceptIdSet();
+                possibleConcepts.or(parentPossibleConcepts);
+                // possibleConcepts.removeAll(results);
+            } else {
+                I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
                 possibleConcepts.or(results);
             }
             break;

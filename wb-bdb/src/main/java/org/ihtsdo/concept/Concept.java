@@ -976,23 +976,34 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return first.getText();
 	}
 
-	@Deprecated
-	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config)
-			throws IOException {
-		I_IntSet isATypes = config.getDestRelTypes();
-		I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-		possibleKindOfConcepts.setMember(getNid());
-		for (NidPair pair: this.getData().getDestRelNidTypeNidList()) {
-			int relNid = pair.getNid1();
-			int typeNid = pair.getNid2();
-			if (isATypes.contains(typeNid)) {
-				possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
-				Concept origin = Bdb.getConceptForComponent(relNid);
-				origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
-			}
-		}
-		return possibleKindOfConcepts;
-	}
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
+            int relNid = pair.getNid1();
+            int typeNid = pair.getNid2();
+            if (isATypes.contains(typeNid)) {
+                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
+                Concept origin = Bdb.getConceptForComponent(relNid);
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
+            }
+        }
+        return possibleKindOfConcepts;
+    }
+
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
+            int relNid = pair.getNid1();
+            int typeNid = pair.getNid2();
+            if (isATypes.contains(typeNid)) {
+                possibleChildOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
+            }
+        }
+        return possibleChildOfConcepts;
+    }
 
 	private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
 			throws IOException {
