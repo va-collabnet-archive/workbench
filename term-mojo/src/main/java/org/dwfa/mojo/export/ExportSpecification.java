@@ -379,7 +379,9 @@ public class ExportSpecification {
     private void setRelationshipDto(ComponentDto componentDto, I_RelTuple tuple, boolean latest) throws TerminologyException,
             IOException, Exception {
         I_GetConceptData destinationConcept = termFactory.getConcept(tuple.getC2Id());
-        if (isExportableConcept(destinationConcept)) {
+        I_GetConceptData relationshipType = termFactory.getConcept(tuple.getTypeId());
+
+        if (isExportableConcept(destinationConcept) && isExportableConcept(relationshipType)) {
             updateComponentDto(componentDto, tuple, latest);
             if (latest) {
                 setExtensionDto(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), TYPE.RELATIONSHIP);
