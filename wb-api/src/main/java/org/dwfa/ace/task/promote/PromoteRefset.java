@@ -145,7 +145,7 @@ public class PromoteRefset extends AbstractTask {
 
     private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, PathSetReadOnly promotionPaths,
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
-        refsetIdentity.promote(viewPosition, promotionPaths, config.getAllowedStatus());
+        refsetIdentity.promote(viewPosition, promotionPaths, null);
         tf.addUncommittedNoChecks(refsetIdentity);
         for (I_ExtendByRef ext : tf.getRefsetExtensionMembers(refsetIdentity.getConceptId())) {
             ext.promote(viewPosition, new PathSetReadOnly(promotionPaths), null);
