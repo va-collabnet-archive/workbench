@@ -28,6 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -39,6 +40,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -113,8 +115,12 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             Set<I_Position> positions = new HashSet<I_Position>();
             positions.add(oldPosition);
 
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
             // get latest concept attributes
-            List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(positions));
+            List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(positions), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest attributes to new path/version
             for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
                 I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
@@ -122,7 +128,8 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest descriptions
-            List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions));
+            List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(positions), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
                 I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
@@ -130,7 +137,8 @@ public class VodbCopyLatestComponent extends AbstractMojo {
             }
 
             // get latest relationships
-            List<? extends I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), false);
+            List<? extends I_RelTuple> relationshipTuples = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(positions), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
                 I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
@@ -167,7 +175,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         try {
             CopyLatestComponent copy = new CopyLatestComponent();
             termFactory.iterateConcepts(copy);

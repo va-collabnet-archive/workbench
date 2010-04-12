@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -33,8 +34,8 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -104,7 +105,7 @@ public class VodbCheckChildCount extends AbstractMojo {
                 + outputTextFileName)));
             htmlWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputHtmlDirectory + File.separator
                 + outputHtmlFileName)));
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
             origins = new HashSet<I_Position>();
         }
 
@@ -117,6 +118,9 @@ public class VodbCheckChildCount extends AbstractMojo {
             origins.add(latestOnArchitectonicPath);
 
             Set<I_Position> branchPositions = new HashSet<I_Position>();
+
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             // get all the concepts/paths/positions for the specified branches
             if (branches == null) {
@@ -134,7 +138,8 @@ public class VodbCheckChildCount extends AbstractMojo {
             I_IntSet isARel = termFactory.newIntSet();
             isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
 
-            List<? extends I_RelTuple> results = concept.getDestRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), false);
+            List<? extends I_RelTuple> results = concept.getDestRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             if (results.size() > count) {
                 String message = "Concept: " + concept + " has > 20 children.";
                 getLog().info(message);
@@ -165,7 +170,7 @@ public class VodbCheckChildCount extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         try {
             FindComponents find = new FindComponents();
             termFactory.iterateConcepts(find);

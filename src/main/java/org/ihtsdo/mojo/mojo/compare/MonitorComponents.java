@@ -23,13 +23,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.mojo.mojo.CompareComponents;
 
 public class MonitorComponents {
@@ -38,10 +39,13 @@ public class MonitorComponents {
     I_TermFactory termFactory;
 
     public MonitorComponents() {
-        termFactory = LocalVersionedTerminology.get();
+        termFactory = Terms.get();
     }
 
     public List<Match> checkConcept(I_GetConceptData concept, List<Integer> acceptedStatusIds) throws Exception {
+
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         // get latest concept attributes/descriptions/relationships
         boolean attributesMatch = true;
@@ -67,9 +71,12 @@ public class MonitorComponents {
         if (positions.size() == 1) {
             Set<I_Position> firstPosition = new HashSet<I_Position>();
             firstPosition.add(positions.get(0));
-            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
-            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
-            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
+            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
+            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
+            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             /*
              * Is the status correct??
@@ -78,7 +85,7 @@ public class MonitorComponents {
             for (int tuple = 0; tuple < conceptAttributeTuples1.size(); tuple++) {
                 if ((acceptedStatusIds.size() == 0 || (acceptedStatusIds.size() != 0 && acceptedStatusIds.contains(conceptAttributeTuples1.get(
                     tuple)
-                    .getConceptStatus())))) {
+                    .getStatusId())))) {
 
                     attributesMatch = true;
                 }
@@ -115,18 +122,24 @@ public class MonitorComponents {
         for (int j = 0; j < positions.size() - 1; j++) {
             Set<I_Position> firstPosition = new HashSet<I_Position>();
             firstPosition.add(positions.get(j));
-            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
-            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
-            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
+            conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
+            descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
+            relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (int i = j; i < positions.size() - 1; i++) {
 
                 Set<I_Position> secondPosition = new HashSet<I_Position>();
                 secondPosition.add(positions.get(i + 1));
 
-                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition));
-                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition));
-                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), false);
+                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 if (!CompareComponents.attributeListsEqual(conceptAttributeTuples1, conceptAttributeTuples2)) {
                     attributesMatch = false;
@@ -139,7 +152,7 @@ public class MonitorComponents {
                     for (int tuple = 0; tuple < conceptAttributeTuples1.size(); tuple++) {
                         if ((acceptedStatusIds.size() == 0 || (acceptedStatusIds.size() != 0 && acceptedStatusIds.contains(conceptAttributeTuples1.get(
                             tuple)
-                            .getConceptStatus())))) {
+                            .getStatusId())))) {
                             attributesMatch = true;
                         }
                     }

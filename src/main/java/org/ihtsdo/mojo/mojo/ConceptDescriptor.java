@@ -20,10 +20,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 
 public class ConceptDescriptor {
 
@@ -41,7 +42,10 @@ public class ConceptDescriptor {
     public static boolean verify(I_GetConceptData concept, String description) throws Exception {
         // check that the description parameter corresponds to one of the
         // concept's descriptions
-        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null);
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descriptionTuples) {
             if (description.toLowerCase().trim().equals(tuple.getText().toLowerCase().trim())) {
                 return true;
@@ -58,7 +62,7 @@ public class ConceptDescriptor {
             throw new Exception("Description parameter must be specified.");
         }
 
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         List<UUID> uuidList = new LinkedList<UUID>();
         uuidList.add(UUID.fromString(uuid));
         I_GetConceptData concept = null;

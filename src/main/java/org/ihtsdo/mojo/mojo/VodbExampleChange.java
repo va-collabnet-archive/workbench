@@ -25,12 +25,13 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -56,7 +57,7 @@ public class VodbExampleChange extends AbstractMojo {
     private String outputDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         try {
             I_GetConceptData architectonicRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
             I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
@@ -66,8 +67,11 @@ public class VodbExampleChange extends AbstractMojo {
             Set<I_Position> positions = new HashSet<I_Position>();
             positions.add(latestOnArchitectonicPath);
             I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-            for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions))) {
+            for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions), 
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 I_ConceptAttributePart part = (I_ConceptAttributePart) tuple.makeAnalog(flaggedStatus.getConceptId(), tuple.getPathId(), Long.MAX_VALUE);
 
                 conceptAttributes.addVersion(part);

@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -43,6 +44,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -239,7 +241,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
         public TallManWriter(HashSet<String> tallManWords) throws Exception {
             descriptionTypes = new HashSet<I_GetConceptData>();
             this.tallManWords = tallManWords;
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
             viewingBranch = viewingBranchDescriptor.getVerifiedConcept();
             editingBranch = editingBranchDescriptor.getVerifiedConcept();
             for (ConceptDescriptor description : descriptionsToCheck) {
@@ -250,6 +252,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
         public void processConcept(I_GetConceptData concept) throws Exception {
 
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             List<UUID> uuids = concept.getUids();
 
             // create list of IDs of description types to check (e.g. preferred
@@ -282,7 +286,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
 
             // get latest descriptions
             List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, descriptionTypesToCheck,
-                new PositionSetReadOnly(positionsToCheck));
+                new PositionSetReadOnly(positionsToCheck), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
@@ -313,7 +318,8 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         // update the current concept with
                         // get latest concept attributes
                         List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(null,
-                            new PositionSetReadOnly(positionsToCheck));
+                            new PositionSetReadOnly(positionsToCheck),
+                            config.getPrecedence(), config.getConflictResolutionStrategy());
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
                             I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId, copyToPath.getConceptId(), Long.MAX_VALUE);

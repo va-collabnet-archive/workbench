@@ -26,15 +26,16 @@ import java.util.Set;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
  *This goal will add all the child concepts of given concept to path.
@@ -83,7 +84,9 @@ public class VodbCreateNewPathFromExistingConcept extends AbstractMojo {
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_TermFactory tf = Terms.get();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Set<I_Position> pathOrigins = null;
             if (origins != null) {
                 pathOrigins = new HashSet<I_Position>(origins.length);
@@ -99,7 +102,8 @@ public class VodbCreateNewPathFromExistingConcept extends AbstractMojo {
             I_IntSet allowedTypes = tf.newIntSet();
 
             allowedTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-            Set<? extends I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, false);
+            Set<? extends I_GetConceptData> s = parent.getDestRelOrigins(allowedStatus, allowedTypes, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             if (s.size() > 0) {
                 for (I_GetConceptData child : s) {
                     if (tf.hasId(child.getUids())) {
