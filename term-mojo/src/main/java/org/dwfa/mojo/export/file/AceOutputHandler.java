@@ -18,14 +18,11 @@ package org.dwfa.mojo.export.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.dwfa.dto.ComponentDto;
@@ -50,8 +47,6 @@ import org.dwfa.util.AceDateFormat;
  * Writes out RF2 format files for both core files and reference sets.
  */
 public class AceOutputHandler extends SnomedFileFormatOutputHandler {
-    /** For converting to midnight UTC. */
-    private Calendar aceTime = new GregorianCalendar();
     /** Full release directory */
     private File fullExportDirectory;
     /** Snapshot release directory */
@@ -367,13 +362,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     String getReleaseDateString(Date concept) {
-        synchronized (aceTime) {
-            aceTime.setTime(concept);
-            aceTime.setTimeZone(TimeZone.getTimeZone("UTC"));
-            aceTime.set(Calendar.HOUR, 0);
-            aceTime.set(Calendar.MINUTE, 0);
-            aceTime.set(Calendar.SECOND, 0);
-            return AceDateFormat.getRf2TimezoneDateFormat().format(aceTime.getTime());
-        }
+        return AceDateFormat.getAceExportDateFormat().format(concept.getTime());
+
     }
 }

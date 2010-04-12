@@ -18,7 +18,6 @@ package org.dwfa.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 /**
  * Class used to get handles on <code>DateFormat</code>ters without using
@@ -52,6 +51,7 @@ public class AceDateFormat {
     public static final String RF2_FORMAT = "yyyyMMdd";
     public static final String RF2_TZ_FORMAT = "yyyyMMdd'T'HHmmssZ";
     public static final String OLD_ACE_EXPORT_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String ACE_EXPORT_FORMAT = "yyyyMMdd'T'HHmmss";
     public static final String VERSION_HELPER_TZ_FORMAT = "yyyy.MM.dd HH:mm:ss z";
     public static final String VERSION_HELPER_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
@@ -64,9 +64,7 @@ public class AceDateFormat {
     }
 
     public synchronized static DateFormat getRf2TimezoneDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat(RF2_TZ_FORMAT);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dateFormat;
+        return new SimpleDateFormat(RF2_TZ_FORMAT);
     }
 
     public synchronized static DateFormat getRf2DateFormat() {
@@ -74,9 +72,11 @@ public class AceDateFormat {
     }
 
     public synchronized static DateFormat getOldAceExportDateFormat() {
-        DateFormat dateFormat = new SimpleDateFormat(OLD_ACE_EXPORT_FORMAT);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return dateFormat;
+        return new SimpleDateFormat(OLD_ACE_EXPORT_FORMAT);
+    }
+
+    public synchronized static DateFormat getAceExportDateFormat() {
+        return new SimpleDateFormat(ACE_EXPORT_FORMAT);
     }
 
     public synchronized static DateFormat getRf1DateOnlyDateFormat() {
