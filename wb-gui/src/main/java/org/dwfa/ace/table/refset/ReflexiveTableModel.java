@@ -496,7 +496,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
                         List<I_ExtendByRefVersion> tuples =
                                 (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config
-                                    .getViewPositionSetReadOnly(), false);
+                                    .getViewPositionSetReadOnly(), 
+                                config.getPrecedence(), config.getConflictResolutionStrategy());
                         if (tuples.size() > 0) {
                             I_ExtendByRefVersion obj = tuples.iterator().next();
                             I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -520,7 +521,8 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         } else {
                             tuples =
                                     (List<I_ExtendByRefVersion>) ext.getTuples(null, config
-                                        .getViewPositionSetReadOnly(), false);
+                                        .getViewPositionSetReadOnly(), config.getPrecedence(), 
+                                        config.getConflictResolutionStrategy());
                             if (tuples.size() > 0) {
                                 I_ExtendByRefVersion obj = tuples.iterator().next();
                                 I_GetConceptData componentRefset = Terms.get().getConcept(obj.getRefsetId());
@@ -578,7 +580,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected abstract Object getPromotionRefsetValue(I_ExtendByRef extension,
             ReflexiveRefsetFieldData reflexiveRefsetFieldData) throws IOException, IllegalAccessException,
-            InvocationTargetException;
+            InvocationTargetException, TerminologyException;
 
     public abstract I_GetConceptData getPromotionRefsetIdentityConcept();
 

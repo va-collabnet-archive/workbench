@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
@@ -55,11 +56,11 @@ public class KindOfComputer {
 		}
 	}
 
-	public static boolean isKindOf(Concept c, KindOfSpec spec) throws IOException {
+	public static boolean isKindOf(Concept c, KindOfSpec spec) throws IOException, TerminologyException {
 		return isKindOfWithDepth(c, spec, 0);
 	}
 
-	private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth) throws IOException {
+	private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth) throws IOException, TerminologyException {
 		if (depth > 15) {
 			AceLog.getAppLog().info("depth of: " + depth + " testing: " + c);
 			if (depth > 100) {
@@ -88,7 +89,7 @@ public class KindOfComputer {
 			}
 		}
 		Set<I_GetConceptData> parents = c.getSourceRelTargets(spec.allowedStatusNids, 
-				spec.relTypeNids, spec.getViewPositionSet(), true);
+				spec.relTypeNids, spec.getViewPositionSet(), spec.precedence, spec.contradictionMgr);
 		if (parents.size() == 0) {
 			cache.setKindOf(c.getNid(), false);
 			return false;

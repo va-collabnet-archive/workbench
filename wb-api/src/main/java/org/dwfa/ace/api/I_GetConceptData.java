@@ -39,25 +39,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public int getConceptId();
 
     /**
-     * Retrieves tuples matching the specified allowedStatuses and positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #getConceptAttributeTuples(I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @return List of matching tuples
-     */
-    @Deprecated
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions)
-            throws IOException;
-
-    /**
      * Retrieves tuples matching the specified allowedStatuses and positions
      * 
      * @param allowedStatus
@@ -73,30 +54,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses and positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #getConceptAttributeTuples(I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @param addUncommitted
-     *            indicates if uncommitted content should also be added in
-     *            results
-     * @return List of matching tuples
-     */
-    @Deprecated
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-            boolean addUncommitted) throws IOException;
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples using the conflict strategy if specified
@@ -107,30 +66,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(boolean returnConflictResolvedLatestState)
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples( 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #getDescriptionTuples(I_IntSet, I_IntSet, Set, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param allowedTypes
-     *            types tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @return List of matching tuples
-     */
-    @Deprecated
-    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -147,8 +85,10 @@ public interface I_GetConceptData extends I_AmTermComponent {
      *            current profile's conflict resolution strategy is required
      * @return List of matching tuples
      */
-    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws IOException;
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, 
+        I_IntSet allowedTypes,
+        PositionSetReadOnly positionSet, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -160,31 +100,12 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_DescriptionTuple> getDescriptionTuples(boolean returnConflictResolvedLatestState) throws IOException,
+    @Deprecated
+    public List<? extends I_DescriptionTuple> getDescriptionTuples() throws IOException,
             TerminologyException;
 
     public Collection<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException;
 
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param allowedTypes
-     *            types tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @return List of matching tuples
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions)
-            throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -202,8 +123,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
+    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -215,40 +136,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_ImageTuple> getImageTuples(boolean returnConflictResolvedLatestState) throws IOException,
+    public List<? extends I_ImageTuple> getImageTuples() throws IOException,
             TerminologyException;
-
-    /**
-     * Gets the relationship tuples matching the supplied criteria that
-     * originate from
-     * this concept.
-     * If you want to get all the is-a relationships for this concept, pass in
-     * only is-a relationship types in the allowed types field.
-     * <p>
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>. It is strongly recommended that you use a method that
-     * does use a conflict management strategy.
-     * 
-     * @see #getSourceRelTuples(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            set of allowed status values that the I_RelTuple must conform
-     *            with
-     * @param allowedTypes
-     *            set of allowed relationship types that the I_RelTuple must
-     *            conform with
-     * @param positions
-     *            set of positions used to determine the state of status, and
-     *            types for query
-     * @param addUncommitted
-     *            include uncommitted relationships in the return values
-     * @return a list of rel tuples that meet the provided criterion.
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
 
     /**
      * If you want to get all the is-a relationships for this concept, pass in
@@ -273,51 +162,12 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions configured in the current profile
-     * 
-     * @param addUncommitted
-     *            include uncommitted relationships in the return values
-     * @param returnConflictResolvedLatestState
-     *            indicates if all tuples or just the latest state using the
-     *            current profile's conflict resolution strategy is required
-     * @return List of matching tuples
-     * @throws TerminologyException
-     */
-    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #getDestRelTuples(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param allowedTypes
-     *            types tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     *            * @param addUncommitted
-     *            include uncommitted relationships in the return values
-     * @return List of matching tuples
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean addUncommitted) throws IOException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
      * positions
      * 
      * @param allowedStatus
@@ -334,8 +184,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
+    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -351,37 +201,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @return List of matching tuples
      * @throws TerminologyException
      */
-    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
-
-    /**
-     * If you want to get all the is-a immediate parents for this concept, pass
-     * in only is-a relationship types in the allowed types field. -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #getSourceRelTargets(I_IntSet, I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            set of allowed status values that the I_RelTuple must conform
-     *            with
-     * @param allowedTypes
-     *            set of allowed relationship types that the I_RelTuple must
-     *            conform with
-     * @param positions
-     *            set of positions used to determine the state of status, and
-     *            types for query
-     * @param addUncommitted
-     *            include uncommitted relationships in the return values
-     * @return a list of I_GetConceptData that meet the provided criterion.
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
+    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * If you want to get all the is-a immediate parents for this concept, pass
@@ -406,7 +227,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -424,34 +246,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
-
-    /**
-     * Gets the relationship origins based on the passed statuses, relationship
-     * types and positions -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @param allowedStatus
-     *            allowed statuses when matching relationships
-     * @param allowedTypes
-     *            allowed relationship types
-     * @param positions
-     *            positions relationships must match
-     * @param addUncommitted
-     *            indicates whether the uncommitted list should be included in
-     *            the search
-     * @return relationship origins based on the passed statuses, relationship
-     *         types and positions
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
+    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, 
+        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Gets the relationship origins based on the passed statuses, relationship
@@ -476,7 +272,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            PositionSetReadOnly positions, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -497,8 +294,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
+    @Deprecated
+    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes) throws IOException, TerminologyException;
 
     public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
 
@@ -524,22 +321,11 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public List<UUID> getUids() throws IOException;
 
-    @Deprecated
-    public List<I_DescriptionVersioned> getUncommittedDescriptions();
-
-    @Deprecated
-    public List<I_RelVersioned> getUncommittedSourceRels();
-
-    @Deprecated
-    public I_ConceptAttributeVersioned getUncommittedConceptAttributes();
-
-    @Deprecated
-    public List<I_ImageVersioned> getUncommittedImages();
-
     public I_Identify getIdentifier() throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
-            PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref) throws IOException;
+            PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
             throws IOException;
@@ -549,14 +335,18 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException;
 
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
-    public boolean isParentOf(I_GetConceptData child, boolean addUncommitted) throws IOException, TerminologyException;
+    @Deprecated
+    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, boolean addUncommitted) throws IOException;
+            PositionSetReadOnly positions, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
-    public boolean isParentOfOrEqualTo(I_GetConceptData child, boolean addUncommitted) throws IOException,
+    @Deprecated
+    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException,
             TerminologyException;
 
     /**
@@ -603,11 +393,11 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public boolean isCanceled() throws IOException;
 
 	public Set<? extends I_ConceptAttributeTuple> getCommonConceptAttributeTuples(
-			I_ConfigAceFrame config) throws IOException;
+			I_ConfigAceFrame config) throws IOException, TerminologyException;
 
 	public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
 
-	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException;
+	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException;
 
 
 }

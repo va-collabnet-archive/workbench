@@ -125,13 +125,11 @@ public class ConceptTupleFileUtil {
                 allowedStatus.add(termFactory.getId(statusUuid).getNid());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 lastConcept = concept;
-                boolean addUncommitted = true;
-                boolean returnConflictResolvedLatestState = true;
 
                 // check if the part exists
                 List<? extends I_ConceptAttributeTuple> parts =
-                        concept.getConceptAttributeTuples(allowedStatus, null, addUncommitted,
-                            returnConflictResolvedLatestState);
+                        concept.getConceptAttributeTuples(allowedStatus, null,
+                            importConfig.getPrecedence(), importConfig.getConflictResolutionStrategy());
 
                 I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {

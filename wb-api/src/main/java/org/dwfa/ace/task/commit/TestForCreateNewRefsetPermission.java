@@ -84,7 +84,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             // if it isn't, then there is no alert
             I_GetConceptData refsetIdentity = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
             assert refsetIdentity != null;
-            if (!refsetIdentity.isParentOf(concept, true)) {
+            if (!refsetIdentity.isParentOf(concept)) {
                 return alertList;
             }
 
@@ -110,7 +110,7 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
 
             boolean foundMatch = false;
             for (I_GetConceptData potentialParent : permissibleRefsetParents) {
-                if (potentialParent.isParentOf(concept, true)) {
+                if (potentialParent.isParentOf(concept)) {
                     foundMatch = true;
                 }
             }
@@ -151,7 +151,8 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         I_IntSet isAAllowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         List<? extends I_RelTuple> roleRels =
-                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true, true);
+                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, 
+                        getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
         for (I_RelTuple roleRel : roleRels) {
 
@@ -159,7 +160,8 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
             List<? extends I_RelTuple> permissionRels =
-                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true, true);
+                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, 
+                        getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
             for (I_RelTuple permissionRel : permissionRels) {
                 I_GetConceptData permission = termFactory.getConcept(permissionRel.getC1Id());
@@ -183,7 +185,8 @@ public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
         Set<? extends I_GetConceptData> refsets =
-                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
+                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, 
+                    getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
         return refsets;
     }

@@ -103,6 +103,6 @@ public abstract class AbstractDifferenceRels extends AbstractSearchTest {
     }
 
     protected abstract List<? extends I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig,
-            I_GetConceptData conceptToTest, PositionSetReadOnly viewSet) throws IOException;
+            I_GetConceptData conceptToTest, PositionSetReadOnly viewSet) throws IOException, TerminologyException;
 
 }

@@ -66,7 +66,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 promotionRefsetIds.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
                 promotionTuples =
                         refsetConcept.getSourceRelTuples(host.getConfig().getAllowedStatus(), promotionRefsetIds, host
-                            .getConfig().getViewPositionSetReadOnly(), true);
+                            .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(),
+                            host.getConfig().getConflictResolutionStrategy());
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
@@ -113,7 +114,8 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 }
 
                 List<? extends I_ExtendByRefVersion> original =
-                        extension.getTuples(statusSet, positionSet, true, false);
+                        extension.getTuples(statusSet, positionSet, 
+                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
                 List<I_ExtendByRefVersion> allParts = new ArrayList<I_ExtendByRefVersion>();
                 allParts.addAll(original);
 
@@ -293,12 +295,13 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     }
 
     public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
-            IllegalAccessException, InvocationTargetException {
+            IllegalAccessException, InvocationTargetException, TerminologyException {
         for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(extension.getComponentId())) {
             if (promotionRefsetId == extForMember.getRefsetId()) {
                 List<I_ExtendByRefVersion> promotionTuples =
                         (List<I_ExtendByRefVersion>) extForMember.getTuples(host.getConfig().getAllowedStatus(), host
-                            .getConfig().getViewPositionSetReadOnly(), false);
+                            .getConfig().getViewPositionSetReadOnly(), 
+                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }

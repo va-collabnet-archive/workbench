@@ -330,11 +330,14 @@ public class DescStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childDescTypes =
                     requiredType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), true, true);
+                        .getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call descriptionTypeIs on each
             for (I_GetConceptData childDescType : childDescTypes) {
@@ -364,11 +367,14 @@ public class DescStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childDescTypes =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call descriptionTypeIs on each
             for (I_GetConceptData childDescType : childDescTypes) {
@@ -399,10 +405,13 @@ public class DescStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> childStatuses =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
                 if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
@@ -428,10 +437,13 @@ public class DescStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> childStatuses =
                     requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
                 if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {

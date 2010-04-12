@@ -31,7 +31,7 @@ import org.dwfa.tapi.TerminologyException;
  * without a time point), implementations of this interface will calculate the
  * "conflict resolved view" of the component at that time point.
  */
-public interface I_ManageConflict extends Serializable {
+public interface I_ManageContradiction extends Serializable {
     /**
      * Method to get the display name of this conflict resolution strategy.
      * Note that this is intended to be something meaningful to an end user
@@ -82,6 +82,8 @@ public interface I_ManageConflict extends Serializable {
      * @return parts resolved as per the resolution strategy
      */
     <T extends I_AmPart> List<T> resolveParts(List<T> parts);
+
+    <T extends I_AmPart> List<T> resolveParts(T part1, T part2);
 
     /**
      * @param concept concept to test

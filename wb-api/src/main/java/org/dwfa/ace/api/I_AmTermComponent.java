@@ -37,7 +37,8 @@ public interface I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, 
+            I_IntSet allowedStatus, PRECEDENCE precedence)
             throws IOException, TerminologyException;
 
 }

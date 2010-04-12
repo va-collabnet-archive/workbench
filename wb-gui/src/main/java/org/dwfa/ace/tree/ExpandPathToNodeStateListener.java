@@ -51,14 +51,16 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         ancestors = new ArrayList<I_GetConceptData>();
         ancestors.add(focus);
         List<? extends I_RelTuple> rels = focus.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
-            config.getViewPositionSetReadOnly(), true);
+            config.getViewPositionSetReadOnly(), 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         while (rels.size() > 0) {
             for (I_RelTuple r : rels) {
                 I_GetConceptData parent = Terms.get().getConcept(r.getC2Id());
                 ancestors.add(0, parent);
                 AceLog.getAppLog().info("Adding parent: " + parent);
                 rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
-                    config.getViewPositionSetReadOnly(), true);
+                    config.getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
                 break;
             }
         }

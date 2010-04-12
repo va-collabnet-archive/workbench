@@ -17,6 +17,7 @@
 package org.dwfa.ace.dnd;
 
 import java.awt.HeadlessException;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -34,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -490,9 +492,19 @@ public class TerminologyTransferHandler extends TransferHandler {
             if (DescriptionsFromCollectionTableModel.class.isAssignableFrom(model.getClass())) {
                 return false;
             }
-            Point mouseLoc = table.getMousePosition();
-            if (mouseLoc != null) {
-                return true;
+            Point loc = MouseInfo.getPointerInfo().getLocation();
+            SwingUtilities.convertPointFromScreen(loc, table);
+            boolean contains = table.contains(loc);
+            if (contains) {
+                int rowIndex = table.rowAtPoint(loc);
+                int columnIndex = table.columnAtPoint(loc);
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("table.getMousePosition() rowIndex " + rowIndex + " columnIndex " + columnIndex + 
+                        " editable: " + model.isCellEditable(rowIndex, columnIndex));
+                }
+                if (model.isCellEditable(rowIndex, columnIndex)) {
+                    return true;
+                }
             }
         }
         if (DropButton.class.isAssignableFrom(comp.getClass())) {

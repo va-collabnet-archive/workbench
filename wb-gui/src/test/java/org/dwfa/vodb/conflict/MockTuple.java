@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
@@ -55,8 +56,10 @@ public class MockTuple implements I_AmTuple {
                 return id;
             }
 
-            public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
-                    throws IOException, TerminologyException {
+
+            @Override
+            public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+                    PRECEDENCE precedence) throws IOException, TerminologyException {
                 throw new UnsupportedOperationException();
             }
 

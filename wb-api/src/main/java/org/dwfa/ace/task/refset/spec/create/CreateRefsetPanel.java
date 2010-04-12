@@ -36,7 +36,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -544,7 +543,7 @@ public class CreateRefsetPanel extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }
@@ -558,7 +557,7 @@ public class CreateRefsetPanel extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }

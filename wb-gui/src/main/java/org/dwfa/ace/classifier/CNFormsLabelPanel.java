@@ -63,6 +63,7 @@ import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 
 /**
@@ -720,10 +721,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             revalidate();
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLog(this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLog(this, Level.SEVERE, "Database Exception: " + e1.getLocalizedMessage(), e1);
         }
     }
 
-    public void setConcept(I_GetConceptData conceptIn, I_ConfigAceFrame config) throws IOException {
+    public void setConcept(I_GetConceptData conceptIn, I_ConfigAceFrame config) throws IOException, TerminologyException {
         this.theCBean = conceptIn;
         this.config = config;
 
@@ -834,7 +837,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     }
 
     public List<I_ImplementActiveLabel> getCommonLabels(boolean showLongForm, boolean showStatus,
-            I_ConfigAceFrame config) throws IOException {
+            I_ConfigAceFrame config) throws IOException, TerminologyException {
         List<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
 
         // GET CONCEPT ATTRIBUTES
@@ -868,7 +871,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
     public Collection<I_ImplementActiveLabel> getDeltaLabels(boolean showLongForm, boolean showStatus,
             I_ConfigAceFrame config, DeltaColors colors, Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
-            Map<I_DescriptionTuple, Color> descColorMap, Map<I_RelTuple, Color> relColorMap) throws IOException {
+            Map<I_DescriptionTuple, Color> descColorMap, Map<I_RelTuple, Color> relColorMap) throws IOException, TerminologyException {
 
         Set<I_ConceptAttributeTuple> allConAttrTuples = new HashSet<I_ConceptAttributeTuple>();
         Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
@@ -881,7 +884,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // concept attributes
             List<? extends I_ConceptAttributeTuple> conTuplesForPosition = this.theCBean.getConceptAttributeTuples(
-                config.getAllowedStatus(), posSet, false); // ####
+                config.getAllowedStatus(), posSet, 
+                config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // COMMON
             // CON
@@ -889,7 +893,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
             // relationships
             List<? extends I_RelTuple> relTuplesForPosition = this.theCBean.getSourceRelTuples(config.getAllowedStatus(), null,
-                posSet, false); // ####
+                posSet, 
+                config.getPrecedence(), config.getConflictResolutionStrategy()); // ####
             // ALL
             // REL
             allRelTuples.addAll(relTuplesForPosition);

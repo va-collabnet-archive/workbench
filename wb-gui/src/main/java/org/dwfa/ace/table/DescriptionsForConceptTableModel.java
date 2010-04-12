@@ -136,11 +136,6 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             if (stopWork) {
                 return false;
             }
-            descs = cb.getUncommittedDescriptions();
-            if (stopWork) {
-                return false;
-            }
-            addToConceptsToFetch(descs);
             refConWorker = new ReferencedConceptsSwingWorker();
             refConWorker.start();
             return true;
@@ -233,10 +228,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         }
         try {
             for (I_DescriptionVersioned desc : cb.getDescriptions()) {
-                desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !host.getShowHistory());
-            }
-            for (I_DescriptionVersioned desc : cb.getUncommittedDescriptions()) {
-                desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !host.getShowHistory());
+                desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, 
+                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
             }
         } catch (TerminologyException e) {
             throw new ToIoException(e);

@@ -79,7 +79,8 @@ public class IsKindOf extends AbstractSearchTest {
             }
 
             return applyInversion(parent.isParentOf(potChild, frameConfig.getAllowedStatus(),
-                frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(), false));
+                frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(),
+                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()));
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (IOException e) {

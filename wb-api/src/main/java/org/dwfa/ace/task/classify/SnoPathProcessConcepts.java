@@ -7,12 +7,15 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
@@ -54,10 +57,12 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui;
     private Logger logger;
+    private PRECEDENCE precedence;
+    private I_ManageContradiction contradictionMgr;
 
     public SnoPathProcessConcepts(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos, I_ShowActivity gui,
-            boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
+            boolean doNotCareIfHasIsa, PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
         this.logger = logger;
         this.snocons = snocons;
         this.snorels = snorels;
@@ -66,6 +71,8 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
         this.statusSet = statSet;
         this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
         this.gui = gui;
+        this.precedence = precedence;
+        this.contradictionMgr = contradictionMgr;
 
         // STATISTICS COUNTERS
         countConSeen = 0;
@@ -125,13 +132,13 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
         // List<Version> attribs = concept.getConceptAttributeTuples(statusSet,
         // fromPathPos, false, true);
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
-                statusSet, fromPathPos, false, true);
+                statusSet, fromPathPos, 
+                precedence, contradictionMgr);
 
         if (attribs.size() == 1) {
-            boolean addUncommitted = false;
-            boolean resolveState = true; // returnConflictResolvedLatestState 
-            List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
-                    roleTypeSet, fromPathPos, addUncommitted, resolveState);
+             List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
+                    roleTypeSet, fromPathPos, 
+                    precedence, contradictionMgr);
 
             // ComponentList<Relationship> rels = concept.getSourceRels();
             boolean isaFound = false;

@@ -67,7 +67,8 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         isATypes.add(ReferenceConcepts.MARKED_PARENT_IS_A_TYPE.getNid());
         Concept memberRefset = Bdb.getConceptDb().getConcept(refsetNid);
         Set<? extends I_GetConceptData> requiredIsAType =
-                memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, false, true);
+                memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, 
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         if (requiredIsAType != null && requiredIsAType.size() > 0) {
             // relationship exists so use the is-a specified by the
@@ -335,7 +336,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             I_IntSet allowedTypes = Terms.get().newIntSet();
             allowedTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.localize().getNid());
 
-            Set<? extends I_GetConceptData> destRelOrigins = purpose.getDestRelOrigins(allowedTypes, false, true);
+            Set<? extends I_GetConceptData> destRelOrigins = purpose.getDestRelOrigins(allowedTypes);
 
             HashSet<Integer> cachedOrigins = new HashSet<Integer>();
             for (I_GetConceptData concept : destRelOrigins) {
@@ -412,13 +413,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     }
 
     private Set<? extends I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
-            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
+            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException, TerminologyException {
         access();
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(refsetIdentityNid);
         Set<? extends I_GetConceptData> matchingConcepts =
                 refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config
-                    .getViewPositionSetReadOnly(), false);
+                    .getViewPositionSetReadOnly(),
+                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         return matchingConcepts;
     }
 
@@ -436,13 +438,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     }
 
     private Set<? extends I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
-            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException {
+            I_ConfigAceFrame config, int refsetIdentityNid) throws IOException, TerminologyException {
         access();
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(refsetIdentityNid);
         Set<? extends I_GetConceptData> matchingConcepts =
                 refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config
-                    .getViewPositionSetReadOnly(), false);
+                    .getViewPositionSetReadOnly(),
+                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         return matchingConcepts;
     }
 
@@ -473,9 +476,11 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
         I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
 
-        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, false, true)) {
+        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null,
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             // Check origin is a refset (ie. has not been retired as a refset)
-            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, false, true)) {
+            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null,
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
                 if (target.getConceptId() == refsetIdenityId) {
                     memberRefsets.add(origin.getConceptId());
                 }
@@ -502,7 +507,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         Concept c = Concept.get(conceptId);
         Collection<Concept> children =
                 c.getDestRelOrigins(getConfig().getAllowedStatus(), getConfig().getDestRelTypes(), getConfig()
-                    .getViewPositionSetReadOnly(), true);
+                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         List<Integer> childNids = new ArrayList<Integer>(children.size());
         for (Concept child : children) {
             childNids.add(child.getNid());

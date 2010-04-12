@@ -564,7 +564,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 conceptsToFetch.add(ext.getRefsetId());
                 List<? extends I_ExtendByRefVersion> parts = new ArrayList<I_ExtendByRefVersion>();
                 if (!host.getShowHistory()) {
-                    parts = ext.getTuples(allowedStatus, null, true, true);
+                    parts = ext.getTuples(allowedStatus, null,
+                        host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
                 } else {
                     parts = ext.getTuples();
                 }

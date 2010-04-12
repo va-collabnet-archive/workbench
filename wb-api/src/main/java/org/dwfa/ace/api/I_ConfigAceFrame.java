@@ -454,21 +454,21 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * @return the conflict resolution strategy in use by the profile
      */
-    I_ManageConflict getConflictResolutionStrategy();
+    I_ManageContradiction getConflictResolutionStrategy();
 
     /**
      * Sets the conflict resolution strategy for this profile
      * 
      * @param conflictResolutionStrategy
      */
-    void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy);
+    void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy);
 
     /**
      * Sets the conflict resolution strategy for this profile
      * 
      * @param conflictResolutionStrategy
      */
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
+    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
 
     public Boolean getHighlightConflictsInTaxonomyView();
 
@@ -523,7 +523,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath);
 
-    public I_ManageConflict[] getAllConflictResolutionStrategies();
+    public I_ManageContradiction[] getAllConflictResolutionStrategies();
 
     public I_ShowActivity getTopActivityListener();
 
@@ -618,4 +618,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireUpdateHierarchyView();
 
     public void refreshRefsetTab();
+    
+    public void setPrecedence(PRECEDENCE precedence);
+    public PRECEDENCE getPrecedence();
 }

@@ -140,12 +140,13 @@ public class SelectUserPanel extends JPanel {
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes);
             I_GetConceptData descriptionType =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = Terms.get().newIntSet();
             descAllowedTypes.add(descriptionType.getConceptId());
-            Set<I_Position> positions = getPositions(Terms.get());
 
             for (I_GetConceptData user : allUsers) {
 
@@ -154,7 +155,8 @@ public class SelectUserPanel extends JPanel {
 
                 List<? extends I_DescriptionTuple> descriptionResults =
                         user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
-                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+                            config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {

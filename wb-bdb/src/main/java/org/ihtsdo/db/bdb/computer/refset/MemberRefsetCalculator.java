@@ -168,7 +168,8 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     // Get both current and retired version, if the latest is
                     // retired then should not be included
                     List<? extends I_ExtendByRefVersion> versions = member.getTuples(getIntSet(
-                        ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.RETIRED), null, false);
+                        ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.RETIRED), null, 
+                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
                     System.out.println("done getting versions for " + concept + " they were " + versions);
 
                     if (versions.size() >= 1) {

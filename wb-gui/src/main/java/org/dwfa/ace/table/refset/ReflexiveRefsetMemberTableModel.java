@@ -28,9 +28,9 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
@@ -78,7 +78,8 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                 statusSet = null;
                 positionSet = null;
             }
-            for (I_ExtendByRefPart part : extension.getTuples(statusSet, new PositionSetReadOnly(positionSet), true, false)) {
+            for (I_ExtendByRefPart part : extension.getTuples(statusSet, new PositionSetReadOnly(positionSet),
+                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy())) {
             	I_ExtendByRefVersion ebrTuple = (I_ExtendByRefVersion) part;
                 for (ReflexiveRefsetFieldData col : columns) {
                     if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {

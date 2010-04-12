@@ -58,15 +58,15 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
     private static final long serialVersionUID = 1L;
 
     public String getDescription() {
-        return "<html>This conflict resolution strategy implements resolution that"
+        return "<html>This resolution strategy implements resolution that"
             + "<ul><li>considers the most recent commit on the configured view paths to be the resolved state of an entity</li>"
-            + "<li>resolves/filters the users view to reflect this conflict resolution</li>"
-            + "<li>only considers a conflict to exist if an entity has two or more states on different paths with exactly the same commit time</ul>"
-            + "This conflict strategy is useful for single expert authoring where all editors are viewing each other's paths.</html>";
+            + "<li>resolves/filters the users view to reflect the resolution</li>"
+            + "<li>only considers a contradiction to exist if an entity has two or more states on different paths with exactly the same commit time</ul>"
+            + "This strategy is useful for single expert authoring where all editors are viewing each other's paths.</html>";
     }
 
     public String getDisplayName() {
-        return "Last commit wins conflict resolution";
+        return "Last commit wins resolution";
     }
 
     private <T extends I_AmTuple> Collection<List<T>> getSortedTuplesCopy(List<T> originalTuples) {
@@ -191,4 +191,19 @@ public class LastCommitWinsConflictResolutionStrategy extends ConflictManagement
 
         return returnList;
     }
+    
+    @Override
+    public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+        ArrayList<T> values = new ArrayList<T>();
+        if (part1.getTime() > part2.getTime()) {
+            values.add(part1);
+        } else if (part1.getTime() < part2.getTime()) {
+            values.add(part2);
+        } else {
+            values.add(part1);
+            values.add(part2);
+        }
+        return values;
+    }
+
 }

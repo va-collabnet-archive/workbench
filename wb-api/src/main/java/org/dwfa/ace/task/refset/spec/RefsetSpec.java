@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
@@ -246,7 +247,10 @@ public class RefsetSpec {
 
         if (concept != null) {
             //TODO should use the version computer
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
@@ -275,8 +279,11 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptId());
 
         if (concept != null) {
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             //TODO should use the version computer
-            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, true, true);
+            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();
@@ -305,7 +312,10 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptId());
 
         if (concept != null) {
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, true, true);
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             //TODO should use the version computer
            for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {

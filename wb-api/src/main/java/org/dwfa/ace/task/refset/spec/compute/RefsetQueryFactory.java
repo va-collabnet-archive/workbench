@@ -170,11 +170,10 @@ public class RefsetQueryFactory {
             // determine type of current child
             I_ExtendByRef currExt = (I_ExtendByRef) childNode.getUserObject();
 
-            boolean addUncommitted = true;
-            boolean returnConflictResolvedLatestState = true;
             List<I_ExtendByRefVersion> extensions =
-                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(), addUncommitted,
-			    returnConflictResolvedLatestState);
+                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), 
+                        configFrame.getViewPositionSetReadOnly(), configFrame.getPrecedence(),
+                        configFrame.getConflictResolutionStrategy());
             if (extensions.size() > 0) {
                 I_ExtendByRefPart thinPart = extensions.get(0).getMutablePart();
 

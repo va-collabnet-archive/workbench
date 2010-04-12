@@ -81,8 +81,6 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             new TermEntry(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
     private String refsetSpecUuidPropName = ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey();
     private Integer maxLineCount = 10000;
-    private boolean addUncommitted = true;
-    private boolean returnConflictResolvedLatestState = true;
     private String delimiter = "\t";
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
 
@@ -162,6 +160,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         File outputFile = new File(fileNameNoTxt + ".txt");
 
         I_TermFactory termFactory = Terms.get();
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
         RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
         I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         BufferedWriter exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
@@ -183,8 +184,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         for (I_ExtendByRef ext : extensions) {
 
             List<? extends I_ExtendByRefVersion> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), addUncommitted, returnConflictResolvedLatestState);
+                    ext.getTuples(helper.getCurrentStatusIntSet(), config
+                        .getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
             I_ExtendByRefVersion latestTuple = null;
 
             for (I_ExtendByRefVersion currentTuple : tuples) {
@@ -302,14 +304,17 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         I_TermFactory termFactory = Terms.get();
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         List<? extends I_DescriptionTuple> descriptionResults = null;
         if (termFactory.hasConcept(componentId)) {
             I_GetConceptData concept = termFactory.getConcept(componentId);
-            descriptionResults = concept.getDescriptionTuples(statuses, allowedTypes, positions, true);
+            descriptionResults = concept.getDescriptionTuples(statuses, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
         } else {
             I_DescriptionVersioned descVersioned = termFactory.getDescription(componentId);
-            descriptionResults = descVersioned.getTuples(true);
+            descriptionResults = descVersioned.getTuples(Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
         }
 
         // find the latest tuple, so that the latest edited version of the

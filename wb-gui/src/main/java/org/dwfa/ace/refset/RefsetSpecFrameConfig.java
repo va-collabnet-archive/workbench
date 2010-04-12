@@ -46,13 +46,14 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -80,6 +81,14 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+
+    public PRECEDENCE getPrecedence() {
+        return frameConfig.getPrecedence();
+    }
+
+    public void setPrecedence(PRECEDENCE precedence) {
+        frameConfig.setPrecedence(precedence);
+    }
 
     public void refreshRefsetTab() {
         frameConfig.refreshRefsetTab();
@@ -206,7 +215,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getAdminUsername();
     }
 
-    public I_ManageConflict[] getAllConflictResolutionStrategies() {
+    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
         return frameConfig.getAllConflictResolutionStrategies();
     }
 
@@ -262,7 +271,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getConceptViewer(index);
     }
 
-    public I_ManageConflict getConflictResolutionStrategy() {
+    public I_ManageContradiction getConflictResolutionStrategy() {
         return frameConfig.getConflictResolutionStrategy();
     }
 
@@ -402,10 +411,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             IntSet allowedTypes = new IntSet();
             try {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
-                boolean addUncommitted = true;
                 List<? extends I_RelTuple> markedParentRefset =
                         refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
-                            .getViewPositionSetReadOnly(), addUncommitted);
+                            .getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
+                            frameConfig.getConflictResolutionStrategy());
                 for (I_RelTuple rel : markedParentRefset) {
                     if (!refsetsToShow.contains(rel.getC2Id())) {
                         refsetsToShow.add(rel.getC2Id());
@@ -435,7 +444,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                     I_ExtendByRef ext = Terms.get().getExtension(memberNid);
                     List<? extends I_ExtendByRefVersion> tuples =
                             ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
-                                true);
+                                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                     if (tuples != null && tuples.size() > 0) {
                         refsetRoots.add(rootNid);
                     }
@@ -537,7 +546,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
                     if (EConcept.REFSET_TYPES.nidToType(ext.getTypeId()) == EConcept.REFSET_TYPES.CID) {
                         List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
-                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, false);
+                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, 
+                            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                         if (returnTuples.size() > 0) {
                             return false;
                         }
@@ -759,11 +769,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 

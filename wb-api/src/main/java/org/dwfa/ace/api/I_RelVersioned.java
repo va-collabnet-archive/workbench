@@ -31,14 +31,12 @@ public interface I_RelVersioned extends I_AmTermComponent {
 
     public List<? extends I_RelPart> getMutableParts();
 
-    public List<? extends I_RelPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_RelPart> getVersions(I_ManageContradiction contradictionManager) throws TerminologyException,
             IOException;
 
     public int versionCount();
 
     public boolean addRetiredRec(int[] releases, int retiredStatusId);
-
-    public boolean removeRedundantRecs();
 
     /**
      * 
@@ -67,7 +65,7 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<? extends I_RelTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_RelTuple> getTuples(I_ManageContradiction contradictionManager) throws TerminologyException,
             IOException;
 
     public I_RelTuple getFirstTuple();
@@ -99,56 +97,9 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    @Deprecated
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<I_RelTuple> returnRels, boolean addUncommitted);
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions -
-     * tuples are returned in the supplied returnTuples List parameter
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param allowedTypes
-     *            types tuples must match to be returned
-     * @param positions
-     *            positions a tuple must be on to be returned
-     * @param returnRels
-     *            List to be populated with the result of the search
-     * @param addUncommitted
-     *            if true matching items from the uncommitted list will be
-     *            added, if false the uncommitted list is ignored
-     * @param returnConflictResolvedLatestState
-     *            indicates if all tuples or just the latest state using the
-     *            current profile's conflict resolution strategy is required
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<I_RelTuple> returnRels, boolean addUncommitted, boolean returnConflictResolvedLatestState)
-            throws TerminologyException, IOException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
-     * positions -
-     * tuples are returned in the supplied returnTuples List parameter
-     * 
-     * @param allowedTypes
-     *            types tuples must match to be returned
-     * @param returnRels
-     *            List to be populated with the result of the search
-     * @param addUncommitted
-     *            if true matching items from the uncommitted list will be
-     *            added, if false the uncommitted list is ignored
-     * @param returnConflictResolvedLatestState
-     *            indicates if all tuples or just the latest state using the
-     *            current profile's conflict resolution strategy is required
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+            List<I_RelTuple> returnRels, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) 
+                    throws TerminologyException, IOException;
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 

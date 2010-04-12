@@ -20,10 +20,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 
@@ -34,11 +35,14 @@ public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
 
     public String retrieveName(final UUID uuid) {
         try {
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
-            I_IntSet status = createCurrentStatus(termFactory);
+            I_TermFactory termFactory = Terms.get();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+           I_IntSet status = createCurrentStatus(termFactory);
             I_IntSet fsn = createFullySpecifiedUUIDs(termFactory);
             List<? extends I_DescriptionTuple> descriptions = termFactory.getConcept(new UUID[] { uuid }).getDescriptionTuples(
-                status, fsn, null);
+                status, fsn, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             // TODO: may have to check for this.
             return descriptions.get(0).getText();
         } catch (Exception e) {

@@ -26,14 +26,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -124,7 +126,10 @@ public final class RefsetUtilImpl implements RefsetUtil {
 
     public List<? extends I_DescriptionTuple> getDescriptionTuples(final I_GetConceptData concept,
             final I_IntSet allowedStatuses, final I_IntSet allowedTypes) throws Exception {
-        return concept.getDescriptionTuples(allowedStatuses, allowedTypes, null);
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        return concept.getDescriptionTuples(allowedStatuses, allowedTypes, null, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
 
     }
 

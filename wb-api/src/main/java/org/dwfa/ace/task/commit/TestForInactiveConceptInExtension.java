@@ -94,7 +94,7 @@ public class TestForInactiveConceptInExtension extends AbstractExtensionTest {
         I_GetConceptData concept = Terms.get().getConcept(nid);
         List<? extends I_ConceptAttributeTuple> attributes =
                 concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(), activeProfile
-                    .getViewPositionSetReadOnly());
+                    .getViewPositionSetReadOnly(), activeProfile.getPrecedence(), activeProfile.getConflictResolutionStrategy());
         if (attributes == null || attributes.size() == 0) {
             String alertString =
                     "<html>Inactive concept in refset:<br> <font color='blue'>" + concept.toString()

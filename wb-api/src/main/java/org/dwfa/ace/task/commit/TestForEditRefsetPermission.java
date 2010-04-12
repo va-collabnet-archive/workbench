@@ -108,7 +108,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
             }
 
             for (I_GetConceptData potentialParent : permissibleRefsetParents) {
-                if (potentialParent.isParentOfOrEqualTo(memberRefset, true)) {
+                if (potentialParent.isParentOfOrEqualTo(memberRefset)) {
                     foundMatch = true;
                 }
             }
@@ -149,7 +149,8 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_IntSet isAAllowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         List<? extends I_RelTuple> roleRels =
-                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, true, true);
+                concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions,
+                    getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
         for (I_RelTuple roleRel : roleRels) {
 
@@ -157,7 +158,8 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
             I_GetConceptData hierarchyPermission = termFactory.getConcept(roleRel.getC2Id());
 
             List<? extends I_RelTuple> permissionRels =
-                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions, true, true);
+                    roleType.getDestRelTuples(activeStatuses, isAAllowedTypes, allPositions,
+                        getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
             for (I_RelTuple permissionRel : permissionRels) {
                 I_GetConceptData permission = termFactory.getConcept(permissionRel.getC1Id());
@@ -181,7 +183,8 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
 
         Set<? extends I_GetConceptData> refsets =
-                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, true, true);
+                concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions,
+                    getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
 
         return refsets;
     }

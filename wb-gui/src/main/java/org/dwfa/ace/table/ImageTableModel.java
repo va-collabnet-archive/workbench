@@ -292,7 +292,6 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
             }
             List<I_ImageVersioned> images = new ArrayList<I_ImageVersioned>();
             images.addAll(cb.getImages());
-            images.addAll(cb.getUncommittedImages());
             for (I_ImageVersioned i : images) {
                 if (stopWork) {
                     return -1;
@@ -436,7 +435,6 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
     public List<I_ImageVersioned> getAllImages() throws IOException {
         if (allImages == null) {
             allImages = new ArrayList<I_ImageVersioned>();
-            allImages.addAll(tableConcept.getUncommittedImages());
             allImages.addAll(tableConcept.getImages());
         }
         return allImages;

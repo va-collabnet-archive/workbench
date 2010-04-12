@@ -71,11 +71,8 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
             for (I_DescriptionTuple desc : concept.getDescriptionTuples(activeProfile.getAllowedStatus(), null,
-                allPositions, true)) {
+                allPositions, activeProfile.getPrecedence(), activeProfile.getConflictResolutionStrategy())) {
                 descriptions.add(desc.getDescVersioned());
-            }
-            for (I_DescriptionVersioned desc : concept.getUncommittedDescriptions()) {
-                descriptions.add(desc);
             }
 
             return testDescriptions(concept, descriptions, forCommit);

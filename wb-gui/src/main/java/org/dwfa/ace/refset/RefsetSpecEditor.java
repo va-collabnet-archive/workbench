@@ -1084,7 +1084,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
                 List<? extends I_RelTuple> refsetSpecTuples =
                         refsetConcept.getDestRelTuples(ace.getAceFrameConfig().getAllowedStatus(), relTypes, ace
-                            .getAceFrameConfig().getViewPositionSetReadOnly(), true);
+                            .getAceFrameConfig().getViewPositionSetReadOnly(), ace.aceFrameConfig.getPrecedence(),
+                            ace.aceFrameConfig.getConflictResolutionStrategy());
                 if (refsetSpecTuples != null && refsetSpecTuples.size() > 0) {
                     refsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
                     localRefsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
@@ -1161,12 +1162,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         private void addExtensionsToMap(List<? extends I_ExtendByRef> list,
                 HashMap<Integer, RefsetSpecTreeNode> extensionMap, HashSet<Integer> fetchedComponents)
-                throws IOException {
+                throws IOException, TerminologyException {
             for (I_ExtendByRef ext : list) {
                 if (ext.getRefsetId() == localRefsetSpecConcept.getConceptId()) {
                     int currentTupleCount =
                             ext.getTuples(ace.getAceFrameConfig().getAllowedStatus(),
-                                ace.getAceFrameConfig().getViewPositionSetReadOnly(), true).size();
+                                ace.getAceFrameConfig().getViewPositionSetReadOnly(),
+                            ace.getAceFrameConfig().getPrecedence(), 
+                            ace.getAceFrameConfig().getConflictResolutionStrategy()).size();
                     if (currentTupleCount > 0 || historyButton.isSelected()) {
                         extensionMap.put(ext.getMemberId(), new RefsetSpecTreeNode(ext, ace.getAceFrameConfig()));
                         if (fetchedComponents.contains(ext.getMemberId()) == false) {

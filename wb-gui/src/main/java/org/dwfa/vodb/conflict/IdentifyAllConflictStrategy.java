@@ -20,6 +20,7 @@
 package org.dwfa.vodb.conflict;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,10 +48,10 @@ public class IdentifyAllConflictStrategy extends ConflictManagementStrategy impl
     private static final long serialVersionUID = 1L;
 
     public String getDescription() {
-        return "<html>This conflict resolution strategy implements the original workbench conflict resolution. It has two main characteristics"
-            + "<ul><li>conflict is considered to exist when there is more than one state for an entity on the user's configured view paths</li>"
-            + "<li>conflict resolution is not performed, therefore the content displayed is not filtered or altered</li></ul>"
-            + "This conflict strategy is useful for expert users or for independant authoring.</html>";
+        return "<html>This resolution strategy has two main characteristics"
+            + "<ul><li>contradiction is considered to exist when there is more than one state for an entity on the user's configured view paths</li>"
+            + "<li>resolution is not performed, therefore the content displayed is not filtered or altered</li></ul>"
+            + "This strategy is useful for expert users or for independant authoring.</html>";
     }
 
     public String getDisplayName() {
@@ -135,5 +136,13 @@ public class IdentifyAllConflictStrategy extends ConflictManagementStrategy impl
 
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         return parts;
+    }
+
+    @Override
+    public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+        ArrayList<T> values = new ArrayList<T>();
+        values.add(part1);
+        values.add(part2);
+        return values;
     }
 }

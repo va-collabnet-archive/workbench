@@ -29,6 +29,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
@@ -208,10 +209,13 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
             I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(termFactory.getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             List<? extends I_RelTuple> roleRels =
                     activeUser.getSourceRelTuples(currentStatuses, roleAllowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_RelTuple roleRel : roleRels) {
 
@@ -219,8 +223,8 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
                 Set<? extends I_GetConceptData> children =
                         hierarchy.getDestRelOrigins(currentStatuses, termFactory.getActiveAceFrameConfig()
-                            .getDestRelTypes(), termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                            true, true);
+                            .getDestRelTypes(), termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                            config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_GetConceptData child : children) {
 
                     RefsetSpec spec = new RefsetSpec(child, true);

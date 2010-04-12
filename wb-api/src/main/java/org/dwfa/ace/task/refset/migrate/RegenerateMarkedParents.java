@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -80,13 +81,16 @@ public class RegenerateMarkedParents extends AbstractTask {
     private void regenerateMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
 
         int refsetId = memberRefsetConcept.getConceptId();
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         Set<Integer> normalMemberIds = new HashSet<Integer>();
         Collection<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 
-            List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {

@@ -3,7 +3,9 @@ package org.ihtsdo.db.bdb.computer.kindof;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
@@ -31,6 +33,10 @@ public class KindOfSpec {
 	 */
 	public int kindNid;
 	
+	public PRECEDENCE precedence;
+	
+	public I_ManageContradiction contradictionMgr;
+	
 	/**
 	 * cached value so that viewPositionSet does not have to be recreated
 	 * each time a query is perfomed. 
@@ -38,7 +44,8 @@ public class KindOfSpec {
 	private PositionSetReadOnly viewPositionSet;
 	
 	public KindOfSpec(I_Position viewPosition, I_IntSet allowedStatus,
-			I_IntSet relTypeNids, int kindNid) {
+			I_IntSet relTypeNids, int kindNid, PRECEDENCE precedence, 
+			I_ManageContradiction contradictionMgr) {
 		super();
 		this.viewPosition = viewPosition;
 		this.allowedStatusNids = new IntSet(allowedStatus.getSetValues());
@@ -49,6 +56,8 @@ public class KindOfSpec {
 		this.relTypeNids = new IntSet(relTypeNids.getSetValues());
 		this.kindNid = kindNid;
 		this.viewPositionSet = new PositionSetReadOnly(viewPosition);
+		this.precedence = precedence;
+		this.contradictionMgr = contradictionMgr;
 	}
 	@Override
 	public boolean equals(Object obj) {

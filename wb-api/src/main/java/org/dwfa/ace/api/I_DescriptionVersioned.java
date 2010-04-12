@@ -31,16 +31,6 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public List<? extends I_DescriptionPart> getMutableParts();
 
-    /**
-     * @param returnConflictResolvedLatestState
-     * @return the versions of this description, filtered to a conflict managed
-     *         state if passed true
-     * @throws TerminologyException
-     * @throws IOException
-     */
-    public List<? extends I_DescriptionPart> getVersions(boolean returnConflictResolvedLatestState) throws TerminologyException,
-            IOException;
-
     public int versionCount();
 
     public boolean matches(Pattern p);
@@ -58,15 +48,22 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<? extends I_DescriptionTuple> getTuples(boolean returnConflictResolvedLatestState) throws TerminologyException,
+    public List<? extends I_DescriptionTuple> getTuples(I_ManageContradiction contradictionManager) throws TerminologyException,
+            IOException;
+
+    /**
+     * @param returnConflictResolvedLatestState
+     * @return the versions of this description, filtered to a conflict managed
+     *         state if passed true
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    public List<? extends I_DescriptionPart> getVersions(I_ManageContradiction contradictionManager) throws TerminologyException,
             IOException;
 
     public I_DescriptionTuple getFirstTuple();
 
     public I_DescriptionTuple getLastTuple();
-
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
-            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted);
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -91,7 +88,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
-            List<I_DescriptionTuple> matchingTuples, boolean addUncommitted, boolean returnConflictResolvedLatestState)
+            List<I_DescriptionTuple> matchingTuples, PRECEDENCE precedence, I_ManageContradiction contradictionMgr)
             throws TerminologyException, IOException;
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);

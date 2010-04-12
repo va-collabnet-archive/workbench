@@ -29,8 +29,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -89,7 +89,8 @@ public class AddRefsetMembersToListView extends AbstractTask {
             Collection<? extends I_ExtendByRef> extVersions = tf.getRefsetExtensionMembers(refset.getConceptId());
             for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
                 List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
-                    config.getViewPositionSetReadOnly(), true);
+                    config.getViewPositionSetReadOnly(), config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
                 for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                     model.addElement(tf.getConcept(thinExtByRefTuple.getComponentId()));
                 }

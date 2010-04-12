@@ -74,7 +74,8 @@ public class TestForStatusForRefset extends AbstractConceptTest {
 
             AceLog.getAppLog().info("Testing for status for refset: " + concept);
             for (I_ConceptAttributeTuple rel : concept.getConceptAttributeTuples(activeProfile.getAllowedStatus(),
-                allPositions, true, true)) {
+                allPositions, 
+                getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) {
                 if (actives.contains(rel.getConceptStatus()))
                     return alertList;
             }
@@ -93,7 +94,8 @@ public class TestForStatusForRefset extends AbstractConceptTest {
                 types.add(isa_con.getConceptId());
 
             for (I_GetConceptData refset : refset_con.getDestRelOrigins(activeProfile.getAllowedStatus(), types,
-                allPositions, true, true)) {
+                allPositions, 
+                getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) {
                 // System.out.println(refset.getInitialText());
                 for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(refset.getConceptId())) {
                     // List<I_ExtendByRef> extensions = termFactory

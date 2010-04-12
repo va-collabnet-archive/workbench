@@ -215,7 +215,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
         Set<? extends I_GetConceptData> targetParentRefsets =
-                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null, false, true);
+                memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null,
+                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
             throw new TerminologyException("Unable to locate parent member refset for '"
@@ -243,7 +244,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
                     .getConceptId());
                 I_GetConceptData memberRefset = Terms.get().getConcept(this.refsetId);
                 Set<? extends I_GetConceptData> requiredIsAType =
-                        memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, false, true);
+                        memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null,
+                            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
                 if (requiredIsAType != null && requiredIsAType.size() > 0) {
                     // relationship exists so use the is-a specified by the
@@ -301,23 +303,6 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
 
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return visited.add(concept.getConceptId());
-        }
-    }
-
-    private class OrOperator implements LineageCondition {
-        private LineageCondition[] conditions;
-
-        public OrOperator(LineageCondition... conditions) {
-            this.conditions = conditions;
-        }
-
-        public boolean evaluate(I_GetConceptData concept) throws Exception {
-            for (LineageCondition condition : this.conditions) {
-                if (condition.evaluate(concept)) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

@@ -30,8 +30,8 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -120,7 +120,7 @@ public class TestGetUncommittedRefset extends AbstractTask {
         }
         allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
         List<? extends I_RelTuple> srcRelTuples = userInfo.getSourceRelTuples(config.getAllowedStatus(), allowedTypes,
-            config.getViewPositionSetReadOnly(), true);
+            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple relTuple : srcRelTuples) {
             List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(relTuple.getRelId(),
                 true);

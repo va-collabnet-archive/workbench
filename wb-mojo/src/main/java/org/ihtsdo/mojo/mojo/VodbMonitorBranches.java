@@ -29,6 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -40,6 +41,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
@@ -127,13 +129,16 @@ public class VodbMonitorBranches extends AbstractMojo {
         int agreedChanges;
 
         public MonitorComponents() throws Exception {
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
             conflicts = 0;
             conceptCount = 0;
             agreedChanges = 0;
         }
 
         public void processConcept(I_GetConceptData concept) throws Exception {
+
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             if (flaggedConcept != null) {
                 flaggedStatusId = termFactory.getConcept(flaggedConcept.getVerifiedConcept().getUids()).getConceptId();
@@ -183,8 +188,10 @@ public class VodbMonitorBranches extends AbstractMojo {
                 Set<I_Position> secondPosition = new HashSet<I_Position>();
                 secondPosition.add(positions.get(i + 1));
 
-                conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition));
-                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition));
+                conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                conceptAttributeTuples2 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
                 if (flaggedConcept != null) {
                     if (!CompareComponents.attributeListsEqual(conceptAttributeTuples1, conceptAttributeTuples2,
                         flaggedStatusId)) {
@@ -196,8 +203,10 @@ public class VodbMonitorBranches extends AbstractMojo {
                     break;
                 }
 
-                descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition));
-                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition));
+                descriptionTuples1 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                descriptionTuples2 = concept.getDescriptionTuples(null, null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
                 if (flaggedConcept != null) {
                     if (!CompareComponents.descriptionListsEqual(descriptionTuples1, descriptionTuples2,
                         flaggedStatusId)) {
@@ -209,8 +218,10 @@ public class VodbMonitorBranches extends AbstractMojo {
                     break;
                 }
 
-                relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), false);
-                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), false);
+                relationshipTuples1 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(firstPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                relationshipTuples2 = concept.getSourceRelTuples(null, null, new PositionSetReadOnly(secondPosition), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
                 if (flaggedConcept != null) {
                     if (!CompareComponents.relationshipListsEqual(relationshipTuples1, relationshipTuples2,
                         flaggedStatusId)) {

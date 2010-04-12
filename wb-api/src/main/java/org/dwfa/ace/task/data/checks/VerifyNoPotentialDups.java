@@ -124,13 +124,15 @@ public class VerifyNoPotentialDups extends AbstractTask {
 
             boolean statusValid = false;
             for (I_GetConceptData potDupConcept : selectedConcept.getSourceRelTargets(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), 
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 statusValid = false;
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<? extends I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSetReadOnly());
+                    config.getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {
                     statusValid = true;
@@ -139,13 +141,15 @@ public class VerifyNoPotentialDups extends AbstractTask {
             }
 
             for (I_GetConceptData potDupConcept : selectedConcept.getDestRelOrigins(config.getAllowedStatus(),
-                potDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
+                potDupTypeSet, config.getViewPositionSetReadOnly(), 
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 statusValid = false;
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<? extends I_ConceptAttributeTuple> statusTuples = potDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSetReadOnly());
+                    config.getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples) {
                     statusValid = true;

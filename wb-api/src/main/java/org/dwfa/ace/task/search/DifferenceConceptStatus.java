@@ -79,7 +79,8 @@ public class DifferenceConceptStatus extends AbstractSearchTest {
                 positions.add(p);
                 PositionSetReadOnly positionSet = new PositionSetReadOnly(positions);
                 List<? extends I_ConceptAttributeTuple> tuples = conceptToTest.getConceptAttributeTuples(
-                    frameConfig.getAllowedStatus(), positionSet);
+                    frameConfig.getAllowedStatus(), positionSet, 
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 if (firstPass) {
                     if (tuples.size() > 0) {
                         firstTuple = tuples.get(0);

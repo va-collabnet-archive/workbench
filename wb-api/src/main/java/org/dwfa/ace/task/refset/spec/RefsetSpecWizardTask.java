@@ -94,14 +94,15 @@ public class RefsetSpecWizardTask extends AbstractTask {
         try {
 
             termFactory = Terms.get();
-            final I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+            final         // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             condition = Condition.ITEM_CANCELED;
             I_GetConceptData userParent = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
             // create list of editors -> FSN, for use in the drop down list
             final Set<? extends I_GetConceptData> allValidUsers =
-                    userParent.getDestRelOrigins(allowedTypes, true, true);
+                    userParent.getDestRelOrigins(allowedTypes);
             final HashMap<String, I_GetConceptData> validUserMap = new HashMap<String, I_GetConceptData>();
             I_GetConceptData fsnConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
@@ -111,7 +112,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
                 String latestDescription = null;
                 int latestVersion = Integer.MIN_VALUE;
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        validUser.getDescriptionTuples(null, fsnAllowedTypes, null, true);
+                        validUser.getDescriptionTuples(null, fsnAllowedTypes, null, 
+                            config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -267,6 +269,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
 
     public String getInbox(I_GetConceptData concept) throws TerminologyException, IOException {
         // find the inbox string using the concept's "user inbox" description
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         I_GetConceptData descriptionType =
                 Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
@@ -290,7 +294,8 @@ public class RefsetSpecWizardTask extends AbstractTask {
             (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
 
         List<? extends I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, true);
+                concept.getDescriptionTuples(activeStatuses, allowedTypes, null, 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getVersion() > latestVersion) {
                 latestVersion = descriptionTuple.getVersion();

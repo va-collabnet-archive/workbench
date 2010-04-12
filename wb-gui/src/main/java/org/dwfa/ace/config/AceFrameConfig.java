@@ -68,12 +68,13 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -128,7 +129,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 45; // keep current with
+    private static final int dataVersion = 46; // keep current with
     // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
@@ -292,7 +293,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_GetConceptData classifierOutputPathConcept;
 
     // 36
-    private I_ManageConflict conflictResolutionStrategy;
+    private I_ManageContradiction conflictResolutionStrategy;
     private boolean highlightConflictsInTaxonomyView;
     private boolean highlightConflictsInComponentPanel;
 
@@ -325,6 +326,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 45
     private I_GetConceptData classificationRoleRoot;
+    
+    // 46
+    private PRECEDENCE precedence;
 
     // transient
     private transient MasterWorker worker;
@@ -522,6 +526,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 45
         writeConceptAsId(classificationRoleRoot, out);
+        
+        // 46
+        out.writeObject(precedence);
 
     }
 
@@ -889,7 +896,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 36) {
-                conflictResolutionStrategy = (I_ManageConflict) in.readObject();
+                conflictResolutionStrategy = (I_ManageContradiction) in.readObject();
                 highlightConflictsInComponentPanel = in.readBoolean();
                 highlightConflictsInTaxonomyView = in.readBoolean();
             } else {
@@ -976,6 +983,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classificationRoleRoot = null;
             }
+            
+            if (objDataVersion >= 46) {
+                precedence = (PRECEDENCE) in.readObject();
+                if (precedence == null) {
+                    precedence = PRECEDENCE.PATH;
+                }
+            } else {
+                precedence = PRECEDENCE.PATH;
+            }
+              
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -2567,7 +2584,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /**
      * @return the conflict resolution strategy in use by the profile
      */
-    public I_ManageConflict getConflictResolutionStrategy() {
+    public I_ManageContradiction getConflictResolutionStrategy() {
         if (conflictResolutionStrategy == null) {
             conflictResolutionStrategy = new IdentifyAllConflictStrategy();
         }
@@ -2579,9 +2596,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * 
      * @param conflictResolutionStrategy
      */
-    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
 
-        I_ManageConflict old = this.conflictResolutionStrategy;
+        I_ManageContradiction old = this.conflictResolutionStrategy;
 
         this.conflictResolutionStrategy = conflictResolutionStrategy;
 
@@ -2593,15 +2610,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * 
      * @param conflictResolutionStrategy
      */
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
 
         try {
             setConflictResolutionStrategy(conflictResolutionStrategyClass.newInstance());
         } catch (InstantiationException e) {
-            alertAndLog("Cannot instanciate conflict resolution strategy of type '" + conflictResolutionStrategyClass
+            alertAndLog("Cannot instanciate resolution strategy of type '" + conflictResolutionStrategyClass
                 + "', will continue with existing value '" + getConflictResolutionStrategy().getClass() + "'", e);
         } catch (IllegalAccessException e) {
-            alertAndLog("Cannot instanciate conflict resolution strategy of type '" + conflictResolutionStrategyClass
+            alertAndLog("Cannot instanciate resolution strategy of type '" + conflictResolutionStrategyClass
                 + "' due to permissions, will continue with existing value '"
                 + getConflictResolutionStrategy().getClass() + "'", e);
         }
@@ -2637,8 +2654,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("highlightConflictsInComponentPanel", old, highlightConflictsInComponentPanel);
     }
 
-    public I_ManageConflict[] getAllConflictResolutionStrategies() {
-        I_ManageConflict[] strategies = new I_ManageConflict[2];
+    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
+        I_ManageContradiction[] strategies = new I_ManageContradiction[2];
         strategies[0] = new IdentifyAllConflictStrategy();
         strategies[1] = new LastCommitWinsConflictResolutionStrategy();
         return strategies;
@@ -2936,6 +2953,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         boolean old = this.searchWithDescTypeFilter;
         this.searchWithDescTypeFilter = searchWithDescTypeFilter;
         this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
+    }
+    
+    public PRECEDENCE getPrecedence() {
+        return precedence;
+    }
+
+    public void setPrecedence(PRECEDENCE precedence) {
+        PRECEDENCE old = this.precedence;
+        this.precedence = precedence;
+        this.changeSupport.firePropertyChange("precedence", old, precedence);
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);        
     }
 
     public void setSelectedPreferencesTab(String tabName) {

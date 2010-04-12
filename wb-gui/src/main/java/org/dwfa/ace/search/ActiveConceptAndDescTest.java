@@ -46,7 +46,8 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
 	            I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
 	            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptId());
 	            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
-	                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), true, false);
+	                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), 
+	                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
 	            if (attributes == null || attributes.size() == 0) {
 	                return false;
 	            }
@@ -56,7 +57,8 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
 	                allowedTypes = frameConfig.getDescTypes();
 	            }
 	            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
-	                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, true);
+	                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, 
+	                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
 	            if (matchingTuples.size() == 0) {
 	                return false;
 	            }

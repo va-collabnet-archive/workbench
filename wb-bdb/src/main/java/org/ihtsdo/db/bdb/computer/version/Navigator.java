@@ -43,7 +43,7 @@ public abstract class Navigator {
 							// nothing to do
 							break;
 
-						case CONFLICTING:
+						case CONTRADICTION:
 							iteratorPartSet.set(i);
 							break;
 

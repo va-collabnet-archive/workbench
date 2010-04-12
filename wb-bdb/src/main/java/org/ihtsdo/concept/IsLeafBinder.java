@@ -38,7 +38,8 @@ public class IsLeafBinder extends TupleBinding<Boolean> {
                     if (r != null) {
                         List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
                         r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-                                .getViewPositionSetReadOnly(), currentVersions, true);
+                                .getViewPositionSetReadOnly(), currentVersions, 
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                         if (currentVersions.size() > 0) {
                             return false;
                         }

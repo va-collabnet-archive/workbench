@@ -31,6 +31,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -74,12 +75,15 @@ public class AddChildrenToList extends AbstractTask {
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
             for (I_GetConceptData child : concept.getDestRelOrigins(config.getAllowedStatus(),
-                config.getDestRelTypes(), config.getViewPositionSetReadOnly(), true)) {
+                config.getDestRelTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+                config.getConflictResolutionStrategy())) {
                 model.addElement(child);
             }
 
             return Condition.CONTINUE;
         } catch (IOException e) {
+            throw new TaskFailedException(e);
+        } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         }
     }

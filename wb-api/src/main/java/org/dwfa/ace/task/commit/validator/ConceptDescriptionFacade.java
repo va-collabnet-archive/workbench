@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -97,7 +98,16 @@ public final class ConceptDescriptionFacade {
      *             Descriptions from the {@code concept}
      */
     public List<? extends I_DescriptionVersioned> getUncommittedDescriptions(final I_GetConceptData concept) throws Exception {
-        return concept.getUncommittedDescriptions();
+        List<I_DescriptionVersioned> uncommitted = new ArrayList<I_DescriptionVersioned>();
+        for (I_DescriptionVersioned descv: concept.getDescriptions()) {
+            for (I_DescriptionTuple p: descv.getTuples()) {
+                if (p.getTime() == Long.MAX_VALUE) {
+                    uncommitted.add(descv);
+                    break;
+                }
+            }
+        }
+        return uncommitted;
     }
 
     /**
@@ -133,6 +143,7 @@ public final class ConceptDescriptionFacade {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
         PositionSetReadOnly allPositions = conceptTest.getPositions(termFactory);
 
-        return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), null, allPositions, true);
+        return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), null, allPositions, 
+            activeProfile.getPrecedence(), activeProfile.getConflictResolutionStrategy());
     }
 }

@@ -145,7 +145,8 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
 
         Set<? extends I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
-            null, false, true);
+            null,
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
             throw new TerminologyException("Unable to locate parent member refset for '"

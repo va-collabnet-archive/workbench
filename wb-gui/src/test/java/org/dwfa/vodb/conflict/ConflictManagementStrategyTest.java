@@ -33,13 +33,13 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 import org.junit.Before;
 import org.junit.Test;
@@ -143,6 +143,11 @@ public class ConflictManagementStrategyTest {
             throw new UnsupportedOperationException();
         }
 
+        @Override
+        public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+            throw new UnsupportedOperationException();
+        }
+
     }
 
     I_GetConceptData conceptWithoutConflict;
@@ -157,7 +162,7 @@ public class ConflictManagementStrategyTest {
     I_Identify idWithConflict;
     I_ImageVersioned imageWithoutConflict;
     I_ImageVersioned imageWithConflict;
-    I_ManageConflict conflictResloutionStrategy = new TestConflictResolutionStrategy();
+    I_ManageContradiction conflictResloutionStrategy = new TestConflictResolutionStrategy();
 
     @Before
     public void initialise() {

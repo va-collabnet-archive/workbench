@@ -301,9 +301,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         }
 
         lowerProgressMessage = "getting destination rels ";
-        destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions, false);
+        destRels = cb.getDestRelTuples(allowedStatus, destRelTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         lowerProgressMessage = "getting source rels ";
-        srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions, false);
+        srcRels = cb.getSourceRelTuples(allowedStatus, sourceRelTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_FilterTaxonomyRels taxonomyFilter : config.getTaxonomyRelFilterList()) {
             taxonomyFilter.filter(cb, srcRels, destRels, config);
         }

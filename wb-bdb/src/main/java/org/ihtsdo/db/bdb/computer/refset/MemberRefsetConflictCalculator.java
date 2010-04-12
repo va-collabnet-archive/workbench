@@ -29,8 +29,7 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
     protected void setMembers() throws Exception {
 
         for (Integer refset : newRefsetMembers.keySet()) {
-            ClosestDistanceHashSet exclusions = new ClosestDistanceHashSet();
-
+ 
             conflictDetails.add("Conflicts in refset " + Terms.get().getConcept(refset) + " are: ");
 
             ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
@@ -47,7 +46,8 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
                             isARel.add(Terms.get().uuidToNative(SNOMED.Concept.IS_A.getUids()));
                             if (old.equals(i)) {
                                 for (I_GetConceptData c : Terms.get().getConcept(i.getConceptId())
-                                    .getSourceRelTargets(null, isARel, null, false)) {
+                                    .getSourceRelTargets(null, isARel, null,
+                                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
                                     int conceptId = c.getConceptId();
                                     if (conceptId == Terms.get().getConcept(i.getInclusionReasonId())
                                         .getConceptId()

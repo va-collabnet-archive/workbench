@@ -361,7 +361,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
-            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, true, true);
+            Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
                     RefsetSpec spec = new RefsetSpec(child, true);
@@ -379,7 +380,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
 
-        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, true, true);
+        List<? extends I_RelTuple> relationships = child.getDestRelTuples(null, allowedTypes, null, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         if (relationships.size() > 0) {
             return true;
         } else {

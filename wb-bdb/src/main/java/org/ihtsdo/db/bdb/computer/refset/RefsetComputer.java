@@ -121,7 +121,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             Concept concept = fcfc.fetch();
             if (specHelper.isDescriptionComputeType()) {
                 List<? extends I_DescriptionTuple> descriptionTuples =
-                        concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), true);
+                        concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), 
+                        frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
                     executeComponent(descVersioned, cNid, descVersioned.getDescId());

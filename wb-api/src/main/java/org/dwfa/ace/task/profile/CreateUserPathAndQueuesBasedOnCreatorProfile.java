@@ -222,6 +222,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.getDbConfig().setRefsetChangesChangeSetPolicy(creatorConfig.getDbConfig().getRefsetChangesChangeSetPolicy());
             newConfig.getDbConfig().setUserChangesChangeSetPolicy(creatorConfig.getDbConfig().getUserChangesChangeSetPolicy());
             newConfig.getDbConfig().setChangeSetWriterThreading(creatorConfig.getDbConfig().getChangeSetWriterThreading());
+            newConfig.setPrecedence(creatorConfig.getPrecedence());
 
             
 

@@ -87,7 +87,7 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
                 positionSet.add(p);
                 PositionSetReadOnly viewSet = new PositionSetReadOnly(positionSet);
                 List<? extends I_DescriptionTuple> tuples = conceptToTest.getDescriptionTuples(frameConfig.getAllowedStatus(),
-                    allowedTypes, viewSet);
+                    allowedTypes, viewSet, frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 if (firstSet == null) {
                     firstSet = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
                     firstSet.addAll(tuples);

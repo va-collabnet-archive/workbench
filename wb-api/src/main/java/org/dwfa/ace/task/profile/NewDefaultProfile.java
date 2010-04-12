@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -310,6 +311,8 @@ public class NewDefaultProfile extends NewProfile {
         activeConfig.setTogglesInComponentPanelVisible(TOGGLES.PREFERENCES, true);
         activeConfig.setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
         activeConfig.setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
+        
+        activeConfig.setPrecedence(PRECEDENCE.PATH);
 
         return activeConfig;
     }

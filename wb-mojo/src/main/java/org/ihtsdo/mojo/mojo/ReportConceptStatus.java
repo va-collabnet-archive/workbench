@@ -36,12 +36,12 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.maven.graph.MojoGraph;
-import org.dwfa.vodb.bind.ThinVersionHelper;
 
 /**
  * 
@@ -69,14 +69,10 @@ public class ReportConceptStatus extends AbstractMojo {
 
     /**
      * Location of the directory to output data files to.
-     * KEC: I added this field, because the maven plugin plugin would
-     * crash unless there was at least one commented field. This field is
-     * not actually used by the plugin.
      * 
      * @parameter expression="${project.build.directory}/.."
      * @required
      */
-    @SuppressWarnings("unused")
     private String outputDirectory;
 
     /**
@@ -122,7 +118,7 @@ public class ReportConceptStatus extends AbstractMojo {
         private double[][] pointData = new double[60][2];
 
         public CheckConceptStatus() throws Exception {
-            termFactory = LocalVersionedTerminology.get();
+            termFactory = Terms.get();
             statusTypeSet = termFactory.newIntSet();
 
             for (int i = 0; i < 60; i++) {
@@ -169,7 +165,8 @@ public class ReportConceptStatus extends AbstractMojo {
             // Set<I_Position> positionSet = new HashSet<I_Position>();
             // positionSet.add(latestOnArchitectonicPath);
 
-            I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame activeConfig = Terms.get().getActiveAceFrameConfig();
             PositionSetReadOnly positionSet = null;
 
             if (!viewPath.equalsIgnoreCase("DEFAULT")) {
@@ -181,7 +178,8 @@ public class ReportConceptStatus extends AbstractMojo {
                 positionSet = activeConfig.getViewPositionSetReadOnly();
             }
 
-            List<? extends I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet);
+            List<? extends I_ConceptAttributeTuple> statusTuples = concept.getConceptAttributeTuples(statusTypeSet, positionSet, 
+                activeConfig.getPrecedence(), activeConfig.getConflictResolutionStrategy());
 
             Iterator<? extends I_ConceptAttributeTuple> it = statusTuples.iterator();
 
@@ -189,7 +187,7 @@ public class ReportConceptStatus extends AbstractMojo {
             int versionId = 0;
             while (it.hasNext()) {
                 I_ConceptAttributeTuple tuple = it.next();
-                conceptStatus = tuple.getConceptStatus();
+                conceptStatus = tuple.getStatusId();
                 versionId = tuple.getVersion();
             }
 
@@ -244,7 +242,7 @@ public class ReportConceptStatus extends AbstractMojo {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
 
-            I_TermFactory termFactory = LocalVersionedTerminology.get();
+            I_TermFactory termFactory = Terms.get();
             CheckConceptStatus ccs = new CheckConceptStatus();
             termFactory.iterateConcepts(ccs);
 

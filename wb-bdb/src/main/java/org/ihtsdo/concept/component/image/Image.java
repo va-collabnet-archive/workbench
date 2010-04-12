@@ -14,9 +14,11 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.utypes.UniversalAceImage;
@@ -388,10 +390,11 @@ public class Image
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_ImageTuple> matchingTuples) {
+			PositionSetReadOnly positions, List<I_ImageTuple> matchingTuples, 
+			PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, 
-				returnTuples, true, getVersions());
+				returnTuples, getVersions(), precedencePolicy, contradictionManager);
 		matchingTuples.addAll(returnTuples);
 	}
 
@@ -419,11 +422,11 @@ public class Image
 	}
 
 	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus) {
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
 		int viewPathId = viewPosition.getPath().getConceptId();
 		List<Version> matchingTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, 
-				getTuples());
+				getTuples(), precedence, null);
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : pomotionPaths) {
 			for (Version it : matchingTuples) {

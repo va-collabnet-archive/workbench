@@ -96,13 +96,13 @@ public class CloneConcept extends AbstractTask {
             newConcept = Terms.get().newConcept(UUID.randomUUID(), false, config);
 
             for (I_DescriptionTuple desc : conceptToClone.getDescriptionTuples(config.getAllowedStatus(), null,
-                clonePositions)) {
+                clonePositions, config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 tf.newDescription(UUID.randomUUID(), newConcept, desc.getLang(), "Clone of " + desc.getText(),
                     tf.getConcept(desc.getTypeId()), config);
             }
 
             for (I_RelTuple rel : conceptToClone.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions,
-                false)) {
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 tf.newRelationship(UUID.randomUUID(), newConcept, tf.getConcept(rel.getTypeId()),
                     tf.getConcept(rel.getC2Id()), tf.getConcept(rel.getCharacteristicId()),
                     tf.getConcept(rel.getRefinabilityId()), tf.getConcept(rel.getStatusId()), rel.getGroup(), config);

@@ -18,6 +18,7 @@ package org.dwfa.ace.file;
 
 import java.util.List;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -71,9 +72,13 @@ public class ConceptListReader extends IterableFileReader<I_GetConceptData> {
     }
 
     protected boolean verifyDescription(I_GetConceptData concept, String description) throws Exception {
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
         // check that the description parameter corresponds to one of the
         // concept's descriptions
-        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null);
+        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null,
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descriptionTuples) {
             if (description.toLowerCase().trim().equals(tuple.getText().toLowerCase().trim())) {
                 return true;

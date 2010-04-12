@@ -14,15 +14,14 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -30,7 +29,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedConcept;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.util.HashFunction;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
@@ -235,47 +233,9 @@ public class ConceptAttributes
 		throw new UnsupportedOperationException();
 	}
 
-	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions,
-			List<Version> returnTuples) {
-		addTuples(allowedStatus, positions, returnTuples, true);
-	}
-
 	private static VersionComputer<ConceptAttributes.Version> computer = 
 		new VersionComputer<ConceptAttributes.Version>();
 
-	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions,
-			List<Version> returnTuples,
-			boolean addUncommitted) {
-		computer.addSpecifiedVersions(allowedStatus, positions, returnTuples,
-				addUncommitted, getVersions());
-	}
-
-	public void addTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positionSet,
-			List<Version> returnTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-
-		List<Version> matchedTuples = new ArrayList<Version>();
-
-		addTuples(allowedStatus, positionSet, matchedTuples, addUncommitted);
-
-		if (returnConflictResolvedLatestState) {
-			I_ConfigAceFrame config = Terms.get()
-					.getActiveAceFrameConfig();
-			I_ManageConflict conflictResolutionStrategy;
-			if (config == null) {
-				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-			} else {
-				conflictResolutionStrategy = config
-						.getConflictResolutionStrategy();
-			}
-			matchedTuples = conflictResolutionStrategy.resolveTuples(matchedTuples);
-		}
-		returnTuples.addAll(matchedTuples);
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -348,37 +308,50 @@ public class ConceptAttributes
 		}
 	}
 
+    @Override
+    public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
+            List<I_ConceptAttributeTuple> returnTuples, PRECEDENCE precedencePolicy,
+            I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
+        List<Version> returnList = new ArrayList<Version>();
+        computer.addSpecifiedVersions(allowedStatus, positionSet, returnList, 
+            getVersions(), precedencePolicy, contradictionManager);
+        returnTuples.addAll(returnList);
+    }
+
 	public List<Version> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly viewPositionSet) {
+			PositionSetReadOnly viewPositionSet, PRECEDENCE precedencePolicy, 
+			I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
-
-		addTuples(allowedStatus, viewPositionSet, returnList);
-
+        computer.addSpecifiedVersions(allowedStatus, viewPositionSet, returnList, 
+            getVersions(), precedencePolicy, contradictionManager);
 		return returnList;
 	}
 
+
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Version> returnTuples) {
+			List<Version> returnTuples, PRECEDENCE precedencePolicy, 
+			I_ManageContradiction contradictionManager) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples,
-				getVersions());
+				getVersions(), precedencePolicy, contradictionManager);
 	}
 
 	public List<Version> getTuples(I_IntSet allowedStatus,
-			I_Position viewPosition) {
+			I_Position viewPosition, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
 
-		addTuples(allowedStatus, viewPosition, returnList);
+		addTuples(allowedStatus, viewPosition, returnList, precedencePolicy,
+		    contradictionManager);
 
 		return returnList;
 	}
 
 	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly promotionPaths, I_IntSet allowedStatus) {
+			PathSetReadOnly promotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
 		int viewPathId = viewPosition.getPath().getConceptId();
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : promotionPaths) {
 			for (Version version : getTuples(allowedStatus,
-					viewPosition)) {
+					viewPosition, precedence, null)) {
 				if (version.getPathId() == viewPathId) {
 					ConceptAttributesRevision promotionPart = 
 						version.makeAnalog(version.getStatusId(),
@@ -400,28 +373,6 @@ public class ConceptAttributes
 	public boolean addVersion(I_ConceptAttributePart part) {
 		this.versions = null;
 		return super.addRevision(new ConceptAttributesRevision(part, this));
-	}
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-			List<I_ConceptAttributeTuple> returnTuples) {
-		addTuples(allowedStatus, new PositionSetReadOnly(positionSet), returnTuples);
-	}
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted) {
-		addTuples(allowedStatus, new PositionSetReadOnly(positionSet), returnTuples,
-				addUncommitted);
-	}
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-			List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		addTuples(allowedStatus, new PositionSetReadOnly(positionSet), returnTuples,
-				addUncommitted, returnConflictResolvedLatestState);
 	}
 
 	@Override
@@ -508,5 +459,7 @@ public class ConceptAttributes
 	protected void clearVersions() {
 		versions = null;
 	}
-	
+
+
+ 	
 }

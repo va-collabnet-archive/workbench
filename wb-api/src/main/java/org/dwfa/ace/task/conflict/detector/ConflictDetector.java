@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.tapi.TerminologyException;
 
 public class ConflictDetector {
     /**
@@ -35,9 +36,10 @@ public class ConflictDetector {
      * @param concept
      * @return
      * @throws IOException
+     * @throws TerminologyException 
      */
     public static boolean conflict(I_GetConceptData concept, I_ConfigAceFrame profileForConflictDetection)
-            throws IOException {
+            throws IOException, TerminologyException {
         Set<I_ConceptAttributeTuple> attributeTuples = null;
         Set<I_DescriptionTuple> descTuples = null;
         Set<I_RelTuple> relTuples = null;
@@ -47,11 +49,15 @@ public class ConflictDetector {
             PositionSetReadOnly viewPositionSet = new PositionSetReadOnly(positionSet);
             if (attributeTuples == null) {
                 attributeTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
-                attributeTuples.addAll(concept.getConceptAttributeTuples(null, viewPositionSet));
+                attributeTuples.addAll(concept.getConceptAttributeTuples(null, viewPositionSet, 
+                    profileForConflictDetection.getPrecedence(), 
+                    profileForConflictDetection.getConflictResolutionStrategy()));
             } else {
                 TreeSet<I_ConceptAttributeTuple> positionTupleSet = new TreeSet<I_ConceptAttributeTuple>(
                     new AttrTupleConflictComparator());
-                positionTupleSet.addAll(concept.getConceptAttributeTuples(null, viewPositionSet));
+                positionTupleSet.addAll(concept.getConceptAttributeTuples(null, viewPositionSet,
+                    profileForConflictDetection.getPrecedence(),
+                    profileForConflictDetection.getConflictResolutionStrategy()));
                 if (positionTupleSet.containsAll(attributeTuples) == false) {
                     return true;
                 }
@@ -62,11 +68,15 @@ public class ConflictDetector {
 
             if (descTuples == null) {
                 descTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
-                descTuples.addAll(concept.getDescriptionTuples(null, null, viewPositionSet));
+                descTuples.addAll(concept.getDescriptionTuples(null, null, viewPositionSet,
+                    profileForConflictDetection.getPrecedence(),
+                    profileForConflictDetection.getConflictResolutionStrategy()));
             } else {
                 TreeSet<I_DescriptionTuple> positionTupleSet = new TreeSet<I_DescriptionTuple>(
                     new DescriptionTupleConflictComparator());
-                positionTupleSet.addAll(concept.getDescriptionTuples(null, null, viewPositionSet));
+                positionTupleSet.addAll(concept.getDescriptionTuples(null, null, viewPositionSet,
+                    profileForConflictDetection.getPrecedence(),
+                    profileForConflictDetection.getConflictResolutionStrategy()));
                 if (positionTupleSet.containsAll(descTuples) == false) {
                     return true;
                 }
@@ -77,10 +87,14 @@ public class ConflictDetector {
 
             if (relTuples == null) {
                 relTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-                relTuples.addAll(concept.getSourceRelTuples(null, null, viewPositionSet, false));
+                relTuples.addAll(concept.getSourceRelTuples(null, null, viewPositionSet,
+                    profileForConflictDetection.getPrecedence(),
+                    profileForConflictDetection.getConflictResolutionStrategy()));
             } else {
                 TreeSet<I_RelTuple> positionTupleSet = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
-                positionTupleSet.addAll(concept.getSourceRelTuples(null, null, viewPositionSet, false));
+                positionTupleSet.addAll(concept.getSourceRelTuples(null, null, viewPositionSet,
+                    profileForConflictDetection.getPrecedence(),
+                    profileForConflictDetection.getConflictResolutionStrategy()));
                 if (positionTupleSet.containsAll(relTuples) == false) {
                     return true;
                 }

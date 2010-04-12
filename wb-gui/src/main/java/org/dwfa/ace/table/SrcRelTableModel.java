@@ -65,13 +65,8 @@ public class SrcRelTableModel extends RelTableModel {
                 if (tableChangedSwingWorker.isWorkStopped()) {
                     return selectedTuples;
                 }
-                rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
-            }
-            for (I_RelVersioned rel : cb.getUncommittedSourceRels()) {
-                if (tableChangedSwingWorker.isWorkStopped()) {
-                    return selectedTuples;
-                }
-                rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
+                rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, 
+                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
             }
         } catch (TerminologyException e) {
             throw new ToIoException(e);

@@ -70,10 +70,6 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
-            for (I_DescriptionVersioned desc : concept.getUncommittedDescriptions()) {
-                descriptions.add(desc);
-            }
-
             return testDescriptions(concept, descriptions, forCommit);
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -85,9 +81,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
 
         PositionSetReadOnly allPositions = null;
         I_IntSet allTypes = null;
-        boolean conflictResolvedLatestState = true;
         return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), allTypes, allPositions,
-            conflictResolvedLatestState);
+            getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
     }
 
     private List<AlertToDataConstraintFailure> testDescriptions(I_GetConceptData concept,

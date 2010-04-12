@@ -121,11 +121,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
@@ -1446,6 +1447,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setup(I_ConfigAceFrame aceFrameConfig) throws Exception {
         menuWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
         this.aceFrameConfig = (AceFrameConfig) aceFrameConfig;
+        Terms.get().setActiveAceFrameConfig(aceFrameConfig);
         this.aceFrameConfig.addPropertyChangeListener(this);
         try {
             masterProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
@@ -1971,17 +1973,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JLayeredPane layers = getRootPane().getLayeredPane();
         preferencesPalette = new CdePalette(new BorderLayout(), new RightPalettePoint());
         preferencesTab = new JTabbedPane();
-        preferencesTab.addTab("View", makeViewConfig());
-        preferencesTab.addTab("Edit", makeEditConfig());
+        preferencesTab.addTab("view", makeViewConfig());
+        preferencesTab.addTab("edit", makeEditConfig());
         JTabbedPane pathPanes = new JTabbedPane();
-        pathPanes.addTab("Configure", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
+        pathPanes.addTab("configure", new SelectPathAndPositionPanelWithCombo(false, "for view", aceFrameConfig,
             new PropertySetListenerGlue("removeViewPosition", "addViewPosition", "replaceViewPosition",
                 "getViewPositionSet", I_Position.class, aceFrameConfig)));
-        pathPanes.addTab("Create", new CreatePathPanel(aceFrameConfig));
-        preferencesTab.addTab("Path", pathPanes);
-        preferencesTab.addTab("Refset", makeRefsetConfig());
-        preferencesTab.addTab("Change Set", new ChangeSetConfigPanel(aceFrameConfig));
-        preferencesTab.addTab("Classifier", makeClassifierConfig());
+        pathPanes.addTab("create", new CreatePathPanel(aceFrameConfig));
+        preferencesTab.addTab("path", pathPanes);
+        preferencesTab.addTab("refset", makeRefsetConfig());
+        preferencesTab.addTab("changeset", new ChangeSetConfigPanel(aceFrameConfig));
+        preferencesTab.addTab("chronicler", makeChroniclerPreferences());
+        preferencesTab.addTab("classifier", makeClassifierConfig());
 
         layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
         preferencesPalette.add(preferencesTab, BorderLayout.CENTER);
@@ -1999,6 +2002,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         addComponentListener(preferencesPalette);
         preferencesPalette.setVisible(true);
 
+    }
+    
+    private JTabbedPane makeChroniclerPreferences() {
+        JTabbedPane p = new JTabbedPane();
+        p.addTab("precedence", makePrecedencePreferencePanel());
+        p.addTab("contradiction", makeContradictionPreferencePanel());
+        
+        return p;
     }
 
     private void removeConfigPalette() {
@@ -2022,8 +2033,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     }
 
-    private Component makeConflictViewPanel() {
-        JPanel conflictConfigPanel = new JPanel(new BorderLayout());
+    private Component makeContradictionPreferencePanel() {
+        JPanel contradictionConfigPanel = new JPanel(new BorderLayout());
 
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
         controlPanel.add(getCheckboxEditor("show conflicts in taxonomy view", "highlightConflictsInTaxonomyView",
@@ -2044,7 +2055,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conflictComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
-                I_ManageConflict conflictResolutionStrategy = (I_ManageConflict) cb.getSelectedItem();
+                I_ManageContradiction conflictResolutionStrategy = (I_ManageContradiction) cb.getSelectedItem();
                 aceFrameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
                 descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());
             }
@@ -2052,10 +2063,42 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         controlPanel.add(conflictComboBox);
 
-        conflictConfigPanel.add(controlPanel, BorderLayout.PAGE_START);
-        conflictConfigPanel.add(descriptionScroll, BorderLayout.CENTER);
+        contradictionConfigPanel.add(controlPanel, BorderLayout.PAGE_START);
+        contradictionConfigPanel.add(descriptionScroll, BorderLayout.CENTER);
 
-        return conflictConfigPanel;
+        return contradictionConfigPanel;
+    }
+    
+    private Component makePrecedencePreferencePanel() {
+        JPanel precedenceConfigPanel = new JPanel(new BorderLayout());
+
+        JPanel controlPanel = new JPanel(new GridLayout(1, 1));
+
+        final JTextPane descriptionPanel = new JTextPane();
+        descriptionPanel.setEditable(false);
+        descriptionPanel.setContentType("text/html");
+        JScrollPane descriptionScroll =
+                new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JComboBox precedenceCombo = new JComboBox(PRECEDENCE.values());
+        precedenceCombo.setSelectedItem(aceFrameConfig.getPrecedence());
+        descriptionPanel.setText(aceFrameConfig.getPrecedence().getDescription());
+        precedenceCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionevent) {
+                JComboBox cb = (JComboBox) actionevent.getSource();
+                PRECEDENCE selectedPrecedence = (PRECEDENCE) cb.getSelectedItem();
+                aceFrameConfig.setPrecedence(selectedPrecedence);
+                descriptionPanel.setText(selectedPrecedence.getDescription());
+            }
+        });
+
+        controlPanel.add(precedenceCombo);
+
+        precedenceConfigPanel.add(controlPanel, BorderLayout.PAGE_START);
+        precedenceConfigPanel.add(descriptionScroll, BorderLayout.CENTER);
+
+        return precedenceConfigPanel;
     }
 
     private JComponent makeTypeFilterPanel() throws TerminologyException, IOException {
@@ -2287,7 +2330,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         tabs.addTab("filters", makeTypeFilterPanel());
         tabs.addTab("status", makeStatusPrefPanel());
         tabs.addTab("taxonomy", makeTaxonomyPrefPanel());
-        tabs.addTab("conflict", makeConflictViewPanel());
         tabs.addTab("component", makeComponentConfig());
         return tabs;
     }

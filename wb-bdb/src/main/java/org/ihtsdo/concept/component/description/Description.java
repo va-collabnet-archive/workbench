@@ -10,24 +10,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.util.HashFunction;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
@@ -354,16 +352,15 @@ public class Description
 		return vList.get(vList.size() - 1);
 	}
 	@Override
-	public List<Version> getVersions(
-			boolean returnConflictResolvedLatestState)
+	public List<Version> getVersions(I_ManageContradiction contradictionMgr)
 			throws TerminologyException, IOException {
-		return getTuples(returnConflictResolvedLatestState);
+		return getTuples(contradictionMgr);
 	}
 
 	@Override
-	public List<Version> getTuples(
-			boolean returnConflictResolvedLatestState)
+	public List<Version> getTuples(I_ManageContradiction contradictionMgr)
 			throws TerminologyException, IOException {
+	    // TODO implement I_ManageContradiction contradictionMgr
 		return getVersions();
 	}
 
@@ -437,46 +434,21 @@ public class Description
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Description.Version> matchingTuples) {
+			List<Description.Version> matchingTuples, PRECEDENCE precedence,
+			I_ManageContradiction contradictionMgr) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition,
-				matchingTuples, getVersions());
+				matchingTuples, getVersions(), precedence, contradictionMgr);
 	}
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
-			boolean addUncommitted) {
+			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples, 
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
-				returnTuples, addUncommitted, getVersions());
+				returnTuples, getVersions(), precedence, contradictionMgr);
 		matchingTuples.addAll(returnTuples);
 	}
-
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		List<Version> returnTuples = new ArrayList<Version>();
-
-		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
-				returnTuples, addUncommitted, getVersions());
-
-		if (returnConflictResolvedLatestState) {
-			I_ConfigAceFrame config = Terms.get()
-					.getActiveAceFrameConfig();
-			I_ManageConflict conflictResolutionStrategy;
-			if (config == null) {
-				conflictResolutionStrategy = new IdentifyAllConflictStrategy();
-			} else {
-				conflictResolutionStrategy = config
-						.getConflictResolutionStrategy();
-			}
-
-			returnTuples = conflictResolutionStrategy.resolveTuples(returnTuples);
-		}
-		matchingTuples.addAll(returnTuples);
-	}
-
 
 	public String getText() {
 		return text;
@@ -564,13 +536,13 @@ public class Description
 
 	@Override
 	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptId();
         Collection<Version> matchingTuples = computer.
         	getSpecifiedVersions(allowedStatus, 
         			viewPosition, 
-        			getVersions());
+        			getVersions(), precedence, null);
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {

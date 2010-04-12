@@ -126,7 +126,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 List<I_GetConceptData> historyToRemove = new ArrayList<I_GetConceptData>();
                 for (I_GetConceptData historyItem : tabHistoryList) {
                     try {
-                        if (Terms.get().getUids(historyItem.getConceptId()) != null) {
+                        if (historyItem.getConceptId() != 0 && Terms.get().getUids(historyItem.getConceptId()) != null) {
                             JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
                             popup.add(menuItem);
                         } else {

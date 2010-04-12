@@ -256,6 +256,8 @@ public class ModifyUserRolePanel extends JPanel {
     private Set<I_GetConceptData> getValidUsers() {
         HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
         try {
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_GetConceptData userParent =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
@@ -263,7 +265,7 @@ public class ModifyUserRolePanel extends JPanel {
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes, true, true);
+            Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes);
             I_GetConceptData descriptionType =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = Terms.get().newIntSet();
@@ -276,7 +278,8 @@ public class ModifyUserRolePanel extends JPanel {
 
                 List<? extends I_DescriptionTuple> descriptionResults =
                         user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
-                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+                            config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -420,6 +423,8 @@ public class ModifyUserRolePanel extends JPanel {
     public class RemoveRoleButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent arg0) {
             try {
+                // TODO replace with passed in config...
+                I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                 I_TermFactory termFactory = Terms.get();
                 I_GetConceptData currentUser = (I_GetConceptData) userComboBox.getSelectedItem();
                 I_GetConceptData currentHierarchy = (I_GetConceptData) hierarchyComboBox.getSelectedItem();
@@ -433,7 +438,8 @@ public class ModifyUserRolePanel extends JPanel {
 
                     List<? extends I_RelTuple> roleRels =
                             currentUser.getSourceRelTuples(currentStatus, roleAllowedTypes, termFactory
-                                .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                                .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+                                config.getPrecedence(), config.getConflictResolutionStrategy());
 
                     for (I_RelTuple roleRel : roleRels) {
                         if (currentHierarchy.getConceptId() == roleRel.getC2Id()) {
@@ -454,7 +460,6 @@ public class ModifyUserRolePanel extends JPanel {
                 }
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
-                I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
                 Set<I_Position> viewPositionSet = config.getViewPositionSet();
                 PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
                 if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
@@ -463,7 +468,8 @@ public class ModifyUserRolePanel extends JPanel {
                             + " promotionPaths: " + promotionPaths);
                 }
                 I_Position viewPosition = viewPositionSet.iterator().next();
-                currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), config.getAllowedStatus());
+                currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
+                    config.getAllowedStatus(), config.getPrecedence());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 

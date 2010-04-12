@@ -35,10 +35,10 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.utypes.UniversalAcePosition;
@@ -282,10 +282,9 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	    	        // Retrieves tuples matching the specified allowedStatuses and positions - tuples are 
 	        		// returned in the supplied specTuples List parameter
 	        		allowedStatus = currentStatus; 
-	        		boolean addUncommitted = false;
-	        		boolean returnConflictResolvedLatestState = false;
 	        		List<I_ExtendByRefVersion> specTuples = new ArrayList<I_ExtendByRefVersion>();
-	        		ext.addTuples(allowedStatus,new PositionSetReadOnly(refsetPositionSet), specTuples, addUncommitted, returnConflictResolvedLatestState);
+	        		ext.addTuples(allowedStatus,new PositionSetReadOnly(refsetPositionSet), specTuples, 
+	        		    config.getPrecedence(), config.getConflictResolutionStrategy());
 
 	    	        //TODO Remove DEBUG statements! 
 	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
@@ -311,7 +310,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        				I_GetConceptData part3 = termFactory.getConcept(ccPart.getC3id());
 		
 	        				boolean hasRetiredConcept = false;
-	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet, 
+	        				    config.getPrecedence(), config.getConflictResolutionStrategy()).size() > 0) {
 	        					// Need to refresh this one...
 	        				    hasRetiredConcept = true;
 		    	    	        //TODO Remove DEBUG statements! 
@@ -319,14 +319,16 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 		    	    	        		+ "\n	Need to refresh part 1: " + part1.getInitialText()); 
 
 	        				}
-	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy()).size() > 0) {
 	        					// Need to refresh this one...
                                 hasRetiredConcept = true;
 		    	    	        //TODO Remove DEBUG statements! 
 		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
 		    	    	        		+ "\n	Need to refresh part 2: " + part1.getInitialText()); 
 	        				}
-	        				if (part3.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        				if (part3.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy()).size() > 0) {
 	        					// Need to refresh this one...
                                 hasRetiredConcept = true;
 		    	    	        //TODO Remove DEBUG statements! 
@@ -353,14 +355,16 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 	        				I_GetConceptData part2 = termFactory.getConcept(ccPart.getC2id());
                             boolean hasRetiredConcept = false;
 		
-	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        				if (part1.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy()).size() > 0) {
 	        					// Need to refresh this one...
                                 hasRetiredConcept = true;
 		    	    	        //TODO Remove DEBUG statements! 
 		    	    	        System.out.println("DEBUG: RefreshRefsetSpecCompareTask.evaluate()" 
 		    	    	        		+ "\n	Need to refresh part 1: " + part1.getInitialText()); 
 	        				}
-	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet).size() > 0) {
+	        				if (part2.getConceptAttributeTuples(notCurrentStatus, snomedPositionSet, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy()).size() > 0) {
 	        					// Need to refresh this one...
                                 hasRetiredConcept = true;
 		    	    	        //TODO Remove DEBUG statements! 

@@ -45,8 +45,9 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public Set<TimePathId> getTimePathSet();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<I_ImageTuple> returnImages);
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, 
+            PositionSetReadOnly positions, List<I_ImageTuple> returnImages, 
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager);
 
     public UniversalAceImage getUniversal() throws IOException, TerminologyException;
 }

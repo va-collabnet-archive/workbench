@@ -122,9 +122,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 			List<? extends I_ConceptAttributeTuple> tuples2 = attr.getTuples(conceptPanel.getConfig().getAllowedStatus(), 
 					conceptPanel.getConfig().getViewPositionSetReadOnly());
 			List<? extends I_ConceptAttributeTuple> tuples3 = igcd.getConceptAttributeTuples(null, 
-            		conceptPanel.getConfig().getViewPositionSetReadOnly(), true, true);
+            		conceptPanel.getConfig().getViewPositionSetReadOnly(), 
+            		conceptPanel.getConfig().getPrecedence(), conceptPanel.getConfig().getConflictResolutionStrategy());
 			List<? extends I_ConceptAttributeTuple> tuples4 = igcd.getConceptAttributeTuples(null, 
-            		conceptPanel.getConfig().getViewPositionSetReadOnly(), true, false);
+            		conceptPanel.getConfig().getViewPositionSetReadOnly(), 
+                    conceptPanel.getConfig().getPrecedence(), conceptPanel.getConfig().getConflictResolutionStrategy());
 			AceLog.getAppLog().info("attr: " + attr);
 			AceLog.getAppLog().info("tuples 1: " + tuples);
 			AceLog.getAppLog().info("tuples 2: " + tuples2);

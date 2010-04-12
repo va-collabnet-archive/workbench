@@ -302,15 +302,19 @@ public class TupleFileUtil {
                 "No marked parent refset found - the member refset should have a 'marked parent refset' relationship to the marked parent refset.");
         }
 
-        I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
+        I_IntSet allowedStatus = config.getAllowedStatus();
         I_IntSet allowedTypes = null;
-        PositionSetReadOnly positions = termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
+        PositionSetReadOnly positions = config.getViewPositionSetReadOnly();
 
         // refset spec
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(refsetSpec));
         tupleCounter.conceptTupleCount++;
         List<? extends I_DescriptionTuple> descTuples =
-                refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
+                refsetSpec.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -319,7 +323,8 @@ public class TupleFileUtil {
         // marked parent refset
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(markedParentRefset));
         tupleCounter.conceptTupleCount++;
-        descTuples = markedParentRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
+        descTuples = markedParentRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -328,7 +333,8 @@ public class TupleFileUtil {
         // member refset
         exportFileWriter.append(ConceptTupleFileUtil.exportTuple(memberRefset));
         tupleCounter.conceptTupleCount++;
-        descTuples = memberRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
+        descTuples = memberRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descTuples) {
             exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
             tupleCounter.descTupleCount++;
@@ -338,7 +344,8 @@ public class TupleFileUtil {
         if (commentsRefset != null) {
             exportFileWriter.append(ConceptTupleFileUtil.exportTuple(commentsRefset));
             tupleCounter.conceptTupleCount++;
-            descTuples = commentsRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
+            descTuples = commentsRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_DescriptionTuple tuple : descTuples) {
                 exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
                 tupleCounter.descTupleCount++;
@@ -349,7 +356,8 @@ public class TupleFileUtil {
         if (promotionRefset != null) {
             exportFileWriter.append(ConceptTupleFileUtil.exportTuple(promotionRefset));
             tupleCounter.conceptTupleCount++;
-            descTuples = promotionRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, true);
+            descTuples = promotionRefset.getDescriptionTuples(allowedStatus, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_DescriptionTuple tuple : descTuples) {
                 exportFileWriter.append(DescTupleFileUtil.exportTuple(tuple));
                 tupleCounter.descTupleCount++;
@@ -358,31 +366,36 @@ public class TupleFileUtil {
 
         // relationships (need to be created after the descriptions)
         List<? extends I_RelTuple> relTuples =
-                memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+                memberRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
-        relTuples = markedParentRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+        relTuples = markedParentRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
-        relTuples = refsetSpec.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+        relTuples = refsetSpec.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple tuple : relTuples) {
             exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
             tupleCounter.relTupleCount++;
         }
         // optional comments and promotions relationships
         if (commentsRefset != null) {
-            relTuples = commentsRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+            relTuples = commentsRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple tuple : relTuples) {
                 exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
                 tupleCounter.relTupleCount++;
             }
         }
         if (promotionRefset != null) {
-            relTuples = promotionRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, true, true);
+            relTuples = promotionRefset.getSourceRelTuples(allowedStatus, allowedTypes, positions, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple tuple : relTuples) {
                 exportFileWriter.append(RelTupleFileUtil.exportTuple(tuple));
                 tupleCounter.relTupleCount++;
@@ -483,11 +496,9 @@ public class TupleFileUtil {
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         for (I_ExtendByRef ext : extensions) {
-            boolean addUncommitted = true;
-            boolean returnConflictResolvedLatestState = true;
             List<? extends I_ExtendByRefVersion> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), null, addUncommitted,
-                        returnConflictResolvedLatestState);
+                    ext.getTuples(helper.getCurrentStatusIntSet(), null,
+                        configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
 
             if (extensions.size() > 0) {
                 I_ExtendByRefVersion thinTuple = tuples.get(0);
@@ -539,11 +550,9 @@ public class TupleFileUtil {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
             I_ExtendByRef currExt = (I_ExtendByRef) childNode.getUserObject();
 
-            boolean addUncommitted = true;
-            boolean returnConflictResolvedLatestState = true;
             List<? extends I_ExtendByRefVersion> extensions =
                     currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(),
-                        addUncommitted, returnConflictResolvedLatestState);
+                        configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
             if (extensions.size() > 0) {
                 I_ExtendByRefVersion thinTuple = extensions.get(0);
                 I_ExtendByRefPart thinPart = thinTuple.getMutablePart();
@@ -599,9 +608,13 @@ public class TupleFileUtil {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
         List<? extends I_RelTuple> relationships =
                 concept.getSourceRelTuples(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes,
-                    Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                    Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple rel : relationships) {
             if (rel.getTime() > latestVersion) {
                 latestVersion = rel.getTime();
@@ -628,9 +641,13 @@ public class TupleFileUtil {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(relationshipType.getConceptId());
 
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
         List<? extends I_RelTuple> relationships =
                 concept.getDestRelTuples(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms
-                    .get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                    .get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_RelTuple rel : relationships) {
             if (rel.getTime() > latestVersion) {
                 latestVersion = rel.getTime();

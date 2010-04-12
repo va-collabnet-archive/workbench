@@ -58,9 +58,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelationshipTableRenderer;
@@ -138,17 +138,21 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
         List<I_ExtendByRefVersion> tuples =
-                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), new PositionSetReadOnly(refsetSpecVersionSet), false, false);
+                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(),
+                    new PositionSetReadOnly(refsetSpecVersionSet),
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
         for (I_ExtendByRefVersion tuple : tuples) {
             if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
                 I_ExtendByRefPartCidCid ccPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart();
                 I_GetConceptData part1 = tf.getConcept(ccPart.getC1id());
                 I_GetConceptData part2 = tf.getConcept(ccPart.getC2id());
 
-                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet, 
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part1;
                 }
-                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet, 
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part2;
                 }
                 break;
@@ -161,13 +165,16 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
 
                 boolean hasRetiredConcept = false;
-                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet, frameConfig.getPrecedence(),
+                    frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part1;
                 }
-                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet, 
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part2;
                 }
-                if (part3.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet).size() > 0) {
+                if (part3.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part3;
                 }
                 break;
@@ -257,7 +264,9 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
 
         List<I_ExtendByRefVersion> tuples =
-                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), false, false);
+                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), 
+                    frameConfig.getViewPositionSetReadOnly(), 
+                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
 
         I_ExtendByRefVersion tuple = tuples.iterator().next();
         if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
@@ -584,7 +593,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 Collection<UUID> clauseIds = clausesToUpdate.remove(0);
                 I_ExtendByRef member = tf.getExtension(tf.uuidToNative(clauseIds));
                 List<I_ExtendByRefVersion> tuples = new ArrayList<I_ExtendByRefVersion>();
-                member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, false);
+                member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy());
                 PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
                 int newMemberNid =
                         tf.uuidToNative(UUID.randomUUID());
@@ -663,16 +673,21 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                         //
                     }
                     tf.commit();
-                    member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, retiredSet);
+                    member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                        retiredSet, frameConfig.getPrecedence());
                     tf.addUncommitted(member);
-                    newMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                    newMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                        currentSet, frameConfig.getPrecedence());
                     tf.addUncommitted(newMember);
-                    newMemberId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                    newMemberId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                        currentSet, frameConfig.getPrecedence());
                     if (comment != null) {
-                        comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                        comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                            currentSet, frameConfig.getPrecedence());
                         tf.addUncommitted(comment);
                         if (commentId != null) {
-                            commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                            commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                                currentSet, frameConfig.getPrecedence());
                             commentRefset.getUncommittedIdVersioned().add(commentId);
                             tf.addUncommitted(commentRefset);
                         }
@@ -686,7 +701,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             Collection<UUID> clauseIds = clausesToUpdate.remove(0);
             I_ExtendByRef member = tf.getExtension(tf.uuidToNative(clauseIds));
             List<I_ExtendByRefVersion> tuples = new ArrayList<I_ExtendByRefVersion>();
-            member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, false);
+            member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, 
+                                config.getPrecedence(), config.getConflictResolutionStrategy());
             PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
             for (I_Path p : config.getEditingPathSet()) {
                 for (I_ExtendByRefVersion tuple : tuples) {
@@ -718,13 +734,16 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                     //
                 }
                 tf.commit();
-                member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, retiredSet);
+                member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                    retiredSet, frameConfig.getPrecedence());
                 tf.addUncommitted(member);
                 if (comment != null) {
-                    comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                    comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                        currentSet, frameConfig.getPrecedence());
                     tf.addUncommitted(comment);
                     if (commentId != null) {
-                        commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, currentSet);
+                        commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                            currentSet, frameConfig.getPrecedence());
                         commentRefset.getUncommittedIdVersioned().add(commentId);
                         tf.addUncommitted(commentRefset);
                     }

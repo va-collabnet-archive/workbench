@@ -31,15 +31,15 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class ConflictManagementStrategy implements I_ManageConflict {
+public abstract class ConflictManagementStrategy implements I_ManageContradiction {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,7 +52,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
      * relationships,
      * extensions etc) it will check through each.
      * 
-     * @see org.dwfa.ace.api.I_ManageConflict#isInConflict(org.dwfa.ace.api.I_GetConceptData,
+     * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      *      boolean)
      */
     public boolean isInConflict(I_GetConceptData concept, boolean includeDependentEntities) throws IOException,
@@ -113,7 +113,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
         }
 
         List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(config.getAllowedStatus(),
-            config.getViewPositionSetReadOnly());
+            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
         return doesConflictExist(tuples);
     }
 
@@ -145,7 +145,8 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         List<I_ImageTuple> matchingTuples = new ArrayList<I_ImageTuple>();
 
-        image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(), matchingTuples);
+        image.addTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(), 
+            matchingTuples, config.getPrecedence(), config.getConflictResolutionStrategy());
 
         return doesConflictExist(matchingTuples);
     }
@@ -161,7 +162,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         I_IntSet srcTypes = config.getSourceRelTypes();
         relationship.addTuples(config.getAllowedStatus(), srcTypes.getSetValues().length == 0 ? null : srcTypes,
-            config.getViewPositionSetReadOnly(), matchingTuples, true);
+            config.getViewPositionSetReadOnly(), matchingTuples, config.getPrecedence(), config.getConflictResolutionStrategy());
 
         return doesConflictExist(matchingTuples);
     }
@@ -177,7 +178,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         I_IntSet descTypes = config.getDescTypes();
         description.addTuples(config.getAllowedStatus(), descTypes.getSetValues().length == 0 ? null : descTypes,
-            config.getViewPositionSetReadOnly(), matchingTuples, true);
+            config.getViewPositionSetReadOnly(), matchingTuples, config.getPrecedence(), config.getConflictResolutionStrategy());
 
         return doesConflictExist(matchingTuples);
     }
@@ -191,7 +192,7 @@ public abstract class ConflictManagementStrategy implements I_ManageConflict {
 
         List<I_ExtendByRefVersion> matchingTuples = new ArrayList<I_ExtendByRefVersion>();
 
-        extension.addTuples(null, null, matchingTuples, true, false);
+        extension.addTuples(null, null, matchingTuples, config.getPrecedence(), config.getConflictResolutionStrategy());
 
         return doesConflictExist(matchingTuples);
     }

@@ -9,8 +9,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -288,13 +290,13 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	
 	@Override
 	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptId();
         Collection<Version> matchingTuples = 
         	getVersionComputer().getSpecifiedVersions(allowedStatus, 
         			viewPosition, 
-        			getVersions());
+        			getVersions(), precedence, null);
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
@@ -333,14 +335,6 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@Override
 	public int getRefsetId() {
 		return enclosingConceptNid;
-	}
-
-
-	@Override
-	public List<I_ExtendByRefVersion> getTuples(boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		throw new UnsupportedOperationException();
 	}
 
 
@@ -435,23 +429,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<I_ExtendByRefVersion> returnTuples, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
+			List<I_ExtendByRefVersion> returnTuples, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
-				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
-		returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
-	}
-
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<I_ExtendByRefVersion> returnTuples, boolean addUncommitted) {
-		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
-		getVersionComputer().addSpecifiedVersions(allowedStatus, 
-				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
+				positions, versionsToAdd, (List<Version>) getVersions(), precedencePolicy, contradictionManager);
 		returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
 	}
 
@@ -459,12 +441,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addTuples(List<I_ExtendByRefVersion> returnTuples,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
+	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), 
 				Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), versionsToAdd, 
-				addUncommitted, (List<Version>) getVersions());
+				(List<Version>) getVersions(), precedencePolicy, contradictionManager);
 		returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
 	}
 
@@ -472,26 +454,22 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, boolean addUncommitted,
-			boolean returnConflictResolvedLatestState)
+			PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
-				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
+				positions, versionsToAdd, (List<Version>) getVersions(), precedencePolicy, contradictionManager);
 		return versionsToAdd;
 	}
 
+    @Override
+    public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
+            throws TerminologyException, IOException {
+        // TODO Implement contradictionMgr part...
+        return getVersions();
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, boolean addUncommitted) {
-		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
-		getVersionComputer().addSpecifiedVersions(allowedStatus, 
-				positions, versionsToAdd, addUncommitted, (List<Version>) getVersions());
-		return versionsToAdd;
-	}
-	
+
 
 	@Override
 	protected void clearVersions() {

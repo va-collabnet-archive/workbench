@@ -107,10 +107,10 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
             typeSet.add(relTypeConcept.getConceptId());
 
             for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
-                false)) {
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 for (I_Path editPath : config.getEditingPathSet()) {
                     List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
-                        positionsForEdit, false);
+                        positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {
                         if (t.getStatusId() != newStatusConcept.getConceptId()) {

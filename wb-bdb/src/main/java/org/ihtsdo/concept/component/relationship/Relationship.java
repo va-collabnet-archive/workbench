@@ -9,12 +9,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
@@ -24,7 +26,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
@@ -373,9 +374,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Version> matchingTuples) {
+			List<Version> matchingTuples, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples,
-				getTuples());
+				getTuples(), precedencePolicy, contradictionManager);
 	}
 
 	@Deprecated
@@ -450,12 +451,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return versions;
 	}
 	
-	public List<Version> getVersions(boolean resolveConflicts) {
+	public List<Version> getVersions(I_ManageContradiction contradictionManager) {
 		// TODO implement conflict resolution
 		return getTuples();
 	}
 	
-	public List<Version> getTuples(boolean resolveConflicts) {
+	public List<Version> getTuples(I_ManageContradiction contradictionManager) {
 		// TODO implement conflict resolution
 		return getTuples();
 	}
@@ -483,13 +484,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 		return universal;
 	}
-	
-	@Override
-	@Deprecated
-	public boolean removeRedundantRecs() {
-		// nothing to do...
-		return false;
-	}
 
 	@Override
 	public void setC2Id(int destNid) {
@@ -499,13 +493,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus)
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptId();
         Collection<Version> matchingTuples = computer.
         	getSpecifiedVersions(allowedStatus, 
         			viewPosition, 
-        			getVersions());
+        			getVersions(), precedence, null);
         boolean promotedAnything = false;
         for (I_Path promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
@@ -525,22 +519,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, List<I_RelTuple> relTupleList,
-			boolean addUncommitted) {
+			PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> tuplesToReturn = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
-					addUncommitted, getVersions());
-		relTupleList.addAll(tuplesToReturn);
-	}
-
-
-	@Override
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_RelTuple> relTupleList,
-			boolean addUncommitted, boolean returnConflictResolvedLatestState)
-			throws TerminologyException, IOException {
-		List<Version> tuplesToReturn = new ArrayList<Version>();
-		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
-					addUncommitted, getTuples());
+					getVersions(), precedencePolicy, contradictionManager);
 		relTupleList.addAll(tuplesToReturn);
 	}
 
@@ -641,17 +623,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public List<? extends I_RelPart> getMutableParts() {
 		return getVersions();
 	}
-
-
-	public ArrayList<Relationship.Version> getMatches(KindOfSpec spec) {
-		ArrayList<Relationship.Version> versionsToReturn = 
-			new ArrayList<Version>();
-		computer.addSpecifiedVersions(spec.allowedStatusNids, 
-				spec.relTypeNids, spec.getViewPositionSet(), versionsToReturn,
-				false, getVersions());
-		return versionsToReturn;
-	}
-
 
 	@Override
 	protected void clearVersions() {

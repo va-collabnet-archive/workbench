@@ -130,7 +130,8 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		List<? extends I_RelTuple> parenttuples = concept.getSourceRelTuples(
 				getStatuses(),
 				(this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A)
-						: getIntSet(this.altIsA)), null, false);
+						: getIntSet(this.altIsA)), null,
+			            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
 		/*
 		 * Iterate over children
@@ -157,16 +158,16 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
 	public boolean isValidStatus(I_ConceptAttributeTuple att)
 			throws TerminologyException, IOException {
-		return att.getConceptStatus() == termFactory.getConcept(
+		return att.getStatusId() == termFactory.getConcept(
 				ArchitectonicAuxiliary.Concept.CURRENT.getUids())
 				.getConceptId()
-				|| att.getConceptStatus() == termFactory.getConcept(
+				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
 						.getConceptId()
-				|| att.getConceptStatus() == termFactory.getConcept(
+				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED
 								.getUids()).getConceptId()
-				|| att.getConceptStatus() == termFactory.getConcept(
+				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE
 								.getUids()).getConceptId();
 	}
@@ -207,7 +208,8 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		List<? extends I_RelTuple> childrentuples = concept.getDestRelTuples(
 				getStatuses(),
 				(this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A)
-						: getIntSet(this.altIsA)), null, false);
+						: getIntSet(this.altIsA)), null,
+			            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
 		/*
 		 * Iterate over children
@@ -249,7 +251,8 @@ public abstract class RefsetUtilities extends LineageHelper implements
 				.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
 		Set<? extends I_GetConceptData> refsetChildren = refsetRoot
-				.getDestRelOrigins(status, is_a, null, false);
+				.getDestRelOrigins(status, is_a, null,
+		            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 		for (I_GetConceptData refsetConcept : refsetChildren) {
 			Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
@@ -344,7 +347,8 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
 		I_GetConceptData memberSetSpecConcept = assertOneOrNone(getConcept(
 				refsetId).getSourceRelTargets(currentIntSet,
-				generatesRelIntSet, null, false));
+				generatesRelIntSet, null,
+	            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy()));
 		return memberSetSpecConcept;
 	}
 
@@ -508,7 +512,8 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		Set<? extends I_GetConceptData> membershipTypes = concept
 				.getSourceRelTargets(
 						getIntSet(ArchitectonicAuxiliary.Concept.CURRENT),
-						getIntSet(relType), null, false);
+						getIntSet(relType), null,
+			            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
 		if (membershipTypes.size() == 0) {
 			throw new TerminologyException("A source relationship of type '"

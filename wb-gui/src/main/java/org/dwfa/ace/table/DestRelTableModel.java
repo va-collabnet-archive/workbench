@@ -65,7 +65,8 @@ public class DestRelTableModel extends RelTableModel {
             }
             if (rel != null) {
                 try {
-                    rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, true, !showHistory);
+                    rel.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, host.getConfig().getPrecedence(), 
+                        host.getConfig().getConflictResolutionStrategy());
                 } catch (TerminologyException e) {
                     throw new ToIoException(e);
                 }

@@ -701,7 +701,8 @@ public class RefsetSpecPanel extends JPanel {
                         if (promotionRefsetId == extForMember.getRefsetId()) {
                             List<? extends I_ExtendByRefVersion> promotionTuples =
                                     extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
-                                        .getViewPositionSetReadOnly(), false, false);
+                                        .getViewPositionSetReadOnly(), aceFrameConfig.getPrecedence(),
+                                        aceFrameConfig.getConflictResolutionStrategy());
                             if (promotionTuples.size() > 0) {
                                 I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
                                 if (promotionPart instanceof I_ExtendByRefPartCid) {
@@ -724,7 +725,7 @@ public class RefsetSpecPanel extends JPanel {
                                         
                                             extForMember.addVersion(analog);
                                             extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
-                                                currentSet);
+                                                currentSet, aceFrameConfig.getPrecedence());
                                         }
                                     }
                                 }

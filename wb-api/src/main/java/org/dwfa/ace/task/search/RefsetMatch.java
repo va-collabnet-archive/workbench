@@ -110,13 +110,13 @@ public class RefsetMatch extends AbstractSearchTest {
     }
 
     private boolean isComponentInRefset(I_ConfigAceFrame frameConfig, I_TermFactory termFactory, int componentId,
-            int refsetId) throws IOException {
+            int refsetId) throws IOException, TerminologyException {
         List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ExtendByRef thinExtByRefVersioned : extensions) {
             List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
             thinExtByRefVersioned.addTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
-                returnTuples, false);
+                returnTuples, frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
             for (I_ExtendByRefVersion thinExtByRefTuple : returnTuples) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
                     return true;

@@ -135,13 +135,15 @@ public class VerifyValidIsNotADups extends AbstractTask {
             pendingRetirementStatusSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
             for (I_GetConceptData notDupConcept : selectedConcept.getSourceRelTargets(pendingRetirementStatusSet,
-                isNotDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
+                isNotDupTypeSet, config.getViewPositionSetReadOnly(), 
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
 
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<? extends I_ConceptAttributeTuple> statusTuples = notDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSetReadOnly());
+                    config.getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples)
                     return Condition.FALSE;
@@ -149,13 +151,15 @@ public class VerifyValidIsNotADups extends AbstractTask {
             }// End for loop
 
             for (I_GetConceptData notDupConcept : selectedConcept.getDestRelOrigins(pendingRetirementStatusSet,
-                isNotDupTypeSet, config.getViewPositionSetReadOnly(), true)) {
+                isNotDupTypeSet, config.getViewPositionSetReadOnly(), 
+                config.getPrecedence(), config.getConflictResolutionStrategy())) {
 
                 I_IntSet statusTypeSet = termFact.newIntSet();
                 statusTypeSet.add(termFact.uuidToNative(ArchitectonicAuxiliary.Concept.DUPLICATE_PENDING_RETIREMENT.getUids()));
 
                 List<? extends I_ConceptAttributeTuple> statusTuples = notDupConcept.getConceptAttributeTuples(statusTypeSet,
-                    config.getViewPositionSetReadOnly());
+                    config.getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
                 for (I_ConceptAttributeTuple tuple : statusTuples)
                     return Condition.FALSE;

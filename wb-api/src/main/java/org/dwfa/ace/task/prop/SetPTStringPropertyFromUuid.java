@@ -107,7 +107,9 @@ public class SetPTStringPropertyFromUuid extends AbstractTask {
 
         List<? extends I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
-                    .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true);
+                    .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                    Terms.get().getActiveAceFrameConfig().getPrecedence(),
+                    Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
 
         // find the latest tuple, so that the latest edited version of the
         // description is always used

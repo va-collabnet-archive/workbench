@@ -42,9 +42,9 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
@@ -174,7 +174,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 			} else {
 				List<I_ExtendByRefVersion> tuples = (List<I_ExtendByRefVersion>) specPart
 						.getTuples(aceConfig.getAllowedStatus(), aceConfig
-								.getViewPositionSetReadOnly(), true);
+								.getViewPositionSetReadOnly(), aceConfig.getPrecedence(),
+								aceConfig.getConflictResolutionStrategy());
 
 				if (tuples.iterator().hasNext()) {
 					I_ExtendByRefVersion firstTuple = tuples.iterator().next();
@@ -200,7 +201,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 					popup.add(changeActionItem);
 				} else {
 					tuples = (List<I_ExtendByRefVersion>) specPart.getTuples(
-							null, aceConfig.getViewPositionSetReadOnly(), true);
+							null, aceConfig.getViewPositionSetReadOnly(), 
+							aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
 				}
 			}
 

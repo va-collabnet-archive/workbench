@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
@@ -230,6 +231,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
                 return true;
             }
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -238,7 +241,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childStatuses =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {

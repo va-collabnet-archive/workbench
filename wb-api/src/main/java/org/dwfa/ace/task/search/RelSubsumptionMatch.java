@@ -108,7 +108,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
             }
 
             List<? extends I_RelTuple> tuples = testConcept.getSourceRelTuples(frameConfig.getAllowedStatus(), null,
-                frameConfig.getViewPositionSetReadOnly(), false);
+                frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
 
             for (I_RelTuple tuple : tuples) {
                 I_GetConceptData relType = Terms.get().getConcept(tuple.getTypeId());
@@ -121,14 +121,16 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 if (relTypeToMatch != null) {
                     if (applySubsumption) {
                         if (relTypeToMatch.isParentOfOrEqualTo(relType, frameConfig.getAllowedStatus(),
-                            frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(), false)) {
+                            frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(),
+                            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy())) {
                             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                                 AceLog.getAppLog().fine("  matched type: " + relType);
                             }
                             if (relRestrictionToMatch != null) {
                                 if (relRestrictionToMatch.isParentOfOrEqualTo(relRestriction,
                                     frameConfig.getAllowedStatus(), frameConfig.getDestRelTypes(),
-                                    frameConfig.getViewPositionSetReadOnly(), false)) {
+                                    frameConfig.getViewPositionSetReadOnly(),
+                                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy())) {
                                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                                         AceLog.getAppLog().fine("  matched restriction: " + relRestriction);
                                         AceLog.getAppLog().fine("Rel subsumption OK1: " + testConcept);
@@ -156,7 +158,8 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 } else if (relRestrictionToMatch != null) {
                     if (applySubsumption) {
                         if (relRestrictionToMatch.isParentOfOrEqualTo(relRestriction, frameConfig.getAllowedStatus(),
-                            frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(), false)) {
+                            frameConfig.getDestRelTypes(), frameConfig.getViewPositionSetReadOnly(),
+                            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy())) {
                             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                                 AceLog.getAppLog().fine("  matched restriction: " + relRestriction);
                                 AceLog.getAppLog().fine("Rel subsumption OK3: " + testConcept);

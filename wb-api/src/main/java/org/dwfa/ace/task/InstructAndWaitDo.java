@@ -235,7 +235,8 @@ public class InstructAndWaitDo extends AbstractTask {
         	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
         }
         PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
-        for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions)) {
+        for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions, 
+            config.getPrecedence(), config.getConflictResolutionStrategy())) {
             // Description is current
             if (desc.getStatusId() != current_status.getConceptId())
                 continue;
@@ -282,7 +283,8 @@ public class InstructAndWaitDo extends AbstractTask {
                 	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
                 }
                 PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
-                for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, false)) {
+                for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, 
+                        config.getPrecedence(), config.getConflictResolutionStrategy())) {
                     termFactory.newRelationship(UUID.randomUUID(), newConcept,
                         termFactory.getConcept(rel.getTypeId()), termFactory.getConcept(rel.getC2Id()),
                         termFactory.getConcept(rel.getCharacteristicId()),

@@ -121,10 +121,8 @@ public class TestForIsa extends AbstractConceptTest {
     private List<? extends I_RelTuple> getSourceRelationships(final I_GetConceptData concept) throws Exception {
         I_IntSet isARelationships = getIsARelationshipList(getTermFactory());
         PositionSetReadOnly allPositions = null;
-        boolean uncommited = true;
-        boolean conflictResolved = true;
 
         return concept.getSourceRelTuples(getActiveProfile().getAllowedStatus(), isARelationships, allPositions,
-            uncommited, conflictResolved);
+            getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
     }
 }

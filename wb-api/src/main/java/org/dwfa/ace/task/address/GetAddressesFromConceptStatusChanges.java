@@ -102,7 +102,8 @@ public class GetAddressesFromConceptStatusChanges extends AbstractTask {
             I_GetConceptData concept = AceTaskUtil.getConceptFromObject(conceptObj);
 
             List<? extends I_ConceptAttributeTuple> attrTupels = concept.getConceptAttributeTuples(
-                workingProfile.getAllowedStatus(), workingProfile.getViewPositionSetReadOnly());
+                workingProfile.getAllowedStatus(), workingProfile.getViewPositionSetReadOnly(),
+                workingProfile.getPrecedence(), workingProfile.getConflictResolutionStrategy());
             I_IntSet pathSet = Terms.get().newIntSet();
 
             for (I_ConceptAttributeTuple t : attrTupels) {

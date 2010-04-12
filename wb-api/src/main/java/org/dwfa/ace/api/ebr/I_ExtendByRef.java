@@ -18,10 +18,11 @@ package org.dwfa.ace.api.ebr;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageContradiction;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 
@@ -63,32 +64,6 @@ public interface I_ExtendByRef extends I_AmTermComponent {
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions -
-     * tuples are returned in the supplied returnTuples List parameter -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            positions a tuple must be on to be returned
-     * @param returnTuples
-     *            List to be populated with the result of the search
-     * @param addUncommitted
-     *            if true matching items from the uncommitted list will be
-     *            added, if false the uncommitted list is ignored
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, List<I_ExtendByRefVersion> returnTuples,
-            boolean addUncommitted);
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses and positions -
      * tuples are returned in the supplied returnTuples List parameter
      * 
      * @param allowedStatus
@@ -107,7 +82,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, List<I_ExtendByRefVersion> returnTuples,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -125,29 +100,8 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public void addTuples(List<I_ExtendByRefVersion> returnTuples, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses and positions
-     * configured in the current profile - <strong>NOTE: this does not use the
-     * conflict management strategy</strong>. It is strongly recommended that
-     * you use a method that does use a conflict management strategy.
-     * 
-     * @see #getTuples(I_IntSet, Set, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            positions a tuple must be on to be returned
-     * @param addUncommitted
-     *            if true matching items from the uncommitted list will be
-     *            added, if false the uncommitted list is ignored
-     * @return matching tuples
-     */
-    @Deprecated
-    public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus, 
-    		PositionSetReadOnly positions, boolean addUncommitted);
+    public void addTuples(List<I_ExtendByRefVersion> returnTuples,
+            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -167,7 +121,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-            boolean addUncommitted, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+        PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -187,7 +141,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public List<? extends I_ExtendByRefVersion> getTuples(boolean addUncommitted, boolean returnConflictResolvedLatestState)
+    public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
             throws TerminologyException, IOException;
 
 	public List<? extends I_ExtendByRefVersion> getTuples();

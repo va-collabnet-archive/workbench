@@ -42,55 +42,6 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions -
-     * tuples are returned in the supplied returnTuples List parameter -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @param returnTuples
-     *            List to be populated with the result of the search
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-            List<I_ConceptAttributeTuple> returnTuples);
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses and positions -
-     * tuples are returned in the supplied returnTuples List parameter -
-     * <strong>NOTE: this does not use the conflict management
-     * strategy</strong>.
-     * It is strongly recommended that you use a method that does use a conflict
-     * management strategy.
-     * 
-     * @see #addTuples(I_IntSet, Set, List, boolean, boolean)
-     * 
-     * @param allowedStatus
-     *            statuses tuples must match to be returned
-     * @param positions
-     *            postions a tuple must be on to be returned
-     * @param returnTuples
-     *            List to be populated with the result of the search
-     * @param addUncommitted
-     *            if true matching items from the uncommitted list will be
-     *            added, if false the uncommitted list is ignored
-     * @throws IOException
-     * @throws TerminologyException
-     */
-    @Deprecated
-    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-            List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted);
-
-    /**
-     * Retrieves tuples matching the specified allowedStatuses and positions -
      * tuples are returned in the supplied returnTuples List parameter
      * 
      * @param allowedStatus
@@ -108,9 +59,10 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public void addTuples(I_IntSet allowedStatus, Set<I_Position> positionSet,
-            List<I_ConceptAttributeTuple> returnTuples, boolean addUncommitted,
-            boolean returnConflictResolvedLatestState) throws TerminologyException, IOException;
+    public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
+            List<I_ConceptAttributeTuple> returnTuples, 
+            PRECEDENCE precedencePolicy, 
+            I_ManageContradiction contradictionManager) throws TerminologyException, IOException;
 
     public I_ConceptualizeLocally getLocalFixedConcept();
 

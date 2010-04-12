@@ -42,7 +42,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
-//import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -61,7 +60,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec; //import org.ihtsdo.db.bdb.Bdb;
+import org.dwfa.util.bean.Spec;
 
 import au.csiro.snorocket.core.IFactory_123;
 import au.csiro.snorocket.snapi.Snorocket_123;
@@ -255,7 +254,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         try {
             // ** GUI: 1. LOAD DATA INTO CLASSIFIER **
             continueThisAction = true;
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            gui = tf.newActivityPanel(true, config); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -273,7 +272,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
             SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, cEditSnoCons,
-                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, false);
+                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, false, 
+                   config.getPrecedence(), config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcEdit); // :!!!:
             // Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
             logger
@@ -379,7 +379,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             System.gc();
 
             // ** GUI: 2 RUN CLASSIFIER **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            gui = tf.newActivityPanel(true, config); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -406,7 +406,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // ** GUI: * GET CLASSIFIER EQUIVALENTS **
             // Show in activity viewer
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig());
+            gui = tf.newActivityPanel(true, config);
             gui.addActionListener(this);
             gui.setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
             gui.setIndeterminate(true);
@@ -434,7 +434,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
 
             // ** GUI: 3 GET CLASSIFIER RESULTS **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            gui = tf.newActivityPanel(true, config); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -474,7 +474,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            gui = tf.newActivityPanel(true, config); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -488,7 +488,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
-                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, gui, true);
+                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, gui, true,
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -519,7 +520,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // ** GUI: 5 WRITE BACK RESULTS **
             gui.complete(); // PHASE 5. DONE
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            gui = tf.newActivityPanel(true, config); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -920,7 +921,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
-            List<? extends I_RelPart> rvList = rBean.getVersions(true);
+            List<? extends I_RelPart> rvList = rBean.getVersions(config.getConflictResolutionStrategy());
 
             if (rvList.size() != 1)
                 logger.info("::: [SnorocketTask] ERROR: writeBackRetired() multiple last versions");
@@ -1030,7 +1031,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 }
             } else {
                 String errStr = "Classifier Root not set! Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + config.getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;
@@ -1041,7 +1042,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 rootRoleNid = tf.uuidToNative(config.getClassificationRoleRoot().getUids());
             } else {
                 String errStr = "Classifier Role Root not set! Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + config.getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;
@@ -1085,7 +1086,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         try {
             if (config.getEditingPathSet().size() != 1) {
                 String errStr = "Profile must have only one edit path. Found: "
-                        + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + config.getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;

@@ -55,34 +55,38 @@ public class TestForIsaCycle extends AbstractConceptTest {
     @Override
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
-        ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+        try {
+            ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
-        List<? extends I_RelVersioned> usrl = concept.getUncommittedSourceRels();
+            List<? extends I_RelVersioned> usrl = (List<? extends I_RelVersioned>) concept.getSourceRels();
 
-        boolean foundCycle = false;
-        for (I_RelVersioned rv : usrl) {
-            List<? extends I_RelTuple> rvtl = rv.getTuples();
-            for (I_RelTuple rt : rvtl) {
-                try {
+            boolean foundCycle = false;
+            for (I_RelVersioned rv : usrl) {
+                List<? extends I_RelTuple> rvtl = rv.getTuples();
+                for (I_RelTuple rt : rvtl) {
+                    try {
 
-                    boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeId(), rt.getC2Id());
-                    if (test)
-                        foundCycle = true;
-                } catch (TerminologyException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                        boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeId(), rt.getC2Id());
+                        if (test)
+                            foundCycle = true;
+                    } catch (TerminologyException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
+
+            if (foundCycle)
+                alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
+                    "<html>Added IS_A relationship will create a cycle. ", concept));
+
+            return alertList;
+        } catch (IOException e) {
+           throw new TaskFailedException(e);
         }
-
-        if (foundCycle)
-            alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-                "<html>Added IS_A relationship will create a cycle. ", concept));
-
-        return alertList;
     }
 
 }

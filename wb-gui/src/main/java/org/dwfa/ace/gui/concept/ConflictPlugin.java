@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 
 public class ConflictPlugin extends AbstractPlugin {
     private static final long serialVersionUID = 1L;
@@ -55,7 +56,7 @@ public class ConflictPlugin extends AbstractPlugin {
         return I_HostConceptPlugins.TOGGLES.CONFLICT.getPluginId();
     }
 
-    public ConflictPanel getComponent(I_HostConceptPlugins host) {
+    public ConflictPanel getComponent(I_HostConceptPlugins host) throws TerminologyException {
         if (conflictPanel == null) {
             setHost(host);
             conflictPanel = new ConflictPanel();
@@ -76,7 +77,7 @@ public class ConflictPlugin extends AbstractPlugin {
     }
 
     @Override
-    public void update() throws IOException {
+    public void update() throws IOException, TerminologyException {
         if (showComponent() && conflictPanel != null) {
             conflictPanel.setConcept((I_GetConceptData) getHost().getTermComponent(), getHost().getConfig());
         }

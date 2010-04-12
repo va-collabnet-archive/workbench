@@ -71,7 +71,7 @@ public class SimilarConceptQuery {
         }
 
         for (I_RelTuple rel : concept.getSourceRelTuples(config.getAllowedStatus(), null, config.getViewPositionSetReadOnly(),
-            true)) {
+            config.getPrecedence(), config.getConflictResolutionStrategy())) {
             // Get "is-a" relationships for is-child-of queries...
             if (config.getSourceRelTypes().contains(rel.getTypeId())) {
                 IsKindOf ico = new IsKindOf();

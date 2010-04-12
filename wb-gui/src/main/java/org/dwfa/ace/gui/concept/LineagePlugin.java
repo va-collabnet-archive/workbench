@@ -228,7 +228,8 @@ public class LineagePlugin extends AbstractPlugin {
         List<List<I_GetConceptData>> lineage = new ArrayList<List<I_GetConceptData>>();
 
         List<? extends I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
-            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), false);
+            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), 
+            getHost().getConfig().getPrecedence(), getHost().getConfig().getConflictResolutionStrategy());
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             if (depth > 3) {
                 String test = "test";

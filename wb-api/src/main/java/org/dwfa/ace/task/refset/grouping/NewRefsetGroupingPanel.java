@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
@@ -177,13 +178,17 @@ public class NewRefsetGroupingPanel extends JPanel {
         HashSet<I_GetConceptData> results = new HashSet<I_GetConceptData>();
         try {
 
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     parent.getDestRelOrigins(currentStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), true, true);
+                        .getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 results.add(child);

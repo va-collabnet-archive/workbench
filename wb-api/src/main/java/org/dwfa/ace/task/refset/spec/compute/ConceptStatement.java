@@ -189,10 +189,13 @@ public class ConceptStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (conceptBeingTested.equals(child)) {
@@ -239,7 +242,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraintConcept.isParentOf(conceptBeingTested, true);
+        return queryConstraintConcept.isParentOf(conceptBeingTested);
     }
 
     /**
@@ -253,7 +256,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, true);
+        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested);
     }
 
     /**
@@ -280,10 +283,13 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
             throws IOException, TerminologyException {
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         List<? extends I_ConceptAttributeTuple> tuples =
                 conceptBeingTested.getConceptAttributeTuples(null, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), true, true);
+                    .getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
         // get latest tuple
         I_ConceptAttributeTuple latestTuple = null;
@@ -338,10 +344,13 @@ public class ConceptStatement extends RefsetSpecStatement {
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-            // get list of all children of input concept
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+           // get list of all children of input concept
             Set<? extends I_GetConceptData> childStatuses =
                     queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), true, true);
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {
@@ -389,10 +398,13 @@ public class ConceptStatement extends RefsetSpecStatement {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> childStatuses =
                     status.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), true, true);
+                        .getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
                 if (conceptStatusIs(conceptBeingTested, childStatus)) {

@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -50,8 +51,9 @@ public class DifferenceRelsSource extends AbstractDifferenceRels {
     }
 
     protected List<? extends I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
-    		PositionSetReadOnly viewSet) throws IOException {
-        return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, false);
+    		PositionSetReadOnly viewSet) throws IOException, TerminologyException {
+        return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, 
+            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
     }
 
 }

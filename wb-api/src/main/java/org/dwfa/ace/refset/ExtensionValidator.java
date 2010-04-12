@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
@@ -105,11 +106,13 @@ public class ExtensionValidator {
             if (inclusionTypeConcept == null)
                 return alertList;
 
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             /*
              * Get "is a" source rels for concept
              */
             Set<? extends I_GetConceptData> inclusionTypes = inclusionTypeConcept.getDestRelOrigins(null, allowedTypes, null,
-                false);
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_ExtendByRef ext : termFactory.getAllExtensionsForComponent(componentId, true)) {
 

@@ -44,12 +44,13 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -69,6 +70,14 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
+
+    public PRECEDENCE getPrecedence() {
+        return config.getPrecedence();
+    }
+
+    public void setPrecedence(PRECEDENCE precedence) {
+        config.setPrecedence(precedence);
+    }
 
     public void refreshRefsetTab() {
         config.refreshRefsetTab();
@@ -139,7 +148,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getAdminUsername();
     }
 
-    public I_ManageConflict[] getAllConflictResolutionStrategies() {
+    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
         return config.getAllConflictResolutionStrategies();
     }
 
@@ -211,7 +220,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getConceptViewer(index);
     }
 
-    public I_ManageConflict getConflictResolutionStrategy() {
+    public I_ManageContradiction getConflictResolutionStrategy() {
         return config.getConflictResolutionStrategy();
     }
 
@@ -692,11 +701,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         config.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
         config.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 

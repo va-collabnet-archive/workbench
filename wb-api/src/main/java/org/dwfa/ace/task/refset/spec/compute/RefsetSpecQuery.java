@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -337,11 +336,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         if (statements.size() == 0 && subqueries.size() == 0) {
             throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
         }
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
         List<? extends I_DescriptionTuple> descriptionTuples =
                 descriptionConcept.getDescriptionTuples(null, null, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), true);
+                    .getViewPositionSetReadOnly(), 
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
         for (I_DescriptionTuple tuple : descriptionTuples) {
             I_DescriptionVersioned descVersioned = tuple.getDescVersioned();

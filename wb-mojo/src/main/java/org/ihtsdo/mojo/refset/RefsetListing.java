@@ -36,13 +36,11 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -107,6 +105,9 @@ public class RefsetListing extends AbstractMojo {
     private File site_output_file;
 
     private void listRefset() throws Exception {
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
         getLog().info("refset list");
         list_file.getParentFile().mkdirs();
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(this.list_file)));
@@ -167,7 +168,8 @@ public class RefsetListing extends AbstractMojo {
                     String head = r_con.getInitialText().replace(" rel", "");
                     I_IntSet r_set = tf.newIntSet();
                     r_set.add(r_con.getConceptId());
-                    for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, true, true)) {
+                    for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, 
+                        config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         // for (int val_id : getRelationship(con.getConceptId(),
                         // r_con.getConceptId(), null, Integer.MAX_VALUE)) {
                         // I_GetConceptData val_con = tf.getConcept(val_id);
@@ -198,7 +200,8 @@ public class RefsetListing extends AbstractMojo {
                     String head = r_con.getInitialText().replace(" rel", "");
                     I_IntSet r_set = tf.newIntSet();
                     r_set.add(r_con.getConceptId());
-                    for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, true, true)) {
+                    for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, 
+                        config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         if (val_con != null) {
                             found = true;
                             out.println("<tr>");
@@ -254,83 +257,6 @@ public class RefsetListing extends AbstractMojo {
         out.close();
     }
 
-    private ArrayList<Integer> getDescendants(int concept_id, I_Path path, int version) throws Exception {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
-        getDescendants1(concept_id, path, version, ret);
-        return ret;
-    }
-
-    private void getDescendants1(int concept_id, I_Path path, int version, ArrayList<Integer> ret) throws Exception {
-        if (ret.contains(concept_id))
-            return;
-        ret.add(concept_id);
-        for (int ch : getChildren(concept_id, path, version)) {
-            getDescendants1(ch, path, version, ret);
-        }
-    }
-
-    private ArrayList<Integer> getChildren(int concept_id, I_Path path, int version) throws Exception {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
-        final I_TermFactory tf = Terms.get();
-        I_GetConceptData c = tf.getConcept(concept_id);
-        for (I_RelVersioned d : c.getDestRels()) {
-            I_RelPart dm = null;
-            for (I_RelPart dd : d.getMutableParts()) {
-                if (path != null && dd.getPathId() != path.getConceptId())
-                    continue;
-                if (!(dd.getTypeId() == tf.getConcept(SNOMED.Concept.IS_A.getUids()).getConceptId() || dd.getTypeId() == tf
-                    .getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId()))
-                    continue;
-                // Find the greatest version <= the one of interest
-                if (dd.getVersion() <= version && (dm == null || dm.getVersion() < dd.getVersion()))
-                    dm = dd;
-            }
-            if (dm != null)
-                System.out.println("Status: " + dm.getStatusId() + " "
-                    + tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-            if (dm != null
-                && dm.getStatusId() == tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId())
-                ret.add(d.getC1Id());
-        }
-        Collections.sort(ret, new Comparator<Integer>() {
-            public int compare(Integer obj1, Integer obj2) {
-                try {
-                    String s1 = tf.getConcept(obj1).getInitialText();
-                    String s2 = tf.getConcept(obj2).getInitialText();
-                    return s1.compareTo(s2);
-                } catch (Exception e) {
-                }
-                return obj1.compareTo(obj2);
-            }
-        });
-        return ret;
-    }
-
-    private ArrayList<Integer> getRelationship(int concept_id, int relationship_id, I_Path path, int version)
-            throws Exception {
-        ArrayList<Integer> ret = new ArrayList<Integer>();
-        I_TermFactory tf = LocalVersionedTerminology.get();
-        I_GetConceptData c = tf.getConcept(concept_id);
-        for (I_RelVersioned d : c.getSourceRels()) {
-            // ret.add(d.getC2Id());
-            I_RelPart dm = null;
-            for (I_RelPart dd : d.getMutableParts()) {
-                if (path != null && dd.getPathId() != path.getConceptId())
-                    continue;
-                if (dd.getTypeId() != relationship_id)
-                    continue;
-                // Find the greatest version <= the one of interest
-                if (dd.getVersion() <= version && (dm == null || dm.getVersion() < dd.getVersion()))
-                    dm = dd;
-            }
-            if (dm != null)
-                // && dm.getStatusId() == tf.getConcept(
-                // ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                // .getConceptId())
-                ret.add(d.getC2Id());
-        }
-        return ret;
-    }
 
     // active status "32dc7b19-95cc-365e-99c9-5095124ebe72"
 
@@ -338,7 +264,7 @@ public class RefsetListing extends AbstractMojo {
     // status.getDestRelOrigins(null, allowedTypes, null, true, true);
 
     private I_IntSet getActiveStatus() throws Exception {
-        final I_TermFactory tf = LocalVersionedTerminology.get();
+        final I_TermFactory tf = Terms.get();
         I_IntSet ret = tf.newIntSet();
         for (Integer s : getCoreDescendants(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid(), null, null)) {
             ret.add(s);
@@ -364,13 +290,16 @@ public class RefsetListing extends AbstractMojo {
     }
 
     private ArrayList<Integer> getCoreChildren(int concept_id, I_IntSet allowed_status, I_Path path) throws Exception {
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         ArrayList<Integer> ret = new ArrayList<Integer>();
-        final I_TermFactory tf = LocalVersionedTerminology.get();
+        final I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(concept_id);
         I_IntSet isa_rels = tf.newIntSet();
         isa_rels.add(SNOMED.Concept.IS_A.localize().getNid());
         isa_rels.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        for (I_GetConceptData d : c.getDestRelOrigins(allowed_status, isa_rels, null, true, true)) {
+        for (I_GetConceptData d : c.getDestRelOrigins(allowed_status, isa_rels, null, 
+            config.getPrecedence(), config.getConflictResolutionStrategy())) {
             ret.add(d.getConceptId());
         }
         Collections.sort(ret, new Comparator<Integer>() {

@@ -153,7 +153,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                     List<Color> pathColors = new ArrayList<Color>();
                     List<? extends I_ConceptAttributeTuple> attributes =
                             cb.getConceptAttributeTuples(aceConfig.getAllowedStatus(), aceConfig
-                                .getViewPositionSetReadOnly(), true);
+                                .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                     for (I_ConceptAttributeTuple t : attributes) {
                         Color pathColor = aceConfig.getColorForPath(t.getPathId());
                         if (pathColor != null) {
@@ -182,7 +182,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
 
                         if (showViewerImagesInTaxonomy) {
                             for (I_ImageTuple imageTuple : cb.getImageTuples(aceConfig.getAllowedStatus(),
-                                viewerImageTypes, aceConfig.getViewPositionSetReadOnly())) {
+                                viewerImageTypes, aceConfig.getViewPositionSetReadOnly(), 
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                 htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
                                     + imageTuple.getConceptId() + "' align=center>");
                             }
@@ -279,7 +280,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                         switch (EConcept.REFSET_TYPES.nidToType(ebr.getTypeId())) {
                                         case BOOLEAN:
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
-                                                returnTuples, false);
+                                                returnTuples, aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                                             for (I_ExtendByRefVersion t : returnTuples) {
                                                 boolean extValue = ((I_ExtendByRefPartBoolean) t.getMutablePart()).getBooleanValue();
 
@@ -294,7 +295,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                     }
                                                     for (I_ImageTuple imageTuple : booleanImageBean.getImageTuples(
                                                         aceConfig.getAllowedStatus(), viewerImageTypes, aceConfig
-                                                            .getViewPositionSetReadOnly())) {
+                                                            .getViewPositionSetReadOnly(), 
+                                                            aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                                         htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()
                                                             + "$" + imageTuple.getConceptId() + "' align=center>");
                                                     }
@@ -305,14 +307,14 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             break;
                                         case CID:
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
-                                                returnTuples, false);
+                                                returnTuples, aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                                             for (I_ExtendByRefVersion t : returnTuples) {
                                             	I_GetConceptData ebrCb =
                                                         Terms.get().getConcept(((I_ExtendByRefPartCid) t.getMutablePart())
                                                             .getC1id());
                                                 for (I_ImageTuple imageTuple : ebrCb.getImageTuples(aceConfig
                                                     .getAllowedStatus(), viewerImageTypes, aceConfig
-                                                    .getViewPositionSetReadOnly())) {
+                                                    .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                                     htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
                                                         + imageTuple.getConceptId() + "' align=center>");
                                                 }
@@ -320,7 +322,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             break;
                                         case INT:
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
-                                                returnTuples, false);
+                                                returnTuples, aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                                             for (I_ExtendByRefVersion t : returnTuples) {
                                                 int extValue = ((I_ExtendByRefPartInt) t.getMutablePart()).getIntValue();
                                                 htmlPrefixes
@@ -329,7 +331,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             break;
                                         case STR:
                                             ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
-                                                returnTuples, false);
+                                                returnTuples, aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                                             for (I_ExtendByRefVersion t : returnTuples) {
                                                 String strExt =
                                                         ((I_ExtendByRefPartStr) t.getMutablePart()).getStringValue();
@@ -380,7 +382,8 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                     
                     List<? extends I_RelTuple> versions =
                             cb.getSourceRelTuples(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(),
-                                aceConfig.getViewPositionSetReadOnly(), false);
+                                aceConfig.getViewPositionSetReadOnly(), 
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                     int sourceRelTupleSize = versions.size(); 
                     if (sourceRelTupleSize > 1) {
                         HashSet<I_RelTuple> unique = new HashSet<I_RelTuple>(versions);

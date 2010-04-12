@@ -44,12 +44,13 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -70,6 +71,14 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
+
+    public PRECEDENCE getPrecedence() {
+        return frameConfig.getPrecedence();
+    }
+
+    public void setPrecedence(PRECEDENCE precedence) {
+        frameConfig.setPrecedence(precedence);
+    }
 
     public void refreshRefsetTab() {
         frameConfig.refreshRefsetTab();
@@ -135,7 +144,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getAdminUsername();
     }
 
-    public I_ManageConflict[] getAllConflictResolutionStrategies() {
+    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
         return frameConfig.getAllConflictResolutionStrategies();
     }
 
@@ -207,7 +216,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getConceptViewer(index);
     }
 
-    public I_ManageConflict getConflictResolutionStrategy() {
+    public I_ManageContradiction getConflictResolutionStrategy() {
         return frameConfig.getConflictResolutionStrategy();
     }
 
@@ -660,11 +669,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageConflict> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageConflict conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 

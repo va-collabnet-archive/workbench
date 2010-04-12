@@ -392,7 +392,7 @@ public class RequestForChangePanel extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }
@@ -430,7 +430,7 @@ public class RequestForChangePanel extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }

@@ -52,7 +52,7 @@ public class UniversalAceDescription implements Serializable {
         UniversalAceDescription universal = new UniversalAceDescription(
         		Terms.get().getUids(desc.getDescId()), Terms.get().getUids(desc.getConceptId()),
         		desc.versionCount());
-        for (I_DescriptionPart part : desc.getVersions(false)) {
+        for (I_DescriptionPart part : desc.getVersions(null)) {
             UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
             universalPart.setInitialCaseSignificant(part.isInitialCaseSignificant());
             universalPart.setLang(part.getLang());

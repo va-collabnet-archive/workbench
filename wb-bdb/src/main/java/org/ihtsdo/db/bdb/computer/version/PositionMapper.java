@@ -16,6 +16,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -51,7 +52,7 @@ public class PositionMapper {
 	 * 
 	 */
 	public enum RELATIVE_POSITION {
-		BEFORE, EQUAL, AFTER, CONFLICTING, UNREACHABLE
+		BEFORE, EQUAL, AFTER, CONTRADICTION, UNREACHABLE
 	};
 
 	private static boolean closed = false;
@@ -161,7 +162,7 @@ public class PositionMapper {
 		}
 		if (onRoute(v1) && onRoute(v2)) {
 			if (conflictMatrix.get(v1.getSapNid(), v2.getSapNid())) {
-				return RELATIVE_POSITION.CONFLICTING;
+				return RELATIVE_POSITION.CONTRADICTION;
 			} else if (positionDistance[v1.getSapNid()] > 
 					positionDistance[v2.getSapNid()]) {
 				return RELATIVE_POSITION.BEFORE;
@@ -184,7 +185,7 @@ public class PositionMapper {
 	 * @throws IOException
 	 */
 	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
-	  fastRelativePosition(V part1, V part2) {
+	  fastRelativePosition(V part1, V part2, PRECEDENCE precedencePolicy) {
 		queryCount++;
 		lastRequestTime = System.currentTimeMillis();
 		// Forms a barrier to ensure that the setup is complete prior to use
@@ -213,16 +214,28 @@ public class PositionMapper {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		if (conflictMatrix.get(part1.getSapNid(), part2.getSapNid())) {
-			return RELATIVE_POSITION.CONFLICTING;
-		} else if (positionDistance[part1.getSapNid()] > 
-			positionDistance[part2.getSapNid()]) {
-			return RELATIVE_POSITION.BEFORE;
-		} else if (positionDistance[part1.getSapNid()] < 
-			positionDistance[part2.getSapNid()]) {
-			return RELATIVE_POSITION.AFTER;
-		} 
-		return RELATIVE_POSITION.EQUAL;
+		switch (precedencePolicy) {
+        case PATH:
+            if (conflictMatrix.get(part1.getSapNid(), part2.getSapNid())) {
+                return RELATIVE_POSITION.CONTRADICTION;
+            } else if (positionDistance[part1.getSapNid()] > 
+                positionDistance[part2.getSapNid()]) {
+                return RELATIVE_POSITION.BEFORE;
+            } else if (positionDistance[part1.getSapNid()] < 
+                positionDistance[part2.getSapNid()]) {
+                return RELATIVE_POSITION.AFTER;
+            } 
+            return RELATIVE_POSITION.EQUAL;
+         case TIME:
+            if (part1.getTime() == part2.getTime()) {
+                return RELATIVE_POSITION.CONTRADICTION;
+            } else if (part1.getTime() < part2.getTime()) {
+                return RELATIVE_POSITION.BEFORE;
+            }
+            return RELATIVE_POSITION.AFTER;
+        default:
+            throw new RuntimeException("Can't handle policy: " + precedencePolicy);
+        }
 	}
 
 	/**

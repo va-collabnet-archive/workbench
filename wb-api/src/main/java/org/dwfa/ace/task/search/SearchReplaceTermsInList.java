@@ -182,7 +182,8 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
                     // get latest descriptions
                     List<? extends I_DescriptionTuple> descriptionTuples = child.getDescriptionTuples(config.getAllowedStatus(),
-                        (searchAll ? null : descriptionTypesToCheck), positionsToCheck);
+                        (searchAll ? null : descriptionTypesToCheck), positionsToCheck, config.getPrecedence(), 
+                        config.getConflictResolutionStrategy());
 
                     // For the current description of this concept
                     for (I_DescriptionTuple description : descriptionTuples) {

@@ -14,17 +14,18 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.task.conflict.detector.AttrTupleConflictComparator;
 import org.dwfa.ace.task.conflict.detector.DescriptionTupleConflictComparator;
 import org.dwfa.ace.task.conflict.detector.RelTupleConflictComparator;
+import org.dwfa.tapi.TerminologyException;
 
 public class ConflictHelper {
 
    
    public static Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(Concept cb, I_ConfigAceFrame config)
-         throws IOException {
+         throws IOException, TerminologyException {
       Set<I_ConceptAttributeTuple> commonTuples = null;
       for (I_Position p : config.getViewPositionSet()) {
           PositionSetReadOnly positionSet = new PositionSetReadOnly(p);
          List<? extends I_ConceptAttributeTuple> tuplesForPosition = cb.getConceptAttributeTuples(config.getAllowedStatus(),
-               positionSet, false);
+               positionSet, config.getPrecedence(), config.getConflictResolutionStrategy());
          if (commonTuples == null) {
             commonTuples = new TreeSet<I_ConceptAttributeTuple>(new AttrTupleConflictComparator());
             commonTuples.addAll(tuplesForPosition);
@@ -38,12 +39,12 @@ public class ConflictHelper {
       return commonTuples;
    }
 
-   public static Set<I_RelTuple> getCommonRelTuples(Concept cb, I_ConfigAceFrame config) throws IOException {
+   public static Set<I_RelTuple> getCommonRelTuples(Concept cb, I_ConfigAceFrame config) throws IOException, TerminologyException {
       Set<I_RelTuple> commonTuples = null;
       for (I_Position p : config.getViewPositionSet()) {
          PositionSetReadOnly positionSet = new PositionSetReadOnly(p);
          List<? extends I_RelTuple> tuplesForPosition = cb
-               .getSourceRelTuples(config.getAllowedStatus(), null, positionSet, false);
+               .getSourceRelTuples(config.getAllowedStatus(), null, positionSet, config.getPrecedence(), config.getConflictResolutionStrategy());
          if (commonTuples == null) {
             commonTuples = new TreeSet<I_RelTuple>(new RelTupleConflictComparator());
             commonTuples.addAll(tuplesForPosition);
@@ -63,7 +64,8 @@ public class ConflictHelper {
       for (I_Position p : config.getViewPositionSet()) {
           PositionSetReadOnly positionSet = new PositionSetReadOnly(p);
          List<I_DescriptionTuple> tuplesForPosition = cb.getDescriptionTuples(config.getAllowedStatus(), null,
-               positionSet, false);
+               positionSet, 
+               config.getPrecedence(), config.getConflictResolutionStrategy());
          if (commonTuples == null) {
             commonTuples = new TreeSet<I_DescriptionTuple>(new DescriptionTupleConflictComparator());
             commonTuples.addAll(tuplesForPosition);

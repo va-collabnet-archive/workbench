@@ -150,13 +150,13 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     buff.append("  </concept-ids>\n");
                     buff.append("  <descriptions>\n");
                     for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
-                        config.getViewPositionSetReadOnly())) {
+                        config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         buff.append("    <description type='");
                         I_GetConceptData type = tf.getConcept(dt.getTypeId());
 
                         I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
                             config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                            config.getLanguageSortPref());
+                            config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
                         buff.append(typeDesc.getText());
                         buff.append("'\n                 text='");
                         buff.append(dt.getText());
@@ -188,7 +188,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
                 config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                config.getLanguageSortPref());
+                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
             buff.append(idt.getDenotation().toString());
@@ -234,7 +234,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
                 config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                config.getLanguageSortPref());
+                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("\t");
             buff.append(idt.getDenotation().toString());

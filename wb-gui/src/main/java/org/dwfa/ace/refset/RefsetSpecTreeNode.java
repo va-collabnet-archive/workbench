@@ -27,11 +27,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 
@@ -97,20 +98,29 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     }
 
     public I_ExtendByRefVersion getExtension() {
-        if (extension == null) {
-            List<I_ExtendByRefVersion> tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(
-                aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), true);
-            if (tupleList.size() > 0) {
-                extension = tupleList.get(tupleList.size() - 1);
-            } else {
-                tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(null, aceConfig.getViewPositionSetReadOnly(),
-                    true);
+        try {
+            if (extension == null) {
+                List<I_ExtendByRefVersion> tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(
+                    aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), 
+                    aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                 if (tupleList.size() > 0) {
                     extension = tupleList.get(tupleList.size() - 1);
+                } else {
+                    tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(null, 
+                        aceConfig.getViewPositionSetReadOnly(),
+                        aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                    if (tupleList.size() > 0) {
+                        extension = tupleList.get(tupleList.size() - 1);
+                    }
                 }
             }
+            return extension;
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
         }
-        return extension;
+        return null;
     }
 
     /**

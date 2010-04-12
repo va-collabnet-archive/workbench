@@ -72,7 +72,9 @@ public class StatusCounter implements I_ProcessConcepts {
             attrTupels = concept.getConceptAttributeTuples(null, null);
         } else {
             attrTupels = concept.getConceptAttributeTuples(profileForConflictDetection.getAllowedStatus(),
-                profileForConflictDetection.getViewPositionSetReadOnly());
+                profileForConflictDetection.getViewPositionSetReadOnly(), 
+                profileForConflictDetection.getPrecedence(), 
+                profileForConflictDetection.getConflictResolutionStrategy());
         }
         int tupleListSize = attrTupels.size();
         if (upperBound != null) {
@@ -88,11 +90,11 @@ public class StatusCounter implements I_ProcessConcepts {
             AceLog.getAppLog().info(concept.getInitialText() + " has multiple tuples: " + attrTupels);
         }
         for (I_ConceptAttributeTuple tuple : attrTupels) {
-            if (statusCount.containsKey(tuple.getConceptStatus())) {
-                Integer count = statusCount.get(tuple.getConceptStatus());
-                statusCount.put(tuple.getConceptStatus(), count.intValue() + 1);
+            if (statusCount.containsKey(tuple.getStatusId())) {
+                Integer count = statusCount.get(tuple.getStatusId());
+                statusCount.put(tuple.getStatusId(), count.intValue() + 1);
             } else {
-                statusCount.put(tuple.getConceptStatus(), 1);
+                statusCount.put(tuple.getStatusId(), 1);
             }
         }
         switch (attrTupels.size()) {

@@ -260,7 +260,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
 
             List<? extends I_ExtendByRefVersion> extensions =
                     thinExtByRefVersioned
-                        .getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), true, false);
+                        .getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {
@@ -293,9 +294,11 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
 
         I_GetConceptData memberPurpose = Terms.get().getConcept(ReferenceConcepts.REFSET_MEMBER_PURPOSE.getNid());
 
-        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, false, true)) {
+        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, 
+                                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             // Check origin is a refset (ie. has not been retired as a refset)
-            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, false, true)) {
+            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, 
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
                 if (target.getConceptId() == ReferenceConcepts.REFSET_IDENTITY.getNid()) {
                     memberRefsets.add(origin.getConceptId());
                 }
@@ -321,7 +324,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
             relTypes.add(ReferenceConcepts.MARKED_PARENT_IS_A_TYPE.getNid());
             I_GetConceptData memberRefset = Terms.get().getConcept(getMemberRefsetId());
             Set<? extends I_GetConceptData> requiredIsAType =
-                    memberRefset.getSourceRelTargets(getCurrentStatusIntSet(), relTypes, null, false, true);
+                    memberRefset.getSourceRelTargets(getCurrentStatusIntSet(), relTypes, null, 
+                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
             if (requiredIsAType != null && requiredIsAType.size() > 0) {
                 // relationship exists so use the is-a specified by the

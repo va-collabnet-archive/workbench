@@ -20,13 +20,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -65,6 +66,8 @@ public class RetireAllMarkedParents extends AbstractTask {
     }
 
     private void retireExistingMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         int refsetId = memberRefsetConcept.getConceptId();
 
@@ -72,7 +75,8 @@ public class RetireAllMarkedParents extends AbstractTask {
 
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 
-            List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, true, false);
+            List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(null, null, 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {

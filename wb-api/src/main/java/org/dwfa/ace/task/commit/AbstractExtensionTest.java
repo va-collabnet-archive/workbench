@@ -138,7 +138,8 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         I_IntSet activeStatuses = getActiveStatus(termFactory);
 
         List<? extends I_RelTuple> relationships =
-                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions, true, true);
+                concept.getSourceRelTuples(activeStatuses, allowedTypes, allPositions,
+                getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
         for (I_RelTuple rel : relationships) {
             if (rel.getVersion() > latestVersion) {
                 latestVersion = rel.getVersion();

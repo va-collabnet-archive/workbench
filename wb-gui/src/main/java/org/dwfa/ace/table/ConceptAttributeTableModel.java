@@ -375,7 +375,8 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             positions = null;
         }
         try {
-            return cb.getConceptAttributeTuples(null, positions, true, !host.getShowHistory());
+            return cb.getConceptAttributeTuples(null, positions, 
+                host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
         } catch (TerminologyException e) {
             throw new ToIoException(e);
         }

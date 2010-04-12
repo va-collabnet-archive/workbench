@@ -36,11 +36,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.AceTableRenderer;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -97,84 +97,60 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     private void generateHtmlRendering(Object value) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-        if (node.getUserObject() != null
-            && (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass()) || I_ExtendByRefVersion.class.isAssignableFrom(node.getUserObject()
-                .getClass()))) {
-            I_ExtendByRefVersion firstTuple = null;
-            I_ExtendByRefVersion lastTuple = null;
-            EConcept.REFSET_TYPES extType = null;
-            List<I_ExtendByRefVersion> tuples = null;
-            if (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass())) {
-                I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
-                tuples = (List<I_ExtendByRefVersion>) ext.getTuples(configAceFrame.getAllowedStatus(), configAceFrame.getViewPositionSetReadOnly(), true);
-                if (tuples != null && tuples.size() > 0) {
-                    firstTuple = tuples.get(0);
-                }
-                if (tuples != null && tuples.size() > 0) {
-                    lastTuple = tuples.get(tuples.size() - 1);
-                    if (lastTuple.getVersion() == Integer.MAX_VALUE) {
-                        this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
+        try {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            if (node.getUserObject() != null
+                && (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass()) || I_ExtendByRefVersion.class.isAssignableFrom(node.getUserObject()
+                    .getClass()))) {
+                I_ExtendByRefVersion firstTuple = null;
+                I_ExtendByRefVersion lastTuple = null;
+                EConcept.REFSET_TYPES extType = null;
+                List<I_ExtendByRefVersion> tuples = null;
+                if (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass())) {
+                    I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
+                    tuples = (List<I_ExtendByRefVersion>) ext.getTuples(configAceFrame.getAllowedStatus(), 
+                        configAceFrame.getViewPositionSetReadOnly(), configAceFrame.getPrecedence(),
+                        configAceFrame.getConflictResolutionStrategy());
+                    if (tuples != null && tuples.size() > 0) {
+                        firstTuple = tuples.get(0);
                     }
-                }
-                if (firstTuple != null) {
-                    try {
-						extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
-					} catch (IOException e) {
-						AceLog.getAppLog().alertAndLogException(e);
-					}
-                }
-            } else {
-                firstTuple = (I_ExtendByRefVersion) node.getUserObject();
-                try {
-					extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-                tuples = new ArrayList<I_ExtendByRefVersion>();
-                tuples.add(firstTuple);
-            }
-
-            boolean indent = false;
-
-            DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
-            if (parent != null && parent.getUserObject() != null) {
-                if (I_GetConceptData.class.isAssignableFrom(parent.getUserObject().getClass())) {
-                    indent = false;
+                    if (tuples != null && tuples.size() > 0) {
+                        lastTuple = tuples.get(tuples.size() - 1);
+                        if (lastTuple.getVersion() == Integer.MAX_VALUE) {
+                            this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
+                        }
+                    }
+                    if (firstTuple != null) {
+                        try {
+            				extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
+            			} catch (IOException e) {
+            				AceLog.getAppLog().alertAndLogException(e);
+            			}
+                    }
                 } else {
-                    indent = true;
+                    firstTuple = (I_ExtendByRefVersion) node.getUserObject();
+                    try {
+            			extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
+            		} catch (IOException e) {
+            			AceLog.getAppLog().alertAndLogException(e);
+            		}
+                    tuples = new ArrayList<I_ExtendByRefVersion>();
+                    tuples.add(firstTuple);
                 }
-            }
-            if (firstTuple != null) {
-                setOpaque(false);
-                try {
-                    switch (extType) {
-                    case CID_CID:
-                        renderBranchingClause(firstTuple);
-                        break;
-                    case CID_CID_CID:
-                        renderStructuralQueryClause(firstTuple, indent);
-                        break;
-                    case CID_CID_STR:
-                        renderTextQueryClause(firstTuple, indent);
-                        break;
+
+                boolean indent = false;
+
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+                if (parent != null && parent.getUserObject() != null) {
+                    if (I_GetConceptData.class.isAssignableFrom(parent.getUserObject().getClass())) {
+                        indent = false;
+                    } else {
+                        indent = true;
                     }
-                } catch (Exception ex) {
-                    setText(ex.getLocalizedMessage());
-                    AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                }
-            } else {
-                setBackground(Color.LIGHT_GRAY);
-                setOpaque(true);
-                I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
-                tuples = (List<I_ExtendByRefVersion>) ext.getTuples(null, configAceFrame.getViewPositionSetReadOnly(), true);
-                firstTuple = null;
-                if (tuples != null && tuples.size() > 0) {
-                    firstTuple = tuples.get(0);
                 }
                 if (firstTuple != null) {
+                    setOpaque(false);
                     try {
-                        extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
                         switch (extType) {
                         case CID_CID:
                             renderBranchingClause(firstTuple);
@@ -191,26 +167,59 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                         AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
                     }
                 } else {
-                    if (extType != null) {
-                        switch (extType) {
-                        case CID_CID:
-                            this.setText("Branching clause is Primoridal or Extinct");
-                            break;
-                        case CID_CID_CID:
-                            this.setText("Structural clause is Primoridal or Extinct");
-                            break;
-                        case CID_CID_STR:
-                            this.setText("Text clause is Primoridal or Extinct");
-                            break;
-                        default:
-                            this.setText("Can't handle extinct type: " + extType);
+                    setBackground(Color.LIGHT_GRAY);
+                    setOpaque(true);
+                    I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
+                    tuples = (List<I_ExtendByRefVersion>) ext.getTuples(null, configAceFrame.getViewPositionSetReadOnly(), 
+                            configAceFrame.getPrecedence(), configAceFrame.getConflictResolutionStrategy());
+                    firstTuple = null;
+                    if (tuples != null && tuples.size() > 0) {
+                        firstTuple = tuples.get(0);
+                    }
+                    if (firstTuple != null) {
+                        try {
+                            extType = EConcept.REFSET_TYPES.nidToType(firstTuple.getTypeId());
+                            switch (extType) {
+                            case CID_CID:
+                                renderBranchingClause(firstTuple);
+                                break;
+                            case CID_CID_CID:
+                                renderStructuralQueryClause(firstTuple, indent);
+                                break;
+                            case CID_CID_STR:
+                                renderTextQueryClause(firstTuple, indent);
+                                break;
+                            }
+                        } catch (Exception ex) {
+                            setText(ex.getLocalizedMessage());
+                            AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
                         }
                     } else {
-                        this.setText("Clause is Primoridal or Extinct");
-                    }
+                        if (extType != null) {
+                            switch (extType) {
+                            case CID_CID:
+                                this.setText("Branching clause is Primoridal or Extinct");
+                                break;
+                            case CID_CID_CID:
+                                this.setText("Structural clause is Primoridal or Extinct");
+                                break;
+                            case CID_CID_STR:
+                                this.setText("Text clause is Primoridal or Extinct");
+                                break;
+                            default:
+                                this.setText("Can't handle extinct type: " + extType);
+                            }
+                        } else {
+                            this.setText("Clause is Primoridal or Extinct");
+                        }
 
+                    }
                 }
             }
+        } catch (TerminologyException e) {
+           AceLog.getAppLog().alertAndLogException(e);
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
         }
     }
 
@@ -305,7 +314,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
     private void addPrefixImage(List<String> htmlParts, int prefixConceptId) throws IOException, TerminologyException {
     	I_GetConceptData prefixConcept = Terms.get().getConcept(prefixConceptId);
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
-            viewerImageTypes, configAceFrame.getViewPositionSetReadOnly())) {
+            viewerImageTypes, configAceFrame.getViewPositionSetReadOnly(),
+            configAceFrame.getPrecedence(), configAceFrame.getConflictResolutionStrategy())) {
             htmlParts.add("<img src='ace:" + imageTuple.getImageId() + "$" + imageTuple.getConceptId()
                 + "' align=absbottom>");
         }

@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
@@ -73,7 +74,9 @@ public class IsValidPath extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_TermFactory termFactory = Terms.get();
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+           I_TermFactory termFactory = Terms.get();
             Object obj = process.getProperty(propName);
             UUID uuid = null;
             if (obj == null) {
@@ -91,7 +94,8 @@ public class IsValidPath extends AbstractTask {
                     .getConceptId());
                 PositionSetReadOnly positions = termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
 
-                if (pathTopHierarchy.isParentOf(path, allowedStatus, allowedTypes, positions, true)) {
+                if (pathTopHierarchy.isParentOf(path, allowedStatus, allowedTypes, positions, 
+                    config.getPrecedence(), config.getConflictResolutionStrategy())) {
                     return Condition.TRUE;
                 } else {
                     process.setProperty(propName, null);

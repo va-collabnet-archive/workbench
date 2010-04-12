@@ -107,7 +107,8 @@ public class LineageHelper implements I_HelpLineage {
     	access();
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
-            positions, false, true)) {
+            positions,
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptId() == child.getConceptId()) {
                 continue ITERATE_PARENTS;
@@ -152,7 +153,8 @@ public class LineageHelper implements I_HelpLineage {
 
     	access();
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
-            positions, false, true)) {
+            positions,
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
             if (childConcept.getConceptId() == parent.getConceptId()) {
                 continue ITERATE_CHILDREN;

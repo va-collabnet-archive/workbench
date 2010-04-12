@@ -36,7 +36,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -758,8 +757,6 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                         .iterator().next();
         }
 
-        int extTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();
-
         // check subject is not already a member
         if (hasCurrentConceptRefsetExtension(refsetId, componentId, conceptId, Terms.get().getConcept(
             new UUID[] { statusUuid }).getConceptId())) {
@@ -846,8 +843,6 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         Collection<I_Path> paths = Terms.get().getPaths();
         paths.clear();
         paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
-
-        int extTypeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION.localize().getNid();
 
         // check subject is not already a member
         if (hasCurrentConceptConceptStringRefsetExtension(refsetId, componentId, c1Id, c2Id, stringValue, Terms.get()
@@ -971,7 +966,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             throws Exception {
 
         ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
-            positions, false, true)) {
+            positions, 
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
             if (childConcept.getConceptId() == parent.getConceptId()) {
                 continue ITERATE_CHILDREN;
@@ -1015,7 +1011,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             throws Exception {
 
         ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
-            positions, false, true)) {
+            positions, 
+            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptId() == child.getConceptId()) {
                 continue ITERATE_PARENTS;
@@ -1266,7 +1263,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     private I_ExtendByRefPart getLatestCurrentPart(I_ExtendByRef memberExtension) throws TerminologyException,
             IOException {
         I_ExtendByRefPart latestPart = null;
-        List<? extends I_ExtendByRefVersion> original = memberExtension.getTuples(null, null, true, false);
+        List<? extends I_ExtendByRefVersion> original = memberExtension.getTuples(null, null, 
+                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         for (I_ExtendByRefVersion part : original) {
             if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
@@ -1349,7 +1347,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         final Set<? extends I_GetConceptData> allUsers =
                 userParent.getDestRelOrigins(allowedStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), true, true);
+                    .getViewPositionSetReadOnly(), 
+                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         Set<I_GetConceptData> allValidUsers = new HashSet<I_GetConceptData>();
         for (I_GetConceptData user : allUsers) {
@@ -1379,7 +1378,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         List<? extends I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), true);
+                    .getViewPositionSetReadOnly(),
+                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         for (I_DescriptionTuple descriptionTuple : descriptionResults) {
             if (descriptionTuple.getTime() > latestVersion) {
                 latestVersion = descriptionTuple.getTime();

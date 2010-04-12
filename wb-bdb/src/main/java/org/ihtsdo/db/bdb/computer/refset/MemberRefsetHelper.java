@@ -245,7 +245,7 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
         for (I_ExtendByRef thinExtByRefVersioned : extVersions) {
 
             List<? extends I_ExtendByRefVersion> extensions = thinExtByRefVersioned.getTuples(config.getAllowedStatus(),
-                config.getViewPositionSetReadOnly(), true, false);
+                config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_ExtendByRefVersion thinExtByRefTuple : extensions) {
                 if (thinExtByRefTuple.getRefsetId() == memberRefsetId) {

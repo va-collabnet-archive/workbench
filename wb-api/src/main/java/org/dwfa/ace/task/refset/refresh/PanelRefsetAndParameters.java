@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
@@ -352,10 +353,12 @@ public class PanelRefsetAndParameters extends JPanel {
 
     private Set<? extends I_GetConceptData> getAllUsers() {
         try {
+            // TODO replace with passed in config...
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_GetConceptData userParent =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
-            return userParent.getDestRelOrigins(allowedTypes, true, true);
+            return userParent.getDestRelOrigins(allowedTypes);
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             return getAllUsers();
@@ -411,7 +414,7 @@ public class PanelRefsetAndParameters extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }
@@ -425,7 +428,7 @@ public class PanelRefsetAndParameters extends JPanel {
         parents.addAll(permissionTest.getValidRefsetsFromRolePermissions(user));
 
         for (I_GetConceptData parent : parents) {
-            if (parent.isParentOfOrEqualTo(selectedRefset, true)) {
+            if (parent.isParentOfOrEqualTo(selectedRefset)) {
                 return true;
             }
         }

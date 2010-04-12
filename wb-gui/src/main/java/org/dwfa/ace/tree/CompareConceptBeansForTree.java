@@ -26,9 +26,10 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 
 public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataForTree> {
 
@@ -60,10 +61,12 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (TerminologyException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private int compareRefset(I_GetConceptDataForTree cb1, I_GetConceptDataForTree cb2) throws IOException {
+    private int compareRefset(I_GetConceptDataForTree cb1, I_GetConceptDataForTree cb2) throws IOException, TerminologyException {
         List<? extends I_ExtendByRef> c1Extensions = getExtensions(cb1);
         List<? extends I_ExtendByRef> c2Extensions = getExtensions(cb2);
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -136,7 +139,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
         return compareDescriptions(cb1, cb2);
     }
 
-    private I_ExtendByRefVersion getExtensionTuple(List<? extends I_ExtendByRef> c1Extensions, int refsetId) throws IOException {
+    private I_ExtendByRefVersion getExtensionTuple(List<? extends I_ExtendByRef> c1Extensions, int refsetId) throws IOException, TerminologyException {
         for (I_ExtendByRef ext : c1Extensions) {
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().fine("Getting tuples for: " + c1Extensions);
@@ -150,7 +153,8 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
                 List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
                 ext.addTuples(this.aceConfig.getAllowedStatus(), 
                 		this.aceConfig.getViewPositionSetReadOnly(),
-                    returnTuples, false);
+                    returnTuples, 
+                    aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                 if (returnTuples.size() > 0) {
                     return returnTuples.get(0);
                 }

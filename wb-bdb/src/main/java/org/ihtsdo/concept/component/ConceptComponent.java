@@ -317,15 +317,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public abstract ArrayIntList getVariableVersionNids();
 
         @Override
-        @Deprecated
         public void setPathId(int pathId) {
-            throw new UnsupportedOperationException("Use makeAnalog instead");
+            if (index >= 0) {
+                revisions.get(index).setPathId(pathId);
+            } else {
+                ConceptComponent.this.setPathId(pathId);
+            }
         }
 
         @Override
-        @Deprecated
         public void setStatusId(int statusId) {
-            throw new UnsupportedOperationException("Use makeAnalog instead");
+            if (index >= 0) {
+                revisions.get(index).setStatusId(statusId);
+            } else {
+                ConceptComponent.this.setStatusId(statusId);
+            }
         }
 
         public UUID getPrimUuid() {
