@@ -1,28 +1,27 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
+ *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.dwfa.ace.task;
 
 public enum ProcessAttachmentKeys {
+
     /**
      * When a plugin process is executed from the concept panel,
      * the concept contained within that panel is written to the process
      * panel using this property name.
      */
-
     ACTIVE_CONCEPT_UUID,
     ACTIVE_CONCEPT,
     ACTIVE_SVN_ENTRY,
@@ -127,7 +126,19 @@ public enum ProcessAttachmentKeys {
     REFSET_NAME,
     ABOUT_BOX_HTML_TEXT,
     ABOUT_BOX_TITLE_TEXT,
-    ABOUT_BOX_PROP_FILE;
+    ABOUT_BOX_PROP_FILE,
+    /**
+     * Error Message for display when using the {@link org.dwfa.ace.task.gui.batchlist.AddUuidListListToListView} task
+     */
+    ERROR_MESSAGE,
+    /**
+     * List of objects for display when using the {@link org.dwfa.ace.task.gui.batchlist.AddUuidListListToListView} task
+     */
+    OBJECTS_LIST,
+    /**
+     * Message Key when displaying dialog messages @see org.dwfa.ace.task.WriteListToFile.
+     */
+    DLG_MSG;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

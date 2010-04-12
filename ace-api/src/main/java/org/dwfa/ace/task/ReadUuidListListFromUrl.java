@@ -1,18 +1,17 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.dwfa.ace.task;
 
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
+import java.util.logging.Level;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -40,70 +39,114 @@ import org.dwfa.util.bean.Spec;
 
 /**
  * Reads list of UUID's from URL/File
- * 
+ *
  * @author Susan Castillo
- * 
+ *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {@Spec(directory = "tasks/ide/assignments", type = BeanType.TASK_BEAN)})
 public class ReadUuidListListFromUrl extends AbstractTask {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-
-    private static final int dataVersion = 2;
-
+    private static final int dataVersion = 3;
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private String uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
+    /**
+     * Whether this tasks should continue if an error is encountered.
+     */
+    private boolean continueOnError;
+    /**
+     * Container for holding invalid Uuids for logging purposes if {@code continueOnError} is true.
+     */
+    private List<String> invalidUuids;
+    /**
+     * Contains a description of why a UUID was invalid.
+     */
+    private String uuidErrorMessage;
+
+    public ReadUuidListListFromUrl() {
+        uuidErrorMessage = "";
+    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
         out.writeObject(uuidFileNamePropName);
+        out.writeBoolean(continueOnError);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion <= dataVersion) {
-            uuidListListPropName = (String) in.readObject();
-            if (objDataVersion >= 2) {
-                uuidFileNamePropName = (String) in.readObject();
-            } else {
+
+        switch (objDataVersion) {
+            case 0:
+            case 1:
+                uuidListListPropName = (String) in.readObject();
                 uuidFileNamePropName = ProcessAttachmentKeys.UUID_LIST_FILENAME.getAttachmentKey();
-            }
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
+                break;
+            case 2:
+                uuidListListPropName = (String) in.readObject();
+                uuidFileNamePropName = (String) in.readObject();
+                break;
+            case 3:
+                uuidListListPropName = (String) in.readObject();
+                uuidFileNamePropName = (String) in.readObject();
+                continueOnError = in.readBoolean();
+                break;
+            default:
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public void complete(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
         try {
 
+            invalidUuids = new ArrayList<String>();
             List<List<UUID>> uuidListOfLists = new ArrayList<List<UUID>>();
 
             String uuidLineStr;
 
-            // worker.getLogger().info("file is: " + uuidFileName);
-            String uuidFileName = (String) process.readProperty(uuidFileNamePropName);
+            String uuidFileName = (String) process.getProperty(uuidFileNamePropName);
             BufferedReader br = new BufferedReader(new FileReader(uuidFileName));
 
-            while ((uuidLineStr = br.readLine()) != null) { // while loop begins
-                                                            // here
+            while ((uuidLineStr = br.readLine()) != null) {
                 List<UUID> uuidList = new ArrayList<UUID>();
                 for (String uuidStr : uuidLineStr.split("\t")) {
-                    worker.getLogger().info("uuidStrs: " + uuidStr);
-                    UUID uuid = UUID.fromString(uuidStr);
-                    uuidList.add(uuid);
+                    worker.getLogger().fine("uuidStrs: " + uuidStr);
+                    try {
+                        UUID uuid = UUID.fromString(uuidStr);
+                        uuidList.add(uuid);
+                    } catch (IllegalArgumentException iae) {
+                        if (!continueOnError) {
+                            throw iae;
+                        }
+                        getLogger().log(Level.WARNING, "Invalid UUID: " + uuidStr);
+                        invalidUuids.add(uuidStr);
+                        if (uuidErrorMessage == null || uuidErrorMessage.isEmpty()) {
+                            uuidErrorMessage = iae.getMessage();
+                        }
+                    }
                 }
-                uuidListOfLists.add(uuidList);
-            } // end while
+                if (!uuidList.isEmpty()) {
+                    uuidListOfLists.add(uuidList);
+                }
+            }
+
 
             process.setProperty(this.uuidListListPropName, uuidListOfLists);
+            if (continueOnError && !invalidUuids.isEmpty()) {
+                appendErrorMessages(process);
+                appendErrorObjects(process);
+            }
 
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
@@ -122,7 +165,7 @@ public class ReadUuidListListFromUrl extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
 
     public Collection<Condition> getConditions() {
@@ -145,4 +188,65 @@ public class ReadUuidListListFromUrl extends AbstractTask {
         this.uuidFileNamePropName = dupPotFileName;
     }
 
+    /**
+     * Returns whether or not this task will continue if an error is encountered. Default: false.
+     * @return true if this task should continue when an error is encountered.
+     */
+    public boolean isContinueOnError() {
+        return continueOnError;
+    }
+
+    /**
+     * Sets whether this task should continue if an error is encountered.
+     * @param isContinueOnError whether this task should continue if an error is encountered.
+     */
+    public void setContinueOnError(boolean isContinueOnError) {
+        this.continueOnError = isContinueOnError;
+    }
+
+    /**
+     * Convenience method to encapsulate adding error messages to existing error messages.
+     * @param process the current business process this task is a part of.
+     * @throws IntrospectionException if there is an error reading or setting a property from the {@code ERROR_MESSAGE}
+     * Key on the {@link I_EncodeBusinessProcess}
+     * @throws IllegalAccessException if there is an error reading or setting a property from the {@code ERROR_MESSAGE}
+     * Key on the {@link I_EncodeBusinessProcess}
+     * @throws InvocationTargetException if there is an error reading or setting a property from the
+     * {@code ERROR_MESSAGE} Key on the {@link I_EncodeBusinessProcess}
+     */
+    private void appendErrorMessages(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        StringBuilder errorMessages = new StringBuilder();
+
+        String previousMessages = (String) process.getProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
+
+        if (previousMessages != null && !previousMessages.isEmpty()) {
+            errorMessages.append(previousMessages).append("\n");
+        }
+
+        errorMessages.append(uuidErrorMessage);
+
+        process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages.toString());
+    }
+
+    /**
+     * Convenience method to encapsulate appending objects to the Object List for use with the {@link WriteToFile} task.
+     * @param process the current business process this task is a part of.
+     * @throws IntrospectionException if there is an error reading or setting a property from the {@code ERROR_MESSAGE}
+     * Key on the {@link I_EncodeBusinessProcess}
+     * @throws IllegalAccessException if there is an error reading or setting a property from the {@code ERROR_MESSAGE}
+     * Key on the {@link I_EncodeBusinessProcess}
+     * @throws InvocationTargetException if there is an error reading or setting a property from the
+     * {@code ERROR_MESSAGE} Key on the {@link I_EncodeBusinessProcess}
+     */
+    private void appendErrorObjects(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        List<Object> objects = new ArrayList<Object>();
+        Object inProperty = process.getProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey());
+        if (inProperty instanceof List) {
+            objects.addAll((List<Object>) inProperty);
+        }
+        objects.addAll(invalidUuids);
+        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), objects);
+    }
 }
