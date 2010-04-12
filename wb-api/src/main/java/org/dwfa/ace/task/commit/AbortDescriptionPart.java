@@ -35,7 +35,7 @@ public class AbortDescriptionPart implements I_Fixup {
     }
 
     public void fix() throws Exception {
-        Terms.get().forget(desc, part);
+        Terms.get().forget(desc);
         Terms.get().addUncommitted(concept);
         AceLog.getAppLog().info("Canceled add desc part: " + part);
     }

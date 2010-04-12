@@ -58,26 +58,25 @@ public class AttributePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
 
             I_GetConceptData sourceBean;
-			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getNid());
-			} catch (TerminologyException e1) {
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				throw new RuntimeException(e1);
-			}
+            try {
+                sourceBean = Terms.get().getConcept(selectedObject.getTuple().getNid());
+            } catch (TerminologyException e1) {
+                throw new RuntimeException(e1);
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
             for (I_Path p : config.getEditingPathSet()) {
-                I_ConceptAttributePart currentPart =
-                        (I_ConceptAttributePart) selectedObject.getTuple().getMutablePart();
-                I_ConceptAttributePart newPart =
-                        (I_ConceptAttributePart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
-                            Long.MAX_VALUE);
+                I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple()
+                    .getMutablePart();
+                I_ConceptAttributePart newPart = (I_ConceptAttributePart) currentPart.makeAnalog(
+                    currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
                 ((I_ConceptAttributeVersioned) selectedObject.getTuple().getFixedPart()).addVersion(newPart);
             }
             Terms.get().addUncommitted(sourceBean);
 
             model.allTuples = null;
-            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
-                .getTermComponent()));
+            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
+                model.host.getTermComponent()));
         }
     }
 
@@ -88,20 +87,16 @@ public class AttributePopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            I_GetConceptData sourceBean;
-			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getNid());
-			} catch (TerminologyException e1) {
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				throw new RuntimeException(e1);
-			}
-            I_ConceptAttributeTuple tuple = selectedObject.getTuple();
-            I_ConceptAttributeVersioned versioned = (I_ConceptAttributeVersioned) tuple.getFixedPart();
-            versioned.getMutableParts().remove(tuple.getMutablePart());
-            Terms.get().addUncommitted(sourceBean);
-            model.allTuples = null;
-            model.fireTableDataChanged();
+            try {
+                I_ConceptAttributeTuple tuple = selectedObject.getTuple();
+                I_ConceptAttributeVersioned versioned = (I_ConceptAttributeVersioned) tuple.getFixedPart();
+                versioned.getMutableParts().remove(tuple.getMutablePart());
+                Terms.get().forget(versioned);
+                model.allTuples = null;
+                model.fireTableDataChanged();
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
         }
     }
 
@@ -120,52 +115,50 @@ public class AttributePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             try {
                 I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getNid());
-                    I_ConceptAttributePart newPart = selectedObject.getTuple().getMutablePart();
-                    if (selectedObject.getTuple().getTime() != Long.MAX_VALUE) {
-                    	I_ConceptAttributePart currentPart = selectedObject.getTuple().getMutablePart();
-                        for (I_Path p : config.getEditingPathSet()) {
-                            switch (field) {
-                            case STATUS:
-                                Collection<UUID> ids = (Collection<UUID>) obj;
-                                
-                                newPart = (I_ConceptAttributePart) currentPart.makeAnalog(
-                                		Terms.get().uuidToNative(ids), 
-                                		p.getConceptId(), Long.MAX_VALUE);
-                                break;
-                            case DEFINED:
-                            	newPart = (I_ConceptAttributePart) currentPart.makeAnalog(
-                            			config.getDefaultStatus().getConceptId(), 
-                            			p.getConceptId(), Long.MAX_VALUE);
-                                newPart.setDefined((Boolean) obj);
-                                break;
-
-                            default:
-                            }
-                            ((I_ConceptAttributeVersioned) selectedObject.getTuple().getFixedPart()).addVersion(newPart);
-                        }
-                    } else {
+                I_ConceptAttributePart newPart = selectedObject.getTuple().getMutablePart();
+                if (selectedObject.getTuple().getTime() != Long.MAX_VALUE) {
+                    I_ConceptAttributePart currentPart = selectedObject.getTuple().getMutablePart();
+                    for (I_Path p : config.getEditingPathSet()) {
                         switch (field) {
                         case STATUS:
                             Collection<UUID> ids = (Collection<UUID>) obj;
-                            newPart.setStatusId(Terms.get().uuidToNative(ids));
+
+                            newPart = (I_ConceptAttributePart) currentPart.makeAnalog(Terms.get().uuidToNative(ids),
+                                p.getConceptId(), Long.MAX_VALUE);
                             break;
                         case DEFINED:
+                            newPart = (I_ConceptAttributePart) currentPart.makeAnalog(config.getDefaultStatus()
+                                .getConceptId(), p.getConceptId(), Long.MAX_VALUE);
                             newPart.setDefined((Boolean) obj);
-                            newPart.setStatusId(config.getDefaultStatus().getConceptId());
                             break;
 
                         default:
                         }
+                        ((I_ConceptAttributeVersioned) selectedObject.getTuple().getFixedPart()).addVersion(newPart);
                     }
-                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                
+                } else {
+                    switch (field) {
+                    case STATUS:
+                        Collection<UUID> ids = (Collection<UUID>) obj;
+                        newPart.setStatusId(Terms.get().uuidToNative(ids));
+                        break;
+                    case DEFINED:
+                        newPart.setDefined((Boolean) obj);
+                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        break;
+
+                    default:
+                    }
+                }
+                model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+
                 Terms.get().addUncommitted(sourceBean);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
             model.allTuples = null;
-            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null, model.host
-                .getTermComponent()));
+            model.propertyChange(new PropertyChangeEvent(this, I_ContainTermComponent.TERM_COMPONENT, null,
+                model.host.getTermComponent()));
         }
     }
 

@@ -44,6 +44,7 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
+import com.sleepycat.je.EnvironmentMutableConfig;
 
 public class Bdb {
 
@@ -84,6 +85,38 @@ public class Bdb {
 		setup(dbRoot, null);
 	}
 	
+	public static void setCacheSize(String cacheSize) {
+	    long size = 0; 
+	    if (cacheSize.toLowerCase().endsWith("m")) {
+	        cacheSize = cacheSize.substring(0, cacheSize.length() - 1);
+	        size = Integer.parseInt(cacheSize);
+	        size = size * 1000;
+	    } else if (cacheSize.toLowerCase().endsWith("g")) {
+            cacheSize = cacheSize.substring(0, cacheSize.length() - 1);
+            size = Integer.parseInt(cacheSize);
+            size = size * 1000000;
+	    } else {
+            size = Integer.parseInt(cacheSize);
+	    }
+        EnvironmentMutableConfig mutableConfig = Bdb.mutable.bdbEnv.getMutableConfig();
+        mutableConfig.setCacheSize(size);
+        Bdb.mutable.bdbEnv.setMutableConfig(mutableConfig);
+        Bdb.readOnly.bdbEnv.setMutableConfig(mutableConfig);
+	}
+    public static long getCacheSize() {
+        return Bdb.mutable.bdbEnv.getMutableConfig().getCacheSize();
+    }
+
+	public static void setCachePercent(String cachePercent) {
+        EnvironmentMutableConfig mutableConfig = Bdb.mutable.bdbEnv.getMutableConfig();
+        mutableConfig.setCachePercent(Integer.parseInt(cachePercent));
+        Bdb.mutable.bdbEnv.setMutableConfig(mutableConfig);
+        Bdb.readOnly.bdbEnv.setMutableConfig(mutableConfig);
+	}
+
+	public static int getCachePercent() {
+	       return Bdb.mutable.bdbEnv.getMutableConfig().getCachePercent();
+	}
 
 	public static void setup(String dbRoot, ActivityPanel activity) {
 		try {
@@ -472,5 +505,15 @@ public class Bdb {
 
     public static boolean hasUuid(UUID uuid) {
         return uuidsToNidMapDb.hasUuid(uuid);
+    }
+
+    public static String getStats() {
+        StringBuffer statBuff = new StringBuffer();
+        statBuff.append("<html>Mutable<br>");
+        statBuff.append(mutable.bdbEnv.getStats(null).toStringVerbose());
+        statBuff.append("<br><br>ReadOnly:<br><br>");
+        statBuff.append(readOnly.bdbEnv.getStats(null).toStringVerbose());
+    
+        return statBuff.toString().replace("\n", "<br>");
     }
 }

@@ -36,6 +36,7 @@ import org.dwfa.ace.activity.UpperInfoOnlyConsoleMonitor;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -272,27 +273,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void forget(I_DescriptionVersioned desc, I_DescriptionPart part) throws IOException {
-        if (part.getTime() == Long.MAX_VALUE) {
-            if (part == desc) {
-                forget(desc);
-            } else {
-                Description d = (Description) desc;
-                if (Description.Version.class.isAssignableFrom(part.getClass())) {
-                    Description.Version dv = (Description.Version) part;
-                    if (dv.getRevision() == null) {
-                        forget(d);
-                    } else {
-                        d.removeRevision((DescriptionRevision) dv.getRevision());
-                    }
-                } else {
-                    d.removeRevision((DescriptionRevision) part);
-                }
-            }
-        }
-    }
-
-    @Override
     public void forget(I_RelVersioned rel) throws IOException {
         BdbCommitManager.forget(rel);
     }
@@ -301,6 +281,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         BdbCommitManager.forget(extension);
     }
 
+    public void forget(I_ConceptAttributeVersioned attr) throws IOException{
+        BdbCommitManager.forget(attr);
+    }
+    
     I_ConfigAceFrame activeAceFrameConfig;
 
     @Override
@@ -547,7 +531,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public String getStats() throws IOException {
-        throw new UnsupportedOperationException();
+        return Bdb.getStats();
     }
 
     @Override
@@ -1682,6 +1666,21 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     public void resetViewPositions() {
         Bdb.getSapDb().clearMapperCache();
+    }
+
+    public void setCacheSize(String cacheSize) {
+        Bdb.setCacheSize(cacheSize);
+    }
+    public long getCacheSize() {
+        return Bdb.getCacheSize();
+    }
+
+    public void setCachePercent(String cachePercent) {
+       Bdb.setCachePercent(cachePercent);
+    }
+
+    public int getCachePercent() {
+       return Bdb.getCachePercent();
     }
 
 }

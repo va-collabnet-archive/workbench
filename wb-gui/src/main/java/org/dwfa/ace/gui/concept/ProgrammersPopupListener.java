@@ -35,7 +35,9 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 		SET_FROM_NID("Set from nid"),
 		ADD_TO_WATCH_LIST("Add to watch list"),
 		REMOVE_FROM_WATCH_LIST("Remove from watch list"),
-		GET_CONCEPT_ATTRIBUTES("Get concept attributes")
+		GET_CONCEPT_ATTRIBUTES("Get concept attributes"),
+        SET_CACHE_SIZE("Set cache size"),
+        SET_CACHE_PERCENT("Set cache percent")
 		
 		;
 		
@@ -110,11 +112,30 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 			case GET_CONCEPT_ATTRIBUTES:
 				getConceptAttributes();
 				break;
-				
+			case SET_CACHE_PERCENT:
+			    setCachePercent();
+			    break;
+			case SET_CACHE_SIZE:
+				setCacheSize();
+				break;
 		}
 	}
 
-	private void getConceptAttributes() {
+	private void setCacheSize() {
+        String sizeString = askQuestion("Set bdb cache size:", "Enter size[XXXXm|XXg]:", "" + Terms.get().getCacheSize());
+        if (sizeString != null) {
+            Terms.get().setCacheSize(sizeString);
+        }
+    }
+
+    private void setCachePercent() {
+        String percentString = askQuestion("Set bdb cache percent:", "Enter percent[1..99]:", "" + Terms.get().getCachePercent());
+        if (percentString != null) {
+            Terms.get().setCachePercent(percentString);
+        }
+    }
+
+    private void getConceptAttributes() {
 		try {
 			I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
 			I_ConceptAttributeVersioned attr = igcd.getConceptAttributes();

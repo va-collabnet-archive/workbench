@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -44,6 +45,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.Revision;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -441,6 +444,34 @@ public class BdbCommitManager {
 		}
 	}
 
+    public static void forget(I_ConceptAttributeVersioned attr) throws IOException {
+        Concept c = Bdb.getConcept(attr.getConId());
+        ConceptAttributes a = (ConceptAttributes) attr;
+        if (a.getTime() != Long.MAX_VALUE) {
+            // Only need to forget additional versions;
+            if (a.revisions == null) {
+                throw new UnsupportedOperationException(
+                "Cannot forget a committed component.");
+            } else {
+                synchronized (a.revisions) {
+                    Iterator<ConceptAttributesRevision> ri = a.revisions
+                    .iterator();
+                    while (ri.hasNext()) {
+                        ConceptAttributesRevision ar = ri.next();
+                        if (ar.getTime() == Long.MAX_VALUE) {
+                            ri.remove();
+                        }
+                    }
+                }
+            }
+        } else {
+            // have to forget "all" references to component...
+            c.abort();
+        }
+        c.modified();
+        Terms.get().addUncommittedNoChecks(c);
+    }
+
 	public static void forget(I_RelVersioned rel) throws IOException {
 	    Concept c = Bdb.getConcept(rel.getC1Id());
 	    Relationship r = (Relationship) rel;
@@ -743,5 +774,6 @@ public class BdbCommitManager {
     public static void setCheckCommitDataEnabled(boolean enabled) {
         performCommitTests = enabled;
     }
+
 
 }

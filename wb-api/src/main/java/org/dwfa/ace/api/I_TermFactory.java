@@ -227,12 +227,12 @@ public interface I_TermFactory {
 
     void forget(I_DescriptionVersioned desc) throws IOException;
 
-    void forget(I_DescriptionVersioned desc, I_DescriptionPart part) throws IOException;
-
     void forget(I_RelVersioned rel) throws IOException;
-
+    
     void forget(I_ExtendByRef ext) throws IOException;
-
+    
+    void forget(I_ConceptAttributeVersioned attr) throws IOException;
+    
     void addUncommitted(I_GetConceptData concept);
 
     void addUncommitted(I_ExtendByRef extension);
@@ -618,5 +618,11 @@ public interface I_TermFactory {
     public List<I_Position> getPathChildren(int nid) throws TerminologyException;
     
     public void resetViewPositions();
+    
+    public void setCacheSize(String cacheSize);
+    public long getCacheSize();
+    
+    public void setCachePercent(String cachePercent);
+    public int getCachePercent();
     
 }
