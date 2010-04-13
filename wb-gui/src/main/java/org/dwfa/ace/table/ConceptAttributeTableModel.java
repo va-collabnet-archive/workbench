@@ -391,7 +391,10 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             return false;
         }
         try {
-            if (getConceptTuple(row).getVersion() != Integer.MAX_VALUE) {
+            if (row < 0 || row >= allTuples.size()) {
+                return false;
+            }
+            if (getConceptTuple(row).getTime() != Long.MAX_VALUE) {
                 return false;
             }
         } catch (IOException e) {

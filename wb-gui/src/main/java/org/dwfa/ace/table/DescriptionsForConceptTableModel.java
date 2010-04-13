@@ -49,6 +49,11 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
 
     List<I_DescriptionTuple> allTuples;
 
+    @Override
+    protected int getDescriptionCount() throws IOException {
+        return allTuples.size();
+    }
+
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
         private boolean stopWork = false;
         private HashMap<Integer, I_GetConceptData> concepts;

@@ -420,7 +420,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         if (ACE.editMode == false) {
             return false;
         }
-        if (row >= allTuples.size()) {
+        if (row < 0 || row >= allTuples.size()) {
             return false;
         }
         I_RelTuple rel = allTuples.get(row);

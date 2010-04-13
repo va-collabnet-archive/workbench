@@ -19,6 +19,7 @@ package org.dwfa.ace.file;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -45,7 +46,7 @@ public class ConceptListWriter extends GenericFileWriter<I_GetConceptData> {
     protected String serialize(I_GetConceptData concept) throws IOException, TerminologyException {
 
         if (snomedIntId == null) {
-            snomedIntId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+            snomedIntId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
         }
 
         Object conceptId = concept.getDenotation(snomedIntId);

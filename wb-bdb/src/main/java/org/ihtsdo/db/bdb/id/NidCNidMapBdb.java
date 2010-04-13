@@ -269,7 +269,7 @@ public class NidCNidMapBdb extends ComponentBdb {
     public boolean hasMap(int nid) {
         int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
         int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
-        if (indexInMap < nidCNidMaps.get().length) {
+        if (mapIndex < nidCNidMaps.get().length && indexInMap < NID_CNID_MAP_SIZE) {
             if (nidCNidMaps.get()[mapIndex][indexInMap] < Integer.MAX_VALUE) {
                 return true;
             }

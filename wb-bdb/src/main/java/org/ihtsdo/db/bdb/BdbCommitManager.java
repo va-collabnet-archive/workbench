@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
@@ -40,6 +43,7 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -210,8 +214,8 @@ public class BdbCommitManager {
 			return;
 		}
 		Concept concept = (Concept) igcd;
+        dataCheckMap.remove(concept);
 		if (concept.isUncommitted() == false) {
-			dataCheckMap.remove(concept);
 			removeUncommitted(concept);
 			if (Bdb.watchList.containsKey(concept.getNid())) {
 				AceLog.getAppLog().info(
@@ -292,55 +296,136 @@ public class BdbCommitManager {
 		return null;
 	}
 
+    private static boolean performCommit = false;
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-        // TODO add commit tests...
         try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
-                    KindOfComputer.reset();
-                    long commitTime = System.currentTimeMillis();
-                    IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
-                            commitTime);
-
-                    if (writeChangeSets) {
-                        if (changeSetPolicy == null) {
-                            changeSetPolicy = ChangeSetPolicy.OFF;
-                        }
-                        if (changeSetWriterThreading == null) {
-                            changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
-                        }
-                        switch (changeSetPolicy) {
-                        case COMPREHENSIVE:
-                        case INCREMENTAL:
-                        case MUTABLE_ONLY:
-                            uncommittedCNidsNoChecks.or(uncommittedCNids);
-                            if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                                ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-                                    uncommittedCNidsNoChecks, commitTime,
-                                    sapNidsFromCommit, changeSetPolicy, changeSetWriterThreading);
-                                changeSetWriterService.execute(handler);
+                    performCommit = true;
+                    int errorCount = 0;
+                    int warningCount = 0;
+                    if (performCreationTests) {
+                        I_IterateIds uncommittedCNidItr = uncommittedCNids.iterator();
+                        dataCheckMap.clear();
+                        while (uncommittedCNidItr.next()) {
+                            List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+                            Concept concept = Concept.get(uncommittedCNidItr.nid());
+                            dataCheckMap.put(concept, warningsAndErrors);
+                            for (I_TestDataConstraints test : commitTests) {
+                                try {
+                                    warningsAndErrors.addAll(test.test(concept, true));
+                                    Collection<RefsetMember<?, ?>> extensions = concept.getExtensions();
+                                    for (RefsetMember<?, ?> extension : extensions) {
+                                        if (extension.isUncommitted()) {
+                                            warningsAndErrors.addAll(test.test(extension, true));
+                                        }
+                                    }
+                                    
+                                    for (AlertToDataConstraintFailure alert: warningsAndErrors) {
+                                        if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                                            errorCount++;
+                                        } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                                            warningCount++;
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    AceLog.getEditLog().alertAndLogException(e);
+                                }
                             }
-                            break;
-                        case OFF:
-                            
-                            break;
-
-                        default:
-                            throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
                         }
                     }
-                    uncommittedCNids.clear();
-                    uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+                    
+                    if (errorCount + warningCount != 0) {
+                        if (errorCount > 0) {
+                            performCommit = false;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    JOptionPane.showMessageDialog(new JFrame(),
+                                        "Please fix data errors prior to commit.",
+                                        "Data errors exist",
+                                        JOptionPane.ERROR_MESSAGE);
+                                }
+                                
+                            });
+                        } else {
+                            if (SwingUtilities.isEventDispatchThread()) {
+                                int selection = JOptionPane.showConfirmDialog(
+                                    new JFrame(),
+                                    "Do you want to continue with commit?",
+                                    "Warnings Detected",
+                                    JOptionPane.YES_NO_OPTION);  
+                                performCommit = selection == JOptionPane.YES_OPTION;
+                            } else {
+                                try {
+                                    SwingUtilities.invokeAndWait(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            int selection = JOptionPane.showConfirmDialog(
+                                                new JFrame(),
+                                                "Do you want to continue with commit?",
+                                                "Warnings Detected",
+                                                JOptionPane.YES_NO_OPTION);  
+                                            performCommit = selection == JOptionPane.YES_OPTION;
+                                        }
+                                        
+                                    });
+                                } catch (InvocationTargetException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                    performCommit = false;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (performCommit) {
+                        KindOfComputer.reset();
+                        long commitTime = System.currentTimeMillis();
+                        IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
+                                commitTime);
 
-                    luceneWriterPermit.acquire();
-                    IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
-                    uncommittedDescNids.clear();
-                    luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
-                    dataCheckMap.clear();
+                        if (writeChangeSets) {
+                            if (changeSetPolicy == null) {
+                                changeSetPolicy = ChangeSetPolicy.OFF;
+                            }
+                            if (changeSetWriterThreading == null) {
+                                changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
+                            }
+                            switch (changeSetPolicy) {
+                            case COMPREHENSIVE:
+                            case INCREMENTAL:
+                            case MUTABLE_ONLY:
+                                uncommittedCNidsNoChecks.or(uncommittedCNids);
+                                if (uncommittedCNidsNoChecks.cardinality() > 0) {
+                                    ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                        uncommittedCNidsNoChecks, commitTime,
+                                        sapNidsFromCommit, changeSetPolicy, changeSetWriterThreading);
+                                    changeSetWriterService.execute(handler);
+                                }
+                                break;
+                            case OFF:
+                                
+                                break;
+
+                            default:
+                                throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
+                            }
+                        }
+                        uncommittedCNids.clear();
+                        uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+
+                        luceneWriterPermit.acquire();
+                        IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
+                        uncommittedDescNids.clear();
+                        luceneWriterService.execute(new LuceneWriter(descNidsToCommit));
+                        dataCheckMap.clear();
+                    }
                 }
             }
-            Bdb.sync();
+            if (performCommit) {
+                Bdb.sync();
+            }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InterruptedException e1) {

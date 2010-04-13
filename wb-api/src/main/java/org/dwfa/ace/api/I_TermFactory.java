@@ -283,7 +283,7 @@ public interface I_TermFactory {
 
     void loadFromDirectory(File dataDir, String encoding) throws Exception;
 
-    int uuidToNative(UUID uid) throws TerminologyException, IOException;
+    int uuidToNative(UUID... uid) throws TerminologyException, IOException;
 
     int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 

@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidRevision;
@@ -27,7 +28,8 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
     public String toString() {
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" c1Nid: " + this.c1Nid);
+        buf.append(" c1Nid: ");
+        ConceptComponent.addNidToBuffer(buf, this.c1Nid);
         buf.append(super.toString());
         return buf.toString();
     }

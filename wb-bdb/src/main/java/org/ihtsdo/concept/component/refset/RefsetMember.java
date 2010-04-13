@@ -65,6 +65,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 		@Override
 		public RefsetRevision<?, ?> makeAnalog(int statusNid, int pathNid, long time) {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog(statusNid, pathNid, time);
+            } 
 			return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, pathNid, time);
 		}
 

@@ -93,16 +93,13 @@ public class TestCPath_New extends AbstractTask {
 				I_RelVersioned rBean = tf.getRelationship(sr.relNid);
 				if (rBean == null) {
 					if (countNull < 20) {
-						sb.append("\r\n::: relNid=\t"+ sr.relNid);
-						I_GetConceptData cBean = tf.getConcept(sr.c1Id);
-						if (cBean != null)
-							sb.append("\tc1Nid=\t" + sr.c1Id + "\t"
-									+ cBean.getUids().get(0) + "\t"
-									+ cBean.getInitialText());
-						else
-							sb.append("\tc1Nid=\t" + sr.c1Id);
+						sb.append("\r\n::: relNid=\t"+ sr.relNid + " " + Terms.get().nativeToUuid(sr.relNid));
+                        addToOutput("c1Nid", sb, sr.c1Id, tf.getConcept(sr.c1Id));
+                        addToOutput("c1Nid", sb, sr.typeId, tf.getConcept(sr.typeId));
+                        addToOutput("c1Nid", sb, sr.c2Id, tf.getConcept(sr.c2Id));
 					}
 					countNull++;
+					rBean = tf.getRelationship(sr.relNid);
 				}
 				countTotal++;
 			} catch (IOException e) {
@@ -123,6 +120,15 @@ public class TestCPath_New extends AbstractTask {
 		logger.info("\r\n::: [TestCPath_New] evaluate() -- completed");
 		return Condition.CONTINUE;
 	}
+
+    private void addToOutput(String label, StringBuilder sb, int nid, I_GetConceptData src) throws IOException {
+        if (src != null)
+        	sb.append("\t"+label+"=\t" + nid + "\t"
+        			+ src.getUids().get(0) + "\t"
+        			+ src.getInitialText());
+        else
+        	sb.append("\t"+label+"=\t" + nid);
+    }
 
 	@Override
 	public Collection<Condition> getConditions() {

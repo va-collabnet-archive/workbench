@@ -185,6 +185,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
     }
 
     protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOException;
+    protected abstract int getDescriptionCount() throws IOException;
 
     public String getColumnName(int col) {
         return columns[col].getColumnName();
@@ -195,7 +196,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             return false;
         }
         try {
-            if (getDescription(row).getVersion() == Integer.MAX_VALUE) {
+            if (row < 0 || row >= getDescriptionCount()) {
+                return false;
+            }
+            if (getDescription(row).getTime() == Long.MAX_VALUE) {
                 if (AceLog.getAppLog().isLoggable(Level.FINER)) {
                     AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
                 }

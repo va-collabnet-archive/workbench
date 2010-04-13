@@ -29,9 +29,9 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -43,17 +43,14 @@ public class ExtensionValidator {
     private I_TermFactory termFactory = null;
     private HashMap<String, Integer> extensions = new HashMap<String, Integer>();
 
-    public ExtensionValidator() {
+    public ExtensionValidator() throws TerminologyException, IOException {
         termFactory = Terms.get();
 
-        extensions.put(I_HostConceptPlugins.REFSET_TYPES.BOOLEAN.name(), ConceptConstants.BOOLEAN_EXT.localize()
-            .getNid());
-        extensions.put(I_HostConceptPlugins.REFSET_TYPES.CONCEPT.name(), ConceptConstants.CONCEPT_EXT.localize()
-            .getNid());
-        extensions.put(I_HostConceptPlugins.REFSET_TYPES.CON_INT.name(), ConceptConstants.CON_INT_EXT.localize()
-            .getNid());
-        extensions.put(I_HostConceptPlugins.REFSET_TYPES.INTEGER.name(), ConceptConstants.INT_EXT.localize().getNid());
-        extensions.put(I_HostConceptPlugins.REFSET_TYPES.STRING.name(), ConceptConstants.STRING_EXT.localize().getNid());
+        extensions.put(I_HostConceptPlugins.REFSET_TYPES.BOOLEAN.name(), Terms.get().uuidToNative(ConceptConstants.BOOLEAN_EXT.getUuids()));
+        extensions.put(I_HostConceptPlugins.REFSET_TYPES.CONCEPT.name(), Terms.get().uuidToNative(ConceptConstants.CONCEPT_EXT.getUuids()));
+        extensions.put(I_HostConceptPlugins.REFSET_TYPES.CON_INT.name(), Terms.get().uuidToNative(ConceptConstants.CON_INT_EXT.getUuids()));
+        extensions.put(I_HostConceptPlugins.REFSET_TYPES.INTEGER.name(), Terms.get().uuidToNative(ConceptConstants.INT_EXT.getUuids()));
+        extensions.put(I_HostConceptPlugins.REFSET_TYPES.STRING.name(), Terms.get().uuidToNative(ConceptConstants.STRING_EXT.getUuids()));
 
     }// End constructor
 
@@ -72,11 +69,11 @@ public class ExtensionValidator {
 
             // check that the SNOMED is-a exists in the current database before
             // adding it
-            if (termFactory.hasId(SNOMED.Concept.IS_A.getUids().iterator().next())) {
-                allowedTypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+            if (termFactory.hasId(SNOMED.Concept.IS_A.getUids())) {
+                allowedTypes.add(Terms.get().uuidToNative(ConceptConstants.SNOMED_IS_A.getUuids()));
             }
 
-            allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+            allowedTypes.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 
             // refesetType == null --> do all refset types (wildcarrd)
 
@@ -97,7 +94,7 @@ public class ExtensionValidator {
                 /*
                  * Get concept for Refset Auxilary -> "inclusion type"
                  */
-                inclusionTypeConcept = termFactory.getConcept(ConceptConstants.INCLUSION_TYPE.localize().getNid());
+                inclusionTypeConcept = termFactory.getConcept(Terms.get().uuidToNative(ConceptConstants.INCLUSION_TYPE.getUuids()));
             } else if (refsetType == extensions.get(REFSET_TYPES.CON_INT.name()).intValue()) {
             } else if (refsetType == extensions.get(REFSET_TYPES.INTEGER.name()).intValue()) {
             } else if (refsetType == extensions.get(REFSET_TYPES.STRING.name()).intValue()) {

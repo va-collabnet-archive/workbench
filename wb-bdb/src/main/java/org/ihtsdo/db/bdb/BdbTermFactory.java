@@ -1216,7 +1216,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public int uuidToNative(UUID uid) throws TerminologyException, IOException {
+    public int uuidToNative(UUID... uid) throws TerminologyException, IOException {
         return Bdb.uuidToNid(uid);
     }
 

@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.table;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,5 +84,10 @@ public class DescriptionsFromCollectionTableModel extends DescriptionTableModel 
             return scoreList.get(rowIndex).toString();
         }
         return "";
+    }
+
+    @Override
+    protected int getDescriptionCount() throws IOException {
+        return descriptionList.size();
     }
 }

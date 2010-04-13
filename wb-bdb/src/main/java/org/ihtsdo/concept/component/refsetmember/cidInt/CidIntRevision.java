@@ -8,6 +8,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidIntRevision;
@@ -29,7 +30,8 @@ public class CidIntRevision
     public String toString() {
         StringBuffer buf = new StringBuffer();  
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" c1Nid:" + this.c1Nid);
+        buf.append(" c1Nid: ");
+        ConceptComponent.addNidToBuffer(buf, c1Nid);
         buf.append(" intValue:" + this.intValue);
         buf.append(super.toString());
         return buf.toString();

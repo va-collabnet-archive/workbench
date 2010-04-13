@@ -562,9 +562,9 @@ public class TupleFileUtil {
                     I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) thinTuple.getMutablePart();
                     I_GetConceptData clause = Terms.get().getConcept(part.getC2id());
                     I_GetConceptData potentialRefset = Terms.get().getConcept(part.getC3id());
-                    if (clause.getConceptId() == RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.localize().getNid()
-                        || clause.getConceptId() == RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.localize().getNid()
-                        || clause.getConceptId() == RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.localize().getNid()) {
+                    if (clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids())
+                        || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
+                        || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
                         if (isMemberRefset(potentialRefset)) {
                             RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true);
                             exportRefsetSpecToFile(outputFileWriter, refsetSpecHelper.getRefsetSpecConcept(),
