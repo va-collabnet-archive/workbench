@@ -82,7 +82,7 @@ public class RefsetSpec {
                 // concept is used
                 return true;
             } else {
-                if (computeType.getConceptId() == RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.localize().getNid()) {
+                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -117,7 +117,7 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptId() == RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.localize().getNid()) {
+                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -140,7 +140,7 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptId() == RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.localize().getNid()) {
+                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -377,9 +377,8 @@ public class RefsetSpec {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
                                 I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
                                 I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
-                                if (status.getConceptId() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()
-                                    || status.getConceptId() == ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT
-                                        .localize().getNid()) {
+                                if (status.getConceptId() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+                                    || status.getConceptId() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids())) {
                                     return true;
                                 }
                             }
@@ -410,8 +409,7 @@ public class RefsetSpec {
                 if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptId(),
                     memberRefsetConcept.getConceptId())) {
                     helper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), memberRefsetConcept
-                        .getConceptId(), newStatus.getConceptId(), ArchitectonicAuxiliary.Concept.CURRENT.localize()
-                        .getNid());
+                        .getConceptId(), newStatus.getConceptId(), Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
                     Terms.get().commit();
                 } else {
                     helper.newRefsetExtension(promotionRefsetConcept.getConceptId(),
