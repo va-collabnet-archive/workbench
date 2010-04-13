@@ -163,13 +163,6 @@ public class RelPopupListener extends MouseAdapter {
                     model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(
                         newPart.getRefinabilityId()));
                     model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
-
-                    I_RelVersioned destRel = destBean.getDestRel(selectedObject.getTuple().getRelId());
-
-                    selectedObject.getTuple().getRelVersioned().addVersion(newPart);
-                    if (destRel != null && srcRel != destRel) {
-                        destRel.addVersion(newPart);
-                    }
                 }
                 Terms.get().addUncommitted(sourceBean);
                 Terms.get().addUncommitted(destBean);
