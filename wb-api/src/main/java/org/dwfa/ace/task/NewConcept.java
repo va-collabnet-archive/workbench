@@ -99,6 +99,7 @@ public class NewConcept extends AbstractTask {
             
             host.unlink();
             host.setTermComponent(newConcept);
+            Terms.get().addUncommitted(newConcept);
 
             return Condition.CONTINUE;
         } catch (TerminologyException e) {
