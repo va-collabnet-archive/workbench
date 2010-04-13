@@ -134,7 +134,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     }
 
     private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid) throws Exception {
-        if (possibleCNids.isMember(componentNid)) {
+        if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
             if (query.execute(component)) {
