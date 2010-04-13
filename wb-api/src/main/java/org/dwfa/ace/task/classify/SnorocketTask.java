@@ -272,8 +272,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
             SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, cEditSnoCons,
-                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, false, 
-                   config.getPrecedence(), config.getConflictResolutionStrategy());
+                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, gui, false, config
+                            .getPrecedence(), config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcEdit); // :!!!:
             // Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
             logger
@@ -296,15 +296,15 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // Fill array to make binary search work correctly.
             Arrays.fill(cNidArray, nextCIdx, cNidArray.length, Integer.MAX_VALUE);
 
-            // FILTER RELATIONSHIPS
-            /* Snorocket_123 is self filtering on C2
-            int last = cEditSnoRels.size();
-            for (int idx = last - 1; idx > -1; idx--)
-                if (Arrays.binarySearch(cNidArray, cEditSnoRels.get(idx).c2Id) < 0)
-                    cEditSnoRels.remove(idx);
-            */
 
             if (debugDump) {
+                // FILTER RELATIONSHIPS
+                /* Snorocket_123 is self filtering on C2 */
+                int last = cEditSnoRels.size();
+                for (int idx = last - 1; idx > -1; idx--)
+                    if (Arrays.binarySearch(cNidArray, cEditSnoRels.get(idx).c2Id) < 0)
+                        cEditSnoRels.remove(idx);
+                
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
                 Collections.sort(cEditSnoCons);
@@ -372,7 +372,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 gui.complete(); // PHASE 1. DONE
                 return Condition.CONTINUE;
             }
-            
+
             cEditSnoCons = null; // :MEMORY:
             cEditSnoRels = null; // :MEMORY:
             pcEdit = null; // :MEMORY:
@@ -488,8 +488,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             cClassSnoRels = new ArrayList<SnoRel>();
             startTime = System.currentTimeMillis();
             SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
-                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, gui, true,
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, gui, true, config
+                            .getPrecedence(), config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
@@ -530,6 +530,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // WRITEBACK RESULTS
             startTime = System.currentTimeMillis();
             logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cClassPathNid));
+
+            // Commit
+            tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
+
             logger.info("\r\n::: *** WRITEBACK *** LAPSED TIME =\t" + toStringLapseSec(startTime)
                     + " ***");
 
@@ -921,27 +925,31 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
-            List<? extends I_RelPart> rvList = rBean.getVersions(config.getConflictResolutionStrategy());
+            if (rBean != null) {
+                List<? extends I_RelPart> rvList = rBean.getVersions(config
+                        .getConflictResolutionStrategy());
 
-            if (rvList.size() != 1)
-                logger.info("::: [SnorocketTask] ERROR: writeBackRetired() multiple last versions");
-            else {
+                if (rvList.size() != 1) {
+                    // CREATE RELATIONSHIP PART W/ TermFactory
+                    I_RelPart nextRelPart = tf.newRelPart(); // I_RelPart
+                    nextRelPart.setTypeId(rel_A.typeId); // from classifier
+                    nextRelPart.setGroup(rel_A.group); // from classifier
+                    I_RelPart lastPart = rvList.get(0);
+                    nextRelPart.setCharacteristicId(lastPart.getCharacteristicId());
+                    nextRelPart.setRefinabilityId(lastPart.getRefinabilityId());
+                    nextRelPart.setStatusId(isRETIRED);
+                    nextRelPart.setTime(versionTime);
+                    nextRelPart.setPathId(writeToNid); // via preferences
 
-                // CREATE RELATIONSHIP PART W/ TermFactory
-                I_RelPart nextRelPart = tf.newRelPart(); // I_RelPart
-                nextRelPart.setTypeId(rel_A.typeId); // from classifier
-                nextRelPart.setGroup(rel_A.group); // from classifier
-                I_RelPart lastPart = rvList.get(0);
-                nextRelPart.setCharacteristicId(lastPart.getCharacteristicId());
-                nextRelPart.setRefinabilityId(lastPart.getRefinabilityId());
-                nextRelPart.setStatusId(isRETIRED);
-                nextRelPart.setTime(versionTime);
-                nextRelPart.setPathId(writeToNid); // via preferences
+                    rBean.addVersionNoRedundancyCheck(nextRelPart);
 
-                rBean.addVersionNoRedundancyCheck(nextRelPart);
-
-                // Commit
-                tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
+                } else {
+                    logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
+                            + "multiple last versions");
+                }
+            } else {
+                logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
+                        + "tf.getRelationship(" + rel_A.relNid + ") == null");
             }
 
         } catch (Exception e) {
@@ -950,33 +958,19 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         }
     }
 
-    private void writeBackCurrent(SnoRel rel_B, int writeToNid, 
-            long versionTime) throws TerminologyException, IOException {
+    private void writeBackCurrent(SnoRel rel_B, int writeToNid, long versionTime)
+            throws TerminologyException, IOException {
         if (rel_B.typeId == isaNid)
             SnoQuery.isaAdded.add(rel_B);
         else
             SnoQuery.roleAdded.add(rel_B);
-               
+
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        tf.newRelationshipNoCheck(UUID.randomUUID(),
-                tf.getConcept(rel_B.c1Id), 
-                rel_B.typeId, 
-                rel_B.c2Id, 
-                isCh_DEFINING_CHARACTERISTIC, 
-                isOPTIONAL_REFINABILITY, 
-                isCURRENT, 
-                rel_B.group, 
-                writeToNid, 
-                versionTime);
-        
-        // Commit
-        try {
-            tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
+        tf.newRelationshipNoCheck(UUID.randomUUID(), tf.getConcept(rel_B.c1Id), rel_B.typeId,
+                rel_B.c2Id, isCh_DEFINING_CHARACTERISTIC, isOPTIONAL_REFINABILITY, isCURRENT,
+                rel_B.group, writeToNid, versionTime);
+
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {
@@ -1030,8 +1024,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     logger.severe("\r\n::: SERVERE ERROR rootNid MISMACTH ***");
                 }
             } else {
-                String errStr = "Classifier Root not set! Found: "
-                        + config.getEditingPathSet();
+                String errStr = "Classifier Root not set! Found: " + config.getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;
@@ -1645,15 +1638,16 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                             + c2.getInitialText() + "\t" + g + "\r\n");
                 }
             }
-            if (format == 4) { // "FULL": UUIDs, NIDs, **_index, Initial Text
+            if (format == 4) { // "FULL": rNID, UUIDs, NIDs, **_index, Initial Text
                 int index = 0;
                 for (SnoRel sr : srl) {
                     I_GetConceptData c1 = tf.getConcept(sr.c1Id);
                     I_GetConceptData t = tf.getConcept(sr.typeId);
                     I_GetConceptData c2 = tf.getConcept(sr.c2Id);
                     int g = sr.group;
-                    bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
-                            + "\t" + c2.getUids().iterator().next() + "\t" + g + "\t");
+                    bw.write(sr.relNid + "\t" + c1.getUids().iterator().next() + "\t"
+                            + t.getUids().iterator().next() + "\t" + c2.getUids().iterator().next()
+                            + "\t" + g + "\t");
                     bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
                     bw.write("**_" + index + "\t|");
                     bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
