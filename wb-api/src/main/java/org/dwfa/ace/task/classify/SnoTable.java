@@ -146,20 +146,25 @@ public class SnoTable {
         else return false;
     }
 
-    private static void updatePrefs(boolean showDialogs) throws TerminologyException, IOException {
+    public static String updatePrefs(boolean showDialogs) throws TerminologyException, IOException {
         tf = Terms.get();
         I_ConfigAceFrame config;
         config = tf.getActiveAceFrameConfig();
+        return updatePrefs(showDialogs, config);
+    }
+
+    private static String updatePrefs(boolean showDialogs, I_ConfigAceFrame config) throws TerminologyException,
+            IOException {
         // Setup core constants
         if (config.getClassifierIsaType() != null)
             isaNid = config.getClassifierIsaType().getConceptId();
         else {
-            String errStr = "SNOMED 'Is a' -- not set in Classifier preferences tab!";
+            String errStr = "'Is a' -- not set in Classifier preferences tab!";
             if (showDialogs)
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
             else
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+            return errStr;
         }
 
         if (config.getClassificationRoleRoot() != null)
@@ -170,7 +175,7 @@ public class SnoTable {
             AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
             else
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+            return errStr;
         }
 
         isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -183,7 +188,7 @@ public class SnoTable {
             AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
             else
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+            return errStr;
         }
 
         // GET ALL EDIT_PATH ORIGINS
@@ -199,7 +204,7 @@ public class SnoTable {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
             else
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+            return errStr;
         }
 
         // GET ALL CLASSIFER_PATH ORIGINS
@@ -215,9 +220,9 @@ public class SnoTable {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
             else
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
-            return;
+            return errStr;
         }
-
+        return null;
     }
 
     private static void addPathOrigins(List<I_Position> origins, I_Path p) {
