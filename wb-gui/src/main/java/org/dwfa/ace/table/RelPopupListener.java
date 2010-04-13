@@ -94,20 +94,19 @@ public class RelPopupListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent e) {
-            I_GetConceptData sourceBean;
 			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
+	            I_RelTuple tuple = selectedObject.getTuple();
+	            I_RelVersioned versioned = (I_RelVersioned) tuple.getRelVersioned();
+	            Terms.get().forget(versioned);
+	            Terms.get().addUncommitted(sourceBean);
+	            model.allTuples = null;
+	            model.fireTableDataChanged();
 			} catch (TerminologyException e1) {
 				throw new RuntimeException(e1);
 			} catch (IOException e1) {
 				throw new RuntimeException(e1);
 			}
-            I_RelTuple tuple = selectedObject.getTuple();
-            I_RelVersioned versioned = (I_RelVersioned) tuple.getRelVersioned();
-            versioned.getMutableParts().remove(tuple.getMutablePart());
-            Terms.get().addUncommitted(sourceBean);
-            model.allTuples = null;
-            model.fireTableDataChanged();
         }
     }
 

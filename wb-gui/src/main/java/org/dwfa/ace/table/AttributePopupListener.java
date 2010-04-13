@@ -90,7 +90,6 @@ public class AttributePopupListener extends MouseAdapter {
             try {
                 I_ConceptAttributeTuple tuple = selectedObject.getTuple();
                 I_ConceptAttributeVersioned versioned = (I_ConceptAttributeVersioned) tuple.getFixedPart();
-                versioned.getMutableParts().remove(tuple.getMutablePart());
                 Terms.get().forget(versioned);
                 model.allTuples = null;
                 model.fireTableDataChanged();

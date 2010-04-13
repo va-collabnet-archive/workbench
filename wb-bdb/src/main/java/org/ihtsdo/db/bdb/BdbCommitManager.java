@@ -44,12 +44,12 @@ import org.dwfa.app.DwfaEnv;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -454,13 +454,16 @@ public class BdbCommitManager {
                 "Cannot forget a committed component.");
             } else {
                 synchronized (a.revisions) {
-                    Iterator<ConceptAttributesRevision> ri = a.revisions
-                    .iterator();
+                    List<ConceptAttributesRevision> toRemove = new ArrayList<ConceptAttributesRevision>();
+                    Iterator<ConceptAttributesRevision> ri = a.revisions.iterator();
                     while (ri.hasNext()) {
                         ConceptAttributesRevision ar = ri.next();
                         if (ar.getTime() == Long.MAX_VALUE) {
-                            ri.remove();
+                            toRemove.add(ar);
                         }
+                    }
+                    for (ConceptAttributesRevision r: toRemove) {
+                        a.removeRevision(r);
                     }
                 }
             }
@@ -482,14 +485,17 @@ public class BdbCommitManager {
 	            "Cannot forget a committed component.");
 	        } else {
 	            synchronized (r.revisions) {
-	                Iterator<RelationshipRevision> ri = r.revisions
-	                .iterator();
+                    List<RelationshipRevision> toRemove = new ArrayList<RelationshipRevision>();
+	                Iterator<RelationshipRevision> ri = r.revisions.iterator();
 	                while (ri.hasNext()) {
 	                    RelationshipRevision rr = ri.next();
 	                    if (rr.getTime() == Long.MAX_VALUE) {
-	                        ri.remove();
+                            toRemove.add(rr);
 	                    }
 	                }
+                    for (RelationshipRevision tr: toRemove) {
+                        r.removeRevision(tr);
+                    }
 	            }
 	        }
 	    } else {
@@ -511,13 +517,17 @@ public class BdbCommitManager {
 		            "Cannot forget a committed component.");
 		    } else {
 		        synchronized (d.revisions) {
+		            List<DescriptionRevision> toRemove = new ArrayList<DescriptionRevision>();
 		            Iterator<DescriptionRevision> di = d.revisions.iterator();
 		            while (di.hasNext()) {
 		                DescriptionRevision dr = di.next();
 		                if (dr.getTime() == Long.MAX_VALUE) {
-		                    di.remove();
+		                    toRemove.add(dr);
 		                }
 		            }
+                    for (DescriptionRevision tr: toRemove) {
+                        d.removeRevision(tr);
+                    }
 		        }
 		    }
 		} else {
@@ -534,8 +544,9 @@ public class BdbCommitManager {
 		Bdb.getConceptDb().forget(c);
 	}
 
+    @SuppressWarnings("unchecked")
     public static void forget(I_ExtendByRef extension) throws IOException {
-		RefsetMember<?, ?> m = (RefsetMember<?, ?>) extension;
+		RefsetMember m = (RefsetMember) extension;
         Concept c = Bdb.getConcept(m.getRefsetId());
         if (m.getTime() != Long.MAX_VALUE) {
             // Only need to forget additional versions;
@@ -544,12 +555,16 @@ public class BdbCommitManager {
                     "Cannot forget a committed component.");
             } else {
                 synchronized (m.revisions) {
+                    List<RefsetRevision<?,?>> toRemove = new ArrayList<RefsetRevision<?,?>>();
                     Iterator<?> mi =  m.revisions.iterator();
                     while (mi.hasNext()) {
-                        Revision<?,?> mr = (Revision<?, ?>) mi.next();
+                        RefsetRevision<?,?> mr = (RefsetRevision<?, ?>) mi.next();
                         if (mr.getTime() == Long.MAX_VALUE) {
-                            mi.remove();
+                            toRemove.add(mr);
                         }
+                    }
+                    for (RefsetRevision tr: toRemove) {
+                        m.removeRevision(tr);
                     }
                 }
             }
