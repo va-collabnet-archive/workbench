@@ -67,7 +67,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             }
         });
         ActivityViewer.addActivity(activity);
-        ActivityViewer.toFront();
 
         this.refsetNid = refsetNid;
         this.refsetConcept = Bdb.getConcept(refsetNid);
