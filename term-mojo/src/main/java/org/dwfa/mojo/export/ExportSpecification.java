@@ -19,6 +19,7 @@ package org.dwfa.mojo.export;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +51,7 @@ import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConceptString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartString;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.util.TupleVersionComparator;
 import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -319,7 +321,7 @@ public class ExportSpecification {
             Collection<I_DescriptionTuple> matchingDescriptionTuples,
             Collection<I_RelTuple> matchingRelationshipTuples, Position position) throws IOException,
             TerminologyException {
-        Collection<I_ConceptAttributeTuple> matchingAttributeTuples = position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, true));
+        Collection<I_ConceptAttributeTuple> matchingAttributeTuples = position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, false));
         matchingConceptTuples.addAll(matchingAttributeTuples);
         if(!exportableConcept) {
             exportableConcept = !matchingAttributeTuples.isEmpty();
@@ -327,10 +329,10 @@ public class ExportSpecification {
 
         if (!matchingAttributeTuples.isEmpty()) {
             matchingDescriptionTuples.addAll(position.getMatchingTuples(
-                concept.getDescriptionTuples(null, null, null, true)));
+                concept.getDescriptionTuples(null, null, null, false)));
 
             matchingRelationshipTuples.addAll(position.getMatchingTuples(
-                concept.getSourceRelTuples(null, null, null, false, true)));
+                concept.getSourceRelTuples(null, null, null, false, false)));
         }
 
         return exportableConcept;
@@ -405,10 +407,10 @@ public class ExportSpecification {
             for (Position position : positions) {
                 if (position.isLastest()) {
                     latestPathExtensionTuples.addAll(
-                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, true)));
+                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
                 } else {
                     extensionTuples.addAll(
-                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, true)));
+                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
                 }
             }
 
@@ -569,17 +571,24 @@ public class ExportSpecification {
 
         setUuidSctIdIdentifier(conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
 
-        List<I_DescriptionTuple> descriptionTuples = conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true);
+        List<I_DescriptionTuple> descriptionTuples = new ArrayList<I_DescriptionTuple>();
+        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true)));
+        Collections.sort(descriptionTuples, new TupleVersionComparator());
 
         String fsn = "NO FSN!!!";
+        I_DescriptionTuple fsnTuple = null;
         if (!descriptionTuples.isEmpty()) {
-            I_DescriptionTuple fsnTuple = getTupleVersion(descriptionTuples, tuple);
+            for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
+                if(isActive(iDescriptionTuple.getStatusId())){
+                    fsnTuple = iDescriptionTuple;
+                }
+            }
+
+            //If no active FSN get the latest inactive FSN
             if (fsnTuple != null) {
                 fsn = fsnTuple.getText();
             } else {
-                logger.severe("No FSN for the tuple version: " + tuple.getVersion() + " concept "
-                    + termFactory.getConcept(conceptData.getNid()));
-                fsn = descriptionTuples.get(0).getText();
+                fsn = descriptionTuples.iterator().next().getText();
             }
         } else {
             logger.severe("No FSN for: " + tuple.getVersion() + " concept "

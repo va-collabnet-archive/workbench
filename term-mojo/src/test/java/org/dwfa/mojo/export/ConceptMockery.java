@@ -708,7 +708,7 @@ public class ConceptMockery {
 
         // mock the exportable tuple
         conceptTupleList.add(exportableConceptTuple);
-        expect(exportableConcept.getConceptAttributeTuples(null, null, false, true)).andReturn(conceptTupleList);
+        expect(exportableConcept.getConceptAttributeTuples(null, null, false, false)).andReturn(conceptTupleList);
 
         // Id
         exportConceptUuidList.add(UUID.randomUUID());
@@ -924,7 +924,7 @@ public class ConceptMockery {
         expect(conceptExtension.getRefsetId()).andReturn(refsetNid).times(2);
         expect(conceptExtension.getMemberId()).andReturn(memberNid).times(4);
         expect(conceptExtension.getComponentId()).andReturn(componentNid);
-        expect(conceptExtension.getTuples(null, null, false, true)).andReturn(extensionConceptTuples);
+        expect(conceptExtension.getTuples(null, null, false, false)).andReturn(extensionConceptTuples);
 
         I_ThinExtByRefTuple conceptExtensionTuple = createMock(I_ThinExtByRefTuple.class);
         expect(conceptExtensionTuple.getRefsetId()).andReturn(refsetNid).times(2);
@@ -958,7 +958,7 @@ public class ConceptMockery {
 
         conceptExtensions.add(conceptExtension);
         expect(termFactory.getAllExtensionsForComponent(componentNid)).andReturn(conceptExtensions);
-        expect(conceptExtension.getTuples(null, null, false, true)).andReturn(extensionConceptTuples);
+        expect(conceptExtension.getTuples(null, null, false, false)).andReturn(extensionConceptTuples);
 
         replay(memberIdPart, memberUuidIdPart, memberIdVersioned, conceptExtension, conceptExtensionTuple);
     }

@@ -82,7 +82,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     private Map<Integer, String> toIdCache = new HashMap<Integer, String>();
     private AceIdentifierWriter aceIdentifierWriter = null;
     private ConceptDescriptor activeStatus = new ConceptDescriptor("32dc7b19-95cc-365e-99c9-5095124ebe72", "active");
-    private DateFormat exportDateFormat = AceDateFormat.getRf2DateFormat();
+    private DateFormat exportDateFormat = AceDateFormat.getRf2TimezoneDateFormat();
 
     /**
      * Used to configure the release date/version to use for given paths,
@@ -650,13 +650,22 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         if (pathReleaseVersions.containsKey(pathId)) {
-            buffer = pathReleaseVersions.get(pathId);
+            buffer = exportDateFormat.format(new Date(ThinVersionHelper.convert(partVersion)));
+            for (PathReleaseDateConfig config : pathReleaseDateConfig) {
+                if (config.getLastReleaseDate() != null
+                    && config.getLastReleaseDate().getTime() < ThinVersionHelper.convert(partVersion)) {
+                    buffer = pathReleaseVersions.get(pathId);
+                }
+            }
         } else if (pathReleaseDateConfig != null) {
             String version = null;
             for (PathReleaseDateConfig config : pathReleaseDateConfig) {
                 if (config.getPath().getVerifiedConcept().getConceptId() == pathId) {
-                    version = exportDateFormat.format(config.getReleaseDate());
-                    pathReleaseVersions.put(pathId, version);
+                    if (config.getLastReleaseDate() != null
+                        && config.getLastReleaseDate().getTime() < ThinVersionHelper.convert(partVersion)) {
+                        version = exportDateFormat.format(config.getReleaseDate());
+                        pathReleaseVersions.put(pathId, version);
+                    }
                 }
             }
             if (version == null) {

@@ -376,7 +376,7 @@ public class DatabaseExportTest extends ConceptMockery {
         ///////////////////////////
         // Exportable relationships
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, false)).andReturn(relationshipTuples);
 
         int relId = 200;
 
@@ -513,7 +513,7 @@ public class DatabaseExportTest extends ConceptMockery {
         // concept relationships //
         ///////////////////////////
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, false)).andReturn(relationshipTuples);
         int relId = 200;
 
         List<UUID> exportRelationshipUuidList = new ArrayList<UUID>();
@@ -611,7 +611,7 @@ public class DatabaseExportTest extends ConceptMockery {
         // concept relationships //
         ///////////////////////////
         List<I_RelTuple> relationshipTuples = new ArrayList<I_RelTuple>();
-        expect(exportableConcept.getSourceRelTuples(null, null, null, false, true)).andReturn(relationshipTuples);
+        expect(exportableConcept.getSourceRelTuples(null, null, null, false, false)).andReturn(relationshipTuples);
         int relId = exportConcept2Nid * 20000;
 
         List<UUID> exportRelationshipUuidList = new ArrayList<UUID>();

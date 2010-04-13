@@ -16,7 +16,7 @@ public class Position {
     private Date timePoint;
     private List<Integer> statusNids = new ArrayList<Integer>();
     private I_GetConceptData path;
-    private boolean lastest;
+    private boolean lastest = false;
 
     public Position(I_GetConceptData path) throws Exception {
         this. path = path;

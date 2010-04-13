@@ -18,6 +18,8 @@ package org.dwfa.mojo.refset;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -33,20 +35,26 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefTuple;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.MemberRefsetHelper;
+import org.dwfa.ace.util.TupleVersionPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.file.AceIdentifierWriter;
 import org.dwfa.mojo.refset.writers.MemberRefsetHandler;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.AceDateFormat;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 
 /**
+ * Get all the descriptions for the concepts and create a description extension
+ * for the latest active preferred term and either a synonym or a unspecified
+ * description that meets the Order of language type preference is en_AU, en_GB,
+ * en then en_US.
  *
- * @author ean
  * @goal update-language-refset
  */
 public class UpdateLanguageRefset extends ReferenceSetExport {
@@ -67,11 +75,6 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
      * @required
      */
     private String exportPathUuidStr;
-
-    /**
-     * Create/updated reset extensions.
-     */
-    private MemberRefsetHelper memberRefsetHelper;
 
     /**
      * Refset to add the members to.
@@ -202,8 +205,6 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
         activeNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid();
         currentNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
         retiredNId = org.dwfa.cement.ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
-        memberRefsetHelper = new MemberRefsetHelper(referencesetConcept.getConceptId(),
-            RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid());
         acceptableDescriptionTypeNid = termFactory.getConcept(ConceptConstants.ACCEPTABLE.getUuids()).getConceptId();
         preferredDescriptionTypeNid = termFactory.getConcept(ConceptConstants.PREFERRED.getUuids()).getConceptId();
     }
@@ -269,23 +270,69 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
         // check if a current extension exists
         int refsetId = referencesetConcept.getConceptId();
 
-        I_ThinExtByRefPartConcept currentRefsetExtension = memberRefsetHelper.getFirstCurrentRefsetExtension(refsetId,
-            descriptionNid);
-        if (currentRefsetExtension != null) {
-            int currentRefsetExtensionType = currentRefsetExtension.getC1id();
-            if (currentRefsetExtensionType == extensionTypeId) {
-                export(currentRefsetExtension, null, refsetId, currentRefsetExtension.getC1id(), TYPE.DESCRIPTION);
-            }
-        } else {
+        Collection<I_ThinExtByRefTuple> currentRefsetExtensions = TupleVersionPart.getLatestMatchingTuples( getAllActiveOrCurrentRefsetExtensions(refsetId, descriptionNid));
+
+        if (currentRefsetExtensions.isEmpty()) {
             // stunt extension part.
             I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
             part.setC1id(extensionTypeId);
             part.setPathId(exportPath.getConceptId());
             part.setStatusId(activeNId);
-            part.setVersion(referencesetConceptLatestVersion.getVersion());
+            part.setVersion(ThinVersionHelper.convert(AceDateFormat.getRf2DateFormat().parse(releaseVersion).getTime()));
             export(part, null, refsetId, descriptionNid, TYPE.DESCRIPTION);
-
+        } else {
+            for (I_ThinExtByRefTuple currentRefsetExtension : currentRefsetExtensions) {
+                I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) currentRefsetExtension.getPart();
+                int currentRefsetExtensionType = part.getC1id();
+                if (currentRefsetExtensionType == extensionTypeId) {
+                    export(part, null, refsetId, descriptionNid, TYPE.DESCRIPTION);
+                }
+            }
         }
+    }
+
+    /**
+     * Obtain all current extensions (latest part only) for a particular refset
+     * that exist on a
+     * specific concept.
+     *
+     * This method is strongly typed. The caller must provide the actual type of
+     * the refset.
+     *
+     * @param <T> the strong/concrete type of the refset extension
+     * @param refsetId Only returns extensions matching this reference set
+     * @param conceptId Only returns extensions that exists on this concept
+     * @return All matching refset extension (latest version parts only)
+     * @throws Exception if unable to complete (never returns null)
+     * @throws ClassCastException if a matching refset extension is not of type
+     *             T
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends I_ThinExtByRefTuple> List<T> getAllActiveOrCurrentRefsetExtensions(int refsetId, int conceptId)
+            throws Exception {
+
+        ArrayList<T> result = new ArrayList<T>();
+
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ThinExtByRefTuple latestTuple = null;
+                for (I_ThinExtByRefTuple tuple : extension.getTuples(null, null, false, true)) {
+                    if ((latestTuple == null) || (tuple.getVersion() >= latestTuple.getVersion())) {
+                        latestTuple = tuple;
+                    }
+                }
+
+                // confirm its the right extension value and its status is
+                // current
+                if (latestTuple.getStatusId() == activeNId || latestTuple.getStatusId() == currentNId) {
+                    result.add((T) latestTuple);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -302,12 +349,21 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
         private static final String EN_AU = "en-AU";
         int processedLineCount = 0;
 
+        /**
+         * Get all the descriptions for the concepts and create a description
+         * extension for the latest active preferred term and either a synonym
+         * or a un specified description that meets the Order of language type
+         * preference is en_AU, en_GB, en then en_US.
+         *
+         * @param I_GetConceptData concept
+         * @throws Exception reading the database.
+         */
         @Override
         public void processConcept(I_GetConceptData concept) throws Exception {
             List<I_DescriptionVersioned> descriptions;
-            I_DescriptionVersioned latestPreferredTerm;
-            I_DescriptionVersioned latestSynonym;
-            I_DescriptionVersioned unSpecifiedDescriptionType;
+            I_DescriptionTuple latestPreferredTerm;
+            I_DescriptionTuple latestSynonym;
+            I_DescriptionTuple unSpecifiedDescriptionType;
 
             for (ExportSpecification spec : exportSpecifications) {
                 if (spec.test(concept) && isConceptAllowedStatus(concept)) {
@@ -315,25 +371,26 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
                     latestPreferredTerm = null;
                     latestSynonym = null;
                     unSpecifiedDescriptionType = null;
-                    I_DescriptionPart latest;
+                    Collection<I_DescriptionTuple> latestTuples;
                     for (I_DescriptionVersioned descriptionVersioned : descriptions) {
-                        I_ThinExtByRefPartConcept currentLanguageExtension = memberRefsetHelper.getFirstCurrentRefsetExtension(
-                            referencesetConcept.getConceptId(), descriptionVersioned.getDescId());
+                        latestTuples = TupleVersionPart.getLatestMatchingTuples(descriptionVersioned.getTuples());
 
-                        latest = getLatest(descriptionVersioned);
-
-                        if (currentLanguageExtension != null) {
-                            retireOldExtension(latest, descriptionVersioned, currentLanguageExtension);
-                        }
-
-                        if (latest.getStatusId() == activeNId || latest.getStatusId() == currentNId) {
-                            if (latest.getTypeId() == prefferredTermNid) {
-                                latestPreferredTerm = getAdrsVersion(descriptionVersioned, latestPreferredTerm);
-                            } else if (latest.getTypeId() == synonymNid) {
-                                latestSynonym = getAdrsVersion(descriptionVersioned, latestSynonym);
-                            } else if (latest.getTypeId() == unSpecifiedDescriptionTypeNid) {
-                                unSpecifiedDescriptionType = getAdrsVersion(descriptionVersioned, unSpecifiedDescriptionType);
+                        for (I_DescriptionTuple latest : latestTuples) {
+                            if (latest.getStatusId() == activeNId || latest.getStatusId() == currentNId) {
+                                if (latest.getTypeId() == prefferredTermNid) {
+                                    latestPreferredTerm = getAdrsVersion(latest, latestPreferredTerm);
+                                } else if (latest.getTypeId() == synonymNid) {
+                                    latestSynonym = getAdrsVersion(latest, latestSynonym);
+                                } else if (latest.getTypeId() == unSpecifiedDescriptionTypeNid) {
+                                    unSpecifiedDescriptionType = getAdrsVersion(latest, unSpecifiedDescriptionType);
+                                }
+                            } else {
+                                Collection<I_ThinExtByRefTuple> currentLanguageExtensions = getAllActiveOrCurrentRefsetExtensions(referencesetConcept.getConceptId(), latest.getDescId());
+                                for (I_ThinExtByRefTuple currentLanguageExtension : currentLanguageExtensions) {
+                                    retireOldExtension(latest, descriptionVersioned, (I_ThinExtByRefPartConcept) currentLanguageExtension.getPart());
+                                }
                             }
+
                         }
                     }
 
@@ -363,16 +420,14 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
          * @param currentLanguageExtension I_ThinExtByRefPartConcept
          * @throws Exception
          */
-        private void retireOldExtension(I_DescriptionPart latest, I_DescriptionVersioned descriptionVersioned,
+        private void retireOldExtension(I_DescriptionTuple latest, I_DescriptionVersioned descriptionVersioned,
                 I_ThinExtByRefPartConcept currentLanguageExtension) throws Exception {
-            if(currentLanguageExtension.getVersion() != latest.getVersion()){
-                I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
-                part.setC1id(currentLanguageExtension.getC1id());
-                part.setPathId(exportPath.getConceptId());
-                part.setStatusId(retiredNId);
-                part.setVersion(referencesetConceptLatestVersion.getVersion());
-                export(part, null, referencesetConcept.getConceptId(), descriptionVersioned.getDescId(), TYPE.DESCRIPTION);
-            }
+            I_ThinExtByRefPartConcept part = new ThinExtByRefPartConcept();
+            part.setC1id(currentLanguageExtension.getC1id());
+            part.setPathId(exportPath.getConceptId());
+            part.setStatusId(retiredNId);
+            part.setVersion(ThinVersionHelper.convert(AceDateFormat.getRf2DateFormat().parse(releaseVersion).getTime()));
+            export(part, null, referencesetConcept.getConceptId(), descriptionVersioned.getDescId(), TYPE.DESCRIPTION);
         }
 
         /**
@@ -380,74 +435,32 @@ public class UpdateLanguageRefset extends ReferenceSetExport {
          *
          * Order of language type preference is en_AU, en_GB, en then en_US.
          *
-         * @param descriptionVersioned I_DescriptionVersioned
-         * @param currentAdrsVersioned I_DescriptionVersioned can be null
+         * @param descriptionVersion I_DescriptionTuple
+         * @param currentAdrsVersion I_DescriptionTuple can be null
          * @return I_DescriptionVersioned
          */
-        private I_DescriptionVersioned getAdrsVersion(I_DescriptionVersioned descriptionVersioned, I_DescriptionVersioned currentAdrsVersioned) {
-            I_DescriptionVersioned adrsVersion = currentAdrsVersioned;
-
-            if (currentAdrsVersioned != null) {
-                I_DescriptionPart currentPart = getLatest(descriptionVersioned);
-                I_DescriptionPart adrsPart = getLatest(currentAdrsVersioned);
-
-                if(currentPart.getLang().equals(EN_AU)) {
-                    adrsVersion = descriptionVersioned;
-                } else if (currentPart.getLang().equals(EN_GB)
-                        && adrsPart.getLang().equals(EN_AU)) {
-                    adrsVersion = descriptionVersioned;
-                } else if (currentPart.getLang().equals(EN)
-                        && adrsPart.getLang().equals(EN_GB)
-                        && adrsPart.getLang().equals(EN_AU)) {
-                    adrsVersion = descriptionVersioned;
-                } else if (currentPart.getLang().equals(EN_US)
-                        && adrsPart.getLang().equals(EN)
-                        && adrsPart.getLang().equals(EN_GB)
-                        && adrsPart.getLang().equals(EN_AU)) {
-                    adrsVersion = descriptionVersioned;
+        private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple) {
+            if (adrsTuple != null) {
+                if(currentTuple.getLang().equals(EN_AU)) {
+                    adrsTuple = currentTuple;
+                } else if (currentTuple.getLang().equals(EN_GB)
+                        && adrsTuple.getLang().equals(EN_AU)) {
+                    adrsTuple = currentTuple;
+                } else if (currentTuple.getLang().equals(EN)
+                        && adrsTuple.getLang().equals(EN_GB)
+                        && adrsTuple.getLang().equals(EN_AU)) {
+                    adrsTuple = currentTuple;
+                } else if (currentTuple.getLang().equals(EN_US)
+                        && adrsTuple.getLang().equals(EN)
+                        && adrsTuple.getLang().equals(EN_GB)
+                        && adrsTuple.getLang().equals(EN_AU)) {
+                    adrsTuple = currentTuple;
                 }
             } else {
-                adrsVersion = descriptionVersioned;
+                adrsTuple = currentTuple;
             }
 
-            return adrsVersion;
-        }
-
-        /**
-         * Yea ol' get latest part
-         *
-         * @param descriptionVersioned I_DescriptionVersioned
-         * @return I_DescriptionPart latest part
-         */
-        private I_DescriptionPart getLatest(I_DescriptionVersioned descriptionVersioned) {
-            I_DescriptionPart latestDescriptionPart = null;
-
-            for (I_DescriptionPart descriptionPart : descriptionVersioned.getVersions()) {
-                if (latestDescriptionPart == null || latestDescriptionPart.getVersion() < descriptionPart.getVersion()) {
-                    latestDescriptionPart = descriptionPart;
-                }
-            }
-
-            return latestDescriptionPart;
-        }
-
-        /**
-         * Is this the latest version of the description type.
-         *
-         * @param typeNid int
-         * @param currentLatest I_DescriptionTuple
-         * @param description I_DescriptionTuple
-         * @return true if the description is the latest.
-         */
-        boolean isLatest(int typeNid, I_DescriptionPart currentLatest, I_DescriptionPart description) {
-            boolean latest = false;
-
-            if (typeNid == description.getTypeId()
-                && (currentLatest == null || description.getVersion() > currentLatest.getVersion())) {
-                latest = true;
-            }
-
-            return latest;
+            return adrsTuple;
         }
     }
 }
