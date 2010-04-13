@@ -121,12 +121,13 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	        AceLog.getAppLog().info("Writing canceled concept suppressed: " + 
 	        		c.toLongString());
 		} else {
-			EConcept eC = computer.getEConcept(c);
-            writePermit.acquireUninterruptibly();
-	        tempOut.writeLong(time);
+		    EConcept eC = null;
 			try {
+	            eC = computer.getEConcept(c);
+	            writePermit.acquireUninterruptibly();
+	            tempOut.writeLong(time);
                 eC.writeExternal(tempOut);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 AceLog.getAppLog().severe("\n##################################################################\n" +
                     "Exception writing change set for concept: \n" + 
                     c.toLongString() + 
@@ -152,7 +153,11 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                 csweOut.writeUTF(" sapNids for commit: ");
                 csweOut.writeUTF(commitSapNids.toString());
                 csweOut.writeUTF("\n*******************************\n");
-                csweOut.writeUTF(eC.toString());
+                if (eC != null) {
+                    csweOut.writeUTF(eC.toString());
+                } else {
+                    csweOut.writeUTF("eC == null");
+                }
             }
 			writePermit.release();
 		}
