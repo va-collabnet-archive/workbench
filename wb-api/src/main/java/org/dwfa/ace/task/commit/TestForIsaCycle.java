@@ -24,6 +24,7 @@ import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
@@ -71,16 +72,13 @@ public class TestForIsaCycle extends AbstractConceptTest {
                     List<? extends I_RelTuple> rvtl = rv.getTuples();
                     for (I_RelTuple rt : rvtl) {
                         try {
-
                             boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeId(), rt.getC2Id());
                             if (test)
                                 foundCycle = true;
                         } catch (TerminologyException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            AceLog.getAppLog().alertAndLogException(e);
                         } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            AceLog.getAppLog().alertAndLogException(e);
                         }
                     }
                 }

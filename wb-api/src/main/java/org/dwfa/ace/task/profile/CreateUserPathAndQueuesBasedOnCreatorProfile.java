@@ -105,6 +105,12 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.getViewPositionSet().clear();
             newConfig.getEditingPathSet().clear();
             I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+            newConfig.setClassificationRoleRoot(creatorConfig.getClassificationRoleRoot());
+            newConfig.setClassificationRoot(creatorConfig.getClassificationRoot());
+            newConfig.setClassifierInputPath(creatorConfig.getClassifierInputPath());
+            newConfig.setClassifierIsaType(creatorConfig.getClassifierIsaType());
+            newConfig.setClassifierOutputPath(creatorConfig.getClassifierOutputPath());
+            
             I_TermFactory tf = Terms.get();
 
             String userDirStr = "profiles" + File.separator + newConfig.getUsername();
