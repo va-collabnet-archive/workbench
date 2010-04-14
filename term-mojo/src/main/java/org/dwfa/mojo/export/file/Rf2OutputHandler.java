@@ -470,13 +470,18 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private Rf2DescriptionRow getRf2DescriptionRow(DescriptionDto descriptionDto) throws Exception {
         Rf2DescriptionRow rf2DescriptionRow = new Rf2DescriptionRow();
 
+        String lanuageCode = descriptionDto.getLanguageCode();
+        if (lanuageCode.length() > 2) {
+            lanuageCode = lanuageCode.substring(0, 2);
+        }
+
         rf2DescriptionRow.setDescriptionSctId(getSctId(descriptionDto, descriptionDto.getDescriptionId(), descriptionDto.getIdentifierDtos(), descriptionDto.getType()).toString());
         rf2DescriptionRow.setConceptSctId(getSctId(descriptionDto, descriptionDto.getConceptId(), TYPE.CONCEPT).toString());
         rf2DescriptionRow.setModuleSctId(getModuleId(descriptionDto).toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
         rf2DescriptionRow.setActive(getActiveFlag(descriptionDto));
         rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId(), TYPE.CONCEPT).toString());
-        rf2DescriptionRow.setLanaguageCode(descriptionDto.getLanguageCode());
+        rf2DescriptionRow.setLanaguageCode(lanuageCode);
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
         rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getRf2TypeId(), TYPE.CONCEPT).toString());
 
