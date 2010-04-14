@@ -80,6 +80,52 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         assert enclosingConcept != null : "enclosing concept cannot be null.";
         this.enclosingConcept = enclosingConcept;
     }
+    
+    public boolean hasUncommittedComponents() {
+        if (hasUncommittedVersion(attributes.get())) {
+            return true;
+        }
+        if (hasUncommittedVersion(srcRels.get())) {
+            return true;
+        }
+        if (hasUncommittedVersion(descriptions.get())) {
+            return true;
+        }
+        if (hasUncommittedVersion(images.get())) {
+            return true;
+        }
+        if (hasUncommittedVersion(refsetMembers.get())) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
+        if (componentList != null) {
+            for (ConceptComponent<?, ?> cc: componentList) {
+                if (hasUncommittedVersion(cc)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasUncommittedVersion(ConceptComponent<?, ?> cc) {
+        if (cc != null) {
+            if (cc.getTime() == Long.MAX_VALUE) {
+                return true;
+            }
+            if (cc.revisions != null) {
+                for (Revision<?, ?> r: cc.revisions) {
+                    if (r.getTime() == Long.MAX_VALUE) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     public AddSrcRelList getSourceRels() throws IOException {
         if (srcRels.get() == null) {

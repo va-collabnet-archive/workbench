@@ -494,8 +494,13 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	@Override
 	public final boolean isUncommitted() {
-		return lastChange > BdbCommitManager.getLastCommit();
+	    if (lastChange > BdbCommitManager.getLastCommit()) {
+	        return hasUncommittedComponents();
+	    }
+		return false;
 	}
+	
+	public abstract boolean hasUncommittedComponents();
 
 	@Override
 	public final boolean isUnwritten() {
