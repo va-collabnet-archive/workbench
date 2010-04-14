@@ -133,7 +133,7 @@ public class PromoteRefset extends AbstractTask {
             }
             for (I_GetConceptData commentsRefsetIdentity : Terms.get().getRefsetHelper(config)
                     .getCommentsRefsetForRefset(refsetToPromote, config)) {
-                    promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
+                promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
            }
             tf.commit();
 

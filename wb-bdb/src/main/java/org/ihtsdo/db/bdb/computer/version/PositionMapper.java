@@ -179,9 +179,10 @@ public class PositionMapper {
 	/**
 	 * Bypasses the onRoute test of <code>relativePosition</code>
 	 * @param <T>
-	 * @param part1
-	 * @param part2
-	 * @return
+     * @param v1 the first part of the comparison.
+     * @param v2 the second part of the comparison.
+     * @return the <code>RELATIVE_POSITION</code> of part1 compared to part2
+     *         with respect to the destination position of the class's instance.
 	 * @throws IOException
 	 */
 	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
@@ -229,9 +230,11 @@ public class PositionMapper {
          case TIME:
             if (part1.getTime() == part2.getTime()) {
                 return RELATIVE_POSITION.CONTRADICTION;
-            } else if (part1.getTime() < part2.getTime()) {
+            } else if (part1.getTime() > part2.getTime()) {
+                // i.e. it is closer to the destination...
                 return RELATIVE_POSITION.BEFORE;
             }
+            // i.e. it is further away from the destination...
             return RELATIVE_POSITION.AFTER;
         default:
             throw new RuntimeException("Can't handle policy: " + precedencePolicy);

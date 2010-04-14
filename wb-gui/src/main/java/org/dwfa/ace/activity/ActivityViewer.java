@@ -464,12 +464,31 @@ public class ActivityViewer {
     }
 
     public static void toFront() {
-        viewer.viewerFrame.setVisible(true);
-        viewer.viewerFrame.toFront();
+        if (SwingUtilities.isEventDispatchThread()) {
+            viewer.viewerFrame.toFront();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                    viewer.viewerFrame.toFront();
+                    
+                }
+            });
+        }
     }
 
     public static void toBack() {
-        viewer.viewerFrame.setVisible(false);
-        viewer.viewerFrame.toBack();
+         if (SwingUtilities.isEventDispatchThread()) {
+             viewer.viewerFrame.toBack();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                
+                @Override
+                public void run() {
+                    viewer.viewerFrame.toBack();
+                }
+            });
+        }
     }
 }
