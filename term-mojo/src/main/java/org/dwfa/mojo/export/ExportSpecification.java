@@ -481,7 +481,7 @@ public class ExportSpecification {
         getBaseConceptDto(relationshipDto, tuple, idParts, latest);
 
         setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), tuple,
-            conceptInactivationIndicatorNid, TYPE.RELATIONSHIP ,latest);
+            relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP ,latest);
         setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
         setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
 
@@ -520,7 +520,7 @@ public class ExportSpecification {
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
 
         setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
-            conceptInactivationIndicatorNid, TYPE.DESCRIPTION ,latest);
+            descriptionInactivationIndicatorNid, TYPE.DESCRIPTION ,latest);
 
         setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId(), latest);
 
