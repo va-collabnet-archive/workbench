@@ -327,8 +327,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                             }
 
                             c.weighty = 1;
+                            c.weightx = 1;
+                            c.fill = GridBagConstraints.BOTH;
                             c.gridy++;
                             dataCheckListPanel.add(new JPanel(), c);
+                            dataCheckListScroller.revalidate();
+                            dataCheckListScroller.validate();
+                            dataCheckListScroller.repaint(0, 0, 2000, 2000);
                             if (dataCheckIndex == -1) {
                                 leftTabs.addTab(DATA_CHECK_TAB_LABEL, getDataCheckListScroller());
                                 dataCheckIndex = leftTabs.indexOfTab(DATA_CHECK_TAB_LABEL);

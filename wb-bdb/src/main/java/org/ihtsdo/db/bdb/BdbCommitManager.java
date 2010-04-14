@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb;
 
+import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,12 +40,13 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.app.DwfaEnv;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
@@ -454,8 +456,8 @@ public class BdbCommitManager {
 					    		Terms.get().getActiveAceFrameConfig().getDbConfig().getAceFrames()) {
 					        frameConfig.fireCommit();
 					        frameConfig.setCommitEnabled(false);
-					        updateAlerts(frameConfig);
 					    }
+                        updateAlerts();
 					}
 				} catch (TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
@@ -478,22 +480,14 @@ public class BdbCommitManager {
 					    		Terms.get().getActiveAceFrameConfig().getDbConfig().getAceFrames()) {
 					        frameConfig.fireCommit();
 					        frameConfig.setCommitEnabled(false);
-					        updateAlerts(frameConfig);
 					    }
 					}
+                    updateAlerts();
 				} catch (TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
-            }
-        });
-    }
-
-    public static void updateAlerts(final I_ConfigAceFrame frameConfig) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                doUpdate(frameConfig);
             }
         });
     }
@@ -691,65 +685,60 @@ public class BdbCommitManager {
 		}
 	}
 
-	private static void doUpdate(I_ConfigAceFrame frameConfig) {
-		try {
-			if (((AceFrameConfig) frameConfig).getAceFrame() != null) {
-				ACE aceInstance = ((AceFrameConfig) frameConfig).getAceFrame()
-						.getCdePanel();
-				aceInstance.getDataCheckListScroller();
-				aceInstance.getUncommittedListModel().clear();
+    private static void doUpdate() {
+        try {
+            for (Frame f : OpenFrames.getFrames()) {
+                if (AceFrame.class.isAssignableFrom(f.getClass())) {
+                    AceFrame af = (AceFrame) f;
+                    ACE aceInstance = af.getCdePanel();
+                    aceInstance.getDataCheckListScroller();
+                    aceInstance.getUncommittedListModel().clear();
 
-				for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap
-						.values()) {
-					aceInstance.getUncommittedListModel().addAll(alerts);
-				}
-				if (aceInstance.getUncommittedListModel().size() > 0) {
-					for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
-						if (aceInstance.getLeftTabs().getTitleAt(i).equals(
-								ACE.DATA_CHECK_TAB_LABEL)) {
-							aceInstance.getLeftTabs().setSelectedIndex(i);
-							break;
-						}
-					}
-					// show data checks tab...
-				} else {
-					for (TermComponentDataCheckSelectionListener l : aceInstance
-							.getDataCheckListeners()) {
-						l.setSelection(null);
-					}
-					// hide data checks tab...
-				}
-				if (uncommittedCNids.cardinality() == 0) {
-					frameConfig.setCommitEnabled(false);
-					frameConfig.fireCommit();
-				} else {
-					frameConfig.setCommitEnabled(true);
-				}
-			}
-		} catch (Exception e) {
-			AceLog.getAppLog().warning(e.toString());
-		}
-	}
+                    for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+                        aceInstance.getUncommittedListModel().addAll(alerts);
+                    }
+                    if (aceInstance.getUncommittedListModel().size() > 0) {
+                        for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
+                            if (aceInstance.getLeftTabs().getTitleAt(i).equals(ACE.DATA_CHECK_TAB_LABEL)) {
+                                aceInstance.getLeftTabs().setSelectedIndex(i);
+                                break;
+                            }
+                        }
+                        // show data checks tab...
+                    } else {
+                        for (TermComponentDataCheckSelectionListener l : aceInstance.getDataCheckListeners()) {
+                            l.setSelection(null);
+                        }
+                        // hide data checks tab...
+                    }
+                    if (uncommittedCNids.cardinality() == 0) {
+                        aceInstance.aceFrameConfig.setCommitEnabled(false);
+                        aceInstance.aceFrameConfig.fireCommit();
+                    } else {
+                        aceInstance.aceFrameConfig.setCommitEnabled(true);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().warning(e.toString());
+        }
+    }
 
-	public static void updateFrames() {
-		if (getActiveFrame() != null) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					doUpdate(getActiveFrame());
-				}
-			});
-		}
-	}
+    public static void updateFrames() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                doUpdate();
+            }
+        });
+    }
 
-	public static void updateAlerts() {
-		if (getActiveFrame() != null) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					doUpdate(getActiveFrame());
-				}
-			});
-		}
-	}
+    public static void updateAlerts() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                doUpdate();
+            }
+        });
+    }
 
 	public static void removeUncommitted(final Concept concept) {
 		uncommittedCNids.setNotMember(concept.getNid());

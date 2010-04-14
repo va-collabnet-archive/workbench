@@ -168,8 +168,8 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
      */
     public boolean addAll(Collection<? extends T> c) {
         int index = data.size();
-        boolean rv = data.addAll(index, c);
-        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, data.size());
+        boolean rv = data.addAll(c);
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, Integer.MAX_VALUE);
         notifyListenersContentChanged(e);
         return rv;
     }
@@ -180,7 +180,7 @@ public class ArrayListModel<T> implements ListModel, List<T>, Serializable {
     public void clear() {
         int size = data.size();
         data.clear();
-        ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, size);
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, Integer.MAX_VALUE);
         notifyListenersContentChanged(e);
     }
 

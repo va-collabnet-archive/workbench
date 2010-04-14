@@ -109,8 +109,8 @@ public class CloneConcept extends AbstractTask {
             }
 
             host.unlink();
-            Terms.get().addUncommitted(newConcept);
             host.setTermComponent(newConcept);
+            Terms.get().addUncommitted(newConcept);
 
             return Condition.CONTINUE;
         } catch (TerminologyException e) {
