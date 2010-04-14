@@ -478,7 +478,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setCaseSignificaceSctId(getSctId(descriptionDto, descriptionDto.getCaseSignificanceId(), TYPE.CONCEPT).toString());
         rf2DescriptionRow.setLanaguageCode(descriptionDto.getLanguageCode());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
-        rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getTypeId(), TYPE.CONCEPT).toString());
+        rf2DescriptionRow.setTypeSctId(getSctId(descriptionDto, descriptionDto.getRf2TypeId(), TYPE.CONCEPT).toString());
 
         return rf2DescriptionRow;
     }

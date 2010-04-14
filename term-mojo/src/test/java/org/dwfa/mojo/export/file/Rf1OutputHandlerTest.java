@@ -424,6 +424,7 @@ public class Rf1OutputHandlerTest {
         descriptionDto.setLanguageCode("en");
         descriptionDto.setLanguageId(UUID.randomUUID());
         descriptionDto.setTypeId(UUID.randomUUID());
+        descriptionDto.setRf2TypeId(UUID.randomUUID());
         descriptionDto.setInitialCapitalStatusCode('2');
         descriptionDto.setDescriptionTypeCode('1');
         descriptionDto.setLanguageCode("en-OZ");

@@ -235,7 +235,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                     validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next()
                         + " No language id");
                 }
-                if (descriptionDto.getTypeId() == null) {
+                if (descriptionDto.getTypeId() == null || descriptionDto.getRf2TypeId() == null ) {
                     validationErrorList.add(descriptionDto.getConceptId().keySet().iterator().next() + " No type id");
                 }
             }

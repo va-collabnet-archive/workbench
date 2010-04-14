@@ -423,7 +423,7 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(getSctId(descriptionDto.getPathId(), descriptionDto),
             descriptionRow.getModuleSctId());
         Assert.assertEquals(descriptionDto.getDescription(), descriptionRow.getTerm());
-        Assert.assertEquals(getSctId(descriptionDto.getTypeId(), descriptionDto),
+        Assert.assertEquals(getSctId(descriptionDto.getRf2TypeId(), descriptionDto),
             descriptionRow.getTypeSctId());
     }
 
@@ -629,6 +629,15 @@ public class Rf2OutputHandlerTest {
         } catch (Exception e) {
 
         }
+
+        componentDto.getDescriptionDtos().set(0, setDescriptionDto(new DescriptionDto()));
+        componentDto.getDescriptionDtos().get(0).setRf2TypeId(null);
+        try{
+            rf2OutputHandler.export(componentDto);
+            Assert.fail("Must have Type Id");
+        } catch (Exception e) {
+
+        }
     }
 
     @Test
@@ -781,6 +790,7 @@ public class Rf2OutputHandlerTest {
         descriptionDto.setLanguageCode("en");
         descriptionDto.setLanguageId(UUID.randomUUID());
         descriptionDto.setTypeId(UUID.randomUUID());
+        descriptionDto.setRf2TypeId(UUID.randomUUID());
 
         return descriptionDto;
     }

@@ -129,6 +129,8 @@ public class ConceptMockery {
     int stringExtensionNid = Integer.MAX_VALUE - 61;
     int promotesToNid = Integer.MAX_VALUE - 62;
     int activeValueNid = Integer.MAX_VALUE - 63;
+    int limitedStatusNId = Integer.MAX_VALUE - 64;
+    int aceLimitedStatusNId = Integer.MAX_VALUE - 65;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -289,6 +291,10 @@ public class ConceptMockery {
         expect(termFactory.getConcept(outdatedStatusNId)).andReturn(outdatedStatusConceptData);
         replay(outdatedStatusConceptData);
 
+        I_GetConceptData limitedConceptData = mockConceptSpec(ConceptConstants.LIMITED, limitedStatusNId);
+        expect(termFactory.getConcept(limitedStatusNId)).andReturn(limitedConceptData);
+        replay(limitedConceptData);
+
         I_GetConceptData inappropriateStatusConceptData = mockConceptSpec(ConceptConstants.INAPPROPRIATE_STATUS, inappropriateStatusNId);
         expect(termFactory.getConcept(inappropriateStatusNId)).andReturn(inappropriateStatusConceptData);
         replay(inappropriateStatusConceptData);
@@ -420,6 +426,11 @@ public class ConceptMockery {
             aceMovedElsewhereStatusNId);
         replay(movedElsewhereConceptData);
 
+        List<UUID> aceLimitedUuidList = new ArrayList<UUID>();
+        aceLimitedUuidList.add(UUID.randomUUID());
+        I_GetConceptData aceLimitedConceptData = mockConceptEnum(movedElsewhereUuidList, ArchitectonicAuxiliary.Concept.LIMITED,
+            aceLimitedStatusNId);
+        replay(aceLimitedConceptData);
 
         List<UUID> initialCharacterNotCaseSensitiveUuidList = new ArrayList<UUID>();
         initialCharacterNotCaseSensitiveUuidList.add(UUID.randomUUID());

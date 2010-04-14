@@ -24,6 +24,7 @@ import java.util.UUID;
 public class DescriptionDto extends ConceptDto {
     private UUID descriptionId;
     private UUID typeId;
+    private UUID rf2TypeId;
     private UUID languageId;
     private UUID caseSignificanceId;
     private String description;
@@ -64,6 +65,20 @@ public class DescriptionDto extends ConceptDto {
      */
     public void setTypeId(UUID typeId) {
         this.typeId = typeId;
+    }
+
+    /**
+     * @return the rf2TypeId
+     */
+    public final UUID getRf2TypeId() {
+        return rf2TypeId;
+    }
+
+    /**
+     * @param rf2TypeId the rf2TypeId to set
+     */
+    public final void setRf2TypeId(UUID rf2TypeId) {
+        this.rf2TypeId = rf2TypeId;
     }
 
     /**

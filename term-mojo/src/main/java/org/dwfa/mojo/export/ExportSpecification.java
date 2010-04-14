@@ -121,6 +121,8 @@ public class ExportSpecification {
     private I_GetConceptData allCharactersCaseSensitive;
     /** Fully specified name desctiption type. */
     private I_GetConceptData fullySpecifiedDescriptionType;
+    /** Synonym desctiption type. */
+    private I_GetConceptData synonymDescriptionType;
     /** Int set of fsn type. */
     private I_IntSet fullySpecifiedDescriptionTypeIIntSet = new IntSet();
     /** CTV3 reference set. */
@@ -139,6 +141,7 @@ public class ExportSpecification {
     int aceOutdatedStatusNId;
     int aceInappropriateStatusNId;
     int aceMovedElsewhereStatusNId;
+    int aceLimitedStatusNId;
     /** RF2 inactive status. */
     int duplicateStatusNId;
     int ambiguousStatusNId;
@@ -146,6 +149,7 @@ public class ExportSpecification {
     int outdatedStatusNId;
     int inappropriateStatusNId;
     int movedElsewhereStatusNId;
+    int limitedStatusNId;
     /** History relationship types to History relationship reference set map. */
     Map<Integer, Integer> historyStatusRefsetMap = new HashMap<Integer, Integer>();
 
@@ -162,6 +166,7 @@ public class ExportSpecification {
 
     /** Component extension processor. */
     private ExtensionProcessor<I_ThinExtByRefPart> extensionProcessor;
+
 
     /**
      * Setup member variables/meta data
@@ -196,6 +201,8 @@ public class ExportSpecification {
             ArchitectonicAuxiliary.Concept.ALL_CHARACTERS_CASE_SENSITIVE.localize().getUids().iterator().next());
         fullySpecifiedDescriptionType = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getUids().iterator().next());
+        synonymDescriptionType = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getUids().iterator().next());
         fullySpecifiedDescriptionTypeIIntSet.add(fullySpecifiedDescriptionType.getConceptId());
         ctv3IdMapExtension = termFactory.getConcept(ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid());
         snomedRtIdMapExtension = termFactory.getConcept(ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid());
@@ -213,6 +220,7 @@ public class ExportSpecification {
         aceOutdatedStatusNId = Concept.OUTDATED.localize().getNid();
         aceInappropriateStatusNId = Concept.INAPPROPRIATE.localize().getNid();
         aceMovedElsewhereStatusNId = Concept.MOVED_ELSEWHERE.localize().getNid();
+        aceLimitedStatusNId = Concept.LIMITED.localize().getNid();
         descriptionInactivationIndicatorNid = ConceptConstants.DESCRIPTION_INACTIVATION_INDICATOR.localize().getNid();
         relationshipInactivationIndicatorNid = ConceptConstants.RELATIONSHIP_INACTIVATION_INDICATOR.localize().getNid();
         conceptInactivationIndicatorNid = ConceptConstants.CONCEPT_INACTIVATION_INDICATOR.localize().getNid();
@@ -227,6 +235,7 @@ public class ExportSpecification {
         historyStatusRefsetMap.put(ConceptConstants.WAS_A_HISTORY.localize().getNid(),
             ConceptConstants.WAS_A_HISTORY_REFSET.localize().getNid());
         relationshipRefinabilityExtensionNid = ConceptConstants.RELATIONSHIP_REFINABILITY_EXTENSION.localize().getNid();
+        limitedStatusNId = ConceptConstants.LIMITED.localize().getNid();
 
         setPositions(positions);
         setInclusions(inclusions);
@@ -526,9 +535,27 @@ public class ExportSpecification {
         descriptionDto.setLanguageId(ArchitectonicAuxiliary.getLanguageConcept(tuple.getLang()).getUids().iterator().next());
         descriptionDto.setNamespace(getNamespace(idParts, tuple));
         descriptionDto.setType(TYPE.DESCRIPTION);
-        descriptionDto.setTypeId(termFactory.getConcept(tuple.getTypeId()).getUids().get(0));
+        descriptionDto.setTypeId(termFactory.getUids(tuple.getTypeId()).iterator().next());
+        descriptionDto.setRf2TypeId(getRf2DescriptionType(tuple.getTypeId()));
 
         componentDto.getDescriptionDtos().add(descriptionDto);
+    }
+
+    /**
+     * Get the Rf2 description type for the Architectonic description type.
+     *
+     * @param typeNid int
+     * @return UUID for either Fully specified name or synonym
+     * @throws IOException
+     */
+    private UUID getRf2DescriptionType(int typeNid) throws IOException {
+        UUID rf2DescriptionType = synonymDescriptionType.getUids().get(0);
+
+        if(fullySpecifiedDescriptionType.getNid() == typeNid){
+            rf2DescriptionType = fullySpecifiedDescriptionType.getUids().get(0);
+        }
+
+        return rf2DescriptionType;
     }
 
     /**
@@ -653,6 +680,7 @@ public class ExportSpecification {
 
                 I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(inactivationIndicatorRefsetNid, 0,
                     componentNid, rf2InactiveStatus, tuple);
+                extensionTuple.setStatusId(activeConcept.getNid());
                 list.add(extensionTuple);
 
                 extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, type, false, latest));
@@ -1013,6 +1041,8 @@ public class ExportSpecification {
             rf2Status = inappropriateStatusNId;
         } else if (statusNid == aceMovedElsewhereStatusNId) {
             rf2Status = movedElsewhereStatusNId;
+        } else if (statusNid == aceLimitedStatusNId) {
+            rf2Status = limitedStatusNId;
         }
 
         return rf2Status;

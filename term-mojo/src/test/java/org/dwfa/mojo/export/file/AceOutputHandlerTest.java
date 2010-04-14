@@ -434,6 +434,7 @@ public class AceOutputHandlerTest {
         descriptionDto.setLanguageCode("en");
         descriptionDto.setLanguageId(UUID.randomUUID());
         descriptionDto.setTypeId(UUID.randomUUID());
+        descriptionDto.setRf2TypeId(UUID.randomUUID());
         descriptionDto.setInitialCapitalStatusCode('2');
         descriptionDto.setDescriptionTypeCode('1');
         descriptionDto.setLanguageCode("en-OZ");
@@ -452,6 +453,7 @@ public class AceOutputHandlerTest {
         relationshipDto.setRefinable('1');
         relationshipDto.setRefinabilityId(UUID.randomUUID());
         relationshipDto.setRelationshipGroup(1);
+        relationshipDto.setTypeId(UUID.randomUUID());
         relationshipDto.setTypeId(UUID.randomUUID());
         relationshipDto.setCharacteristicTypeCode('0');
         relationshipDto.setRefinable('0');

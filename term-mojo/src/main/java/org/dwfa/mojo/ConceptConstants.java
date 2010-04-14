@@ -66,6 +66,8 @@ public class ConceptConstants {
         "Inappropriate component (foundation metadata concept)", "eddca00d-583c-455f-af08-5fea1adc08dc");
     public static final ConceptSpec MOVED_ELSEWHERE_STATUS = new ConceptSpec(
         "Component moved elsewhere (foundation metadata concept)", "0f726025-6b09-41de-a59c-e8309afaf987");
+    public static final ConceptSpec LIMITED = new ConceptSpec(
+        "Limited component (foundation metadata concept)", "63fc49db-9868-4e65-9e98-5a64c7e8d61e");
 
     public static final ConceptSpec MAY_BE_A_HISTORY = new ConceptSpec("MAY BE A (attribute)",
         "721dadc2-53a0-3ffa-8abd-80ff6aa87db2");
