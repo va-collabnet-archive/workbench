@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -378,6 +379,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples,
 				getTuples(), precedencePolicy, contradictionManager);
 	}
+
+    public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
+        List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
+        computer.addSpecifiedVersions(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), specifiedVersions,
+            getTuples(), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+        return specifiedVersions;
+    }
 
 	@Deprecated
 	public void addTuples(I_IntSet allowedTypes, 

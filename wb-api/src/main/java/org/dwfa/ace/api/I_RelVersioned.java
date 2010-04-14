@@ -101,6 +101,8 @@ public interface I_RelVersioned extends I_AmTermComponent {
             List<I_RelTuple> returnRels, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) 
                     throws TerminologyException, IOException;
 
+    public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException;
+
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
     public Set<TimePathId> getTimePathSet();
