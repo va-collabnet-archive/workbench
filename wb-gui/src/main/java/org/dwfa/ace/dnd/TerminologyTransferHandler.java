@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 
 import javax.swing.Icon;
@@ -157,10 +158,14 @@ public class TerminologyTransferHandler extends TransferHandler {
 			            return new ConceptTransferable(Terms.get().getConcept(rel.getCharacteristicId()));
 			        case STATUS:
 			            return new ConceptTransferable(Terms.get().getConcept(rel.getStatusId()));
-			        case REL_ID:
+                    case PATH:
+                        return new ConceptTransferable(Terms.get().getConcept(rel.getPathId()));
+                    case REL_ID:
+                        return new StringSelection(rel.toString());
 			        case VERSION:
-			        case PATH:
+                        return new StringSelection(new Date(rel.getTime()).toString());
 			        case GROUP:
+                        return new StringSelection("" + rel.getGroup());
 			        default:
 			            throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
 			        }
@@ -186,9 +191,12 @@ public class TerminologyTransferHandler extends TransferHandler {
 			                return new StringSelection(desc.getLang());
 			            case TEXT:
 			                return new DescriptionTransferable(desc);
+	                    case PATH:
+	                        return new ConceptTransferable(Terms.get().getConcept(desc.getPathId()));
 			            case DESC_ID:
+	                        return new StringSelection(desc.toString());
 			            case VERSION:
-			            case PATH:
+	                        return new StringSelection(new Date(desc.getTime()).toString());
 			            default:
 			                throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
 			            }
