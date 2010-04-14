@@ -35,6 +35,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -42,6 +43,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -926,23 +928,15 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
             if (rBean != null) {
-                List<? extends I_RelPart> rvList = rBean.getVersions(config
-                        .getConflictResolutionStrategy());
+                List<? extends I_RelTuple> rvList = rBean.getSpecifiedVersions(config);
 
-                if (rvList.size() != 1) {
+                if (rvList.size() == 1) {
                     // CREATE RELATIONSHIP PART W/ TermFactory
-                    I_RelPart nextRelPart = tf.newRelPart(); // I_RelPart
-                    nextRelPart.setTypeId(rel_A.typeId); // from classifier
-                    nextRelPart.setGroup(rel_A.group); // from classifier
-                    I_RelPart lastPart = rvList.get(0);
-                    nextRelPart.setCharacteristicId(lastPart.getCharacteristicId());
-                    nextRelPart.setRefinabilityId(lastPart.getRefinabilityId());
-                    nextRelPart.setStatusId(isRETIRED);
-                    nextRelPart.setTime(versionTime);
-                    nextRelPart.setPathId(writeToNid); // via preferences
+                    rvList.get(0).makeAnalog(isRETIRED, writeToNid, versionTime);
 
-                    rBean.addVersionNoRedundancyCheck(nextRelPart);
-
+                } else if (rvList.size() == 0) {
+                    logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
+                            + "empty version list");                    
                 } else {
                     logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
                             + "multiple last versions");
