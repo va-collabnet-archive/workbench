@@ -16,6 +16,10 @@
 		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta</developerConnection>
 		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
 	</scm>
+	<ciManagement>
+		<system>bamboo</system>
+		<url>http://buildserver1.nehta.net.au/bamboo/browse/ACENEHTA-ACEMODULESSNP</url>
+	</ciManagement>
 	<properties>
 		<ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
