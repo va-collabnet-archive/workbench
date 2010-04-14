@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -22,6 +23,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -376,9 +378,11 @@ public class ConceptAttributes
 	}
 
 	@Override
+	@Deprecated
 	public List<Version> getTuples(I_IntSet allowedStatus,
-			Set<I_Position> viewPositionSet) {
-		return getTuples(allowedStatus, new PositionSetReadOnly(viewPositionSet));
+			Set<I_Position> viewPositionSet) throws TerminologyException, IOException {
+		return getTuples(allowedStatus, new PositionSetReadOnly(viewPositionSet), Terms.get().getActiveAceFrameConfig().getPrecedence(),
+		    Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
 	}
 
 	@Override
