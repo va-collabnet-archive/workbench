@@ -936,10 +936,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
                 } else if (rvList.size() == 0) {
                     logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
-                            + "empty version list");                    
+                            + "empty version list" +"\trelNid=\t" + rel_A.relNid + "\tc1=\t" + rel_A.c1Id +"\t" + tf.getConcept(rel_A.c1Id).toLongString());                    
                 } else {
                     logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
-                            + "multiple last versions");
+                            + "multiple last versions"+"\trelNid=\t" + rel_A.relNid + "\tc1=\t" + rel_A.c1Id +"\t" + tf.getConcept(rel_A.c1Id).toLongString());
                 }
             } else {
                 logger.info("::: [SnorocketTask] ERROR: writeBackRetired() "
