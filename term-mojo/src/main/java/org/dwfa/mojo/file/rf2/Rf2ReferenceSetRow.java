@@ -78,9 +78,9 @@ public class Rf2ReferenceSetRow {
         return "id" + COLUMN_DELIMITER + "effectiveTime" + COLUMN_DELIMITER + "active" + COLUMN_DELIMITER + "moduleId"
             + COLUMN_DELIMITER + "refSetId" + COLUMN_DELIMITER + "referencedComponentId"
             + ((componentId1 == null) ? "" : COLUMN_DELIMITER + "valueId")
-            + ((componentId2 == null) ? "" : COLUMN_DELIMITER + "valueId2")
-            + ((componentId3 == null) ? "" : COLUMN_DELIMITER + "valueId3")
-            + ((value == null) ? "" : COLUMN_DELIMITER + "value");
+            + ((componentId2 == null) ? "" : COLUMN_DELIMITER + "valueId")
+            + ((componentId3 == null) ? "" : COLUMN_DELIMITER + "valueId")
+            + ((value == null) ? "" : COLUMN_DELIMITER + "valueId");
     }
 
     /**
