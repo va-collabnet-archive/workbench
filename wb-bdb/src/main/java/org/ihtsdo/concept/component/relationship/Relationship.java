@@ -387,7 +387,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return specifiedVersions;
     }
 
-	@Deprecated
+    public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
+        List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
+        computer.addSpecifiedVersions(allowedStatus, positions, specifiedVersions,
+            getTuples(), precedencePolicy, contradictionManager);
+        return specifiedVersions;
+    }
+
+    @Deprecated
 	public void addTuples(I_IntSet allowedTypes, 
 						  List<I_RelTuple> returnRels,
 						  boolean addUncommitted, 
