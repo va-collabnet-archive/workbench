@@ -19,6 +19,7 @@ package org.dwfa.mojo.file;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.mojo.file.spec.SearchReplaceSpec;
 import org.dwfa.mojo.file.util.FileUtil;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	 * Expression used to match text from the input file
 	 * 
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	String search;
 
@@ -66,9 +67,17 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	 * Value used to replace the text matched on the search string
 	 * 
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	String replace;
+
+    /**
+	 * Value used to replace text matched on the search criteria
+	 *
+	 * @parameter
+	 * @optional
+	 */
+	SearchReplaceSpec[] specs;
 
 	/**
 	 * Indicates if the output file should use DOS line termination - defaults
@@ -85,6 +94,11 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
+        if (search == null && replace == null && specs == null) {
+            getLog().warn("No search and replace criteria were defined for the 'Search and Replace' mojo");
+            return;
+        }
+        
 		File tmpDir = new File(outputDirectory.getAbsolutePath() + TMP_TOKEN);
 
 		if (!inputDirectory.exists() || !inputDirectory.isDirectory()
@@ -108,6 +122,7 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 					.setOutputFile(new File(tmpDir, file.getName()));
 			fileSearchReplaceMojo.setSearch(search);
 			fileSearchReplaceMojo.setReplace(replace);
+            fileSearchReplaceMojo.setSpecs(specs);
 			fileSearchReplaceMojo.execute();            
 		}
 
@@ -156,4 +171,12 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	public void setUseDosLineTermination(boolean useDosLineTermination) {
 		this.useDosLineTermination = useDosLineTermination;
 	}
+
+    public SearchReplaceSpec[] getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(SearchReplaceSpec[] specs) {
+        this.specs = specs;
+    }
 }

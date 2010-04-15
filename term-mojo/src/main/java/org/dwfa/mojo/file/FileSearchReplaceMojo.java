@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.dwfa.mojo.file.spec.SearchReplaceSpec;
+
 /**
  * Copyright (c) 2010 International Health Terminology Standards Development Organisation
  * <p/>
@@ -58,7 +60,7 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 	 * Expression used to match text from the input file
 	 * 
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	String search;
 
@@ -66,9 +68,17 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 	 * Value used to replace text matched on the search criteria
 	 * 
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	String replace;
+
+    /**
+	 * Value used to replace text matched on the search criteria
+	 *
+	 * @parameter
+	 * @optional
+	 */
+	SearchReplaceSpec[] specs;
 
 	/**
 	 * Indicates if the output file should use DOS line termination - defaults
@@ -82,12 +92,17 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.maven.plugin.Mojo#execute()
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-		File tmpFile = new File(outputFile.getAbsolutePath() + TMP_TOKEN);
+        if (search == null && replace == null && specs == null) {
+            getLog().warn("No search and replace criteria were defined for the 'Search and Replace' mojo");
+            return;
+        }
+
+        File tmpFile = new File(outputFile.getAbsolutePath() + TMP_TOKEN);
 
 		if (!inputFile.exists() || !inputFile.isFile() || !inputFile.canRead()) {
 			throw new MojoFailureException("The input file " + inputFile
@@ -108,7 +123,7 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 
 			String inputLine = reader.readLine();
 			while (inputLine != null) {
-				writeLine(writer, inputLine.replaceAll(search, replace));
+				writeLine(writer, searchAndReplace(inputLine));
 				inputLine = reader.readLine();
 			}
 
@@ -127,7 +142,19 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 		}
 	}
 
-	private void writeLine(BufferedWriter writer, String inputLine)
+    private String searchAndReplace(String inputLine) {
+        if (search != null && replace != null) {
+            inputLine = inputLine.replaceAll(search, replace);
+        }
+        if (specs != null) {
+            for (SearchReplaceSpec spec : specs) {
+                inputLine = inputLine.replaceAll(spec.getSearch(), spec.getReplace());
+            }
+        }
+        return inputLine;
+    }
+
+    private void writeLine(BufferedWriter writer, String inputLine)
 			throws IOException {
 		writer.write(inputLine);
 		if (useDosLineTermination) {
@@ -176,4 +203,12 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 	public void setUseDosLineTermination(boolean useDosLineTermination) {
 		this.useDosLineTermination = useDosLineTermination;
 	}
+
+    public SearchReplaceSpec[] getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(SearchReplaceSpec[] specs) {
+        this.specs = specs;
+    }
 }

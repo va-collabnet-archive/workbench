@@ -2,6 +2,7 @@ package org.dwfa.mojo.file;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.mojo.file.spec.SearchReplaceSpec;
 import org.dwfa.mojo.file.util.FileUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,7 +54,9 @@ public class FileSearchReplaceMojoTest {
 	private static final String firstLine = "This is the first searchVal line in our searchVal file";
 	private static final String secondLine = "And this searchVal is the second line";
 
-	/**
+    private static SearchReplaceSpec[] specs = new SearchReplaceSpec[2];
+
+    /**
 	 * Setup test file object
 	 */
 	@BeforeClass
@@ -69,6 +73,15 @@ public class FileSearchReplaceMojoTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+                 
+        SearchReplaceSpec spec1 = new SearchReplaceSpec();
+        SearchReplaceSpec spec2 = new SearchReplaceSpec();
+        spec1.setSearch("first");
+        spec1.setReplace("1st");
+        spec2.setSearch("second");
+        spec2.setReplace("2nd");
+        specs[0] = spec1;
+        specs[1] = spec2;
 	}
 
 	@Test
@@ -114,6 +127,26 @@ public class FileSearchReplaceMojoTest {
 			Assert.fail("The text in the output file is incorrect");
 		}
 	}
+
+    @Test
+    public void testSearchReplaceSpec() throws MojoExecutionException, MojoFailureException, IOException {
+
+        FileSearchReplaceMojo fileSearchReplaceMojo = new FileSearchReplaceMojo();
+		fileSearchReplaceMojo.setInputFile(outputFile);
+		fileSearchReplaceMojo.setOutputFile(outputFile);
+        fileSearchReplaceMojo.setSpecs(specs);
+		fileSearchReplaceMojo.execute();
+
+		BufferedReader br = new BufferedReader(new FileReader(outputFile));
+		String readLine1 = br.readLine();
+		String readLine2 = br.readLine();
+
+		if (!(readLine1
+				.equals("This is the 1st anotherVal line in our anotherVal file") && readLine2
+				.equals("And this anotherVal is the 2nd line"))) {
+			Assert.fail("The text in the output file is incorrect");
+		}
+    }
 
 	@AfterClass
 	public static void tearDown() {
