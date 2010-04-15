@@ -409,11 +409,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 		assert eAttr != null;
 		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
 		c.data.set(attr);
-		if (eAttr.getRevisionList() != null) {
-			for (I_ConceptualizeExternally eav : eAttr.getRevisionList()) {
-				attr.addRevision(new ConceptAttributesRevision(eav, attr));
-			}
-		}
 	}
 
 

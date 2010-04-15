@@ -316,6 +316,21 @@ public class Bdb {
 			}
 		}
 	}
+	
+	/**
+	 * For unit test teardown. May corrupt database. 
+	 */
+	public static void fastExit() {
+	    try {
+            mutable.bdbEnv.close();
+        } catch (Throwable e) {
+        }
+        try {
+            mutable.bdbEnv.close();
+        } catch (Throwable e) {
+        }
+	}
+	
 	// Close the environment
 	public static void close() throws InterruptedException, ExecutionException {
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {

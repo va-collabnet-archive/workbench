@@ -41,7 +41,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.ace.task.status.TupleListUtil;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;

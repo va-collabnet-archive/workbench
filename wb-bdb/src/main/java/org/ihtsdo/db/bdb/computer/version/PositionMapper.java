@@ -230,11 +230,9 @@ public class PositionMapper {
          case TIME:
             if (part1.getTime() == part2.getTime()) {
                 return RELATIVE_POSITION.CONTRADICTION;
-            } else if (part1.getTime() > part2.getTime()) {
-                // i.e. it is closer to the destination...
+            } else if (part1.getTime() < part2.getTime()) {
                 return RELATIVE_POSITION.BEFORE;
             }
-            // i.e. it is further away from the destination...
             return RELATIVE_POSITION.AFTER;
         default:
             throw new RuntimeException("Can't handle policy: " + precedencePolicy);
@@ -293,7 +291,10 @@ public class PositionMapper {
 			return;
 		}
 		Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptId());
-		String pathDesc = pathConcept.getDescriptions().iterator().next().getText();
+        String pathDesc = pathConcept.getPrimUuid().toString(); 
+        if (pathConcept.getDescriptions() != null && pathConcept.getDescriptions().size() > 0) {
+            pathDesc = pathConcept.getDescriptions().iterator().next().getText();
+        }
 		writeLock.lock();
 		if (completeLatch.getCount() == 1) {
 			try {
@@ -324,7 +325,7 @@ public class PositionMapper {
 				for (I_Position o : origins) {
 					originMap.put(o.getPath().getConceptId(), o);
 					depthMap.put(o.getPath().getConceptId(),
-							getDepth(o, destination, 0));
+							getDepth(o, destination, 1));
 					precedingPathIdMap.put(o.getPath().getConceptId(),
 							getPreceedingPathSet(o));
 				}
@@ -351,8 +352,7 @@ public class PositionMapper {
 								.getConceptId()) {
 							// On the same path as the destination...
 							if (p1.getTime() <= destination.getTime()) {
-								positionComputedDistance[p1index] = BigInteger
-										.valueOf(destination.getTime() - p1.getTime());
+								positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(-p1.getTime()));
 							} else {
 								positionNotReachable(positionComputedDistance, p1index);
 							}
@@ -363,9 +363,8 @@ public class PositionMapper {
 						} else {
 							// On a different path than the destination
 							// compute the distance to the destination
-							positionComputedDistance[p1index] = BigInteger.valueOf(
-									p1.getTime()).add(
-									timeUpperBound.multiply(pathDepth));
+							positionComputedDistance[p1index] = timeUpperBound.multiply(pathDepth).subtract(
+							        BigInteger.valueOf(p1.getTime()));
 
 							// iterate to compute conflicts...
 							for (int p2index = 0; p2index < positionCount; p2index++) {

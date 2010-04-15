@@ -83,11 +83,6 @@ public class VodbExportEConcepts extends AbstractMojo implements I_ProcessConcep
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		if (conceptCount < conceptLimit) {
 			boolean found = false;
-			if (concept.getUids().contains(UUID.fromString("181e45e8-b05a-33da-8b52-7027cbee6856"))) {
-				System.out.println("\n\nWriting entry: " + conceptCount);
-				System.out.println("\n\nWriting: " + concept);
-				found = true;
-			}
 			EConcept eC = new EConcept(concept);
 			eC.writeExternal(eConceptDOS);
 			if (found) {

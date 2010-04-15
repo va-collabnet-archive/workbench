@@ -1057,6 +1057,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    @Deprecated
     public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept)
             throws TerminologyException, IOException {
         return newPath(origins, pathConcept, getActiveAceFrameConfig());

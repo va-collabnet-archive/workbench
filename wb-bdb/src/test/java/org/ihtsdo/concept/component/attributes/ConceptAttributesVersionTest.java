@@ -4,28 +4,39 @@
 package org.ihtsdo.concept.component.attributes;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.profile.NewDefaultProfile;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.ConceptComponentBinder;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.sleepycat.je.DatabaseEntry;
 
 /**
  * @author kec
@@ -33,107 +44,143 @@ import com.sleepycat.je.DatabaseEntry;
  */
 public class ConceptAttributesVersionTest {
 	EConcept testConcept;
-	EConcept test2Concept;
 	String dbTarget;
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
+	I_ConfigAceFrame config;
+    private I_Path p0;
+    private I_Path p1_1;
+    private I_Path p1_2;
+    private I_Path p2;
+    private long t0;
+    private long t1;
+    private long t2;
+    private long t3;
+    private long t4;
+
 	public void setUp() throws Exception {
 		dbTarget = "target/" + UUID.randomUUID();
 		Bdb.setup(dbTarget);
+		
+        FileInputStream fis = new FileInputStream(new File("src/test/resources/wb-aux.jbin"));
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        DataInputStream in = new DataInputStream(bis);
+        try {
+            while (true) {
+                EConcept eConcept = new EConcept(in);
+                Bdb.getConceptDb().writeConcept(Concept.get(eConcept));
+            }
+        } catch (EOFException e) {
+            in.close();
+        }
+
+		config = NewDefaultProfile.newProfile("", "", "", "", "");
+		for (I_Position pos: config.getViewPositionSet()) {
+	        config.getEditingPathSet().add(pos.getPath());
+		}
+
+		Concept p0Concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
+		addDescription("P-0", p0Concept);
+
+		p0 = Terms.get().newPath(config.getViewPositionSet(), p0Concept, config);
+		I_Position firstOrigin = Terms.get().newPosition(p0, Integer.MAX_VALUE);
+        Terms.get().commit();
+		Set<I_Position> firstOriginSet = new HashSet<I_Position>();
+		firstOriginSet.add(firstOrigin);
+		
+		Concept p1_1_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
+        addDescription("P-1.1", p1_1_concept);
+        Concept p1_2_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
+        addDescription("P-1.2", p1_2_concept);
+
+        p1_1 = Terms.get().newPath(firstOriginSet, p1_1_concept, config);
+        p1_2 = Terms.get().newPath(firstOriginSet, p1_2_concept, config);
+
+        Concept p2_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
+        addDescription("P-2", p2_concept);
+        Set<I_Position> secondOriginSet = new HashSet<I_Position>();
+        secondOriginSet.add(Terms.get().newPosition(p1_1, Integer.MAX_VALUE));
+        secondOriginSet.add(Terms.get().newPosition(p1_2, Integer.MAX_VALUE));
+
+        p2 = Terms.get().newPath(secondOriginSet, p2_concept, config);
+
+		Terms.get().commit();
+
+		t0 = System.currentTimeMillis();
 		testConcept = new EConcept();
 		EConceptAttributes eca1 = new EConceptAttributes();
 		eca1.primordialUuid = UUID.randomUUID();
 		eca1.setStatusUuid(UUID.randomUUID());
-		eca1.setPathUuid(UUID.randomUUID());
-		eca1.setTime(System.currentTimeMillis());
+		eca1.setPathUuid(p0Concept.getPrimUuid());
+		eca1.setTime(t0);
 		eca1.setDefined(true);
+        eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
 		
-		EConceptAttributesRevision ecav = new EConceptAttributesRevision();
-		ecav.setDefined(false);
-		ecav.setPathUuid(eca1.getPathUuid());
-		ecav.setStatusUuid(eca1.getStatusUuid());
-		ecav.setTime(eca1.getTime() + 10);
-		eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
-		eca1.revisions.add(ecav);
+         t1 = t0 + 10000;
+ 		 addAttribute(t1, eca1, p0Concept.getPrimUuid());
+
+         t2 = t1 + 10000;
+         addAttribute(t2, eca1, p1_1_concept.getPrimUuid());
+
+         t3 = t2 + 10000;
+         addAttribute(t3, eca1, p1_2_concept.getPrimUuid());
+
+         t4 = t3 + 10000;
+         addAttribute(t4, eca1, p2_concept.getPrimUuid());
+
+		
 		
 		testConcept.setConceptAttributes(eca1);
-		test2Concept = new EConcept();
-		EConceptAttributes eca2 = new EConceptAttributes();
-		eca2.primordialUuid = UUID.randomUUID();
-		eca2.setStatusUuid(UUID.randomUUID());
-		eca2.setPathUuid(UUID.randomUUID());
-		eca2.setDefined(false);
-		eca2.setTime(eca1.getTime());
-		test2Concept.setConceptAttributes(eca2);
 	}
+
+    private void addDescription(String text, Concept c) throws TerminologyException, IOException {
+        Terms.get().newDescription(UUID.randomUUID(), c, "en", text, 
+		    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
+		Terms.get().addUncommittedNoChecks(c);
+    }
+
+    private void addAttribute(long time, EConceptAttributes eca1, UUID pathUuid) {
+        EConceptAttributesRevision ecav = new EConceptAttributesRevision();
+		ecav.setDefined(false);
+		ecav.setPathUuid(pathUuid);
+		ecav.setStatusUuid(eca1.getStatusUuid());
+		ecav.setTime(time);
+		eca1.revisions.add(ecav);
+    }
+
+    @Test
+    @Ignore
+    public void testVersionComputer() {
+        try {
+            
+            setUp();
+            
+            Concept c = Concept.get(testConcept);
+            
+            
+            
+            IntSet allowedStatus = null;
+            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, Terms.get().newPosition(p1_1, Integer.MAX_VALUE), PRECEDENCE.PATH, config.getConflictResolutionStrategy());
+            assertEquals(1, tuples.size());
+            assertTrue(tuples.get(0).getTime() == t2);
+            
+            
+            tuples = c.getConceptAttributes().getTuples(allowedStatus, Terms.get().newPosition(p1_1, Integer.MAX_VALUE), PRECEDENCE.TIME, config.getConflictResolutionStrategy());
+            assertEquals(1, tuples.size());
+            assertTrue(tuples.get(0).getTime() == t2);
+            
+            
+            tearDown();
+            
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+        
+    }
 
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@After
 	public void tearDown() throws Exception {
-		Bdb.close();
+	    Bdb.close();
 		FileIO.recursiveDelete(new File(dbTarget));
 	}
-
-	/**
-	 * Test method for {@link org.ihtsdo.concept.component.attributes.ConceptAttributesRevision#ConceptAttributesVersion(com.sleepycat.bind.tuple.TupleInput, org.ihtsdo.concept.component.attributes.ConceptAttributes)}.
-	 */
-	@Test
-	@Ignore
-	public void testConceptAttributesVersionTupleInputConceptAttributes() {
-		try {
-			Concept c = Concept.getTempConcept(testConcept);
-			assertNotNull(c.getConceptAttributes());
-			ConceptComponentBinder<ConceptAttributesRevision, ConceptAttributes> cab = 
-				new ConceptAttributesBinder();
-			DatabaseEntry entry = new DatabaseEntry();
-			ArrayList<ConceptAttributes> origList = c.getConceptAttributesList();
-			cab.objectToEntry(origList, entry);
-			cab.setupBinder(c);
-			Collection<ConceptAttributes> newList = cab.entryToObject(entry);
-			assertEquals(origList, newList);
-
-			Concept c2 = Concept.getTempConcept(test2Concept);
-			ArrayList<ConceptAttributes> c2List = c2.getConceptAttributesList();
-			cab.objectToEntry(c2List, entry);
-			Collection<ConceptAttributes> c2NewList = cab.entryToObject(entry);
-			assertEquals(c2List, c2NewList);
-			if (c2List.equals(newList)) {
-				fail("lists should not be equal");
-			}
-			ConceptAttributes ca1 = origList.get(0);
-			testCa1(ca1);
-			
-			Concept c3 = Concept.getTempConcept(testConcept);
-			Bdb.getConceptDb().writeConcept(c3);
-			Concept c4 = Bdb.getConceptDb().getConcept(c3.getNid());
-			testCa1(c4.getConceptAttributes());
-		} catch (IOException e) {
-			fail(e.toString());
-		}
-		
-	}
-
-	private void testCa1(ConceptAttributes ca1) {
-		assertNotNull(ca1.revisions);
-		assertEquals(ca1.revisions.size(), 1);
-		ConceptAttributesRevision cav = ca1.revisions.get(0);
-		assertEquals(ca1.getStatusId(), cav.getStatusId());
-		assertEquals(ca1.getPathId(), cav.getPathId());
-		if (ca1.primordialSapNid == cav.sapNid) {
-			fail("statusAtPositionNid should not be equal. ");
-		}
-
-		if (ca1.getTime() == cav.getTime()) {
-			fail("getTime should not be equal. ");
-		}
-		
-		if (ca1.isDefined() == cav.isDefined()) {
-			fail("isDefined should not be equal. ");
-		}
-	}
-
 }
