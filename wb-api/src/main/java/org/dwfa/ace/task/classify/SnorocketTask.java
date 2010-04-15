@@ -243,6 +243,37 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
+        debug = false; // :DEBUG:
+        debugDump = false; // :DEBUG: save to files
+        
+        Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
+            public int compare(SnoRel o1, SnoRel o2) {
+                int thisMore = 1;
+                int thisLess = -1;
+                if (o1.c2Id > o2.c2Id) {
+                    return thisMore;
+                } else if (o1.c2Id < o2.c2Id) {
+                    return thisLess;
+                } else {
+                    if (o1.c1Id > o2.c1Id) {
+                        return thisMore;
+                    } else if (o1.c1Id < o2.c1Id) {
+                        return thisLess;
+                    } else {
+
+                        if (o1.typeId > o2.typeId) {
+                            return thisMore;
+                        } else if (o1.typeId < o2.typeId) {
+                            return thisLess;
+                        } else {
+                                return 0; // this == received
+                        }
+                    }
+                }
+            } // compare()
+        };
+
+
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
@@ -322,8 +353,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
                 Collections.sort(cEditSnoCons);
+                
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_compare.txt", 5);
-                Collections.sort(cEditSnoRels);
+                Collections.sort(cEditSnoRels, compDump);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);
             }
 
@@ -490,7 +522,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
-                Collections.sort(cRocketSnoRels);
+                
+                Collections.sort(cRocketSnoRels, compDump);
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);
             }
 
@@ -522,8 +555,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     cClassSnoRels.remove(idx);
 
             if (debugDump) {
-                Collections.sort(cClassSnoRels);
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
+                
+                Collections.sort(cClassSnoRels, compDump);
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_compare.txt", 5);
             }
 
@@ -563,24 +597,25 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     + toStringLapseSec(startTime) + " ***");
 
             if (debugDump) {
+
                 ArrayList<SnoRel> sqrl = SnoQuery.getIsaAdded();
-                Collections.sort(sqrl);
+                Collections.sort(sqrl, compDump);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
                 dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_compare.txt",
                         5);
 
                 sqrl = SnoQuery.getIsaDropped();
-                Collections.sort(sqrl);
+                Collections.sort(sqrl, compDump);
                 dumpSnoRel(sqrl, "SnoRelIsaDrop_full.txt", 4);
                 dumpSnoRel(sqrl, "SnoRelIsaDrop_compare.txt", 5);
 
                 sqrl = SnoQuery.getRoleAdded();
-                Collections.sort(sqrl);
+                Collections.sort(sqrl, compDump);
                 dumpSnoRel(sqrl, "SnoRelRoleAdd_full.txt", 4);
                 dumpSnoRel(sqrl, "SnoRelRoleAdd_compare.txt", 5);
 
                 sqrl = SnoQuery.getRoleDropped();
-                Collections.sort(sqrl);
+                Collections.sort(sqrl, compDump);
                 dumpSnoRel(sqrl, "SnoRelRoleDrop_full.txt", 4);
                 dumpSnoRel(sqrl, "SnoRelRoleDrop_compare.txt", 5);
             }
@@ -656,6 +691,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private String compareAndWriteBack(List<SnoRel> snorelA,
             List<SnoRel> snorelB, int classPathNid)
             throws TerminologyException, IOException {
+        // Actual write back approximately 16,380 per minute
+        // Write back dropped to approximately 1,511 per minute
         long vTime;
         vTime = System.currentTimeMillis();
 
@@ -696,7 +733,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 logger.info("::: [SnorocketTask] compareAndWriteBack @ #\t"
                         + countConSeen);
             }
-            // Actual write back approximately 16,380 per minute
 
             if (rel_A.c1Id == rel_B.c1Id) {
                 // COMPLETELY PROCESS ALL C1 FOR BOTH IN & OUT
@@ -955,6 +991,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleDropped.add(rel_A);
 
+        if (debug)
+            return;
+        
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
             if (rBean != null) {
@@ -1005,6 +1044,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleAdded.add(rel_B);
 
+        if (debug)
+            return;
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), tf.getConcept(rel_B.c1Id),
@@ -1748,12 +1789,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     I_GetConceptData c1 = tf.getConcept(sr.c1Id);
                     I_GetConceptData t = tf.getConcept(sr.typeId);
                     I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-                    int g = sr.group;
                     bw.write(c1.getUids().iterator().next() + "\t"
                             + t.getUids().iterator().next() + "\t"
-                            + c2.getUids().iterator().next() + "\t" + g + "\t");
-                    // bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id +
-                    // "\t" + sr.group + "\t");
+                            + c2.getUids().iterator().next() + "\t");
                     bw.write(c1.getInitialText() + "\t|" + t.getInitialText()
                             + "\t|" + c2.getInitialText() + "\r\n");
                     index += 1;
