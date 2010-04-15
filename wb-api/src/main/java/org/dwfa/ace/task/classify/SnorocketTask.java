@@ -273,7 +273,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             } // compare()
         };
 
-
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketTask] evaluate() -- begin");
 
@@ -352,8 +351,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
-                Collections.sort(cEditSnoCons);
-                
+
+                Collections.sort(cEditSnoCons);                
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_compare.txt", 5);
                 Collections.sort(cEditSnoRels, compDump);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);
@@ -618,6 +617,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 Collections.sort(sqrl, compDump);
                 dumpSnoRel(sqrl, "SnoRelRoleDrop_full.txt", 4);
                 dumpSnoRel(sqrl, "SnoRelRoleDrop_compare.txt", 5);
+
+                SnoConGrpList sqcgl = SnoQuery.getEquiv();
+                dumpSnoConGrpList(sqcgl, "SnoConEquiv_compare.txt");            
             }
 
             // ** GUI: 5 COMPLETE **
@@ -1696,6 +1698,32 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
+            // due to new FileWriter
+            e.printStackTrace();
+        }
+    }
+
+    // dump equivalent concepts to file
+    private void dumpSnoConGrpList(SnoConGrpList scgl, String fName) {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
+            // "COMPARE" UUIDs, //NIDs, Initial Text
+                int index = 0;
+                for (SnoConGrp scg : scgl) {
+                	if (scg.size() > 0) {
+                		SnoCon sc =scg.get(0); 
+                        I_GetConceptData c = tf.getConcept(sc.id);
+                        bw.write(c.getUids().get(0).toString() + "\tcount=\t" + scg.size() + "\t");
+                        bw.write(c.getInitialText() + "\r\n");
+                	}
+                }
+
+            bw.flush();
+            bw.close();
+        } catch (TerminologyException e) {
+            // due to tf.getConcept()
+            e.printStackTrace();
+        } catch (IOException e) {
             // due to new FileWriter
             e.printStackTrace();
         }

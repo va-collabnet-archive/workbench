@@ -95,11 +95,10 @@ public class TestCPath_New extends AbstractTask {
 					if (countNull < 20) {
 						sb.append("\r\n::: relNid=\t"+ sr.relNid + " " + Terms.get().nativeToUuid(sr.relNid));
                         addToOutput("c1Nid", sb, sr.c1Id, tf.getConcept(sr.c1Id));
-                        addToOutput("c1Nid", sb, sr.typeId, tf.getConcept(sr.typeId));
-                        addToOutput("c1Nid", sb, sr.c2Id, tf.getConcept(sr.c2Id));
+                        addToOutput("rtNid", sb, sr.typeId, tf.getConcept(sr.typeId));
+                        addToOutput("c2Nid", sb, sr.c2Id, tf.getConcept(sr.c2Id));
 					}
 					countNull++;
-					rBean = tf.getRelationship(sr.relNid);
 				}
 				countTotal++;
 			} catch (IOException e) {
