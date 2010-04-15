@@ -476,11 +476,11 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("POM Output Directory: " + outputDirectory);
         }
 
-        executeMojo(buildDir, targetSubDir, sctInputDirArray, includeCTV3ID, includeSNOMEDRTID);
+        executeMojo(buildDir, targetSubDir, sctInputDirArray, outputDirectory, includeCTV3ID, includeSNOMEDRTID);
         getLog().info("POM PROCESSING COMPLETE ");
     }
 
-    void executeMojo(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
+    void executeMojo(String wDir, String subDir, String[] inDirs,String outDir, boolean ctv3idTF,
             boolean snomedrtTF) throws MojoFailureException {
         fNameStep1Con = wDir + scratchDirectory + FILE_SEPARATOR + "step1_concepts.ser";
         fNameStep1Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step1_relationships.ser";
@@ -493,7 +493,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         fNameStep3Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step3_relationships.ser";
         fNameStep3RelDest = wDir + scratchDirectory + FILE_SEPARATOR + "step3_rel_dest.ser";
 
-        fNameStep4ECon = wDir + outputDirectory + FILE_SEPARATOR + "sctSiEConcepts.jbin";
+        fNameStep4ECon = wDir + outDir + FILE_SEPARATOR + "sctSiEConcepts.jbin";
 
         xPathMap = new HashMap<String, Integer>();
         xPathList = new ArrayList<String>();
@@ -511,7 +511,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 
         // STEP 1. Convert to versioned binary objects file.  
         // Also computes algorithmic relationship uuid.
-        executeMojoStep1(wDir, subDir, inDirs, ctv3idTF, snomedrtTF);
+        executeMojoStep1(wDir, subDir, inDirs, outDir, ctv3idTF, snomedrtTF);
         stateSave(wDir);
         System.gc();
 
@@ -981,7 +981,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 getLog().info("CONFIRM: ROOT CONCEPT ");
                 getLog().info(" -is- concept SNOMED id =" + conList.get(0).id);
                 getLog().info(" -is- concept counter #" + countCon);
-                getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
+                getLog().info(" -is- description \"" + desList.get(0).termText + "\"");
                 getLog().info(
                         " ...prev... " + prevCon + " " + prevDes + " " + prevRel + " "
                                 + prevRelDest);
@@ -1004,8 +1004,18 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             } else if (theCon == theDes && theCon == theRel && theCon != theRelDest) {
                 // BOTTOM CASE
                 createEConcept(conList, desList, relList, null, dos);
+            } else if (theCon == theDes && theCon != theRel && theCon != theRelDest) {
+                createEConcept(conList, desList, null, null, dos);
+                if (debug) {
+                    getLog().info("--- Case concept without any relationship -- Step 4"+
+                    	    		" theCon=\t" + theCon + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel + "\ttheRelDest\t" + theRelDest);
+                    getLog().info("--- --- concept SNOMED id =" + theCon);
+                    getLog().info("--- --- concept counter   #" + countCon);
+                    getLog().info("--- --- description       \"" + desList.get(0).termText + "\"");
+                    getLog().info("--- \r\n");
+                }
             } else {
-                throw new MojoFailureException("Case not implemented -- Step 4");
+                throw new MojoFailureException("Case not implemented -- Step 4");            	
             }
 
             if (conNext == null && desNext == null && relNext == null)
@@ -1547,7 +1557,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    void executeMojoStep1(String wDir, String subDir, String[] inDirs, boolean ctv3idTF,
+    void executeMojoStep1(String wDir, String subDir, String[] inDirs, String outDir, boolean ctv3idTF,
             boolean snomedrtTF) throws MojoFailureException {
         getLog().info("*** SctSiToEConcept STEP #1 BEGINNING ***");
         long start = System.currentTimeMillis();
@@ -1558,7 +1568,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         // SETUP OUTPUT directory
         try {
             // Create multiple directories
-            String outDir = outputDirectory;
             boolean success = (new File(wDir + outDir)).mkdirs();
             if (success) {
                 getLog().info("OUTPUT DIRECTORY: " + wDir + outDir);
