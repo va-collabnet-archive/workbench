@@ -28,7 +28,10 @@ import java.io.File;
  * Simple Mojo that performs a search and replace on contents of files within a
  * directory. The resultant files are written to the output directory. If the
  * output directory is the same as the input directory the input files will be
- * overwritten
+ * overwritten. The search and replace criteria can be defined in one of two ways
+ * or in combination of both. The execution can simply define a search value and
+ * a replace value (to maintain backwards compatibility) and/or any number of
+ * search-replace specifications to enable replacing multiple values
  * 
  * @author Luke Swindale
  * 
@@ -56,8 +59,24 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	File outputDirectory;
 
 	/**
-	 * Expression used to match text from the input file
+	 * Indicates if the output file should use DOS line termination - defaults
+	 * to true
 	 * 
+	 * @parameter
+	 */
+	boolean useDosLineTermination = true;
+
+
+
+
+
+
+
+
+    // ****** SINGLE REPLACE ******
+	/**
+	 * Expression used to match text from the input file
+	 *
 	 * @parameter
 	 * @optional
 	 */
@@ -65,12 +84,18 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 
 	/**
 	 * Value used to replace the text matched on the search string
-	 * 
+	 *
 	 * @parameter
 	 * @optional
 	 */
 	String replace;
+    // ****************************
 
+
+
+
+
+    // ****** MULTI REPLACE *******
     /**
 	 * Value used to replace text matched on the search criteria
 	 *
@@ -78,14 +103,13 @@ public class DirectoryFileSearchReplaceMojo extends AbstractMojo {
 	 * @optional
 	 */
 	SearchReplaceSpec[] specs;
+    // ****************************
 
-	/**
-	 * Indicates if the output file should use DOS line termination - defaults
-	 * to true
-	 * 
-	 * @parameter
-	 */
-	boolean useDosLineTermination = true;
+
+
+
+
+
 
 	/*
 	 * (non-Javadoc)

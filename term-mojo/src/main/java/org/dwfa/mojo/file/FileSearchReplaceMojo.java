@@ -31,7 +31,11 @@ import org.dwfa.mojo.file.spec.SearchReplaceSpec;
 /**
  * Simple Mojo that performs a search and replace on contents of a file. The
  * resultant file is written to the output directory. If the output file is the
- * same as the input file the input file will be overwritten
+ * same as the input file the input file will be overwritten. The search and
+ * replace criteria can be defined in one of two ways or in combination of both.
+ * The execution can simply define a search value and a replace value (to maintain
+ * backwards compatibility) and/or any number of search-replace specifications to
+ * enable replacing multiple values
  * 
  * @author Luke Swindale
  * 
@@ -54,31 +58,7 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 	 * @parameter
 	 * @required
 	 */
-	File outputFile;
-
-	/**
-	 * Expression used to match text from the input file
-	 * 
-	 * @parameter
-	 * @optional
-	 */
-	String search;
-
-	/**
-	 * Value used to replace text matched on the search criteria
-	 * 
-	 * @parameter
-	 * @optional
-	 */
-	String replace;
-
-    /**
-	 * Value used to replace text matched on the search criteria
-	 *
-	 * @parameter
-	 * @optional
-	 */
-	SearchReplaceSpec[] specs;
+	File outputFile;	
 
 	/**
 	 * Indicates if the output file should use DOS line termination - defaults
@@ -89,6 +69,51 @@ public class FileSearchReplaceMojo extends AbstractMojo {
 	boolean useDosLineTermination = true;
 
 	private static final String TMP_TOKEN = ".tmp";
+
+
+
+
+
+
+
+
+    // ****** SINGLE REPLACE ******
+	/**
+	 * Expression used to match text from the input file
+	 *
+	 * @parameter
+	 * @optional
+	 */
+	String search;
+
+	/**
+	 * Value used to replace the text matched on the search string
+	 *
+	 * @parameter
+	 * @optional
+	 */
+	String replace;
+    // ****************************
+
+
+
+
+
+    // ****** MULTI REPLACE *******
+    /**
+	 * Value used to replace text matched on the search criteria
+	 *
+	 * @parameter
+	 * @optional
+	 */
+	SearchReplaceSpec[] specs;
+    // ****************************
+
+
+
+
+
+
 
 	/*
 	 * (non-Javadoc)
