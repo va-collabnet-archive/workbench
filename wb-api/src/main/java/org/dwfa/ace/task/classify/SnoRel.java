@@ -16,8 +16,18 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+
 
 public class SnoRel implements Comparable<Object> {
     public int relNid;
@@ -90,6 +100,124 @@ public class SnoRel implements Comparable<Object> {
 
     public String toStringHdr() {
         return "relId     \t" + "c1Id      \t" + "c2Id      \t" + "typeId    \t" + "group";
+    }
+
+    public static void dumpToFile(List<SnoRel> srl, String fName, int format) {
+
+        try {
+            I_TermFactory tf = Terms.get();
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
+            if (format == 1) { // RAW NIDs
+                for (SnoRel sr : srl) {
+                    bw
+                            .write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group
+                                    + "\r\n");
+                }
+            }
+            if (format == 2) { // UUIDs
+                for (SnoRel sr : srl) {
+                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
+                    I_GetConceptData t = tf.getConcept(sr.typeId);
+                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
+                    int g = sr.group;
+                    bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
+                            + "\t" + c2.getUids().iterator().next() + "\t" + g + "\r\n");
+                }
+            }
+            if (format == 3) { // Initial Text
+                for (SnoRel sr : srl) {
+                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
+                    I_GetConceptData t = tf.getConcept(sr.typeId);
+                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
+                    int g = sr.group;
+                    bw.write(c1.getInitialText() + "\t" + t.getInitialText() + "\t"
+                            + c2.getInitialText() + "\t" + g + "\r\n");
+                }
+            }
+            if (format == 4) { // "FULL": rNID, UUIDs, NIDs, **_index, Initial
+                // Text
+                int index = 0;
+                for (SnoRel sr : srl) {
+                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
+                    I_GetConceptData t = tf.getConcept(sr.typeId);
+                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
+                    int g = sr.group;
+                    bw.write(sr.relNid + "\t" + c1.getUids().iterator().next() + "\t"
+                            + t.getUids().iterator().next() + "\t" + c2.getUids().iterator().next()
+                            + "\t" + g + "\t");
+                    bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\t");
+                    bw.write("**_" + index + "\t|");
+                    bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
+                            + c2.getInitialText() + "\t" + g + "\r\n");
+                    index += 1;
+                }
+            }
+            if (format == 5) { // "COMPARE": UUIDs, Initial Text
+                Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
+                    public int compare(SnoRel o1, SnoRel o2) {
+                        int thisMore = 1;
+                        int thisLess = -1;
+                        if (o1.c2Id > o2.c2Id) {
+                            return thisMore;
+                        } else if (o1.c2Id < o2.c2Id) {
+                            return thisLess;
+                        } else {
+                            if (o1.c1Id > o2.c1Id) {
+                                return thisMore;
+                            } else if (o1.c1Id < o2.c1Id) {
+                                return thisLess;
+                            } else {
+
+                                if (o1.typeId > o2.typeId) {
+                                    return thisMore;
+                                } else if (o1.typeId < o2.typeId) {
+                                    return thisLess;
+                                } else {
+                                    return 0; // this == received
+                                }
+                            }
+                        }
+                    } // compare()
+                };
+                Collections.sort(srl, compDump);
+
+                int index = 0;
+                for (SnoRel sr : srl) {
+                    I_GetConceptData c1 = tf.getConcept(sr.c1Id);
+                    I_GetConceptData t = tf.getConcept(sr.typeId);
+                    I_GetConceptData c2 = tf.getConcept(sr.c2Id);
+                    bw.write(c1.getUids().iterator().next() + "\t" + t.getUids().iterator().next()
+                            + "\t" + c2.getUids().iterator().next() + "\t");
+                    bw.write(c1.getInitialText() + "\t|" + t.getInitialText() + "\t|"
+                            + c2.getInitialText() + "\r\n");
+                    index += 1;
+                }
+            }
+            if (format == 6) { // Distribution Form
+                int index = 0;
+                bw.write("RELATIONSHIPID\t" + "CONCEPTID1\t" + "RELATIONSHIPTYPE\t"
+                        + "CONCEPTID2\t" + "CHARACTERISTICTYPE\t" + "REFINABILITY\t"
+                        + "RELATIONSHIPGROUP\r\n");
+                for (SnoRel sr : srl) {
+                    // RELATIONSHIPID + CONCEPTID1 + RELATIONSHIPTYPE +
+                    // CONCEPTID2
+                    bw.write("#" + index + "\t" + sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id
+                            + "\t");
+                    // CHARACTERISTICTYPE + REFINABILITY + RELATIONSHIPGROUP
+                    bw.write("NA\t" + "NA\t" + sr.group + "\r\n");
+                    index += 1;
+                }
+            }
+            bw.flush();
+            bw.close();
+        } catch (TerminologyException e) {
+            // can be caused by tf.getConcept()
+            e.printStackTrace();
+        } catch (IOException e) {
+            // can be caused by new FileWriter
+            e.printStackTrace();
+        }
     }
 
 } // class SnoRel

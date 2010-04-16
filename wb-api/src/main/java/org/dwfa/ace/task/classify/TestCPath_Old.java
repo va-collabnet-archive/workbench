@@ -1,5 +1,7 @@
 package org.dwfa.ace.task.classify;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
-public class TestCPath_New extends AbstractTask {
+public class TestCPath_Old extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     // USER INTERFACE
@@ -51,13 +53,13 @@ public class TestCPath_New extends AbstractTask {
     private I_IntSet allowedRoleTypes;
     private ArrayList<I_Position> cClassPathPos;
     private int workbenchAuxPath;
-    
+
     // :DEBUG:
     private static boolean debugDump; 
 
     @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        // nothing to do
+        // nothing to do       
     }
 
     @Override
@@ -65,77 +67,39 @@ public class TestCPath_New extends AbstractTask {
             throws TaskFailedException {
         debugDump = true;
         logger = worker.getLogger();
-        logger.info("\r\n::: [TestCPath_New] evaluate() -- begin");
+        logger.info("\r\n::: [TestCPath_Old] evaluate() -- begin");
 
         tf = Terms.get();
 
         setupCoreNids();
         setupPaths();
 
-        cClassSnoRels = new ArrayList<SnoRel>();
-        // cClassSnoRels = null;
-        logger.info("\r\n::: [TestCPath_New] cClassSnoRels = null;");
+        // cClassSnoRels = new ArrayList<SnoRel>();
+        cClassSnoRels = null;
+        logger.info("\r\n::: [TestCPath_Old] cClassSnoRels = null;");
 
         try {
-            setupRoleNids();
-            SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
-                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, null, false, config
-                            .getPrecedence(), config.getConflictResolutionStrategy());
+            int[] rNidArray = setupRoleNids();
+            SnoPathProcess pcClass = new SnoPathProcess(logger, null, cClassSnoRels, rNidArray,
+                    cClassPathPos, null, true);
             tf.iterateConcepts(pcClass);
 
-            int countNull = 0;
-            int countTotal = 0;
-            StringBuilder sb = new StringBuilder(
-                    "\r\n::: [TestCPath_New] tf.getRelationship(...) == null;");
-            for (SnoRel sr : cClassSnoRels) {
-                try {
-                    I_RelVersioned rBean = tf.getRelationship(sr.relNid);
-                    if (rBean == null) {
-                        if (countNull < 20) {
-                            sb.append("\r\n::: relNid=\t" + sr.relNid + " "
-                                    + Terms.get().nativeToUuid(sr.relNid));
-                            addToOutput("c1Nid", sb, sr.c1Id, tf.getConcept(sr.c1Id));
-                            addToOutput("rtNid", sb, sr.typeId, tf.getConcept(sr.typeId));
-                            addToOutput("c2Nid", sb, sr.c2Id, tf.getConcept(sr.c2Id));
-                        }
-                        countNull++;
-                    }
-                    countTotal++;
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (TerminologyException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+            // DUMP FILES
+            if (debugDump) {
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_Old_full.txt", 4);                
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_Old_compare.txt", 5);
             }
-            sb.append("\r\n::: ... completed limited snapshot ...");
-            logger.info(sb.toString() + "\r\n::: [TestCPath_New] countNull=" + countNull
-                    + " countTotal=" + countTotal);
             
-            // 
-            if (debugDump == true) {
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_New_full.txt", 4);                
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditPath_New_compare.txt", 5);
-            }
-
             cClassSnoRels = null;
             System.gc();
 
-            logger.info("\r\n::: [TestCPath_New] evaluate() -- completed");
+            logger.info("\r\n::: [TestCPath_Old] evaluate() -- completed");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Condition.CONTINUE;
-    }
 
-    private void addToOutput(String label, StringBuilder sb, int nid, I_GetConceptData src)
-            throws IOException {
-        if (src != null)
-            sb.append("\t" + label + "=\t" + nid + "\t" + src.getUids().get(0) + "\t"
-                    + src.getInitialText());
-        else
-            sb.append("\t" + label + "=\t" + nid);
+        return Condition.CONTINUE;
     }
 
     @Override
@@ -163,8 +127,7 @@ public class TestCPath_New extends AbstractTask {
 
             I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
             cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            // cClassPosSet = new
-            // PositionSetReadOnly(cClassIPath.getOrigins().get(0));
+            // cClassPosSet = new PositionSetReadOnly(cClassIPath.getOrigins().get(0));
 
             // Setup to exclude Workbench Auxiliary on path
             UUID wAuxUuid = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
@@ -258,7 +221,7 @@ public class TestCPath_New extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void setupRoleNids() throws TerminologyException, IOException {
+    private int[] setupRoleNids() throws TerminologyException, IOException {
         int countRelDuplVersion = 0;
         LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
 
@@ -318,6 +281,8 @@ public class TestCPath_New extends AbstractTask {
 
         allowedRoleTypes = tf.newIntSet();
         allowedRoleTypes.addAll(resultInt);
+        return resultInt;
     }
-
+    
 }
+

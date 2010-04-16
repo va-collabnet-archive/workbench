@@ -32,7 +32,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
-public class TestCPath_New extends AbstractTask {
+public class TestEPath_New extends AbstractTask {
     private static final long serialVersionUID = 1L;
 
     // USER INTERFACE
@@ -41,15 +41,15 @@ public class TestCPath_New extends AbstractTask {
     private I_ConfigAceFrame config = null;
 
     // INTERNAL DATA STRUCTURES
-    private ArrayList<SnoRel> cClassSnoRels;
-    private PositionSetReadOnly cClassPosSet;
+    private ArrayList<SnoRel> cEditSnoRels;
+    private PositionSetReadOnly cEditPosSet;
     private int isaNid;
     private int rootNid;
     private int rootRoleNid;
     private int isCURRENT;
     private I_IntSet statusSet;
     private I_IntSet allowedRoleTypes;
-    private ArrayList<I_Position> cClassPathPos;
+    private ArrayList<I_Position> cEditPathPos;
     private int workbenchAuxPath;
     
     // :DEBUG:
@@ -65,29 +65,29 @@ public class TestCPath_New extends AbstractTask {
             throws TaskFailedException {
         debugDump = true;
         logger = worker.getLogger();
-        logger.info("\r\n::: [TestCPath_New] evaluate() -- begin");
+        logger.info("\r\n::: [TestEPath_New] evaluate() -- begin");
 
         tf = Terms.get();
 
         setupCoreNids();
         setupPaths();
 
-        cClassSnoRels = new ArrayList<SnoRel>();
-        // cClassSnoRels = null;
-        logger.info("\r\n::: [TestCPath_New] cClassSnoRels = null;");
+        cEditSnoRels = new ArrayList<SnoRel>();
+        // cEditSnoRels = null;
+        logger.info("\r\n::: [TestEPath_New] cEditSnoRels = null;");
 
         try {
             setupRoleNids();
-            SnoPathProcessConcepts pcClass = new SnoPathProcessConcepts(logger, null,
-                    cClassSnoRels, allowedRoleTypes, statusSet, cClassPosSet, null, false, config
+            SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger, null,
+                    cEditSnoRels, allowedRoleTypes, statusSet, cEditPosSet, null, false, config
                             .getPrecedence(), config.getConflictResolutionStrategy());
-            tf.iterateConcepts(pcClass);
+            tf.iterateConcepts(pcEdit);
 
             int countNull = 0;
             int countTotal = 0;
             StringBuilder sb = new StringBuilder(
-                    "\r\n::: [TestCPath_New] tf.getRelationship(...) == null;");
-            for (SnoRel sr : cClassSnoRels) {
+                    "\r\n::: [TestEPath_New] tf.getRelationship(...) == null;");
+            for (SnoRel sr : cEditSnoRels) {
                 try {
                     I_RelVersioned rBean = tf.getRelationship(sr.relNid);
                     if (rBean == null) {
@@ -110,19 +110,19 @@ public class TestCPath_New extends AbstractTask {
                 }
             }
             sb.append("\r\n::: ... completed limited snapshot ...");
-            logger.info(sb.toString() + "\r\n::: [TestCPath_New] countNull=" + countNull
+            logger.info(sb.toString() + "\r\n::: [TestEPath_New] countNull=" + countNull
                     + " countTotal=" + countTotal);
             
-            // 
+            // DUMP FILES
             if (debugDump == true) {
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_New_full.txt", 4);                
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditPath_New_compare.txt", 5);
+                SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditRead_New_full.txt", 4);                
+                SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditPath_New_compare.txt", 5);
             }
 
-            cClassSnoRels = null;
+            cEditSnoRels = null;
             System.gc();
 
-            logger.info("\r\n::: [TestCPath_New] evaluate() -- completed");
+            logger.info("\r\n::: [TestEPath_New] evaluate() -- completed");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -154,26 +154,26 @@ public class TestCPath_New extends AbstractTask {
             }
 
             // GET ALL EDIT_PATH ORIGINS
-            I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
-            if (cClassPathObj == null) {
+            I_GetConceptData cEditPathObj = config.getClassifierInputPath();
+            if (cEditPathObj == null) {
                 String errStr = "Classifier Stored Output (Inferred) Path -- not set in Classifier preferences tab!";
                 logger.info(errStr);
                 return Condition.STOP;
             }
 
-            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            // cClassPosSet = new
-            // PositionSetReadOnly(cClassIPath.getOrigins().get(0));
+            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+            cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+            // cEditPosSet = new
+            // PositionSetReadOnly(cEditIPath.getOrigins().get(0));
 
             // Setup to exclude Workbench Auxiliary on path
             UUID wAuxUuid = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
             I_GetConceptData wAuxCb = tf.getConcept(wAuxUuid);
             workbenchAuxPath = wAuxCb.getConceptId();
 
-            cClassPathPos = new ArrayList<I_Position>();
-            cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-            getPathOrigins(cClassPathPos, cClassIPath);
+            cEditPathPos = new ArrayList<I_Position>();
+            cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+            getPathOrigins(cEditPathPos, cEditIPath);
 
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -225,7 +225,7 @@ public class TestCPath_New extends AbstractTask {
             if (config.getClassificationRoot() != null) {
                 int checkRootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
                 if (checkRootNid != rootNid) {
-                    logger.severe("\r\n::: SERVERE ERROR rootNid MISMACTH ***");
+                    logger.severe("\r\n::: SERVERE ERROR rootNid MISMATCH ***");
                 }
             } else {
                 String errStr = "Classifier Root not set! Found: "
@@ -268,7 +268,7 @@ public class TestCPath_New extends AbstractTask {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rv : thisLevel) {
                 I_RelPart rPart1 = null;
-                for (I_Position pos : cClassPathPos) { // PATHS_IN_PRIORITY_ORDER
+                for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
                         if (pos.getPath().getConceptId() == rPart.getPathId()) {
                             if (rPart1 == null) {
