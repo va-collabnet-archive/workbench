@@ -2662,19 +2662,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
-        return aceFrame.getCdePanel().getRefsetInSpecEditor();
+        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+            return aceFrame.getCdePanel().getRefsetInSpecEditor();
+        return null;
     }
 
     public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
+        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+            return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
+        return null;
     }
 
     public JTree getTreeInSpecEditor() {
-        return aceFrame.getCdePanel().getTreeInSpecEditor();
+        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+            return aceFrame.getCdePanel().getTreeInSpecEditor();
+        return null;
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
-        return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
+        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+            return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
+        return null;
     }
 
     public I_GetConceptData getClassificationRoleRoot() {

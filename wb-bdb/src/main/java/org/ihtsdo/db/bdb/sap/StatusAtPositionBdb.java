@@ -2,10 +2,9 @@ package org.ihtsdo.db.bdb.sap;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +50,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
 	private static final int MIN_ARRAY_SIZE = 100;
 
-	private static HashMap<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries = new HashMap<UncommittedStatusForPath, Integer>();
+	private static Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries = new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
 
 	private AtomicInteger sequence;
 
@@ -341,7 +340,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				committedSapNids.add(sapNid);
 			}
 			assert committedSapNids.contiguous() : " commit sapNids are not contiguous: "
-				+ Arrays.asList(committedSapNids.getSetValues());
+				+ committedSapNids.toString();
 			uncomittedStatusPathEntries.clear();
 			mapperCache.clear();
 		}
@@ -368,6 +367,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			if (uncomittedStatusPathEntries.containsKey(usp)) {
 				return uncomittedStatusPathEntries.get(usp);
 			} else {
+			    synchronized (usp) {
+                    
+                }
 				int statusAtPositionNid = sequence.getAndIncrement();
 				mapperCache.clear();
 				readWriteArray
