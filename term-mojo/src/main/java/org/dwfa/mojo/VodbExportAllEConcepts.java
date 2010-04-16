@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -40,11 +42,13 @@ public class VodbExportAllEConcepts extends AbstractMojo implements I_ProcessCon
     private transient int conceptCount = 0;
     
     private transient int debugCount = 0;
+    
+    SimpleDateFormat simple = new SimpleDateFormat("dd.MM.yyyy H:m:s");
 
 
 
 	private DataOutputStream eConceptDOS;
-    private static int conceptLimit = Integer.MAX_VALUE;
+    //private static int conceptLimit = Integer.MAX_VALUE;
     
     public void execute() throws MojoExecutionException, MojoFailureException {
     	getLog().info("VodbExportAllEConcepts execute called");
@@ -64,9 +68,19 @@ public class VodbExportAllEConcepts extends AbstractMojo implements I_ProcessCon
             eConceptsFile.getParentFile().mkdirs();
             BufferedOutputStream eConceptsBos = new BufferedOutputStream(new FileOutputStream(eConceptsFile));
             eConceptDOS = new DataOutputStream(eConceptsBos);
-            getLog().info("About to iterate concepts");
+            Date startD = new Date();       
+            long dateLongStart = startD.getTime();
+            getLog().info("About to iterate concepts starting at: "+simple.format(startD));
             Terms.get().iterateConcepts(this);
-            getLog().info("Finished Iterating closing Stream");
+            getLog().info("Finished Iterating closing Stream processed "+conceptCount +" concepts");
+            
+            Date endD = new Date(); 
+            long dateLongEnd = endD.getTime();
+            long millistaken = dateLongEnd - dateLongStart;
+            long seconds = millistaken/1000;
+            getLog().info("Finished at = "+simple.format(endD));
+            getLog().info("Time taken in seconds = "+seconds);
+            getLog().info("Concepts/Second = "+conceptCount/seconds);
             eConceptDOS.close();
             getLog().info("Finished");
         
@@ -90,41 +104,20 @@ public class VodbExportAllEConcepts extends AbstractMojo implements I_ProcessCon
 
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		
-		//if(conceptCount == 0) {
+	if(conceptCount == 0) {
 			getLog().info("processConcept called " +concept);
-			getLog().info("processConcept conceptCount = " +conceptCount);
-		//}
-		
-		
-		if (conceptCount < conceptLimit) {
-			getLog().info("Turning Concept into EConcept");
-			boolean found = false;
-		/*if (concept.getUids().contains(UUID.fromString("181e45e8-b05a-33da-8b52-7027cbee6856"))) {
-				System.out.println("\n\nWriting entry: " + conceptCount);
-				System.out.println("\n\nWriting: " + concept);
-				found = true;
-			}*/
-			if(conceptCount == 0 || debugCount == 1000) {
-				getLog().info("\n\nWriting entry: " + conceptCount);
-				getLog().info("\n\nWriting: " + concept);
-				found = true;
-			}
-			getLog().info("About to create EConcept");
-			EConcept eC = new EConcept(concept);
-			getLog().info("EConcept created about to write");
-			eC.writeExternal(eConceptDOS);
-			getLog().info("EConcept writen");
-			if (found) {
-				System.out.println("\n\nWrote: " + eC);
-				System.out.println("\n\n");
-			}
-			debugCount++;
-			if(debugCount == 1000) {
-				System.out.println("\n\nFound: " + conceptCount);	
-				debugCount = 0;
-			}
-			conceptCount++;
-		}
 	}
-
+		
+	//if (conceptCount < conceptLimit) {
+		EConcept eC = new EConcept(concept);
+		eC.writeExternal(eConceptDOS);
+		debugCount++;
+		if(debugCount == 1000) {
+			getLog().info("\n\n Found: " + conceptCount);
+			getLog().info("\n\n Wrote: " + concept);	
+			debugCount = 0;
+		}
+		conceptCount++;	
+	//}
+	}
 }
