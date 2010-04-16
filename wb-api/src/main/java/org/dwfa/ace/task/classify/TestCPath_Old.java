@@ -86,8 +86,8 @@ public class TestCPath_Old extends AbstractTask {
 
             // DUMP FILES
             if (debugDump) {
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_Old_full.txt", 4);                
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_Old_compare.txt", 5);
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_Old_full.txt", 4);                
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_Old_compare.txt", 5);
             }
             
             cClassSnoRels = null;

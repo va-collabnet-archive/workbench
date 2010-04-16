@@ -115,8 +115,8 @@ public class TestCPath_New extends AbstractTask {
             
             // 
             if (debugDump == true) {
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditRead_New_full.txt", 4);                
-                SnoRel.dumpToFile(cClassSnoRels, "SnoRelEditPath_New_compare.txt", 5);
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_New_full.txt", 4);                
+                SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_New_compare.txt", 5);
             }
 
             cClassSnoRels = null;
