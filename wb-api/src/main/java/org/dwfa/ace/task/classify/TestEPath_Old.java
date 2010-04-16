@@ -72,8 +72,8 @@ public class TestEPath_Old extends AbstractTask {
         setupCoreNids();
         setupPaths();
 
-        // cEditSnoRels = new ArrayList<SnoRel>();
-        cEditSnoRels = null;
+        cEditSnoRels = new ArrayList<SnoRel>();
+        // cEditSnoRels = null;
         logger.info("\r\n::: [TestEPath_Old] cEditSnoRels = null;");
 
         try {

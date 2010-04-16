@@ -74,8 +74,8 @@ public class TestCPath_Old extends AbstractTask {
         setupCoreNids();
         setupPaths();
 
-        // cClassSnoRels = new ArrayList<SnoRel>();
-        cClassSnoRels = null;
+        cClassSnoRels = new ArrayList<SnoRel>();
+        // cClassSnoRels = null;
         logger.info("\r\n::: [TestCPath_Old] cClassSnoRels = null;");
 
         try {
