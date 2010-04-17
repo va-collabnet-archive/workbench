@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.Bdb;
@@ -544,8 +545,8 @@ public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 			return;
 		}
 		long start = System.currentTimeMillis();
-		if (newCapacity > 102400) {
-			AceLog.getAppLog().info("----- Starting rehash. oldCapacity: " + 
+		if (newCapacity > 102400 && AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().fine("----- Starting rehash. oldCapacity: " + 
 					oldCapacity + " newCapacity: " + 
 						newCapacity + " -----");
 		}

@@ -3,6 +3,7 @@ package org.ihtsdo.db.uuidmap;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.time.TimeUtil;
@@ -526,8 +527,8 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 				newState[index] = FULL;
 			}
 		}
-		if (newCapacity > 10240) {
-			AceLog.getAppLog().info("----- Finished rehash:  newCapacity: " + 
+		if (newCapacity > 10240  && AceLog.getAppLog().isLoggable(Level.FINE)) {
+			AceLog.getAppLog().fine("----- Finished rehash:  newCapacity: " + 
 						newCapacity + " " + 
 					TimeUtil.getElapsedTimeString(System.currentTimeMillis() - start)
 					+ " ----- ");
