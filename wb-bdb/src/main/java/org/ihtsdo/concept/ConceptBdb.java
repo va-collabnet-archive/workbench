@@ -38,13 +38,12 @@ public class ConceptBdb extends ComponentBdb {
 
     private static ExecutorService iteratorService = Executors.newCachedThreadPool(new NamedThreadFactory(
         conDbThreadGroup, "parallel iterator service"));
-    private static ExecutorService idFinderService = Executors.newFixedThreadPool(2, new NamedThreadFactory(
-        conDbThreadGroup, "id finder service"));
 
     private int processors = Runtime.getRuntime().availableProcessors();
 
     public ConceptBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
         super(readOnlyBdbEnv, mutableBdbEnv);
+        getReadOnlyConceptIdSet();
     }
 
     @Override
@@ -197,17 +196,15 @@ public class ConceptBdb extends ComponentBdb {
      */
     public IdentifierSetReadOnly getReadOnlyConceptIdSet() throws IOException {
         if (conceptIdSet == null) {
-            Future<IdentifierSet> readOnlyFuture = idFinderService.submit(new GetCNids(readOnly));
-            Future<IdentifierSet> mutableFuture = idFinderService.submit(new GetCNids(mutable));
+
+            GetCNids readOnlyGetter = new GetCNids(readOnly);
+            GetCNids mutableGetter = new GetCNids(mutable);
             try {
-                IdentifierSet readOnlyMap = readOnlyFuture.get();
-                IdentifierSet mutableMap = mutableFuture.get();
-                idFinderService.shutdown();
+                IdentifierSet readOnlyMap = readOnlyGetter.call();
+                IdentifierSet mutableMap = mutableGetter.call();
                 readOnlyMap.or(mutableMap);
                 conceptIdSet = new IdentifierSet(readOnlyMap);
-            } catch (InterruptedException e) {
-                throw new IOException(e);
-            } catch (ExecutionException e) {
+            } catch (Exception e) {
                 throw new IOException(e);
             }
         }

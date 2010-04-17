@@ -336,6 +336,13 @@ public class Bdb {
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
+                AceLog.getAppLog().info("Starting last sync.");
+                System.out.println("Starting last sync.");
+                assert conceptDb != null: "conceptDb is null...";
+                new Sync().run();
+                AceLog.getAppLog().info("Shutting down sync service.");
+                System.out.println("Shutting down sync service.");
+                syncService.shutdown();
 			    
                 AceLog.getAppLog().info("Closing all JFrames.");
                 System.out.println("Closing all JFrames.");
@@ -345,6 +352,10 @@ public class Bdb {
 		                f.dispose();
 		            }
 		        }
+                AceLog.getAppLog().info("Awaiting termination of sync service.");
+                System.out.println("Awaiting termination of sync service.");
+                syncService.awaitTermination(90, TimeUnit.MINUTES);
+
                 AceLog.getAppLog().info("Starting LuceneManager close.");
                 System.out.println("Starting LuceneManager close.");
 		        LuceneManager.close();
@@ -361,15 +372,6 @@ public class Bdb {
                 System.out.println("Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
                 NidDataFromBdb.close();
-                AceLog.getAppLog().info("Starting last sync.");
-                System.out.println("Starting last sync.");
-				new Sync().run();
-                AceLog.getAppLog().info("Shutting down sync service.");
-                System.out.println("Shutting down sync service.");
-				syncService.shutdown();
-                AceLog.getAppLog().info("Awaiting termination of sync service.");
-                System.out.println("Awaiting termination of sync service.");
-				syncService.awaitTermination(90, TimeUnit.MINUTES);
 				mutable.bdbEnv.sync();
                 AceLog.getAppLog().info("mutable.bdbEnv.sync() finished.");
                 System.out.println("mutable.bdbEnv.sync() finished.");
