@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
@@ -63,8 +64,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             getProgress().setActive(true);
             concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
-            synchronized (conceptsToFetch) {
-                fetchSet = new HashSet<Integer>(conceptsToFetch);
+            fetchSet = new HashSet<Integer>(conceptsToFetch.size());
+            for (Integer i: conceptsToFetch.keySet()) {
+                fetchSet.add(i);
             }
             for (Integer id : fetchSet) {
                 if (stopWork) {
@@ -176,9 +178,9 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                     return;
                 }
                 for (I_DescriptionPart descVersion : d.getMutableParts()) {
-                    conceptsToFetch.add(descVersion.getTypeId());
-                    conceptsToFetch.add(descVersion.getStatusId());
-                    conceptsToFetch.add(descVersion.getPathId());
+                    conceptsToFetch.put(descVersion.getTypeId(), descVersion.getTypeId());
+                    conceptsToFetch.put(descVersion.getStatusId(), descVersion.getStatusId());
+                    conceptsToFetch.put(descVersion.getPathId(), descVersion.getPathId());
                 }
             }
         }
@@ -198,7 +200,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
 
     private ReferencedConceptsSwingWorker refConWorker;
 
-    private Set<Integer> conceptsToFetch = new HashSet<Integer>();
+    private ConcurrentHashMap<Integer, Integer> conceptsToFetch = new ConcurrentHashMap<Integer, Integer>();
 
     Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
