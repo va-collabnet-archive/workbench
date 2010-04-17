@@ -339,8 +339,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
 				readWriteArray.commitTimes[getReadWriteIndex(sapNid)] = time;
 				committedSapNids.add(sapNid);
 			}
-			assert committedSapNids.contiguous() : " commit sapNids are not contiguous: "
-				+ committedSapNids.toString();
 			uncomittedStatusPathEntries.clear();
 			mapperCache.clear();
 		}
@@ -367,9 +365,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			if (uncomittedStatusPathEntries.containsKey(usp)) {
 				return uncomittedStatusPathEntries.get(usp);
 			} else {
-			    synchronized (usp) {
-                    
-                }
 				int statusAtPositionNid = sequence.getAndIncrement();
 				mapperCache.clear();
 				readWriteArray

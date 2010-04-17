@@ -46,6 +46,7 @@ import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
@@ -54,7 +55,9 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
@@ -75,6 +78,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
@@ -106,14 +110,19 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
     private HostProxy host = new HostProxy();
 
+    private I_HelpRefsets refsetHelper;
+    
+    
+
+    @SuppressWarnings("unchecked")
     public RefreshSpecClausePanel(I_GetConceptData refsetIdentityConcept, PositionSetReadOnly refsetSpecVersionSet,
             PositionSetReadOnly sourceTerminologyVersionSet, List<Collection<UUID>> clausesToUpdate,
             I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
         super();
         replacementConceptLabel = null;
         replacementConceptLabel = new TermComponentLabel(frameConfig);
-        this.refsetSpec =
-        	Terms.get().getRefsetHelper(frameConfig).getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig).iterator().next();
+        this.refsetHelper = Terms.get().getRefsetHelper(frameConfig);
+        this.refsetSpec = this.refsetHelper.getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig).iterator().next();
         this.refsetSpecVersionSet = refsetSpecVersionSet;
         this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
         this.clausesToUpdate = clausesToUpdate;
@@ -164,7 +173,6 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 I_GetConceptData part2 = tf.getConcept(cccPart.getC2id());
                 I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
 
-                boolean hasRetiredConcept = false;
                 if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet, frameConfig.getPrecedence(),
                     frameConfig.getConflictResolutionStrategy()).size() > 0) {
                     this.conceptUnderReview = part1;
@@ -210,6 +218,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         return fields.toArray(new REL_FIELD[fields.size()]);
     }
 
+    @SuppressWarnings("unchecked")
     private void layoutRefreshSpecClausePanel() throws IOException, TerminologyException {
         this.removeAll();
         setLayout(new GridBagLayout());
@@ -596,106 +605,62 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, 
                                 config.getPrecedence(), config.getConflictResolutionStrategy());
                 PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
-                int newMemberNid =
-                        tf.uuidToNative(UUID.randomUUID());
-                I_Identify newMemberId = tf.getId(newMemberNid);
-                I_ExtendByRef newMember =
-                        tf.newExtensionNoChecks(member.getRefsetId(), newMemberNid, member.getComponentId(), member
-                            .getTypeId());
-
-                for (I_Path p : config.getEditingPathSet()) {
-
-                    for (I_ExtendByRefVersion tuple : tuples) {
-
-                        I_ExtendByRefPart newRetiredPart =
-                                (I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, p.getConceptId(),
-                                    Long.MAX_VALUE);
-                        tuple.addVersion(newRetiredPart);
-                        tf.addUncommitted(tuple.getCore());
-
-                        if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-
-                            I_ExtendByRefPartCidCid newCCPart =
-                                    (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(currentNid,
-                                        p.getConceptId(), Long.MAX_VALUE);
-                            newMember.addVersion(newCCPart);
-                            tf.addUncommitted(newMember);
-
-                            if (newCCPart.getC1id() == conceptUnderReview.getConceptId()) {
-                                newCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
-                                tf.addUncommitted(comment);
-                                tf.addUncommitted(commentRefset);
-                            }
-                            if (newCCPart.getC2id() == conceptUnderReview.getConceptId()) {
-                                newCCPart.setC2id(replacementConceptLabel.getTermComponent().getNid());
-                            }
-                        } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION
-                            .localize().getNid()) {
-                            I_ExtendByRefPartCidCidCid newCCCPart =
-                                    (I_ExtendByRefPartCidCidCid) tuple.getMutablePart().makeAnalog(
-                                        currentNid, p.getConceptId(), Long.MAX_VALUE);
-                            newMember.addVersion(newCCCPart);
-                            tf.addUncommitted(newMember);
-                            if (newCCCPart.getC1id() == conceptUnderReview.getConceptId()) {
-                                newCCCPart.setC1id(replacementConceptLabel.getTermComponent().getNid());
-                            }
-                            if (newCCCPart.getC2id() == conceptUnderReview.getConceptId()) {
-                                newCCCPart.setC2id(replacementConceptLabel.getTermComponent().getNid());
-                            }
-                            if (newCCCPart.getC3id() == conceptUnderReview.getConceptId()) {
-                                newCCCPart.setC3id(replacementConceptLabel.getTermComponent().getNid());
-                            }
-                        }
+                I_Position viewPosition = config.getViewPositionSet().iterator().next();
+                
+                for (I_ExtendByRefVersion tuple : tuples) {
+                    I_ExtendByRefPartCidCid newRetiredPart =
+                        (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(retiredNid, retiredNid,
+                            Long.MAX_VALUE);
+                    RefsetPropertyMap propMap = new RefsetPropertyMap();
+                    if (newRetiredPart.getC1id() == conceptUnderReview.getConceptId()) {
+                        propMap.put(REFSET_PROPERTY.CID_ONE, replacementConceptLabel.getTermComponent().getNid());
+                    } else {
+                        propMap.put(REFSET_PROPERTY.CID_ONE, newRetiredPart.getC1id());
                     }
-
+                    if (newRetiredPart.getC2id() == conceptUnderReview.getConceptId()) {
+                        propMap.put(REFSET_PROPERTY.CID_TWO, replacementConceptLabel.getTermComponent().getNid());
+                    } else {
+                        propMap.put(REFSET_PROPERTY.CID_TWO, newRetiredPart.getC2id());
+                    }
+                    I_ExtendByRef newMember;
+                    switch (REFSET_TYPES.nidToType(tuple.getTypeId())) {
+                    case CID_CID:
+                        newMember = this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member.getComponentId(), REFSET_TYPES.CID_CID, propMap, UUID.randomUUID());
+                        break;
+                    case  CID_CID_CID:
+                        I_ExtendByRefPartCidCidCid c3Part = (I_ExtendByRefPartCidCidCid) newRetiredPart;
+                        if (c3Part.getC3id() == conceptUnderReview.getConceptId()) {
+                            propMap.put(REFSET_PROPERTY.CID_THREE, replacementConceptLabel.getTermComponent().getNid());
+                        } else {
+                            propMap.put(REFSET_PROPERTY.CID_THREE, c3Part.getC3id());
+                        }
+                        newMember = this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member.getComponentId(), REFSET_TYPES.CID_CID_CID, propMap, UUID.randomUUID());
+                        break;
+                    default:
+                       throw new Exception("Can't handle: " + REFSET_TYPES.nidToType(member.getTypeId()));
+                    }
                     if (writeComment) {
-                        UUID memberUuid = UUID.randomUUID();
-                        Collection<UUID> memberUuids = new ArrayList<UUID>();
-                        memberUuids.add(memberUuid);
-                        int commentNid =
-                                tf.uuidToNative(memberUuids);
-                        commentId = tf.getId(commentNid);
-                        if (commentRefset != null && commentId != null) {
-                            commentRefset.getUncommittedIdVersioned().add(commentId);
-                            comment =
-                                    tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, newMember
-                                        .getMemberId(), RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
-                            I_ExtendByRefPartStr commentExtPart =
-                                    tf.newExtensionPart(I_ExtendByRefPartStr.class);
-                            commentExtPart.setStringValue(editorComments.getText());
-                            comment.addVersion(commentExtPart);
-                            commentExtPart.setPathId(p.getConceptId());
-                            commentExtPart.setStatusId(currentNid);
-                            commentExtPart.setTime(Long.MAX_VALUE);
-                            tf.addUncommitted(comment);
-                            tf.addUncommitted(commentRefset);
-                        }
-                        //
+                        RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
+                        commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
+                        comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptId(), 
+                            newMember.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
+                        tf.addUncommittedNoChecks(commentRefset);
                     }
+                    tf.addUncommittedNoChecks(refsetSpec);
                     tf.commit();
-                    member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                    member.promote(viewPosition, promotionPath, 
                         retiredSet, frameConfig.getPrecedence());
-                    tf.addUncommitted(member);
-                    newMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                    newMember.promote(viewPosition, promotionPath, 
                         currentSet, frameConfig.getPrecedence());
-                    tf.addUncommitted(newMember);
-                    newMemberId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
-                        currentSet, frameConfig.getPrecedence());
+                    tf.addUncommittedNoChecks(refsetSpec);
                     if (comment != null) {
-                        comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                        comment.promote(viewPosition, promotionPath, 
                             currentSet, frameConfig.getPrecedence());
-                        tf.addUncommitted(comment);
-                        if (commentId != null) {
-                            commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
-                                currentSet, frameConfig.getPrecedence());
-                            commentRefset.getUncommittedIdVersioned().add(commentId);
-                            tf.addUncommitted(commentRefset);
-                        }
+                        tf.addUncommittedNoChecks(commentRefset);
                     }
                     tf.commit();
-                } // End For
+                }
             } // End check for replacementConceptLabel
-
         } else if (updateOptions.getSelectedItem().equals(RETIRE_OPTION)) {
             // Do retire here...
             Collection<UUID> clauseIds = clausesToUpdate.remove(0);
@@ -704,52 +669,30 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples, 
                                 config.getPrecedence(), config.getConflictResolutionStrategy());
             PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
-            for (I_Path p : config.getEditingPathSet()) {
+            I_Position viewPosition = config.getViewPositionSet().iterator().next();
+
                 for (I_ExtendByRefVersion tuple : tuples) {
-                    I_ExtendByRefPart newPart =
-                            (I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, p.getConceptId(),
+                    tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptId(),
                                 Long.MAX_VALUE);
-                    tuple.getCore().addVersion(newPart);
-                    tf.addUncommitted(tuple.getCore());
                 }
+                tf.addUncommittedNoChecks(refsetSpec);
                 if (writeComment) {
-                    UUID memberUuid = UUID.randomUUID();
-                    Collection<UUID> memberUuids = new ArrayList<UUID>();
-                    memberUuids.add(memberUuid);
-                    int commentNid =
-                            tf.uuidToNative(memberUuids);
-                    commentId = tf.getId(commentNid);
-                    commentRefset.getUncommittedIdVersioned().add(commentId);
-                    comment =
-                            tf.newExtensionNoChecks(commentRefset.getConceptId(), commentNid, member.getMemberId(),
-                                RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid());
-                    I_ExtendByRefPartStr commentExtPart = tf.newExtensionPart(I_ExtendByRefPartStr.class);
-                    commentExtPart.setStringValue(editorComments.getText());
-                    comment.addVersion(commentExtPart);
-                    commentExtPart.setPathId(p.getConceptId());
-                    commentExtPart.setStatusId(currentNid);
-                    commentExtPart.setTime(Long.MAX_VALUE);
-                    tf.addUncommitted(comment);
-                    tf.addUncommitted(commentRefset);
-                    //
+                    RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
+                    commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
+                    comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptId(), 
+                        member.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
+                    tf.addUncommittedNoChecks(commentRefset);
                 }
                 tf.commit();
-                member.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                member.promote(viewPosition, promotionPath, 
                     retiredSet, frameConfig.getPrecedence());
                 tf.addUncommitted(member);
                 if (comment != null) {
-                    comment.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
+                    comment.promote(viewPosition, promotionPath, 
                         currentSet, frameConfig.getPrecedence());
                     tf.addUncommitted(comment);
-                    if (commentId != null) {
-                        commentId.promote(new Position(Integer.MAX_VALUE, p), promotionPath, 
-                            currentSet, frameConfig.getPrecedence());
-                        commentRefset.getUncommittedIdVersioned().add(commentId);
-                        tf.addUncommitted(commentRefset);
-                    }
                 }
                 tf.commit();
-            }
 
         } else if (updateOptions.getSelectedItem().equals(SKIP_OPTION)) {
             // remove from front, add to end...

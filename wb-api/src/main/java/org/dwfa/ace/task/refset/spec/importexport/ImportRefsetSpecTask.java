@@ -93,6 +93,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
+        Terms.get().suspendChangeSetWriters();
         // initialize the progress panel
         I_ShowActivity activityPanel = null;
         try {
@@ -129,6 +130,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             I_GetConceptData memberRefset = tupleImporter.importFile(new File(importFileName),
                 new File(outputFileName), importConfig);
 
+            
             Terms.get().commit();
             
             Terms.get().setCheckCommitDataEnabled(checkCommitTestsEnabled);
@@ -147,6 +149,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             Terms.get().getActiveAceFrameConfig().setBuilderToggleVisible(true);
             Terms.get().getActiveAceFrameConfig().setInboxToggleVisible(true);
             Terms.get().commit();
+            Terms.get().resumeChangeSetWriters();
             return Condition.CONTINUE;
         } catch (Exception ex) {
             try {
@@ -157,6 +160,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Terms.get().resumeChangeSetWriters();
             throw new TaskFailedException(ex);
         }
     }

@@ -22,8 +22,6 @@ import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.thread.NamedThreadFactory;
 
-import cern.colt.map.OpenIntIntHashMap;
-
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.CursorConfig;
@@ -34,13 +32,13 @@ import com.sleepycat.je.OperationStatus;
 
 public class ConceptBdb extends ComponentBdb {
 
-    private IdentifierSetReadOnly readOnlyConceptIdSet;
+    private IdentifierSet conceptIdSet;
 
     private static ThreadGroup conDbThreadGroup = new ThreadGroup("concept db threads");
 
     private static ExecutorService iteratorService = Executors.newCachedThreadPool(new NamedThreadFactory(
         conDbThreadGroup, "parallel iterator service"));
-    private static ExecutorService idFinderService = Executors.newCachedThreadPool(new NamedThreadFactory(
+    private static ExecutorService idFinderService = Executors.newFixedThreadPool(2, new NamedThreadFactory(
         conDbThreadGroup, "id finder service"));
 
     private int processors = Runtime.getRuntime().availableProcessors();
@@ -56,7 +54,7 @@ public class ConceptBdb extends ComponentBdb {
 
     @Override
     protected void init() throws IOException {
-        // Nothing to do...
+        // nothing to do...
     }
 
     public List<UUID> getUuidsForConcept(int cNid) throws IOException {
@@ -82,6 +80,7 @@ public class ConceptBdb extends ComponentBdb {
         ConceptBinder binder = new ConceptBinder();
         DatabaseEntry key = new DatabaseEntry();
         int cNid = concept.getNid();
+        conceptIdSet.setMember(cNid);
         IntegerBinding.intToEntry(cNid, key);
         DatabaseEntry value = new DatabaseEntry();
         synchronized (concept) {
@@ -95,7 +94,6 @@ public class ConceptBdb extends ComponentBdb {
             mutable.put(null, key, value);
             concept.setLastWrite(writeVersion);
         }
-        readOnlyConceptIdSet = null;
         Collection<Integer> nids = concept.getAllNids();
         NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
         for (int nid : nids) {
@@ -160,7 +158,7 @@ public class ConceptBdb extends ComponentBdb {
         }
     }
 
-    private static class GetCNids implements Callable<OpenIntIntHashMap> {
+    private static class GetCNids implements Callable<IdentifierSet> {
         private Database db;
 
         public GetCNids(Database db) {
@@ -169,9 +167,9 @@ public class ConceptBdb extends ComponentBdb {
         }
 
         @Override
-        public OpenIntIntHashMap call() throws Exception {
+        public IdentifierSet call() throws Exception {
             int size = (int) db.count();
-            OpenIntIntHashMap nidMap = new OpenIntIntHashMap(size + 2);
+            IdentifierSet nidMap = new IdentifierSet(size + 2);
             CursorConfig cursorConfig = new CursorConfig();
             cursorConfig.setReadUncommitted(true);
             Cursor cursor = db.openCursor(null, cursorConfig);
@@ -180,14 +178,11 @@ public class ConceptBdb extends ComponentBdb {
                 DatabaseEntry foundData = new DatabaseEntry();
                 foundData.setPartial(true);
                 foundData.setPartial(0, 0, true);
-                int max = Integer.MIN_VALUE;
                 while (cursor.getNext(foundKey, foundData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
                     int cNid = IntegerBinding.entryToInt(foundKey);
-                    nidMap.put(cNid, cNid);
-                    max = Math.max(max, cNid);
+                    nidMap.setMember(cNid);
                 }
                 cursor.close();
-                nidMap.put(Integer.MAX_VALUE, max);
                 return nidMap;
             } finally {
                 cursor.close();
@@ -201,20 +196,22 @@ public class ConceptBdb extends ComponentBdb {
      * @throws IOException
      */
     public IdentifierSetReadOnly getReadOnlyConceptIdSet() throws IOException {
-        if (readOnlyConceptIdSet == null) {
-            Future<OpenIntIntHashMap> readOnlyFuture = idFinderService.submit(new GetCNids(readOnly));
-            Future<OpenIntIntHashMap> mutableFuture = idFinderService.submit(new GetCNids(mutable));
+        if (conceptIdSet == null) {
+            Future<IdentifierSet> readOnlyFuture = idFinderService.submit(new GetCNids(readOnly));
+            Future<IdentifierSet> mutableFuture = idFinderService.submit(new GetCNids(mutable));
             try {
-                OpenIntIntHashMap readOnlyMap = readOnlyFuture.get();
-                OpenIntIntHashMap mutableMap = mutableFuture.get();
-                readOnlyConceptIdSet = new IdentifierSetReadOnly(mergeIntoIdSet(readOnlyMap, mutableMap));
+                IdentifierSet readOnlyMap = readOnlyFuture.get();
+                IdentifierSet mutableMap = mutableFuture.get();
+                idFinderService.shutdown();
+                readOnlyMap.or(mutableMap);
+                conceptIdSet = new IdentifierSet(readOnlyMap);
             } catch (InterruptedException e) {
                 throw new IOException(e);
             } catch (ExecutionException e) {
                 throw new IOException(e);
             }
         }
-        return readOnlyConceptIdSet;
+        return new IdentifierSetReadOnly(conceptIdSet);
     }
 
     /**
@@ -223,32 +220,11 @@ public class ConceptBdb extends ComponentBdb {
      * @throws IOException
      */
     public I_RepresentIdSet getConceptIdSet() throws IOException {
-        return new IdentifierSet(getReadOnlyConceptIdSet());
+        return new IdentifierSet(conceptIdSet);
     }
 
     public I_RepresentIdSet getEmptyIdSet() throws IOException {
         return new IdentifierSet(getReadOnlyConceptIdSet().totalBits());
-    }
-
-    private IdentifierSet mergeIntoIdSet(OpenIntIntHashMap map1, OpenIntIntHashMap map2) {
-        if (map1.size() < map2.size()) {
-            return mergeIntoIdSet(map2, map1);
-        }
-        int max1 = map1.get(Integer.MAX_VALUE);
-        int max2 = map1.get(Integer.MAX_VALUE);
-        map1.removeKey(Integer.MAX_VALUE);
-        map2.removeKey(Integer.MAX_VALUE);
-        int max = Math.max(max1, max2);
-        map1.ensureCapacity(map1.size() + map2.size());
-        for (int key : map2.keys().elements()) {
-            map1.put(key, key);
-        }
-        map2 = null;
-        IdentifierSet returnList = new IdentifierSet(max - Integer.MAX_VALUE);
-        for (int key : map1.keys().elements()) {
-            returnList.setMember(key);
-        }
-        return returnList;
     }
 
     public class ReferenceFinder implements I_ProcessConceptData {
@@ -295,9 +271,9 @@ public class ConceptBdb extends ComponentBdb {
     }
 
     public void forget(Concept c) throws IOException {
+        int cNid = c.getNid();
         try {
             DatabaseEntry key = new DatabaseEntry();
-            int cNid = c.getNid();
             IntegerBinding.intToEntry(cNid, key);
             // Perform the deletion. All records that use this key are
             // deleted.
@@ -305,5 +281,6 @@ public class ConceptBdb extends ComponentBdb {
         } catch (Exception e) {
             throw new IOException(e);
         }
+        conceptIdSet.setNotMember(cNid);
     }
 }

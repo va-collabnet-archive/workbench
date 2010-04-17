@@ -77,7 +77,7 @@ public interface I_HelpRefsets extends I_HelpLineage {
 			RefsetPropertyMap propMap, I_ConfigAceFrame config) throws Exception;
 	
 	public <T extends I_ExtendByRefPart> I_ExtendByRef getOrCreateRefsetExtension(
-			int refsetId, int conceptId, REFSET_TYPES type,
+			int refsetId, int componentId, REFSET_TYPES type,
 			RefsetPropertyMap extProps, UUID memberUuid) throws Exception;
 
 

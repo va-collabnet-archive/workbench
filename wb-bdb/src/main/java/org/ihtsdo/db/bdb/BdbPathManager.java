@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.db.bdb;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
@@ -58,6 +58,8 @@ import org.ihtsdo.etypes.EConcept;
 public class BdbPathManager implements I_Manage<I_Path> {
 
 	protected Path editPath;
+	
+	ConcurrentHashMap<Integer, Path> pathMap;
 	
 	private class RefsetHelperGetter {
 		ConcurrentHashMap<I_ConfigAceFrame, RefsetHelper>  helperMap = 
@@ -93,9 +95,11 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			.getName());
 
 	private RefsetHelperGetter helperGetter = new RefsetHelperGetter();
+	
 	public BdbPathManager() throws TerminologyException {
 		try {
 			editPath = new Path(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), null);
+			setupPathMap();
 		} catch (Exception e) {
 			throw new TerminologyException(
 					"Unable to initialise path management.", e);
@@ -103,31 +107,13 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	}
 
 	public boolean exists(int cNid) throws TerminologyException {
-		try {
-	        try {
-	        	I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-	        	if (config == null) {
-	        		return true;
-	        	}
-	            return helperGetter.get(config).hasCurrentRefsetExtension(
-	            		ReferenceConcepts.REFSET_PATHS.getNid(), 
-	            		ReferenceConcepts.PATH.getNid(), 
-	            		new RefsetPropertyMap().with(
-	            				RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, cNid));
-
-	        } catch (Exception e) {
-	            throw new TerminologyException("Unable to determine if path exists.", e);
-	        }
-		} catch (Exception e) {
-			throw new TerminologyException(
-					"Unable to determine if path exists.", e);
-		}
+	    return pathMap.containsKey(cNid);
 	}
 
 	public I_Path get(int nid) throws PathNotExistsException,
 			TerminologyException {
 		if (exists(nid)) {
-			return new Path(nid, getPathOrigins(nid));
+			return pathMap.get(nid);
 		} else {
 			throw new PathNotExistsException("Path not found: "
 					+ TerminologyHelper.conceptToString(nid));
@@ -152,66 +138,42 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public Set<I_Path> getAll() throws TerminologyException {
-		try {
-			HashSet<I_Path> result = new HashSet<I_Path>();
-			Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
-					ReferenceConcepts.REFSET_PATHS.getNid());
-
-			for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
-				CidMember conceptExtension = (CidMember) extPart;
-				result.add(get(conceptExtension.getC1Nid()));
-			}
-			return result;
-
-		} catch (Exception e) {
-			throw new TerminologyException("Unable to retrieve all paths.", e);
-		}
+	    return new HashSet<I_Path>(pathMap.values());
 	}
+	
 	@SuppressWarnings("unchecked")
+    private void setupPathMap() throws IOException {
+        if (pathMap == null) {
+            pathMap = new ConcurrentHashMap<Integer, Path>();
+
+            try {
+                Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
+                        ReferenceConcepts.REFSET_PATHS.getNid());
+
+                for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
+                    CidMember conceptExtension = (CidMember) extPart;
+                    int pathId = conceptExtension.getC1Nid();
+                    pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
+                }
+
+
+            } catch (Exception e) {
+                throw new IOException("Unable to retrieve all paths.", e);
+            }
+        }
+	}
+	
 	public List<I_Position> getAllPathOrigins(int nid) throws TerminologyException {
-		try {
-			ArrayList<I_Position> result = new ArrayList<I_Position>();
-			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
-			for (RefsetMember extPart : pathConcept
-					.getConceptExtensions(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid())) {
-				assert extPart != null : "No concept extension for: "
-						+ pathConcept.getNid();
-				CidIntMember conceptExtension = (CidIntMember) extPart;
-				if (conceptExtension.getC1Nid() == nid) {
-					AceLog.getAppLog().severe(
-							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().iterator().next().getFirstTuple().getText());
-				} else {
-					Path path = getPath(conceptExtension.getC1Nid());
-					result.add(new Position(conceptExtension.getIntValue(),
-							path));
-					result.addAll(path.getInheritedOrigins());
-				}
-			}
-			return result;
-		} catch (Exception e) {
-			throw new TerminologyException("Unable to retrieve path origins.", e);
-		}
+        Path p = pathMap.get(nid);
+        return new ArrayList<I_Position>(p.getInheritedOrigins());
 	}
 
     
-    @SuppressWarnings("unchecked")
-    public List<I_Position> getPathChildren(int nid) throws TerminologyException {
+    public List<I_Position> getPathOrigins(int nid) throws TerminologyException {
         try {
-            ArrayList<I_Position> children = new ArrayList<I_Position>();
-            Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
-            Concept originRefset = Bdb.getConceptDb().getConcept(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
-            for (RefsetMember extPart : originRefset.getExtensions()) {
-                assert extPart != null : "Null origin for: " + pathConcept.getNid();
-                CidIntMember cidIntExtension = (CidIntMember) extPart;
-                if (cidIntExtension.getC1Nid() == nid) {
-                    children.add(new Position(cidIntExtension.getIntValue(),
-                        getPath(cidIntExtension.getComponentId())));
-                } 
-            }
-            return children;
+            Path p = pathMap.get(nid);
+            return p.getOrigins();
         } catch (Exception e) {
             throw new TerminologyException("Unable to retrieve path children.", e);
         }
@@ -220,7 +182,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<I_Position> getPathOrigins(int nid) throws TerminologyException {
+	private List<I_Position> getPathOriginsFromDb(int nid) throws TerminologyException {
 		try {
 			ArrayList<I_Position> result = new ArrayList<I_Position>();
 			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
@@ -234,54 +196,19 @@ public class BdbPathManager implements I_Manage<I_Path> {
 							"Self-referencing origin in path: "
 									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
 				} else {
-					result.add(new Position(conceptExtension.getIntValue(),
-							getPath(conceptExtension.getC1Nid())));
+				    if (pathMap.containsKey(conceptExtension.getC1Nid())) {
+	                    result.add(new Position(conceptExtension.getIntValue(),
+	                        pathMap.get(conceptExtension.getC1Nid())));
+				    } else {
+	                    result.add(new Position(conceptExtension.getIntValue(),
+                            new Path(conceptExtension.getC1Nid(), 
+                                     getPathOriginsFromDb(conceptExtension.getC1Nid()))));
+				    }
 				}
 			}
 			return result;
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to retrieve path origins.", e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<I_Position> getPathOrigins(int nid, HashSet<I_Position> prevOrigins) throws TerminologyException {
-		try {
-			ArrayList<I_Position> result = new ArrayList<I_Position>();
-			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
-			for (RefsetMember extPart : pathConcept
-					.getConceptExtensions(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid())) {
-				assert extPart != null : "No concept extension for: "
-						+ pathConcept.getNid();
-				CidIntMember conceptExtension = (CidIntMember) extPart;
-				if (conceptExtension.getC1Nid() == nid) {
-					AceLog.getAppLog().severe(
-							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
-				} else {
-					
-					Position anOrigin = new Position(conceptExtension.getIntValue(),
-							getPath(conceptExtension.getC1Nid()));
-					if (prevOrigins.contains(anOrigin)) {
-						throw new TerminologyException("Cycle detected in path adding: " +
-								anOrigin + " to: " + prevOrigins);
-					}
-					result.add(anOrigin);
-				}
-			}
-			return result;
-		} catch (Exception e) {
-			throw new TerminologyException("Unable to retrieve path origins.", e);
-		}
-	}
-
-	private Path getPath(int nid)
-			throws PathNotExistsException, TerminologyException {
-		if (exists(nid)) {
-			return new Path(nid, getPathOrigins(nid));
-		} else {
-			throw new PathNotExistsException("Path not found: "
-					+ TerminologyHelper.conceptToString(nid));
 		}
 	}
 
@@ -307,7 +234,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			for (I_Position origin : path.getOrigins()) {
 				writeOrigin(path, origin, config);
 			}
-
+			pathMap.put(path.getConceptId(), (Path) path);
 			logger.info("Wrote path : " + path);
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to write path: " + path, e);
@@ -351,6 +278,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					.getConceptId(), EConcept.REFSET_TYPES.CID_INT, propMap,
 					config);
 			BdbCommitManager.addUncommittedNoChecks(Concept.get(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid()));
+            pathMap.put(path.getConceptId(), (Path) path);
 			logger.info("Wrote origin path : " + origin + " to path " + path);
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to write path origin: "
@@ -366,6 +294,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					.getConceptId(), new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin
 							.getPath().getConceptId()));
+			path.getOrigins().remove(origin);
+            pathMap.put(path.getConceptId(), (Path) path);
 
 			logger.info("Removed origin path : " + origin + " from path "
 					+ path);
