@@ -16,7 +16,8 @@
  */
 package org.dwfa.mojo;
 
-import org.dwfa.mojo.ConceptDescriptor;
+import java.text.ParseException;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -39,7 +40,7 @@ public class PositionDescriptor {
         return timeString;
     }
 
-    public void setTimeString(String timeString) {
+    public void setTimeString(String timeString) throws ParseException {
         this.timeString = timeString;
     }
 

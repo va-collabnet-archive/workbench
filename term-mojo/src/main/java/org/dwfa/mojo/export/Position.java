@@ -34,7 +34,7 @@ public class Position {
             timePoint = new Date();
             timePoint.setTime(Long.MAX_VALUE);
         } else {
-            timePoint = AceDateFormat.getRf2DateFormat().parse(positionDescriptor.getTimeString());
+            timePoint = AceDateFormat.getVersionHelperDateFormat().parse(positionDescriptor.getTimeString());
         }
     }
 

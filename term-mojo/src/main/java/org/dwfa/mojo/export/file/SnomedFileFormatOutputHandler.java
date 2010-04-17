@@ -32,6 +32,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
     /** Uuid to Sct id map handler. */
     static UuidSnomedHandler snomedIdHandler;
 
+    /***/
     private Map<UUID, Map<UUID, Date>> releasePathDateMap;
 
     /**

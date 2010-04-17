@@ -122,4 +122,13 @@ public class ConceptDto extends BaseConceptDto implements Concept {
     public void setIdentifierDtos(List<IdentifierDto> identifierDtos) {
         this.identifierDtos = identifierDtos;
     }
+
+    /**
+     * Is this concept active (new or existing) or a inactive concept that was previously released.
+     *
+     * @return true if this concept is active or a inactive concept that was previously released.
+     */
+    public boolean isNewActiveOrRetiringLive() {
+        return ((!this.isActive() && this.isLive()) || this.isActive());
+    }
 }

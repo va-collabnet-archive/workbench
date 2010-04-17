@@ -128,12 +128,14 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
-            synchronized (conceptFileFull) {
-                conceptFileFull.write(getRf2ConceptRow(conceptDto));
-            }
-            if(conceptDto.isLatest()){
-                synchronized (conceptFileSnapShot) {
-                    conceptFileSnapShot.write(getRf2ConceptRow(conceptDto));
+            if (conceptDto.isNewActiveOrRetiringLive()) {
+                synchronized (conceptFileFull) {
+                    conceptFileFull.write(getRf2ConceptRow(conceptDto));
+                }
+                if(conceptDto.isLatest()){
+                    synchronized (conceptFileSnapShot) {
+                        conceptFileSnapShot.write(getRf2ConceptRow(conceptDto));
+                    }
                 }
             }
         }
@@ -145,12 +147,18 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            synchronized (descriptionFileFull) {
-                descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
-            }
-            if(descriptionDto.isLatest()){
-                synchronized (descriptionFileSnapShot) {
-                    descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+            if (descriptionDto.isNewActiveOrRetiringLive()) {
+                synchronized (descriptionFileFull) {
+                    descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
+                }
+                if(descriptionDto.isLatest() && !descriptionDto.isActive() && descriptionDto.isLive()){
+                    synchronized (descriptionFileSnapShot) {
+                        descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                    }
+                } else if(descriptionDto.isLatest() && descriptionDto.isActive()){
+                    synchronized (descriptionFileSnapShot) {
+                        descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                    }
                 }
             }
         }
@@ -162,12 +170,14 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            synchronized (relationshipFileFull) {
-                relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
-            }
-            if(relationshipDto.isLatest()){
-                synchronized (relationshipFileSnapShot) {
-                    relationshipFileSnapShot.write(getRf2RelationshipRow(relationshipDto));
+            if (relationshipDto.isNewActiveOrRetiringLive()) {
+                synchronized (relationshipFileFull) {
+                    relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
+                }
+                if(relationshipDto.isLatest()){
+                    synchronized (relationshipFileSnapShot) {
+                        relationshipFileSnapShot.write(getRf2RelationshipRow(relationshipDto));
+                    }
                 }
             }
         }
@@ -180,17 +190,23 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
 
         // group all the matching members together.
         for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
-            writeExtensionRow(extensionDto);
+            if (extensionDto.isNewActiveOrRetiringLive()) {
+                writeExtensionRow(extensionDto);
+            }
         }
         writeExtensionIdRows(componentDto.getConceptExtensionDtos());
 
         for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
-            writeExtensionRow(extensionDto);
+            if (extensionDto.isNewActiveOrRetiringLive()) {
+                writeExtensionRow(extensionDto);
+            }
         }
         writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
 
         for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
-            writeExtensionRow(extensionDto);
+            if (extensionDto.isNewActiveOrRetiringLive()) {
+                writeExtensionRow(extensionDto);
+            }
         }
         writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
     }
@@ -231,28 +247,30 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Collections.sort(extensionDtos);
         ExtensionDto lastExtensionDto = null;
         for (ExtensionDto extensionDto : extensionDtos) {
-            if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
-                if (extensionDto.isClinical()) {
-                    synchronized (identifierCliniclFileFull) {
-                        identifierCliniclFileFull.write(getRf2MemberIdentifierRow(extensionDto));
-                    }
-                    if (extensionDto.isLatest()) {
-                        synchronized (identifierCliniclFileSnapShot) {
-                            identifierCliniclFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+            if (extensionDto.isNewActiveOrRetiringLive()) {
+                if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
+                    if (extensionDto.isClinical()) {
+                        synchronized (identifierCliniclFileFull) {
+                            identifierCliniclFileFull.write(getRf2MemberIdentifierRow(extensionDto));
                         }
-                    }
-                } else {
-                    synchronized (identifierStructuralFileFull) {
-                        identifierStructuralFileFull.write(getRf2MemberIdentifierRow(extensionDto));
-                    }
-                    if (extensionDto.isLatest()) {
-                        synchronized (identifierStructuralFileSnapShot) {
-                            identifierStructuralFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+                        if (extensionDto.isLatest()) {
+                            synchronized (identifierCliniclFileSnapShot) {
+                                identifierCliniclFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+                            }
+                        }
+                    } else {
+                        synchronized (identifierStructuralFileFull) {
+                            identifierStructuralFileFull.write(getRf2MemberIdentifierRow(extensionDto));
+                        }
+                        if (extensionDto.isLatest()) {
+                            synchronized (identifierStructuralFileSnapShot) {
+                                identifierStructuralFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
+                            }
                         }
                     }
                 }
+                lastExtensionDto = extensionDto;
             }
-            lastExtensionDto = extensionDto;
         }
     }
 
@@ -389,23 +407,30 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         Map<UUID, Long> exportedIds = new HashMap<UUID, Long>();
 
         for (ConceptDto conceptDto : conceptDtos) {
-            for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
-                UUID uuid  = identifierDto.getConceptId().keySet().iterator().next();
+            if(conceptDto.isNewActiveOrRetiringLive()){
+                for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
+                    UUID uuid  = identifierDto.getConceptId().keySet().iterator().next();
 
-                if (!exportedIds.containsKey(uuid)) {
-                    Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
-                    rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
-                    rf2IdentifierRow.setAlternateIdentifier(uuid.toString());
-                    rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
-                    rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto,
-                        identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
-                    rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
-                    rf2IdentifierRow.setReferencedComponentSctId(identifierDto.getReferencedSctId().toString());
+                    if (!exportedIds.containsKey(uuid)) {
+                        Rf2IdentifierRow rf2IdentifierRow = new Rf2IdentifierRow();
+                        rf2IdentifierRow.setActive(identifierDto.isActive() ? "1" : "0");
+                        rf2IdentifierRow.setAlternateIdentifier(uuid.toString());
+                        rf2IdentifierRow.setEffectiveTime(getReleaseDate(identifierDto));
+                        rf2IdentifierRow.setIdentifierSchemeSctId(getSctId(identifierDto,
+                            identifierDto.getIdentifierSchemeUuid(), TYPE.CONCEPT).toString());
+                        rf2IdentifierRow.setModuleSctId(getModuleId(identifierDto).toString());
+                        rf2IdentifierRow.setReferencedComponentSctId(identifierDto.getReferencedSctId().toString());
 
-                    if((latest && identifierDto.isLatest())
-                            || !latest) {
-                        rf2IdentifierRows.add(rf2IdentifierRow);
-                        exportedIds.put(uuid, identifierDto.getReferencedSctId());
+                        if (!latest) {
+                            rf2IdentifierRows.add(rf2IdentifierRow);
+                            exportedIds.put(uuid, identifierDto.getReferencedSctId());
+                        } else if((latest && identifierDto.isLatest() && conceptDto.isActive())) {
+                            rf2IdentifierRows.add(rf2IdentifierRow);
+                            exportedIds.put(uuid, identifierDto.getReferencedSctId());
+                        } else if((latest && identifierDto.isLatest() && !conceptDto.isActive()) && conceptDto.isLive()) {
+                            rf2IdentifierRows.add(rf2IdentifierRow);
+                            exportedIds.put(uuid, identifierDto.getReferencedSctId());
+                        }
                     }
                 }
             }

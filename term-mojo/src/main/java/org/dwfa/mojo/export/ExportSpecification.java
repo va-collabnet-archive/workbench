@@ -73,7 +73,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.ThinExtByRefPartConcept;
 import org.dwfa.vodb.types.ThinExtByRefPartString;
-import org.dwfa.vodb.types.ThinExtByRefTuple;
 import org.dwfa.vodb.types.ThinExtByRefVersioned;
 import org.dwfa.vodb.types.ThinIdPart;
 
@@ -409,32 +408,21 @@ public class ExportSpecification {
      */
     private void setExtensionDto(List<ExtensionDto> extensionList, int nid, TYPE type) throws Exception {
         Set<I_ThinExtByRefTuple> extensionTuples = new HashSet<I_ThinExtByRefTuple>();
-        Set<I_ThinExtByRefTuple> latestPathExtensionTuples = new HashSet<I_ThinExtByRefTuple>();
-        Set<I_ThinExtByRefTuple> latestExtensionTuples = new HashSet<I_ThinExtByRefTuple>();
+        List<I_ThinExtByRefPart> extensionPartList = new ArrayList<I_ThinExtByRefPart>();
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : termFactory.getAllExtensionsForComponent(nid)) {
             for (Position position : positions) {
-                if (position.isLastest()) {
-                    latestPathExtensionTuples.addAll(
-                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
-                } else {
-                    extensionTuples.addAll(
-                        position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
-                }
+                extensionTuples.addAll(position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
             }
 
-            extensionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(latestPathExtensionTuples));
-            latestExtensionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(extensionTuples));
-            extensionTuples.removeAll(latestExtensionTuples);
-
-            extensionList.addAll(extensionProcessor.processList(thinExtByRefVersioned, latestExtensionTuples,
-                type , true, true));
-            extensionList.addAll(extensionProcessor.processList(thinExtByRefVersioned, extensionTuples,
-                    type , true, false));
-
-            latestPathExtensionTuples.clear();
-            latestExtensionTuples.clear();
+            if (!extensionTuples.isEmpty()) {
+                for (I_ThinExtByRefTuple tuple : extensionTuples) {
+                    extensionPartList.add(tuple.getPart());
+                }
+                extensionList.addAll(extensionProcessor.processList(extensionTuples.iterator().next().getCore(), extensionPartList, type, true));
+            }
             extensionTuples.clear();
+            extensionPartList.clear();
         }
     }
 
@@ -643,14 +631,11 @@ public class ExportSpecification {
     private void setConceptHistory(ComponentDto componentDto, I_RelVersioned versionedRel, boolean latest) throws Exception {
         for (I_RelPart versionPart : versionedRel.getVersions()) {
             if (historyStatusRefsetMap.containsKey(versionPart.getTypeId())) {
-                List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
-
-                I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(historyStatusRefsetMap.get(versionPart.getTypeId()), 0,
+                I_ThinExtByRefVersioned extensionVersioned = getThinExtByRefTuple(historyStatusRefsetMap.get(versionPart.getTypeId()), 0,
                     versionedRel.getC1Id(), versionedRel.getC2Id(), versionPart);
-                list.add(extensionTuple);
 
                 componentDto.getRelationshipExtensionDtos().addAll(
-                    extensionProcessor.processList(extensionTuple.getCore(), list, TYPE.CONCEPT, false, latest));
+                    extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(), TYPE.CONCEPT, false));
             }
         }
     }
@@ -669,6 +654,7 @@ public class ExportSpecification {
      */
     private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid, I_AmTuple tuple,
             int inactivationIndicatorRefsetNid, TYPE type, boolean latest) throws Exception {
+        I_ThinExtByRefVersioned extensionVersioned = null;
         int rf2InactiveStatus = getRf2Status(tuple.getStatusId());
         if (rf2InactiveStatus != -1) {
             // if the status is INACTIVE or ACTIVE there is no need for a
@@ -676,15 +662,21 @@ public class ExportSpecification {
             if (tuple.getStatusId() != activeConcept.getNid()
                 && tuple.getStatusId() != inActiveConcept.getNid()
                 && tuple.getStatusId() != currentConcept.getNid()) {
-                List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
 
-                I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(inactivationIndicatorRefsetNid, 0,
+                extensionVersioned = getThinExtByRefTuple(inactivationIndicatorRefsetNid, 0,
                     componentNid, rf2InactiveStatus, tuple);
-                extensionTuple.setStatusId(activeConcept.getNid());
-                list.add(extensionTuple);
-
-                extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, type, false, latest));
             }
+        } else {
+            extensionVersioned = getRefsetExtensionVersioned(inactivationIndicatorRefsetNid, componentNid);
+            if (extensionVersioned != null) {
+                addRetireLastestPart(extensionVersioned);
+            }
+        }
+
+        if (extensionVersioned != null) {
+            TupleVersionPart.getLatestPart(extensionVersioned.getVersions()).setStatusId(activeConcept.getNid());
+            extensionDtos.addAll(extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(),
+                type, false));
         }
     }
 
@@ -697,14 +689,11 @@ public class ExportSpecification {
      */
     private void setRelationshipRefinabilityReferenceSet(List<ExtensionDto> extensionDtos,
             I_RelTuple relationshipTuple, boolean latest) throws Exception {
-        List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
+        I_ThinExtByRefVersioned extensionVersioned = getThinExtByRefTuple(relationshipRefinabilityExtensionNid, 0,
+            relationshipTuple.getRelId(), relationshipTuple.getRefinabilityId(), relationshipTuple);
 
-        I_ThinExtByRefTuple extensionTuple = createThinExtByRefTuple(relationshipRefinabilityExtensionNid, 0, relationshipTuple.getRelId(),
-            relationshipTuple.getRefinabilityId(), relationshipTuple);
-
-        list.add(extensionTuple);
-
-        extensionDtos.addAll(extensionProcessor.processList(extensionTuple.getCore(), list, TYPE.RELATIONSHIP, false, latest));
+        extensionDtos.addAll(extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(),
+            TYPE.RELATIONSHIP, false));
     }
 
     /**
@@ -718,14 +707,11 @@ public class ExportSpecification {
      */
     private void setCtv3ReferenceSet(ComponentDto componentDto, I_ConceptAttributeTuple tuple, I_IdPart ctv3IdPart, boolean latest)
             throws Exception {
-        List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
-
-        I_ThinExtByRefTuple ctv3tuple = createThinExtByRefTuple(ctv3IdMapExtension.getConceptId(), 0, tuple.getConId(),
+        I_ThinExtByRefVersioned ctv3Versioned = getThinExtByRefTuple(ctv3IdMapExtension.getConceptId(), 0, tuple.getConId(),
             ctv3IdPart, ctv3IdPart.getSourceId().toString());
-        list.add(ctv3tuple);
 
         componentDto.getConceptExtensionDtos().addAll(
-            extensionProcessor.processList(ctv3tuple.getCore(), list, TYPE.CONCEPT, false, latest));
+            extensionProcessor.processList(ctv3Versioned, ctv3Versioned.getVersions(), TYPE.CONCEPT, false));
     }
 
     /**
@@ -739,14 +725,11 @@ public class ExportSpecification {
      */
     private void setSnomedRtIdReferenceSet(ComponentDto componentDto, I_ConceptAttributeTuple tuple, I_IdPart snomedIdPart, boolean latest)
             throws Exception {
-        List<I_ThinExtByRefTuple> list = new ArrayList<I_ThinExtByRefTuple>();
-
-        I_ThinExtByRefTuple snomedIdtuple = createThinExtByRefTuple(snomedRtIdMapExtension.getConceptId(), 0,
+        I_ThinExtByRefVersioned snomedIdVersioned = getThinExtByRefTuple(snomedRtIdMapExtension.getConceptId(), 0,
             tuple.getConId(), snomedIdPart, snomedIdPart.getSourceId().toString());
-        list.add(snomedIdtuple);
 
         componentDto.getConceptExtensionDtos().addAll(
-            extensionProcessor.processList(snomedIdtuple.getCore(), list, TYPE.CONCEPT, false, latest));
+            extensionProcessor.processList(snomedIdVersioned, snomedIdVersioned.getVersions(), TYPE.CONCEPT, false));
     }
 
     /**
@@ -759,21 +742,50 @@ public class ExportSpecification {
      * @param referencedComponentNid int
      * @param amPart I_AmPart int
      * @return I_ThinExtByRefTuple
+     * @throws Exception
      */
-    private I_ThinExtByRefTuple createThinExtByRefTuple(int refsetNid, int memberNid, int referencedComponentNid,
-            int component1, I_AmPart amPart) {
-        ThinExtByRefVersioned thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, referencedComponentNid,
-            conceptExtensionNid);
+    private I_ThinExtByRefVersioned getThinExtByRefTuple(int refsetNid, int memberNid, int referencedComponentNid,
+            int component1, I_AmPart amPart) throws Exception {
+        I_ThinExtByRefVersioned thinExtByRefVersioned = getRefsetExtensionVersioned(refsetNid, referencedComponentNid);
+        I_ThinExtByRefPartConcept conceptExtension = null;
 
-        I_ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
-        conceptExtension.setC1id(component1);
-        conceptExtension.setPathId(amPart.getPathId());
-        conceptExtension.setStatusId(amPart.getStatusId());
-        conceptExtension.setVersion(amPart.getVersion());
+        if (thinExtByRefVersioned == null) {
+            thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, referencedComponentNid,
+                conceptExtensionNid);
+        } else {
+            for (I_ThinExtByRefPart stringParts : thinExtByRefVersioned.getVersions()) {
+                if(stringParts.getPathId() == amPart.getPathId()
+                        && stringParts.getStatusId() == amPart.getStatusId()
+                        && stringParts.getVersion() == amPart.getVersion()){
+                    conceptExtension = (I_ThinExtByRefPartConcept) stringParts;
+                    break;
+                }
+            }
+        }
 
-        I_ThinExtByRefTuple ctv3tuple = new ThinExtByRefTuple(thinExtByRefVersioned, conceptExtension);
+        if (conceptExtension == null) {
+            conceptExtension = new ThinExtByRefPartConcept();
 
-        return ctv3tuple;
+            conceptExtension.setC1id(component1);
+            conceptExtension.setPathId(amPart.getPathId());
+            conceptExtension.setStatusId(amPart.getStatusId());
+            conceptExtension.setVersion(amPart.getVersion());
+
+            thinExtByRefVersioned.addVersion(conceptExtension);
+        }
+
+        return thinExtByRefVersioned;
+    }
+
+    private void addRetireLastestPart(I_ThinExtByRefVersioned thinExtByRefVersioned) {
+        ThinExtByRefPartConcept latestPart = (ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(thinExtByRefVersioned.getVersions());
+        ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
+        thinExtByRefVersioned.addVersion(conceptExtension);
+
+        conceptExtension.setC1id(latestPart.getC1id());
+        conceptExtension.setPathId(latestPart.getPathId());
+        conceptExtension.setStatusId(inActiveConcept.getNid());
+        conceptExtension.setVersion(latestPart.getVersion());
     }
 
     /**
@@ -783,26 +795,73 @@ public class ExportSpecification {
      *
      * @param refsetNid int
      * @param memberNid int
-     * @param componentNid int
+     * @param referencedComponentNid int
      * @param amPart I_AmPart
      * @param string String
      * @return
+     * @throws Exception
      */
-    private I_ThinExtByRefTuple createThinExtByRefTuple(int refsetNid, int memberNid, int componentNid,
-            I_AmPart amPart, String string) {
-        ThinExtByRefVersioned thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, componentNid,
-            stringExtensionNid);
+    private I_ThinExtByRefVersioned getThinExtByRefTuple(int refsetNid, int memberNid, int referencedComponentNid,
+            I_AmPart amPart, String string) throws Exception {
+        I_ThinExtByRefVersioned thinExtByRefVersioned = getRefsetExtensionVersioned(refsetNid, referencedComponentNid);
+        I_ThinExtByRefPartString conceptExtension = null;
 
-        I_ThinExtByRefPartString conceptExtension = new ThinExtByRefPartString();
-        conceptExtension.setStringValue(string);
-        conceptExtension.setPathId(amPart.getPathId());
-        conceptExtension.setStatusId(amPart.getStatusId());
-        conceptExtension.setVersion(amPart.getVersion());
+        if (thinExtByRefVersioned == null) {
+            thinExtByRefVersioned = new ThinExtByRefVersioned(refsetNid, memberNid, referencedComponentNid,
+                stringExtensionNid);
+        } else {
+            for (I_ThinExtByRefPart stringParts : thinExtByRefVersioned.getVersions()) {
+                if(stringParts.getPathId() == amPart.getPathId()
+                        && stringParts.getStatusId() == amPart.getStatusId()
+                        && stringParts.getVersion() == amPart.getVersion()){
+                    conceptExtension = (I_ThinExtByRefPartString) stringParts;
+                    break;
+                }
+            }
+        }
 
-        I_ThinExtByRefTuple tuple = new ThinExtByRefTuple(thinExtByRefVersioned, conceptExtension);
+        if(conceptExtension == null){
+            conceptExtension = new ThinExtByRefPartString();
+            conceptExtension.setStringValue(string);
+            conceptExtension.setPathId(amPart.getPathId());
+            conceptExtension.setStatusId(amPart.getStatusId());
+            conceptExtension.setVersion(amPart.getVersion());
+            thinExtByRefVersioned.addVersion(conceptExtension);
+        }
 
-        return tuple;
+        return thinExtByRefVersioned;
     }
+
+    /**
+     * Obtain all current extensions (latest part only) for a particular refset
+     * that exist on a
+     * specific concept.
+     *
+     * This method is strongly typed. The caller must provide the actual type of
+     * the refset.
+     *
+     * @param <T> the strong/concrete type of the refset extension
+     * @param refsetId Only returns extensions matching this reference set
+     * @param conceptId Only returns extensions that exists on this concept
+     * @return All matching refset extension (latest version parts only)
+     * @throws Exception if unable to complete (never returns null)
+     * @throws ClassCastException if a matching refset extension is not of type
+     *             T
+     */
+    public I_ThinExtByRefVersioned getRefsetExtensionVersioned(int refsetId, int conceptId)
+            throws Exception {
+        I_ThinExtByRefVersioned result = null;
+
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+            if (extension.getRefsetId() == refsetId) {
+                result = extension;
+                break;
+            }
+        }
+
+        return result;
+    }
+
 
     /**
      * Gets the active status, date time, namespace, path and status id for a
@@ -854,6 +913,7 @@ public class ExportSpecification {
             uuid = termFactory.getUids(componentNid).iterator().next();
         }
 
+        conceptDto.setLive(sctIdPart != null);
         if (sctIdPart == null) {
             sctIdPart = new ThinIdPart();
 
@@ -1228,21 +1288,22 @@ public class ExportSpecification {
          */
         @SuppressWarnings("unchecked")
         public List<ExtensionDto> processList(I_ThinExtByRefVersioned thinExtByRefVersioned,
-                Collection<I_ThinExtByRefTuple> list, TYPE type, boolean isClinical, boolean latest) throws Exception {
+                Collection<? extends I_ThinExtByRefPart> list, TYPE type, boolean isClinical) throws Exception {
             List<ExtensionDto> extensionDtos = new ArrayList<ExtensionDto>();
+            I_ThinExtByRefPart latestPart = TupleVersionPart.getLatestPart(list);
 
-            for (I_ThinExtByRefTuple t : list) {
-                I_GetConceptData refsetConcept = termFactory.getConcept(t.getRefsetId());
+            for (I_ThinExtByRefPart t : list) {
+                I_GetConceptData refsetConcept = termFactory.getConcept(thinExtByRefVersioned.getRefsetId());
                 if (isExportableConcept(refsetConcept)) {
-                    I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(t.getTypeId());
+                    I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(thinExtByRefVersioned.getTypeId());
                     if(extensionProcessor != null){
-                        ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t.getPart(), type, latest);
+                        ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t, type, t == latestPart);
                         extensionDto.setIsClinical(isClinical);
                         extensionDtos.add(extensionDto);
                     } else {
-                        logger.severe("No extension processor for refset " + termFactory.getConcept(t.getRefsetId()).getInitialText());
-                        logger.severe("No extension processor for concept " + termFactory.getConcept(t.getComponentId()).getInitialText());
-                        logger.severe("No extension processor for type " + termFactory.getConcept(t.getTypeId()).getInitialText());
+                        logger.severe("No extension processor for refset " + termFactory.getConcept(thinExtByRefVersioned.getRefsetId()).getInitialText());
+                        logger.severe("No extension processor for concept " + termFactory.getConcept(thinExtByRefVersioned.getComponentId()).getInitialText());
+                        logger.severe("No extension processor for type " + termFactory.getConcept(thinExtByRefVersioned.getTypeId()).getInitialText());
                     }
                 }
             }

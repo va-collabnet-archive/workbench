@@ -344,7 +344,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                             releasePathDateMap.put(pathUuid, mappedModuleDate);
                         }
                         mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
-                            AceDateFormat.getRf2DateFormat().parse(releasePosition.getTimeString()));
+                            AceDateFormat.getVersionHelperDateFormat().parse(releasePosition.getTimeString()));
                     }
                 }
             }

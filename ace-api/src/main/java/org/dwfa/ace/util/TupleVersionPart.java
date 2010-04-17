@@ -35,6 +35,25 @@ public class TupleVersionPart {
     }
 
     /**
+     * Get the latest part
+     *
+     * @param <T> extends I_AmPart
+     * @param list List of I_AmPart
+     * @return <T> extends I_AmPart
+     */
+    public static <T extends I_AmPart> T getLatestPart(Collection<T> list) {
+        T latestPart = null;
+
+        for (T part : list) {
+            if(latestPart == null || latestPart.getVersion() < part.getVersion()){
+                latestPart = part;
+            }
+        }
+
+        return latestPart;
+    }
+
+    /**
      * Check all the versioned parts for duplicates and remove, if no parts left in
      * versioned remove the versioned from the <code>versionedList</code> list
      *

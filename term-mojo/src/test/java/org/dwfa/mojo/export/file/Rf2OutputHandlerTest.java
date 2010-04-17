@@ -184,6 +184,7 @@ public class Rf2OutputHandlerTest {
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
         componentDto.getDescriptionDtos().get(0).setConceptId(conceptDto.getConceptId());
         componentDto.getDescriptionDtos().add(setDescriptionDto(new DescriptionDto()));
+        componentDto.getDescriptionDtos().get(0).setLanguageCode("en-AU");
         componentDto.getDescriptionDtos().get(1).setConceptId(conceptDto.getConceptId());
 
         componentDto.getRelationshipDtos().add(setRelationshipDto(new RelationshipDto()));
@@ -423,6 +424,7 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(getSctId(descriptionDto.getPathId(), descriptionDto),
             descriptionRow.getModuleSctId());
         Assert.assertEquals(descriptionDto.getDescription(), descriptionRow.getTerm());
+        Assert.assertEquals(descriptionRow.getLanaguageCode(), "en");
         Assert.assertEquals(getSctId(descriptionDto.getRf2TypeId(), descriptionDto),
             descriptionRow.getTypeSctId());
     }

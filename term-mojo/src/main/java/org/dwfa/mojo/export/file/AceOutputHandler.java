@@ -115,36 +115,42 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
-            synchronized (conceptFile) {
-                conceptFile.write(getAceConceptRow(conceptDto));
-            }
-            if(conceptDto.isLatest()){
-                synchronized (conceptFileSnapShot) {
-                    conceptFileSnapShot.write(getAceConceptRow(conceptDto));
+            if (conceptDto.isNewActiveOrRetiringLive()) {
+                synchronized (conceptFile) {
+                    conceptFile.write(getAceConceptRow(conceptDto));
+                }
+                if(conceptDto.isLatest()){
+                    synchronized (conceptFileSnapShot) {
+                        conceptFileSnapShot.write(getAceConceptRow(conceptDto));
+                    }
                 }
             }
         }
         writeIdRows(componentDto.getConceptDtos());
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            synchronized (descriptionFile) {
-                descriptionFile.write(getAceDescriptionRow(descriptionDto));
-            }
-            if(descriptionDto.isLatest()){
-                synchronized (descriptionFileSnapShot) {
-                    descriptionFileSnapShot.write(getAceDescriptionRow(descriptionDto));
+            if (descriptionDto.isNewActiveOrRetiringLive()) {
+                synchronized (descriptionFile) {
+                    descriptionFile.write(getAceDescriptionRow(descriptionDto));
+                }
+                if(descriptionDto.isLatest()){
+                    synchronized (descriptionFileSnapShot) {
+                        descriptionFileSnapShot.write(getAceDescriptionRow(descriptionDto));
+                    }
                 }
             }
         }
         writeIdRows(componentDto.getDescriptionDtos());
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            synchronized (relationshipFile) {
-                relationshipFile.write(getAceRelationshipRow(relationshipDto));
-            }
-            if(relationshipDto.isLatest()){
-                synchronized (relationshipFileSnapShot) {
-                    relationshipFileSnapShot.write(getAceRelationshipRow(relationshipDto));
+            if (relationshipDto.isNewActiveOrRetiringLive()) {
+                synchronized (relationshipFile) {
+                    relationshipFile.write(getAceRelationshipRow(relationshipDto));
+                }
+                if(relationshipDto.isLatest()){
+                    synchronized (relationshipFileSnapShot) {
+                        relationshipFileSnapShot.write(getAceRelationshipRow(relationshipDto));
+                    }
                 }
             }
         }
@@ -319,28 +325,30 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         Collections.sort(extensionDtos);
         ExtensionDto lastExtensionDto = null;
         for (ExtensionDto extensionDto : extensionDtos) {
-            if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
-                if (extensionDto.isClinical()) {
-                    synchronized (aceIdentifierCliniclFile) {
-                        aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
-                    }
-                    if(extensionDto.isLatest()){
-                        synchronized (aceIdentifierCliniclFileSnapShot) {
-                            aceIdentifierCliniclFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+            if (extensionDto.isNewActiveOrRetiringLive()) {
+                if (lastExtensionDto == null || !lastExtensionDto.getMemberId().equals(extensionDto.getMemberId())) {
+                    if (extensionDto.isClinical()) {
+                        synchronized (aceIdentifierCliniclFile) {
+                            aceIdentifierCliniclFile.write(getAceMemberIdentifierRow(extensionDto));
                         }
-                    }
-                } else {
-                    synchronized (aceIdentifierStructuralFile) {
-                        aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
-                    }
-                    if(extensionDto.isLatest()){
-                        synchronized (aceIdentifierStructuralFileSnapShot) {
-                            aceIdentifierStructuralFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+                        if(extensionDto.isLatest()){
+                            synchronized (aceIdentifierCliniclFileSnapShot) {
+                                aceIdentifierCliniclFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+                            }
+                        }
+                    } else {
+                        synchronized (aceIdentifierStructuralFile) {
+                            aceIdentifierStructuralFile.write(getAceMemberIdentifierRow(extensionDto));
+                        }
+                        if(extensionDto.isLatest()){
+                            synchronized (aceIdentifierStructuralFileSnapShot) {
+                                aceIdentifierStructuralFileSnapShot.write(getAceMemberIdentifierRow(extensionDto));
+                            }
                         }
                     }
                 }
+                lastExtensionDto = extensionDto;
             }
-            lastExtensionDto = extensionDto;
         }
     }
 

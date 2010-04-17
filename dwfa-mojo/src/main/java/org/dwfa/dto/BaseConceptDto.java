@@ -31,7 +31,8 @@ public class BaseConceptDto {
     private UUID status;
     private String statusCode;
     private Date dateTime;
-    private boolean isActive;
+    private boolean isActive = false;;
+    private boolean islive = false;
     private NAMESPACE namespace;
     private TYPE type;
 
@@ -124,6 +125,20 @@ public class BaseConceptDto {
      */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    /**
+     * @return the islive
+     */
+    public final boolean isLive() {
+        return islive;
+    }
+
+    /**
+     * @param islive the islive to set
+     */
+    public final void setLive(boolean islive) {
+        this.islive = islive;
     }
 
     /**

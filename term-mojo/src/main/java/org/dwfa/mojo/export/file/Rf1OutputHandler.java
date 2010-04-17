@@ -67,17 +67,21 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
-            if (conceptDto.isLatest()) {
-                synchronized (conceptFile) {
-                    conceptFile.write(getRf1ConceptRow(conceptDto));
+            if (conceptDto.isNewActiveOrRetiringLive()) {
+                    if (conceptDto.isLatest()) {
+                    synchronized (conceptFile) {
+                        conceptFile.write(getRf1ConceptRow(conceptDto));
+                    }
                 }
             }
         }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (descriptionDto.isLatest()) {
-                synchronized (descriptionFile) {
-                    descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+            if (descriptionDto.isNewActiveOrRetiringLive()) {
+                if (descriptionDto.isLatest()) {
+                    synchronized (descriptionFile) {
+                        descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+                    }
                 }
             }
         }
