@@ -105,7 +105,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         }
 
         public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
+            synchronized (ids) {
                 Integer nid = null;
                 boolean unmapped = false;
                 for (UUID uuid : uids) {
@@ -124,42 +124,42 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
                     }
                 }
                 return nid;
-			}
+            }
         }
 
          public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
-         	synchronized (ids) {
-	            if (ids.containsKey(uid)) {
-	                return ids.get(uid);
-	            } else {
-	                int nid = maxId.next();
-	                ids.put(uid, nid);
-	                 return nid;
-	            }
-         	}
+             synchronized (ids) {
+                if (ids.containsKey(uid)) {
+                    return ids.get(uid);
+                } else {
+                    int nid = maxId.next();
+                    ids.put(uid, nid);
+                     return nid;
+                }
+             }
         }
 
         public void flushIdBuffer() throws Exception {
-        	synchronized (ids) {
-	            getLog().info("ID Count: " + ids.size());
-	            int count = 0;
-	            for (Entry<UUID, Integer> entry : ids.entrySet()) {
-	                I_IdVersioned idv = vodb.getIdNullOk(entry.getValue());
-	                if (idv == null) {
-	                    idv = new ThinIdVersioned(entry.getValue(), 1);
-	                    addUuidPart(entry.getKey(), idv);
-	                }
-	                vodb.writeId(idv);
-	                count++;
-	                if (count % 100000 == 0) {
-	                    getLog().info("processed " + count + " identifiers. ");
-	                }
-	            }
+            synchronized (ids) {
+                getLog().info("ID Count: " + ids.size());
+                int count = 0;
+                for (Entry<UUID, Integer> entry : ids.entrySet()) {
+                    I_IdVersioned idv = vodb.getIdNullOk(entry.getValue());
+                    if (idv == null) {
+                        idv = new ThinIdVersioned(entry.getValue(), 1);
+                        addUuidPart(entry.getKey(), idv);
+                    }
+                    vodb.writeId(idv);
+                    count++;
+                    if (count % 100000 == 0) {
+                        getLog().info("processed " + count + " identifiers. ");
+                    }
+                }
 
-	            map = new BerkeleyIdMapper();
-	            this.ids.clear();
-	            getLog().info("Converted to Berkeley-based id mapper");
-        	}
+                map = new BerkeleyIdMapper();
+                this.ids.clear();
+                getLog().info("Converted to Berkeley-based id mapper");
+            }
         }
 
         private void addUuidPart(UUID uuid, I_IdVersioned idv)
@@ -183,61 +183,61 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         int encodingSource = PrimordialId.ACE_AUX_ENCODING_ID.getNativeId(Integer.MIN_VALUE);
 
         public BerkeleyIdMapper() throws DatabaseException {
-			super();
-			vodb.logIdDbStats();
-		}
+            super();
+            vodb.logIdDbStats();
+        }
 
-		public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
-	            Integer nid = idsFromCollection.get(uids);
-	            if (nid != null) {
-	                return nid;
-	            }
-	            if (vodb.hasId(uids)) {
-	                nid = vodb.getId(uids).getNativeId();
-	                idsFromCollection.put(uids, nid);
-	                return nid;
-	            }
+        public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception {
+            synchronized (ids) {
+                Integer nid = idsFromCollection.get(uids);
+                if (nid != null) {
+                    return nid;
+                }
+                if (vodb.hasId(uids)) {
+                    nid = vodb.getId(uids).getNativeId();
+                    idsFromCollection.put(uids, nid);
+                    return nid;
+                }
 
-	            Iterator<UUID> idsItr = uids.iterator();
-	            UUID firstId = idsItr.next();
+                Iterator<UUID> idsItr = uids.iterator();
+                UUID firstId = idsItr.next();
 
-	            int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
-	            idsFromCollection.put(uids, newId);
+                int newId = vodb.uuidToNativeWithGeneration(firstId, encodingSource, idPath, version);
+                idsFromCollection.put(uids, newId);
 
-	            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
-	            addUuidPart(idPath, version, firstId, idv);
-	            while (idsItr.hasNext()) {
-	                addUuidPart(idPath, version, idsItr.next(), idv);
-	            }
+                I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+                addUuidPart(idPath, version, firstId, idv);
+                while (idsItr.hasNext()) {
+                    addUuidPart(idPath, version, idsItr.next(), idv);
+                }
 
-				vodb.writeId(idv);
-	            return newId;
-        	}
+                vodb.writeId(idv);
+                return newId;
+            }
         }
 
         public int getIntId(UUID uid, I_Path idPath, int version) throws Exception {
-        	synchronized (ids) {
-	            Integer nid = ids.get(uid);
-	            if (nid != null) {
-	                return nid;
-	            }
-	            if (vodb.hasId(uid)) {
-	                nid = vodb.getId(uid).getNativeId();
-	                ids.put(uid, nid);
-	                return nid;
-	            }
+            synchronized (ids) {
+                Integer nid = ids.get(uid);
+                if (nid != null) {
+                    return nid;
+                }
+                if (vodb.hasId(uid)) {
+                    nid = vodb.getId(uid).getNativeId();
+                    ids.put(uid, nid);
+                    return nid;
+                }
 
-	            int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
-	            ids.put(uid, newId);
+                int newId = vodb.uuidToNativeWithGeneration(uid, encodingSource, idPath, version);
+                ids.put(uid, newId);
 
-	            I_IdVersioned idv = new ThinIdVersioned(newId, 1);
+                I_IdVersioned idv = new ThinIdVersioned(newId, 1);
 
-	            addUuidPart(idPath, version, uid, idv);
-				vodb.writeId(idv);
+                addUuidPart(idPath, version, uid, idv);
+                vodb.writeId(idv);
 
-	            return newId;
-        	}
+                return newId;
+            }
         }
 
         private void addUuidPart(I_Path idPath, int version, UUID firstId, I_IdVersioned idv)
@@ -322,7 +322,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if (vcon.addVersion(con)) {
                 vodb.writeConceptAttributes(vcon);
             }
-		}
+        }
 
         latch.countDown();
     }
@@ -355,7 +355,7 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
             if (vdesc.addVersion(desc)) {
                 vodb.writeDescriptionNoLuceneUpdate(vdesc);
             }
-		}
+        }
 
         latch.countDown();
     }
@@ -390,26 +390,29 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         int relId = map.getIntId((UUID) relID, aceAuxPath, version);
         I_RelVersioned vrel;
         synchronized (vodb) {
-	        if (vodb.hasRel(relId, c1id)) {
-	            vrel = vodb.getRel(relId, c1id);
-	            if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
-	                // rel ok
-	            } else {
-                I_GetConceptData c1 = ConceptBean.get(c1id);
-                I_GetConceptData c2 = ConceptBean.get(c2id);
-                I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
+            if (vodb.hasRel(relId, c1id)) {
+                vrel = vodb.getRel(relId, c1id);
+                if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
+                    // rel ok
+                } else {
+                    I_GetConceptData c1 = ConceptBean.get(c1id);
+                    I_GetConceptData c2 = ConceptBean.get(c2id);
+                    I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
 
-                throw new Exception("Duplicate rels with different c1 and c2:\n relId: " + relID + "\n c1: " + c1
-                    + "\n c2: " + c2 + "\n c3: " + c3);
-	            }
-	        } else {
-	            vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
-	                    .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath,
-	                                                                                      version), 1);
-	        }
-	        if (vrel.addVersionNoRedundancyCheck(part)) {
-	            vodb.writeRel(vrel);
-	        }
+                    AceLog.getEditLog().log(Level.SEVERE,
+                            "Duplicate rels with different c1 and c2:\n relId: " + relID + "\n c1: " + c1 + "\n c2: " + c2 + "\n c3: " + c3);
+                    vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
+                            .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath,
+                                                                                              version), 1);
+                }
+            } else {
+                vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
+                        .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath,
+                                                                                          version), 1);
+            }
+            if (vrel.addVersionNoRedundancyCheck(part)) {
+                vodb.writeRel(vrel);
+            }
         }
 
         latch.countDown();
