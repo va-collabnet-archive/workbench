@@ -643,6 +643,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
         cClassSnoRels = null; // :MEMORY:
         cRocketSnoRels = null; // :MEMORY:
+        
+        SnoQuery.setDirty(true);
+        config.fireCommit();
+        
         return Condition.CONTINUE;
     }
 
@@ -1708,14 +1712,14 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
             // "COMPARE" UUIDs, //NIDs, Initial Text
-                int index = 0;
+                int setNumber = 1;
                 for (SnoConGrp scg : scgl) {
-                	if (scg.size() > 0) {
-                		SnoCon sc =scg.get(0); 
+                    for (SnoCon sc:scg) {
                         I_GetConceptData c = tf.getConcept(sc.id);
-                        bw.write(c.getUids().get(0).toString() + "\tcount=\t" + scg.size() + "\t");
+                        bw.write(c.getUids().get(0).toString() + "\tset=\t" + setNumber + "\t");
                         bw.write(c.getInitialText() + "\r\n");
-                	}
+                    }
+                    setNumber++;
                 }
 
             bw.flush();

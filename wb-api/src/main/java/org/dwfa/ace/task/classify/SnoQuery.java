@@ -25,6 +25,7 @@ public class SnoQuery {
     static ArrayList<SnoRel> roleAdded;
     static ArrayList<SnoRel> roleDropped;
     static SnoConGrpList equivCon;
+    private static boolean dirty;
 
     public SnoQuery() {
         isaAdded = new ArrayList<SnoRel>();
@@ -80,4 +81,13 @@ public class SnoQuery {
     static public SnoConGrpList getEquiv() {
         return equivCon;
     }
+
+    public static void setDirty(boolean dirty) {
+        SnoQuery.dirty = dirty;
+    }
+
+    public static boolean isDirty() {
+        return dirty;
+    }
+
 }

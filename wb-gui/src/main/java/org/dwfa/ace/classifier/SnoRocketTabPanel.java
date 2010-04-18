@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +32,32 @@ import org.dwfa.ace.classifier.EquivPanel;
 import org.dwfa.ace.classifier.ViewPathPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoAB;
+import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
 
 public class SnoRocketTabPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
+
+    private class SnorocketListener implements PropertyChangeListener {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            // TODO Auto-generated method stub
+            if (SnoQuery.isDirty()) {
+                // DIFFS JPANEL
+                diffPathJPanel.update();
+
+                // EQUIVALENTS JPANEL
+                equivJPanel.update();
+
+                revalidate();
+                repaint();
+                
+                SnoQuery.setDirty(false);
+            }            
+        }
+    }
 
     // ** WORKBENCH PARTICULARS **
     private I_TermFactory tf;
@@ -44,7 +67,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     private List<I_Position> cClassPathPos;
 
     // ** CONFIGURATION PARTICULARS **
-    private static final boolean debug = true; // :DEBUG:
+    private static final boolean debug = false; // :DEBUG:
     private boolean viewPathTF = false;
 
     // ** GUI **
@@ -63,6 +86,8 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     public SnoRocketTabPanel(ACE ace) throws IOException {
         super();
         getClassifyPrefs(ace);
+        getClassifyPrefs(ace);
+        config.addPropertyChangeListener("commit", new SnorocketListener());
 
         // COMPONENT BORDER
         setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
