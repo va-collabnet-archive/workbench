@@ -476,11 +476,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             getLog().info("POM Output Directory: " + outputDirectory);
         }
 
-        executeMojo(buildDir, targetSubDir, sctInputDirArray, outputDirectory, includeCTV3ID, includeSNOMEDRTID);
+        executeMojo(buildDir, targetSubDir, sctInputDirArray, outputDirectory, includeCTV3ID,
+                includeSNOMEDRTID);
         getLog().info("POM PROCESSING COMPLETE ");
     }
 
-    void executeMojo(String wDir, String subDir, String[] inDirs,String outDir, boolean ctv3idTF,
+    void executeMojo(String wDir, String subDir, String[] inDirs, String outDir, boolean ctv3idTF,
             boolean snomedrtTF) throws MojoFailureException {
         fNameStep1Con = wDir + scratchDirectory + FILE_SEPARATOR + "step1_concepts.ser";
         fNameStep1Rel = wDir + scratchDirectory + FILE_SEPARATOR + "step1_relationships.ser";
@@ -1007,15 +1008,17 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             } else if (theCon == theDes && theCon != theRel && theCon != theRelDest) {
                 createEConcept(conList, desList, null, null, dos);
                 if (debug) {
-                    getLog().info("--- Case concept without any relationship -- Step 4"+
-                    	    		" theCon=\t" + theCon + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel + "\ttheRelDest\t" + theRelDest);
+                    getLog().info(
+                            "--- Case concept without any relationship -- Step 4" + " theCon=\t"
+                                    + theCon + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
+                                    + "\ttheRelDest\t" + theRelDest);
                     getLog().info("--- --- concept SNOMED id =" + theCon);
                     getLog().info("--- --- concept counter   #" + countCon);
                     getLog().info("--- --- description       \"" + desList.get(0).termText + "\"");
                     getLog().info("--- \r\n");
                 }
             } else {
-                throw new MojoFailureException("Case not implemented -- Step 4");            	
+                throw new MojoFailureException("Case not implemented -- Step 4");
             }
 
             if (conNext == null && desNext == null && relNext == null)
@@ -1095,8 +1098,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         ca.setTime(xRevDateArray[cRec0.xRevision]); // long
 
         int max = conList.size();
-        String idCtv3IdFirst = cRec0.ctv3id;
-        String idSnomedRtFirst = cRec0.snomedrtid;
+        //String idCtv3IdFirst = cRec0.ctv3id;
+        //String idSnomedRtFirst = cRec0.snomedrtid;
         List<EConceptAttributesRevision> caRevisions = new ArrayList<EConceptAttributesRevision>();
         for (int i = 1; i < max; i++) {
             EConceptAttributesRevision rev = new EConceptAttributesRevision();
@@ -1239,7 +1242,11 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     rel.setCharacteristicUuid(xRelCharArray[rRec.characteristic]);
                     rel.setRefinabilityUuid(xRelRefArray[rRec.refinability]);
                     rel.setStatusUuid(lookupXStatus(rRec.status));
-                    rel.setPathUuid(xPathArray[rRec.xPath]);
+                    if (rRec.characteristic == 0) // 0=DEFINING
+                        rel.setPathUuid(xPathArray[rRec.xPath]);
+                    else
+                        // 1=Qualifier, 2=Historical, 3=Additional
+                        rel.setPathUuid(uuidPathSnomedCore);
                     rel.setTime(xRevDateArray[rRec.xRevision]);
                     rel.revisions = null;
                 } else {
@@ -1249,7 +1256,11 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     erv.setCharacteristicUuid(xRelCharArray[rRec.characteristic]);
                     erv.setRefinabilityUuid(xRelRefArray[rRec.refinability]);
                     erv.setStatusUuid(lookupXStatus(rRec.status));
-                    erv.setPathUuid(xPathArray[rRec.xPath]);
+                    if (rRec.characteristic == 0) // 0=DEFINING
+                        erv.setPathUuid(xPathArray[rRec.xPath]);
+                    else
+                        // 1=Qualifier, 2=Historical, 3=Additional
+                        erv.setPathUuid(uuidPathSnomedCore);                    
                     erv.setTime(xRevDateArray[rRec.xRevision]);
                     revisions.add(erv);
                 }
@@ -1557,8 +1568,8 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    void executeMojoStep1(String wDir, String subDir, String[] inDirs, String outDir, boolean ctv3idTF,
-            boolean snomedrtTF) throws MojoFailureException {
+    void executeMojoStep1(String wDir, String subDir, String[] inDirs, String outDir,
+            boolean ctv3idTF, boolean snomedrtTF) throws MojoFailureException {
         getLog().info("*** SctSiToEConcept STEP #1 BEGINNING ***");
         long start = System.currentTimeMillis();
 
@@ -2469,7 +2480,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                 bPos = bPos + len;
                 aPos = aPos + len + 1;
             }
-            len = lenA - aPos; 
+            len = lenA - aPos;
             System.arraycopy(a, aPos, b, bPos, len);
             return b;
         } else
