@@ -136,7 +136,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                     "\n##################################################################\n"
                     );
                 AceLog.getAppLog().alertAndLogException(new Exception("Exception writing change set for: " + c + 
-                    "\n See log for details"));
+                    "\n See log for details", e));
                 
             }
 			if (cswcOut != null) {

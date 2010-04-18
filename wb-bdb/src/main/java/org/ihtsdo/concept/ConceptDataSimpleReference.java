@@ -331,7 +331,9 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             Concept refsetConcept = Bdb.getConceptDb().getConcept(refsetNid);
             RefsetMember<?, ?> member = refsetConcept.getRefsetMember(memberNid);
             if (member != null) {
-                if (member.getComponentId() == componentId) {
+                if (member.getComponentId() == componentId 
+                        && member.primordialSapNid >= 0 
+                        && member.getTime() != Long.MIN_VALUE) {
                     refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
                 }
             } else {

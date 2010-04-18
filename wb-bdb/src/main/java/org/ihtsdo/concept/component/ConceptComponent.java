@@ -556,10 +556,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         buf.append(nid);
         buf.append(" pUuid:");
         buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
-        buf.append(" xtraIds:");
-        buf.append(additionalIdentifierParts);
-        buf.append(" xtraVersions: ");
-        buf.append(revisions);
         buf.append(" sap: ");
         if (primordialSapNid == Integer.MIN_VALUE) {
             buf.append("Integer.MIN_VALUE");
@@ -582,6 +578,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
+        buf.append(" xtraIds:");
+        buf.append(additionalIdentifierParts);
+        buf.append(" xtraVersions: ");
+        buf.append(revisions);
         buf.append("};");
         return buf.toString();
     }

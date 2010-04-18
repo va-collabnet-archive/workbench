@@ -106,18 +106,25 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	public boolean exists(int cNid) throws TerminologyException {
-	    return pathMap.containsKey(cNid);
+	public boolean exists(int cNid) throws TerminologyException, IOException {
+	    if (pathMap.containsKey(cNid)) {
+	        return true;
+	    }
+	    return getFromDisk(cNid) != null;
 	}
 
 	public I_Path get(int nid) throws PathNotExistsException,
-			TerminologyException {
+			TerminologyException, IOException {
 		if (exists(nid)) {
 			return pathMap.get(nid);
 		} else {
-			throw new PathNotExistsException("Path not found: "
-					+ TerminologyHelper.conceptToString(nid));
+		    I_Path p = getFromDisk(nid);
+		    if (p != null) {
+		        return p;
+		    }
 		}
+        throw new PathNotExistsException("Path not found: "
+            + TerminologyHelper.conceptToString(nid));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -162,6 +169,27 @@ public class BdbPathManager implements I_Manage<I_Path> {
                 throw new IOException("Unable to retrieve all paths.", e);
             }
         }
+	}
+	
+	@SuppressWarnings("unchecked")
+    private Path getFromDisk(int cNid) throws IOException {
+        try {
+            Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
+                    ReferenceConcepts.REFSET_PATHS.getNid());
+
+            for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
+                CidMember conceptExtension = (CidMember) extPart;
+                int pathId = conceptExtension.getC1Nid();
+                if (pathId == cNid) {
+                    pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
+                    return pathMap.get(cNid);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new IOException("Unable to retrieve all paths.", e);
+        }
+        return null;
 	}
 	
 	public List<I_Position> getAllPathOrigins(int nid) throws TerminologyException {

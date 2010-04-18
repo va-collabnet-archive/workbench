@@ -1532,7 +1532,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public boolean pathExists(int pathConceptId) throws TerminologyException {
+    public boolean pathExists(int pathConceptId) throws TerminologyException, IOException {
         return pathManager.exists(pathConceptId);
     }
 

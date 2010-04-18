@@ -61,6 +61,7 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
+import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 
@@ -543,6 +544,7 @@ public class BdbCommitManager {
                     }
                     for (ConceptAttributesRevision r: toRemove) {
                         a.removeRevision(r);
+                        r.sapNid = -1;
                     }
                 }
             }
@@ -581,6 +583,7 @@ public class BdbCommitManager {
 	        // have to forget "all" references to component...
 	        c.getSourceRels().remove(rel);
 	        c.getData().getSrcRelNids().remove(rel.getNid());
+	        r.primordialSapNid = -1;
 	    }
 	    c.modified();
 	    Terms.get().addUncommittedNoChecks(c);
@@ -606,13 +609,16 @@ public class BdbCommitManager {
 		            }
                     for (DescriptionRevision tr: toRemove) {
                         d.removeRevision(tr);
+                        tr.sapNid = -1;
                     }
 		        }
 		    }
 		} else {
 		    // have to forget "all" references to component...
+		    
 		    c.getDescriptions().remove(d);
             c.getData().getDescNids().remove(d.getNid());
+            d.primordialSapNid = -1;
 		}
 		c.modified();
 		Terms.get().addUncommittedNoChecks(c);
@@ -644,13 +650,16 @@ public class BdbCommitManager {
                     }
                     for (RefsetRevision tr: toRemove) {
                         m.removeRevision(tr);
+                        tr.sapNid = -1;
                     }
                 }
             }
         } else {
             // have to forget "all" references to component...
             c.getRefsetMembers().remove(m);
-            c.getData().getMemberNids().remove(m.getNid());
+            NidPair toRemove = new NidPair(m.getRefsetId(), m.getMemberId());
+            c.getData().getMemberNids().remove(toRemove);
+            m.setStatusAtPositionNid(-1);
         }
         c.modified();
         Terms.get().addUncommittedNoChecks(c);
@@ -778,6 +787,10 @@ public class BdbCommitManager {
 	        while (cNidItr.next()) {
 	            returnSet.add(Concept.get(cNidItr.nid()));
 	        }
+            cNidItr = uncommittedCNidsNoChecks.iterator();
+            while (cNidItr.next()) {
+                returnSet.add(Concept.get(cNidItr.nid()));
+            }
 	        return returnSet;
 	    } catch (IOException e) {
 	        throw new RuntimeException(e);
