@@ -467,9 +467,13 @@ public class ModifyUserRolePanel extends JPanel {
                         "There must be only one view position, and one promotion path: viewPaths " + viewPositionSet
                             + " promotionPaths: " + promotionPaths);
                 }
+                I_IntSet retiredSet = Terms.get().newIntSet();
+                retiredSet.add(ArchitectonicAuxiliary.Concept.RETIRED
+                    .localize().getNid());
+                
                 I_Position viewPosition = viewPositionSet.iterator().next();
                 currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-                    config.getAllowedStatus(), config.getPrecedence());
+                    retiredSet, config.getPrecedence());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 

@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -33,16 +34,19 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -189,7 +193,32 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     I_ExtendByRef ext =
                             refsetHelper.getOrCreateRefsetExtension(refsetId, componentId, propMap.getMemberType(),
                                 propMap, UUID.randomUUID());
-                    tf.addUncommitted(ext);
+                    
+                    List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(), 
+                        configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+                    if (tuples.size() > 0) {
+                        boolean added = false;
+                        for (I_ExtendByRefVersion t: tuples) {
+                            if (t.getTime() == Long.MAX_VALUE) {
+                                tf.addUncommitted(ext);
+                                added = true;
+                            }
+                        }
+                        if (!added) {
+                            String msg = "Unable to add spec. Equivalent specification already exists.";
+                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
+                        }
+                    } else {
+                        List<? extends I_ExtendByRefVersion> lastTuple = ext.getTuples(null, configFrame.getViewPositionSetReadOnly(), 
+                            configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+                        for (I_ExtendByRefVersion t: lastTuple) {
+                            for (I_Path p: configFrame.getEditingPathSet()) {
+                                I_ExtendByRefVersion analog = (I_ExtendByRefVersion) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
+                                ext.addVersion(analog);
+                                tf.addUncommitted(ext);
+                            }
+                        }
+                    }
                     configFrame.fireRefsetSpecChanged(ext);
                 } else {
                     String msg = "Unable to add spec. Selected parent must be a branching spec.";

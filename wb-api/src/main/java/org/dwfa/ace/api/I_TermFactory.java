@@ -569,7 +569,7 @@ public interface I_TermFactory {
 			List<I_TestSearchResults> criterion,
 			I_ConfigAceFrame differenceSearchConfig) throws IOException, ParseException;
 	
-	public boolean pathExists(int pathConceptId) throws TerminologyException;
+	public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
 
 	/**
 	 * Close the database. Called on quit. 
