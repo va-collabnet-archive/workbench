@@ -392,18 +392,23 @@ public class ProcessAceFormatSourcesBerkeley extends ProcessAceFormatSources {
         synchronized (vodb) {
             if (vodb.hasRel(relId, c1id)) {
                 vrel = vodb.getRel(relId, c1id);
-                if ((vrel.getC1Id() == c1id) && (vrel.getC2Id() == c2id)) {
-                    // rel ok
-                } else {
+                if ((vrel.getC1Id() != c1id) || (vrel.getC2Id() != c2id)) {
                     I_GetConceptData c1 = ConceptBean.get(c1id);
                     I_GetConceptData c2 = ConceptBean.get(c2id);
                     I_GetConceptData c3 = ConceptBean.get(vrel.getC2Id());
 
                     AceLog.getEditLog().log(Level.SEVERE,
                             "Duplicate rels with different c1 and c2:\n relId: " + relID + "\n c1: " + c1 + "\n c2: " + c2 + "\n c3: " + c3);
-                    vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map
-                            .getIntId((UUID) conceptOneID, aceAuxPath, version), map.getIntId((UUID) conceptTwoID, aceAuxPath,
-                                                                                              version), 1);
+
+                    ThinRelPart retiredPart = part.duplicate();
+                    retiredPart.setStatusId(map.getIntId(RETIRED_UUID, aceAuxPath, version));
+                    if (vrel.addVersionNoRedundancyCheck(retiredPart)) {
+                        vodb.writeRel(vrel);
+                    }
+
+                    vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version),
+                            map.getIntId((UUID) conceptOneID, aceAuxPath, version),
+                            map.getIntId((UUID) conceptTwoID, aceAuxPath,version), 1);
                 }
             } else {
                 vrel = new ThinRelVersioned(map.getIntId((UUID) relID, aceAuxPath, version), map

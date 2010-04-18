@@ -32,20 +32,11 @@ package org.dwfa.vodb.process;
  * limitations under the License.
  */
 
-import com.sleepycat.je.DatabaseException;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
-import org.dwfa.vodb.types.IntSet;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -53,7 +44,18 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.process.ProcessAceFormatSources.FORMAT;
+import org.dwfa.vodb.types.IntSet;
+
+import com.sleepycat.je.DatabaseException;
+
 public abstract class ProcessSources {
+
+    public static final UUID RETIRED_UUID = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
 
     private static final int THREAD_COUNT = 1;
 
@@ -335,6 +337,9 @@ public abstract class ProcessSources {
         st.eolIsSignificant(true);
         int rels = 0;
 
+        ProcessQueue processQueue = new ProcessQueue("AceRelationshipQueue", THREAD_COUNT);
+        WriteRelationshipJob job = new WriteRelationshipJob(this);
+
         skipLineOne(st, relationshipLatch);
         int tokenType = st.nextToken();
         while (tokenType != StreamTokenizer.TT_EOF) {
@@ -377,10 +382,12 @@ public abstract class ProcessSources {
             if (rels > 0 && rels % batchSize == 0) {
                 getLog().info(
                     "Added " + batchSize + " relationships, time to execute job - " + rels + " relationships parsed");
+                processQueue.execute(job);
+                job = new WriteRelationshipJob(this);
             }
 
-            writeRelationship(relationshipLatch, statusDate, relID, Arrays.asList(new Object[] { statusId }), conceptOneID, relationshipTypeConceptID,
-                conceptTwoID, characteristic, refinability, group, Arrays.asList(new Object[] { pathId }));
+            job.addTask(relationshipLatch, statusDate, relID, statusId, conceptOneID, relationshipTypeConceptID,
+                conceptTwoID, characteristic, refinability, group, pathId);
 
             rels++;
 
@@ -394,6 +401,13 @@ public abstract class ProcessSources {
             // Beginning of loop
             tokenType = st.nextToken();
         }
+        getLog().info(
+            "Added final relationships processing job with " + job.batch.size() + " items to process - " + rels
+                + " relationships parsed");
+        processQueue.execute(job);
+
+        getLog().info("Awaiting completion of queued relationships processing tasks");
+        processQueue.awaitCompletion();
         getLog().info("Process time: " + (System.currentTimeMillis() - start) + " Parsed relationsips: " + rels);
     }
 
