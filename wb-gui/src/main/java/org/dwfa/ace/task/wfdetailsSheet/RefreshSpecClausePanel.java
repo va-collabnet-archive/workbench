@@ -606,11 +606,14 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                                 config.getPrecedence(), config.getConflictResolutionStrategy());
                 PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
                 I_Position viewPosition = config.getViewPositionSet().iterator().next();
+                I_Path editPath = config.getEditingPathSet().iterator().next();
                 
                 for (I_ExtendByRefVersion tuple : tuples) {
                     I_ExtendByRefPartCidCid newRetiredPart =
-                        (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(retiredNid, retiredNid,
+                        (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(retiredNid, editPath.getConceptId(),
                             Long.MAX_VALUE);
+                    member.addVersion(newRetiredPart);
+                    
                     RefsetPropertyMap propMap = new RefsetPropertyMap();
                     if (newRetiredPart.getC1id() == conceptUnderReview.getConceptId()) {
                         propMap.put(REFSET_PROPERTY.CID_ONE, replacementConceptLabel.getTermComponent().getNid());

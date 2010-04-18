@@ -16,6 +16,7 @@
  */
 package org.dwfa.vodb;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -32,11 +33,11 @@ import org.dwfa.tapi.TerminologyException;
  */
 public interface I_Manage<T> {
 
-    public T get(int nid) throws TerminologyException;
+    public T get(int nid) throws TerminologyException, IOException;
 
     public Set<T> getAll() throws TerminologyException;
 
-    public boolean exists(int nid) throws TerminologyException;
+    public boolean exists(int nid) throws TerminologyException, IOException;
 
     public void write(T object, I_ConfigAceFrame config) throws TerminologyException;
 

@@ -2963,6 +2963,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showSearchToggle.addActionListener(bottomPanelActionListener);
         bottomPanel.add(showSearchToggle, c);
         showSearchToggle.setToolTipText("show/hide search panel");
+        showSearchToggle.setSelected(false);
         c.gridx++;
         showSignpostPanelToggle = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/signpost.png")));
         showSignpostPanelToggle.addActionListener(bottomPanelActionListener);
