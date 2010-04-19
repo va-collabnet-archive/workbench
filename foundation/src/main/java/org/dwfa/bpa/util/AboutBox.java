@@ -22,6 +22,8 @@ package org.dwfa.bpa.util;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -52,6 +54,16 @@ public class AboutBox {
         URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
         Toolkit tk = aboutBox.getToolkit();
         JLabel aboutLabel;
+        if (aboutBoxUrl == null) {
+            File aboutBoxFile = new File(graphic);
+            if (aboutBoxFile.exists()) {
+                try {
+                    aboutBoxUrl = aboutBoxFile.toURI().toURL();
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         if (aboutBoxUrl != null) {
             Image img = tk.getImage(aboutBoxUrl);
             aboutLabel = new JLabel(new ImageIcon(img));
