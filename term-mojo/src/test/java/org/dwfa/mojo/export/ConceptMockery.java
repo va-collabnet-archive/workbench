@@ -131,6 +131,9 @@ public class ConceptMockery {
     int activeValueNid = Integer.MAX_VALUE - 63;
     int limitedStatusNId = Integer.MAX_VALUE - 64;
     int aceLimitedStatusNId = Integer.MAX_VALUE - 65;
+    int retiredStatusNid = Integer.MAX_VALUE - 66;
+    int rf2AcceptableDescriptionTypeNid = Integer.MAX_VALUE - 67;
+    int rf2PreferredDescriptionTypeNid = Integer.MAX_VALUE - 68;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -205,6 +208,13 @@ public class ConceptMockery {
         expect(activeConceptData.isParentOf(currentConceptData, null, null, null, false)).andReturn(true).anyTimes();
         expect(termFactory.getConcept(currentStatusNid)).andReturn(currentConceptData).anyTimes();
         replay(currentConceptData);
+
+        List<UUID> retiredUuidList = new ArrayList<UUID>();
+        retiredUuidList.add(UUID.randomUUID());
+        I_GetConceptData retiredConceptData = mockConceptEnum(retiredUuidList, ArchitectonicAuxiliary.Concept.RETIRED,
+            retiredStatusNid);
+        expect(retiredConceptData.getConceptId()).andReturn(retiredStatusNid).anyTimes();
+        replay(retiredConceptData);
 
         snomedCoreUuidList = new ArrayList<UUID>();
         snomedCoreUuidList.add(UUID.randomUUID());
@@ -363,6 +373,14 @@ public class ConceptMockery {
         I_GetConceptData wasAHistoryConceptData = mockConceptSpec(ConceptConstants.WAS_A_HISTORY, wasAHistoryNid);
         expect(termFactory.getConcept(wasAHistoryNid)).andReturn(wasAHistoryConceptData);
         replay(wasAHistoryConceptData);
+
+        I_GetConceptData rf2AcceptableDescriptionTypeConceptData = mockConceptSpec(org.dwfa.ace.refset.ConceptConstants.ACCEPTABLE, rf2AcceptableDescriptionTypeNid);
+        expect(termFactory.getConcept(rf2AcceptableDescriptionTypeNid)).andReturn(rf2AcceptableDescriptionTypeConceptData);
+        replay(rf2AcceptableDescriptionTypeConceptData);
+
+        I_GetConceptData rf2PreferredDescriptionTypeConceptData = mockConceptSpec(org.dwfa.ace.refset.ConceptConstants.PREFERRED, rf2PreferredDescriptionTypeNid);
+        expect(termFactory.getConcept(rf2PreferredDescriptionTypeNid)).andReturn(rf2PreferredDescriptionTypeConceptData);
+        replay(rf2PreferredDescriptionTypeConceptData);
 
         I_GetConceptData wasAHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.WAS_A_HISTORY_REFSET, wasAHistoryRefsetNid);
         expect(termFactory.getConcept(wasAHistoryRefsetNid)).andReturn(wasAHistoryRefsetConceptData).anyTimes();

@@ -15,6 +15,8 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersioned;
+import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
@@ -42,6 +44,7 @@ public class DatabaseExportTest extends ConceptMockery {
     private I_GetConceptData exportPositionConceptData;
     private List<UUID> pathUuidList;
     private Class<? extends DatabaseExport> databaseExportClass;
+    private I_Position exportPosition;
 
     int incluesionRootConceptDataNid = 1;
     int exclusionsRootConceptDataNid = 2;
@@ -67,11 +70,19 @@ public class DatabaseExportTest extends ConceptMockery {
         exportPositionConceptData = createMock(I_GetConceptData.class);
         expect(exportPositionConceptData.getUids()).andReturn(pathUuidList);
 
+        exportPosition = createMock(I_Position.class);
+        I_Path path = createMock(I_Path.class);
+        expect(path.getConceptId()).andReturn(1).anyTimes();
+        expect(exportPosition.getPath()).andReturn(path).anyTimes();
+        expect(exportPosition.getVersion()).andReturn(exportVersion).anyTimes();
+        replay(exportPosition, path);
+
         PositionDescriptor positionDescriptor = createMock(PositionDescriptor.class);
         ConceptDescriptor conceptDescriptor = createMock(ConceptDescriptor.class);
 
         org.easymock.classextension.EasyMock.expect(conceptDescriptor.getVerifiedConcept()).andReturn(exportPositionConceptData);
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getPath()).andReturn(conceptDescriptor);
+        org.easymock.classextension.EasyMock.expect(positionDescriptor.getPosition()).andReturn(exportPosition).anyTimes();
         org.easymock.classextension.EasyMock.expect(positionDescriptor.getTimeString()).andReturn("latest").times(1, 2);
 
         PositionDescriptor[] exportPositions = new PositionDescriptor[0];
@@ -110,6 +121,12 @@ public class DatabaseExportTest extends ConceptMockery {
             setField(databaseExportClass, databaseExport, "uuidSctidDbUsername", System.getProperty(UUID_MAP_TEST_DATABASE_USER));
             setField(databaseExportClass, databaseExport, "uuidSctidDbPassword", System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
+
+        //.getNid();
+        I_GetConceptData adrs = createMock(I_GetConceptData.class);
+        expect(adrs.getNid()).andReturn(0);
+        expect(termFactory.getConcept(UUID.fromString("850495d2-61c0-593e-bc74-46ed297a8923"))).andReturn(adrs);
+        replay(adrs);
 
         //set the default namespace
         setField(databaseExportClass, databaseExport, "defaultNamespace", NAMESPACE.NEHTA.getDigits());

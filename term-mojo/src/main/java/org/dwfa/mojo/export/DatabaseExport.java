@@ -42,6 +42,7 @@ import org.dwfa.ace.api.process.I_ProcessQueue;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.ace.task.path.PromoteToPath;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
@@ -53,6 +54,8 @@ import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.AceDateFormat;
+import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.types.ThinConPart;
 
 
 /**
@@ -216,6 +219,11 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private I_GetConceptData promotesToConcept;
 
     /**
+     * Tuple part to use for exporting new refset content namely the ADRS.
+     */
+    private ThinConPart releasePart;
+
+    /**
      * TODO need to mock this out.
      * For testing
      */
@@ -272,7 +280,13 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 }
             }
 
+            releasePart = new ThinConPart();
+            releasePart.setPathId(releasePosition.getPosition().getPath().getConceptId());
+            releasePart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+            releasePart.setVersion(releasePosition.getPosition().getVersion());
+
             exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots, NAMESPACE.fromString(defaultNamespace));
+            exportSpecification.setReleasePart(releasePart);
         } catch (IOException e) {
             throw new MojoExecutionException("Execute error: ", e);
         } catch (SQLException e) {

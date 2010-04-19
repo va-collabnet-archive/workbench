@@ -394,7 +394,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             if (!uuidIgnorList.containsKey(uuid)) {
                 errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id " + sctId + " database id "
                     + dbSctId;
-                logger.severe(errorMessage);
+                //logger.severe(errorMessage);
             }
             throw new NoMappingException(errorMessage);
         } else if (dbSctId == null) {
