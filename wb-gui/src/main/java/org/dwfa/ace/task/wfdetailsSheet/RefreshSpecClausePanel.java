@@ -59,10 +59,8 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
@@ -77,7 +75,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
-import org.dwfa.vodb.types.Position;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
