@@ -1544,7 +1544,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public void computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
             throws Exception {
-        ActivityViewer.toFront();
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true);
@@ -1598,7 +1597,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(),
                 frameConfig.getDbConfig().getChangeSetWriterThreading());
-        ActivityViewer.toBack();
     }
 
     private static class ConceptFetcher implements I_FetchConceptFromCursor {
