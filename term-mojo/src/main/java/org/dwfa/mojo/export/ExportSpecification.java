@@ -596,19 +596,25 @@ public class ExportSpecification {
         I_DescriptionTuple latestSynonym = null;
         I_DescriptionTuple unSpecifiedDescriptionType = null;
 
-        for (I_DescriptionTuple latest : conceptDescriptionTuples) {
-            if (latest.getStatusId() == activeConcept.getNid() || latest.getStatusId() == currentConcept.getNid()) {
-                if (latest.getTypeId() == preferredDescriptionType.getNid()) {
-                    latestPreferredTerm = getAdrsVersion(latest, latestPreferredTerm);
-                } else if (latest.getTypeId() == synonymDescriptionType.getNid()) {
-                    latestSynonym = getAdrsVersion(latest, latestSynonym);
-                } else if (latest.getTypeId() == unspecifiedDescriptionType.getNid()) {
-                    unSpecifiedDescriptionType = getAdrsVersion(latest, unSpecifiedDescriptionType);
+        for (I_DescriptionTuple currentDescription : conceptDescriptionTuples) {
+            if (currentDescription.getStatusId() == activeConcept.getNid() || currentDescription.getStatusId() == currentConcept.getNid()) {
+                if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
+                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm);
+                } else if (currentDescription.getTypeId() == synonymDescriptionType.getNid()) {
+                    latestSynonym = getAdrsVersion(currentDescription, latestSynonym);
+                } else if (currentDescription.getTypeId() == unspecifiedDescriptionType.getNid()) {
+                    unSpecifiedDescriptionType = getAdrsVersion(currentDescription, unSpecifiedDescriptionType);
                 }
-            } else {
-                I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid, latest.getDescId());
+            }
+        }
+        for (I_DescriptionTuple currentDescription : conceptDescriptionTuples) {
+            if ((currentDescription != latestPreferredTerm
+                    && currentDescription != latestSynonym
+                    && currentDescription != unSpecifiedDescriptionType)) {
+                I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid, currentDescription.getDescId());
                 if (currentLanguageExtensions != null) {
-                    I_ThinExtByRefPart retireLatestPart = TupleVersionPart.getLatestPart(currentLanguageExtensions.getVersions()).duplicate();
+                    I_ThinExtByRefPart retireLatestPart = TupleVersionPart.getLatestPart(
+                        currentLanguageExtensions.getVersions()).duplicate();
                     currentLanguageExtensions.addVersion(retireLatestPart);
                     retireLatestPart.setStatusId(retiredConcept.getNid());
                     retireLatestPart.setPathId(releasePart.getPathId());
@@ -807,7 +813,7 @@ public class ExportSpecification {
         } else {
             extensionVersioned = getRefsetExtensionVersioned(inactivationIndicatorRefsetNid, componentNid);
             if (extensionVersioned != null) {
-                addRetireLastestPart(extensionVersioned);
+                addRetireLastestPart(extensionVersioned, tuple.getPart());
             }
         }
 
@@ -915,15 +921,21 @@ public class ExportSpecification {
         return thinExtByRefVersioned;
     }
 
-    private void addRetireLastestPart(I_ThinExtByRefVersioned thinExtByRefVersioned) {
+    /**
+     * Adds a retired part to the versioned.
+     *
+     * @param thinExtByRefVersioned I_ThinExtByRefVersioned
+     * @param retireForPart I_AmPart path and version to use for the retired part
+     */
+    private void addRetireLastestPart(I_ThinExtByRefVersioned thinExtByRefVersioned, I_AmPart retireForPart) {
         ThinExtByRefPartConcept latestPart = (ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(thinExtByRefVersioned.getVersions());
         ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
         thinExtByRefVersioned.addVersion(conceptExtension);
 
         conceptExtension.setC1id(latestPart.getC1id());
-        conceptExtension.setPathId(latestPart.getPathId());
-        conceptExtension.setStatusId(inActiveConcept.getNid());
-        conceptExtension.setVersion(latestPart.getVersion());
+        conceptExtension.setPathId(retireForPart.getPathId());
+        conceptExtension.setStatusId(retiredConcept.getNid());
+        conceptExtension.setVersion(retireForPart.getVersion());
     }
 
     /**
