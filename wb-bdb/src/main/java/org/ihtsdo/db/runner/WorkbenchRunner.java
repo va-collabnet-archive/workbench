@@ -172,7 +172,6 @@ public class WorkbenchRunner {
 
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
-			AceLog.getAppLog().info("BBBBOBBBB looking for wb.properties Exists = "+acePropertiesFileExists);
 			wbProperties = new Properties();
 			
 			boolean initialized = false;
@@ -180,7 +179,6 @@ public class WorkbenchRunner {
 				wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
 				initialized = Boolean.parseBoolean((String) wbProperties
 						.get("initialized"));
-				AceLog.getAppLog().info("BBBBOBBBB wb.properties Exists = "+wbProperties);
 			}
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
