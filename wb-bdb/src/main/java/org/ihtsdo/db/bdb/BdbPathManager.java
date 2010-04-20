@@ -245,7 +245,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			            }
 	                    result.add(new Position(conceptExtension.getIntValue(),
                             new Path(conceptExtension.getC1Nid(), 
-                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth++))));
+                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth + 1))));
 				    }
 				}
 			}
