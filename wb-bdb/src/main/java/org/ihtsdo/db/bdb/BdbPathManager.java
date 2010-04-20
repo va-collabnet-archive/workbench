@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -214,7 +215,11 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	
 	@SuppressWarnings("unchecked")
 	private List<I_Position> getPathOriginsFromDb(int nid) throws TerminologyException {
-		try {
+		return getPathOriginsWithDepth(nid, 0);
+	}
+
+    private List<I_Position> getPathOriginsWithDepth(int nid, int depth) throws TerminologyException {
+        try {
 			ArrayList<I_Position> result = new ArrayList<I_Position>();
 			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
 			for (RefsetMember extPart : pathConcept
@@ -231,9 +236,16 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	                    result.add(new Position(conceptExtension.getIntValue(),
 	                        pathMap.get(conceptExtension.getC1Nid())));
 				    } else {
+			            if (depth > 20) {
+			                AceLog.getAppLog().alertAndLogException(new Exception(
+			                    "Depth limit exceeded. Path concept: \n" +
+			                    pathConcept.toLongString() + 
+			                    "\n\n extensionPart: \n\n" + 
+			                    extPart.toString()));
+			            }
 	                    result.add(new Position(conceptExtension.getIntValue(),
                             new Path(conceptExtension.getC1Nid(), 
-                                     getPathOriginsFromDb(conceptExtension.getC1Nid()))));
+                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth++))));
 				    }
 				}
 			}
@@ -241,7 +253,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to retrieve path origins.", e);
 		}
-	}
+    }
 
 	/**
 	 * Add or update a path and all its origin positions NOTE it will not
