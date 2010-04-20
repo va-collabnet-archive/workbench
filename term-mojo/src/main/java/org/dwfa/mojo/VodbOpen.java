@@ -41,7 +41,7 @@ public class VodbOpen extends AbstractMojo {
      *
      * Only required if <code>useExistingDb</code> is null or set to false
      *
-    Not    * @parameter default-value=
+     * @parameter default-value=
      *            "${project.build.directory}/generated-resources/berkeley-db"
      * @required
      */
