@@ -192,8 +192,11 @@ public class BdbPathManager implements I_Manage<I_Path> {
         return null;
 	}
 	
-	public List<I_Position> getAllPathOrigins(int nid) throws TerminologyException {
+	public List<I_Position> getAllPathOrigins(int nid) throws TerminologyException, IOException {
         Path p = pathMap.get(nid);
+        if (p == null) {
+            p = getFromDisk(nid);
+        }
         return new ArrayList<I_Position>(p.getInheritedOrigins());
 	}
 
