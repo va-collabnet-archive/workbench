@@ -158,7 +158,7 @@ public class Bdb {
 	            Terms.set(tf);
 			}
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
-			pathManager = new BdbPathManager();
+			pathManager = BdbPathManager.get();
 			tf.setPathManager(pathManager);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

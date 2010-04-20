@@ -299,7 +299,7 @@ public class PositionMapper {
 		if (completeLatch.getCount() == 1) {
 			try {
 				if (pathManager == null) {
-					pathManager = new BdbPathManager();
+					pathManager = BdbPathManager.get();
 				}
 				AceLog.getAppLog().info(
 						"Creating new PositionMapper for: "

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -31,7 +33,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -97,7 +98,28 @@ public class BdbPathManager implements I_Manage<I_Path> {
 
 	private RefsetHelperGetter helperGetter = new RefsetHelperGetter();
 	
-	public BdbPathManager() throws TerminologyException {
+	private static BdbPathManager singleton;
+	
+	private static Lock l = new ReentrantLock();
+	
+	public static BdbPathManager get() throws TerminologyException {
+	    if (singleton == null) {
+	        l.lock();
+	        try {
+	        if (singleton == null) {
+	            BdbPathManager mgr = new BdbPathManager();
+	            singleton = mgr;
+	        }
+	        } finally {
+	            l.unlock();
+	        }
+	    }
+	    
+	    return singleton;
+	    
+	}
+	
+	private BdbPathManager() throws TerminologyException {
 		try {
 			editPath = new Path(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), null);
 			setupPathMap();
@@ -238,14 +260,18 @@ public class BdbPathManager implements I_Manage<I_Path> {
 				    } else {
 			            if (depth > 20) {
 			                AceLog.getAppLog().alertAndLogException(new Exception(
-			                    "Depth limit exceeded. Path concept: \n" +
+			                    "\n\n****************************************\nDepth limit exceeded. Path concept: \n" +
 			                    pathConcept.toLongString() + 
-			                    "\n\n extensionPart: \n\n" + 
-			                    extPart.toString()));
+                                "\n\n extensionPart: \n\n" + 
+                                extPart.toString() + 
+                                "\n\n origin refset: \n\n" + 
+                                Concept.get(extPart.getRefsetId()).toLongString() + 
+			                    "\n-------------------------------------------\n\n"));
+			            } else {
+	                        result.add(new Position(conceptExtension.getIntValue(),
+	                            new Path(conceptExtension.getC1Nid(),  
+	                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth + 1))));
 			            }
-	                    result.add(new Position(conceptExtension.getIntValue(),
-                            new Path(conceptExtension.getC1Nid(),  
-                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth + 1))));
 				    }
 				}
 			}
