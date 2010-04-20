@@ -1649,9 +1649,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
     }
     
-    //TODO check if custom UI defined
     private JComponent getContentPanel() throws Exception {
-    	System.out.println("BBBBOOOOBBBB getContentPanel called");
     	
     	String custUI = (String)ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
     	
@@ -1762,7 +1760,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     CollectionEditorContainer conceptListEditor;
 
-    private Component getConceptListEditor() throws IOException, ClassNotFoundException, NoSuchAlgorithmException,
+    public Component getConceptListEditor() throws IOException, ClassNotFoundException, NoSuchAlgorithmException,
             TerminologyException {
         if (conceptListEditor == null) {
             if (aceFrameConfig.getTabHistoryMap().get("batchList") == null) {
