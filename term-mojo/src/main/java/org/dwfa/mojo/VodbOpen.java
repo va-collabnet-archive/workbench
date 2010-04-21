@@ -51,7 +51,7 @@ public class VodbOpen extends AbstractMojo {
      *
      * @parameter
      */
-    private Boolean readOnly;
+    private boolean readOnly = false;
     /**
      * Size of cache used by the database.
      *
