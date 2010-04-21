@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
@@ -86,7 +88,7 @@ public class TestCPath_New extends AbstractTask {
             int countNull = 0;
             int countTotal = 0;
             StringBuilder sb = new StringBuilder(
-                    "\r\n::: [TestCPath_New] tf.getRelationship(...) == null;");
+                    "\r\n::: [TestCPath_New] tf.getRelationship(...) == null; ... if any exist ...");
             for (SnoRel sr : cClassSnoRels) {
                 try {
                     I_RelVersioned rBean = tf.getRelationship(sr.relNid);
@@ -112,10 +114,38 @@ public class TestCPath_New extends AbstractTask {
             sb.append("\r\n::: ... completed limited snapshot ...");
             logger.info(sb.toString() + "\r\n::: [TestCPath_New] countNull=" + countNull
                     + " countTotal=" + countTotal);
-            
+
+            Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
+                public int compare(SnoRel o1, SnoRel o2) {
+                    int thisMore = 1;
+                    int thisLess = -1;
+                    if (o1.c1Id > o2.c1Id) {
+                        return thisMore;
+                    } else if (o1.c1Id < o2.c1Id) {
+                        return thisLess;
+                    } else {
+                        if (o1.typeId > o2.typeId) {
+                            return thisMore;
+                        } else if (o1.typeId < o2.typeId) {
+                            return thisLess;
+                        } else {
+
+                            if (o1.c2Id > o2.c2Id) {
+                                return thisMore;
+                            } else if (o1.c2Id < o2.c2Id) {
+                                return thisLess;
+                            } else {
+                                    return 0; // this == received
+                            }
+                        }
+                    }
+                } // compare()
+            };
+
             // 
             if (debugDump == true) {
                 SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_New_full.txt", 4);                
+                Collections.sort(cClassSnoRels, compDump);
                 SnoRel.dumpToFile(cClassSnoRels, "SnoRelInferPathRead_New_compare.txt", 5);
             }
 
