@@ -339,57 +339,61 @@ public class PositionMapper {
 				Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
 				conflictMatrix = new BitMatrix(positionCount, positionCount);
 				for (int p1index = 0; p1index < positionCount; p1index++) {
-					I_Position p1 = Bdb.getSapDb().getPosition(p1index);
-					Integer p1pathId = p1.getPath().getConceptId();
-					Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
-					// see if position may be in route to the destination
-					if (originMap.containsKey(p1pathId)) {
-						// compute the distance to the destination
-						BigInteger pathDepth = depthMap
-								.get(p1.getPath().getConceptId());
+					try {
+                        I_Position p1 = Bdb.getSapDb().getPosition(p1index);
+                        Integer p1pathId = p1.getPath().getConceptId();
+                        Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
+                        // see if position may be in route to the destination
+                        if (originMap.containsKey(p1pathId)) {
+                        	// compute the distance to the destination
+                        	BigInteger pathDepth = depthMap
+                        			.get(p1.getPath().getConceptId());
 
-						if (destination.getPath().getConceptId() == p1.getPath()
-								.getConceptId()) {
-							// On the same path as the destination...
-							if (p1.getTime() <= destination.getTime()) {
-								positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(-p1.getTime()));
-							} else {
-								positionNotReachable(positionComputedDistance, p1index);
-							}
-							for (int p2index = 0; p2index < positionCount; p2index++) {
-								// no conflicts with any position
-								conflictMatrix.putQuick(p1index, p2index, false);
-							}
-						} else {
-							// On a different path than the destination
-							// compute the distance to the destination
-							positionComputedDistance[p1index] = timeUpperBound.multiply(pathDepth).subtract(
-							        BigInteger.valueOf(p1.getTime()));
+                        	if (destination.getPath().getConceptId() == p1.getPath()
+                        			.getConceptId()) {
+                        		// On the same path as the destination...
+                        		if (p1.getTime() <= destination.getTime()) {
+                        			positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(-p1.getTime()));
+                        		} else {
+                        			positionNotReachable(positionComputedDistance, p1index);
+                        		}
+                        		for (int p2index = 0; p2index < positionCount; p2index++) {
+                        			// no conflicts with any position
+                        			conflictMatrix.putQuick(p1index, p2index, false);
+                        		}
+                        	} else {
+                        		// On a different path than the destination
+                        		// compute the distance to the destination
+                        		positionComputedDistance[p1index] = timeUpperBound.multiply(pathDepth).subtract(
+                        		        BigInteger.valueOf(p1.getTime()));
 
-							// iterate to compute conflicts...
-							for (int p2index = 0; p2index < positionCount; p2index++) {
-								I_Position p2 = Bdb.getSapDb()
-										.getPosition(p2index);
-								Integer p2pathId = p2.getPath().getConceptId();
-								if (originMap.containsKey(p2pathId)
-										&& p2.getTime() <= originMap.get(p2pathId)
-												.getTime()) {
-								    Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
-									if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
-										conflictMatrix
-												.putQuick(p1index, p2index, false);
-									} else {
-										conflictMatrix.putQuick(p1index, p2index, true);
-									}
-								} else {
-									positionNotReachable(positionComputedDistance,
-											p1index);
-								}
-							}
-						}
-					} else {
-						positionNotReachable(positionComputedDistance, p1index);
-					}
+                        		// iterate to compute conflicts...
+                        		for (int p2index = 0; p2index < positionCount; p2index++) {
+                        			I_Position p2 = Bdb.getSapDb()
+                        					.getPosition(p2index);
+                        			Integer p2pathId = p2.getPath().getConceptId();
+                        			if (originMap.containsKey(p2pathId)
+                        					&& p2.getTime() <= originMap.get(p2pathId)
+                        							.getTime()) {
+                        			    Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
+                        				if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
+                        					conflictMatrix
+                        							.putQuick(p1index, p2index, false);
+                        				} else {
+                        					conflictMatrix.putQuick(p1index, p2index, true);
+                        				}
+                        			} else {
+                        				positionNotReachable(positionComputedDistance,
+                        						p1index);
+                        			}
+                        		}
+                        	}
+                        } else {
+                        	positionNotReachable(positionComputedDistance, p1index);
+                        }
+                    } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
 					
 				}
 

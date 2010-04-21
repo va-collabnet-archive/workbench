@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -35,6 +36,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
 
@@ -474,10 +476,15 @@ public class DescStatement extends RefsetSpecStatement {
         return descriptionBeingChecked.getDescId() == queryConstraintDesc.getDescId();
     }
 
+    Pattern regexPattern;
     private boolean descriptionRegexMatch(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        String queryConstraintString = (String) queryConstraint;
+        if (regexPattern == null) {
+            String queryConstraintString = (String) queryConstraint;
+            regexPattern = Pattern.compile(queryConstraintString);
+            AceLog.getAppLog().info("Compiling regex: " + regexPattern + " into: " + regexPattern);
+        }
 
-        if (descriptionBeingChecked.getText().contains(queryConstraintString)) {
+        if (regexPattern.matcher(descriptionBeingChecked.getText()).find()) {
             return true;
         } else {
             return false;

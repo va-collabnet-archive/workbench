@@ -147,7 +147,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		    }
 		}
         throw new PathNotExistsException("Path not found: "
-            + TerminologyHelper.conceptToString(nid));
+            + TerminologyHelper.conceptToString(nid) + " uuid: " + Bdb.getUuidsToNidMap().getUuidsForNid(nid));
 	}
 	
 	@SuppressWarnings("unchecked")
