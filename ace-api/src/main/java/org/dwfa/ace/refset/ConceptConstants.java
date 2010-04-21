@@ -35,7 +35,7 @@ public class ConceptConstants {
         "adccc8cc-cfe0-4947-b2b2-2c493034ac3a");
     public static final ConceptSpec SNOMED_IS_A = new ConceptSpec("Is a (attribute)",
         "c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
-    public static final ConceptSpec PARENT_MARKER = new ConceptSpec("marked parent member",
+    public static final ConceptSpec PARENT_MARKER = new ConceptSpec("Marked parent member (foundation metadata concept)",
         "125f3d04-de17-490e-afec-1431c2a39e29");
     public static final ConceptSpec REFSET_TYPE_REL = new ConceptSpec("refset type rel",
         "f353db14-3b0d-3001-9f27-7d8b00f51a1c");
