@@ -295,7 +295,10 @@ public class ExportSpecification {
      */
     public ComponentDto getDataForExport(I_GetConceptData concept) throws Exception {
         ComponentDto componentDto = null;
-        boolean exportableConcept = false;
+
+        if(concept.getNid() == -2147482113){
+            logger.fine("Donkey puncher");
+        }
 
         Set<I_ConceptAttributeTuple> matchingConceptTuples = new HashSet<I_ConceptAttributeTuple>();
         Set<I_DescriptionTuple> matchingDescriptionTuples = new HashSet<I_DescriptionTuple>();
@@ -308,12 +311,12 @@ public class ExportSpecification {
         if (isExportableConcept(concept)) {
             componentDto = new ComponentDto();
             for (Position position : positions) {
-                if(position.isLastest()){
-                    exportableConcept = setComponentTuples(concept, exportableConcept, latestPostionMatchingConceptTuples,
+                if (position.isLastest()) {
+                    setComponentTuples(concept, latestPostionMatchingConceptTuples,
                         latestPostionMatchingDescriptionTuples, latestPostionMatchingRelationshipTuples, position);
                 } else {
-                    exportableConcept = setComponentTuples(concept, exportableConcept, matchingConceptTuples,
-                        matchingDescriptionTuples, matchingRelationshipTuples, position);
+                    setComponentTuples(concept, matchingConceptTuples, matchingDescriptionTuples,
+                        matchingRelationshipTuples, position);
                 }
             }
 
@@ -342,7 +345,7 @@ public class ExportSpecification {
             }
         }
 
-        return (exportableConcept) ? componentDto : null;
+        return (!matchingConceptTuples.isEmpty()) ? componentDto : null;
     }
 
     /**
@@ -360,26 +363,19 @@ public class ExportSpecification {
      * @throws IOException
      * @throws TerminologyException
      */
-    private boolean setComponentTuples(I_GetConceptData concept, boolean exportableConcept,
+    private void setComponentTuples(I_GetConceptData concept,
             Collection<I_ConceptAttributeTuple> matchingConceptTuples,
             Collection<I_DescriptionTuple> matchingDescriptionTuples,
             Collection<I_RelTuple> matchingRelationshipTuples, Position position) throws IOException,
             TerminologyException {
-        Collection<I_ConceptAttributeTuple> matchingAttributeTuples = position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, false));
-        matchingConceptTuples.addAll(matchingAttributeTuples);
-        if(!exportableConcept) {
-            exportableConcept = !matchingAttributeTuples.isEmpty();
-        }
+        matchingConceptTuples.addAll(
+            position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, false)));
 
-        if (!matchingAttributeTuples.isEmpty()) {
-            matchingDescriptionTuples.addAll(position.getMatchingTuples(
-                concept.getDescriptionTuples(null, null, null, false)));
+        matchingDescriptionTuples.addAll(
+            position.getMatchingTuples(concept.getDescriptionTuples(null, null, null, false)));
 
-            matchingRelationshipTuples.addAll(position.getMatchingTuples(
-                concept.getSourceRelTuples(null, null, null, false, false)));
-        }
-
-        return exportableConcept;
+        matchingRelationshipTuples.addAll(
+            position.getMatchingTuples(concept.getSourceRelTuples(null, null, null, false, false)));
     }
 
     /**
@@ -506,10 +502,12 @@ public class ExportSpecification {
 
         getBaseConceptDto(relationshipDto, tuple, idParts, latest);
 
-        setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), tuple,
-            relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP ,latest);
-        setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
-        setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
+        if (latest) {
+            setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), tuple,
+                relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP ,latest);
+            setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
+            setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
+        }
 
         setUuidSctIdIdentifier(relationshipDto, tuple, idParts, TYPE.RELATIONSHIP, tuple.getRelId(), latest);
 
@@ -545,8 +543,10 @@ public class ExportSpecification {
 
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
 
-        setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
-            descriptionInactivationIndicatorNid, TYPE.DESCRIPTION ,latest);
+        if (latest) {
+            setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
+                descriptionInactivationIndicatorNid, TYPE.DESCRIPTION ,latest);
+        }
 
         setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId(), latest);
 
@@ -709,24 +709,27 @@ public class ExportSpecification {
 
         getBaseConceptDto(conceptDto, tuple, conceptData.getId().getVersions(), latest);
 
-        I_IdPart ctv3IdPart = getLatesIdtVersion(conceptData.getId().getVersions(), ctv3Id.getConceptId(), tuple);
-        if (ctv3IdPart != null) {
-            conceptDto.setCtv3Id(ctv3IdPart.getSourceId().toString());
-            setCtv3ReferenceSet(componentDto, tuple, ctv3IdPart ,latest);
-        } else {
-            conceptDto.setCtv3Id("");
+        if (latest) {
+            I_IdPart ctv3IdPart = getLatesIdtVersion(conceptData.getId().getVersions(), ctv3Id.getConceptId(), tuple);
+            if (ctv3IdPart != null) {
+                conceptDto.setCtv3Id(ctv3IdPart.getSourceId().toString());
+                setCtv3ReferenceSet(componentDto, tuple, ctv3IdPart ,latest);
+            } else {
+                conceptDto.setCtv3Id("");
+            }
+
+            I_IdPart snomedIdPart = getLatesIdtVersion(conceptData.getId().getVersions(), snomedRtId.getConceptId(), tuple);
+            if(snomedIdPart != null){
+                conceptDto.setSnomedId(snomedIdPart.getSourceId().toString());
+                setSnomedRtIdReferenceSet(componentDto, tuple, snomedIdPart ,latest);
+            } else {
+                conceptDto.setSnomedId("");
+            }
+
+            setComponentInactivationReferenceSet(componentDto.getConceptExtensionDtos(), tuple.getConId(), tuple,
+                conceptInactivationIndicatorNid, TYPE.CONCEPT, latest);
         }
 
-        I_IdPart snomedIdPart = getLatesIdtVersion(conceptData.getId().getVersions(), snomedRtId.getConceptId(), tuple);
-        if(snomedIdPart != null){
-            conceptDto.setSnomedId(snomedIdPart.getSourceId().toString());
-            setSnomedRtIdReferenceSet(componentDto, tuple, snomedIdPart ,latest);
-        } else {
-            conceptDto.setSnomedId("");
-        }
-
-        setComponentInactivationReferenceSet(componentDto.getConceptExtensionDtos(), tuple.getConId(), tuple,
-            conceptInactivationIndicatorNid, TYPE.CONCEPT, latest);
 
         setUuidSctIdIdentifier(conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
 
