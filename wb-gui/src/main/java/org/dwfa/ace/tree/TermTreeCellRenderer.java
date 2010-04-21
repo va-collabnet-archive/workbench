@@ -461,7 +461,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
             toolTipText.append("<br>");
         }
         int childCount = 0;
-        for (I_Position child: Terms.get().getPathChildren(cb.getConceptId())) {
+        for (I_Path child: Terms.get().getPathChildren(cb.getConceptId())) {
             childCount++;
             toolTipText.append("<font color=green>child:</font> ");
             toolTipText.append(child.toString());

@@ -615,7 +615,7 @@ public interface I_TermFactory {
     public void setCheckCommitDataEnabled(boolean enabled);
     public boolean isCheckCommitDataEnabled();
     
-    public List<I_Position> getPathChildren(int nid) throws TerminologyException;
+    public List<? extends I_Path> getPathChildren(int nid) throws TerminologyException;
     
     public void resetViewPositions();
     

@@ -1241,8 +1241,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
     }
 
-    public List<I_Position> getPathChildren(int nid) throws TerminologyException {
-        return pathManager.getPathOrigins(nid);
+    @Override
+    public List<Path> getPathChildren(int nid) throws TerminologyException {
+        return pathManager.getPathChildren(nid);
     }
 
     @Override

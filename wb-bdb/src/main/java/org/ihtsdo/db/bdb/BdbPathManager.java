@@ -374,4 +374,18 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
+    public List<Path> getPathChildren(int nid) {
+        List<Path> origins = new ArrayList<Path>();
+        for (Path p: pathMap.values()) {
+            if (p.getOrigins() != null) {
+                for (I_Position origin: p.getOrigins()) {
+                    if (origin.getPath().getConceptId() == nid) {
+                        origins.add(p);
+                    }
+                }
+            }
+        }
+        return origins;
+    }
+
 }

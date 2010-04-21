@@ -148,8 +148,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
                 I_Path newPromotionPath = createPromotionPath(newConfig, promotePathProfile);
                 // Add new promotion paths as origins to developer path...
                 for (I_Path devPath : promotePathProfile.getEditingPathSet()) {
-                    for (I_Position devPathOrigin : Terms.get().getPathChildren(devPath.getConceptId())) {
-                        devPathOrigin.getPath().addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
+                    for (I_Path devPathOrigin : Terms.get().getPathChildren(devPath.getConceptId())) {
+                        devPathOrigin.addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
                         		creatorConfig);
                     }
                 }
