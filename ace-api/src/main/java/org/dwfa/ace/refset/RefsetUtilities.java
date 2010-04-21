@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -133,49 +134,24 @@ public abstract class RefsetUtilities {
                 ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId();
     }
 
-    public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) throws IOException,
-            Exception {
+    public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) 
+            throws IOException, Exception {
 
-        Set<Integer> allParents = new HashSet<Integer>();
-
-        Set<Integer> parents = getParentsOfConcept(conceptId);
-        for (Integer parent : parents) {
-            if (!concepts.keySet().contains(parent)) {
-                allParents.add(parent);
-                allParents.addAll(getAncestorsOfConcept(parent, concepts));
-            }
+        Set<Integer> ancestors = new HashSet<Integer>(); 
+        for (I_GetConceptData parent : new LineageHelper().getAllAncestors(termFactory.getConcept(conceptId))) {
+            ancestors.add(parent.getConceptId());
         }
-        return allParents;
+        return ancestors;
     }
 
+    
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
 
-        if (!termFactory.hasId(SNOMED.Concept.IS_A.getUids()) && this.altIsA == null) {
-            if (termFactory.hasId(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())) {
-                this.altIsA = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-            }
-        }
-        List<Integer> children = new ArrayList<Integer>();
-
-        I_GetConceptData concept = getConcept(conceptId);
-        /*
-         * Find all children
-         */
-        List<I_RelTuple> childrentuples = concept.getDestRelTuples(getStatuses(),
-            (this.altIsA == null ? getIntSet(ConceptConstants.SNOMED_IS_A) : getIntSet(this.altIsA)), null, false);
-
-        /*
-         * Iterate over children
-         */
-        for (I_RelTuple child : childrentuples) {
-
-            List<I_ConceptAttributeTuple> atts = getConcept(child.getC1Id()).getConceptAttributeTuples(null, null);
-            I_ConceptAttributeTuple att = getLatestAttribute(atts);
-            if (isValidStatus(att)) {
-                children.add(child.getC1Id());
-            }
-        }
-        return children;
+       List<Integer> descendants = new ArrayList<Integer>(); 
+       for (I_GetConceptData child : new LineageHelper().getAllDescendants(termFactory.getConcept(conceptId))) {
+           descendants.add(child.getConceptId());
+       }
+       return descendants;
     }
 
     public List<Integer> getSpecificationRefsets() throws Exception {
@@ -530,12 +506,14 @@ public abstract class RefsetUtilities {
     }
 
     public I_GetConceptData getConcept(int id) throws TerminologyException, IOException {
-        I_GetConceptData concept = conceptCache.get(id);
-        if (concept == null) {
-            concept = termFactory.getConcept(id);
-            conceptCache.put(id, concept);
-        }
-        return concept;
+//        I_GetConceptData concept = conceptCache.get(id);
+//        if (concept == null) {
+//            concept = termFactory.getConcept(id);
+//            conceptCache.put(id, concept);
+//        }
+//        return concept;
+        
+        return termFactory.getConcept(id);
     }
 
     public void setAltIsA(I_GetConceptData altIsA) {
