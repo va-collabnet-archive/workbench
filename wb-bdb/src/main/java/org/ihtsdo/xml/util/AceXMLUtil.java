@@ -158,7 +158,7 @@ public class AceXMLUtil {
 	}
 	
 	public static ArrayList<String> getDescVal_ByTypeUUID(Node node,String uuid_s) throws Exception {
-		return getdestRel_c1id_ByTypeID(node,getIdFromUUID(uuid_s));
+		return getDescVal_ByTypeID(node,getIdFromUUID(uuid_s));
 	}
 	
 	public static ArrayList<String> getDescVal_ByTypeID(Node node,String intI) throws Exception {
@@ -175,6 +175,19 @@ public class AceXMLUtil {
 		
 	}
 	
+	//Debug method
+	public String printXML(Document doc){
+		String xml = "";
+		//
+		try {
+			xml = XMLUtil.convertToStringLeaveCDATA(doc);
+			//log.severe("printXML = \n" + xml);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return xml;
+	}
 	
 
 }
