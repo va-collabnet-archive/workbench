@@ -171,12 +171,19 @@ public class AceXMLUtil {
 	public static ArrayList<String> getAllDescVals(Node node) throws Exception{
 		String Xpath ="//*[name()='descriptionPart']";
 		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.TEXT_ATT);
-		
-		
+	}
+	
+	public static String getFirstStringFromArrayList(ArrayList<String> ar) {
+		String retVal ="";
+		if(ar.size() > 0) {
+			//log.info("getFirstStringFromArrayList ar.size = "+ar.size() );
+			retVal = ar.get(0);
+		}
+		return retVal;
 	}
 	
 	//Debug method
-	public String printXML(Document doc){
+	public static String printXML(Document doc){
 		String xml = "";
 		//
 		try {

@@ -832,13 +832,21 @@ final public class XMLUtil {
 		NodeList nl = getNodesListXpathNode(Xpath,node);
 		int l = nl.getLength();
 		Element e = null;
-		String val = null;
+		String val = "";
 		
 		for (int i = 0; i < l; i++) {
 			e = (Element) nl.item(i);
 			if (e.getNodeType() == Node.ELEMENT_NODE) {
 				val = e.getAttribute(attrName);
-				retV.add(val);	
+				if(val != null && val.length() > 0) {
+					//log.info("getNodeListAttValAsStringCol val = "+val +" attname = "+attrName);
+				/*try {
+					log.info(convertToStringLeaveCDATA(e));
+				}catch(Exception E) {
+					E.printStackTrace();
+				}*/
+					retV.add(val);	
+				}
 			}
 		}
 		return retV;
