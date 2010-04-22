@@ -293,22 +293,15 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private void ExcludeAllChildren(int componentId, int refsetId, int parentId, int distance) throws IOException,
             Exception {
-        /*
-         * Make sure the concept isn't already directly included
-         */
-        if (!conceptsWithDirectInclusion.get(refsetId).contains(componentId)) {
-
-            addToRefsetExclusion(new ConceptRefsetInclusionDetails(componentId, excludeLineage, parentId, distance),
-                refsetId);
-
-            List<Integer> children = this.getChildrenOfConcept(componentId);
-            distance++;
-
-            for (Integer i : children) {
-                ExcludeAllChildren(i, refsetId, parentId, distance);
+        
+        for (Integer descendantId : getDescendantsOfConcept(componentId)) {
+            /*
+             * Make sure the concept isn't already directly included
+             */
+            if (!conceptsWithDirectInclusion.get(refsetId).contains(descendantId)) {
+                addToRefsetExclusion(new ConceptRefsetInclusionDetails(descendantId, excludeLineage, parentId, distance), refsetId);
             }
         }
-
     }
 
     private void removeFromRefsetExclusion(int componentId, int refsetId) {
@@ -327,18 +320,12 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
     private void IncludeAllChildren(int componentId, int refsetId, int parentId, int distance) throws IOException,
             Exception {
-        if (!conceptsWithDirectExclusion.get(refsetId).contains(componentId)) {
-
-            addToRefsetMembers(new ConceptRefsetInclusionDetails(componentId, includeLineage, parentId, distance),
-                refsetId);
-
-            List<Integer> children = this.getChildrenOfConcept(componentId);
-            distance++;
-            for (Integer i : children) {
-                IncludeAllChildren(i, refsetId, parentId, distance);
+        
+        for (Integer descendantId : getDescendantsOfConcept(componentId)) {
+            if (!conceptsWithDirectExclusion.get(refsetId).contains(descendantId)) {
+                addToRefsetMembers(new ConceptRefsetInclusionDetails(descendantId, includeLineage, parentId, distance), refsetId);
             }
         }
-
     }
 
     public void addToExistingRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {

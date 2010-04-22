@@ -17,9 +17,11 @@
 package org.dwfa.ace.api;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -110,7 +112,7 @@ public class LineageHelper {
         if (conditions == null) {
             conditions = new Condition[] { new NotAlreadyVisited() };
         }
-
+        
         // find all the children
         Set<I_GetConceptData> descendants = getAllDescendants(new HashSet<I_GetConceptData>(), concept,
             getAllowedStatuses(), getIsARelTypes(), getViewPositions(), 0, conditions);

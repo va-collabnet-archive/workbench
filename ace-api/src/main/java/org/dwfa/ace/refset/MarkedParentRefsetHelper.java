@@ -24,6 +24,7 @@ import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.LineageHelper.FirstRelationOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -87,7 +88,8 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         // lineage that should not be modified.
         Set<Integer> lineageToExclude = new HashSet<Integer>();
         for (Integer parentId : toBeRetired) {
-            for (Integer childId : refsetHelper.getChildrenOfConcept(parentId)) {
+            for (I_GetConceptData child : getAllDescendants(termFactory.getConcept(parentId), new FirstRelationOnly())) {
+                Integer childId = child.getConceptId();
                 if (!toBeRetired.contains(childId) && (isMarkedParent(childId) || isMember(childId))) {
                     lineageToExclude.add(childId);
                 }

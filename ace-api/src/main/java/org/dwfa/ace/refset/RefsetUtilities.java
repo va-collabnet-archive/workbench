@@ -33,16 +33,13 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.TerminologyRuntimeException;
-import org.dwfa.tapi.UnknownComponentException;
 import org.dwfa.tapi.spec.ConceptSpec;
 
 @Deprecated
@@ -144,8 +141,19 @@ public abstract class RefsetUtilities {
         return ancestors;
     }
 
-    
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
+
+        List<Integer> descendants = new ArrayList<Integer>(); 
+        
+        LineageHelper lineageHelper = new LineageHelper();
+        for (I_GetConceptData child : lineageHelper.getAllDescendants(
+                termFactory.getConcept(conceptId), lineageHelper.new FirstRelationOnly())) {
+            descendants.add(child.getConceptId());
+        }
+        return descendants;
+     }
+    
+    public List<Integer> getDescendantsOfConcept(int conceptId) throws IOException, Exception {
 
        List<Integer> descendants = new ArrayList<Integer>(); 
        for (I_GetConceptData child : new LineageHelper().getAllDescendants(termFactory.getConcept(conceptId))) {
