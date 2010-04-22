@@ -353,7 +353,7 @@ public class PositionMapper {
                         			.getConceptId()) {
                         		// On the same path as the destination...
                         		if (p1.getTime() <= destination.getTime()) {
-                        			positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(-p1.getTime()));
+                        			positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(p1.getTime()));
                         		} else {
                         			positionNotReachable(positionComputedDistance, p1index);
                         		}
