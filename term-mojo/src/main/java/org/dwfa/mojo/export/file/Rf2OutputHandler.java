@@ -127,8 +127,10 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
+        boolean isNewActiveOrRetiringLiveConcept = false;
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
             if (conceptDto.isNewActiveOrRetiringLive()) {
+                isNewActiveOrRetiringLiveConcept = true;
                 synchronized (conceptFileFull) {
                     conceptFileFull.write(getRf2ConceptRow(conceptDto));
                 }
@@ -147,7 +149,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         }
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (descriptionDto.isNewActiveOrRetiringLive()) {
+            if (isNewActiveOrRetiringLiveConcept && descriptionDto.isNewActiveOrRetiringLive()) {
                 synchronized (descriptionFileFull) {
                     descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
                 }
@@ -170,7 +172,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         }
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            if (relationshipDto.isNewActiveOrRetiringLive()) {
+            if (isNewActiveOrRetiringLiveConcept && relationshipDto.isNewActiveOrRetiringLive()) {
                 synchronized (relationshipFileFull) {
                     relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
                 }
@@ -188,27 +190,29 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
             identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), true));
         }
 
-        // group all the matching members together.
-        for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
-            if (extensionDto.isNewActiveOrRetiringLive()) {
-                writeExtensionRow(extensionDto);
+        if (isNewActiveOrRetiringLiveConcept) {
+            // group all the matching members together.
+            for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
+                if (extensionDto.isNewActiveOrRetiringLive()) {
+                    writeExtensionRow(extensionDto);
+                }
             }
-        }
-        writeExtensionIdRows(componentDto.getConceptExtensionDtos());
+            writeExtensionIdRows(componentDto.getConceptExtensionDtos());
 
-        for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
-            if (extensionDto.isNewActiveOrRetiringLive()) {
-                writeExtensionRow(extensionDto);
+            for (ExtensionDto extensionDto : componentDto.getDescriptionExtensionDtos()) {
+                if (extensionDto.isNewActiveOrRetiringLive()) {
+                    writeExtensionRow(extensionDto);
+                }
             }
-        }
-        writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
+            writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
 
-        for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
-            if (extensionDto.isNewActiveOrRetiringLive()) {
-                writeExtensionRow(extensionDto);
+            for (ExtensionDto extensionDto : componentDto.getRelationshipExtensionDtos()) {
+                if (extensionDto.isNewActiveOrRetiringLive()) {
+                    writeExtensionRow(extensionDto);
+                }
             }
+            writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
         }
-        writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
     }
 
     /**

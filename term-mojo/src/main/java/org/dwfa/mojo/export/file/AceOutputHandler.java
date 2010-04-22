@@ -114,8 +114,10 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
+        boolean isNewActiveOrRetiringLiveConcept = false;
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
             if (conceptDto.isNewActiveOrRetiringLive()) {
+                isNewActiveOrRetiringLiveConcept = true;
                 synchronized (conceptFile) {
                     conceptFile.write(getAceConceptRow(conceptDto));
                 }
@@ -129,7 +131,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         writeIdRows(componentDto.getConceptDtos());
 
         for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (descriptionDto.isNewActiveOrRetiringLive()) {
+            if (isNewActiveOrRetiringLiveConcept && descriptionDto.isNewActiveOrRetiringLive()) {
                 synchronized (descriptionFile) {
                     descriptionFile.write(getAceDescriptionRow(descriptionDto));
                 }
@@ -143,7 +145,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         writeIdRows(componentDto.getDescriptionDtos());
 
         for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            if (relationshipDto.isNewActiveOrRetiringLive()) {
+            if (isNewActiveOrRetiringLiveConcept && relationshipDto.isNewActiveOrRetiringLive()) {
                 synchronized (relationshipFile) {
                     relationshipFile.write(getAceRelationshipRow(relationshipDto));
                 }

@@ -743,6 +743,7 @@ public class ExportSpecification {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
                 if(isActive(iDescriptionTuple.getStatusId())){
                     fsnTuple = iDescriptionTuple;
+                    break;
                 }
             }
 
