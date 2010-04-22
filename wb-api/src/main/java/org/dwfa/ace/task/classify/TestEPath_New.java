@@ -114,39 +114,12 @@ public class TestEPath_New extends AbstractTask {
             sb.append("\r\n::: ... completed limited snapshot ...");
             logger.info(sb.toString() + "\r\n::: [TestEPath_New] countNull=" + countNull
                     + " countTotal=" + countTotal);
-            
-            Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
-                public int compare(SnoRel o1, SnoRel o2) {
-                    int thisMore = 1;
-                    int thisLess = -1;
-                    if (o1.c1Id > o2.c1Id) {
-                        return thisMore;
-                    } else if (o1.c1Id < o2.c1Id) {
-                        return thisLess;
-                    } else {
-                        if (o1.typeId > o2.typeId) {
-                            return thisMore;
-                        } else if (o1.typeId < o2.typeId) {
-                            return thisLess;
-                        } else {
-
-                            if (o1.c2Id > o2.c2Id) {
-                                return thisMore;
-                            } else if (o1.c2Id < o2.c2Id) {
-                                return thisLess;
-                            } else {
-                                    return 0; // this == received
-                            }
-                        }
-                    }
-                } // compare()
-            };
-            
+                        
             // DUMP FILES
             if (debugDump == true) {
-                SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditRead_New_full.txt", 4);                
-                Collections.sort(cEditSnoRels, compDump);
+                // SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditRead_New_full.txt", 4);                
                 SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditPath_New_compare.txt", 5);
+                SnoRel.dumpToFile(cEditSnoRels, "SnoRelEditPathRead_New_uuid_compare.txt", 2);                
             }
 
             cEditSnoRels = null;
