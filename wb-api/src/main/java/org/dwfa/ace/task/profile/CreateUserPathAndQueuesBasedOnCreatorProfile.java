@@ -385,7 +385,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     }
 
     private void createClassifierPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Set<I_Position> inputSet = getDeveloperOrigins(creatorConfig);
+        Collection<I_Position> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
         I_Path classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
         newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptId()));
     }
@@ -411,7 +411,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         return null;
     }
 
-    private I_Path createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<I_Position> positionSet,
+    private I_Path createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Collection<I_Position> positionSet,
             String suffix) throws TaskFailedException, TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {
