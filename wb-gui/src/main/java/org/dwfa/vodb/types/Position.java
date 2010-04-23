@@ -101,7 +101,7 @@ public class Position implements I_Position {
         return checkAntecedentOrEqualToOrigins(path.getOrigins(), version, pathId);
     }
 
-    private boolean checkSubsequentOrEqualToOrigins(List<I_Position> origins, int testVersion, int testPathId) {
+    private boolean checkSubsequentOrEqualToOrigins(Collection<I_Position> origins, int testVersion, int testPathId) {
         for (I_Position origin : origins) {
             if (testPathId == origin.getPath().getConceptId()) {
                 return origin.getVersion() >= testVersion;
@@ -112,7 +112,7 @@ public class Position implements I_Position {
         return false;
     }
 
-    private boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins, int testVersion, int testPathId) {
+    private boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins, int testVersion, int testPathId) {
         for (I_Position origin : origins) {
             if (testPathId == origin.getPath().getConceptId()) {
                 return origin.getVersion() <= testVersion;
@@ -147,7 +147,7 @@ public class Position implements I_Position {
      * org.dwfa.vodb.types.I_Position#checkAntecedentOrEqualToOrigins(java.util
      * .List)
      */
-    public boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins) {
+    public boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins) {
         for (I_Position origin : origins) {
             if (path.getConceptId() == origin.getPath().getConceptId()) {
                 return version <= origin.getVersion();

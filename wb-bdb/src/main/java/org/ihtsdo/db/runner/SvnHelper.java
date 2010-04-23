@@ -28,6 +28,7 @@ import org.dwfa.bpa.util.SelectObjectDialog;
 import org.dwfa.svn.Svn;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
+import org.ihtsdo.db.bdb.BdbPathManager;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
@@ -287,6 +288,7 @@ public class SvnHelper {
             }
 
             AceLog.getAppLog().info("Finished eccs import");
+            BdbPathManager.get().resetPathMap(); 
             Terms.get().resumeChangeSetWriters();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);

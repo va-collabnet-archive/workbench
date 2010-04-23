@@ -315,7 +315,7 @@ public class WorkbenchRunner {
 							AceConfig.config.getChangeSetWriterFileName()),
 					new File(AceConfig.config.getChangeSetRoot(), "."
 							+ AceConfig.config.getChangeSetWriterFileName()),
-							ChangeSetPolicy.INCREMENTAL));
+							ChangeSetPolicy.MUTABLE_ONLY));
 			ChangeSetWriterHandler.addWriter(new CommitLog(new File(
 					AceConfig.config.getChangeSetRoot(), "commitLog.xls"),
 					new File(AceConfig.config.getChangeSetRoot(), "."

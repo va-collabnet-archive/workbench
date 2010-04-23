@@ -18,7 +18,6 @@ package org.dwfa.ace.api;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAcePath;
@@ -28,7 +27,7 @@ public interface I_Path {
 
     public int getConceptId();
 
-    public List<I_Position> getOrigins();
+    public Collection<I_Position> getOrigins();
 
     /**
      * Get all origins and origin of origins, etc., for this path.

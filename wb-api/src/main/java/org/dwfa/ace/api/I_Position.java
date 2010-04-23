@@ -17,7 +17,6 @@
 package org.dwfa.ace.api;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface I_Position {
 
@@ -33,7 +32,7 @@ public interface I_Position {
 
     public boolean isAntecedentOrEqualTo(I_Position another);
 
-    public boolean checkAntecedentOrEqualToOrigins(List<I_Position> origins);
+    public boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins);
 
     public boolean isSubsequentOrEqualTo(I_Position another);
 

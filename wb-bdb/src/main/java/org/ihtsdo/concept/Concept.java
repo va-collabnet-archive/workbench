@@ -49,7 +49,6 @@ import org.ihtsdo.concept.ConceptDataManager.SetModifiedWhenChangedList;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
 import org.ihtsdo.concept.component.image.Image;
@@ -69,7 +68,6 @@ import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERelationship;
-import org.ihtsdo.etypes.I_ConceptualizeExternally;
 import org.ihtsdo.lucene.LuceneManager;
 
 public class Concept implements I_Transact, I_GetConceptData {
@@ -91,19 +89,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid);
-		if (c.isPrimordial()) {
-			populateFromEConcept(eConcept, c);
-			LuceneManager.writeToLucene(c.getDescriptions());
-			BdbCommitManager.addUncommittedNoChecks(c);
-		} else {
-			mergeWithEConcept(eConcept, c);
-			BdbCommitManager.addUncommittedNoChecks(c);
-		}
+		mergeWithEConcept(eConcept, c);
+		BdbCommitManager.addUncommittedNoChecks(c);
 		return c;
-	}
-	
-	private boolean isPrimordial() throws IOException {
-		return data.isPrimordial();
 	}
 
 	public static Concept get(EConcept eConcept) throws IOException {
@@ -116,11 +104,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 	
 	private static Concept mergeWithEConcept(EConcept eConcept, Concept c)
 			throws IOException {
-		if (eConcept.getPrimordialUuid().equals(
-				UUID.fromString("a902562c-4768-4809-9859-a613d3914fe3"))) {
-			AceLog.getAppLog().info("developer origin: Concept: \n" + 
-					c.toLongString() + "\n\n" + eConcept);
-		}
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		if (eAttr != null) {
 			if (c.getConceptAttributes() == null) {
@@ -1439,14 +1422,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 			if (specifiedRefsetNid == refsetNid) {
 				Concept c = Concept.get(refsetNid);
 				RefsetMember<?, ?> member = c.getRefsetMember(memberNid);
-				try {
-					assert member != null : " null member retrieving "
-							+ memberNid + " from: " + c.toLongString()
-							+ " references: "
-							+ Bdb.getConceptDb().findReferences(memberNid);
-				} catch (Exception e) {
-					throw new IOException(e);
-				}
+				assert member != null: "\n\nMissing concept refset exetension " + 
+				    memberNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(memberNid) +
+				    " in concept: \n-------------------------\n\n" + 
+				    this.toLongString() + 
+				    "\n\nIn refset\n\n**********************************\n\n" +
+				    Concept.get(refsetNid).toLongString() +
+				    "\n-------------------------\n\n";
 				returnValues.add(member);
 			}
 		}

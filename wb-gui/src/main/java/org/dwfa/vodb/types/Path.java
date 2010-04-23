@@ -48,15 +48,15 @@ public class Path implements I_Path {
 
     int conceptId;
 
-    List<I_Position> origins;
+    Set<I_Position> origins;
 
     public Path(int conceptId, List<I_Position> origins) {
         super();
         this.conceptId = conceptId;
         if (origins != null) {
-            this.origins = Collections.unmodifiableList(origins);
+            this.origins = new HashSet<I_Position>(origins);
         } else {
-            this.origins = Collections.unmodifiableList(new ArrayList<I_Position>(0));
+            this.origins = new HashSet<I_Position>(0);
         }
     }
 
@@ -94,8 +94,8 @@ public class Path implements I_Path {
      * 
      * @see org.dwfa.vodb.types.I_Path#getOrigins()
      */
-    public List<I_Position> getOrigins() {
-        return origins;
+    public Collection<I_Position> getOrigins() {
+        return Collections.unmodifiableSet(origins);
     }
 
     public Set<I_Position> getInheritedOrigins() {
@@ -273,6 +273,16 @@ public class Path implements I_Path {
     }
 
     public void addOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException {
+        assert this.origins.contains(position) == false: "Attempt to add duplicate origin to path: " +
+            this.toString() + " duplicate origin: " + position;
+        this.origins.add(position);
         Terms.get().writePathOrigin(this, position, config);
+    }
+    
+    public void remmoveOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException {
+        assert this.origins.contains(position) == false: "Attempt to remove origin that is not in path: " +
+            this.toString() + " erroneous origin: " + position;
+        this.origins.remove(position);
+        Terms.get().removeOrigin(this, position, config);
     }
 }

@@ -624,5 +624,6 @@ public interface I_TermFactory {
     
     public void setCachePercent(String cachePercent);
     public int getCachePercent();
+    public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
     
 }

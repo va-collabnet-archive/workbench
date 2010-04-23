@@ -1685,4 +1685,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
        return Bdb.getCachePercent();
     }
 
+    @Override
+    public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
+        pathManager.removeOrigin(path, origin, config);
+    }
+
 }

@@ -162,6 +162,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
                 .getCommitErrorsAndWarnings();
             process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
             if (errorsAndWarnings.size() > 0) {
+                AceLog.getAppLog().warning(errorsAndWarnings.toString());
             	Terms.get().cancel();
                 return Condition.FALSE;
             }
