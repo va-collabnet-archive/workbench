@@ -22,29 +22,39 @@ public class SctIdGeneratorTest extends TestCase {
 
     // Concept table
     // 369445005 0 Chronic proctocolitis (disorder) XUU7a D5-45285 1
-
     // Description table
     // 513502016 8 133947006 Occupations 0 3 en
-
     // Rel table
     // 100000028 280844000 116680003 71737002 0 0 0
     // 1000036
+    public void testGenerateSctIdAuProject() {
 
-    public void testGenerate() {
         try {
-            SctIdGenerator.generate(0, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA,
-                SctIdGenerator.TYPE.CONCEPT);
-            fail("Generator should have thrown an error");
-        } catch (Exception e) {
-            // expected exception at 0 index;
-        }
-        try { // SNAMESPCPRC
-            assertEquals("11000036103", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AMT,
-                SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
+            assertEquals("11000036103", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AU,
+                    SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
         } catch (Exception e) {
             fail("exception: " + e.getLocalizedMessage());
         }
 
+    }
+
+    public void testGenerateWithZeroSequenceFails() {
+        try {
+            SctIdGenerator.generate(0, SctIdGenerator.PROJECT.AMT, SctIdGenerator.NAMESPACE.NEHTA,
+                    SctIdGenerator.TYPE.CONCEPT);
+            fail("Generator should have thrown an error");
+        } catch (Exception e) {
+            assertTrue(e instanceof RuntimeException);
+        }
+    }
+
+    public void testGenerateSctIdAMTProject() {
+        try {
+            assertEquals("1011000036106", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AMT,
+                    SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
+        } catch (Exception e) {
+            fail("exception: " + e.getLocalizedMessage());
+        }
     }
 
     public void testVerhoeffCheck() {
