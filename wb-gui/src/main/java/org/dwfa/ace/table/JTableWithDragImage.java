@@ -299,9 +299,9 @@ public class JTableWithDragImage extends JTable {
             CONCEPT_FIELD field = (CONCEPT_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
             case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getConId()));
+                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getNid()));
             case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getConceptStatus()));
+                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getStatusId()));
             case DEFINED:
                 return new StringSelection(swct.getCellText());
             case VERSION:
@@ -315,7 +315,7 @@ public class JTableWithDragImage extends JTable {
 
         private Transferable transferableFromIWImgT(Object obj) throws IOException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
-            return new StringSelection("<img src='ace:" + Terms.get().nativeToUuid(iwit.tuple.getImageId())
+            return new StringSelection("<img src='ace:" + Terms.get().nativeToUuid(iwit.tuple.getNid())
                 + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptId()) + "'>");
         }
 
@@ -325,7 +325,7 @@ public class JTableWithDragImage extends JTable {
             switch (field) {
             case IMAGE_ID:
                 return new StringSelection("<img src='ace:"
-                    + Terms.get().nativeToUuid(swit.getTuple().getImageId()) + "$"
+                    + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
                     + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
             case CON_ID:
                 return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptId()));
@@ -333,7 +333,7 @@ public class JTableWithDragImage extends JTable {
                 return new StringSelection(swit.getTuple().getTextDescription());
             case IMAGE:
                 return new StringSelection("<img src='ace:"
-                    + Terms.get().nativeToUuid(swit.getTuple().getImageId()) + "$"
+                    + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
                     + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
             case FORMAT:
                 return new StringSelection(swit.getTuple().getFormat());
@@ -350,6 +350,7 @@ public class JTableWithDragImage extends JTable {
             }
         }
 
+        @SuppressWarnings("unchecked")
         public Image getDragImage(Object obj) {
             JLabel dragLabel;
             if (I_CellTextWithTuple.class.isAssignableFrom(obj.getClass())) {

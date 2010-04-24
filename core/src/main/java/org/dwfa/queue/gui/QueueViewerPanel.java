@@ -122,8 +122,10 @@ public class QueueViewerPanel extends JPanel {
     }
 
     private class ExecuteProcessActionListener implements ActionListener {
+        @SuppressWarnings("unused")
         Configuration config;
 
+        @SuppressWarnings("unused")
         Uuid id;
 
         I_Work worker;
@@ -293,7 +295,7 @@ public class QueueViewerPanel extends JPanel {
                         List<I_DescribeQueueEntry> selectedProcesses = new ArrayList<I_DescribeQueueEntry>();
                         for (int i = firstSelectedRow; i <= lastSelectedRow; i++) {
                             if (lsm.isSelectedIndex(i)) {
-                                I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(i);
+                                I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(tableOfQueueEntries.getRowSorter().convertRowIndexToModel(i));
                                 selectedProcesses.add(processMeta);
                             }
                         }
@@ -351,7 +353,7 @@ public class QueueViewerPanel extends JPanel {
             QueueAdaptor qAdaptor = null;
             if (tableOfQueues.getSelectedRow() >= 0) {
                 ListOfQueuesTableModel loqtm = (ListOfQueuesTableModel) tableOfQueues.getModel();
-                qAdaptor = loqtm.getQueueAt(tableOfQueues.getSelectedRow());
+                qAdaptor = loqtm.getQueueAt(tableOfQueues.getRowSorter().convertRowIndexToModel(tableOfQueues.getSelectedRow()));
             }
             // System.out.println(" Transaction committed. Performing queue refresh. ");
 
@@ -383,7 +385,7 @@ public class QueueViewerPanel extends JPanel {
                 QueueAdaptor qAdaptor = null;
                 if (tableOfQueues.getSelectedRow() >= 0) {
                     ListOfQueuesTableModel loqtm = (ListOfQueuesTableModel) tableOfQueues.getModel();
-                    qAdaptor = loqtm.getQueueAt(tableOfQueues.getSelectedRow());
+                    qAdaptor = loqtm.getQueueAt(tableOfQueues.getRowSorter().convertRowIndexToModel(tableOfQueues.getSelectedRow()));
                 }
 
                 if (qAdaptor == null) {
@@ -450,7 +452,7 @@ public class QueueViewerPanel extends JPanel {
                     if (lsm.getMinSelectionIndex() < table.getRowCount()) {
                         int firstSelectedRow = lsm.getMinSelectionIndex();
                         tableOfQueueEntriesModel.updateQueueData();
-                        I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(firstSelectedRow);
+                        I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(table.getRowSorter().convertRowIndexToModel(firstSelectedRow));
                         if (processMeta != null) {
                             processEntryID = processMeta.getEntryID();
                             try {
@@ -797,7 +799,7 @@ public class QueueViewerPanel extends JPanel {
                         queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));
                         queueContentsSplitPane.setDividerLocation(dividerLoc);
                     } else {
-                        int selectedRow = tableOfQueueEntries.getSelectedRow();
+                        int selectedRow = tableOfQueueEntries.getRowSorter().convertRowIndexToModel(tableOfQueueEntries.getSelectedRow());
                         EntryID selectedEntry = null;
                         if (selectedRow >= 0 && selectedRow < tableOfQueueEntries.getRowCount()) {
                             selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(selectedRow, 6);
@@ -806,7 +808,7 @@ public class QueueViewerPanel extends JPanel {
                         if (selectedEntry != null) {
                             boolean entryFound = false;
                             for (int row = 0; row < tableOfQueueEntries.getRowCount(); row++) {
-                                EntryID entry = (EntryID) tableOfQueueEntries.getModel().getValueAt(row, 6);
+                                EntryID entry = (EntryID) tableOfQueueEntries.getModel().getValueAt(tableOfQueueEntries.getRowSorter().convertRowIndexToModel(row), 6);
                                 if (entry.equals(selectedEntry)) {
                                     tableOfQueueEntries.getSelectionModel().addSelectionInterval(row, row);
                                     entryFound = true;
