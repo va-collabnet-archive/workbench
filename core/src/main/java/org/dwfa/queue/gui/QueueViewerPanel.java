@@ -58,6 +58,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.jini.config.Configuration;
@@ -490,12 +492,21 @@ public class QueueViewerPanel extends JPanel {
 
     }
 
-    private class QueueSelectionListener implements ListSelectionListener {
+    private class QueueSelectionListener implements ListSelectionListener, RowSorterListener {
 
         public void valueChanged(ListSelectionEvent e) {
+            handleChange();
+        }
+
+        @Override
+        public void sorterChanged(RowSorterEvent e) {
+            handleChange();
+        }
+
+        private void handleChange() {
             if (tableOfQueues.getSelectedRow() >= 0) {
                 ListOfQueuesTableModel tableModel = (ListOfQueuesTableModel) tableOfQueues.getModel();
-                QueueAdaptor qAdaptor = tableModel.getQueueAt(tableOfQueues.getSelectedRow());
+                QueueAdaptor qAdaptor = tableModel.getQueueAt(tableOfQueues.getRowSorter().convertRowIndexToModel(tableOfQueues.getSelectedRow()));
 
                 if (qAdaptor == null) {
                     clearQueuePanel();
@@ -522,6 +533,7 @@ public class QueueViewerPanel extends JPanel {
             queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));
             queueContentsSplitPane.setDividerLocation(dividerLoc);
         }
+
 
     }
 
@@ -710,11 +722,12 @@ public class QueueViewerPanel extends JPanel {
         tableOfQueues = new JTable(tableOfQueuesModel);
         SortClickListener.setupSorter(tableOfQueues);
         // Set up tool tips for column headers.
-        tableOfQueues.getTableHeader().setToolTipText(
-            "Click to specify sorting");
+        tableOfQueues.getTableHeader().setToolTipText("Click to specify sorting");
         // Create a tableOfQueues that allows one selection at a time.
-        tableOfQueues.getSelectionModel().addListSelectionListener(new QueueSelectionListener());
+        QueueSelectionListener qmsl = new QueueSelectionListener();
+        tableOfQueues.getSelectionModel().addListSelectionListener(qmsl);
         tableOfQueues.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tableOfQueues.getRowSorter().addRowSorterListener(qmsl);
         ToolTipManager.sharedInstance().registerComponent(tableOfQueues);
         return new JScrollPane(tableOfQueues);
     }

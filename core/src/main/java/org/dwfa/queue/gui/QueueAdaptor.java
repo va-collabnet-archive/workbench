@@ -23,7 +23,7 @@ import net.jini.core.lookup.ServiceID;
 
 import org.dwfa.bpa.process.I_QueueProcesses;
 
-public class QueueAdaptor implements Comparable {
+public class QueueAdaptor implements Comparable<QueueAdaptor> {
     I_QueueProcesses queue;
 
     String queueName;
@@ -46,8 +46,7 @@ public class QueueAdaptor implements Comparable {
         return this.queueName;
     }
 
-    public int compareTo(Object o) {
-        QueueAdaptor qa2 = (QueueAdaptor) o;
-        return queueName.compareTo(qa2.queueName);
+    public int compareTo(QueueAdaptor q) {
+        return queueName.compareTo(q.queueName);
     }
 }
