@@ -25,6 +25,7 @@ import java.util.Collection;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.DetailSheetClientProperties;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -109,6 +110,7 @@ public class ClearWorkflowDetailsSheet extends AbstractTask {
                 workflowDetailsSheet.remove(components[i]);
             }
             workflowDetailsSheet.setVisible(false);
+            workflowDetailsSheet.putClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS, null);
         } catch (Exception e) {
             ex = e;
         }

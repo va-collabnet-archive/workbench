@@ -31,10 +31,12 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.DetailSheetClientProperties;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -161,8 +163,15 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             cont.validate();
             cont = cont.getParent();
         }
-        continueButton.requestFocusInWindow();
-        workflowPanel.repaint();
+        JPanel detailsSheet = config.getWorkflowDetailsSheet();
+        if (detailsSheet.isVisible() && 
+                detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS) != null) {
+            JComponent componentToFocus = (JComponent) detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS);
+            componentToFocus.requestFocusInWindow();
+        } else {
+            continueButton.requestFocusInWindow();
+        }
+         workflowPanel.repaint();
     }
 
     protected abstract boolean showPrevious();

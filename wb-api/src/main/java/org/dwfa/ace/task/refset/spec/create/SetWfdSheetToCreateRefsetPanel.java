@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.DetailSheetClientProperties;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -192,6 +193,7 @@ public class SetWfdSheetToCreateRefsetPanel extends AbstractTask {
              * ----------------------------------------------------------------------------------
              */
             workflowDetailsSheet.add(newPanel);
+            workflowDetailsSheet.putClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS, newPanel.getRequestedFocus());
 
         } catch (Exception e) {
             ex = e;

@@ -132,7 +132,9 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             Set<? extends I_GetConceptData> allValidUsers = helper.getAllValidUsers();
 
-            wfSheet.add(new RequestForChangePanel(refsets, allValidUsers));
+            RequestForChangePanel rfcp = new RequestForChangePanel(refsets, allValidUsers);
+            wfSheet.add(rfcp);
+            rfcp.focusOnRefsetName();
             wfSheet.repaint();
         } catch (Exception e) {
             ex = e;

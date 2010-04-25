@@ -540,4 +540,8 @@ public class RequestForChangePanel extends JPanel {
         attachmentListModel.clear();
         attachmentListModel.addAll(files);
     }
+
+    public void focusOnRefsetName() {
+        refsetNameComboBox.requestFocusInWindow();
+    }
 }

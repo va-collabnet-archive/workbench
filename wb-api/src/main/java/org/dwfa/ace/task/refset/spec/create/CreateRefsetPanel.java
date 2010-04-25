@@ -23,6 +23,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -48,6 +51,7 @@ import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RequestFocus;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.TestForEditRefsetPermission;
@@ -136,8 +140,8 @@ class ReviewerTableModel extends AbstractTableModel {
  * @version 1.0, December 2009
  * 
  */
-public class CreateRefsetPanel extends JPanel {
-
+public class CreateRefsetPanel extends JPanel implements I_RequestFocus {
+    
     /*
      * -----------------------
      * Properties
@@ -193,7 +197,6 @@ public class CreateRefsetPanel extends JPanel {
         setDefaultValues();
         setUpComboBoxes();
         layoutComponents();
-
     }
 
     private void setDefaultValues() {
@@ -217,6 +220,14 @@ public class CreateRefsetPanel extends JPanel {
 
         // Data Controls
         refsetNameTextField = new JTextField(20);
+        refsetNameTextField.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                e.getComponent().requestFocusInWindow();
+            }
+            
+        });
         refsetParentComboBox = new JComboBox(refsetParents.toArray());
         commentsTextField = new JTextArea();
         commentsTextField.setLineWrap(true);
@@ -757,6 +768,13 @@ public class CreateRefsetPanel extends JPanel {
             layoutComponents();
         }
 
+    }
+
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.task.refset.spec.create.I_RequestFocus#getRequestedFocus()
+     */
+    public JComponent getRequestedFocus() {
+        return refsetNameTextField;
     }
 
 }
