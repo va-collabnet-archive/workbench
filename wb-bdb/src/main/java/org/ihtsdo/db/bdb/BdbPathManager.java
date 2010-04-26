@@ -98,6 +98,10 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			.getName());
 
 	private RefsetHelperGetter helperGetter = new RefsetHelperGetter();
+
+    private Concept pathRefsetConcept;
+
+    private Concept refsetPathOriginsConcept;
 	
 	private static BdbPathManager singleton;
 	
@@ -155,10 +159,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	public Set<Integer> getPathNids() throws TerminologyException {
 		try {
 			HashSet<Integer> result = new HashSet<Integer>();
-			Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
-					ReferenceConcepts.REFSET_PATHS.getNid());
 
-			for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
+			for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
 			    I_ExtendByRefPartCid conceptExtension = (I_ExtendByRefPartCid) extPart;
 				result.add(conceptExtension.getC1id());
 			}
@@ -184,10 +186,9 @@ public class BdbPathManager implements I_Manage<I_Path> {
             pathMap = new ConcurrentHashMap<Integer, Path>();
 
             try {
-                Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
-                        ReferenceConcepts.REFSET_PATHS.getNid());
+                getPathRefsetConcept();
 
-                for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
+                for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
                     CidMember conceptExtension = (CidMember) extPart;
                     int pathId = conceptExtension.getC1Nid();
                     pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
@@ -199,14 +200,20 @@ public class BdbPathManager implements I_Manage<I_Path> {
             }
         }
 	}
+
+    private Concept getPathRefsetConcept() throws IOException {
+        if (pathRefsetConcept == null) {
+            pathRefsetConcept = Bdb.getConceptDb().getConcept(
+                ReferenceConcepts.REFSET_PATHS.getNid());
+        }
+        return pathRefsetConcept;
+    }
 	
 	@SuppressWarnings("unchecked")
     private Path getFromDisk(int cNid) throws IOException {
         try {
-            Concept pathRefsetConcept = Bdb.getConceptDb().getConcept(
-                    ReferenceConcepts.REFSET_PATHS.getNid());
 
-            for (RefsetMember extPart : pathRefsetConcept.getExtensions()) {
+            for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
                 CidMember conceptExtension = (CidMember) extPart;
                 int pathId = conceptExtension.getC1Nid();
                 if (pathId == cNid) {
@@ -254,7 +261,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					.getConceptExtensions(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid())) {
 				assert extPart != null : "Null path origins for: " +
 						pathConcept.toLongString() + "\n\nin refset: \n\n" +
-						Concept.get(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid()).toLongString();
+						getRefsetPathOriginsConcept().toLongString();
 				CidIntMember conceptExtension = (CidIntMember) extPart;
 				if (conceptExtension.getC1Nid() == nid) {
 					AceLog.getAppLog().severe(
@@ -288,6 +295,13 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
     }
 
+    private Concept getRefsetPathOriginsConcept() throws IOException {
+        if (this.refsetPathOriginsConcept == null) {
+            this.refsetPathOriginsConcept = Concept.get(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
+        }
+        return refsetPathOriginsConcept;
+    }
+
 	/**
 	 * Add or update a path and all its origin positions NOTE it will not
 	 * automatically remove origins. This must be done explicitly with
@@ -303,7 +317,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 							.getConceptId());
 			helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(), ReferenceConcepts.PATH.getNid(),
 					EConcept.REFSET_TYPES.CID, propMap, config);
-			BdbCommitManager.addUncommittedNoChecks(Concept.get(ReferenceConcepts.REFSET_PATHS.getNid()));
+			BdbCommitManager.addUncommittedNoChecks(getPathRefsetConcept());
 
 			// write position
 
@@ -355,7 +369,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			refsetHelper.newRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
 					.getConceptId(), EConcept.REFSET_TYPES.CID_INT, propMap,
 					config);
-			BdbCommitManager.addUncommittedNoChecks(Concept.get(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid()));
+			BdbCommitManager.addUncommittedNoChecks(getRefsetPathOriginsConcept());
             pathMap.put(path.getConceptId(), (Path) path);
 			logger.info("Wrote origin path : " + origin + " to path " + path);
 		} catch (Exception e) {

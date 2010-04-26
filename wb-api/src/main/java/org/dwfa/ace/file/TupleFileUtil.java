@@ -19,10 +19,12 @@ package org.dwfa.ace.file;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +39,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -56,19 +59,26 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 
 
 public class TupleFileUtil {
 
-    public I_GetConceptData importFile(File importFile, File reportFile, I_ConfigAceFrame importConfig)
+    public I_GetConceptData importFile(File importFile, File reportFile, I_ConfigAceFrame importConfig, I_ShowActivity activityPanel)
             throws TerminologyException {
 
         try {
-            // pathUuids.clear();
+            int lines = 0;
+            long startTime = System.currentTimeMillis();
 
+            activityPanel.setValue(0);
+            int length = (int) importFile.length();
+            activityPanel.setMaximum((int) importFile.length());
+            activityPanel.setIndeterminate(false);
             
             BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(reportFile));
-            BufferedReader inputFileReader = new BufferedReader(new FileReader(importFile));
+            FileInputStream input = new FileInputStream(importFile);
+            BufferedReader inputFileReader = new BufferedReader(new InputStreamReader(input));
 
             String currentLine = inputFileReader.readLine();
             int lineCount = 1;
@@ -79,6 +89,19 @@ public class TupleFileUtil {
 
             while (currentLine != null) {
 
+                if (lines % 50 == 0) {
+                    int completed = length - input.available();
+                    activityPanel.setValue(completed);
+                    long endTime = System.currentTimeMillis();
+
+                    long elapsed = endTime - startTime;
+                    String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+
+                    String remainingStr = TimeUtil.getRemainingTimeString(completed, length, elapsed);
+
+                    activityPanel.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
+                        + ".");
+                }
                 if (!currentLine.trim().equals("")) {
                     String[] lineParts = currentLine.split("\t");
 

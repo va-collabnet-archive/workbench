@@ -128,7 +128,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             boolean checkCreationTestsEnabled = Terms.get().isCheckCreationDataEnabled();
             boolean checkCommitTestsEnabled = Terms.get().isCheckCommitDataEnabled();
             I_GetConceptData memberRefset = tupleImporter.importFile(new File(importFileName),
-                new File(outputFileName), importConfig);
+                new File(outputFileName), importConfig, activityPanel);
 
             
             Terms.get().commit();

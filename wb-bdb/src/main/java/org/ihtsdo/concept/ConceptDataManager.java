@@ -389,7 +389,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 			dest.getData().addRefsetNidMemberNidForComponent(
 					refsetMember.enclosingConceptNid, refsetMember.nid,
 					refsetMember.getComponentId());
-			BdbCommitManager.addUncommittedNoChecks(dest);
+			if (dest.getNid() != this.enclosingConcept.getNid()) {
+	            BdbCommitManager.addUncommittedNoChecks(dest);
+			}
 		}
 		modified();
 	}
