@@ -59,6 +59,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -821,6 +822,17 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
     public List<CriterionPanel> getCriterionPanels() {
         return criterionPanels;
+    }
+
+    public void focusOnInput() {
+        SwingUtilities.invokeLater(new Runnable() {
+            
+            @Override
+            public void run() {
+                searchPhraseField.selectAll();
+                searchPhraseField.requestFocusInWindow();
+            }
+        });
     }
 
 }

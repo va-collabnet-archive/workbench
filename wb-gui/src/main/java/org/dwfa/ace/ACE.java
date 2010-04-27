@@ -986,6 +986,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 hidden = true;
             }
             resizePalttes();
+            if (showSearchToggle.isSelected()) {
+                searchPanel.focusOnInput();
+            }
         }
 
     }
