@@ -16,9 +16,11 @@
  */
 package org.ihtsdo.mojo.maven.sct;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class SctYIdRecord {
+public class SctYIdRecord implements Comparable<SctYIdRecord>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     long primaryUuidMsb; // CONCEPTID/PRIMARYID
     long primaryUuidLsb; // CONCEPTID/PRIMARYID
@@ -50,4 +52,37 @@ public class SctYIdRecord {
         this.yRevision = revDate;
         this.yPath = pathIdx;
     }
+
+    @Override
+    public int compareTo(SctYIdRecord o) {
+        int thisMore = 1;
+        int thisLess = -1;
+        if (primaryUuidMsb > o.primaryUuidMsb) {
+            return thisMore;
+        } else if (primaryUuidMsb < o.primaryUuidMsb) {
+            return thisLess;
+        } else {
+            if (primaryUuidLsb > o.primaryUuidLsb) {
+                return thisMore;
+            } else if (primaryUuidLsb < o.primaryUuidLsb) {
+                return thisLess;
+            } else {
+                if (this.yPath > o.yPath) {
+                    return thisMore;
+                } else if (this.yPath < o.yPath) {
+                    return thisLess;
+                } else {
+                    if (this.yRevision > o.yRevision) {
+                        return thisMore;
+                    } else if (this.yRevision < o.yRevision) {
+                        return thisLess;
+                    } else {
+                        return 0; // EQUAL
+                    }
+                }
+            }
+        }
+    }
+    
+    
 }
