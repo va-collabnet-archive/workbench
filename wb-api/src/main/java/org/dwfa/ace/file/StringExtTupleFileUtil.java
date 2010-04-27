@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -62,9 +63,10 @@ public class StringExtTupleFileUtil {
         }
     }
 
-    public static boolean importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
+    public static I_GetConceptData importTuple(String inputLine, BufferedWriter outputFileWriter, int lineCount,
             I_ConfigAceFrame importConfig) throws TerminologyException {
 
+        I_GetConceptData refsetConcept = null;
         try {
             String[] lineParts = inputLine.split("\t");
 
@@ -78,6 +80,7 @@ public class StringExtTupleFileUtil {
             try {
                 memberUuid = UUID.fromString(lineParts[1]);
                 refsetUuid = UUID.fromString(lineParts[2]);
+                refsetConcept = Terms.get().getConcept(refsetUuid);
                 componentUuid = UUID.fromString(lineParts[3]);
                 extString = lineParts[5];
                 if ((Boolean) importConfig.getProperty("override") == false) {
@@ -97,7 +100,7 @@ public class StringExtTupleFileUtil {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
-                return false;
+                return null;
             }
 
             try {
@@ -107,7 +110,7 @@ public class StringExtTupleFileUtil {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
-                return false;
+                return null;
             }
 
             I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
@@ -134,7 +137,7 @@ public class StringExtTupleFileUtil {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
-                return false;
+                return null;
             }
 
         } catch (Exception e) {
@@ -143,12 +146,12 @@ public class StringExtTupleFileUtil {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
-                return false;
+                return null;
             } catch (IOException e1) {
                 e1.printStackTrace();
-                return false;
+                return null;
             }
         }
-        return true;
+        return refsetConcept;
     }
 }

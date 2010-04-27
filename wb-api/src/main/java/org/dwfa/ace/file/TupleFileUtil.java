@@ -86,6 +86,8 @@ public class TupleFileUtil {
 
             Set<I_GetConceptData> concepts = new HashSet<I_GetConceptData>();
             I_GetConceptData memberRefset = null;
+            
+            Set<I_GetConceptData> refsetConcepts = new HashSet<I_GetConceptData>();
 
             while (currentLine != null) {
 
@@ -129,40 +131,50 @@ public class TupleFileUtil {
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_TUPLE.getUids()
                         .iterator().next())) {
-                        if (ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.ccTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_CONCEPT_TUPLE
                         .getUids().iterator().next())) {
-                        if (ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.cccTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_CONCEPT_STRING_TUPLE
                         .getUids().iterator().next())) {
-                        if (ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.ccsTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_TUPLE.getUids().iterator()
                         .next())) {
-                        if (ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.conceptExtTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_INT_TUPLE.getUids().iterator()
                         .next())) {
-                        if (IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.intTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
@@ -171,16 +183,20 @@ public class TupleFileUtil {
                         // skip as we'll process them in the second pass
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_STRING_TUPLE.getUids().iterator()
                         .next())) {
-                        if (StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.stringTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
                         }
                     } else if (tupleUuid.equals(ArchitectonicAuxiliary.Concept.EXT_CONCEPT_STRING_TUPLE.getUids()
                         .iterator().next())) {
-                        if (ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
-                            importConfig)) {
+                        I_GetConceptData refsetConcept = ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
+                            importConfig);
+                        if (refsetConcept != null) {
+                            refsetConcepts.add(refsetConcept);
                             tupleCounter.csTupleCount++;
                         } else {
                             tupleCounter.errorCount++;
@@ -258,6 +274,10 @@ public class TupleFileUtil {
             outputFileWriter.flush();
             outputFileWriter.close();
             inputFileReader.close();
+            
+            for (I_GetConceptData refset: refsetConcepts) {
+                Terms.get().addUncommittedNoChecks(refset);
+            }
             
             if (tupleCounter.errorCount > 0) {
                 AceLog.getAppLog().alertAndLogException(new IOException(tupleCounter.errorCount + " errors during import. Please examine error log."));

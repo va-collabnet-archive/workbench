@@ -43,6 +43,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	private ChangeSetPolicy policy;
 	
 	private Semaphore writePermit = new Semaphore(1);
+	
 
     public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy) {
         super();

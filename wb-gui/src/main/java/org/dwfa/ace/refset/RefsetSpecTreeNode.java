@@ -97,6 +97,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return truthDesc;
     }
 
+    @SuppressWarnings("unchecked")
     public I_ExtendByRefVersion getExtension() {
         try {
             if (extension == null) {
@@ -176,7 +177,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 					        if (comparison != 0) {
 					            return comparison;
 					        }
-					        return compareConstraint(thisExt, otherExt);
+					        return this.getConstraintDesc().compareTo(o.getClauseDesc());
 					    case CID_CID_STR:
 					        return -1;
 					    default:
@@ -225,23 +226,6 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
 
-    private int compareConstraint(I_ExtendByRefVersion thisExt, I_ExtendByRefVersion otherExt) throws IOException, TerminologyException {
-    	I_GetConceptData thisClause = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) thisExt.getMutablePart()).getC3id());
-    	I_GetConceptData otherClause = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) otherExt.getMutablePart()).getC3id());
-        I_DescriptionTuple thisClauseDesc = thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
-        I_DescriptionTuple otherClauseDesc = otherClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
-        if (thisClauseDesc == null || otherClauseDesc == null) {
-            if (thisClauseDesc == otherClauseDesc) {
-                return thisClause.toString().compareTo(otherClause.toString());
-            }
-            if (thisClauseDesc == null) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-        return thisClauseDesc.getText().toLowerCase().compareTo(otherClauseDesc.getText().toLowerCase());
-    }
 
     private int compareClause(RefsetSpecTreeNode o) throws IOException, TerminologyException {
         return getClauseDesc().compareTo(o.getClauseDesc());
@@ -274,6 +258,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         this.aceConfig = aceConfig;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean sortChildren() {
         if (children != null) {
             Collections.sort(children);
@@ -282,8 +267,17 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public Vector<RefsetSpecTreeNode> getChildren() {
         return children;
     }
 
+    private String htmlRendering;
+    public String getHtmlRendering() {
+        return htmlRendering;
+    }
+    
+    public void setHtmlRendering(String htmlRendering) {
+        this.htmlRendering = htmlRendering;
+    }
 }
