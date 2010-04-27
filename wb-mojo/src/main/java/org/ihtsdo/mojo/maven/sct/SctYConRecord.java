@@ -17,6 +17,7 @@
 package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +34,8 @@ class SctYConRecord implements Comparable<Object>, Serializable {
     long conUuidMsb; // CONCEPTID
     long conUuidLsb; // CONCEPTID
     int status; // CONCEPTSTATUS
-    List<EIdentifier> additionalIds;
+    // ArrayList<EIdentifier> additionalIds;
+    ArrayList<SctYIdRecord> addedIds;
     String ctv3id; // CTV3ID
     String snomedrtid; // SNOMEDID (SNOMED RT ID)
     int isprimitive; // ISPRIMITIVE
@@ -46,7 +48,8 @@ class SctYConRecord implements Comparable<Object>, Serializable {
         conUuidMsb = tmpUUID.getMostSignificantBits();
         conUuidLsb = tmpUUID.getLeastSignificantBits();
         status = s;
-        additionalIds = null;
+        // additionalIds = null;
+        addedIds = null;
         ctv3id = ctv;
         snomedrtid = rt;
         isprimitive = p;
@@ -58,7 +61,8 @@ class SctYConRecord implements Comparable<Object>, Serializable {
         conUuidMsb = cUuid.getMostSignificantBits();
         conUuidLsb = cUuid.getLeastSignificantBits();
         status = s;
-        additionalIds = null;
+        // additionalIds = null;
+        addedIds = null;
         ctv3id = null;
         snomedrtid = null;
         isprimitive = p;

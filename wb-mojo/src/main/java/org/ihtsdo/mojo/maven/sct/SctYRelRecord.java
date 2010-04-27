@@ -17,6 +17,7 @@
 package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,12 +32,14 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     long relSnoId; // SNOMED RELATIONSHIPID, if applicable
     long relUuidMsb;
     long relUuidLsb;
-    List<EIdentifier> additionalIds;
+    // List<EIdentifier> additionalIds;
+    ArrayList<SctYIdRecord> addedIds;
     int status; // status is computed for relationships
     long c1SnoId; // CONCEPTID1
     long c1UuidMsb;
     long c1UuidLsb;
-    long roleType; // RELATIONSHIPTYPE
+    long roleTypeSnoId; // RELATIONSHIPTYPE .. SNOMED ID
+    int roleTypeIdx; // RELATIONSHIPTYPE .. index
     long c2SnoId; // CONCEPTID2
     long c2UuidMsb;
     long c2UuidLsb;
@@ -47,32 +50,34 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     int yPath;
     int yRevision;
 
-    public SctYRelRecord(long relID, int st, long cOneID, long relType, long cTwoID,
+    public SctYRelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
             int characterType, int r, int grp) {
-        relSnoId = relID; // RELATIONSHIPID
+        this.relSnoId = relID; // RELATIONSHIPID
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(relSnoId);
-        relUuidMsb = tmpUUID.getMostSignificantBits();
-        relUuidLsb = tmpUUID.getLeastSignificantBits();
+        this.relUuidMsb = tmpUUID.getMostSignificantBits();
+        this.relUuidLsb = tmpUUID.getLeastSignificantBits();
 
-        additionalIds = null;
-        status = st; // status is computed for relationships
-        c1SnoId = cOneID; // CONCEPTID1
+        // additionalIds = null;
+        addedIds = null;
+        this.status = st; // status is computed for relationships
+        this.c1SnoId = cOneID; // CONCEPTID1
         
         tmpUUID = Type3UuidFactory.fromSNOMED(c1SnoId);
-        c1UuidMsb = tmpUUID.getMostSignificantBits();
-        c1UuidLsb = tmpUUID.getLeastSignificantBits();
+        this.c1UuidMsb = tmpUUID.getMostSignificantBits();
+        this.c1UuidLsb = tmpUUID.getLeastSignificantBits();
         
-        roleType = relType; // RELATIONSHIPTYPE
+        this.roleTypeSnoId = roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID) 
+        this.roleTypeIdx = roleTypeIdx; // RELATIONSHIPTYPE  <-- INDEX (NOT SNOMED ID) 
         
-        c2SnoId = cTwoID; // CONCEPTID2
+        this.c2SnoId = cTwoID; // CONCEPTID2
         tmpUUID = Type3UuidFactory.fromSNOMED(c2SnoId);
-        c2UuidMsb = tmpUUID.getMostSignificantBits();
-        c2UuidLsb = tmpUUID.getLeastSignificantBits();
+        this.c2UuidMsb = tmpUUID.getMostSignificantBits();
+        this.c2UuidLsb = tmpUUID.getLeastSignificantBits();
 
-        characteristic = characterType; // CHARACTERISTICTYPE
-        refinability = r; // REFINABILITY
-        group = grp; // RELATIONSHIPGROUP
-        exceptionFlag = false;
+        this.characteristic = characterType; // CHARACTERISTICTYPE
+        this.refinability = r; // REFINABILITY
+        this.group = grp; // RELATIONSHIPGROUP
+        this.exceptionFlag = false;
     }
 
     public SctYRelRecord(UUID uuidRelId, int status, UUID uuidC1, int roleTypeIdx, UUID uuidC2,
@@ -81,12 +86,14 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
         this.relSnoId = Long.MAX_VALUE; // SNOMED RELATIONSHIPID, if applicable
         this.relUuidMsb = uuidRelId.getMostSignificantBits();
         this.relUuidLsb = uuidRelId.getLeastSignificantBits();
-        this.additionalIds = null;
+        // additionalIds = null;
+        addedIds = null;
         this.status = status; // status is computed for relationships
         this.c1SnoId = Long.MAX_VALUE; // CONCEPTID1
         this.c1UuidMsb = uuidC1.getMostSignificantBits();
         this.c1UuidLsb = uuidC1.getLeastSignificantBits();
-        this.roleType = roleTypeIdx; // RELATIONSHIPTYPE
+        this.roleTypeSnoId = Long.MAX_VALUE; // max not assigned or unknown
+        this.roleTypeIdx = roleTypeIdx; // RELATIONSHIPTYPE
         this.c2SnoId = Long.MAX_VALUE; // CONCEPTID2
         this.c2UuidMsb = uuidC2.getMostSignificantBits();
         this.c2UuidLsb = uuidC2.getLeastSignificantBits();
@@ -135,6 +142,6 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     public String toString() {
         UUID uuid = new UUID(relUuidMsb, relUuidLsb); // :yyy:
         return uuid + TAB_CHARACTER + relSnoId + TAB_CHARACTER + status + TAB_CHARACTER
-                + c1SnoId + TAB_CHARACTER + roleType + TAB_CHARACTER + c2SnoId;
+                + c1SnoId + TAB_CHARACTER + roleTypeIdx + TAB_CHARACTER + c2SnoId;
     }
 }

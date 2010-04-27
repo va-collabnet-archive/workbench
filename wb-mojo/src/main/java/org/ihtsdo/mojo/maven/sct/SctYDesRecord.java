@@ -17,6 +17,7 @@
 package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,8 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
     long desUuidMsb;
     long desUuidLsb;    
     int status; // DESCRIPTIONSTATUS
-    List<EIdentifier> additionalIds;
+    // ArrayList<EIdentifier> additionalIds;
+    ArrayList<SctYIdRecord> addedIds;
     long conSnoId; // CONCEPTID
     long conUuidMsb; // CONCEPTID
     long conUuidLsb; // CONCEPTID    
@@ -49,7 +51,8 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
         desUuidLsb = tmpUUID.getLeastSignificantBits();
         
         status = s;
-        additionalIds = null;
+        // additionalIds = null;
+        addedIds = null;
         
         conSnoId = cId;
         tmpUUID = Type3UuidFactory.fromSNOMED(conSnoId);
@@ -68,7 +71,8 @@ class SctYDesRecord implements Comparable<Object>, Serializable {
          this.desUuidMsb = desUuid.getMostSignificantBits();
          this.desUuidLsb = desUuid.getLeastSignificantBits();    
          this.status = status; // DESCRIPTIONSTATUS
-         this.additionalIds = null;
+         // additionalIds = null;
+         addedIds = null;
          this.conSnoId = Long.MAX_VALUE; // CONCEPTID
          this.conUuidMsb = uuidCon.getMostSignificantBits(); // CONCEPTID
          this.conUuidLsb = uuidCon.getLeastSignificantBits(); // CONCEPTID    

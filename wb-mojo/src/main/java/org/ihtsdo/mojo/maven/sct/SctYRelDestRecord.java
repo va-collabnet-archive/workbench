@@ -27,25 +27,18 @@ public class SctYRelDestRecord implements Comparable<Object>, Serializable {
     // private UUID uuid; // COMPUTED RELATIONSHIPID
     long relUuidMsb; // RELATIONSHIPID
     long relUuidLsb; // RELATIONSHIPID
-    long c2SnoId; // CONCEPTID2
     long c2UuidMsb;
     long c2UuidLsb;
-    long roleType; // RELATIONSHIPTYPE
-    long roleTypeUuidMsb; // RELATIONSHIPTYPE
-    long roleTypeUuidLsb; // RELATIONSHIPTYPE
-    
-    public SctYRelDestRecord(long uuidMostSigBits, long uuidLeastSigBits, long conceptTwoID,
-            long roleType, long uuidTypeMsb, long uuidTypeLsb) {
+    int roleTypeIdx; // RELATIONSHIPTYPE  IDX !!!
+
+    public SctYRelDestRecord(long uuidRelMsb, long uuidRelLsb, long uuidC2Msb, long uuidC2Lsb,
+            int roleTypeIdx) {
         super();
-        this.relUuidMsb = uuidMostSigBits;
-        this.relUuidLsb = uuidLeastSigBits;
-        this.c2SnoId = conceptTwoID;
-        UUID tmpUUID = Type3UuidFactory.fromSNOMED(c2SnoId);
-        c2UuidMsb = tmpUUID.getMostSignificantBits();
-        c2UuidLsb = tmpUUID.getLeastSignificantBits();
-        this.roleType = roleType;
-        this.roleTypeUuidMsb = uuidTypeMsb;
-        this.roleTypeUuidLsb = uuidTypeLsb;
+        this.relUuidMsb = uuidRelMsb;
+        this.relUuidLsb = uuidRelLsb;
+        c2UuidMsb = uuidC2Msb;
+        c2UuidLsb = uuidC2Lsb;
+        this.roleTypeIdx = roleTypeIdx;
     }
 
     // method required for object to be sortable (comparable) in arrays
@@ -53,18 +46,13 @@ public class SctYRelDestRecord implements Comparable<Object>, Serializable {
         SctYRelDestRecord tmp = (SctYRelDestRecord) obj;
         int thisMore = 1;
         int thisLess = -1;
-        if (roleTypeUuidMsb > tmp.roleTypeUuidMsb) {
+        if (roleTypeIdx > tmp.roleTypeIdx) {
             return thisMore;
-        } else if (roleTypeUuidMsb < tmp.roleTypeUuidMsb) {
+        } else if (roleTypeIdx < tmp.roleTypeIdx) {
             return thisLess;
         } else {
-            if (roleTypeUuidLsb > tmp.roleTypeUuidLsb) {
-                return thisMore;
-            } else if (roleTypeUuidLsb < tmp.roleTypeUuidLsb) {
-                return thisLess;
-            } else {
-                return 0; // EQUAL
-            }
+            return 0; // EQUAL
         }
     }
+
 }
