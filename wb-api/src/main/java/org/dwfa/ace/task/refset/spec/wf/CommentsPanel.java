@@ -23,6 +23,7 @@ import java.awt.Insets;
 import java.io.IOException;
 
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,6 +43,14 @@ public class CommentsPanel extends JPanel {
 
     // components
     private JTextArea commentsTextField;
+
+    public JTextArea getCommentsTextField() {
+        return commentsTextField;
+    }
+    
+    public JComponent getRequestedFocus() {
+        return getCommentsTextField();
+    }
 
     public CommentsPanel() throws TerminologyException, IOException {
         super();

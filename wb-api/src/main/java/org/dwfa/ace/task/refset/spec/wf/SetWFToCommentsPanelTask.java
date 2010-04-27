@@ -27,6 +27,7 @@ import java.util.Collection;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.DetailSheetClientProperties;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -111,7 +112,9 @@ public class SetWFToCommentsPanelTask extends AbstractTask {
             int height = 300;
             wfSheet.setSize(width, height);
             wfSheet.setLayout(new GridLayout(1, 1));
-            wfSheet.add(new CommentsPanel());
+            CommentsPanel cp = new CommentsPanel();
+            wfSheet.add(cp);
+            wfSheet.putClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS, cp.getRequestedFocus());
         } catch (Exception e) {
             ex = e;
         }
