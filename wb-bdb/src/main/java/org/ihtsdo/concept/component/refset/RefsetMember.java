@@ -138,11 +138,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 		@Override
 		public int compareTo(I_ExtendByRefPart o) {
-			Version another = (Version) o;
-			if (getSapNid() != another.getSapNid()) {
-				return this.getSapNid() - another.getSapNid();
-			}
-			return this.index - another.index;
+		    if (Version.class.isAssignableFrom(o.getClass())) {
+	            Version another = (Version) o;
+	            if (getSapNid() != another.getSapNid()) {
+	                return this.getSapNid() - another.getSapNid();
+	            }
+	            return this.index - another.index;
+		    }
+		    return this.toString().compareTo(o.toString());
 		}
 
 		@Override
