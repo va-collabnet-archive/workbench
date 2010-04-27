@@ -120,12 +120,13 @@ public class AceFrame extends ComponentFrame {
         layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
         wizPanel.setLocation(350, 0);
 
+        setContentPane(getCdePanel());
+
         getCdePanel().setWorkflowDetailsSheet(wizPanel.getWfDetailsPanel());
         getCdePanel().setWorkflowPanel(wizPanel.getWfPanel());
         getCdePanel().setWorfklowDetailSheetVisible(false);
         getCdePanel().setup(frameConfig);
 
-        setContentPane(getCdePanel());
         Rectangle defaultBounds = getDefaultFrameSize();
         Rectangle bounds = frameConfig.getBounds();
         bounds.width = Math.min(bounds.width, defaultBounds.width);

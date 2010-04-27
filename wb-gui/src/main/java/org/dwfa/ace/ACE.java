@@ -1117,6 +1117,20 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
+    private class HandleFirstShow implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    showSearchToggle.doClick();
+                    startupTimer = null;
+                }
+            });
+        }
+    }
+    
     private class TogglePanelsActionListener implements ActionListener, ComponentListener {
         private Integer origWidth;
 
@@ -1491,8 +1505,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             aceFrameConfig.getTabHistoryMap().put("viewerHistoryList", new ArrayList<I_GetConceptData>());
         }
         viewerHistoryTableModel = new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("viewerHistoryList"));
+        startupTimer = new javax.swing.Timer(500, new HandleFirstShow());
+        startupTimer.setRepeats(false);
+        startupTimer.start();
     }
 
+    javax.swing.Timer startupTimer;
+    
     public JMenuBar createMenuBar(JFrame frame) throws LoginException, SecurityException, ConfigurationException,
             IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
