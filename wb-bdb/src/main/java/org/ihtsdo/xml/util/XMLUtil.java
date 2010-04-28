@@ -851,6 +851,48 @@ final public class XMLUtil {
 		}
 		return retV;
 	}
+	
+	
+	public static ArrayList<String> getNodeListAttValAsStringCols(String Xpath, Node node,String[] attrNames,String sep)throws Exception{
+		ArrayList<String> retV = new ArrayList<String>();
+		
+		
+		if(sep == null) {
+			sep = " ";
+		}
+		int aNamesL = attrNames.length;
+		if(aNamesL > 0) {
+		
+		NodeList nl = getNodesListXpathNode(Xpath,node);
+		int l = nl.getLength();
+		Element e = null;
+		String val = "";
+		
+		for (int i = 0; i < l; i++) {
+			e = (Element) nl.item(i);
+			if (e.getNodeType() == Node.ELEMENT_NODE) {
+				StringBuilder sb = new StringBuilder();
+				for (int y = 0; y < aNamesL; y++) {
+				sb.append(e.getAttribute(attrNames[y]))	;
+				if(y < aNamesL -1) {
+					sb.append(sep);
+				}
+				}
+				val = sb.toString();
+				if(val != null && val.length() > 0) {
+					//log.info("getNodeListAttValAsStringCol val = "+val +" attrNames = "+attrNames);
+				/*try {
+					log.info(convertToStringLeaveCDATA(e));
+				}catch(Exception E) {
+					E.printStackTrace();
+				}*/
+					retV.add(val);	
+				}
+			}
+		}
+		}
+		return retV;
+	}
 
 	// Return type is one of XPathConstants .BOOLEAN, .NODE, .NODESET, .NUMBER,
 	// .STRING

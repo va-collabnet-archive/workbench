@@ -1,8 +1,7 @@
 package org.ihtsdo.xml.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -44,19 +43,19 @@ public class AceXMLUtil {
 	}
 	
 /**
- * Gets a hashmap of UUID as string and int as String	
+ * Gets a Hashtable of UUID as string and int as String	
  * @return
  */
-	public static HashMap<String,String> getUuidInt(){
+	public static Hashtable<String,String> getUuidInt(){
 		if(ObjectCache.get(CommonXMLStatics.UUID_INT_HT) == null){
-			HashMap<String,String> uuidIntHT = new HashMap<String, String>();
+			Hashtable<String,String> uuidIntHT = new Hashtable<String, String>();
 			ObjectCache.put(CommonXMLStatics.UUID_INT_HT, uuidIntHT);
 		}
-		return (HashMap<String, String>)ObjectCache.get(CommonXMLStatics.UUID_INT_HT);	
+		return (Hashtable<String, String>)ObjectCache.get(CommonXMLStatics.UUID_INT_HT);	
 	}
 	
 /**
- * Adds a record to UUIDInt hashmap	
+ * Adds a record to UUIDInt Hashtable	
  * @param uuidS
  * @param intS
  */
@@ -66,7 +65,7 @@ public class AceXMLUtil {
 	}
 	
 	/**
-	 * Adds a record to UUIDInt hashmap	 uuid as String intI as int
+	 * Adds a record to UUIDInt Hashtable	 uuid as String intI as int
 	 * @param uuidS
 	 * @param intI
 	 */
@@ -157,6 +156,15 @@ public class AceXMLUtil {
 		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.C1_ID_ATT);
 	}
 	
+	public static ArrayList<String> getsrcRel_c2id_ByTypeUUID(Node node,String uuid_s) throws Exception {
+		return getsrcRel_c2id_ByTypeID(node,getIdFromUUID(uuid_s));
+	}
+	
+	public static ArrayList<String> getsrcRel_c2id_ByTypeID(Node node,String intI) throws Exception {
+		String Xpath ="//*[name()='srcRel'][./relPart/@typeId='"+intI+"']";
+		return XMLUtil.getNodeListAttValAsStringCol(Xpath, node, CommonXMLStatics.C2_ID_ATT);
+	}
+	
 	public static ArrayList<String> getDescVal_ByTypeUUID(Node node,String uuid_s) throws Exception {
 		return getDescVal_ByTypeID(node,getIdFromUUID(uuid_s));
 	}
@@ -195,6 +203,13 @@ public class AceXMLUtil {
 		}
 		return xml;
 	}
+	
+	public static ArrayList<String> getConceptStatusVals(Node node) throws Exception{
+		String Xpath ="//*[name()='attPart']";
+		String [] attrs = {CommonXMLStatics.STATUS_ATT,CommonXMLStatics.VERSION_ATT};
+		return XMLUtil.getNodeListAttValAsStringCols(Xpath, node, attrs,"|");
+	}
+	
 	
 
 }
