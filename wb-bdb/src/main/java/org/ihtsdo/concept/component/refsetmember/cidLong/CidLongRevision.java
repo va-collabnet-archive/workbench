@@ -10,6 +10,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidLongRevision;
 
@@ -81,6 +82,12 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
         }
 		return new CidLongRevision(statusNid, pathNid, time, this);
 	}
+
+
+    @Override
+    public CidLongRevision makeAnalog() {
+         return new CidLongRevision(getStatusId(), getPathId(), getTime(), this);
+    }
 
 	public CidLongRevision(TupleInput input, 
 			CidLongMember primoridalMember) {

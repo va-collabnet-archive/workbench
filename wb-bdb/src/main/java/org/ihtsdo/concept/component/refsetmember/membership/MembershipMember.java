@@ -9,6 +9,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.Long.LongRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetMemberMember;
 import org.ihtsdo.etypes.ERefsetRevision;
@@ -97,6 +98,12 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 		addRevision(newR);
 		return newR;
 	}
+
+    @Override
+    public MembershipRevision makeAnalog() {
+        MembershipRevision newR = new MembershipRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
 	
 	@Override
 	public int getTypeId() {

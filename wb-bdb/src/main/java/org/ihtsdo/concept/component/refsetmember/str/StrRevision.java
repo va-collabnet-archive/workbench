@@ -75,6 +75,12 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 		return new StrRevision(statusNid, pathNid, time, this);
 	}
 
+
+    @Override
+    public StrRevision makeAnalog() {
+         return new StrRevision(getStatusId(), getPathId(), getTime(), this);
+    }
+
 	public StrRevision(TupleInput input, 
 			StrMember primoridalMember) {
 		super(input, primoridalMember);

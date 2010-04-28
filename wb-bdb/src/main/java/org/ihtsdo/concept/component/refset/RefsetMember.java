@@ -71,7 +71,15 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 			return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, pathNid, time);
 		}
 
-		@SuppressWarnings("unchecked")
+        @Override
+        public R makeAnalog() {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog();
+            } 
+            return (R) RefsetMember.this.makeAnalog();
+        }
+
+        @SuppressWarnings("unchecked")
 		@Override
 		public void addVersion(I_ExtendByRefPart part) {
 			versions = null;
@@ -173,7 +181,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	}
 	
 
-	public RefsetMember(ERefsetMember<?> refsetMember, 
+	public abstract R makeAnalog();
+
+
+    public RefsetMember(ERefsetMember<?> refsetMember, 
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());

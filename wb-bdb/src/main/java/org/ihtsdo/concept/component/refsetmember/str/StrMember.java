@@ -166,6 +166,13 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 		return newR;
 	}
 
+
+    @Override
+    public StrRevision makeAnalog() {
+        StrRevision newR = new StrRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
+
 	public String getStringValue() {
 		return stringValue;
 	}

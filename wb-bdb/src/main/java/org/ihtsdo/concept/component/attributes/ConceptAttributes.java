@@ -107,6 +107,14 @@ public class ConceptAttributes
 			return new ConceptAttributesRevision(ConceptAttributes.this, 
 					statusNid, pathNid, time, ConceptAttributes.this);
 		}
+        @Override
+        public ConceptAttributesRevision makeAnalog() {
+            if (index >= 0) {
+                ConceptAttributesRevision rev = revisions.get(index);
+                return new ConceptAttributesRevision(rev, ConceptAttributes.this);
+            }
+            return new ConceptAttributesRevision(ConceptAttributes.this, ConceptAttributes.this);
+        }
 
 		@Override
 		public int getConId() {
@@ -142,6 +150,7 @@ public class ConceptAttributes
 			}
 			return ConceptAttributes.this.getVariableVersionNids();
 		}
+
 				
 	}
 

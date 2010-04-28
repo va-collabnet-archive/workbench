@@ -341,6 +341,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public Version removeDuplicates(Version dup1, Version dup2) {
             return ConceptComponent.this.removeDuplicates(dup1, dup2);
         }
+
+        public abstract R makeAnalog();
     }
 
     public class IdVersion implements I_IdVersion, I_IdPart {
@@ -667,7 +669,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         for (ConceptComponent<?, ?>.Version v : newSapMap.values()) {
             assert !currentSapNids.contains(v.getSapNid()) : "currentSapNids: " + currentSapNids + " v: " + v
                 + " newSapMap: " + newSapMap;
-            addRevision((R) v.makeAnalog(v.getStatusId(), v.getPathId(), v.getTime()));
+            assert 
+            addRevision((R) v.makeAnalog());
         }
 
         currentSapNids = getIdSapNids();

@@ -26,6 +26,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.image.Image;
+import org.ihtsdo.concept.component.image.ImageRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
@@ -64,7 +66,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			return revisions.get(index).getCharacteristicId();
 		}
-		return characteristicNid;
+		return getCharacteristicNid();
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			return revisions.get(index).getRefinabilityId();
 		}
-		return refinabilityNid;
+		return getRefinabilityNid();
 	}
 
 	@Override
@@ -130,7 +132,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		if (index >= 0) {
 			return revisions.get(index).getTypeId();
 		} else {
-			return Relationship.this.typeNid;
+			return Relationship.this.getTypeNid();
 		}
 	}
 
@@ -174,6 +176,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 	}
 
+    @Override
+    public RelationshipRevision makeAnalog() {
+        if (index >= 0) {
+            RelationshipRevision rev = revisions.get(index);
+            return new RelationshipRevision(rev, Relationship.this);
+        }
+        return new RelationshipRevision(Relationship.this);
+    }
+
 	@Override
 	public I_RelPart getMutablePart() {
 		return (I_RelPart) super.getMutablePart();
@@ -207,10 +218,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public Relationship(ERelationship eRel, Concept enclosingConcept) throws IOException {
 		super(eRel, enclosingConcept);
 		c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
-		characteristicNid = Bdb.uuidToNid(eRel.getCharacteristicUuid());
+		setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
 		group = eRel.getRelGroup();
-		refinabilityNid = Bdb.uuidToNid(eRel.getRefinabilityUuid());
-		typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
+		setRefinabilityNid(Bdb.uuidToNid(eRel.getRefinabilityUuid()));
+		setTypeNid(Bdb.uuidToNid(eRel.getTypeUuid()));
 		primordialSapNid = Bdb.getSapNid(eRel);
 		if (eRel.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<RelationshipRevision>();
@@ -234,14 +245,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		buf.append("src:");
 		ConceptComponent.addNidToBuffer(buf, getEnclosingConcept().getNid());
 		buf.append(" t:");
-		ConceptComponent.addNidToBuffer(buf, typeNid);
+		ConceptComponent.addNidToBuffer(buf, getTypeNid());
 		buf.append(" dest:");
 		ConceptComponent.addNidToBuffer(buf, c2Nid);
         buf.append(" c:");
-        ConceptComponent.addNidToBuffer(buf, characteristicNid);
+        ConceptComponent.addNidToBuffer(buf, getCharacteristicNid());
 		buf.append(" g:" + group);
 		buf.append(" r:");
-		ConceptComponent.addNidToBuffer(buf, refinabilityNid);
+		ConceptComponent.addNidToBuffer(buf, getRefinabilityNid());
 		buf.append(" ");
 		buf.append(super.toString());
 		return buf.toString();
@@ -254,16 +265,16 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			if (this.c2Nid != another.c2Nid) {
 				return false;
 			}
-			if (this.characteristicNid != another.characteristicNid) {
+			if (this.getCharacteristicNid() != another.getCharacteristicNid()) {
 				return false;
 			}
 			if (this.group != another.group) {
 				return false;
 			}
-			if (this.refinabilityNid != another.refinabilityNid) {
+			if (this.getRefinabilityNid() != another.getRefinabilityNid()) {
 				return false;
 			}
-			if (this.typeNid != another.typeNid) {
+			if (this.getTypeNid() != another.getTypeNid()) {
 				return false;
 			}
 			return conceptComponentFieldsEqual(another);
@@ -287,25 +298,25 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                 "\t\tthis.c2Nid = " + this.c2Nid + "\n" + 
                 "\t\tanother.c2Nid = " + another.c2Nid + "\n");
         }
-        if (this.characteristicNid != another.characteristicNid) {
+        if (this.getCharacteristicNid() != another.getCharacteristicNid()) {
             buf.append("\tRelationship.characteristicNid not equal: \n" + 
-                "\t\tthis.characteristicNid = " + this.characteristicNid + "\n" + 
-                "\t\tanother.characteristicNid = " + another.characteristicNid + "\n");
+                "\t\tthis.characteristicNid = " + this.getCharacteristicNid() + "\n" + 
+                "\t\tanother.characteristicNid = " + another.getCharacteristicNid() + "\n");
         }
         if (this.group != another.group) {
             buf.append("\tRelationship.group not equal: \n" + 
                 "\t\tthis.group = " + this.group + "\n" + 
                 "\t\tanother.group = " + another.group + "\n");
         }
-        if (this.refinabilityNid != another.refinabilityNid) {
+        if (this.getRefinabilityNid() != another.getRefinabilityNid()) {
             buf.append("\tRelationship.refinabilityNid not equal: \n" + 
-                "\t\tthis.refinabilityNid = " + this.refinabilityNid + "\n" + 
-                "\t\tanother.refinabilityNid = " + another.refinabilityNid + "\n");
+                "\t\tthis.refinabilityNid = " + this.getRefinabilityNid() + "\n" + 
+                "\t\tanother.refinabilityNid = " + another.getRefinabilityNid() + "\n");
         }
-        if (this.typeNid != another.typeNid) {
+        if (this.getTypeNid() != another.getTypeNid()) {
             buf.append("\tRelationship.typeNid not equal: \n" + 
-                "\t\tthis.typeNid = " + this.typeNid + "\n" + 
-                "\t\tanother.typeNid = " + another.typeNid + "\n");
+                "\t\tthis.typeNid = " + this.getTypeNid() + "\n" + 
+                "\t\tanother.typeNid = " + another.getTypeNid() + "\n");
         }
 
         // Compare the parents 
@@ -318,10 +329,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public void readFromBdb(TupleInput input) {
 		// nid, list size, and conceptNid are read already by the binder...
 		c2Nid = input.readInt();
-		characteristicNid = input.readInt();
+		setCharacteristicNid(input.readInt());
 		group = input.readInt();
-		refinabilityNid = input.readInt();
-		typeNid = input.readInt();
+		setRefinabilityNid(input.readInt());
+		setTypeNid(input.readInt());
 		int additionalVersionCount = input.readShort();
 		if (additionalVersionCount > 0) {
 			revisions = new CopyOnWriteArrayList<RelationshipRevision>();
@@ -346,10 +357,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		// Start writing
 		// c1Nid is the enclosing concept, does not need to be written. 
 		output.writeInt(c2Nid);
-		output.writeInt(characteristicNid);
+		output.writeInt(getCharacteristicNid());
 		output.writeInt(group);
-		output.writeInt(refinabilityNid);
-		output.writeInt(typeNid);
+		output.writeInt(getRefinabilityNid());
+		output.writeInt(getTypeNid());
 		output.writeShort(partsToWrite.size());
 		for (RelationshipRevision p : partsToWrite) {
 			p.writePartToBdb(output);
@@ -555,7 +566,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public int getCharacteristicId() {
-		return characteristicNid;
+		return getCharacteristicNid();
 	}
 
 
@@ -567,13 +578,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public int getRefinabilityId() {
-		return refinabilityNid;
+		return getRefinabilityNid();
 	}
 
 
 	@Override
 	public void setCharacteristicId(int characteristicNid) {
-		this.characteristicNid = characteristicNid;
+		this.setCharacteristicNid(characteristicNid);
         modified();
 	}
 
@@ -587,19 +598,19 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public void setRefinabilityId(int refinabilityId) {
-		this.refinabilityNid = refinabilityId;
+		this.setRefinabilityNid(refinabilityId);
         modified();
 	}
 
 	@Override
 	public int getTypeId() {
-		return this.typeNid;
+		return this.getTypeNid();
 	}
 
 
 	@Override
 	public void setTypeId(int typeNid) {
-		this.typeNid = typeNid;
+		this.setTypeNid(typeNid);
         modified();
 	}
 
@@ -609,9 +620,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		ArrayIntList nidList = new ArrayIntList(7);
 		nidList.add(enclosingConceptNid);
 		nidList.add(c2Nid);
-		nidList.add(characteristicNid);
-		nidList.add(refinabilityNid);
-		nidList.add(typeNid);
+		nidList.add(getCharacteristicNid());
+		nidList.add(getRefinabilityNid());
+		nidList.add(getTypeNid());
 		return nidList;
 	}
 
@@ -651,5 +662,35 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	protected void clearVersions() {
 		versions = null;
 	}
+
+
+    public void setCharacteristicNid(int characteristicNid) {
+        this.characteristicNid = characteristicNid;
+    }
+
+
+    public int getCharacteristicNid() {
+        return characteristicNid;
+    }
+
+
+    public void setRefinabilityNid(int refinabilityNid) {
+        this.refinabilityNid = refinabilityNid;
+    }
+
+
+    public int getRefinabilityNid() {
+        return refinabilityNid;
+    }
+
+
+    public void setTypeNid(int typeNid) {
+        this.typeNid = typeNid;
+    }
+
+
+    public int getTypeNid() {
+        return typeNid;
+    }
 
 }

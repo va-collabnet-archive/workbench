@@ -18,7 +18,6 @@ public class DescriptionRevision
 	extends Revision<DescriptionRevision, Description> 
 	implements I_DescriptionPart {
 	
-	@SuppressWarnings("unused")
 	private static Charset utf8 = Charset.forName("UTF-8");
 	
 	private transient Description description;
@@ -100,6 +99,13 @@ public class DescriptionRevision
 			Description primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 	}
+    protected DescriptionRevision(Description primoridalMember) {
+        super(primoridalMember.primordialSapNid, primoridalMember);
+        this.text = primoridalMember.getText();
+        this.typeNid = primoridalMember.typeNid;
+        this.lang = primoridalMember.getLang();
+        this.initialCaseSignificant = primoridalMember.isInitialCaseSignificant();
+    }
 	
 	protected DescriptionRevision(DescriptionRevision another, 
 			Description primoridalMember) {

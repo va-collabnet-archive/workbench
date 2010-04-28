@@ -71,6 +71,11 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 		return new CidRevision(statusNid, pathNid, time, this);
 	}
 
+    @Override
+    public CidRevision makeAnalog() {
+         return new CidRevision(getStatusId(), getPathId(), getTime(), this);
+    }
+
 	protected CidRevision(int statusAtPositionNid, 
 			CidMember primoridalMember) {
 		super(statusAtPositionNid, 

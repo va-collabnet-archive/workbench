@@ -191,6 +191,13 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember> imp
 		return newR;
 	}
 
+
+    @Override
+    public CidIntRevision makeAnalog() {
+        CidIntRevision newR = new CidIntRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
+
 	public int getC1Nid() {
 		return c1Nid;
 	}

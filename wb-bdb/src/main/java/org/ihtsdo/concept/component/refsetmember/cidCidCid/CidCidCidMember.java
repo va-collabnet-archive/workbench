@@ -15,6 +15,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
@@ -213,6 +214,12 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		addRevision(newR);
 		return newR;
 	}
+
+    @Override
+    public CidCidCidRevision makeAnalog() {
+        CidCidCidRevision newR = new CidCidCidRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
 
 	public int getC1Nid() {
 		return c1Nid;

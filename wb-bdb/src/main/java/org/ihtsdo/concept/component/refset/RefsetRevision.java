@@ -80,4 +80,6 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
         }
         return false;
     }
+    
+    public abstract V makeAnalog();
 }

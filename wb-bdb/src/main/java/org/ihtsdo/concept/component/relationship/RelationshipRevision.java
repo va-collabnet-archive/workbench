@@ -70,6 +70,14 @@ public class RelationshipRevision
 		this.typeNid = another.typeNid;
 	}
 
+	   public RelationshipRevision(Relationship primordialRel) {
+	        super(primordialRel.primordialSapNid, primordialRel);
+	        this.characteristicNid = primordialRel.getCharacteristicNid();
+	        this.group = primordialRel.getGroup();
+	        this.refinabilityNid = primordialRel.getRefinabilityNid();
+	        this.typeNid = primordialRel.getTypeNid();
+	    }
+
 	public RelationshipRevision(I_RelPart another, int statusNid,
 			int pathNid, long time, 
 			Relationship primordialRel) {

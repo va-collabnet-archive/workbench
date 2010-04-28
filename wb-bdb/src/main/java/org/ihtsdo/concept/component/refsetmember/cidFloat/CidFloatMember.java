@@ -9,6 +9,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.cidCidStr.CidCidStrRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
@@ -91,6 +92,13 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		addRevision(newR);
 		return newR;
 	}
+
+
+    @Override
+    public CidFloatRevision makeAnalog() {
+        CidFloatRevision newR = new CidFloatRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
 
 	public int getC1Nid() {
 		return c1Nid;

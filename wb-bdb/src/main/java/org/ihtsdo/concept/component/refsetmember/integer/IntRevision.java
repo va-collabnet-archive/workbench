@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -72,6 +73,12 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
         }
 		return new IntRevision(statusNid, pathNid, time, this);
 	}
+
+
+    @Override
+    public IntRevision makeAnalog() {
+         return new IntRevision(getStatusId(), getPathId(), getTime(), this);
+    }
 
 	public IntRevision(TupleInput input, 
 			IntMember primoridalMember) {

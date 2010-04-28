@@ -29,7 +29,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EImage;
@@ -129,6 +128,14 @@ public class Image
 			}
 			return Image.this.makeAnalog(statusNid, pathNid, time);
 		}
+        @Override
+        public ImageRevision makeAnalog() {
+            if (index >= 0) {
+                ImageRevision rev = revisions.get(index);
+                return new ImageRevision(rev, Image.this);
+            }
+            return new ImageRevision(Image.this);
+        }
 		@Override
 		public I_ImagePart getMutablePart() {
 			return (I_ImagePart) super.getMutablePart();

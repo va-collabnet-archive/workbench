@@ -72,6 +72,10 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 		return new BooleanRevision(statusNid, pathNid, time, this);
 	}
 
+    @Override
+    public BooleanRevision makeAnalog() {
+        return new BooleanRevision(getStatusId(), getPathId(), getTime(), this);
+    }
 	public BooleanRevision(TupleInput input, 
 			BooleanMember primoridalMember) {
 		super(input, primoridalMember);

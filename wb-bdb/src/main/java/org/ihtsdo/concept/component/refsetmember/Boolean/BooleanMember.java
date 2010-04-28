@@ -190,6 +190,13 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		return newR;
 	}
 
+	@Override
+	public BooleanRevision makeAnalog() {
+	    BooleanRevision newR = new BooleanRevision(getStatusId(), getPathId(), getTime(), this);
+	    return newR;
+	}
+
+
 	public boolean getBooleanValue() {
 		return booleanValue;
 	}

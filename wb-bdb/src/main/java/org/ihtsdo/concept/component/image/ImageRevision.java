@@ -56,13 +56,19 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 		this.typeNid = input.readInt();
 	}
 
-	private ImageRevision(ImageRevision another, 
+	ImageRevision(ImageRevision another, 
 			Image primoridalMember) {
 		super(another.sapNid, 
 				primoridalMember);
 		this.textDescription = another.textDescription;
 		this.typeNid = another.typeNid;
 	}
+    ImageRevision(Image primoridalMember) {
+    super(primoridalMember.primordialSapNid, 
+            primoridalMember);
+    this.textDescription = primoridalMember.getTextDescription();
+    this.typeNid = primoridalMember.getTypeNid();
+}
 
 	protected ImageRevision(I_ImagePart another, int statusNid, 
 			int pathNid, long time, 
@@ -89,11 +95,6 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	protected void writeFieldsToBdb(TupleOutput output) {
 		output.writeString(textDescription);
 		output.writeInt(typeNid);
-	}
-
-	private ImageRevision(int statusAtPositionNid, 
-			Image primoridalMember) {
-		super(statusAtPositionNid, primoridalMember);
 	}
 
 

@@ -28,6 +28,7 @@ import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
@@ -175,6 +176,14 @@ public class Description
 				return Description.this.makeAnalog(statusNid, pathNid, time);
 			}
 		}
+        @Override
+        public DescriptionRevision makeAnalog() {
+            if (index >= 0) {
+                DescriptionRevision rev = revisions.get(index);
+                return new DescriptionRevision(rev, Description.this);
+            }
+            return new DescriptionRevision(Description.this);
+        }
 		@Override
 		@Deprecated
 		public I_DescriptionPart duplicate() {
@@ -185,7 +194,7 @@ public class Description
 	
 	private String text;
 	private boolean initialCaseSignificant;
-	private int typeNid; 
+	int typeNid; 
 	private String lang;
 
 	
@@ -521,7 +530,8 @@ public class Description
 		return this;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public List<? extends I_DescriptionPart> getMutableParts() {
 		return new EditableVersionList(getVersions());
 	}

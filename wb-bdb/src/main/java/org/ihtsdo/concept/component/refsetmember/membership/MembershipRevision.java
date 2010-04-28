@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
@@ -67,6 +66,11 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
         }
 		return new MembershipRevision(statusNid, pathNid, time, this);
 	}
+
+    @Override
+    public MembershipRevision makeAnalog() {
+         return new MembershipRevision(getStatusId(), getPathId(), getTime(), this);
+    }
 
 	public MembershipRevision(ERefsetRevision eVersion,
 			MembershipMember member) {

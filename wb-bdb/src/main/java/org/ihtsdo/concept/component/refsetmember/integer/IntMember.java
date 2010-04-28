@@ -15,6 +15,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetIntMember;
@@ -162,6 +163,12 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 		addRevision(newR);
 		return newR;
 	}
+
+    @Override
+    public IntRevision makeAnalog() {
+        IntRevision newR = new IntRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
 
 	public int getIntValue() {
 		return intValue;

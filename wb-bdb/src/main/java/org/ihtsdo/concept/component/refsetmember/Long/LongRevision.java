@@ -9,6 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.etypes.ERefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -68,6 +69,12 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	public LongRevision makeAnalog(int statusNid, int pathNid, long time) {
 		return new LongRevision(statusNid, pathNid, time, this);
 	}
+
+
+    @Override
+    public LongRevision makeAnalog() {
+         return new LongRevision(getStatusId(), getPathId(), getTime(), this);
+    }
 
 	public LongRevision(TupleInput input, 
 			LongMember primoridalMember) {

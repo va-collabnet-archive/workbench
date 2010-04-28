@@ -9,6 +9,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongRevision;
@@ -101,7 +102,14 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		return newR;
 	}
 
-	protected long getLongValue() {
+
+    @Override
+    public LongRevision makeAnalog() {
+        LongRevision newR = new LongRevision(getStatusId(), getPathId(), getTime(), this);
+        return newR;
+    }
+
+    protected long getLongValue() {
 		return longValue;
 	}
 
