@@ -235,6 +235,10 @@ public class DescriptionRevision
 	@Override
 	public DescriptionRevision makeAnalog(int statusNid, int pathNid, 
 			long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new DescriptionRevision(this, statusNid, 
 				pathNid, time, this.primordialComponent);
 	}

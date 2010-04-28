@@ -28,6 +28,7 @@ import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
@@ -164,6 +165,11 @@ public class Description
 		@Override
 		public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
+			    DescriptionRevision rev = revisions.get(index);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
+			        rev.setStatusId(statusNid);
+                    return rev;
+                }
 				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
 			} else {
 				return Description.this.makeAnalog(statusNid, pathNid, time);
@@ -497,6 +503,9 @@ public class Description
 
 	@Override
 	public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (getTime() == time && getPathId() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
 		DescriptionRevision newR = new DescriptionRevision(this, statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

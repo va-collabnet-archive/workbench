@@ -75,6 +75,10 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 
 	@Override
 	public CidLongRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new CidLongRevision(statusNid, pathNid, time, this);
 	}
 

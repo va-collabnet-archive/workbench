@@ -77,6 +77,10 @@ public class CidIntRevision
 
 	@Override
 	public CidIntRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new CidIntRevision(statusNid, pathNid, time, this);
 	}
 

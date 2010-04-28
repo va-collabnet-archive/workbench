@@ -29,6 +29,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EImage;
@@ -117,9 +118,14 @@ public class Image
 		}
 
 		@Override
-		public I_ImagePart makeAnalog(int statusNid, int pathNid, long time) {
+		public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
-				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
+                ImageRevision rev = revisions.get(index);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
+			        rev.setStatusId(statusNid);
+                    return rev;
+                }
+                return rev.makeAnalog(statusNid, pathNid, time);
 			}
 			return Image.this.makeAnalog(statusNid, pathNid, time);
 		}
@@ -479,6 +485,9 @@ public class Image
 
 	@Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (getTime() == time && getPathId() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
 		ImageRevision newR = new ImageRevision(this, statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

@@ -46,6 +46,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
     @Override
     public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
         return new ConceptAttributesRevision(this, statusNid, pathNid, time, this.primordialComponent);
     }
 

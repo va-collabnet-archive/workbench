@@ -68,6 +68,10 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
 	@Override
 	public StrRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new StrRevision(statusNid, pathNid, time, this);
 	}
 

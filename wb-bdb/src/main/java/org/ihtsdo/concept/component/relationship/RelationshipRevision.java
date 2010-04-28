@@ -161,6 +161,10 @@ public class RelationshipRevision
 	
 	@Override
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new RelationshipRevision(this, statusNid, pathNid, time,
 				primordialComponent);
 	}

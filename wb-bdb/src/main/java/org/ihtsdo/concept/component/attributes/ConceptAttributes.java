@@ -14,7 +14,6 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
@@ -98,7 +97,12 @@ public class ConceptAttributes
 		@Override
 		public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
-				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
+			    ConceptAttributesRevision rev = revisions.get(index);
+			    if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
+			        rev.setStatusId(statusNid);
+			        return rev;
+			    }
+				return rev.makeAnalog(statusNid, pathNid, time);
 			}
 			return new ConceptAttributesRevision(ConceptAttributes.this, 
 					statusNid, pathNid, time, ConceptAttributes.this);
@@ -398,6 +402,9 @@ public class ConceptAttributes
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+	    if (getTime() == time && getPathId() == pathNid) {
+	        throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+	    }
 		ConceptAttributesRevision newR = new ConceptAttributesRevision(this, statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

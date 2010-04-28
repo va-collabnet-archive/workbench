@@ -164,7 +164,9 @@ public class DescStatement extends RefsetSpecStatement {
             break;
         case DESC_LUCENE_MATCH:
             getPossibleDescriptions(configFrame, termFactory.getEmptyIdSet());
-            possibleConcepts.or(possibleLuceneConcMatches);
+            if (possibleLuceneConcMatches != null) {
+                possibleConcepts.or(possibleLuceneConcMatches);
+            }
             break;
         case DESC_STATUS_IS:
         case DESC_STATUS_IS_CHILD_OF:

@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.time.TimeUtil;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -168,17 +169,13 @@ public abstract class Revision<V extends Revision<V, C>,
         StringBuffer buf = new StringBuffer();
          buf.append(" sap:");
         buf.append(sapNid);
-        buf.append(" path:");
-        ConceptComponent.addNidToBuffer(buf, getPathId());
-        buf.append(" tm:");
-		if (getTime() == Long.MAX_VALUE) {
-			buf.append("uncommitted");
-		} else {
-			buf.append(Revision.fileDateFormat.format(new Date(getTime())));
-		}
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
-        buf.append(" };");
+        buf.append(" path:");
+        ConceptComponent.addNidToBuffer(buf, getPathId());
+        buf.append(" tm: ");
+        buf.append(TimeUtil.formatDate(getTime()));
+         buf.append(" };");
         return buf.toString();
     }
 

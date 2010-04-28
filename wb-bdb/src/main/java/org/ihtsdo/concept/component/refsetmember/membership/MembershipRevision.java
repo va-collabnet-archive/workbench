@@ -61,6 +61,10 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 
 	@Override
 	public MembershipRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new MembershipRevision(statusNid, pathNid, time, this);
 	}
 

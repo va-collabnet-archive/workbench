@@ -65,6 +65,10 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 
 	@Override
 	public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new BooleanRevision(statusNid, pathNid, time, this);
 	}
 

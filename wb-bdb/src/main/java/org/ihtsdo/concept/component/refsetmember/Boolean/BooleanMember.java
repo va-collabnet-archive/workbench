@@ -182,6 +182,9 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        if (getTime() == time && getPathId() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
 		BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

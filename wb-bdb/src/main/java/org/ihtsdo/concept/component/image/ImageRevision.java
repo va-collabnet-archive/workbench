@@ -78,6 +78,10 @@ public class ImageRevision extends Revision<ImageRevision, Image>
     
     @Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new ImageRevision(this, statusNid, pathNid, time, this.primordialComponent);
 	}
 

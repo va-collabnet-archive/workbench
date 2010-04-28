@@ -349,7 +349,7 @@ public abstract class Worker implements I_Work {
             this.setActiveTransaction(null);
             this.nextTransaction = null;
             throw new TaskFailedException(e);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             this.setActiveTransaction(null);
             this.nextTransaction = null;
             throw new TaskFailedException(e);

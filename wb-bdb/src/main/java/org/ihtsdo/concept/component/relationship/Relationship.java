@@ -163,7 +163,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
 		if (index >= 0) {
-			return revisions.get(index).makeAnalog(statusNid, pathNid, time);
+		    RelationshipRevision rev = revisions.get(index);
+            if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
+			    rev.setStatusId(statusNid);
+                return rev;
+            }
+            return rev.makeAnalog(statusNid, pathNid, time);
 		} else {
 			return Relationship.this.makeAnalog(statusNid, pathNid, time);
 		}
@@ -613,6 +618,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (getTime() == time && getPathId() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
 		RelationshipRevision newR = new RelationshipRevision(this, statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

@@ -77,6 +77,10 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 
 	@Override
 	public CidStrRevision makeAnalog(int statusNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
 		return new CidStrRevision(statusNid, pathNid, time, this);
 	}
 

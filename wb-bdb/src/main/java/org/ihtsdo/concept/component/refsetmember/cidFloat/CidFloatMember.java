@@ -84,6 +84,9 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+        if (getTime() == time && getPathId() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
 		CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;

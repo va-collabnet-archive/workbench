@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.ihtsdo.etypes.EIdentifier;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.EIdentifierUuid;
+import org.ihtsdo.time.TimeUtil;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -563,18 +563,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             buf.append(primordialSapNid);
         }
         if (primordialSapNid >= 0) {
-            buf.append(" path: ");
+            buf.append(" status:");
+            ConceptComponent.addNidToBuffer(buf, getStatusId());
+            buf.append(" path:");
             ConceptComponent.addNidToBuffer(buf, getPathId());
             buf.append(" tm: ");
-            if (getTime() == Long.MAX_VALUE) {
-                buf.append("uncommitted");
-            } else if (getTime() == Long.MIN_VALUE) {
-                buf.append("bot/canceled");
-            } else {
-                buf.append(Revision.fileDateFormat.format(new Date(getTime())));
-            }
-            buf.append(" status: ");
-            ConceptComponent.addNidToBuffer(buf, getStatusId());
+            buf.append(TimeUtil.formatDate(getTime()));
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
