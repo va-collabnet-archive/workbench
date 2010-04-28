@@ -92,6 +92,17 @@ import org.dwfa.tapi.TerminologyException;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
+    public class EraseListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
+            searchPhraseField.selectAll();
+            searchPhraseField.requestFocusInWindow();
+        }
+
+    }
+
     private class FilterSearchActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
@@ -115,6 +126,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             linkSpinner.setVisible(!toggle.isSelected());
             showHistory.setVisible(!toggle.isSelected());
             searchWithDescTypeFilter.setVisible(!toggle.isSelected());
+            eraseButton.setVisible(!toggle.isSelected());
             for (CriterionPanel test : criterionPanels) {
                 test.setVisible(toggle.isSelected());
             }
@@ -395,6 +407,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton addButton;
 
     private JButton removeButton;
+    
+    private JButton eraseButton;
 
     private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
 
@@ -492,6 +506,18 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         add(searchPhraseField, gbc);
 
         gbc.gridx++;
+        gbc.gridheight = 2;        
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        eraseButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/delete2.png")));
+        eraseButton.setToolTipText("Erase the search results, and select & focus on search text.");
+        eraseButton.setVisible(true);
+        eraseButton.addActionListener(new EraseListener());
+        add(eraseButton, gbc);
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx++;
+        gbc.gridheight = 1;        
 
         gbc.weightx = 0.75;
         progressBar = new JProgressBar();
@@ -503,9 +529,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 0;
 
         gbc.fill = GridBagConstraints.NONE;
+        
 
         // row 0, double height
-        gbc.gridheight = 2;
+        gbc.gridheight = 2;        
+        
         searchSetting = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
         searchSetting.setVisible(false);
         gbc.gridx++;
@@ -620,7 +648,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         // Set up tool tips for column headers.
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 13;
+        gbc.gridwidth = 14;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         JScrollPane scrollPane = new JScrollPane(descTable);
