@@ -31,30 +31,30 @@ import org.dwfa.maven.sctid.UuidSctidMapDb;
 public class UpdateUuidSctidMapDb extends AbstractMojo {
     /**
      * URL used to connect to the database
-     * 
+     *
      * @parameter
      * @required
      */
     String dbConnectionUrl;
-    
+
     /**
      * Database driver fully qualified class name
-     * 
+     *
      * @parameter
      * @required
      */
     String dbDriver;
-    
+
     /**
      * Database user to optionally authenticate to the database
-     * 
+     *
      * @parameter
      */
     String dbUsername;
-    
+
     /**
      * Database user's password optionally used to authenticate to the database
-     * 
+     *
      * @parameter
      */
     String dbPassword;
@@ -105,18 +105,18 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
             if (!mapDbInstance.isDatabaseInitialised()) {
                 throw new MojoFailureException("Database is not initialised - cannot update. Please create a database first");
             }
-            
+
             if (fixIdMapDirectory != null) {
                 mapDbInstance.openDb(fixIdMapDirectory, readWriteMapDirectory, validate);
             } else {
                 mapDbInstance.openDb();
             }
-                
+
             if (rf2IdFiles != null) {
                 mapDbInstance.updateDbFromRf2IdFile(rf2IdFiles);
             } else if (aceIdFiles != null) {
                 for (File rf2IdFile : aceIdFiles) {
-                    UuidSctidMapDb.getInstance().updateDbFromAceIdFile(rf2IdFile);
+                    mapDbInstance.updateDbFromAceIdFile(rf2IdFile);
                 }
             }
         } catch (SQLException e) {

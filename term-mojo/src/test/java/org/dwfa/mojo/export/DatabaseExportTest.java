@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
@@ -125,11 +126,14 @@ public class DatabaseExportTest extends ConceptMockery {
         //.getNid();
         I_GetConceptData adrs = createMock(I_GetConceptData.class);
         expect(adrs.getNid()).andReturn(0);
-        expect(termFactory.getConcept(UUID.fromString("850495d2-61c0-593e-bc74-46ed297a8923"))).andReturn(adrs);
+        expect(termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9"))).andReturn(adrs);
         replay(adrs);
 
         //set the default namespace
         setField(databaseExportClass, databaseExport, "defaultNamespace", NAMESPACE.NEHTA.getDigits());
+
+        //set the default project
+        setField(databaseExportClass, databaseExport, "defaultProject", PROJECT.AU.toString());
 
         //setup 1 call to iterate concepts
         termFactory.iterateConcepts(databaseExport);
@@ -447,7 +451,7 @@ public class DatabaseExportTest extends ConceptMockery {
         Field exportSpecificationField = databaseExport.getClass().getDeclaredField("exportSpecification");
         exportSpecificationField.setAccessible(true);
         ExportSpecification exportSpecification = (ExportSpecification) exportSpecificationField.get(databaseExport);
-        Field fsnIntTypeField = exportSpecification.getClass().getDeclaredField("fullySpecifiedDescriptionTypeIIntSet");
+        Field fsnIntTypeField = exportSpecification.getClass().getDeclaredField("fullySpecifiedDescriptionTypeIntSet");
         fsnIntTypeField.setAccessible(true);
         fsnIntTypeField.set(exportSpecification, fsnIIntSet);
 
@@ -557,7 +561,7 @@ public class DatabaseExportTest extends ConceptMockery {
         Field exportSpecificationField = databaseExport.getClass().getDeclaredField("exportSpecification");
         exportSpecificationField.setAccessible(true);
         ExportSpecification exportSpecification = (ExportSpecification) exportSpecificationField.get(databaseExport);
-        Field fsnIntTypeField = exportSpecification.getClass().getDeclaredField("fullySpecifiedDescriptionTypeIIntSet");
+        Field fsnIntTypeField = exportSpecification.getClass().getDeclaredField("fullySpecifiedDescriptionTypeIntSet");
         fsnIntTypeField.setAccessible(true);
         fsnIntTypeField.set(exportSpecification, fsnIIntSet);
 

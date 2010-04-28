@@ -272,6 +272,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             if (concept.getNamespace() == null) {
                 validationErrorList.add(concept.getConceptId() + " No name space");
             }
+            if (concept.getProject() == null) {
+                validationErrorList.add(concept.getConceptId() + " No project");
+            }
         }
     }
 
@@ -332,7 +335,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 //}
             }
         } else {
-            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type, concept.getProject());
         }
 
         return sctId;
@@ -356,7 +359,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         UUID uuid = conceptIdMap.keySet().iterator().next();
 
         if (sctId == null) {
-            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+            sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type, concept.getProject());
         } else {
             try {
                 getCheckSctIdAndAddToDb(sctId, uuid);
@@ -394,7 +397,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             if (!uuidIgnorList.containsKey(uuid)) {
                 errorMessage = "Id Missmatch for concept " + uuid + " Concept sct id " + sctId + " database id "
                     + dbSctId;
-                //logger.severe(errorMessage);
+                logger.severe(errorMessage);
             }
             throw new NoMappingException(errorMessage);
         } else if (dbSctId == null) {
@@ -426,7 +429,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws Exception if cannot get an SCTID
      */
     protected Long getSctId(Concept concept, UUID uuid, TYPE type) throws Exception {
-        return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type);
+        return snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type, concept.getProject());
     }
 
     /**
@@ -440,7 +443,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         Long moduleSctId;
         UUID moduleUuid = getModuleUuid(concept);
 
-        moduleSctId = snomedIdHandler.getWithGeneration(moduleUuid, concept.getNamespace(), TYPE.CONCEPT);
+        moduleSctId = snomedIdHandler.getWithGeneration(moduleUuid, concept.getNamespace(), TYPE.CONCEPT, concept.getProject());
 
         return moduleSctId;
     }

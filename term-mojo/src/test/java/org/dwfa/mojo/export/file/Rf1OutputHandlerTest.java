@@ -18,6 +18,7 @@ import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.file.rf1.Rf1ConceptReader;
 import org.dwfa.mojo.file.rf1.Rf1ConceptRow;
@@ -400,6 +401,7 @@ public class Rf1OutputHandlerTest {
         conceptDto.setDateTime(new Date());
         conceptDto.setFullySpecifiedName("Flamingducks");
         conceptDto.setNamespace(NAMESPACE.NEHTA);
+        conceptDto.setProject(PROJECT.AU);
         conceptDto.setPathId(UUID.randomUUID());
         conceptDto.setPrimative(false);
         conceptDto.setStatusId(UUID.randomUUID());

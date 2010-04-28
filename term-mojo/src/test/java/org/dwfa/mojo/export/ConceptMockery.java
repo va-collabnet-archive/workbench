@@ -134,6 +134,7 @@ public class ConceptMockery {
     int retiredStatusNid = Integer.MAX_VALUE - 66;
     int rf2AcceptableDescriptionTypeNid = Integer.MAX_VALUE - 67;
     int rf2PreferredDescriptionTypeNid = Integer.MAX_VALUE - 68;
+    int snomedIsANId = Integer.MAX_VALUE - 69;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -381,6 +382,11 @@ public class ConceptMockery {
         I_GetConceptData rf2PreferredDescriptionTypeConceptData = mockConceptSpec(org.dwfa.ace.refset.ConceptConstants.PREFERRED, rf2PreferredDescriptionTypeNid);
         expect(termFactory.getConcept(rf2PreferredDescriptionTypeNid)).andReturn(rf2PreferredDescriptionTypeConceptData);
         replay(rf2PreferredDescriptionTypeConceptData);
+
+        I_GetConceptData snomedIsAConceptData = mockConceptSpec(org.dwfa.ace.refset.ConceptConstants.SNOMED_IS_A, snomedIsANId);
+        expect(termFactory.getConcept(snomedIsANId)).andReturn(snomedIsAConceptData);
+        expect(snomedIsAConceptData.getConceptId()).andReturn(snomedIsANId);
+        replay(snomedIsAConceptData);
 
         I_GetConceptData wasAHistoryRefsetConceptData = mockConceptSpec(ConceptConstants.WAS_A_HISTORY_REFSET, wasAHistoryRefsetNid);
         expect(termFactory.getConcept(wasAHistoryRefsetNid)).andReturn(wasAHistoryRefsetConceptData).anyTimes();

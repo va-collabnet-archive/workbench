@@ -1385,7 +1385,7 @@ public class UuidSctidMapDb {
      * @throws SQLException SQL error
      */
     public Long getSctSequenceId(NAMESPACE namespace, TYPE type) throws NoSuchElementException, SQLException {
-        Long sequenceId = 0l;
+        Long sequenceId = 100l;
         ResultSet results = null;
 
         try {

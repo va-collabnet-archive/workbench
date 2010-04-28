@@ -27,6 +27,7 @@ import org.dwfa.maven.Transform;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.AbstractTransform;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 /**
@@ -92,9 +93,9 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * @return SctId as a String
      * @throws Exception reading DB or creating the new SctId
      */
-    public String transform(String uuidStr, NAMESPACE namespace) throws Exception {
+    public String transform(String uuidStr, NAMESPACE namespace, PROJECT project) throws Exception {
         UUID uuid = UUID.fromString(uuidStr);
-        return setLastTransform(Long.toString(map.getWithGeneration(uuid, namespace, getType())));
+        return setLastTransform(Long.toString(map.getWithGeneration(uuid, namespace, getType(), project)));
     }
 
     /**
@@ -109,7 +110,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * @return
      * @throws Exception
      */
-    public String transform(List<UUID> uuids, NAMESPACE namespace) throws Exception {
+    public String transform(List<UUID> uuids, NAMESPACE namespace, PROJECT project) throws Exception {
         Long result = null;
         for (UUID uuid : uuids) {
             result = map.getWithoutGeneration(uuid, namespace, getType());
@@ -119,7 +120,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
         }
 
         if (result == null) {
-            result = map.getWithGeneration(uuids.get(0), namespace, getType());
+            result = map.getWithGeneration(uuids.get(0), namespace, getType(), project);
         }
 
         return result.toString();
@@ -132,7 +133,7 @@ public abstract class UuidToSctIdWithGeneration extends AbstractTransform implem
      * @see String transform(String uuidStr, NAMESPACE namespace)
      */
     public String transform(String input) throws Exception {
-        return transform(input, getNamespace());
+        return transform(input, getNamespace(), null);
     }
 
     /**

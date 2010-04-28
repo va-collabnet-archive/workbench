@@ -48,6 +48,7 @@ import org.dwfa.maven.sctid.transform.UuidToSctIdWithGeneration;
 import org.dwfa.maven.sctid.transform.UuidToSctRelIdWithGeneration;
 import org.dwfa.maven.transform.CaseSensitivityToUuidTransform;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.mojo.file.AceConceptReader.AceConceptRow;
 import org.dwfa.mojo.file.AceDescriptionReader.AceDescriptionRow;
@@ -241,25 +242,25 @@ public class Ace2Rf2 extends AbstractMojo {
             primationSctId = uuidToSctIdConcept.transform(ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION.getUids()
                 .iterator()
                 .next()
-                .toString(), NAMESPACE.SNOMED_META_DATA);
+                .toString(), NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
 
             fullyDefinedSctId = uuidToSctIdConcept.transform(
                 ArchitectonicAuxiliary.Concept.DEFINED_DEFINITION.getUids().iterator().next().toString(),
-                NAMESPACE.SNOMED_META_DATA);
+                NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
 
             fsnSctId = uuidToSctIdConcept.transform(
                 ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next().toString(),
-                NAMESPACE.SNOMED_META_DATA);
+                NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
 
             synonymSctId = uuidToSctIdConcept.transform(
                 ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids().iterator().next().toString(),
-                NAMESPACE.SNOMED_META_DATA);
+                NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
 
             activeConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getUids().iterator().next());
             uuidIdentifierSchemeSctId = uuidToSctIdConcept.transform(
-                ConceptConstants.UNIVERSALLY_UNIQUE_IDENTIFIER.getUuids()[0].toString(), NAMESPACE.SNOMED_META_DATA);
+                ConceptConstants.UNIVERSALLY_UNIQUE_IDENTIFIER.getUuids()[0].toString(), NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
             modifierSomeSctId = uuidToSctIdConcept.transform(ConceptConstants.MODIFIER_SOME.getUuids()[0].toString(),
-                NAMESPACE.SNOMED_META_DATA);
+                NAMESPACE.SNOMED_META_DATA, PROJECT.SNOMED_CT);
         } catch (IOException e) {
             logger.severe("ERROR: error accessing build and/or source directories " + e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -310,6 +311,20 @@ public class Ace2Rf2 extends AbstractMojo {
         return namespace;
     }
 
+    private PROJECT getProject(I_Path forPath) {
+        PROJECT project = PROJECT.AU;
+
+        // try{
+        // namespace = NAMESPACE.fromString(forPath.getNamespace());
+        // } catch (Exception e) {
+        if (forPath.toString().equals("SNOMED Core")) {
+            project = PROJECT.SNOMED_CT;
+            // }
+        }
+
+        return project;
+    }
+
     private NAMESPACE getNamespace(String forPath) throws TerminologyException, IOException {
         NAMESPACE namespace;
 
@@ -340,6 +355,7 @@ public class Ace2Rf2 extends AbstractMojo {
         AceIdentifierRow aceIdentifierRow;
         Rf2IdentifierRow rf2IdentifierRow;
         NAMESPACE namespace;
+        PROJECT project;
 
         aceIdentifierReader = new AceIdentifierReader(new File(idFile.getInputFileName()));
         aceIdentifierReader.setHasHeader(idFile.isHeaderLine());
@@ -363,13 +379,14 @@ public class Ace2Rf2 extends AbstractMojo {
                 aceIdentifierRow = identifierIterator.next();
 
                 namespace = getNamespace(aceIdentifierRow.getPathUuid());
+                project = getProject(tf.getPath(UUID.fromString(aceIdentifierRow.getPathUuid())));
 
                 rf2IdentifierRow.setIdentifierSchemeSctId(uuidIdentifierSchemeSctId);
                 rf2IdentifierRow.setAlternateIdentifier(aceIdentifierRow.getPrimaryUuid());
                 rf2IdentifierRow.setEffectiveTime(getRf2Time(aceIdentifierRow.getEffectiveTime()));
                 rf2IdentifierRow.setActive(getRF2ActiveFlag(aceIdentifierRow.getStatusUuid()));
 
-                rf2IdentifierRow.setModuleSctId(getSctIdWithGeneration(aceIdentifierRow.getPathUuid(), namespace,
+                rf2IdentifierRow.setModuleSctId(getSctIdWithGeneration(aceIdentifierRow.getPathUuid(), namespace, project,
                     uuidToSctIdConcept));
 
                 rf2IdentifierRow.setReferencedComponentSctId(aceIdentifierRow.getSourceId());
@@ -432,6 +449,7 @@ public class Ace2Rf2 extends AbstractMojo {
         Rf2ConceptWriter rf2ConceptWriter;
         Iterator<AceConceptRow> conceptIterator;
         NAMESPACE namespace;
+        PROJECT project;
 
         AceConceptRow aceConceptRow;
         Rf2ConceptRow rf2ConceptRow;
@@ -456,12 +474,14 @@ public class Ace2Rf2 extends AbstractMojo {
                 aceConceptRow = conceptIterator.next();
 
                 namespace = getNamespace(aceConceptRow.getPathUuid());
+                project = getProject(tf.getPath(UUID.fromString(aceConceptRow.getPathUuid())));
 
-                rf2ConceptRow.setConceptSctId(getSctIdWithGeneration(aceConceptRow.getConceptId(), namespace,
+
+                rf2ConceptRow.setConceptSctId(getSctIdWithGeneration(aceConceptRow.getConceptId(), namespace, project,
                     uuidToSctIdConcept));
                 rf2ConceptRow.setEffectiveTime(getRf2Time(aceConceptRow.getEffectiveTime()));
                 rf2ConceptRow.setActive(getRF2ActiveFlag(aceConceptRow.getConceptStatusId()));
-                rf2ConceptRow.setModuleSctId(getSctIdWithGeneration(aceConceptRow.getPathUuid(), namespace,
+                rf2ConceptRow.setModuleSctId(getSctIdWithGeneration(aceConceptRow.getPathUuid(), namespace, project,
                     uuidToSctIdConcept));
                 rf2ConceptRow.setDefiniationStatusSctId(getDefinitionSctId(aceConceptRow.getIsPrimative()));
 
@@ -519,6 +539,7 @@ public class Ace2Rf2 extends AbstractMojo {
         AceDescriptionReader aceDescriptionReader;
         Rf2DescriptionWriter rf2DescriptionWriter;
         NAMESPACE namespace;
+        PROJECT project;
 
         aceDescriptionReader = new AceDescriptionReader(new File(descriptionAceFile));
         aceDescriptionReader.setHasHeader(Boolean.parseBoolean(hasHeader));
@@ -546,21 +567,22 @@ public class Ace2Rf2 extends AbstractMojo {
                 aceDescriptionRow = descriptionIterator.next();
 
                 namespace = getNamespace(aceDescriptionRow.getPathUuid());
+                project = getProject(tf.getPath(UUID.fromString(aceDescriptionRow.getPathUuid())));
 
                 rf2DescriptionRow.setDescriptionSctId(getSctIdWithGeneration(aceDescriptionRow.getDescriptionId(),
-                    namespace, uuidToSctIdDescription));
+                    namespace, project, uuidToSctIdDescription));
                 rf2DescriptionRow.setEffectiveTime(getRf2Time(aceDescriptionRow.getEffectiveTime()));
                 rf2DescriptionRow.setActive(getRF2ActiveFlag(aceDescriptionRow.getDescriptionStatusId()));
-                rf2DescriptionRow.setModuleSctId(getSctIdWithGeneration(aceDescriptionRow.getPathUuid(), namespace,
+                rf2DescriptionRow.setModuleSctId(getSctIdWithGeneration(aceDescriptionRow.getPathUuid(), namespace, project,
                     uuidToSctIdConcept));
-                rf2DescriptionRow.setConceptSctId(getSctIdWithGeneration(aceDescriptionRow.getConceptId(), namespace,
+                rf2DescriptionRow.setConceptSctId(getSctIdWithGeneration(aceDescriptionRow.getConceptId(), namespace, project,
                     uuidToSctIdConcept));
                 rf2DescriptionRow.setLanaguageCode(aceDescriptionRow.getLanguageCode().toLowerCase().substring(0, 2));
                 rf2DescriptionRow.setTypeSctId(getDescriptionTypeSctId(aceDescriptionRow.getDescriptionTypeId()));
                 rf2DescriptionRow.setTerm(aceDescriptionRow.getTerm());
                 rf2DescriptionRow.setCaseSignificaceSctId(uuidToSctIdConcept.transform(
                     caseSensitivityToUuidTransform.transform(aceDescriptionRow.getCasesensitivityId()),
-                    getNamespace(tf.getPath(UUID.fromString(aceDescriptionRow.getPathUuid())))));
+                    getNamespace(tf.getPath(UUID.fromString(aceDescriptionRow.getPathUuid()))), project));
 
                 writeDescriptionRow(rf2DescriptionWriter, rf2DescriptionRow);
                 if (lineCount % 10000 == 0) {
@@ -616,6 +638,7 @@ public class Ace2Rf2 extends AbstractMojo {
         AceRelationshipReader aceRelationshipReader;
         Rf2RelationshipWriter rf2RelationshipWriter;
         NAMESPACE namespace;
+        PROJECT project;
 
         aceRelationshipReader = new AceRelationshipReader(new File(relationshipAceFile));
         aceRelationshipReader.setHasHeader(Boolean.parseBoolean(hasHeader));
@@ -644,22 +667,23 @@ public class Ace2Rf2 extends AbstractMojo {
                 if (!HISTORICAL_CHARACTERISTIC_UUIDS.contains(UUID.fromString(aceRelationshipRow.getCharacteristicTypeId()))) {
 
                     namespace = getNamespace(aceRelationshipRow.getPathUuid());
+                    project = getProject(tf.getPath(UUID.fromString(aceRelationshipRow.getPathUuid())));
 
                     rf2RelationshipRow.setRelationshipSctId(getSctIdWithGeneration(
-                        aceRelationshipRow.getRelationshipId(), namespace, uuidToSctIdRelationship));
+                        aceRelationshipRow.getRelationshipId(), namespace, project, uuidToSctIdRelationship));
                     rf2RelationshipRow.setEffectiveTime(getRf2Time(aceRelationshipRow.getEffectiveTime()));
                     rf2RelationshipRow.setActive(getRF2ActiveFlag(aceRelationshipRow.getRelationshipStatusUuid()));
                     rf2RelationshipRow.setModuleSctId(getSctIdWithGeneration(aceRelationshipRow.getPathUuid(),
-                        namespace, uuidToSctIdConcept));
+                        namespace, project, uuidToSctIdConcept));
                     rf2RelationshipRow.setSourceSctId(getSctIdWithGeneration(aceRelationshipRow.getConcept1Id(),
-                        namespace, uuidToSctIdConcept));
+                        namespace, project, uuidToSctIdConcept));
                     rf2RelationshipRow.setDestinationSctId(getSctIdWithGeneration(aceRelationshipRow.getConcept2Id(),
-                        namespace, uuidToSctIdConcept));
+                        namespace, project, uuidToSctIdConcept));
                     rf2RelationshipRow.setRelationshipGroup(aceRelationshipRow.getRelationshipGroup());
                     rf2RelationshipRow.setTypeSctId(getSctIdWithGeneration(aceRelationshipRow.getRelationshipTypeId(),
-                        namespace, uuidToSctIdConcept));
+                        namespace, project, uuidToSctIdConcept));
                     rf2RelationshipRow.setCharacteristicSctId(getSctIdWithGeneration(
-                        aceRelationshipRow.getCharacteristicTypeId(), namespace, uuidToSctIdConcept));
+                        aceRelationshipRow.getCharacteristicTypeId(), namespace, project, uuidToSctIdConcept));
                     rf2RelationshipRow.setModifierSctId(modifierSomeSctId);
 
                     writeRelationshipRow(rf2RelationshipWriter, rf2RelationshipRow);
@@ -817,9 +841,9 @@ public class Ace2Rf2 extends AbstractMojo {
      * @return
      * @throws Exception
      */
-    private String getSctIdWithGeneration(String uuid, NAMESPACE namespace, UuidToSctIdWithGeneration idWithGeneration)
+    private String getSctIdWithGeneration(String uuid, NAMESPACE namespace, PROJECT project, UuidToSctIdWithGeneration idWithGeneration)
             throws Exception {
-        return idWithGeneration.transform(uuid, namespace);
+        return idWithGeneration.transform(uuid, namespace, project);
     }
 
     /**

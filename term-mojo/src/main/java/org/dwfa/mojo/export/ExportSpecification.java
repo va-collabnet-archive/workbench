@@ -66,6 +66,7 @@ import org.dwfa.dto.RelationshipDto;
 import org.dwfa.maven.sctid.SctIdValidator;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.NoMappingException;
@@ -130,7 +131,9 @@ public class ExportSpecification {
     /** Synonym desctiption type. */
     private I_GetConceptData synonymDescriptionType;
     /** Int set of fsn type. */
-    private I_IntSet fullySpecifiedDescriptionTypeIIntSet = new IntSet();
+    private I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
+    /** Int set of fsn type. */
+    private I_IntSet snomedIsATypeIntSet = new IntSet();
     /** CTV3 reference set. */
     private I_GetConceptData ctv3IdMapExtension;
     /** Snomed Rt Id reference set. */
@@ -173,9 +176,19 @@ public class ExportSpecification {
     int conceptInactivationIndicatorNid;
 
     /** ADRS TODO need to change this to be configurable */
+    List<Integer> structuralRefsets = new ArrayList<Integer>();
     int adrsNid;
+    int ctv3SimpleMapReferenceSetNid;
+    int conceptInactivationIndicatorAttributeValueReferenceSet;
+    int descriptionInactivationIndicatorAttributeValueReferenceSet;
+    int snomedRtIdSimpleMap;
+    int relationshipRefinabilityAttributeValueReferenceSet;
+
     /** release part for new content namely ADRS members */
     ThinConPart releasePart;
+
+    /***/
+    private PROJECT defaultProject;
 
     /** Da factory. */
     private I_TermFactory termFactory;
@@ -194,7 +207,7 @@ public class ExportSpecification {
      * @throws Exception cannot load meta data concepts
      */
     public ExportSpecification(List<Position> positions, List<I_GetConceptData> inclusions,
-            List<I_GetConceptData> exclusions, NAMESPACE defaultNamespace) throws Exception {
+            List<I_GetConceptData> exclusions, NAMESPACE defaultNamespace, PROJECT defaultProject) throws Exception {
         termFactory = LocalVersionedTerminology.get();
 
         rf2ActiveConcept = termFactory.getConcept(ConceptConstants.ACTIVE_VALUE.localize().getNid());
@@ -234,7 +247,8 @@ public class ExportSpecification {
         rf2PreferredDescriptionTypeNid = termFactory.getConcept(
             org.dwfa.ace.refset.ConceptConstants.PREFERRED.getUuids()).getNid();
 
-        fullySpecifiedDescriptionTypeIIntSet.add(fullySpecifiedDescriptionType.getConceptId());
+        fullySpecifiedDescriptionTypeIntSet.add(fullySpecifiedDescriptionType.getConceptId());
+        snomedIsATypeIntSet.add(termFactory.getConcept(org.dwfa.ace.refset.ConceptConstants.SNOMED_IS_A.getUuids()).getConceptId());
         ctv3IdMapExtension = termFactory.getConcept(ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid());
         snomedRtIdMapExtension = termFactory.getConcept(ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid());
         stringExtensionNid = RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
@@ -269,15 +283,30 @@ public class ExportSpecification {
         limitedStatusNId = ConceptConstants.LIMITED.localize().getNid();
 
         //TODO this needs to be re factored...
-        adrsNid = termFactory.getConcept(UUID.fromString("850495d2-61c0-593e-bc74-46ed297a8923")).getNid();
+        adrsNid = termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9")).getNid();
+
+        structuralRefsets.add(adrsNid);
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("6f1e56b5-c127-4f0b-97fa-cb72c76ad58a")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("ef010cf1-cf06-4c8a-9684-a040e61b319d")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("f8834d2f-4e2d-4793-a9e0-5190391ad277")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("69eb6cad-441a-456e-93da-78520ba68a29")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("c4367277-ed2a-4641-b35c-8e4c6d92a3c9")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("856c8043-6890-42c2-bb4b-b97d127b7f5c")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("aa1698ba-8bff-4e9d-abdf-a0cb47b7bc5e")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("6dba82a0-c89d-4ee5-91e4-cb63787447fa")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("622aa587-2e34-43b3-b3d4-53561aa3c7be")).getNid());
+        structuralRefsets.add(termFactory.getConcept(UUID.fromString("6c441f26-ed8a-42ff-91b7-fcb27191f9f6")).getNid());
+
 
         setPositions(positions);
         setInclusions(inclusions);
         setExclusions(exclusions);
 
         this.defaultNamespace = defaultNamespace;
+        this.defaultProject = defaultProject;
 
         uuidSnomedDbMapHandler = UuidSnomedDbMapHandler.getInstance();
+        uuidSnomedDbMapHandler.updateNextSequenceMap();
 
         extensionProcessor = new ExtensionProcessor<I_ThinExtByRefPart>();
     }
@@ -295,10 +324,6 @@ public class ExportSpecification {
      */
     public ComponentDto getDataForExport(I_GetConceptData concept) throws Exception {
         ComponentDto componentDto = null;
-
-        if(concept.getNid() == -2147482113){
-            logger.fine("Donkey puncher");
-        }
 
         Set<I_ConceptAttributeTuple> matchingConceptTuples = new HashSet<I_ConceptAttributeTuple>();
         Set<I_DescriptionTuple> matchingDescriptionTuples = new HashSet<I_DescriptionTuple>();
@@ -444,7 +469,7 @@ public class ExportSpecification {
 
         for (I_ThinExtByRefVersioned thinExtByRefVersioned : termFactory.getAllExtensionsForComponent(nid)) {
             for (Position position : positions) {
-                if(thinExtByRefVersioned.getRefsetId() != adrsNid) {
+                if (!structuralRefsets.contains(thinExtByRefVersioned.getRefsetId())) {
                     extensionTuples.addAll(position.getMatchingTuples(thinExtByRefVersioned.getTuples(null, null, false, false)));
                 }
             }
@@ -593,26 +618,47 @@ public class ExportSpecification {
      */
     private void updateAdrsComponentDto(ComponentDto componentDto, Collection<I_DescriptionTuple> conceptDescriptionTuples) throws Exception {
         I_DescriptionTuple latestPreferredTerm = null;
-        I_DescriptionTuple latestSynonym = null;
-        I_DescriptionTuple unSpecifiedDescriptionType = null;
+        List<I_DescriptionTuple> latestSynonyms = new ArrayList<I_DescriptionTuple>();
+        List<I_DescriptionTuple> latestUnSpecifiedDescriptionTypes = new ArrayList<I_DescriptionTuple>();
 
-        for (I_DescriptionTuple currentDescription : conceptDescriptionTuples) {
+        Collection<I_DescriptionTuple> latestsConceptDescriptionTuples = TupleVersionPart.getLatestMatchingTuples(conceptDescriptionTuples);
+
+        for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
             if (currentDescription.getStatusId() == activeConcept.getNid() || currentDescription.getStatusId() == currentConcept.getNid()) {
                 if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
-                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm);
+                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, false);
                 } else if (currentDescription.getTypeId() == synonymDescriptionType.getNid()) {
-                    latestSynonym = getAdrsVersion(currentDescription, latestSynonym);
+                    latestSynonyms = getAdrsVersion(currentDescription, latestSynonyms, true);
                 } else if (currentDescription.getTypeId() == unspecifiedDescriptionType.getNid()) {
-                    unSpecifiedDescriptionType = getAdrsVersion(currentDescription, unSpecifiedDescriptionType);
+                    latestUnSpecifiedDescriptionTypes = getAdrsVersion(currentDescription, latestUnSpecifiedDescriptionTypes, true);
                 }
             }
         }
-        for (I_DescriptionTuple currentDescription : conceptDescriptionTuples) {
-            if ((currentDescription != latestPreferredTerm
-                    && currentDescription != latestSynonym
-                    && currentDescription != unSpecifiedDescriptionType)) {
-                I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid, currentDescription.getDescId());
-                if (currentLanguageExtensions != null) {
+        for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
+            I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,
+                currentDescription.getDescId());
+            boolean retireCurrentExtension = false;
+            if (currentLanguageExtensions != null) {
+                //Is there a new Description for the ADRS (retired description)
+                if ((latestPreferredTerm == null || currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId())
+                    && !isDescriptionInList(latestSynonyms, currentLanguageExtensions.getComponentId())
+                    && !isDescriptionInList(latestUnSpecifiedDescriptionTypes, currentLanguageExtensions.getComponentId())){
+                    retireCurrentExtension = true;
+
+                // has the description type changed
+                } else if (latestPreferredTerm != null
+                    && (currentLanguageExtensions.getComponentId() == latestPreferredTerm.getDescId()
+                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2PreferredDescriptionTypeNid)) {
+                    retireCurrentExtension = true;
+                } else if (isDescriptionInList(latestSynonyms, currentLanguageExtensions.getComponentId())
+                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2AcceptableDescriptionTypeNid) {
+                    retireCurrentExtension = true;
+                } else if (isDescriptionInList(latestUnSpecifiedDescriptionTypes, currentLanguageExtensions.getComponentId())
+                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2AcceptableDescriptionTypeNid) {
+                    retireCurrentExtension = true;
+                }
+
+                if (retireCurrentExtension) {
                     I_ThinExtByRefPart retireLatestPart = TupleVersionPart.getLatestPart(
                         currentLanguageExtensions.getVersions()).duplicate();
                     currentLanguageExtensions.addVersion(retireLatestPart);
@@ -631,10 +677,14 @@ public class ExportSpecification {
             setAdrsExtension(componentDto, latestPreferredTerm, rf2PreferredDescriptionTypeNid);
         }
 
-        if (latestSynonym != null) {
-            setAdrsExtension(componentDto, latestSynonym, rf2AcceptableDescriptionTypeNid);
-        } else if (unSpecifiedDescriptionType != null) {
-            setAdrsExtension(componentDto, unSpecifiedDescriptionType, rf2AcceptableDescriptionTypeNid);
+        if (!latestSynonyms.isEmpty()) {
+            for (I_DescriptionTuple iDescriptionTuple : latestSynonyms) {
+                setAdrsExtension(componentDto, iDescriptionTuple, rf2AcceptableDescriptionTypeNid);
+            }
+        } else if (!latestUnSpecifiedDescriptionTypes.isEmpty()) {
+            for (I_DescriptionTuple iDescriptionTuple : latestUnSpecifiedDescriptionTypes) {
+                setAdrsExtension(componentDto, iDescriptionTuple, rf2AcceptableDescriptionTypeNid);
+            }
         }
     }
 
@@ -658,33 +708,99 @@ public class ExportSpecification {
     }
 
     /**
+     * Is the description id in the list of descriptions
+     *
+     * @param tuples List of I_DescriptionTuple
+     * @param descriptionNid int
+     * @return true if in list.
+     */
+    private boolean isDescriptionInList(List<I_DescriptionTuple>  tuples, int descriptionNid){
+        boolean isInList = false;
+
+        for (I_DescriptionTuple currentDescriptionTuple : tuples) {
+            if(currentDescriptionTuple.getDescId() == descriptionNid){
+                isInList = true;
+                break;
+            }
+        }
+
+        return isInList;
+    }
+
+    /**
+     * Updates the list of description tuples.
+     *
+     * If the list is empty the <code>currentTuple</code> is returned in the
+     * list
+     * If the list contains the same type of descriptions at the same language
+     * type the the <code>currentTuple</code> is added to the list
+     * If the <code>currentTuple</code> is a different language type or newer
+     * than the list of items then <code>currentTuple</code> is returned in the
+     * list and the other items are removed.
+     *
+     * @param currentTuple I_DescriptionTuple
+     * @param adrsTuples List of I_DescriptionTuple
+     * @param usAllowed boolean are US descriptions allowed
+     *
+     * @return List of I_DescriptionTuple
+     */
+    private List<I_DescriptionTuple> getAdrsVersion(I_DescriptionTuple currentTuple, List<I_DescriptionTuple>  adrsTuples, boolean usAllowed) {
+        I_DescriptionTuple adrsTuple = null;
+        I_DescriptionTuple selectedAdrsTuple;
+
+        if(!adrsTuples.isEmpty()){
+            adrsTuple = adrsTuples.get(0);
+        }
+        selectedAdrsTuple = getAdrsVersion(currentTuple, adrsTuple, usAllowed);
+
+        if (adrsTuple == null) {
+            adrsTuples.add(selectedAdrsTuple);
+        } else if(selectedAdrsTuple.getDescId() != currentTuple.getDescId()
+                && selectedAdrsTuple.getLang().equals(currentTuple.getLang())
+                && selectedAdrsTuple.getVersion() == currentTuple.getVersion()){
+            adrsTuples.add(currentTuple);
+        } else if(selectedAdrsTuple.getDescId() != adrsTuple.getDescId()
+                && (!selectedAdrsTuple.getLang().equals(adrsTuple.getLang())
+                || selectedAdrsTuple.getVersion() > adrsTuple.getVersion())) {
+            adrsTuples.clear();
+            adrsTuples.add(selectedAdrsTuple);
+        }
+
+        return adrsTuples;
+    }
+    /**
      * Gets the Language I_DescriptionVersioned to use for the refset.
      *
-     * Order of language type preference is en_AU, en_GB, en then en_US.
+     * Order of language type preference is en_AU, en_GB, en then en_US if allowed.
      *
      * @param descriptionVersion I_DescriptionTuple
      * @param currentAdrsVersion I_DescriptionTuple can be null
+     * @param boolean are US descriptions allowed
      * @return I_DescriptionVersioned
      */
-    private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple) {
+    private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple, boolean usAllowed) {
         if (adrsTuple != null) {
             if(currentTuple.getLang().equals(EN_AU)) {
                 adrsTuple = currentTuple;
-            } else if (currentTuple.getLang().equals(EN_GB)
-                    && adrsTuple.getLang().equals(EN_AU)) {
+            } else if (adrsTuple.getLang().equals(EN_GB)
+                    && currentTuple.getLang().equals(EN_AU)) {
                 adrsTuple = currentTuple;
-            } else if (currentTuple.getLang().equals(EN)
-                    && adrsTuple.getLang().equals(EN_GB)
-                    && adrsTuple.getLang().equals(EN_AU)) {
+            } else if (adrsTuple.getLang().equals(EN)
+                    && (currentTuple.getLang().equals(EN_GB)
+                    || currentTuple.getLang().equals(EN_AU))) {
                 adrsTuple = currentTuple;
-            } else if (currentTuple.getLang().equals(EN_US)
-                    && adrsTuple.getLang().equals(EN)
-                    && adrsTuple.getLang().equals(EN_GB)
-                    && adrsTuple.getLang().equals(EN_AU)) {
+            } else if (adrsTuple.getLang().equals(EN_US)
+                    && (currentTuple.getLang().equals(EN)
+                    || currentTuple.getLang().equals(EN_GB)
+                    || currentTuple.getLang().equals(EN_AU))) {
                 adrsTuple = currentTuple;
             }
         } else {
-            adrsTuple = currentTuple;
+            if (usAllowed) {
+                adrsTuple = currentTuple;
+            } else if (!currentTuple.getLang().equals(EN_US)) {
+                adrsTuple = currentTuple;
+            }
         }
 
         return adrsTuple;
@@ -734,7 +850,7 @@ public class ExportSpecification {
         setUuidSctIdIdentifier(conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
 
         List<I_DescriptionTuple> descriptionTuples = new ArrayList<I_DescriptionTuple>();
-        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIIntSet, null, true)));
+        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIntSet, null, true)));
         Collections.sort(descriptionTuples, new TupleVersionComparator());
 
         String fsn = "NO FSN!!!";
@@ -782,6 +898,15 @@ public class ExportSpecification {
                 I_ThinExtByRefVersioned extensionVersioned = getThinExtByRefTuple(historyStatusRefsetMap.get(versionPart.getTypeId()), 0,
                     versionedRel.getC1Id(), versionedRel.getC2Id(), versionPart);
 
+                List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+                for (I_ThinExtByRefPart part : extensionVersioned.getVersions()) {
+                    if(part.getPathId() != versionPart.getPathId()
+                            || part.getVersion() != versionPart.getVersion()){
+                        partsToRemove.add(part);
+                    }
+                }
+                extensionVersioned.getVersions().removeAll(partsToRemove);
+
                 componentDto.getRelationshipExtensionDtos().addAll(
                     extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(), TYPE.CONCEPT, false));
             }
@@ -800,19 +925,19 @@ public class ExportSpecification {
      * @throws IOException
      * @throws TerminologyException
      */
-    private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid, I_AmTuple tuple,
-            int inactivationIndicatorRefsetNid, TYPE type, boolean latest) throws Exception {
+    private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid,
+            I_AmTuple tuple, int inactivationIndicatorRefsetNid, TYPE type, boolean latest) throws Exception {
         I_ThinExtByRefVersioned extensionVersioned = null;
         int rf2InactiveStatus = getRf2Status(tuple.getStatusId());
         if (rf2InactiveStatus != -1) {
             // if the status is INACTIVE or ACTIVE there is no need for a
             // reason. For simplicity, CURRENT will be treated this way too,
-            if (tuple.getStatusId() != activeConcept.getNid()
-                && tuple.getStatusId() != inActiveConcept.getNid()
+            if (tuple.getStatusId() != activeConcept.getNid() && tuple.getStatusId() != inActiveConcept.getNid()
                 && tuple.getStatusId() != currentConcept.getNid()) {
 
-                extensionVersioned = getThinExtByRefTuple(inactivationIndicatorRefsetNid, 0,
-                    componentNid, rf2InactiveStatus, tuple);
+                extensionVersioned = getThinExtByRefTuple(inactivationIndicatorRefsetNid, 0, componentNid,
+                    rf2InactiveStatus, tuple);
+                TupleVersionPart.getLatestPart(extensionVersioned.getVersions()).setStatusId(activeConcept.getNid());
             }
         } else {
             extensionVersioned = getRefsetExtensionVersioned(inactivationIndicatorRefsetNid, componentNid);
@@ -822,7 +947,6 @@ public class ExportSpecification {
         }
 
         if (extensionVersioned != null) {
-            TupleVersionPart.getLatestPart(extensionVersioned.getVersions()).setStatusId(activeConcept.getNid());
             extensionDtos.addAll(extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(),
                 type, false));
         }
@@ -839,6 +963,15 @@ public class ExportSpecification {
             I_RelTuple relationshipTuple, boolean latest) throws Exception {
         I_ThinExtByRefVersioned extensionVersioned = getThinExtByRefTuple(relationshipRefinabilityExtensionNid, 0,
             relationshipTuple.getRelId(), relationshipTuple.getRefinabilityId(), relationshipTuple);
+
+        List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+        for (I_ThinExtByRefPart part : extensionVersioned.getVersions()) {
+            if(part.getPathId() != relationshipTuple.getPathId()
+                    || part.getVersion() != relationshipTuple.getVersion()){
+                partsToRemove.add(part);
+            }
+        }
+        extensionVersioned.getVersions().removeAll(partsToRemove);
 
         extensionDtos.addAll(extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(),
             TYPE.RELATIONSHIP, false));
@@ -858,6 +991,16 @@ public class ExportSpecification {
         I_ThinExtByRefVersioned ctv3Versioned = getThinExtByRefTuple(ctv3IdMapExtension.getConceptId(), 0, tuple.getConId(),
             ctv3IdPart, ctv3IdPart.getSourceId().toString());
 
+        List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+        for (I_ThinExtByRefPart part : ctv3Versioned.getVersions()) {
+            if(part.getPathId() != ctv3IdPart.getPathId()
+                    || part.getVersion() != ctv3IdPart.getVersion()){
+                partsToRemove.add(part);
+            }
+        }
+        ctv3Versioned.getVersions().removeAll(partsToRemove);
+
+
         componentDto.getConceptExtensionDtos().addAll(
             extensionProcessor.processList(ctv3Versioned, ctv3Versioned.getVersions(), TYPE.CONCEPT, false));
     }
@@ -875,6 +1018,15 @@ public class ExportSpecification {
             throws Exception {
         I_ThinExtByRefVersioned snomedIdVersioned = getThinExtByRefTuple(snomedRtIdMapExtension.getConceptId(), 0,
             tuple.getConId(), snomedIdPart, snomedIdPart.getSourceId().toString());
+
+        List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+        for (I_ThinExtByRefPart part : snomedIdVersioned.getVersions()) {
+            if(part.getPathId() != snomedIdPart.getPathId()
+                    || part.getVersion() != snomedIdPart.getVersion()){
+                partsToRemove.add(part);
+            }
+        }
+        snomedIdVersioned.getVersions().removeAll(partsToRemove);
 
         componentDto.getConceptExtensionDtos().addAll(
             extensionProcessor.processList(snomedIdVersioned, snomedIdVersioned.getVersions(), TYPE.CONCEPT, false));
@@ -1006,7 +1158,7 @@ public class ExportSpecification {
             throws Exception {
         I_ThinExtByRefVersioned result = null;
 
-        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId)) {
             if (extension.getRefsetId() == refsetId) {
                 result = extension;
                 break;
@@ -1032,6 +1184,7 @@ public class ExportSpecification {
         baseConceptDto.setActive(isActive(tuple.getStatusId()));
         baseConceptDto.setDateTime(new Date(tuple.getTime()));
         baseConceptDto.setNamespace(getNamespace(idVersions,tuple));
+        baseConceptDto.setProject(getProject(idVersions, tuple));
         baseConceptDto.setPathId(termFactory.getConcept(tuple.getPathId()).getUids().get(0));
         baseConceptDto.setStatusId(termFactory.getConcept(tuple.getStatusId()).getUids().get(0));
         baseConceptDto.setStatusCode(ArchitectonicAuxiliary.getSnomedConceptStatusId(
@@ -1073,7 +1226,7 @@ public class ExportSpecification {
 
             sctIdPart.setPathId(tuple.getPathId());
             sctIdPart.setSource(snomedIntId.getConceptId());
-            sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type));
+            sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type, getProject(idVersions, tuple)));
             sctIdPart.setStatusId(activeConcept.getConceptId());
             sctIdPart.setVersion(tuple.getVersion());
         }
@@ -1184,6 +1337,33 @@ public class ExportSpecification {
         }
 
         return namespace;
+    }
+
+    /**
+     * Get the SNOMED name space for the tuple based on the SCTID of the concept
+     * or if no SCTID then use the tuple path.
+     *
+     * NB currently if no SCTID and not the international path then the
+     * defaultNamespace is returned.
+     *
+     * @param uuid UUID of the concept
+     * @param tuple I_AmPart
+     *
+     * @return NAMESPACE
+     *
+     * @throws IOException DB errors
+     * @throws TerminologyException DB errors
+     */
+    private PROJECT getProject(List<I_IdPart> idVersions, I_AmPart tuple) throws IOException, TerminologyException {
+        PROJECT project;
+
+        if (isInternationalPath(tuple.getPathId())) {
+            project = PROJECT.SNOMED_CT;
+        } else {
+            project = defaultProject;
+        }
+
+        return project;
     }
 
     /**
@@ -1305,7 +1485,7 @@ public class ExportSpecification {
                 includedConcept = true;
                 break;
             }
-            if (includeConceptData.isParentOf(concept, null, null, null, false)) {
+            if (includeConceptData.isParentOf(concept, null, snomedIsATypeIntSet, null, false)) {
                 includedConcept = true;
                 break;
             }
@@ -1332,7 +1512,7 @@ public class ExportSpecification {
                 excludedConcept = true;
                 break;
             }
-            if (excludedConceptData.isParentOf(concept, null, null, null, false)) {
+            if (excludedConceptData.isParentOf(concept, null, snomedIsATypeIntSet, null, false)) {
                 excludedConcept = true;
                 break;
             }

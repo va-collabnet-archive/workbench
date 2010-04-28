@@ -46,6 +46,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.Rf2ModuleDescriptor;
@@ -54,7 +55,6 @@ import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.AceDateFormat;
-import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.ThinConPart;
 
 
@@ -134,6 +134,14 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @required
      */
     private String defaultNamespace;
+
+    /**
+     * The default namespace for this export
+     *
+     * @parameter
+     * @required
+     */
+    private String defaultProject;
 
     /**
      * Directory for export files.
@@ -285,7 +293,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             releasePart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
             releasePart.setVersion(releasePosition.getPosition().getVersion());
 
-            exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots, NAMESPACE.fromString(defaultNamespace));
+            exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots, NAMESPACE.fromString(defaultNamespace), PROJECT.valueOf(defaultProject));
             exportSpecification.setReleasePart(releasePart);
         } catch (IOException e) {
             throw new MojoExecutionException("Execute error: ", e);

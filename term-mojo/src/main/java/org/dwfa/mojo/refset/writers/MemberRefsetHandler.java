@@ -49,6 +49,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PathReleaseDateConfig;
@@ -361,12 +362,30 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         return namespace;
     }
 
+    /**
+     * THIS IS A HACK REMOVE.
+     *
+     * Get the namespace for the I_Path.
+     *
+     * @param forPath I_path
+     * @return NAMESPACE
+     */
+    private PROJECT getProject(I_Path forPath) {
+        PROJECT project = PROJECT.AU;
+
+        if (forPath != null && forPath.toString().equals("SNOMED Core")) {
+            project = PROJECT.SNOMED_CT;
+        }
+
+        return project;
+    }
+
     private String getMemberId(UUID memberUuid, int componentNid, int refsetNid, boolean useRf2) throws SQLException,
             ClassNotFoundException, Exception {
         I_Path refsetPath = getLatestPath(getTermFactory().getConcept(refsetNid));
 
         return Long.toString(getSctGenerator().getWithGeneration(memberUuid, getNamespace(refsetPath),
-            getSctIdTypeForExtention(componentNid, useRf2)));
+            getSctIdTypeForExtention(componentNid, useRf2), getProject(refsetPath)));
     }
 
     protected UUID getMemberUuid(Integer memberNid, int componentNid, int refsetNid) throws UnsupportedEncodingException,
@@ -407,7 +426,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
             I_Path refsetPath = getLatestPath(tf.getConcept(componentId));
 
             id = Long.toString(getSctGenerator().getWithGeneration(tf.getUids(componentId).iterator().next(),
-                getNamespace(refsetPath), type));
+                getNamespace(refsetPath), type, getProject(refsetPath)));
 
             if (id == null) {
                 logger.severe("no sct-id type for this component.");

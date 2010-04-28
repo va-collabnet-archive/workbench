@@ -19,10 +19,11 @@ package org.dwfa.maven.sctid;
 import java.util.UUID;
 
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 public interface UuidSnomedHandler {
-    public Long getWithGeneration(UUID id, NAMESPACE namespace, TYPE type) throws Exception;
+    public Long getWithGeneration(UUID id, NAMESPACE namespace, TYPE type, PROJECT project) throws Exception;
 
     public Long getWithoutGeneration(UUID id, NAMESPACE namespace, TYPE type) throws Exception;
 

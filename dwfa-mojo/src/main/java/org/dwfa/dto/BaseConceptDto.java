@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 
 /**
@@ -34,6 +35,7 @@ public class BaseConceptDto {
     private boolean isActive = false;;
     private boolean islive = false;
     private NAMESPACE namespace;
+    private PROJECT project;
     private TYPE type;
 
     /**
@@ -153,6 +155,20 @@ public class BaseConceptDto {
      */
     public void setNamespace(NAMESPACE namespace) {
         this.namespace = namespace;
+    }
+
+    /**
+     * @return the project
+     */
+    public final PROJECT getProject() {
+        return project;
+    }
+
+    /**
+     * @param project the project to set
+     */
+    public final void setProject(PROJECT project) {
+        this.project = project;
     }
 
     /**
