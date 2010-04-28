@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
@@ -159,8 +160,11 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
                     // Get both current and retired version, if the latest is
                     // retired then should not be included
-                    List<I_ThinExtByRefTuple> versions = member.getTuples(getIntSet(
-                        ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.RETIRED), null, false);
+                    I_IntSet tupleStatuses = getIntSet(
+                        ArchitectonicAuxiliary.Concept.CURRENT, 
+                        ArchitectonicAuxiliary.Concept.ACTIVE, 
+                        ArchitectonicAuxiliary.Concept.RETIRED);
+                    List<I_ThinExtByRefTuple> versions = member.getTuples(tupleStatuses, null, false);
                     System.out.println("done getting versions for " + concept + " they were " + versions);
 
                     if (versions.size() >= 1) {
@@ -259,7 +263,7 @@ public class MemberRefsetCalculator extends RefsetUtilities {
                     }
 
                     I_ThinExtByRefPart latest = getLatestVersion(member);
-                    if (latest != null && latest.getStatus() == currentStatusId) {
+                    if (latest != null && isActiveStatus(latest.getStatusId())) {
                         I_ThinExtByRefPartConcept part = (I_ThinExtByRefPartConcept) latest;
                         if (part.getConceptId() != parent_marker_nid) {
                             addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),
@@ -389,7 +393,8 @@ public class MemberRefsetCalculator extends RefsetUtilities {
 
         retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
         currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
-
+        activeStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids().iterator().next());
+        
         normalMemberId = RefsetAuxiliary.Concept.NORMAL_MEMBER.localize().getNid();
         markedParentMemberId = RefsetAuxiliary.Concept.MARKED_PARENT.localize().getNid();
         

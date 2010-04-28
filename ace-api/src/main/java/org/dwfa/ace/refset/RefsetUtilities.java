@@ -55,6 +55,7 @@ public abstract class RefsetUtilities {
 
     protected int retiredConceptId;
     protected int currentStatusId;
+    protected int activeStatusId;
     protected int typeId;
 
     Map<Integer, I_GetConceptData> conceptCache = new HashMap<Integer, I_GetConceptData>();
@@ -67,7 +68,7 @@ public abstract class RefsetUtilities {
         for (I_ThinExtByRefPart version : versions) {
 
             if (latest == null) {
-                if (version.getStatus() == currentStatusId) {
+                if (isActiveStatus(version.getStatus())) {
                     latest = version;
                 }
             } else {
@@ -116,21 +117,33 @@ public abstract class RefsetUtilities {
     }
 
     private I_IntSet getStatuses() throws Exception {
-        return getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.PENDING_MOVE,
-            ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED, ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE);
+        return getIntSet(
+            ArchitectonicAuxiliary.Concept.CURRENT, 
+            ArchitectonicAuxiliary.Concept.ACTIVE,
+            ArchitectonicAuxiliary.Concept.PENDING_MOVE,
+            ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED, 
+            ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE);
     }
 
     private boolean isValidStatus(I_ConceptAttributeTuple att) throws TerminologyException, IOException {
-        return att.getConceptStatus() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-            .getConceptId()
-            || att.getConceptStatus() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
-                .getConceptId()
-            || att.getConceptStatus() == termFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId()
-            || att.getConceptStatus() == termFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId();
+        int pendingMoveStatusId = 
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()).getConceptId();
+        int currentUnreviewedStatusId = 
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
+        int noEditStatusId = 
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE.getUids()).getConceptId();
+        
+        return (att.getConceptStatus() == currentStatusId ||
+                att.getConceptStatus() == activeStatusId ||
+                att.getConceptStatus() == pendingMoveStatusId || 
+                att.getConceptStatus() == currentUnreviewedStatusId ||
+                att.getConceptStatus() == noEditStatusId);
     }
 
+    protected boolean isActiveStatus(int statusId) {
+        return (statusId == currentStatusId || statusId == activeStatusId);
+    }
+    
     public Set<Integer> getAncestorsOfConcept(int conceptId, ClosestDistanceHashSet concepts) 
             throws IOException, Exception {
 
@@ -168,7 +181,8 @@ public abstract class RefsetUtilities {
 
         I_IntSet status = termFactory.newIntSet();
         status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId());
-
+        status.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()).getConceptId());
+        
         I_IntSet is_a = termFactory.newIntSet();
         if (this.altIsA == null) {
             is_a.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
@@ -180,18 +194,18 @@ public abstract class RefsetUtilities {
         I_GetConceptData refsetRoot = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
         Set<I_GetConceptData> refsetChildren = refsetRoot.getDestRelOrigins(status, is_a, null, false);
+        
+        int refsetPurposeRelId = 
+            termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId();
+        
         for (I_GetConceptData refsetConcept : refsetChildren) {
             Set<I_GetConceptData> purposeConcepts = new HashSet<I_GetConceptData>();
 
             List<? extends I_RelVersioned> rels = refsetConcept.getSourceRels();
             for (I_RelVersioned rel : rels) {
                 List<I_RelTuple> tuples = rel.getTuples();
-                for (I_RelTuple tuple : tuples) {
-                    if (tuple.getStatusId() == termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                        .getConceptId()
-                        && tuple.getRelTypeId() == termFactory.getConcept(
-                            RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids()).getConceptId()) {
-
+                for (I_RelTuple tuple : tuples) {                    
+                    if (isActiveStatus(tuple.getStatusId()) && tuple.getRelTypeId() == refsetPurposeRelId) {
                         purposeConcepts.add(getConcept(tuple.getC2Id()));
                     }
                 }
@@ -260,10 +274,11 @@ public abstract class RefsetUtilities {
     }
 
     public I_GetConceptData getMemberSetConcept(int refsetId) throws Exception {
-        I_IntSet currentIntSet = getIntSet(ArchitectonicAuxiliary.Concept.CURRENT);
+        I_IntSet activeStatusIntSet = 
+            getIntSet(ArchitectonicAuxiliary.Concept.CURRENT, ArchitectonicAuxiliary.Concept.ACTIVE);
         I_IntSet generatesRelIntSet = getIntSet(ConceptConstants.GENERATES_REL);
 
-        I_GetConceptData memberSetSpecConcept = assertOneOrNone(getConcept(refsetId).getSourceRelTargets(currentIntSet,
+        I_GetConceptData memberSetSpecConcept = assertOneOrNone(getConcept(refsetId).getSourceRelTargets(activeStatusIntSet,
             generatesRelIntSet, null, false));
         return memberSetSpecConcept;
     }
@@ -457,14 +472,14 @@ public abstract class RefsetUtilities {
             if (targets.containsKey(srcRelTargetId)) {
                 int latestVersion = targets.get(srcRelTargetId);
                 if (srcRel.getVersion() > latestVersion) {
-                    if (srcRel.getStatusId() == currentStatusId) {
+                    if (isActiveStatus(srcRel.getStatusId())) {
                         targets.put(srcRelTargetId, latestVersion);
                     } else {
                         targets.remove(srcRelTargetId);
                     }
                 }
             } else {
-                if (srcRel.getStatusId() == currentStatusId) {
+                if (isActiveStatus(srcRel.getStatusId())) {
                     targets.put(srcRelTargetId, srcRelVersion);
                 }
             }
