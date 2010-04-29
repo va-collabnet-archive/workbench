@@ -104,6 +104,10 @@ public class ExportSpecification {
     private I_GetConceptData inActiveConcept;
     /** The active concept. */
     private I_GetConceptData currentConcept;
+    /** The active concept. */
+    private I_GetConceptData conceptRetired;
+    /** The active concept. */
+    private I_GetConceptData pendingMove;
     /** Retired concept */
     private I_GetConceptData retiredConcept;
     /** International release path. */
@@ -217,6 +221,10 @@ public class ExportSpecification {
             ArchitectonicAuxiliary.Concept.INACTIVE.localize().getUids().iterator().next());
         currentConcept = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.CURRENT.localize().getUids().iterator().next());
+        conceptRetired = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getUids().iterator().next());
+        pendingMove = termFactory.getConcept(
+            ArchitectonicAuxiliary.Concept.PENDING_MOVE.localize().getUids().iterator().next());
         retiredConcept = termFactory.getConcept(
             ArchitectonicAuxiliary.Concept.RETIRED.localize().getUids().iterator().next());
         snomedReleasePath = termFactory.getConcept(
@@ -567,6 +575,7 @@ public class ExportSpecification {
         List<I_IdPart> idParts = termFactory.getId(tuple.getDescId()).getVersions();
 
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
+        descriptionDto.setActive(isDescriptionActive(tuple.getStatusId()));
 
         if (latest) {
             setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
@@ -643,8 +652,17 @@ public class ExportSpecification {
                 if ((latestPreferredTerm == null || currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId())
                     && !isDescriptionInList(latestSynonyms, currentLanguageExtensions.getComponentId())
                     && !isDescriptionInList(latestUnSpecifiedDescriptionTypes, currentLanguageExtensions.getComponentId())){
-                    retireCurrentExtension = true;
 
+                    I_ThinExtByRefPart retireLatestPart = TupleVersionPart.getLatestPart(
+                        currentLanguageExtensions.getVersions()).duplicate();
+                    currentLanguageExtensions.addVersion(retireLatestPart);
+                    retireLatestPart.setStatusId(retiredConcept.getNid());
+                    retireLatestPart.setPathId(releasePart.getPathId());
+                    retireLatestPart.setVersion(releasePart.getVersion());
+
+                    componentDto.getConceptExtensionDtos().addAll(
+                        extensionProcessor.processList(currentLanguageExtensions,
+                            currentLanguageExtensions.getVersions(), TYPE.CONCEPT, false));
                 // has the description type changed
                 } else if (latestPreferredTerm != null
                     && (currentLanguageExtensions.getComponentId() == latestPreferredTerm.getDescId()
@@ -665,10 +683,6 @@ public class ExportSpecification {
                     retireLatestPart.setStatusId(retiredConcept.getNid());
                     retireLatestPart.setPathId(releasePart.getPathId());
                     retireLatestPart.setVersion(releasePart.getVersion());
-
-                    componentDto.getConceptExtensionDtos().addAll(
-                        extensionProcessor.processList(currentLanguageExtensions,
-                            currentLanguageExtensions.getVersions(), TYPE.CONCEPT, false));
                 }
             }
         }
@@ -778,21 +792,25 @@ public class ExportSpecification {
      * @param boolean are US descriptions allowed
      * @return I_DescriptionVersioned
      */
-    private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple, boolean usAllowed) {
+    private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple,
+            boolean usAllowed) {
         if (adrsTuple != null) {
-            if(currentTuple.getLang().equals(EN_AU)) {
+            if (currentTuple.getLang().equals(EN_AU)) {
                 adrsTuple = currentTuple;
             } else if (adrsTuple.getLang().equals(EN_GB)
                     && currentTuple.getLang().equals(EN_AU)) {
                 adrsTuple = currentTuple;
             } else if (adrsTuple.getLang().equals(EN)
-                    && (currentTuple.getLang().equals(EN_GB)
-                    || currentTuple.getLang().equals(EN_AU))) {
+                && (currentTuple.getLang().equals(EN_GB)
+                        || currentTuple.getLang().equals(EN_AU))) {
                 adrsTuple = currentTuple;
             } else if (adrsTuple.getLang().equals(EN_US)
-                    && (currentTuple.getLang().equals(EN)
-                    || currentTuple.getLang().equals(EN_GB)
-                    || currentTuple.getLang().equals(EN_AU))) {
+                && (currentTuple.getLang().equals(EN)
+                        || currentTuple.getLang().equals(EN_GB)
+                        || currentTuple.getLang().equals(EN_AU))) {
+                adrsTuple = currentTuple;
+            } else if (adrsTuple.getLang().equals(currentTuple.getLang())
+                && currentTuple.getVersion() > adrsTuple.getVersion()) {
                 adrsTuple = currentTuple;
             }
         } else {
@@ -1389,11 +1407,11 @@ public class ExportSpecification {
     }
 
     /**
-     * Checks is the uuidStatus equals the Concept.ACTIVE uuid.
+     * Checks if the Status equals the Concept.ACTIVE or Current
      * or is a child of Concept.ACTIVE
      *
      * @param statusNid int
-     * @return String 1 if the statusNid is active otherwise 0;
+     * @return boolean true if the statusNid is active
      * @throws TerminologyException DB error
      * @throws IOException DB error
      */
@@ -1408,6 +1426,32 @@ public class ExportSpecification {
         } else if (activeConcept.getNid() == statusConcept.getNid()) {
             activate = true;
         } else if (currentConcept.getNid() == statusConcept.getNid()) {
+            activate = true;
+        }
+
+        return activate;
+    }
+
+    /**
+     * Checks if the Status equals ACTIVE, Current, Pending Move, Concept Retired, Moved Elsewhere
+     *
+     * @param statusNid int
+     * @return boolean true if the statusNid is active
+     * @throws TerminologyException DB error
+     * @throws IOException DB error
+     */
+    private boolean isDescriptionActive(final int statusNid) {
+        boolean activate = false;
+
+        if (activeConcept.getNid() == statusNid) {
+            activate = true;
+        } else if (currentConcept.getNid() == statusNid) {
+            activate = true;
+        } else if (pendingMove.getNid() == statusNid) {
+            activate = true;
+        } else if(conceptRetired.getNid() == statusNid) {
+            activate = true;
+        } else if (aceMovedElsewhereStatusNId == statusNid) {
             activate = true;
         }
 

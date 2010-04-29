@@ -135,6 +135,8 @@ public class ConceptMockery {
     int rf2AcceptableDescriptionTypeNid = Integer.MAX_VALUE - 67;
     int rf2PreferredDescriptionTypeNid = Integer.MAX_VALUE - 68;
     int snomedIsANId = Integer.MAX_VALUE - 69;
+    int conceptRetiredStatusNid = Integer.MAX_VALUE - 70;
+    int pendingMoveStatusNid = Integer.MAX_VALUE - 71;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -216,6 +218,18 @@ public class ConceptMockery {
             retiredStatusNid);
         expect(retiredConceptData.getConceptId()).andReturn(retiredStatusNid).anyTimes();
         replay(retiredConceptData);
+
+        List<UUID> conceptRetiredUuidList = new ArrayList<UUID>();
+        conceptRetiredUuidList.add(UUID.randomUUID());
+        I_GetConceptData conceptRetiredConceptData = mockConceptEnum(retiredUuidList, ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED,
+            conceptRetiredStatusNid);
+        replay(conceptRetiredConceptData);
+
+        List<UUID> pendingMoveUuidList = new ArrayList<UUID>();
+        pendingMoveUuidList.add(UUID.randomUUID());
+        I_GetConceptData pendingMoveConceptData = mockConceptEnum(retiredUuidList, ArchitectonicAuxiliary.Concept.PENDING_MOVE,
+            pendingMoveStatusNid);
+        replay(pendingMoveConceptData);
 
         snomedCoreUuidList = new ArrayList<UUID>();
         snomedCoreUuidList.add(UUID.randomUUID());
