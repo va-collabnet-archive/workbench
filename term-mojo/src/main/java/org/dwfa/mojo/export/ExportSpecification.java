@@ -662,7 +662,7 @@ public class ExportSpecification {
 
                     componentDto.getConceptExtensionDtos().addAll(
                         extensionProcessor.processList(currentLanguageExtensions,
-                            currentLanguageExtensions.getVersions(), TYPE.CONCEPT, false));
+                            currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
                 // has the description type changed
                 } else if (latestPreferredTerm != null
                     && (currentLanguageExtensions.getComponentId() == latestPreferredTerm.getDescId()
@@ -705,6 +705,8 @@ public class ExportSpecification {
     /**
      * Create an adrs extension using the extension processor for the rf2 description type (Acceptable or Preferred)
      *
+     * Checks if the current extension is of the same type, if not it creates a new version (part) for the required <code>desctriptionTypeNid</code>
+     *
      * @param componentDto ComponentDto
      * @param descriptionTuple I_DescriptionTuple
      * @param desctriptionTypeNid desctriptionTypeNid
@@ -715,10 +717,22 @@ public class ExportSpecification {
         if (adrsVersioned == null) {
             adrsVersioned = getThinExtByRefTuple(adrsNid, 0, descriptionTuple.getDescId(),
                 desctriptionTypeNid, releasePart);
+        } else {
+            I_ThinExtByRefPartConcept latestPart = (I_ThinExtByRefPartConcept) adrsVersioned.getLatestVersion();
+            if(latestPart.getC1id() != desctriptionTypeNid){
+                I_ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
+
+                conceptExtension.setC1id(desctriptionTypeNid);
+                conceptExtension.setPathId(releasePart.getPathId());
+                conceptExtension.setStatusId(releasePart.getStatusId());
+                conceptExtension.setVersion(releasePart.getVersion());
+
+                adrsVersioned.addVersion(conceptExtension);
+            }
         }
 
         componentDto.getConceptExtensionDtos().addAll(
-            extensionProcessor.processList(adrsVersioned, adrsVersioned.getVersions(), TYPE.DESCRIPTION, false));
+            extensionProcessor.processList(adrsVersioned, adrsVersioned.getVersions(), TYPE.DESCRIPTION, true));
     }
 
     /**
@@ -1658,7 +1672,7 @@ public class ExportSpecification {
                 if (isExportableConcept(refsetConcept)) {
                     I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(thinExtByRefVersioned.getTypeId());
                     if(extensionProcessor != null){
-                        ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t, type, t == latestPart);
+                        ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t, type, t.getVersion() == latestPart.getVersion());
                         extensionDto.setIsClinical(isClinical);
                         extensionDtos.add(extensionDto);
                     } else {
