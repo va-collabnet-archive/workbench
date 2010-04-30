@@ -799,10 +799,16 @@ public class QueueViewerPanel extends JPanel {
                         queueContentsSplitPane.setBottomComponent(new JLabel("No process is selected"));
                         queueContentsSplitPane.setDividerLocation(dividerLoc);
                     } else {
-                        int selectedRow = tableOfQueueEntries.getRowSorter().convertRowIndexToModel(tableOfQueueEntries.getSelectedRow());
+                        
                         EntryID selectedEntry = null;
-                        if (selectedRow >= 0 && selectedRow < tableOfQueueEntries.getRowCount()) {
-                            selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(selectedRow, 6);
+                        int selectedRow = tableOfQueueEntries.getSelectedRow();
+                        try {
+                            int convertedRow = tableOfQueueEntries.getRowSorter().convertRowIndexToModel(selectedRow);
+                            if (convertedRow >= 0 && convertedRow < tableOfQueueEntries.getRowCount()) {
+                                selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(convertedRow, 6);
+                            }
+                        } catch (IndexOutOfBoundsException e) {
+                            logger.log(Level.WARNING, e.toString() + " selected row: " + selectedRow);
                         }
                         tableOfQueueEntriesModel.updateQueueData();
                         if (selectedEntry != null) {

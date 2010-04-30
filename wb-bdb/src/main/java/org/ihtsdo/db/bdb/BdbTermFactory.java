@@ -88,6 +88,7 @@ import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
@@ -1545,6 +1546,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public void computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
             throws Exception {
+        AceLog.getAppLog().info("Computing RefsetSpecQuery: " +  query);
+        List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
+        for (String warning: dangleWarnings) {
+            AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
+        }
+
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true);
