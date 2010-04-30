@@ -86,7 +86,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // Nothing to do
     }
 
-    private Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
+    public Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
 
         if (refset == null) {
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
