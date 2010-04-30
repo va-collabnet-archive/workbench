@@ -428,10 +428,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
                         if (!latest) {
                             rf2IdentifierRows.add(rf2IdentifierRow);
                             exportedIds.put(uuid, identifierDto.getReferencedSctId());
-                        } else if((latest && identifierDto.isLatest() && conceptDto.isActive())) {
-                            rf2IdentifierRows.add(rf2IdentifierRow);
-                            exportedIds.put(uuid, identifierDto.getReferencedSctId());
-                        } else if((latest && identifierDto.isLatest() && !conceptDto.isActive()) && conceptDto.isLive()) {
+                        } else if((latest && identifierDto.isLatest() && conceptDto.isNewActiveOrRetiringLive())) {
                             rf2IdentifierRows.add(rf2IdentifierRow);
                             exportedIds.put(uuid, identifierDto.getReferencedSctId());
                         }

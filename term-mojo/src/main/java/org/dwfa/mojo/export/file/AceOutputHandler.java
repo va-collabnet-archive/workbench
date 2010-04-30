@@ -289,25 +289,25 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         for (ConceptDto conceptDto : conceptDtos) {
             for (IdentifierDto identifierDto : conceptDto.getIdentifierDtos()) {
                 UUID uuid  = identifierDto.getConceptId().keySet().iterator().next();
+                AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
+                aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
+                aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
+                aceIdentifierRow.setPrimaryUuid(uuid.toString());
+                aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
+                aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
+                aceIdentifierRow.setStatusUuid(identifierDto.getStatusId().toString());
 
                 if (!exportedIds.containsKey(uuid)) {
-                    AceIdentifierRow aceIdentifierRow = new AceIdentifierRow();
-                    aceIdentifierRow.setEffectiveDate(getReleaseDate(identifierDto));
-                    aceIdentifierRow.setPathUuid(getModuleUuid(identifierDto).toString());
-                    aceIdentifierRow.setPrimaryUuid(uuid.toString());
-                    aceIdentifierRow.setSourceId(identifierDto.getReferencedSctId().toString());
-                    aceIdentifierRow.setSourceSystemUuid(identifierDto.getIdentifierSchemeUuid().toString());
-                    aceIdentifierRow.setStatusUuid(identifierDto.getStatusId().toString());
-
                     exportedIds.put(uuid, identifierDto.getReferencedSctId());
 
                     synchronized (idsFile) {
                         idsFile.write(aceIdentifierRow);
                     }
-                    if(identifierDto.isLatest()){
-                        synchronized (idsFileSnapShot) {
-                            idsFileSnapShot.write(aceIdentifierRow);
-                        }
+                }
+
+                if (identifierDto.isLatest() && conceptDto.isNewActiveOrRetiringLive()) {
+                    synchronized (idsFileSnapShot) {
+                        idsFileSnapShot.write(aceIdentifierRow);
                     }
                 }
             }

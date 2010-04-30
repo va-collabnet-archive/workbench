@@ -138,6 +138,8 @@ public class ExportSpecification {
     private I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
     /** Int set of fsn type. */
     private I_IntSet snomedIsATypeIntSet = new IntSet();
+    /** Int set of fsn type. */
+    private I_IntSet currentActiveStatusIntSet = new IntSet();
     /** CTV3 reference set. */
     private I_GetConceptData ctv3IdMapExtension;
     /** Snomed Rt Id reference set. */
@@ -257,6 +259,8 @@ public class ExportSpecification {
 
         fullySpecifiedDescriptionTypeIntSet.add(fullySpecifiedDescriptionType.getConceptId());
         snomedIsATypeIntSet.add(termFactory.getConcept(org.dwfa.ace.refset.ConceptConstants.SNOMED_IS_A.getUuids()).getConceptId());
+        currentActiveStatusIntSet.add(currentConcept.getNid());
+        currentActiveStatusIntSet.add(activeConcept.getNid());
         ctv3IdMapExtension = termFactory.getConcept(ConceptConstants.CTV3_ID_MAP_EXTENSION.localize().getNid());
         snomedRtIdMapExtension = termFactory.getConcept(ConceptConstants.SNOMED_ID_MAP_EXTENSION.localize().getNid());
         stringExtensionNid = RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid();
@@ -635,18 +639,17 @@ public class ExportSpecification {
         for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
             if (currentDescription.getStatusId() == activeConcept.getNid() || currentDescription.getStatusId() == currentConcept.getNid()) {
                 if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
-                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, false);
+                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true);
                 } else if (currentDescription.getTypeId() == synonymDescriptionType.getNid()) {
-                    latestSynonyms = getAdrsVersion(currentDescription, latestSynonyms, true);
+                    latestSynonyms = getAdrsVersion(currentDescription, latestSynonyms, false);
                 } else if (currentDescription.getTypeId() == unspecifiedDescriptionType.getNid()) {
-                    latestUnSpecifiedDescriptionTypes = getAdrsVersion(currentDescription, latestUnSpecifiedDescriptionTypes, true);
+                    latestUnSpecifiedDescriptionTypes = getAdrsVersion(currentDescription, latestUnSpecifiedDescriptionTypes, false);
                 }
             }
         }
         for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
             I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,
                 currentDescription.getDescId());
-            boolean retireCurrentExtension = false;
             if (currentLanguageExtensions != null) {
                 //Is there a new Description for the ADRS (retired description)
                 if ((latestPreferredTerm == null || currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId())
@@ -663,26 +666,6 @@ public class ExportSpecification {
                     componentDto.getConceptExtensionDtos().addAll(
                         extensionProcessor.processList(currentLanguageExtensions,
                             currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
-                // has the description type changed
-                } else if (latestPreferredTerm != null
-                    && (currentLanguageExtensions.getComponentId() == latestPreferredTerm.getDescId()
-                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2PreferredDescriptionTypeNid)) {
-                    retireCurrentExtension = true;
-                } else if (isDescriptionInList(latestSynonyms, currentLanguageExtensions.getComponentId())
-                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2AcceptableDescriptionTypeNid) {
-                    retireCurrentExtension = true;
-                } else if (isDescriptionInList(latestUnSpecifiedDescriptionTypes, currentLanguageExtensions.getComponentId())
-                            && ((ThinExtByRefPartConcept) currentLanguageExtensions.getLatestVersion()).getConceptId() != rf2AcceptableDescriptionTypeNid) {
-                    retireCurrentExtension = true;
-                }
-
-                if (retireCurrentExtension) {
-                    I_ThinExtByRefPart retireLatestPart = TupleVersionPart.getLatestPart(
-                        currentLanguageExtensions.getVersions()).duplicate();
-                    currentLanguageExtensions.addVersion(retireLatestPart);
-                    retireLatestPart.setStatusId(retiredConcept.getNid());
-                    retireLatestPart.setPathId(releasePart.getPathId());
-                    retireLatestPart.setVersion(releasePart.getVersion());
                 }
             }
         }
@@ -746,7 +729,7 @@ public class ExportSpecification {
         boolean isInList = false;
 
         for (I_DescriptionTuple currentDescriptionTuple : tuples) {
-            if(currentDescriptionTuple.getDescId() == descriptionNid){
+            if (currentDescriptionTuple != null && currentDescriptionTuple.getDescId() == descriptionNid) {
                 isInList = true;
                 break;
             }
@@ -781,13 +764,13 @@ public class ExportSpecification {
         }
         selectedAdrsTuple = getAdrsVersion(currentTuple, adrsTuple, usAllowed);
 
-        if (adrsTuple == null) {
+        if (adrsTuple == null && selectedAdrsTuple != null) {
             adrsTuples.add(selectedAdrsTuple);
-        } else if(selectedAdrsTuple.getDescId() != currentTuple.getDescId()
+        } else if(selectedAdrsTuple != null && selectedAdrsTuple.getDescId() != currentTuple.getDescId()
                 && selectedAdrsTuple.getLang().equals(currentTuple.getLang())
                 && selectedAdrsTuple.getVersion() == currentTuple.getVersion()){
             adrsTuples.add(currentTuple);
-        } else if(selectedAdrsTuple.getDescId() != adrsTuple.getDescId()
+        } else if(selectedAdrsTuple != null && selectedAdrsTuple.getDescId() != adrsTuple.getDescId()
                 && (!selectedAdrsTuple.getLang().equals(adrsTuple.getLang())
                 || selectedAdrsTuple.getVersion() > adrsTuple.getVersion())) {
             adrsTuples.clear();
@@ -889,7 +872,7 @@ public class ExportSpecification {
         I_DescriptionTuple fsnTuple = null;
         if (!descriptionTuples.isEmpty()) {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-                if(isActive(iDescriptionTuple.getStatusId())){
+                if(isDescriptionActive(iDescriptionTuple.getStatusId())){
                     fsnTuple = iDescriptionTuple;
                     break;
                 }
@@ -1543,7 +1526,7 @@ public class ExportSpecification {
                 includedConcept = true;
                 break;
             }
-            if (includeConceptData.isParentOf(concept, null, snomedIsATypeIntSet, null, false)) {
+            if (includeConceptData.isParentOf(concept, currentActiveStatusIntSet, snomedIsATypeIntSet, null, false)) {
                 includedConcept = true;
                 break;
             }
@@ -1570,7 +1553,7 @@ public class ExportSpecification {
                 excludedConcept = true;
                 break;
             }
-            if (excludedConceptData.isParentOf(concept, null, snomedIsATypeIntSet, null, false)) {
+            if (excludedConceptData.isParentOf(concept, currentActiveStatusIntSet, snomedIsATypeIntSet, null, false)) {
                 excludedConcept = true;
                 break;
             }
