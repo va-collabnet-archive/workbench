@@ -427,18 +427,35 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     // DESCRIPTION TYPE LOOKUP
-    private UUID[] yDesTypeArray;
-    private String[] yDesTypeStrArray;
+    private HashMap<String, Integer> yDesTypeUuidMap;
+    private ArrayList<String> yDesTypeUuidList;
+    private UUID[] yDesTypeUuidArray;
+    private int yDesTypeUuidIdxCounter;
 
-    private int lookupDesTypeIdx(String uuid) {
-        int idx = 0;
-        while (idx < 4) {
-            if (uuid.equalsIgnoreCase(yDesTypeStrArray[idx]))
-                break;
-            idx++;
-        }
-        return idx;
+    private int lookupYDesTypeUuidIdx(String desTypeUuidStr) {
+        Integer tmp = yDesTypeUuidMap.get(desTypeUuidStr);
+        if (tmp == null) {
+            yDesTypeUuidIdxCounter++;
+            yDesTypeUuidMap.put(desTypeUuidStr, Integer.valueOf(yDesTypeUuidIdxCounter));
+            yDesTypeUuidList.add(desTypeUuidStr);
+            return yDesTypeUuidIdxCounter;
+        } else
+            return tmp.intValue();
     }
+
+//    // DESCRIPTION TYPE LOOKUP
+//    private UUID[] yDesTypeArray;
+//    private String[] yDesTypeStrArray;
+//
+//    private int lookupDesTypeIdx(String uuid) {
+//        int idx = 0;
+//        while (idx < 4) {
+//            if (uuid.equalsIgnoreCase(yDesTypeStrArray[idx]))
+//                break;
+//            idx++;
+//        }
+//        return idx;
+//    }
 
     // RELATIONSHIP CHARACTERISTIC LOOKUP
     private UUID[] yRelCharArray;
@@ -594,15 +611,20 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             yStatusStrArray[idx] = yStatusArray[idx].toString();
 
         try {
-            // DESCRIPTION TYPES
-            yDesTypeArray = new UUID[4];
-            for (i = 0; i < 4; i++)
-                yDesTypeArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
-                        .iterator().next();
-            // string lookup array
-            yDesTypeStrArray = new String[4];
-            for (int idx = 0; idx < 4; idx++)
-                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
+          // DESCRIPTION TYPES
+          // Setup the standard description types used in SNOMED
+          for (i = 0; i < 4; i++)
+              lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
+                      .iterator().next().toString());
+//            // DESCRIPTION TYPES
+//            yDesTypeArray = new UUID[4];
+//            for (i = 0; i < 4; i++)
+//                yDesTypeArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
+//                        .iterator().next();
+//            // string lookup array
+//            yDesTypeStrArray = new String[4];
+//            for (int idx = 0; idx < 4; idx++)
+//                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
 
             // RELATIONSHIP CHARACTERISTIC
             yRelCharArray = new UUID[5];
@@ -637,9 +659,15 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     private void setupLookupPartB() throws MojoFailureException {
+        yDesTypeUuidArray = new UUID[yDesTypeUuidList.size()];
+        int i = 0;
+        for (String s : yDesTypeUuidList) {
+            yDesTypeUuidArray[i] = UUID.fromString(s);
+            i++;
+        }
 
         yPathArray = new UUID[yPathList.size()];
-        int i = 0;
+        i = 0;
         for (String s : yPathList) {
             yPathArray[i] = UUID.fromString(s);
             i++;
@@ -765,6 +793,10 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         ySourceUuidMap = new HashMap<String, Integer>();
         ySourceUuidList = new ArrayList<String>();
         ySourceUuidIdxCounter = -1;
+
+        yDesTypeUuidMap = new HashMap<String, Integer>();
+        yDesTypeUuidList = new ArrayList<String>();
+        yDesTypeUuidIdxCounter = -1;
 
         setupUuids();
 
@@ -1081,7 +1113,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // CAPITALIZATION_STATUS = 4;
             int capitalization = Integer.parseInt(line[CAPITALIZATION_STATUS_INT]);
             // DESCRIPTION_TYPE = 5;
-            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
+            int descriptionType = lookupYDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
+//            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
             // LANGUAGE_CODE = 6;
             String langCodeStr = line[LANGUAGE_CODE_STR];
             // EFFFECTIVE_DATE = 7;
@@ -2975,7 +3008,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     des.setText(dRec.termText);
                     des.setInitialCaseSignificant(dRec.capStatus == 1 ? true : false);
                     des.setLang(dRec.languageCode);
-                    des.setTypeUuid(yDesTypeArray[dRec.descriptionType]);
+                    des.setTypeUuid(yDesTypeUuidArray[dRec.descriptionType]);
                     des.setStatusUuid(lookupYStatus(dRec.status));
                     des.setPathUuid(yPathArray[dRec.yPath]);
                     des.setTime(yRevDateArray[dRec.yRevision]);
@@ -2983,7 +3016,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 } else {
                     EDescriptionRevision edv = new EDescriptionRevision();
                     edv.setText(dRec.termText);
-                    edv.setTypeUuid(yDesTypeArray[dRec.descriptionType]);
+                    edv.setTypeUuid(yDesTypeUuidArray[dRec.descriptionType]);
                     edv.setInitialCaseSignificant(dRec.capStatus == 1 ? true : false);
                     edv.setLang(dRec.languageCode);
                     edv.setStatusUuid(lookupYStatus(dRec.status));
