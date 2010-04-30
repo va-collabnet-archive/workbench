@@ -1,0 +1,364 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.ihtsdo</groupId>
+		<artifactId>cement-master</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dwfa</groupId>
+	<artifactId>cement-sab</artifactId>
+	<name>cement terminology ide sa bundle</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>cement terminology ide stand alone bundle </description>
+	<dependencies>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>ihtsdo-resources</artifactId>
+			<version>1.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<!--
+				A dependency required to use the jini/jehri dynamic provider
+				security model
+			-->
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>jsk-policy</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.nhs.uktc</groupId>
+			<artifactId>nhs-subset-editor-doc</artifactId>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>start</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>jsk-dl</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa</groupId>
+			<artifactId>ace-ide-admin-bp</artifactId>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa</groupId>
+			<artifactId>ace-ide-user-bp</artifactId>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-bdb</artifactId>
+		</dependency>
+		<dependency>
+			<!--
+        this project contains the berkeley database directory that the
+        bundle will use.
+      -->
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>cement-bdb</artifactId>
+			<scope>runtime-directory</scope>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<!--
+        This runtime directory needs to be replaced with a svn checkout, and the profile
+        directory needs to also be checked out as well. 
+      -->
+			<groupId>org.dwfa</groupId>
+			<artifactId>cement-profiles</artifactId>
+			<scope>runtime-directory</scope>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>assembly</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>directory-single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/bundle-all.xml</descriptor>
+							</descriptors>
+							<finalName>wb</finalName>
+							<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<executions>
+					<execution>
+						<id>process-config</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process-config</goal>
+						</goals>
+						<configuration>
+							<specs>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*config$ </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+									<substitutions>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery" </patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() </replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/jehri/config.*config$ </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+									<substitutions>
+										<substutionSpec>
+											<propertyName>org.dwfa.configname </propertyName>
+											<patternStr>UniqueConfig</patternStr>
+											<replacementStr/>
+											<nullActionStr>EMPTY_STRING</nullActionStr>
+										</substutionSpec>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery" </patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() </replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/ace/config.*config$ </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+									<substitutions>
+										<substutionSpec>
+											<propertyName>org.dwfa.configname </propertyName>
+											<patternStr>UniqueConfig</patternStr>
+											<replacementStr/>
+											<nullActionStr>EMPTY_STRING</nullActionStr>
+										</substutionSpec>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery" </patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup() </replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/ace/config.*policy </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/jehri/config.*policy </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*policy </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*properties </filePatternStr>
+									<destDir>generated-resources/config </destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/icon.* </filePatternStr>
+									<destDir>generated-resources/config/icon </destDir>
+								</extractAndProcessSpec>
+							</specs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>export-beans</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-beans</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources/ </targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-config</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-config</goal>
+						</goals>
+						<configuration>
+							<specs>
+								<configSpec>
+									<className>org.dwfa.ace.config.AceLocalConfiguration </className>
+									<configFileName>
+										generated-resources/config/start-ace-local.config </configFileName>
+									<methodName>writeToFile</methodName>
+								</configSpec>
+								<configSpec>
+									<className>org.dwfa.ace.config.AceConfiguration </className>
+									<configFileName> generated-resources/config/start-ace.config </configFileName>
+									<methodName>writeToFile</methodName>
+								</configSpec>
+							</specs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-scripts</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>generate-scripts</goal>
+						</goals>
+						<configuration>
+							<scriptOutputDir>wb-bundle/</scriptOutputDir>
+							<libDir>lib</libDir>
+							<scriptNames>
+								<param>wb</param>
+								<param>dWb</param>
+								<param>pWb</param>
+							</scriptNames>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources/</targetSubDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>run-on-mac</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>exec-maven-plugin</artifactId>
+							<version>1.1.1</version>
+							<executions>
+								<execution>
+									<id>exec-one</id>
+									<phase>run</phase>
+									<goals>
+										<goal>exec</goal>
+									</goals>
+								</execution>
+							</executions>
+							<configuration>
+								<workingDirectory>target/wb-bundle</workingDirectory>
+								<executable>./dAceOsX.sh</executable>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>run-on-pc</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>exec-maven-plugin</artifactId>
+							<executions>
+								<execution>
+									<id>exec-one</id>
+									<phase>run</phase>
+									<goals>
+										<goal>exec</goal>
+									</goals>
+								</execution>
+							</executions>
+							<configuration>
+								<workingDirectory>target/wb-bundle</workingDirectory>
+								<executable>ace.bat</executable>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>install4j</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install4j</id>
+								<phase>install</phase>
+								<configuration>
+									
+									<tasks>
+										<taskdef name="install4j"
+											classname="com.install4j.Install4JTask"
+											classpath="/Applications/install4j 4/bin/ant.jar;/opt/install4j/bin/ant.jar"/>
+										<install4j projectfile="src/main/install4j/cement_sa_wb.install4j">
+											<variable name="project.version" value="${project.version}"/>
+											<variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.file_description" value="IHTSDO Workbench Beta Release"/>
+											<variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
+											<variable name="bundle.version" value="test"/>
+											<variable name="bundle.publisher" value="IHTSDO"/>
+											<variable name="bundle.publisher.url" value="http://www.ihtsdo.org"/>
+											<variable name="bundle.vm_args" value="config/start-wb-local.config"/>
+											<variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
+											<variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
+											<variable name="pom.short.name" value="ihtsdo workbench sa"/>
+											<variable name="media.dir" value="${project.build.directory}/site"/>
+											<variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
+											<variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
+											<variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
+											<variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
+										</install4j>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>commons-net</groupId>
+								<artifactId>commons-net</artifactId>
+								<version>1.4.1</version>
+							</dependency>
+							<dependency>
+								<groupId>ant</groupId>
+								<artifactId>ant-commons-net</artifactId>
+								<version>1.6.5</version>
+							</dependency>
+							<dependency>
+								<groupId>ant</groupId>
+								<artifactId>ant-nodeps</artifactId>
+								<version>1.6.5</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

@@ -1,0 +1,890 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.ihtsdo</groupId>
+		<artifactId>cement-master</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dwfa</groupId>
+	<artifactId>cement-ace</artifactId>
+	<name>cement in ace format</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>cement in ace format. This file only contains the promoted content, not the
+		developmental content.</description>
+
+	<dependencies>
+		<dependency>
+			<!--
+				this project contains the berkeley database directory that the
+				bundle will use.
+			-->
+			<groupId>org.dwfa</groupId>
+			<artifactId>cement-vodb</artifactId>
+			<scope>runtime-directory</scope>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagBase> https://csfe.aceworkspace.net/svn/repos/sct-au/tags/au-ct-release </tagBase>
+					<preparationGoals>clean validate</preparationGoals>
+					<goals>clean install deploy:deploy</goals>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<executions>
+					<execution>
+						<id>write-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir> generated-resources/ </targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-set-default-config</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>vodb-set-default-config</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>vodb-set-architectonic-edit-path</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>vodb-set-edit-paths</goal>
+						</goals>
+						<configuration>
+							<editPaths>
+								<ConceptDescriptor>
+									<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+									<description>Workbench Auxiliary</description>
+								</ConceptDescriptor>
+							</editPaths>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>vodb-open</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-open</goal>
+						</goals>
+						<configuration>
+							<vodbDirectory>
+								${project.build.directory}/generated-resources/berkeley-db
+							</vodbDirectory>
+						</configuration>
+					</execution>
+
+					<!-- Used until promotion process is completed. -->
+					<execution>
+						<id>copy-data-to-SNOMED-model-component-path</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-hierarchy-to-path</goal>
+						</goals>
+						<configuration>
+							<toPath>
+								<uuid>51a2f84e-25c8-4c73-9389-630c7a6ed884</uuid>
+								<description>SNOMED Model Component</description>
+							</toPath>
+							<rootNode>
+								<uuid>768e720f-8833-415a-b726-5245bbca5941</uuid>
+								<description>SNOMED CT Model Component</description>
+							</rootNode>
+							<hierarchyStatuses>
+								<status>
+									<uuid>2faa9261-8fb2-11db-b606-0800200c9a66</uuid>
+									<description>current</description>
+								</status>
+								<status>
+									<uuid>32dc7b19-95cc-365e-99c9-5095124ebe72</uuid>
+									<description>active</description>
+								</status>
+							</hierarchyStatuses>
+						</configuration>
+					</execution>
+
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>exportdata</goal>
+						</goals>
+						<configuration>
+							<outputDirectory> ${project.build.directory}/generated-resources </outputDirectory>
+							<exportCohesiveSet>false</exportCohesiveSet>
+							<releaseDate>20091101</releaseDate>
+							<positionsForExport>
+								<position>
+									<path>
+										<uuid>51a2f84e-25c8-4c73-9389-630c7a6ed884</uuid>
+										<description>SNOMED Model Component</description>
+									</path>
+									<timeString>latest</timeString>
+								</position>
+								<position>
+									<path>
+										<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+										<description>Workbench Auxiliary</description>
+									</path>
+									<timeString>latest</timeString>
+								</position>
+							</positionsForExport>
+							<statusValuesForExport>
+								<status>
+									<uuid>2faa9261-8fb2-11db-b606-0800200c9a66</uuid>
+									<description>current</description>
+								</status>
+								<status>
+									<uuid>e1956e7b-08b4-3ad0-ab02-b411869f1c09</uuid>
+									<description>retired</description>
+								</status>
+								<status>
+									<uuid>cbe19851-49f7-32f7-bb27-2d24be0e77e8</uuid>
+									<description>duplicate</description>
+								</status>
+								<status>
+									<uuid>ad6b6532-0cb7-35d0-be04-47a9e4634ed8</uuid>
+									<description>outdated</description>
+								</status>
+								<status>
+									<uuid>3b397a0a-b510-391b-bd2e-5dd168c092ba</uuid>
+									<description>ambiguous</description>
+								</status>
+								<status>
+									<uuid>a09cc39f-2c01-3563-84cc-bad7d7fb597f</uuid>
+									<description>erroneous</description>
+								</status>
+								<status>
+									<uuid>4bc081d8-9f64-3a89-a668-d11ca031979b</uuid>
+									<description>limited</description>
+								</status>
+								<status>
+									<uuid>76367831-522f-3250-83a4-8609ab298436</uuid>
+									<description>moved elsewhere</description>
+								</status>
+								<status>
+									<uuid>11c24184-4d8a-3cd3-bc30-bb0aa4c76e93</uuid>
+									<description>pending move</description>
+								</status>
+								<status>
+									<uuid>181e45e8-b05a-33da-8b52-7027cbee6856</uuid>
+									<description>concept retired (active status type)</description>
+								</status>
+							</statusValuesForExport>
+							<specs>
+								<ExportSpecification>
+									<root>
+										<uuid>768e720f-8833-415a-b726-5245bbca5941</uuid>
+										<description>SNOMED CT Model Component</description>
+									</root>
+									<relTypesForHierarchy>
+										<relType>
+											<uuid>c93a30b9-ba77-3adb-a9b8-4589c9f8fb25</uuid>
+											<description>Is a (attribute)</description>
+										</relType>
+									</relTypesForHierarchy>
+									<positionsForExport>
+										<position>
+											<path>
+												<uuid>51a2f84e-25c8-4c73-9389-630c7a6ed884</uuid>
+												<description>SNOMED Model Component</description>
+											</path>
+											<timeString>latest</timeString>
+										</position>
+									</positionsForExport>
+									<statusValuesForExport>
+										<status>
+											<uuid>2faa9261-8fb2-11db-b606-0800200c9a66</uuid>
+											<description>current</description>
+										</status>
+										<status>
+											<uuid>e1956e7b-08b4-3ad0-ab02-b411869f1c09</uuid>
+											<description>retired</description>
+										</status>
+										<status>
+											<uuid>cbe19851-49f7-32f7-bb27-2d24be0e77e8</uuid>
+											<description>duplicate</description>
+										</status>
+										<status>
+											<uuid>ad6b6532-0cb7-35d0-be04-47a9e4634ed8</uuid>
+											<description>outdated</description>
+										</status>
+										<status>
+											<uuid>3b397a0a-b510-391b-bd2e-5dd168c092ba</uuid>
+											<description>ambiguous</description>
+										</status>
+										<status>
+											<uuid>a09cc39f-2c01-3563-84cc-bad7d7fb597f</uuid>
+											<description>erroneous</description>
+										</status>
+										<status>
+											<uuid>4bc081d8-9f64-3a89-a668-d11ca031979b</uuid>
+											<description>limited</description>
+										</status>
+										<status>
+											<uuid>76367831-522f-3250-83a4-8609ab298436</uuid>
+											<description>moved elsewhere</description>
+										</status>
+										<status>
+											<uuid>11c24184-4d8a-3cd3-bc30-bb0aa4c76e93</uuid>
+											<description>pending move</description>
+										</status>
+										<status>
+											<uuid>181e45e8-b05a-33da-8b52-7027cbee6856</uuid>
+											<description>concept retired (active status
+												type)</description>
+										</status>
+									</statusValuesForExport>
+								</ExportSpecification>
+								<ExportSpecification>
+									<root>
+										<uuid>f4d2fabc-7e96-3b3a-a348-ae867ba74029</uuid>
+										<description>Terminology Auxiliary concept</description>
+									</root>
+									<relTypesForHierarchy>
+										<relType>
+											<uuid>46bccdc4-8fb6-11db-b606-0800200c9a66</uuid>
+											<description>is a (relationship type)</description>
+										</relType>
+									</relTypesForHierarchy>
+									<positionsForExport>
+										<position>
+											<path>
+												<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+												<description>Workbench Auxiliary</description>
+											</path>
+											<timeString>latest</timeString>
+										</position>
+									</positionsForExport>
+									<statusValuesForExport>
+										<status>
+											<uuid>2faa9261-8fb2-11db-b606-0800200c9a66</uuid>
+											<description>current</description>
+										</status>
+										<status>
+											<uuid>e1956e7b-08b4-3ad0-ab02-b411869f1c09</uuid>
+											<description>retired</description>
+										</status>
+										<status>
+											<uuid>cbe19851-49f7-32f7-bb27-2d24be0e77e8</uuid>
+											<description>duplicate</description>
+										</status>
+										<status>
+											<uuid>ad6b6532-0cb7-35d0-be04-47a9e4634ed8</uuid>
+											<description>outdated</description>
+										</status>
+										<status>
+											<uuid>3b397a0a-b510-391b-bd2e-5dd168c092ba</uuid>
+											<description>ambiguous</description>
+										</status>
+										<status>
+											<uuid>a09cc39f-2c01-3563-84cc-bad7d7fb597f</uuid>
+											<description>erroneous</description>
+										</status>
+										<status>
+											<uuid>4bc081d8-9f64-3a89-a668-d11ca031979b</uuid>
+											<description>limited</description>
+										</status>
+										<status>
+											<uuid>76367831-522f-3250-83a4-8609ab298436</uuid>
+											<description>moved elsewhere</description>
+										</status>
+										<status>
+											<uuid>11c24184-4d8a-3cd3-bc30-bb0aa4c76e93</uuid>
+											<description>pending move</description>
+										</status>
+										<status>
+											<uuid>181e45e8-b05a-33da-8b52-7027cbee6856</uuid>
+											<description>concept retired (active status
+												type)</description>
+										</status>
+									</statusValuesForExport>
+								</ExportSpecification>
+								<ExportSpecification>
+									<root>
+										<uuid>1c698388-c309-3dfa-96f0-86248753fac5</uuid>
+										<description>Refset Auxiliary Concept</description>
+									</root>
+									<relTypesForHierarchy>
+										<relType>
+											<uuid>46bccdc4-8fb6-11db-b606-0800200c9a66</uuid>
+											<description>is a (relationship type)</description>
+										</relType>
+									</relTypesForHierarchy>
+									<positionsForExport>
+										<position>
+											<path>
+												<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+												<description>Workbench Auxiliary</description>
+											</path>
+											<timeString>latest</timeString>
+										</position>
+									</positionsForExport>
+									<statusValuesForExport>
+										<status>
+											<uuid>2faa9261-8fb2-11db-b606-0800200c9a66</uuid>
+											<description>current</description>
+										</status>
+										<status>
+											<uuid>e1956e7b-08b4-3ad0-ab02-b411869f1c09</uuid>
+											<description>retired</description>
+										</status>
+										<status>
+											<uuid>cbe19851-49f7-32f7-bb27-2d24be0e77e8</uuid>
+											<description>duplicate</description>
+										</status>
+										<status>
+											<uuid>ad6b6532-0cb7-35d0-be04-47a9e4634ed8</uuid>
+											<description>outdated</description>
+										</status>
+										<status>
+											<uuid>3b397a0a-b510-391b-bd2e-5dd168c092ba</uuid>
+											<description>ambiguous</description>
+										</status>
+										<status>
+											<uuid>a09cc39f-2c01-3563-84cc-bad7d7fb597f</uuid>
+											<description>erroneous</description>
+										</status>
+										<status>
+											<uuid>4bc081d8-9f64-3a89-a668-d11ca031979b</uuid>
+											<description>limited</description>
+										</status>
+										<status>
+											<uuid>76367831-522f-3250-83a4-8609ab298436</uuid>
+											<description>moved elsewhere</description>
+										</status>
+										<status>
+											<uuid>11c24184-4d8a-3cd3-bc30-bb0aa4c76e93</uuid>
+											<description>pending move</description>
+										</status>
+										<status>
+											<uuid>181e45e8-b05a-33da-8b52-7027cbee6856</uuid>
+											<description>concept retired (active status
+												type)</description>
+										</status>
+									</statusValuesForExport>
+								</ExportSpecification>
+							</specs>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>vodb-close</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>vodb-close</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<executions>
+					<execution>
+						<id>write-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir> generated-resources/ </targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>transform</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+						<configuration>
+							<idFileLoc>${project.build.directory}/generated-resources/</idFileLoc>
+							<outputSpecs>
+								<outputSpec name="output concepts">
+									<writers>
+										<writer
+											implementation="org.dwfa.maven.transform.SimpleExportNullIsEmpty">
+											<fileName>${project.build.directory}/classes/ace/concepts.txt</fileName>
+											<exportOnlyActive>false</exportOnlyActive>
+											<append>true</append>
+											<writeHeaders>false</writeHeaders>
+											<columns>
+												<name>CONCEPTUUID</name>
+												<name>CONCEPTSTATUSUUID</name>
+												<name>ISPRIMITVE</name>
+												<name>EFFECTIVETIME</name>
+												<name>PATHUUID</name>
+											</columns>
+										</writer>
+									</writers>
+									<inputSpecs>
+										<inputSpec>
+											<inputFile>
+												${project.build.directory}/generated-resources/concepts.txt </inputFile>
+											<skipFirstLine> false </skipFirstLine>
+											<columnSpecs>
+												<!-- 0 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTID </name>
+												</transform>
+												<!-- 1 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTSTATUS </name>
+												</transform>
+												<!-- 2 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> FULLYSPECIFIEDNAME </name>
+												</transform>
+												<!-- 3 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>CTV3ID</name>
+												</transform>
+												<!-- 4 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> SNOMEDID </name>
+												</transform>
+												<!-- 5 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> ISPRIMITVE </name>
+												</transform>
+												<!-- 6 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTUUID </name>
+												</transform>
+												<!-- 7 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTSTATUSUUID </name>
+												</transform>
+												<!-- 7 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTSTATUSID </name>
+												<columnId> 7 </columnId>
+												</transform>
+												<!-- 8 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> EFFECTIVETIME </name>
+												</transform>
+												<!-- 9 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> PATHUUID </name>
+												</transform>
+												<!-- 9 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>PATHID</name>
+												<columnId> 9 </columnId>
+												</transform>
+												<!-- 10 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_UUID</name>
+												</transform>
+												<!-- 10 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_SCTID</name>
+												<columnId> 10 </columnId>
+												</transform>
+											</columnSpecs>
+										</inputSpec>
+									</inputSpecs>
+								</outputSpec>
+								<outputSpec name="output descriptions">
+									<writers>
+										<writer
+											implementation="org.dwfa.maven.transform.SimpleExport">
+											<fileName>${project.build.directory}/classes/ace/descriptions.txt</fileName>
+											<exportOnlyActive>false</exportOnlyActive>
+											<append>true</append>
+											<writeHeaders>false</writeHeaders>
+											<columns>
+												<name>DESCRIPTIONUUID</name>
+												<name>DESCRIPTIONSTATUSUUID</name>
+												<name>CONCEPTUUID</name>
+												<name>TERM</name>
+												<name>CASESENSITIVITY_UUID</name>
+												<name>DESCRIPTIONTYPEUUID</name>
+												<name>LANGUAGEUUID</name>
+												<name>EFFECTIVETIME</name>
+												<name>PATHUUID</name>
+											</columns>
+										</writer>
+									</writers>
+									<inputSpecs>
+										<inputSpec>
+											<inputFile>
+												${project.build.directory}/generated-resources/descriptions.txt </inputFile>
+											<skipFirstLine> false </skipFirstLine>
+											<columnSpecs>
+												<!-- 0 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONID </name>
+												</transform>
+												<!-- 1 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONSTATUS </name>
+												</transform>
+												<!-- 2 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTID </name>
+												</transform>
+												<!-- 3 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>TERM</name>
+												</transform>
+												<!-- 4 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CASESENSITIVITY </name>
+												</transform>
+												<!-- 4 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CASESENSITIVITY_UUID </name>
+												<columnId> 4 </columnId>
+												</transform>
+												<!-- 4 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CASESENSITIVITY_SCTID </name>
+												<columnId> 4 </columnId>
+												<chainedTransform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> LANGUAGEID </name>
+												<columnId> 4 </columnId>
+												</chainedTransform>
+												</transform>
+												<!-- 5 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> INITIALCAPITALSTATUS </name>
+												</transform>
+												<!-- 6 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONTYPE </name>
+												</transform>
+												<!-- 7 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> LANGUAGECODE </name>
+												</transform>
+												<!-- 8 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> LANGUAGEUUID </name>
+												</transform>
+												<!-- 8 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> LANGUAGEID </name>
+												<columnId> 8 </columnId>
+												<chainedTransform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> LANGUAGEID </name>
+												<columnId> 8 </columnId>
+												</chainedTransform>
+												</transform>
+												<!-- 9 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONUUID </name>
+												</transform>
+												<!-- 10 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONSTATUSUUID </name>
+												</transform>
+												<!-- 10 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONSTATUSID </name>
+												<columnId> 10 </columnId>
+												</transform>
+												<!-- 11 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONTYPEUUID </name>
+												</transform>
+												<!-- 11 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> DESCRIPTIONTYPEID </name>
+												<columnId> 11 </columnId>
+												</transform>
+												<!-- 12 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTUUID </name>
+												</transform>
+												<!-- 13 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> EFFECTIVETIME </name>
+												</transform>
+												<!-- 14 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> PATHUUID </name>
+												</transform>
+												<!-- 14 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>PATHID</name>
+												<columnId> 14 </columnId>
+												</transform>
+												<!-- 15 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_UUID</name>
+												</transform>
+												<!-- 15 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_SCTID</name>
+												<columnId> 15 </columnId>
+												</transform>
+											</columnSpecs>
+										</inputSpec>
+									</inputSpecs>
+								</outputSpec>
+								<outputSpec name="output relationships">
+									<writers>
+										<writer
+											implementation="org.dwfa.maven.transform.SimpleExport">
+											<fileName>${project.build.directory}/classes/ace/relationships.txt</fileName>
+											<exportOnlyActive>false</exportOnlyActive>
+											<append>true</append>
+											<writeHeaders>false</writeHeaders>
+											<columns>
+												<name>RELATIONSHIPUUID</name>
+												<name>RELATIONSHIPSTATUSUUID</name>
+												<name>CONCEPTUUID1</name>
+												<name>RELATIONSHIPTYPEUUID</name>
+												<name>CONCEPTUUID2</name>
+												<name>CHARACTERISTICTYPEUUID</name>
+												<name>REFINABILITYUUID</name>
+												<name>RELATIONSHIPGROUP</name>
+												<name>EFFECTIVETIME</name>
+												<name>PATHUUID</name>
+											</columns>
+										</writer>
+									</writers>
+									<inputSpecs>
+										<inputSpec>
+											<inputFile>
+												${project.build.directory}/generated-resources/relationships.txt </inputFile>
+											<skipFirstLine> false </skipFirstLine>
+											<columnSpecs>
+												<!-- 0 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPID </name>
+												</transform>
+												<!-- 1 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> REL_STATUS </name>
+												</transform>
+												<!-- 2 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTID1 </name>
+												</transform>
+												<!-- 3 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPTYPE </name>
+												</transform>
+												<!-- 4 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTID2 </name>
+												</transform>
+												<!-- 5 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CHARACTERISTICTYPE </name>
+												</transform>
+												<!-- 6 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> REFINABILITY </name>
+												</transform>
+												<!-- 7 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPGROUP </name>
+												</transform>
+												<!-- 8 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPUUID </name>
+												</transform>
+												<!-- 9 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTUUID1 </name>
+												</transform>
+												<!-- 10 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPTYPEUUID </name>
+												</transform>
+												<!-- 10 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPTYPEID </name>
+												<columnId> 10 </columnId>
+												</transform>
+												<!-- 11 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CONCEPTUUID2 </name>
+												</transform>
+												<!-- 12 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CHARACTERISTICTYPEUUID </name>
+												</transform>
+												<!-- 12 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> CHARACTERISTICTYPEID </name>
+												<columnId> 12 </columnId>
+												</transform>
+												<!-- 13 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> REFINABILITYUUID </name>
+												</transform>
+												<!-- 14 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> RELATIONSHIPSTATUSUUID </name>
+												</transform>
+												<!-- 15 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> EFFECTIVETIME </name>
+												</transform>
+												<!-- 16 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> PATHUUID </name>
+												</transform>
+												<!-- 16 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>PATHID</name>
+												<columnId> 16 </columnId>
+												</transform>
+												<!-- 17 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_UUID</name>
+												</transform>
+												<!-- 17 again -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name>STATUS_SCTID</name>
+												<columnId> 17 </columnId>
+												</transform>
+											</columnSpecs>
+										</inputSpec>
+									</inputSpecs>
+								</outputSpec>
+								<outputSpec name="output identifiers">
+									<writers>
+										<writer
+											implementation="org.dwfa.maven.transform.SimpleExport">
+											<fileName>${project.build.directory}/classes/ace/ids.txt</fileName>
+											<exportOnlyActive>false</exportOnlyActive>
+											<append>true</append>
+											<writeHeaders>false</writeHeaders>
+											<columns>
+												<name>PRIMARY_UUID</name>
+												<name>SOURCE_SYSTEM_UUID</name>
+												<name>SOURCE_ID</name>
+												<name>STATUS_UUID</name>
+												<name>EFFECTIVE_DATE</name>
+												<name>PATH_UUID</name>
+											</columns>
+										</writer>
+									</writers>
+									<inputSpecs>
+										<inputSpec>
+											<inputFile>
+												${project.build.directory}/generated-resources/ids.txt </inputFile>
+											<skipFirstLine> false </skipFirstLine>
+											<columnSpecs>
+												<!-- 0 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> PRIMARY_UUID </name>
+												</transform>
+												<!-- 1 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> SOURCE_SYSTEM_UUID </name>
+												</transform>
+												<!-- 2 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> SOURCE_ID </name>
+												</transform>
+												<!-- 3 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> STATUS_UUID </name>
+												</transform>
+												<!-- 4 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> EFFECTIVE_DATE </name>
+												</transform>
+												<!-- 5 -->
+												<transform
+												implementation="org.dwfa.maven.transform.IdentityTransform">
+												<name> PATH_UUID </name>
+												</transform>
+											</columnSpecs>
+										</inputSpec>
+									</inputSpecs>
+								</outputSpec>
+							</outputSpecs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

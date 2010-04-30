@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dwfa</groupId>
+	<artifactId>cement-cs</artifactId>
+	<name>cement change sets</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>cement development represented as change sets. </description>
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>ACE Archiva Releases Repository</name>
+			<url>file:///ciserver/repositories/releases
+      </url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>ACE Archiva Snapshots Repository</name>
+			<url>file:///ciserver/repositories/snapshots
+      </url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<properties>
+		<org.ihtsdo.wb-mojo.version>1.0-SNAPSHOT</org.ihtsdo.wb-mojo.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<executions>
+					<execution>
+						<id>process-project-dirs</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>process-project-dirs</goal>
+						</goals>
+						<configuration>
+							<specs>
+								<extractAndProcessSpec>
+									<!--
+										This line enables all change sets to be incorporated in the
+										standard jar file so that other projects can "subscribe" to
+										the change sets using standard maven mechanisms.
+									-->
+									<filePatternStr>.*jcs$</filePatternStr>
+									<destDir>classes</destDir>
+									<retainDirStructure>true</retainDirStructure>
+								</extractAndProcessSpec>
+							</specs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
