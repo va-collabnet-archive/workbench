@@ -267,7 +267,7 @@ public class CollectionEditorContainer extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         showComponentView = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/component.png")));
         showComponentActionListener = new ShowComponentActionListener();
-        showComponentView.setVisible(ACE.editMode);
+        showComponentView.setVisible(true);
         showComponentView.addActionListener(showComponentActionListener);
         showComponentView.setToolTipText("Show component view associated with list view");
         listEditorTopPanel.add(showComponentView, c);
@@ -280,7 +280,7 @@ public class CollectionEditorContainer extends JPanel {
         c.gridx++;
 
         JButton eraseListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_delete.png")));
-        eraseListButton.setVisible(ACE.editMode);
+        eraseListButton.setVisible(true);
         eraseListButton.addActionListener(new EraseListActionListener());
         eraseListButton.setToolTipText("clear the list");
         listEditorTopPanel.add(eraseListButton, c);
