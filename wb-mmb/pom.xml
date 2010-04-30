@@ -84,7 +84,6 @@
         </plugins>
     </reporting>
     <modules>
-        <module>dwfa-pom</module>
         <module>foundation</module>
         <module>core</module>
         <module>wb-api</module>
