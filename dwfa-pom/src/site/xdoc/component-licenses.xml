@@ -1,0 +1,30 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>Component Licenses</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Default License">
+      <p>
+       Most of the components included in this project are licensed under the Apache 2 license as described 
+       <a href="license.html">here</a>.
+      </p>
+      <p>
+      Some components are included for convience of providing a comprehensive bundle rather than requiring end-users
+      to assemble the components themselves. These components are subject to a separate license.
+      </p>
+      <ul>
+      <li>The InstallAnywhere installer and associated libraries.</li>
+      <li>The SNOMED content.</li>
+      <li>The Informatics, Inc. logo is a trademark of Informatics, Inc.</li>
+      
+      </ul>
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

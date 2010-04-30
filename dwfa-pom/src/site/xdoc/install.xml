@@ -1,0 +1,22 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>DWFA Installer</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Install Instructions">
+       <p>Download instructions for installing the Clinic Workflow Bundle <a href="DWFA_Installation.pdf">here</a>.</p>
+	   
+    </section>
+    <section name="Bundle Installer">
+
+      <!-- Within sections, any XHTML can be used -->
+      <iframe src="Web_Installers/install.htm" frameborder="0" width="690" height="2000" scrolling="no"></iframe>
+    </section>
+  </body>
+</document>

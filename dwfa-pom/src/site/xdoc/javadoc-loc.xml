@@ -1,0 +1,19 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>JavaDoc Location</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="JavaDoc Location">
+       <p>The JavaDoc for each of the modules is available by selecting the desired module from the 
+       left-hand side of this web page. Then from the module's web-page, select the API Documentation link.</p>
+
+        
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

@@ -1,0 +1,45 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>AceWorkspace Maven Repository</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Ace Workspace Maven Repository">
+       <p>It is often more convient to access the latest dependencies from a Maven Repository rather than requiring the developer
+         to continually checkout and compile the latest sources. The 
+         <a href="https://mgr.servers.aceworkspace.net/apps/ace_archiva/archiva/repository/ace_releases">Ace Workspace Maven Release repository</a> and the 
+         <a href="https://mgr.servers.aceworkspace.net/apps/ace_archiva/archiva/repository/ace_snapshots">Ace Workspace Maven Snapshot repository</a>
+         is available for this purpose. 
+       To allow maven to access the repository, add the following to your settings.xml file:</p>
+      <source>
+        <pre>
+          &lt;profiles&gt;
+            &lt;profile&gt;
+              &lt;activation&gt;
+                &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;
+              &lt;/activation&gt;
+              &lt;repositories&gt;
+                &lt;repository&gt;
+                  &lt;id&gt;ace.snapshots&lt;/id&gt;
+                  &lt;name&gt;ace snapshot repository&lt;/name&gt;
+                  &lt;url&gt;https://mgr.servers.aceworkspace.net/apps/ace_archiva/archiva/repository/ace_snapshots&lt;/url&gt;
+                &lt;/repository&gt;
+                &lt;repository&gt;
+                  &lt;id&gt;ace.releases&lt;/id&gt;
+                  &lt;name&gt;ace releases repository&lt;/name&gt;
+                  &lt;url&gt;https://mgr.servers.aceworkspace.net/apps/ace_archiva/archiva/repository/ace_releases&lt;/url&gt;
+                &lt;/repository&gt;
+                &lt;/repositories&gt;
+            &lt;/profile&gt;
+          &lt;/profiles&gt;
+        </pre>
+      </source>
+      
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

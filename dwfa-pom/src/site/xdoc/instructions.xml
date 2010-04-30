@@ -1,0 +1,18 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>DWFA Installer Instructions</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Install Instructions">
+       These are the installer instructions.
+
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

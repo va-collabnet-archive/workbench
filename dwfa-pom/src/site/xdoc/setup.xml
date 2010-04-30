@@ -1,0 +1,68 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>Setup Instructions</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="A. Clinic Installation Instructions">
+    <ol>
+       <li>Download <a href="DWFA_Installation.pdf">Installation Instructions</a>.</li>
+       </ol>
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+    <section name="B. Put Record on Server">
+    <p>Subsequent exercises depend on a health record. This exercise shows the steps
+    necessary to install a pre-generated record on the chart server.</p>
+    <ol>
+       <li>Select the Queue Viewer window.</li>
+       <li>In the queue list on the 
+       left hand side of the window, select the queue with the 
+       "Queue Name" of "[prefix] Clinic Launcher Queue." Once selected, 
+       the processes within this queue are listed in a table to the top and right of the queue list.</li>
+       <li>Select the process with the name "Put Chart on Server" from the process list. Once selected, 
+       the process is shown on the panel below. This particular process has four tasks, that are briefly described here: 
+       <ul>
+        <li>
+            <dl>
+                <dt><font color='black'>Change Instance Id</font></dt>
+                <dd>Changes the identifier of the process when launched to ensure that all processes have unique identifiers.</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt><font color='green'>Set Deadline</font></dt>
+                <dd>Sets the execution deadline to be 0 minutes relative to the time this task is executed. This
+        is used to order processes within a queue to ensure timely execution.</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt><font color='green'>Put Chart On Server</font></dt>
+                <dd>Prompts the user to select a chart object from the filesystem that will be put
+        on the chart server for subsequent exercises.</dd>
+            </dl>
+        </li>
+        <li>
+            <dl>
+                <dt><font color='red'>Process Complete</font></dt>
+                <dd>Indicates that the process has completed normally.</dd>
+            </dl>
+        </li>
+       </ul>
+     </li>
+     <li>Select the "execute" button on the bottom right side of the window. </li>
+     <li>Using the file dialog box, select the file "ChekovRecord.bean" located in [install directory]/beans/records/ChekovRecord.bean on unix or 
+     [install directory]\beans\records\ChekovRecord.bean on window. </li>
+     <li>Note that after execution, the process list refreshes, and shows all the processes available in this queue. Since this queue is configured
+     to be a "launcher" queue, the process remains in the queue so it can be lauched again. In most other queues, launching a process removes that process
+     from the queue. </li>
+    </ol>
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

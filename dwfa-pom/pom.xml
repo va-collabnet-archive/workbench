@@ -1,0 +1,368 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dwfa</groupId>
+    <artifactId>dwfa-pom</artifactId>
+    <packaging>pom</packaging>
+    <version>2.31-SNAPSHOT</version>
+    <name>DWFA Master POM</name>
+    <inceptionYear>2004</inceptionYear>
+    <description> Distributed Workflow Architecture based on JavaBeans and Jini. </description>
+    <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/dwfa/site/index.html</url>
+    <organization>
+        <name>Informatics, Inc.</name>
+        <url>http://www.informatics.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <distributionManagement>
+        <site>
+            <id>website</id>
+            <url>file:///ciserver/sites/dwfa</url>
+        </site>
+        <snapshotRepository>
+            <id>archiva04.snapshots</id>
+            <name>Archiva04 Snapshots Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>archiva04.releases</id>
+            <name>Archiva04 Releases Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
+        </repository>
+    </distributionManagement>
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
+    </scm>
+    <issueManagement>
+        <system>Tracker</system>
+        <url>https://csfe.aceworkspace.net/sf/tracker/do/listTrackers/projects.dwfa/tracker</url>
+    </issueManagement>
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://mgr.servers.aceworkspace.net/apps/hudson04/</url>
+    </ciManagement>
+    <mailingLists>
+        <mailingList>
+            <name>announce</name>
+            <subscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.announce</subscribe>
+            <unsubscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.announce</unsubscribe>
+            <post>announce-dwfa@sf19-ace.sjc.collab.net</post>
+            <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.announce</archive>
+        </mailingList>
+        <mailingList>
+            <name>users</name>
+            <subscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.users</subscribe>
+            <unsubscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.users</unsubscribe>
+            <post>general-dwfa@sf19-ace.sjc.collab.net</post>
+            <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.users</archive>
+        </mailingList>
+        <mailingList>
+            <name>development</name>
+            <subscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.dev</subscribe>
+            <unsubscribe>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.dev</unsubscribe>
+            <post>dev-dwfa@sf19-ace.sjc.collab.net</post>
+            <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.dwfa/discussion.dev</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <developer>
+            <id>kec</id>
+            <name>Keith Campbell MD, PhD </name>
+            <email>campbell@informatics.com</email>
+            <url>http://www.informatics.com/bios/campbell.html</url>
+            <organization>Informatics, Inc.</organization>
+            <organizationUrl>http://www.informatics.com</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Java Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+            <properties />
+        </developer>
+        <developer>
+            <id>sc</id>
+            <name>Susan Castillo</name>
+            <email>castillo@informatics.com</email>
+            <url>http://www.informatics.com/bios/castillo.html</url>
+            <organization>Informatics, Inc.</organization>
+            <organizationUrl>http://www.informatics.com</organizationUrl>
+            <roles>
+                <role>Install Anywhere</role>
+                <role>Quality Assurance</role>
+            </roles>
+            <timezone>-8</timezone>
+            <properties />
+        </developer>
+        <developer>
+            <id>wpreid</id>
+            <name>Perry Reid</name>
+            <email>wpreid@gmail.com</email>
+            <url>http://www.informatics.com/bios/perry.reid.html</url>
+            <organization>Informatics, Inc.</organization>
+            <organizationUrl>http://www.informatics.com</organizationUrl>
+            <roles>
+                <role>Java Developer</role>
+                <role>Build Manager</role>
+            </roles>
+            <timezone>-6</timezone>
+            <properties />
+        </developer>
+    </developers>
+    <repositories>
+        <repository>
+            <id>archiva04.snapshots</id>
+            <name>Archiva04 Managed Snapshot Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>archiva04.releases</id>
+            <name>Archiva04 Managed Release Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>ace.snapshots</id>
+            <name>ace snapshot repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva5/archiva/repository/ace_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ace.releases</id>
+            <name>ace releases repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva5/archiva/repository/ace_releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>ciserver.snapshots</id>
+            <name>Archiva ciserver Managed Snapshot Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/ciserver.snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ciserver.releases</id>
+            <name>Archiva ciserver Managed Release Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/ciserver.releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+         <repository>
+            <id>maven.org</id>
+            <url>http://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>informatics.com</id>
+            <url>http://www.informatics.com/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>hourly</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Repository</name>
+            <url>http://people.apache.org/maven-snapshot-repository</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mortbay.snapshots</id>
+            <name>Mortbay Development Repository</name>
+            <url>http://www.mortbay.org/maven2/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+		<repository>
+			<id>java.net</id>
+			<url>http://download.java.net/maven/2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>ciserver.releases</id>
+            <name>Archiva ciserver Managed Release Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/ciserver.releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>ciserver.snapshots</id>
+            <name>Archiva ciserver Managed Snapshot Repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/ciserver.snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>ace.snapshots</id>
+            <name>ace snapshot repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva5/archiva/repository/ace_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>ace.releases</id>
+            <name>ace releases repository</name>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva5/archiva/repository/ace_releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>apache.snapshots</id>
+            <name>Apache Development Repository</name>
+            <url>http://people.apache.org/maven-snapshot-repository</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>snapshots-codehaus-org</id>
+            <name>Snapshots of maven plugins at codehaus.org</name>
+            <url>http://snapshots.repository.codehaus.org/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <!--<updatePolicy>always</updatePolicy>-->
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+		  	</plugin>
+			<plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-release-plugin</artifactId>
+                 <version>2.0-beta-9</version>
+                 <configuration>
+                     <tagBase>${scm.tagbase}</tagBase>
+                     <preparationGoals>clean validate</preparationGoals>
+                     <goals>deploy</goals>
+                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                     <remoteTagging>true</remoteTagging>
+                 </configuration>
+             </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.4.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

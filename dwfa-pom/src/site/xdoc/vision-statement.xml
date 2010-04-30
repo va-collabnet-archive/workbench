@@ -1,0 +1,21 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>Vision Statement</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Vision">
+       <p>Loosely coupled service-oriented architecture.</p>
+       <p>Open source projects will better serve some markets. This project is an 
+       effort to see if an open-source distributed workflow project might serve aspects
+       of the healthcare and healthcare terminology markets.  </p>
+
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

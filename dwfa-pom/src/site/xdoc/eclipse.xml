@@ -1,0 +1,40 @@
+<document>
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>Eclipse Integration</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head>
+  </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="Eclipse Integration">
+       <p>Eclipse provides a generally available integrated development environment for developing java components. 
+       <a href="http://maven.apache.org/plugins/maven-eclipse-plugin/overview.html">The Maven Eclipse Plugin</a> provides a means to 
+       generate an Eclipse project file from a Maven project.</p>
+       <p>The DWFA modules include an entry for the Maven Eclipse Plugin in each of their <code>pom.xml</code> files.
+       If you would like to use Eclipse to extend the DWFA environment by adding your own tasks, please follow these steps:</p>
+       <ol>
+        <li><p>Eclipse needs to know the path to the local maven repository. 
+                Therefore the classpath variable <i>M2_REPO</i> has to be set. 
+                Execute the following command:</p>
+                <p><code>
+                    mvn -Declipse.workspace=&lt;path-to-eclipse-workspace&gt; eclipse:add-maven-repo 
+                    </code></p>
+            <p>You can also define a new classpath variable inside eclipse: 
+            From the menu bar, select Window &gt; Preferences. Select the Java &gt; Build Path &gt; Classpath Variables page.</p></li>
+        <li>Navigate to the <code>dev/process</code> directory inside dfwa folder you installed with the installer, or you copied from a CD-ROM.<br/><br/></li>
+        <li>Verify that you are in the same directory as the pom.xml file<br/><br/></li>
+        <li>Execute <code>mvn eclipse:eclipse</code> at a command prompt from within this folder. This execution will cause maven to generate
+            several files used by eclipse. Eclipse can now import the module. <br/><br/></li>
+        <li>Import the process project. From the menu bar, select File &gt; Import... From the import dialog, select General &gt; Existing Projects into Workspace,
+        then select the Next  &gt; button. Select the Browse button next to the Select root directory, and navigate to the <code>dev/process</code> 
+        directory inside dfwa folder you installed with the installer, or you copied from a CD-ROM, and select this folder. The project name will show
+        inside the Projects: list inside the import dialog. Select the finish button, and the project will be imported. You can now browse the source files, and other
+        files inside this project from within Eclipse. <br/><br/></li>
+       </ol>
+
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>
