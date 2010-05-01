@@ -26,12 +26,15 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
@@ -41,6 +44,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -74,6 +78,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private I_GetConceptData reviewedApprovedAdditionStatus;
     private I_GetConceptData reviewedRejectedDeletionStatus;
     private I_GetConceptData reviewedRejectedAdditionStatus;
+    private I_ConfigAceFrame activeFrameConfig;
 
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
@@ -97,17 +102,14 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+        AceLog.getAppLog().info("Starting " + this.getIdAndName());
 
         try {
             ex = null;
             if (SwingUtilities.isEventDispatchThread()) {
-                doRun(process, worker);
+                throw new TaskFailedException("This task cannot be run on the event dispatch thread. ");
             } else {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        doRun(process, worker);
-                    }
-                });
+                doRun(process, worker);
             }
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -121,6 +123,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
 
         try {
+            //TODO replace getActiveFrameConfig with a passed in value. 
+            activeFrameConfig = Terms.get().getActiveAceFrameConfig();
 
             termFactory = Terms.get();
             currentStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -187,6 +191,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private void updatePromotionsRefset(Collection<? extends I_ExtendByRef> memberExtensions,
                                                    Collection<? extends I_ExtendByRef> promotionExtensions) throws Exception {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+        refsetHelper.setAutocommitActive(false);
         for (I_ExtendByRef memberExtension : memberExtensions) {
             I_ExtendByRefPart latestMemberPart = getLatestPart(memberExtension);
             I_ExtendByRef promotionExtension =
@@ -253,6 +258,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                 }
             }
         }
+        Terms.get().addUncommittedNoChecks(promotionRefsetConcept);
+        Terms.get().addUncommittedNoChecks(memberRefsetConcept);
     }
 
     private I_GetConceptData getPromotionStatus(I_ExtendByRef promotionExtension) throws Exception {
@@ -278,15 +285,19 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         return null;
     }
 
-    // TODO get this to use the version computer. 
-    private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) {
-        I_ExtendByRefPart latestPart = null;
-        for (I_ExtendByRefPart part : memberExtension.getMutableParts()) {
-            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
-                latestPart = part;
-            }
+    private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) throws TerminologyException, IOException {
+        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(activeFrameConfig.getAllowedStatus(), 
+            activeFrameConfig.getViewPositionSetReadOnly(), 
+            activeFrameConfig.getPrecedence(), 
+            activeFrameConfig.getConflictResolutionStrategy());
+        if (versions.size() == 0) {
+            return null;
         }
-        return latestPart;
+        if (versions.size() > 1) {
+            throw new IOException("Contradiction identified in member extension:\n" +
+                memberExtension + "\n\ncontradiction: " + versions);
+        }
+        return versions.get(0);
     }
 
     public int[] getDataContainerIds() {

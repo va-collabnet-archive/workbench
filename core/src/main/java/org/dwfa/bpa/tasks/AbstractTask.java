@@ -136,13 +136,12 @@ public abstract class AbstractTask implements I_DefineTask {
         }
 
     }
-
+    
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getName()
      */
     public final String getName() {
-        String className = this.getClass().getName();
-        return className.substring(className.lastIndexOf('.') + 1);
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -150,6 +149,10 @@ public abstract class AbstractTask implements I_DefineTask {
      */
     public int getId() {
         return this.id;
+    }
+    
+    public final String getIdAndName() {
+        return this.id + ": " + getName();
     }
 
     /**
