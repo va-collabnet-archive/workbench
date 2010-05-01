@@ -408,23 +408,40 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             return tmp.intValue();
     }
 
-    // STATUS LOOKUP
-    private UUID[] yStatusArray;
-    private String[] yStatusStrArray;
+    // STATUS TYPE LOOKUP
+    private HashMap<String, Integer> yStatusUuidMap;
+    private ArrayList<String> yStatusUuidList;
+    private UUID[] yStatusUuidArray;
+    private int yStatusUuidIdxCounter;
 
-    private UUID lookupYStatus(int j) {
-        return yStatusArray[j + 2];
+    private int lookupYStatusUuidIdx(String statusUuidStr) {
+        Integer tmp = yStatusUuidMap.get(statusUuidStr);
+        if (tmp == null) {
+            yStatusUuidIdxCounter++;
+            yStatusUuidMap.put(statusUuidStr, Integer.valueOf(yStatusUuidIdxCounter));
+            yStatusUuidList.add(statusUuidStr);
+            return yStatusUuidIdxCounter;
+        } else
+            return tmp.intValue();
     }
 
-    private int lookupYStatusIdx(String status) {
-        int idx = 0;
-        while (idx < 12) {
-            if (status.equalsIgnoreCase(yStatusStrArray[idx]))
-                break;
-            idx++;
-        }
-        return idx - 2;
-    }
+//    // STATUS LOOKUP
+//    private UUID[] yStatusArray;
+//    private String[] yStatusStrArray;
+//
+//    private UUID lookupYStatus(int j) {
+//        return yStatusArray[j + 2];
+//    }
+//
+//    private int lookupYStatusIdx(String status) {
+//        int idx = 0;
+//        while (idx < 12) {
+//            if (status.equalsIgnoreCase(yStatusStrArray[idx]))
+//                break;
+//            idx++;
+//        }
+//        return idx - 2;
+//    }
 
     // DESCRIPTION TYPE LOOKUP
     private HashMap<String, Integer> yDesTypeUuidMap;
@@ -586,34 +603,40 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         // Relationship Role Types
         yRoleTypeList = new ArrayList<RoleTypeEntry>();
 
+
         // Status Array
-        yStatusArray = new UUID[14];
-        int i = 0;
-        int j = -2;
-        while (j < 12) {
-            try {
-                yStatusArray[i] = ArchitectonicAuxiliary.getStatusFromId(j).getUids().iterator()
-                        .next();
-            } catch (IOException e) {
-                yStatusArray[i] = null;
-                e.printStackTrace();
-            } catch (TerminologyException e) {
-                yStatusArray[i] = null;
-                e.printStackTrace();
-            }
-            i++;
-            j++;
-        }
+//        yStatusArray = new UUID[14];
+//        int i = 0;
+//        int j = -2;
+//        while (j < 12) {
+//            try {
+//                yStatusArray[i] = ArchitectonicAuxiliary.getStatusFromId(j).getUids().iterator()
+//                        .next();
+//            } catch (IOException e) {
+//                yStatusArray[i] = null;
+//                e.printStackTrace();
+//            } catch (TerminologyException e) {
+//                yStatusArray[i] = null;
+//                e.printStackTrace();
+//            }
+//            i++;
+//            j++;
+//        }
 
         // Status String Array
-        yStatusStrArray = new String[14];
-        for (int idx = 0; idx < 14; idx++)
-            yStatusStrArray[idx] = yStatusArray[idx].toString();
+//        yStatusStrArray = new String[14];
+//        for (int idx = 0; idx < 14; idx++)
+//            yStatusStrArray[idx] = yStatusArray[idx].toString();
 
         try {
+            // Status Array
+            for (int idx = 0; idx <  12; idx++)
+                lookupYStatusUuidIdx(ArchitectonicAuxiliary.getStatusFromId(idx).getUids().iterator()
+                        .next().toString());
+
           // DESCRIPTION TYPES
           // Setup the standard description types used in SNOMED
-          for (i = 0; i < 4; i++)
+          for (int i = 0; i < 4; i++)
               lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
                       .iterator().next().toString());
 //            // DESCRIPTION TYPES
@@ -628,7 +651,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             // RELATIONSHIP CHARACTERISTIC
             yRelCharArray = new UUID[5];
-            for (i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
                 yRelCharArray[i] = ArchitectonicAuxiliary.getSnomedCharacteristicType(i).getUids()
                         .iterator().next();
             // string lookup array
@@ -638,7 +661,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             // RELATIONSHIP REFINABILITY
             yRelRefArray = new UUID[3];
-            for (i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 yRelRefArray[i] = ArchitectonicAuxiliary.getSnomedRefinabilityType(i).getUids()
                         .iterator().next();
             // string lookup array
@@ -659,8 +682,15 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     }
 
     private void setupLookupPartB() throws MojoFailureException {
-        yDesTypeUuidArray = new UUID[yDesTypeUuidList.size()];
+        yStatusUuidArray = new UUID[yStatusUuidList.size()];
         int i = 0;
+        for (String s : yStatusUuidList) {
+            yStatusUuidArray[i] = UUID.fromString(s);
+            i++;
+        }
+
+        yDesTypeUuidArray = new UUID[yDesTypeUuidList.size()];
+        i = 0;
         for (String s : yDesTypeUuidList) {
             yDesTypeUuidArray[i] = UUID.fromString(s);
             i++;
@@ -793,6 +823,10 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         ySourceUuidMap = new HashMap<String, Integer>();
         ySourceUuidList = new ArrayList<String>();
         ySourceUuidIdxCounter = -1;
+
+        yStatusUuidMap = new HashMap<String, Integer>();
+        yStatusUuidList = new ArrayList<String>();
+        yStatusUuidIdxCounter = -1;
 
         yDesTypeUuidMap = new HashMap<String, Integer>();
         yDesTypeUuidList = new ArrayList<String>();
@@ -1063,7 +1097,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // Status UUID
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // Status
-            int conceptStatus = lookupYStatusIdx(line[CONCEPT_STATUS]);
+            int conceptStatus = lookupYStatusUuidIdx(line[CONCEPT_STATUS]);
             // Primitive
             int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
             // Effective Date
@@ -1105,7 +1139,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // DESCRIPTION_UUID = 0;
             UUID uuidDes = UUID.fromString(line[DESCRIPTION_UUID]);
             // STATUS_UUID = 1;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // CONCEPT_UUID = 2;
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // TERM_STRING = 3;
@@ -1162,7 +1196,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // RELATIONSHIP_UUID = 0;
             UUID uuidRelId = UUID.fromString(line[RELATIONSHIP_UUID]);
             // STATUS_UUID = 1;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // C1_UUID = 2;
             UUID uuidC1 = UUID.fromString(line[C1_UUID]);
             // ROLE_TYPE_UUID = 3;
@@ -1216,21 +1250,11 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // ID_FROM_SOURCE_SYSTEM = 2;
             String idFromSourceSystem = line[ID_FROM_SOURCE_SYSTEM];
             // STATUS_UUID = 3;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
             int revDate = lookupYRevDateIdx(line[EFFECTIVE_DATE]);
             // PATH_UUID = 5;
             int pathIdx = lookupYPathIdx(line[PATH_UUID]);
-
-            // :DEBUG: 
-            if (uuidPrimaryId == null || lookupSrcSystemUUID(sourceSystemIdx) == null
-                    || idFromSourceSystem == null || lookupYStatus(status) == null
-                    || yPathList.get(pathIdx) == null)
-                getLog().info(
-                        "\r\nuuidPrimaryId=" + uuidPrimaryId + "\r\nsourceSystemIdx"
-                                + sourceSystemIdx + "\r\nidFromSourceSystem" + idFromSourceSystem
-                                + "\r\nstatus" + status + "\r\nyPathList.get(pathIdx)"
-                                + yPathList.get(pathIdx));
 
             SctYIdRecord tmpIdRec = new SctYIdRecord(uuidPrimaryId, sourceSystemIdx,
                     idFromSourceSystem, status, revDate, pathIdx);
@@ -1267,7 +1291,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1315,7 +1339,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1361,7 +1385,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1407,7 +1431,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // MEMBER_UUID = 1;
             UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
             // STATUS_UUID = 2;
-            int status = lookupYStatusIdx(line[STATUS_UUID]);
+            int status = lookupYStatusUuidIdx(line[STATUS_UUID]);
             // COMPONENT_UUID = 3;
             UUID uuidComponent = UUID.fromString(line[COMPONENT_UUID]);
             // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
@@ -1832,8 +1856,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         long lsb = yPathArray[id.yPath].getLeastSignificantBits();
         eId.setPathUuid(new UUID(msb, lsb));
         // eId.setPathUuid(yPathArray[id.yPath]);
-        msb = lookupYStatus(id.status).getMostSignificantBits();
-        lsb = lookupYStatus(id.status).getLeastSignificantBits();
+        msb = yStatusUuidArray[id.status].getMostSignificantBits();
+        lsb = yStatusUuidArray[id.status].getLeastSignificantBits();
         eId.setStatusUuid(new UUID(msb, lsb));
         // eId.setStatusUuid(lookupYStatus(id.status));
         eId.setTime(id.yRevision);
@@ -2924,7 +2948,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         else
             ca.additionalIds = null;
 
-        ca.setStatusUuid(lookupYStatus(cRec0.status));
+        ca.setStatusUuid(yStatusUuidArray[cRec0.status]);
         ca.setPathUuid(yPathArray[cRec0.yPath]);
         ca.setTime(yRevDateArray[cRec0.yRevision]); // long
 
@@ -2934,7 +2958,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             EConceptAttributesRevision rev = new EConceptAttributesRevision();
             SctYConRecord cRec = conList.get(i);
             rev.setDefined(cRec.isprimitive == 0 ? true : false);
-            rev.setStatusUuid(lookupYStatus(cRec.status));
+            rev.setStatusUuid(yStatusUuidArray[cRec.status]);
             rev.setPathUuid(yPathArray[cRec.yPath]);
             rev.setTime(yRevDateArray[cRec.yRevision]);
             caRevisions.add(rev);
@@ -3009,7 +3033,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     des.setInitialCaseSignificant(dRec.capStatus == 1 ? true : false);
                     des.setLang(dRec.languageCode);
                     des.setTypeUuid(yDesTypeUuidArray[dRec.descriptionType]);
-                    des.setStatusUuid(lookupYStatus(dRec.status));
+                    des.setStatusUuid(yStatusUuidArray[dRec.status]);
                     des.setPathUuid(yPathArray[dRec.yPath]);
                     des.setTime(yRevDateArray[dRec.yRevision]);
                     des.revisions = null;
@@ -3019,7 +3043,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     edv.setTypeUuid(yDesTypeUuidArray[dRec.descriptionType]);
                     edv.setInitialCaseSignificant(dRec.capStatus == 1 ? true : false);
                     edv.setLang(dRec.languageCode);
-                    edv.setStatusUuid(lookupYStatus(dRec.status));
+                    edv.setStatusUuid(yStatusUuidArray[dRec.status]);
                     edv.setPathUuid(yPathArray[dRec.yPath]);
                     edv.setTime(yRevDateArray[dRec.yRevision]);
                     revisions.add(edv);
@@ -3081,7 +3105,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     rel.setRelGroup(rRec.group);
                     rel.setCharacteristicUuid(yRelCharArray[rRec.characteristic]);
                     rel.setRefinabilityUuid(yRelRefArray[rRec.refinability]);
-                    rel.setStatusUuid(lookupYStatus(rRec.status));
+                    rel.setStatusUuid(yStatusUuidArray[rRec.status]);
                     rel.setPathUuid(yPathArray[rRec.yPath]);
                     rel.setTime(yRevDateArray[rRec.yRevision]);
                     rel.revisions = null;
@@ -3091,7 +3115,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     erv.setRelGroup(rRec.group);
                     erv.setCharacteristicUuid(yRelCharArray[rRec.characteristic]);
                     erv.setRefinabilityUuid(yRelRefArray[rRec.refinability]);
-                    erv.setStatusUuid(lookupYStatus(rRec.status));
+                    erv.setStatusUuid(yStatusUuidArray[rRec.status]);
                     erv.setPathUuid(yPathArray[rRec.yPath]);
                     erv.setTime(yRevDateArray[rRec.yRevision]);
                     revisions.add(erv);
@@ -3162,7 +3186,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                     tmp.setComponentUuid(new UUID(r.componentUuidMsb, r.componentUuidLsb));
-                    tmp.setStatusUuid(lookupYStatus(r.status));
+                    tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
                     // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
@@ -3176,7 +3200,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                     tmp.setComponentUuid(new UUID(r.componentUuidMsb, r.componentUuidLsb));
-                    tmp.setStatusUuid(lookupYStatus(r.status));
+                    tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
                     // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
@@ -3190,7 +3214,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                     tmp.setComponentUuid(new UUID(r.componentUuidMsb, r.componentUuidLsb));
-                    tmp.setStatusUuid(lookupYStatus(r.status));
+                    tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
                     // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
@@ -3204,7 +3228,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                     tmp.setComponentUuid(new UUID(r.componentUuidMsb, r.componentUuidLsb));
-                    tmp.setStatusUuid(lookupYStatus(r.status));
+                    tmp.setStatusUuid(yStatusUuidArray[r.status]);
                     tmp.setTime(yRevDateArray[r.yRevision]);
                     tmp.setPathUuid(yPathArray[r.yPath]);
                     // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
