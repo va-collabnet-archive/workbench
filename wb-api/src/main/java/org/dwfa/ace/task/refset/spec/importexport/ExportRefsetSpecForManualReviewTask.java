@@ -113,7 +113,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig());
+            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(),
+                "Exporting refset spec...");
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 

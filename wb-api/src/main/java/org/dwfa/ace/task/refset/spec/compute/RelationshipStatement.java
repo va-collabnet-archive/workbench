@@ -28,10 +28,12 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 
 /**
  * Represents partial information contained in a refset spec.
@@ -63,7 +65,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;
         I_RelTuple relTuple = relVersioned.getLastTuple();
@@ -130,10 +132,17 @@ public class RelationshipStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
+            "Possible: " + this.toString());
+        activity.setIndeterminate(true);
+        activity.setProgressInfoUpper("Possible: " + this.toString());
+        long startTime = System.currentTimeMillis();
+        
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
+        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case REL_IS_MEMBER_OF:
@@ -185,6 +194,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
+        
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
+            "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.complete();
         return possibleConcepts;
     }
 

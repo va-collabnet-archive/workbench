@@ -9,13 +9,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
@@ -43,7 +43,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private AtomicInteger retiredMembers = new AtomicInteger();
     private boolean canceled = false;
     private boolean informed = false;
-    private ActivityPanel activity;
+    private I_ShowActivity activity;
     private long startTime = System.currentTimeMillis();
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
@@ -57,7 +57,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         this.frameConfig = frameConfig;
         conceptCount = Bdb.getConceptDb().getCount();
 
-        activity = new ActivityPanel(true, null, null);
+        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset");
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset");
         activity.setProgressInfoLower("Setting up the computer...");
@@ -115,7 +115,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             return;
         }
 
-
         if (possibleCNids.isMember(cNid)) {
             Concept concept = fcfc.fetch();
             if (specHelper.isDescriptionComputeType()) {
@@ -124,19 +123,19 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                         frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                    executeComponent(descVersioned, cNid, descVersioned.getDescId());
+                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig);
                 }
             } else if (specHelper.isConceptComputeType()) {
-                executeComponent(concept, cNid, cNid);
+                executeComponent(concept, cNid, cNid, frameConfig);
             }
         }
     }
 
-    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid) throws Exception {
+    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid, I_ConfigAceFrame config) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component)) {
+            if (query.execute(component, config)) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();

@@ -34,11 +34,13 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 
 /**
  * Represents partial information contained in a refset spec. An example of a
@@ -95,7 +97,7 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
             I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
@@ -108,19 +110,19 @@ public class DescStatement extends RefsetSpecStatement {
             case DESC_STATUS_IS:
                 return descriptionStatusIs(descriptionTuple);
             case DESC_STATUS_IS_CHILD_OF:
-                return descriptionStatusIsChildOf(descriptionTuple);
+                return descriptionStatusIsChildOf(descriptionTuple, config);
             case DESC_STATUS_IS_KIND_OF:
-                return descriptionStatusIsKindOf(descriptionTuple);
+                return descriptionStatusIsKindOf(descriptionTuple, config);
             case DESC_STATUS_IS_DESCENDENT_OF:
-                return descriptionStatusIsDescendentOf(descriptionTuple);
+                return descriptionStatusIsDescendentOf(descriptionTuple, config);
             case DESC_TYPE_IS:
                 return descriptionTypeIs(descriptionTuple);
             case DESC_TYPE_IS_CHILD_OF:
-                return descriptionTypeIsChildOf(descriptionTuple);
+                return descriptionTypeIsChildOf(descriptionTuple, config);
             case DESC_TYPE_IS_KIND_OF:
-                return descriptionTypeIsKindOf(descriptionTuple);
+                return descriptionTypeIsKindOf(descriptionTuple, config);
             case DESC_TYPE_IS_DESCENDENT_OF:
-                return descriptionTypeIsDescendentOf(descriptionTuple);
+                return descriptionTypeIsDescendentOf(descriptionTuple, config);
             case DESC_REGEX_MATCH:
                 return descriptionRegexMatch(descriptionTuple);
             case DESC_LUCENE_MATCH:
@@ -136,10 +138,15 @@ public class DescStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, "Possible: " + this.toString());
+        activity.setIndeterminate(true);
+        long startTime = System.currentTimeMillis();
+
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
+        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case DESC_IS:
@@ -183,6 +190,13 @@ public class DescStatement extends RefsetSpecStatement {
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
+        
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
+            "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.complete();
         return possibleConcepts;
     }
 
@@ -279,7 +293,7 @@ public class DescStatement extends RefsetSpecStatement {
         default:
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
-        setPossibleConceptsCount(possibleDescriptions.size());
+        setPossibleConceptsCount(possibleDescriptions.cardinality());
         return possibleDescriptions;
     }
 
@@ -308,14 +322,14 @@ public class DescStatement extends RefsetSpecStatement {
      * the query constraint. This also checks for the description type's
      * children (depth >= 1);
      */
-    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
+    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws IOException,
             TerminologyException {
 
         if (descriptionTypeIs(descriptionBeingChecked)) {
             return true;
         }
 
-        return descriptionTypeIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
+        return descriptionTypeIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked, config);
     }
 
     /**
@@ -328,19 +342,16 @@ public class DescStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType,
-            I_DescriptionTuple descriptionBeingChecked) throws IOException, TerminologyException {
+            I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
         try {
             I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childDescTypes =
-                    requiredType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), 
+                    requiredType.getDestRelOrigins(currentStatuses, allowedTypes, config.getViewPositionSetReadOnly(), 
                         config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call descriptionTypeIs on each
@@ -348,7 +359,7 @@ public class DescStatement extends RefsetSpecStatement {
 
                 if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
                     return true;
-                } else if (descriptionTypeIsDescendentOf(childDescType, descriptionBeingChecked)) {
+                } else if (descriptionTypeIsDescendentOf(childDescType, descriptionBeingChecked, config)) {
                     return true;
                 }
             }
@@ -360,24 +371,22 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException,
+    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws IOException,
             TerminologyException {
-        return descriptionTypeIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
+        return descriptionTypeIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked, config);
     }
 
-    private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
+    private boolean descriptionTypeIsChildOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws TerminologyException,
             IOException {
         try {
             I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childDescTypes =
-                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, 
+                        config.getViewPositionSetReadOnly(), 
                         config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call descriptionTypeIs on each
@@ -403,18 +412,15 @@ public class DescStatement extends RefsetSpecStatement {
         return descriptionBeingChecked.getStatusId() == requiredStatus.getConceptId();
     }
 
-    private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
+    private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws TerminologyException,
             IOException {
         try {
             I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> childStatuses =
-                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, config.getViewPositionSetReadOnly(), 
                         config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
@@ -430,20 +436,18 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked)
+    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config)
             throws TerminologyException, IOException {
-        return descriptionStatusIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
+        return descriptionStatusIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked, config);
     }
 
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
-            I_DescriptionTuple descriptionBeingChecked) throws TerminologyException, IOException {
+            I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws TerminologyException, IOException {
         try {
             I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
+ 
             Set<? extends I_GetConceptData> childStatuses =
                     requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
                         .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
@@ -452,7 +456,7 @@ public class DescStatement extends RefsetSpecStatement {
             for (I_GetConceptData childStatus : childStatuses) {
                 if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
                     return true;
-                } else if (descriptionStatusIsDescendentOf(childStatus, descriptionBeingChecked)) {
+                } else if (descriptionStatusIsDescendentOf(childStatus, descriptionBeingChecked, config)) {
                     return true;
                 }
             }
@@ -464,13 +468,13 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,
+    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked, I_ConfigAceFrame config) throws TerminologyException,
             IOException {
         if (descriptionStatusIs(descriptionBeingChecked)) {
             return true;
         }
 
-        return descriptionStatusIsDescendentOf(descriptionBeingChecked);
+        return descriptionStatusIsDescendentOf(descriptionBeingChecked, config);
     }
 
     private boolean descriptionIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {

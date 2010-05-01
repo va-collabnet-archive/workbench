@@ -28,10 +28,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 
 /**
  * Represents partial information contained in a refset spec.
@@ -80,11 +82,17 @@ public class ConceptStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
+            "Possible: " + this.toString());
+        activity.setIndeterminate(true);
+        long startTime = System.currentTimeMillis();
+        
         queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
+        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case CONCEPT_IS:
@@ -144,18 +152,25 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
+        
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
+            "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.complete();
         return possibleConcepts;
     }
 
     @Override
-    public boolean getStatementResult(I_AmTermComponent component) throws TerminologyException, IOException {
+    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {
         I_GetConceptData concept = (I_GetConceptData) component;
 
         switch (tokenEnum) {
         case CONCEPT_IS:
             return conceptIs(concept);
         case CONCEPT_IS_CHILD_OF:
-            return conceptIsChildOf(concept);
+            return conceptIsChildOf(concept, config);
         case CONCEPT_IS_DESCENDENT_OF:
             return conceptIsDescendantOf(concept);
         case CONCEPT_IS_KIND_OF:
@@ -184,13 +199,11 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      * @throws IOException
      */
-    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
+    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested, I_ConfigAceFrame config) throws TerminologyException, IOException {
         try {
             I_IntSet allowedTypes = getIsAIds();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory

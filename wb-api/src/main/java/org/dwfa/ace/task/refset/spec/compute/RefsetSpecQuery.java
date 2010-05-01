@@ -31,12 +31,14 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.time.TimeUtil;
 
 /**
  * Represents the data provided by a refset spec. It can hold 0 or more
@@ -184,81 +186,102 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Possible: " + this.toString());
+        activity.setMaximum(statements.size() + subqueries.size());
+        activity.setValue(0);
+        activity.setIndeterminate(false);
+        long startTime = System.currentTimeMillis();
 
     	if (allComponentsNeedsResort) {
             Collections.sort(allComponents, calculationOrderComparator);
             allComponentsNeedsResort = false;
     	}
 
-        long startTime = System.currentTimeMillis();
         AceLog.getAppLog().info(">> Start of " + this.toString());
         I_RepresentIdSet possibleConcepts = null;
         // process all statements and subqueries
         switch (groupingType) {
         case AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
                 throw new TerminologyException("Spec is invalid - dangling AND.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                activity.setProgressInfoLower("Processing: " + component.toString());
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
                     possibleConcepts.and(component.getPossibleConcepts(config, possibleConcepts));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
-
             break;
 
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling OR.");
                 throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                activity.setProgressInfoLower("Processing: " + component.toString());
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
                     possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
 
             break;
         case CONCEPT_CONTAINS_DESC:
         case NOT_CONCEPT_CONTAINS_DESC:
             if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-desc.");
                 throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
             }
             for (RefsetSpecComponent component : allComponents) {
+                activity.setProgressInfoLower("Processing: " + component.toString());
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
                     possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
         case CONCEPT_CONTAINS_REL:
         case NOT_CONCEPT_CONTAINS_REL:
             if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-rel.");
                 throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                activity.setProgressInfoLower("Processing: " + component.toString());
                 if (possibleConcepts == null) {
-                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
+                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
                     possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
 
             break;
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        long minutes = elapsedTime / 60000;
-        long seconds = (elapsedTime % 60000) / 1000;
-        AceLog.getAppLog().info(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+        AceLog.getAppLog().info(this + " possibleConceptTime: " + elapsedStr);
         setPossibleConceptsCount(possibleConcepts.cardinality());
+        activity.setProgressInfoLower("Possible concept count: " + possibleConcepts.cardinality());
+        activity.complete();
         return possibleConcepts;
     }
 
@@ -277,7 +300,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public boolean execute(I_AmTermComponent component) throws IOException, TerminologyException {
+    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
     	if (allComponentsNeedsResort) {
             Collections.sort(allComponents, executionOrderComparator);
@@ -292,7 +315,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
-                if (!specComponent.execute(component)) {
+                if (!specComponent.execute(component, config)) {
                     // can exit the AND early, as at least one statement is
                     // returning false
                     return false;
@@ -308,7 +331,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
-                if (specComponent.execute(component)) {
+                if (specComponent.execute(component, config)) {
                     // exit the OR statement early, as at least one statement
                     // has returned true
                     return true;
@@ -319,25 +342,24 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             // will return false
             return false;
         case CONCEPT_CONTAINS_DESC:
-            return executeConceptContainsDesc(component);
+            return executeConceptContainsDesc(component, config);
         case NOT_CONCEPT_CONTAINS_DESC:
-            return !executeConceptContainsDesc(component);
+            return !executeConceptContainsDesc(component, config);
         case CONCEPT_CONTAINS_REL:
-            return executeConceptContainsRel(component);
+            return executeConceptContainsRel(component, config);
         case NOT_CONCEPT_CONTAINS_REL:
-            return !executeConceptContainsRel(component);
+            return !executeConceptContainsRel(component, config);
         default:
             throw new TerminologyException("Unknown grouping type.");
         }
 
     }
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component) throws TerminologyException, IOException {
+    private boolean executeConceptContainsDesc(I_AmTermComponent component, 
+            I_ConfigAceFrame config) throws TerminologyException, IOException {
         if (statements.size() == 0 && subqueries.size() == 0) {
             throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
         }
-        // TODO replace with passed in config...
-        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
         List<? extends I_DescriptionTuple> descriptionTuples =
@@ -350,7 +372,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             boolean valid = false;
 
             for (RefsetSpecStatement statement : statements) {
-                if (!statement.execute(descVersioned)) {
+                if (!statement.execute(descVersioned, config)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -361,7 +383,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
-                if (!subquery.execute(descVersioned)) {
+                if (!subquery.execute(descVersioned, config)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -379,7 +401,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component) throws TerminologyException, IOException {
+    private boolean executeConceptContainsRel(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {
         if (statements.size() == 0 && subqueries.size() == 0) {
             throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
         }
@@ -391,7 +413,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             boolean valid = false;
 
             for (RefsetSpecStatement statement : statements) {
-                if (!statement.execute(versionedTuple)) {
+                if (!statement.execute(versionedTuple, config)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -402,7 +424,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
-                if (!subquery.execute(versionedTuple)) {
+                if (!subquery.execute(versionedTuple, config)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;

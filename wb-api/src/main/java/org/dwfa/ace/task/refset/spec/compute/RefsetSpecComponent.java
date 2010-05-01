@@ -47,7 +47,7 @@ public abstract class RefsetSpecComponent {
         return null;
     }
 
-    public abstract boolean execute(I_AmTermComponent component) throws IOException, TerminologyException;
+    public abstract boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException;
 
     public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config,
             I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;

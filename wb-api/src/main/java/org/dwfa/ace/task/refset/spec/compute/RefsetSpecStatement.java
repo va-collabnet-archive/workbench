@@ -174,9 +174,9 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return useNotQualifier;
     }
 
-    public boolean execute(I_AmTermComponent component) throws IOException, TerminologyException {
+    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
-        boolean statementResult = getStatementResult(component);
+        boolean statementResult = getStatementResult(component, config);
 
         if (useNotQualifier) {
             // if the statement has a negation associated with it then we need
@@ -187,7 +187,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
-    public abstract boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException;
+    public abstract boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 
@@ -307,7 +307,6 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     public String toString() {
         StringBuffer buff = new StringBuffer();
-        buff.append("RefsetSpecStatment: ");
         buff.append(!useNotQualifier);
         buff.append(" ");
         buff.append(getTokenEnum());

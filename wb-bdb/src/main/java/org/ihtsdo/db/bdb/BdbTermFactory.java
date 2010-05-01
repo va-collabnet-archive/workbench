@@ -736,13 +736,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig) {
+    public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig, 
+            String firstUpperInfo) {
         if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
             ActivityPanel ap = new ActivityPanel(true, null, aceFrameConfig);
             ap.setIndeterminate(true);
-            ap.setProgressInfoUpper("New activity");
+            ap.setProgressInfoUpper(firstUpperInfo);
             ap.setProgressInfoLower("");
             if (displayInViewer) {
                 try {

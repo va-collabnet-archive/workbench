@@ -78,7 +78,7 @@ public class ExportRefsetSpecTask extends AbstractTask {
         I_ShowActivity activityPanel = null;
         try {
             activityPanel = Terms.get().newActivityPanel(true,
-                Terms.get().getActiveAceFrameConfig());
+                Terms.get().getActiveAceFrameConfig(), "Exporting refset spec...");
             I_ConfigAceFrame configFrame = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             String exportFileName = (String) process.getProperty(outputFilePropName);

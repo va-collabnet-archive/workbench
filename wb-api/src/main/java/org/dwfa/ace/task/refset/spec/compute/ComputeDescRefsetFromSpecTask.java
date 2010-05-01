@@ -136,7 +136,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             // initialise the progress panel
 
             if (showActivityPanel) {
-                computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame);
+                computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame, "Computing Refset");
                 computeRefsetActivityPanel.setStringPainted(true);
                 computeRefsetActivityPanel.setValue(0);
                 computeRefsetActivityPanel.setIndeterminate(true);
@@ -279,7 +279,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
                         boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
 
-                        if (query.execute(currentDescription)) {
+                        if (query.execute(currentDescription, configFrame)) {
                             if (!containsCurrentMember) {
                                 newMembers.add(currentDescription.getDescId());
                             }
