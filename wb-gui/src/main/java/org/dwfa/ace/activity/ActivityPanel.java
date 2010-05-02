@@ -200,6 +200,11 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         }
     }
 
+    @Override
+    public void removeActivityFromViewer() {
+        ActivityViewer.removeActivity(this);
+    }
+
     public JPanel getViewPanel() {
         return this;
     }
@@ -265,6 +270,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
             }
         });
         for (I_ShowActivity shower : showActivityListeners) {
+            shower.setMaximum(progressBar.getMaximum());
             shower.setValue(n);
         }
     }
@@ -377,4 +383,5 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     public void setEraseWhenFinishedEnabled(boolean eraseWhenFinishedEnabled) {
         this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
     }
+
 }

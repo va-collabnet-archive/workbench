@@ -58,6 +58,11 @@ public class ActivityViewer {
 
     private static class CompleteListener implements I_ShowActivity {
 
+        @Override
+        public void removeActivityFromViewer() {
+            viewer.activitiesList.remove(this);
+        }
+
         public void addActionListener(ActionListener l) {
         }
 
@@ -176,6 +181,7 @@ public class ActivityViewer {
 
         }
 
+        
         @Override
         public int getCount() {
             // TODO Auto-generated method stub

@@ -53,6 +53,8 @@ public interface I_ShowActivity {
     public void removeActionListener(ActionListener l);
 
     public void complete();
+    
+    public void removeActivityFromViewer();
 
     public boolean isComplete();
 

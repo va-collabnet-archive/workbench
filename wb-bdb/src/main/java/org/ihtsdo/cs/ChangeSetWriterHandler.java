@@ -27,6 +27,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private String commitTimeStr;
 	private IntSet sapNidsFromCommit;
     private int conceptCount;
+    private int reportInterval;
     private ActivityPanel activity;
     private long startTime = System.currentTimeMillis();
     private AtomicInteger processedCount = new AtomicInteger();
@@ -42,10 +43,14 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		assert commitTime != Long.MIN_VALUE;
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
+		reportInterval = changedCount / 500;
+		if (reportInterval < 1) {
+		    reportInterval = 1;
+		}
 		this.commitTime = commitTime;
 		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
-		    " gVersion: " + Bdb.gVersion.incrementAndGet() + 
-		    " (" + cNidsToWrite.cardinality() + " total concept changes)";
+		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
+		    " (" + cNidsToWrite.cardinality() + " items)";
 		this.sapNidsFromCommit = sapNidsFromCommit;
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
@@ -59,7 +64,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
 	        activity = new ActivityPanel(true, null, null);
 	        activity.setIndeterminate(true);
-	        activity.setProgressInfoUpper("Writing change sets for: " + commitTimeStr + "...");
+	        activity.setProgressInfoUpper("CS writer: " + commitTimeStr + "...");
 	        activity.setProgressInfoLower("Opening change set writers...");
 	        activity.getStopButton().setVisible(false);
 	        ActivityViewer.addActivity(activity);
@@ -118,7 +123,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             }
         }
         int completed = processedCount.incrementAndGet();
-        if (completed % 5000 == 0) {
+        if (completed % reportInterval == 0) {
             activity.setValue(completed);
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;

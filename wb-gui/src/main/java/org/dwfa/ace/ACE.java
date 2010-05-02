@@ -2069,9 +2069,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JPanel contradictionConfigPanel = new JPanel(new BorderLayout());
 
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
-        controlPanel.add(getCheckboxEditor("show conflicts in taxonomy view", "highlightConflictsInTaxonomyView",
+        controlPanel.add(getCheckboxEditor("show contradictions in taxonomy view", "highlightConflictsInTaxonomyView",
             aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
-        controlPanel.add(getCheckboxEditor("show conflicts in component panel", "highlightConflictsInComponentPanel",
+        controlPanel.add(getCheckboxEditor("show contradictions in component panel", "highlightConflictsInComponentPanel",
             aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
 
         final JTextPane descriptionPanel = new JTextPane();

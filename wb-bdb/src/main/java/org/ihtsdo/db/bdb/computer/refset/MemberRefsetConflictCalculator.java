@@ -60,7 +60,7 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
                                             sb.append(Terms.get().getConcept(i.getConceptId()).toString());
                                             sb.append(" because of "
                                                 + Terms.get().getConcept(i.getInclusionReasonId()).toString());
-                                            sb.append(" conflicts with "
+                                            sb.append(" contradicts "
                                                 + Terms.get().getConcept(old.getInclusionReasonId()).toString());
 
                                             conflictDetails.add(sb.toString());

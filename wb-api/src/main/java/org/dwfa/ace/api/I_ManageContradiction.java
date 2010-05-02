@@ -24,7 +24,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Interface for classes that resolve conflicts - i.e. the scenario where two
+ * Interface for classes that resolve contradictions - i.e. the scenario where two
  * different paths have different data for a given component.
  * <p>
  * Given a component's tuples and an optional time point (latest is assumed

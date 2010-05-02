@@ -136,7 +136,8 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             // initialise the progress panel
 
             if (showActivityPanel) {
-                computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame, "Computing Refset");
+                computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame, 
+                    "Computing Refset: " + refset.toString());
                 computeRefsetActivityPanel.setStringPainted(true);
                 computeRefsetActivityPanel.setValue(0);
                 computeRefsetActivityPanel.setIndeterminate(true);

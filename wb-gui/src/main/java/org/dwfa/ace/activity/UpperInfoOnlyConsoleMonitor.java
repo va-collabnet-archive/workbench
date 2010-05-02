@@ -154,4 +154,10 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void removeActivityFromViewer() {
+        // TODO Auto-generated method stub
+        
+    }
 }

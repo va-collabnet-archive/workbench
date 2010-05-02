@@ -55,11 +55,13 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         super();
         this.possibleCNids = possibleIds;
         this.frameConfig = frameConfig;
-        conceptCount = Bdb.getConceptDb().getCount();
+        this.refsetNid = refsetNid;
+        this.refsetConcept = Bdb.getConcept(refsetNid);
+        conceptCount = possibleIds.cardinality();
 
-        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset");
+        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString());
         activity.setIndeterminate(true);
-        activity.setProgressInfoUpper("Computing refset");
+        activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
         activity.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -68,8 +70,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         });
         ActivityViewer.addActivity(activity);
 
-        this.refsetNid = refsetNid;
-        this.refsetConcept = Bdb.getConcept(refsetNid);
 
         this.query = query;
         allRefsetMembers = Terms.get().getRefsetExtensionMembers(refsetNid);
@@ -88,7 +88,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         activity.setProgressInfoLower("Starting computation...");
         activity.setValue(0);
-        activity.setMaximum(conceptCount);
+        activity.setMaximum(possibleIds.cardinality());
         activity.setIndeterminate(false);
         specHelper = new RefsetSpec(refsetConcept, true);
 
@@ -152,7 +152,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 }
             }
             int completed = processedCount.incrementAndGet();
-            if (completed % 5000 == 0) {
+            if (completed % 500 == 0) {
                 activity.setValue(completed);
                 if (!canceled) {
                     long endTime = System.currentTimeMillis();
