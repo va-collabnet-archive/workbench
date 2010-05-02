@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.ihtsdo.mojo.maven.MojoUtil;
@@ -71,6 +72,8 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 	 */
 	private File targetDirectory;
 
+	private I_ConfigAceFrame config;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			if (MojoUtil.alreadyRun(getLog(), this.getClass()
@@ -85,19 +88,28 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 		}
 
 		try {
+			config = Terms.get().newAceFrameConfig();
+			Terms.get().setActiveAceFrameConfig(config);
 			reportFile.getParentFile().mkdirs();
 			TupleFileUtil tupleImporter = new TupleFileUtil();
-			UUID uuid = null;
+			UUID pathUuid = null;
 			if (editPathDescriptor != null) {
-				uuid = editPathDescriptor.getVerifiedConcept().getUids()
+				pathUuid = editPathDescriptor.getVerifiedConcept().getUids()
 						.iterator().next();
 			}
 			getLog().info(
 					"Beginning import of refset spec :"
 							+ refsetSpecFile.getPath());
 			// tupleImporter.importFile(refsetSpecFile, reportFile, uuid);
-			tupleImporter.importFile(refsetSpecFile, reportFile, Terms.get()
-					.getActiveAceFrameConfig(), null);
+			if (pathUuid != null) {
+				config.setProperty("override", true);
+				config.setProperty("pathUuid", pathUuid);
+				config.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+			} else {
+				config.setProperty("override", false);
+			}
+			tupleImporter.importFile(refsetSpecFile, reportFile, config, Terms
+					.get().newActivityPanel(false, config, "Import"));
 			getLog().info(
 					"Finished importing refset spec from "
 							+ refsetSpecFile.getPath());
