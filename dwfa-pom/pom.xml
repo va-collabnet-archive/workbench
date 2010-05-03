@@ -3,7 +3,7 @@
     <groupId>org.dwfa</groupId>
     <artifactId>dwfa-pom</artifactId>
     <packaging>pom</packaging>
-    <version>2.31-SNAPSHOT</version>
+    <version>3</version>
     <name>DWFA Master POM</name>
     <inceptionYear>2004</inceptionYear>
     <description> Distributed Workflow Architecture based on JavaBeans and Jini. </description>
