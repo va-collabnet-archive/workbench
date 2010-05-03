@@ -185,11 +185,8 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.custom.statics.CustomStatics;
-import org.ihtsdo.dashboard.Dashboard;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
-
-import com.sun.org.apache.bcel.internal.generic.DASTORE;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
@@ -1731,9 +1728,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
             snoRocketPanel);
 
+        try {
+            Class<JPanel> panelClass = (Class<JPanel>) Class.forName("org.ihtsdo.arena.Arena");
+            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/brush1.png")), 
+                panelClass.newInstance());
+        } catch (ClassNotFoundException e) {
+            // Ignore this exception. 
+        }
         /*
-        conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/brush1.png")), 
-            new Dashboard());
         */
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
