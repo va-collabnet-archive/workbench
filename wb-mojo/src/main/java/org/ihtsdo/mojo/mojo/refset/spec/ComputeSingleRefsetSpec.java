@@ -41,54 +41,59 @@ import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 
 public class ComputeSingleRefsetSpec extends AbstractMojo {
 
-    /**
-     * The refset spec.
-     * 
-     * @parameter
-     * @required
-     */
-    private ConceptDescriptor refsetSpecDescriptor;
+	/**
+	 * The refset spec.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private ConceptDescriptor refsetSpecDescriptor;
 
-    /**
-     * Location of the build directory.
-     * 
-     * @parameter expression="${project.build.directory}"
-     * @required
-     */
-    private File targetDirectory;
+	/**
+	 * Location of the build directory.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @required
+	 */
+	private File targetDirectory;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        try {
-            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + refsetSpecDescriptor, this
-                .getClass(), targetDirectory)) {
-                return;
-            }
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		try {
+			if (MojoUtil.alreadyRun(getLog(), this.getClass()
+					.getCanonicalName()
+					+ refsetSpecDescriptor, this.getClass(), targetDirectory)) {
+				return;
+			}
+		} catch (Exception e) {
+			throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		}
 
-        try {
+		try {
 
-            I_GetConceptData refsetSpec = refsetSpecDescriptor.getVerifiedConcept();
-            boolean showActivityPanel = false;
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
-            I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
+			I_GetConceptData refsetSpec = refsetSpecDescriptor
+					.getVerifiedConcept();
+			boolean showActivityPanel = false;
+			// RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+			// I_GetConceptData memberRefset =
+			// refsetSpecHelper.getMemberRefsetConcept();
 
-            if (refsetSpecHelper.isConceptComputeType()) {
-                ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
-                task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(), memberRefset,
-                    showActivityPanel);
-            } else {
-                ComputeDescRefsetFromSpecTask task = new ComputeDescRefsetFromSpecTask();
-                task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(), memberRefset,
-                    showActivityPanel);
-            }
+			// if (refsetSpecHelper.isConceptComputeType()) {
+			ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
+			task.computeRefset(Terms.get().getActiveAceFrameConfig(),
+					refsetSpec, showActivityPanel);
+			// } else {
+			// ComputeDescRefsetFromSpecTask task = new
+			// ComputeDescRefsetFromSpecTask();
+			// task.computeRefset(LocalVersionedTerminology.get().getActiveAceFrameConfig(),
+			// memberRefset,
+			// showActivityPanel);
+			// }
 
-            Terms.get().commit();
+			Terms.get().commit();
 
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
-    }
+		} catch (Exception e) {
+			throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		}
+	}
 
 }
