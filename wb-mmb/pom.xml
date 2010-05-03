@@ -3,16 +3,16 @@
     <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
-        <version>2.31-SNAPSHOT</version>
+        <version>3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
+    <version>2.5-SNAPSHOT</version>
     <name>Workbench modules multi-module build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
-    <version>1.0-SNAPSHOT</version>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</developerConnection>

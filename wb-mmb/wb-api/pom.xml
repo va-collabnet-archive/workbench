@@ -16,16 +16,14 @@
  -->
 
     <parent>
-        <groupId>org.dwfa</groupId>
-        <artifactId>dwfa-pom</artifactId>
-        <version>2.30-SNAPSHOT</version>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.ihtsdo</groupId>
     <artifactId>wb-api</artifactId>
     <packaging>jar</packaging>
     <name>Workbench API</name>
-    <version>1.0-SNAPSHOT</version>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</connection>
@@ -52,7 +50,7 @@
         <dependency>
             <groupId>org.dwfa</groupId>
             <artifactId>core</artifactId>
-            <version>2.0.22-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-primitives</groupId>
