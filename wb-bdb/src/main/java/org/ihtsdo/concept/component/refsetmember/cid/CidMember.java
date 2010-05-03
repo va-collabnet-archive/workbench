@@ -83,7 +83,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		
 		@Override
 		public ERefsetCidMember getERefsetMember() throws TerminologyException, IOException {
-			return new ERefsetCidMember(this);
+			return new ERefsetCidMember(this, CidMember.this);
 		}
 
 		@Override

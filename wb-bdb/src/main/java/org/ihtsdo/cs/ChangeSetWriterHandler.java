@@ -50,7 +50,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.commitTime = commitTime;
 		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
 		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
-		    " (" + cNidsToWrite.cardinality() + " items)";
+		    " (" + cNidsToWrite.cardinality() + " concepts)";
 		this.sapNidsFromCommit = sapNidsFromCommit;
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();

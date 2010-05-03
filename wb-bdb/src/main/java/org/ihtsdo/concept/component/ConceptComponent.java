@@ -19,6 +19,10 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.PRECEDENCE;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
@@ -194,9 +198,65 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     };
 
-    public abstract class Version implements I_AmTuple {
+    public abstract class Version implements I_AmTuple, I_Identify {
         protected int index = -1;
         private boolean dup = false;
+
+        @Override
+        public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
+            return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, pathNid, time);
+        }
+
+        @Override
+        public boolean addMutableIdPart(I_IdPart srcId) {
+            return ConceptComponent.this.addMutableIdPart(srcId);
+        }
+
+        @Override
+        public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time) {
+            return ConceptComponent.this.addStringId(stringId, authorityNid, statusNid, pathNid, time);
+        }
+
+        @Override
+        public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int pathNid, long time) {
+            return ConceptComponent.this.addUuidId(uuidId, authorityNid, statusNid, pathNid, time);
+        }
+
+        @Override
+        public List<? extends I_IdVersion> getIdVersions() {
+            return ConceptComponent.this.getIdVersions();
+        }
+
+        @Override
+        public List<? extends I_IdPart> getMutableIdParts() {
+            return ConceptComponent.this.getMutableIdParts();
+        }
+
+        @Override
+        public Set<TimePathId> getTimePathSet() {
+            return ConceptComponent.this.getTimePathSet();
+        }
+
+        @Override
+        public List<UUID> getUUIDs() {
+            return ConceptComponent.this.getUUIDs();
+        }
+
+        @Override
+        public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException {
+            return ConceptComponent.this.getUniversalId();
+        }
+
+        @Override
+        public boolean hasMutableIdPart(I_IdPart newPart) {
+            return ConceptComponent.this.hasMutableIdPart(newPart);
+        }
+
+        @Override
+        public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+                PRECEDENCE precedence) throws IOException, TerminologyException {
+            return ConceptComponent.this.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+        }
 
         @Override
         public boolean equals(Object obj) {
