@@ -17,10 +17,13 @@
 package org.ihtsdo.mojo.mojo.refset.spec;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
@@ -69,7 +72,17 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
 		}
 
 		try {
-
+			I_ConfigAceFrame config = Terms.get().newAceFrameConfig();
+//			config
+//					.getEditingPathSet()
+//					.add(
+//							Terms
+//									.get()
+//									.getPath(
+//											Arrays
+//													.asList(UUID
+//															.fromString("2faa9260-8fb2-11db-b606-0800200c9a66"))));
+			Terms.get().setActiveAceFrameConfig(config);
 			I_GetConceptData refsetSpec = refsetSpecDescriptor
 					.getVerifiedConcept();
 			boolean showActivityPanel = false;
@@ -79,8 +92,7 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
 
 			// if (refsetSpecHelper.isConceptComputeType()) {
 			ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
-			task.computeRefset(Terms.get().getActiveAceFrameConfig(),
-					refsetSpec, showActivityPanel);
+			task.computeRefset(config, refsetSpec, showActivityPanel);
 			// } else {
 			// ComputeDescRefsetFromSpecTask task = new
 			// ComputeDescRefsetFromSpecTask();
