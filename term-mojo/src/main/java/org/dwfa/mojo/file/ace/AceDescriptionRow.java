@@ -7,7 +7,7 @@ public class AceDescriptionRow {
     String term;
     String casesensitivityUuid;
     String descriptiontypeUuid;
-    String languageUuid;
+    String languageCode;
     String effectiveTime;
     String pathUuid;
     private int CONCEPT_COLUMNS = 9;
@@ -28,7 +28,7 @@ public class AceDescriptionRow {
         term = columns[3];
         casesensitivityUuid = columns[4];
         descriptiontypeUuid = columns[5];
-        languageUuid = columns[6];
+        languageCode = columns[6];
         effectiveTime = columns[7];
         pathUuid = columns[8];
     }
@@ -40,7 +40,7 @@ public class AceDescriptionRow {
      */
     public String getHeader() {
         return "DESCRIPTIONUUID" + "\t" + "DESCRIPTIONSTATUSUUID" + "\t" + "CONCEPTUUID" + "\t" + "TERM" + "\t" + "CASESENSITIVITYUUID" + "\t"
-            + "DESCRIPTIONTYPEUUID" + "\t" + "LANGUAGEUUID" + "\t" + "EFFECTIVETIME" + "\t" + "PATHUUID";
+            + "DESCRIPTIONTYPEUUID" + "\t" + "LANGUAGECode" + "\t" + "EFFECTIVETIME" + "\t" + "PATHUUID";
     }
 
     /**
@@ -48,7 +48,7 @@ public class AceDescriptionRow {
      */
     public String toString() {
         return descriptionUuid + "\t" + descriptionstatusUuid + "\t" + conceptUuid + "\t" + term + "\t" + casesensitivityUuid
-            + "\t" + descriptiontypeUuid + "\t" + languageUuid + "\t" + effectiveTime + "\t" + pathUuid;
+            + "\t" + descriptiontypeUuid + "\t" + languageCode + "\t" + effectiveTime + "\t" + pathUuid;
     }
 
     /**
@@ -138,15 +138,15 @@ public class AceDescriptionRow {
     /**
      * @return the languageUuid
      */
-    public final String getLanguageUuid() {
-        return languageUuid;
+    public final String getLanguageCode() {
+        return languageCode;
     }
 
     /**
      * @param languageUuid the languageUuid to set
      */
-    public final void setLanguageUuid(String languageUuid) {
-        this.languageUuid = languageUuid;
+    public final void setLanguageCode(String languageUuid) {
+        this.languageCode = languageUuid;
     }
 
     /**

@@ -126,7 +126,7 @@ public class AceOutputHandlerTest {
         Assert.assertEquals(descriptionDto.getStatusId().toString(), descriptionRow.getDescriptionstatusUuid());
         Assert.assertEquals(descriptionDto.getTypeId().toString(), descriptionRow.getDescriptiontypeUuid());
         Assert.assertEquals(aceOutputHandler.getReleaseDate(descriptionDto), descriptionRow.getEffectiveTime());
-        Assert.assertEquals(descriptionDto.getTypeId().toString(), descriptionRow.getLanguageUuid());
+        Assert.assertEquals(descriptionDto.getLanguageCode(), descriptionRow.getLanguageCode());
         Assert.assertEquals(descriptionDto.getPathId().toString(), descriptionRow.getPathUuid());
     }
 

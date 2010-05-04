@@ -245,7 +245,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
         rf2DescriptionRow.setCasesensitivityUuid(descriptionDto.getCaseSignificanceId().toString());
         rf2DescriptionRow.setDescriptionstatusUuid(descriptionDto.getStatusId().toString());
         rf2DescriptionRow.setEffectiveTime(getReleaseDate(descriptionDto));
-        rf2DescriptionRow.setLanguageUuid(descriptionDto.getTypeId().toString());
+        rf2DescriptionRow.setLanguageCode(descriptionDto.getLanguageCode());
         rf2DescriptionRow.setPathUuid(getModuleUuid(descriptionDto).toString());
         rf2DescriptionRow.setTerm(descriptionDto.getDescription());
         rf2DescriptionRow.setDescriptiontypeUuid(descriptionDto.getTypeId().toString());
