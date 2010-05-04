@@ -19,7 +19,7 @@
     <parent>
         <groupId>au.gov.nehta</groupId>
         <artifactId>ace-modules</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.4-SCTAU-R2-RC2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.gov.nehta</groupId>
@@ -29,9 +29,9 @@
     <inceptionYear>2005</inceptionYear>
     <description>ACE editor toolkit and version-oriented database</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/vodb</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/vodb</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC2.2/vodb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC2.2/vodb</developerConnection>
+        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC2.2/vodb</url>
     </scm>
     <licenses>
         <license>
