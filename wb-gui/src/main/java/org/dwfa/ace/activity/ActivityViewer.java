@@ -472,13 +472,17 @@ public class ActivityViewer {
 
     public static void toFront() {
         if (SwingUtilities.isEventDispatchThread()) {
-            viewer.viewerFrame.toFront();
+            if (viewer != null) {
+                viewer.viewerFrame.toFront();
+            }
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 
                 @Override
                 public void run() {
-                    viewer.viewerFrame.toFront();
+                    if (viewer != null) {
+                        viewer.viewerFrame.toFront();
+                    }
                     
                 }
             });

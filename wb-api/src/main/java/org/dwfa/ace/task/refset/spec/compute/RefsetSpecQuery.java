@@ -205,7 +205,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
                 activity.setProgressInfoLower("Spec is invalid - dangling AND.");
-                throw new TerminologyException("Spec is invalid - dangling AND.");
+                throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -223,7 +223,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             if (statements.size() == 0 && subqueries.size() == 0) {
                 activity.complete();
                 activity.setProgressInfoLower("Spec is invalid - dangling OR.");
-                throw new TerminologyException("Spec is invalid - dangling OR.");
+                throw new TerminologyException("Spec is invalid - dangling OR.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
@@ -287,7 +287,17 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public String toString() {
         try {
-            return groupingType.getTruth() + " " + termFactory.getConcept(groupingType.getNid()).getInitialText();
+            StringBuffer buff = new StringBuffer();
+            buff.append(groupingType.getTruth() + " " + termFactory.getConcept(groupingType.getNid()).getInitialText());
+            for (RefsetSpecStatement s: statements) {
+                buff.append("\n    ");
+                buff.append(s.toString());
+            }
+            for (RefsetSpecQuery sq: subqueries){
+                buff.append("\n    ");
+                buff.append(sq.toString());
+            }
+            return buff.toString();
         } catch (Exception e) {
             return "UNKNOWN QUERY";
         }
