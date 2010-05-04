@@ -23,6 +23,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.file.TupleFileUtil;
 import org.ihtsdo.mojo.maven.MojoUtil;
@@ -108,8 +109,16 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 			} else {
 				config.setProperty("override", false);
 			}
-			tupleImporter.importFile(refsetSpecFile, reportFile, config, Terms
-					.get().newActivityPanel(false, config, "Import"));
+			I_GetConceptData refset = tupleImporter.importFile(refsetSpecFile,
+					reportFile, config, Terms.get().newActivityPanel(false,
+							config, "Import"));
+			if (refset != null) {
+				getLog().info(
+						"Refset is: " + refset.getInitialText() + " "
+								+ refset.getUids().get(0));
+			} else {
+				getLog().info("Refset is: " + refset);
+			}
 			getLog().info(
 					"Finished importing refset spec from "
 							+ refsetSpecFile.getPath());
