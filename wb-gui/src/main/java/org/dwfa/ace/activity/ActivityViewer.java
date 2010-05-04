@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -496,5 +497,12 @@ public class ActivityViewer {
                 }
             });
         }
+    }
+
+    public static JFrame getActivityFrame() {
+        if (viewer == null) {
+            return null;
+        }
+        return viewer.viewerFrame;
     }
 }
