@@ -9,7 +9,7 @@ public class Rf1ConceptRow {
     String fullySpecifiedName;
     String ctv3Id;
     String snomedId;
-    String isPrimitve;
+    String isPrimitive;
 
     private int CONCEPT_COLUMNS = 6;
 
@@ -27,7 +27,7 @@ public class Rf1ConceptRow {
         fullySpecifiedName = columns[2];
         ctv3Id = columns[3];
         snomedId = columns[4];
-        isPrimitve = columns[5];
+        isPrimitive = columns[5];
     }
 
     /**
@@ -36,14 +36,14 @@ public class Rf1ConceptRow {
      * @return String header.
      */
     public String getHeader() {
-        return "CONCEPTID" + "\t" + "CONCEPTSTATUS" + "\t" + "FULLYSPECIFIEDNAME" + "\t" + "CTV3ID" + "\t" + "SNOMEDID" + "\t" + "ISPRIMITVE";
+        return "CONCEPTID" + "\t" + "CONCEPTSTATUS" + "\t" + "FULLYSPECIFIEDNAME" + "\t" + "CTV3ID" + "\t" + "SNOMEDID" + "\t" + "ISPRIMITIVE";
     }
 
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return conceptSctId + "\t" + conceptStatus + "\t" + fullySpecifiedName + "\t" + ctv3Id + "\t" + snomedId + "\t" + isPrimitve;
+        return conceptSctId + "\t" + conceptStatus + "\t" + fullySpecifiedName + "\t" + ctv3Id + "\t" + snomedId + "\t" + isPrimitive;
     }
 
     /**
@@ -119,14 +119,14 @@ public class Rf1ConceptRow {
     /**
      * @return the isPrimitve
      */
-    public final String getIsPrimitve() {
-        return isPrimitve;
+    public final String getIsPrimitive() {
+        return isPrimitive;
     }
 
     /**
-     * @param isPrimitve the isPrimitve to set
+     * @param isPrimitive the isPrimitve to set
      */
-    public final void setIsPrimitve(String isPrimitve) {
-        this.isPrimitve = isPrimitve;
+    public final void setIsPrimitive(String isPrimitive) {
+        this.isPrimitive = isPrimitive;
     }
 }

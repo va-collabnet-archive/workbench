@@ -872,8 +872,10 @@ public class ExportSpecification {
         I_DescriptionTuple fsnTuple = null;
         if (!descriptionTuples.isEmpty()) {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-                if(isDescriptionActive(iDescriptionTuple.getStatusId())){
-                    fsnTuple = iDescriptionTuple;
+                if (isDescriptionActive(iDescriptionTuple.getStatusId())) {
+                    if (fsnTuple == null || fsnTuple.getVersion() < fsnTuple.getVersion()) {
+                        fsnTuple = iDescriptionTuple;
+                    }
                     break;
                 }
             }
@@ -1199,7 +1201,7 @@ public class ExportSpecification {
         baseConceptDto.setActive(isActive(tuple.getStatusId()));
         baseConceptDto.setDateTime(new Date(tuple.getTime()));
         baseConceptDto.setNamespace(getNamespace(idVersions,tuple));
-        baseConceptDto.setProject(getProject(idVersions, tuple));
+        baseConceptDto.setProject(getProject(tuple));
         baseConceptDto.setPathId(termFactory.getConcept(tuple.getPathId()).getUids().get(0));
         baseConceptDto.setStatusId(termFactory.getConcept(tuple.getStatusId()).getUids().get(0));
         baseConceptDto.setStatusCode(ArchitectonicAuxiliary.getSnomedConceptStatusId(
@@ -1235,13 +1237,14 @@ public class ExportSpecification {
             uuid = termFactory.getUids(componentNid).iterator().next();
         }
 
+        // If there is no sct id the concept is not live (previously released)
         conceptDto.setLive(sctIdPart != null);
         if (sctIdPart == null) {
             sctIdPart = new ThinIdPart();
 
             sctIdPart.setPathId(tuple.getPathId());
             sctIdPart.setSource(snomedIntId.getConceptId());
-            sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type, getProject(idVersions, tuple)));
+            sctIdPart.setSourceId(uuidSnomedDbMapHandler.getWithGeneration(uuid, getNamespace(idVersions, tuple), type, getProject(tuple)));
             sctIdPart.setStatusId(activeConcept.getConceptId());
             sctIdPart.setVersion(tuple.getVersion());
         }
@@ -1301,6 +1304,7 @@ public class ExportSpecification {
         identifierDto.setConceptId(idMap);
         identifierDto.setType(type);
         identifierDto.setActive(isActive(sctIdPart.getStatusId()));
+        identifierDto.setLive(conceptDto.isLive());
         identifierDto.setReferencedSctId(Long.valueOf(sctIdPart.getSourceId().toString()));
         identifierDto.setIdentifierSchemeUuid(snomedIntId.getUids().get(0));
 
@@ -1361,7 +1365,6 @@ public class ExportSpecification {
      * NB currently if no SCTID and not the international path then the
      * defaultNamespace is returned.
      *
-     * @param uuid UUID of the concept
      * @param tuple I_AmPart
      *
      * @return NAMESPACE
@@ -1369,7 +1372,7 @@ public class ExportSpecification {
      * @throws IOException DB errors
      * @throws TerminologyException DB errors
      */
-    private PROJECT getProject(List<I_IdPart> idVersions, I_AmPart tuple) throws IOException, TerminologyException {
+    private PROJECT getProject(I_AmPart tuple) throws IOException, TerminologyException {
         PROJECT project;
 
         if (isInternationalPath(tuple.getPathId())) {

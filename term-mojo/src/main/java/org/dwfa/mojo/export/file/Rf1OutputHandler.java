@@ -121,7 +121,7 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
         conceptRow.setCtv3Id(conceptDto.getCtv3Id());
         conceptRow.setSnomedId(conceptDto.getSnomedId());
         conceptRow.setFullySpecifiedName(conceptDto.getFullySpecifiedName());
-        conceptRow.setIsPrimitve(getPrimitiveFlag(conceptDto));
+        conceptRow.setIsPrimitive(getPrimitiveFlag(conceptDto));
 
         return conceptRow;
     }

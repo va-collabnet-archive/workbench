@@ -226,14 +226,16 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
     private void writeExtensionRow(ExtensionDto extensionDto) throws Exception, IOException, TerminologyException {
         Rf2ReferenceSetRow referenceSetRow = getRf2ExtensionRow(extensionDto);
 
-        Rf2ReferenceSetWriter referenceSetWriter = getReferenceSetWriter(extensionDto, false);
-        synchronized (referenceSetWriter) {
-            referenceSetWriter.write(referenceSetRow);
-        }
-        if (extensionDto.isLatest()) {
-            referenceSetWriter = getReferenceSetWriter(extensionDto, true);
+        if (extensionDto.isNewActiveOrRetiringLive()) {
+            Rf2ReferenceSetWriter referenceSetWriter = getReferenceSetWriter(extensionDto, false);
             synchronized (referenceSetWriter) {
                 referenceSetWriter.write(referenceSetRow);
+            }
+            if (extensionDto.isLatest()) {
+                referenceSetWriter = getReferenceSetWriter(extensionDto, true);
+                synchronized (referenceSetWriter) {
+                    referenceSetWriter.write(referenceSetRow);
+                }
             }
         }
     }
@@ -249,6 +251,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
      */
     private void writeExtensionIdRows(List<ExtensionDto> extensionDtos) throws Exception {
         Collections.sort(extensionDtos);
+
         ExtensionDto lastExtensionDto = null;
         for (ExtensionDto extensionDto : extensionDtos) {
             if (extensionDto.isNewActiveOrRetiringLive()) {
@@ -257,19 +260,15 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
                         synchronized (identifierCliniclFileFull) {
                             identifierCliniclFileFull.write(getRf2MemberIdentifierRow(extensionDto));
                         }
-                        if (extensionDto.isLatest()) {
-                            synchronized (identifierCliniclFileSnapShot) {
-                                identifierCliniclFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
-                            }
+                        synchronized (identifierCliniclFileSnapShot) {
+                            identifierCliniclFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
                         }
                     } else {
                         synchronized (identifierStructuralFileFull) {
                             identifierStructuralFileFull.write(getRf2MemberIdentifierRow(extensionDto));
                         }
-                        if (extensionDto.isLatest()) {
-                            synchronized (identifierStructuralFileSnapShot) {
-                                identifierStructuralFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
-                            }
+                        synchronized (identifierStructuralFileSnapShot) {
+                            identifierStructuralFileSnapShot.write(getRf2MemberIdentifierRow(extensionDto));
                         }
                     }
                 }
