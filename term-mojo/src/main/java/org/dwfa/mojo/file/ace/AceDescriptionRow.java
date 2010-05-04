@@ -5,7 +5,7 @@ public class AceDescriptionRow {
     String descriptionstatusUuid;
     String conceptUuid;
     String term;
-    String casesensitivityUuid;
+    String initialCapitalStatusCode;
     String descriptiontypeUuid;
     String languageCode;
     String effectiveTime;
@@ -26,7 +26,7 @@ public class AceDescriptionRow {
         descriptionstatusUuid = columns[1];
         conceptUuid = columns[2];
         term = columns[3];
-        casesensitivityUuid = columns[4];
+        initialCapitalStatusCode = columns[4];
         descriptiontypeUuid = columns[5];
         languageCode = columns[6];
         effectiveTime = columns[7];
@@ -39,7 +39,7 @@ public class AceDescriptionRow {
      * @return String header.
      */
     public String getHeader() {
-        return "DESCRIPTIONUUID" + "\t" + "DESCRIPTIONSTATUSUUID" + "\t" + "CONCEPTUUID" + "\t" + "TERM" + "\t" + "CASESENSITIVITYUUID" + "\t"
+        return "DESCRIPTIONUUID" + "\t" + "DESCRIPTIONSTATUSUUID" + "\t" + "CONCEPTUUID" + "\t" + "TERM" + "\t" + "INITIALCAPITALSTATUSCODE" + "\t"
             + "DESCRIPTIONTYPEUUID" + "\t" + "LANGUAGECode" + "\t" + "EFFECTIVETIME" + "\t" + "PATHUUID";
     }
 
@@ -47,7 +47,7 @@ public class AceDescriptionRow {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return descriptionUuid + "\t" + descriptionstatusUuid + "\t" + conceptUuid + "\t" + term + "\t" + casesensitivityUuid
+        return descriptionUuid + "\t" + descriptionstatusUuid + "\t" + conceptUuid + "\t" + term + "\t" + initialCapitalStatusCode
             + "\t" + descriptiontypeUuid + "\t" + languageCode + "\t" + effectiveTime + "\t" + pathUuid;
     }
 
@@ -110,15 +110,15 @@ public class AceDescriptionRow {
     /**
      * @return the casesensitivityUuid
      */
-    public final String getCasesensitivityUuid() {
-        return casesensitivityUuid;
+    public final String getInitialCapitalStatusCode() {
+        return initialCapitalStatusCode;
     }
 
     /**
-     * @param casesensitivityUuid the casesensitivityUuid to set
+     * @param initialCapitalStatusCode the initialCapitalStatusCode to set
      */
-    public final void setCasesensitivityUuid(String casesensitivityUuid) {
-        this.casesensitivityUuid = casesensitivityUuid;
+    public final void setInitialCapitalStatusCode(String initialCapitalStatusCode) {
+        this.initialCapitalStatusCode = initialCapitalStatusCode;
     }
 
     /**
@@ -143,10 +143,10 @@ public class AceDescriptionRow {
     }
 
     /**
-     * @param languageUuid the languageUuid to set
+     * @param languageCode the languageCode to set
      */
-    public final void setLanguageCode(String languageUuid) {
-        this.languageCode = languageUuid;
+    public final void setLanguageCode(String languageCode) {
+        this.languageCode = languageCode;
     }
 
     /**
