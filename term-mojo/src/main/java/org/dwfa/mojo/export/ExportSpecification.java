@@ -872,11 +872,10 @@ public class ExportSpecification {
         I_DescriptionTuple fsnTuple = null;
         if (!descriptionTuples.isEmpty()) {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-                if (isDescriptionActive(iDescriptionTuple.getStatusId())) {
-                    if (fsnTuple == null || fsnTuple.getVersion() < fsnTuple.getVersion()) {
+                if (isDescriptionActive(iDescriptionTuple.getStatusId()) || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
+                    if (fsnTuple == null || fsnTuple.getVersion() < iDescriptionTuple.getVersion()) {
                         fsnTuple = iDescriptionTuple;
                     }
-                    break;
                 }
             }
 
