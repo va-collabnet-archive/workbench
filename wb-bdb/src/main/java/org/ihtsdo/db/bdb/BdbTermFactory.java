@@ -1285,6 +1285,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             throw new IOException(e);
         } catch (ExecutionException e) {
             throw new IOException(e);
+        } catch (TerminologyException e) {
+            throw new IOException(e);
         }
     }
 

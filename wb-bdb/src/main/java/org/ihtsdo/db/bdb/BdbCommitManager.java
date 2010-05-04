@@ -435,6 +435,8 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (ExecutionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
         }
         fireCommit();
         updateFrames();
