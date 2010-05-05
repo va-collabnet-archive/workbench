@@ -151,6 +151,10 @@ public class WorkbenchRunner {
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
 			
+			if (System.getProperty("viewer") != null && System.getProperty("viewer").toLowerCase().startsWith("t")) {
+			    ACE.editMode = false;
+			}
+			
 			if (System.getProperty("newprofile") != null) {
                 File dbFolder = new File("berkeley-db");
                 if (jiniConfig != null) {

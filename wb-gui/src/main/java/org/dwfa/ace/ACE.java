@@ -1602,8 +1602,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
         this.frame = aceFrame;
-        if (editMode) {
             JMenuItem menuItem = null;
+            if (editMode) {
             /*
              * menuItem = new JMenuItem("Export Baseline Jar...");
              * menuItem.addActionListener(new WriteJar(aceConfig));
@@ -1634,8 +1634,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             menuItem = new JMenuItem("Save Profile As...");
             menuItem.addActionListener(new SaveProfileAs(aceFrame));
             fileMenu.add(menuItem);
+            }
             menuBar.add(fileMenu);
-        }
 
     }
 
@@ -2873,7 +2873,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showQueuesActionListener = new QueuesPaletteActionListener();
         showQueuesButton.addActionListener(showQueuesActionListener);
         showQueuesButton.setToolTipText("Show the queue viewer...");
-        showQueuesButton.setVisible(editMode);
         if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.INBOX)) {
             showQueuesButton.setVisible(false);
         }
