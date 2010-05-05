@@ -47,6 +47,7 @@ import org.ihtsdo.etypes.EIdentifier;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
+import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetMemberMember;
@@ -3196,7 +3197,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
                     listErm.add(tmp);
                 } else if (r.valueType == SctYRefSetRecord.ValueType.CONCEPT) {
-                    ERefsetMemberMember tmp = new ERefsetMemberMember();
+                    ERefsetCidMember tmp = new ERefsetCidMember();
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                     tmp.setComponentUuid(new UUID(r.componentUuidMsb, r.componentUuidLsb));
@@ -3206,7 +3207,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     // :!!!: tmp.setAdditionalIdComponents(additionalIdComponents);
                     // :!!!: tmp.setRevisions(revisions);
 
-                    // :!!!:???:@@@: no additional field
+                    tmp.setC1Uuid(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
 
                     listErm.add(tmp);
                 } else if (r.valueType == SctYRefSetRecord.ValueType.INTEGER) {
