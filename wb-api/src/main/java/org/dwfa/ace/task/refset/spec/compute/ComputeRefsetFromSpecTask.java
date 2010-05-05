@@ -105,7 +105,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 		}
 
 		try {
-			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
+			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
 			I_GetConceptData refsetSpec = refsetSpecHelper
 					.getRefsetSpecConcept();
 			AceLog.getAppLog().info(

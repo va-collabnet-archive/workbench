@@ -164,7 +164,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config);
         I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         BufferedWriter exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
 

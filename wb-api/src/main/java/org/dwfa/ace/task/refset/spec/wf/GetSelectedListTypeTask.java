@@ -85,6 +85,7 @@ public class GetSelectedListTypeTask extends AbstractTask {
         try {
             termFactory = Terms.get();
 
+            //TODO use other than termFactory.getActiveAceFrameConfig();
             I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
             JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
             for (Component c : workflowDetailsSheet.getComponents()) {
@@ -105,7 +106,7 @@ public class GetSelectedListTypeTask extends AbstractTask {
                         .getRefsetSpecInSpecEditor();
 
                     if (refsetSpecConcept != null) {
-                        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept);
+                        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept, config);
                         I_GetConceptData promotionsRefset = refsetSpecHelper.getPromotionRefsetConcept();
                         if (promotionsRefset != null) {
                             process.setProperty(memberRefsetUuidPropName, promotionsRefset.getUids().iterator().next());

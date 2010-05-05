@@ -21,6 +21,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * This panel allows the user to select a refset spec that they have owner access to.
@@ -60,16 +62,20 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
     private DynamicWidthComboBox refsetComboBox;
     private DynamicWidthComboBox statusComboBox;
+    
+    I_ConfigAceFrame config;
 
-    public ModifyOverallSpecStatusPanel() {
+    public ModifyOverallSpecStatusPanel() throws TerminologyException, IOException {
         super();
-        init();
+        //TODO use other than termFactory.getActiveAceFrameConfig();
+        config = Terms.get().getActiveAceFrameConfig();
+        init(config);
     }
 
-    private void init() {
+    private void init(I_ConfigAceFrame config) {
         setDefaultValues();
         addListeners();
-        layoutComponents();
+        layoutComponents(config);
     }
 
     private void setDefaultValues() {
@@ -98,10 +104,10 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         return statuses;
     }
 
-    private String getPromotionStatus() {
+    private String getPromotionStatus(I_ConfigAceFrame config) {
         I_GetConceptData selectedRefset = getRefset();
         if (selectedRefset != null) {
-            RefsetSpec spec = new RefsetSpec(selectedRefset, true);
+            RefsetSpec spec = new RefsetSpec(selectedRefset, true, config);
             return spec.getOverallSpecStatusString();
         } else {
             return "";
@@ -112,7 +118,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         refsetComboBox.addActionListener(new RefsetListener());
     }
 
-    private void layoutComponents() {
+    private void layoutComponents(I_ConfigAceFrame config) {
 
         this.setLayout(new GridBagLayout());
         this.removeAll();
@@ -153,7 +159,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
         gridBagConstraints.insets = new Insets(10, 10, 10, 10); // padding
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        JLabel promotionStatusLabel = new JLabel(getPromotionStatus());
+        JLabel promotionStatusLabel = new JLabel(getPromotionStatus(config));
         this.add(promotionStatusLabel, gridBagConstraints);
 
         // new status label and combo box
@@ -227,7 +233,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
                             config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_GetConceptData child : children) {
 
-                    RefsetSpec spec = new RefsetSpec(child, true);
+                    RefsetSpec spec = new RefsetSpec(child, true, config);
                     if (spec.getRefsetSpecConcept() != null) {
                         validRefsets.add(child);
                     }
@@ -250,7 +256,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
 
     class RefsetListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            layoutComponents();
+            layoutComponents(config);
         }
     }
 }

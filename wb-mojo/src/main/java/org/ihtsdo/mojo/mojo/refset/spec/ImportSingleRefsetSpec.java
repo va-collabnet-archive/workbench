@@ -89,8 +89,11 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 		}
 
 		try {
-			config = Terms.get().newAceFrameConfig();
-			Terms.get().setActiveAceFrameConfig(config);
+		    config = Terms.get().getActiveAceFrameConfig();
+		    if (config == null) {
+	            config = Terms.get().newAceFrameConfig();
+	            Terms.get().setActiveAceFrameConfig(config);
+		    }
 			reportFile.getParentFile().mkdirs();
 			TupleFileUtil tupleImporter = new TupleFileUtil();
 			UUID pathUuid = null;
@@ -111,7 +114,7 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 			}
 			I_GetConceptData refset = tupleImporter.importFile(refsetSpecFile,
 					reportFile, config, Terms.get().newActivityPanel(false,
-							config, "Import"));
+							config, "Importing refset spec..."));
 			if (refset != null) {
 				getLog().info(
 						"Refset is: " + refset.getInitialText() + " "

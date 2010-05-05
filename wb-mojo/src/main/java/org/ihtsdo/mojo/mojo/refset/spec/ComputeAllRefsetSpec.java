@@ -25,7 +25,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
@@ -80,13 +79,14 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
 
 		try {
 			I_TermFactory termFactory = Terms.get();
+            //TODO use other than termFactory.getActiveAceFrameConfig();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
 			Set<Integer> excludedRefsets = new HashSet<Integer>();
 			if (excludedRefsetSpecDescriptors != null) {
 				for (ConceptDescriptor refsetSpecDescriptor : excludedRefsetSpecDescriptors) {
 					RefsetSpec spec = new RefsetSpec(refsetSpecDescriptor
-							.getVerifiedConcept());
+							.getVerifiedConcept(), config);
 					excludedRefsets.add(spec.getMemberRefsetConcept()
 							.getConceptId());
 				}
@@ -120,7 +120,8 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
 			for (I_GetConceptData child : children) {
 				if (conceptIsRefsetSpec(child)) {
 
-					RefsetSpec refsetSpecHelper = new RefsetSpec(child);
+		            //TODO use other than termFactory.getActiveAceFrameConfig();
+					RefsetSpec refsetSpecHelper = new RefsetSpec(child, Terms.get().getActiveAceFrameConfig());
 					I_GetConceptData memberRefset = refsetSpecHelper
 							.getMemberRefsetConcept();
 					boolean showActivityPanel = false;

@@ -90,7 +90,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         activity.setValue(0);
         activity.setMaximum(possibleIds.cardinality());
         activity.setIndeterminate(false);
-        specHelper = new RefsetSpec(refsetConcept, true);
+        specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
 
     }
 

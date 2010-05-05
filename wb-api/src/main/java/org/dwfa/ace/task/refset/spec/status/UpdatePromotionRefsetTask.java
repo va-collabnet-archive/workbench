@@ -135,7 +135,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                 throw new Exception("No refset spec currently in refset spec panel.");
             }
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
-            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
+            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, activeFrameConfig);
             I_ShowActivity activity = Terms.get().newActivityPanel(true, activeFrameConfig, "Updating refset: " + 
                 refsetSpec.getPromotionRefsetConcept().toString());
             activity.setIndeterminate(true);

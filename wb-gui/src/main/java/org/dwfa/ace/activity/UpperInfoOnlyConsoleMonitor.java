@@ -28,6 +28,10 @@ import org.dwfa.ace.log.AceLog;
 public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 
     long startTime;
+    int value;
+    int max;
+    boolean complete = false;
+    private boolean indeterminate = true;;
 
     public long getStartTime() {
         return startTime;
@@ -43,8 +47,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public void complete() {
-        // TODO Auto-generated method stub
-
+        this.complete = true;
     }
 
     public JPanel getViewPanel() {
@@ -58,13 +61,11 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public void setIndeterminate(boolean newValue) {
-        // TODO Auto-generated method stub
-
+        this.indeterminate = newValue;
     }
 
     public void setMaximum(int n) {
-        // TODO Auto-generated method stub
-
+           max = n;
     }
 
     public void setProgressInfoLower(String text) {
@@ -78,32 +79,31 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public void setValue(int n) {
-        // TODO Auto-generated method stub
-
+        value = n;
     }
 
     public void addShowActivityListener(I_ShowActivity listener) {
-        throw new UnsupportedOperationException();
+
     }
 
     public void removeShowActivityListener(I_ShowActivity listener) {
-        throw new UnsupportedOperationException();
+
     }
 
     public int getMaximum() {
-        throw new UnsupportedOperationException();
+        return max;
     }
 
     public int getValue() {
-        throw new UnsupportedOperationException();
+        return value;
     }
-
+    
     public boolean isComplete() {
-        throw new UnsupportedOperationException();
+        return this.complete;
     }
 
     public boolean isIndeterminate() {
-        throw new UnsupportedOperationException();
+       return this.indeterminate ;
     }
 
     public I_ShowActivity getSecondaryPanel() {

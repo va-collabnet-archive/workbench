@@ -72,17 +72,7 @@ public class ComputeSingleRefsetSpec extends AbstractMojo {
 		}
 
 		try {
-			I_ConfigAceFrame config = Terms.get().newAceFrameConfig();
-//			config
-//					.getEditingPathSet()
-//					.add(
-//							Terms
-//									.get()
-//									.getPath(
-//											Arrays
-//													.asList(UUID
-//															.fromString("2faa9260-8fb2-11db-b606-0800200c9a66"))));
-			Terms.get().setActiveAceFrameConfig(config);
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData refsetSpec = refsetSpecDescriptor
 					.getVerifiedConcept();
 			boolean showActivityPanel = false;

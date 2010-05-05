@@ -158,7 +158,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 return Condition.ITEM_CANCELED;
             }
 
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
             I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
 
             // verify a valid refset spec construction

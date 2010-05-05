@@ -26,10 +26,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.ihtsdo.mojo.maven.MojoUtil;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
  * 
@@ -66,8 +66,8 @@ public class VodbSetEditPaths extends AbstractMojo {
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-            I_ConfigAceFrame activeConfig = LocalVersionedTerminology.get().getActiveAceFrameConfig();
-            I_TermFactory tf = LocalVersionedTerminology.get();
+            I_ConfigAceFrame activeConfig = Terms.get().getActiveAceFrameConfig();
+            I_TermFactory tf = Terms.get();
 
             activeConfig.getEditingPathSet().clear();
             for (ConceptDescriptor pathConcept : editPaths) {

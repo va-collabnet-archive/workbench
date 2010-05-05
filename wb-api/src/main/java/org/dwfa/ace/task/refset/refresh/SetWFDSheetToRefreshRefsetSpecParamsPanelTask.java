@@ -358,14 +358,14 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(this.owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(this.owner));
 
-        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+        I_IntSet allowedTypes = config.getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
                     config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    RefsetSpec spec = new RefsetSpec(child, true);
+                    RefsetSpec spec = new RefsetSpec(child, true, config);
                     if (spec.isEditableRefset()) {
                         refsetSpecs.add(child);
                     }

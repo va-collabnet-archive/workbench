@@ -76,6 +76,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
             I_TermFactory termFactory = Terms.get();
+            //TODO use other than termFactory.getActiveAceFrameConfig();
             I_ConfigAceFrame configFrame = termFactory.getActiveAceFrameConfig();
             I_ConfigAceDb configDb = configFrame.getDbConfig();
             I_GetConceptData userTopHierarchy = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
@@ -95,7 +96,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
                 return alertList;
             }
 
-            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept);
+            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame);
 
             alertList = verifyRefsetSpec(specHelper, alertList);
 

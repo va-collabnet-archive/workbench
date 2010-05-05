@@ -2396,8 +2396,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setCommitAbortButtonsVisible(boolean visible) {
-        aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
-
+        if (aceFrame != null && aceFrame.getCdePanel() != null) {
+            aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
+        }
     }
 
     public Map<TOGGLES, I_HoldRefsetPreferences> getRefsetPreferencesMap() {

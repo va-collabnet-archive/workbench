@@ -48,7 +48,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
@@ -597,8 +596,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         retiredSet.add(retiredNid);
         boolean writeComment = editorComments.getText().length() > 3;
         I_ExtendByRef comment = null;
-        I_Identify commentId = null;
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, frameConfig);
         I_GetConceptData commentRefset = refsetSpecHelper.getCommentsRefsetConcept();
 
         if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {

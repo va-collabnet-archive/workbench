@@ -696,7 +696,7 @@ public class RefsetSpecPanel extends JPanel {
                     refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
                     
                     for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
-                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
+                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
                             List<? extends I_ExtendByRefVersion> promotionTuples =

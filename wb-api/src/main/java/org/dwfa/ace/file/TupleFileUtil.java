@@ -331,7 +331,9 @@ public class TupleFileUtil {
                 "No refset spec found - the refset spec should have a src relationship of type 'specifies refset' to the member refset.");
         }
         I_TermFactory termFactory = Terms.get();
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+        // TODO replace with passed in config...
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config);
         I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         I_GetConceptData markedParentRefset = refsetSpecHelper.getMarkedParentRefsetConcept();
         I_GetConceptData commentsRefset = refsetSpecHelper.getCommentsRefsetConcept();
@@ -345,8 +347,6 @@ public class TupleFileUtil {
                 "No marked parent refset found - the member refset should have a 'marked parent refset' relationship to the marked parent refset.");
         }
 
-        // TODO replace with passed in config...
-        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         I_IntSet allowedStatus = config.getAllowedStatus();
         I_IntSet allowedTypes = null;
@@ -609,7 +609,7 @@ public class TupleFileUtil {
                         || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
                         || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
                         if (isMemberRefset(potentialRefset)) {
-                            RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true);
+                            RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true, configFrame);
                             exportRefsetSpecToFile(outputFileWriter, refsetSpecHelper.getRefsetSpecConcept(),
                                 tupleCounter);
                         }

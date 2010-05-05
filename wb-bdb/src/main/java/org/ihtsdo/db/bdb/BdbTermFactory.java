@@ -1557,7 +1557,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         SpecRefsetHelper refsetHelper = new SpecRefsetHelper(frameConfig);
         Concept refsetConcept = Concept.get(refsetNid);
-        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true);
+        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
         ComponentList<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
 
         HashSet<Integer> currentMembersList = new HashSet<Integer>();
@@ -1577,6 +1577,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         I_RepresentIdSet possibleIds;
         if (specHelper.isConceptComputeType()) {
+            AceLog.getAppLog().info("Computing possible concepts for spec: " + query);
             possibleIds = query.getPossibleConcepts(frameConfig, null);
         } else if (specHelper.isDescriptionComputeType()) {
             possibleIds = query.getPossibleDescriptions(frameConfig, null);

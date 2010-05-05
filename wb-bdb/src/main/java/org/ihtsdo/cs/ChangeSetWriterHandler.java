@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -28,7 +30,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 	private IntSet sapNidsFromCommit;
     private int conceptCount;
     private int reportInterval;
-    private ActivityPanel activity;
+    private I_ShowActivity activity;
     private long startTime = System.currentTimeMillis();
     private AtomicInteger processedCount = new AtomicInteger();
     private AtomicInteger processedChangedCount = new AtomicInteger();
@@ -62,12 +64,13 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
-	        activity = new ActivityPanel(true, null, null);
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...");
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("CS writer: " + commitTimeStr + "...");
 	        activity.setProgressInfoLower("Opening change set writers...");
-	        activity.getStopButton().setVisible(false);
-	        ActivityViewer.addActivity(activity);
+	        if (activity.getStopButton() != null) {
+	            activity.getStopButton().setVisible(false);
+	        }
 			for (I_WriteChangeSet writer : writers) {
 				writer.open(sapNidsFromCommit);
 			}

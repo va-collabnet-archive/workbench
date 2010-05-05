@@ -296,9 +296,6 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			== false: " Attempt to add duplicate uuid: " + uuids;
 			*/
 		int newNid = sequence.getAndIncrement();
-		if (newNid > -2144319243) {
-		    System.out.println("newNid: " + newNid);
-		}
 		for (UUID uuid : uuids) {
 			mutableUuidsToNidMap.put(uuid, newNid);
 		}
