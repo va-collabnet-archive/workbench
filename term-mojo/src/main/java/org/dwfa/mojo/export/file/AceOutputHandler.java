@@ -128,39 +128,42 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
                 }
             }
         }
-        writeIdRows(componentDto.getConceptDtos());
 
-        for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (isNewActiveOrRetiringLiveConcept && descriptionDto.isNewActiveOrRetiringLive()) {
-                synchronized (descriptionFile) {
-                    descriptionFile.write(getAceDescriptionRow(descriptionDto));
-                }
-                if(descriptionDto.isLatest()){
-                    synchronized (descriptionFileSnapShot) {
-                        descriptionFileSnapShot.write(getAceDescriptionRow(descriptionDto));
+        if(isNewActiveOrRetiringLiveConcept){
+            writeIdRows(componentDto.getConceptDtos());
+
+            for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
+                if (descriptionDto.isNewActiveOrRetiringLive()) {
+                    synchronized (descriptionFile) {
+                        descriptionFile.write(getAceDescriptionRow(descriptionDto));
+                    }
+                    if(descriptionDto.isLatest()){
+                        synchronized (descriptionFileSnapShot) {
+                            descriptionFileSnapShot.write(getAceDescriptionRow(descriptionDto));
+                        }
                     }
                 }
             }
-        }
-        writeIdRows(componentDto.getDescriptionDtos());
+            writeIdRows(componentDto.getDescriptionDtos());
 
-        for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            if (isNewActiveOrRetiringLiveConcept && relationshipDto.isNewActiveOrRetiringLive()) {
-                synchronized (relationshipFile) {
-                    relationshipFile.write(getAceRelationshipRow(relationshipDto));
-                }
-                if(relationshipDto.isLatest()){
-                    synchronized (relationshipFileSnapShot) {
-                        relationshipFileSnapShot.write(getAceRelationshipRow(relationshipDto));
+            for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
+                if (relationshipDto.isNewActiveOrRetiringLive()) {
+                    synchronized (relationshipFile) {
+                        relationshipFile.write(getAceRelationshipRow(relationshipDto));
+                    }
+                    if(relationshipDto.isLatest()){
+                        synchronized (relationshipFileSnapShot) {
+                            relationshipFileSnapShot.write(getAceRelationshipRow(relationshipDto));
+                        }
                     }
                 }
             }
-        }
-        writeIdRows(componentDto.getRelationshipDtos());
+            writeIdRows(componentDto.getRelationshipDtos());
 
-        writeExtensionIdRows(componentDto.getConceptExtensionDtos());
-        writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
-        writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
+            writeExtensionIdRows(componentDto.getConceptExtensionDtos());
+            writeExtensionIdRows(componentDto.getDescriptionExtensionDtos());
+            writeExtensionIdRows(componentDto.getRelationshipExtensionDtos());
+        }
     }
 
     /**

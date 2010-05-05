@@ -141,56 +141,57 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
                 }
             }
         }
-        synchronized (identifierFileFull) {
-            identifierFileFull.write(getRf2IdentifierRows(componentDto.getConceptDtos(), false));
-        }
-        synchronized (identifierFileSnapShot) {
-            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getConceptDtos(), true));
-        }
 
-        for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (isNewActiveOrRetiringLiveConcept && descriptionDto.isNewActiveOrRetiringLive()) {
-                synchronized (descriptionFileFull) {
-                    descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
-                }
-                if(descriptionDto.isLatest() && !descriptionDto.isActive() && descriptionDto.isLive()){
-                    synchronized (descriptionFileSnapShot) {
-                        descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+        if(isNewActiveOrRetiringLiveConcept){
+            synchronized (identifierFileFull) {
+                identifierFileFull.write(getRf2IdentifierRows(componentDto.getConceptDtos(), false));
+            }
+            synchronized (identifierFileSnapShot) {
+                identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getConceptDtos(), true));
+            }
+
+            for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
+                if (descriptionDto.isNewActiveOrRetiringLive()) {
+                    synchronized (descriptionFileFull) {
+                        descriptionFileFull.write(getRf2DescriptionRow(descriptionDto));
                     }
-                } else if(descriptionDto.isLatest() && descriptionDto.isActive()){
-                    synchronized (descriptionFileSnapShot) {
-                        descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                    if(descriptionDto.isLatest() && !descriptionDto.isActive() && descriptionDto.isLive()){
+                        synchronized (descriptionFileSnapShot) {
+                            descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                        }
+                    } else if(descriptionDto.isLatest() && descriptionDto.isActive()){
+                        synchronized (descriptionFileSnapShot) {
+                            descriptionFileSnapShot.write(getRf2DescriptionRow(descriptionDto));
+                        }
                     }
                 }
             }
-        }
-        synchronized (identifierFileFull) {
-            identifierFileFull.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), false));
-        }
-        synchronized (identifierFileSnapShot) {
-            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), true));
-        }
+            synchronized (identifierFileFull) {
+                identifierFileFull.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), false));
+            }
+            synchronized (identifierFileSnapShot) {
+                identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getDescriptionDtos(), true));
+            }
 
-        for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            if (isNewActiveOrRetiringLiveConcept && relationshipDto.isNewActiveOrRetiringLive()) {
-                synchronized (relationshipFileFull) {
-                    relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
-                }
-                if(relationshipDto.isLatest()){
-                    synchronized (relationshipFileSnapShot) {
-                        relationshipFileSnapShot.write(getRf2RelationshipRow(relationshipDto));
+            for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
+                if (relationshipDto.isNewActiveOrRetiringLive()) {
+                    synchronized (relationshipFileFull) {
+                        relationshipFileFull.write(getRf2RelationshipRow(relationshipDto));
+                    }
+                    if(relationshipDto.isLatest()){
+                        synchronized (relationshipFileSnapShot) {
+                            relationshipFileSnapShot.write(getRf2RelationshipRow(relationshipDto));
+                        }
                     }
                 }
             }
-        }
-        synchronized (identifierFileFull) {
-            identifierFileFull.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), false));
-        }
-        synchronized (identifierFileSnapShot) {
-            identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), true));
-        }
+            synchronized (identifierFileFull) {
+                identifierFileFull.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), false));
+            }
+            synchronized (identifierFileSnapShot) {
+                identifierFileSnapShot.write(getRf2IdentifierRows(componentDto.getRelationshipDtos(), true));
+            }
 
-        if (isNewActiveOrRetiringLiveConcept) {
             // group all the matching members together.
             for (ExtensionDto extensionDto : componentDto.getConceptExtensionDtos()) {
                 if (extensionDto.isNewActiveOrRetiringLive()) {

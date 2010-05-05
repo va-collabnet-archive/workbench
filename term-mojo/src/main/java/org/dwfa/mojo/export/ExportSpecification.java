@@ -366,6 +366,9 @@ public class ExportSpecification {
             for (I_ConceptAttributeTuple tuple : matchingConceptTuples) {
                 setConceptDto(componentDto, tuple, latestConceptTuples.contains(tuple));
             }
+            setComponentInactivationReferenceSet(componentDto.getConceptExtensionDtos(), concept.getNid(), matchingConceptTuples,
+                conceptInactivationIndicatorNid, TYPE.CONCEPT);
+
             setExtensionDto(componentDto.getConceptExtensionDtos(), concept.getConceptId(), TYPE.CONCEPT);
 
             Set<I_DescriptionTuple> latestDescriptionTuples = new HashSet<I_DescriptionTuple>();
@@ -373,12 +376,21 @@ public class ExportSpecification {
             for (I_DescriptionTuple tuple : matchingDescriptionTuples) {
                 setDescriptionDto(componentDto, tuple, latestDescriptionTuples.contains(tuple));
             }
+            for (I_DescriptionTuple latestDescription : latestDescriptionTuples) {
+                setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), latestDescription.getDescId(), latestDescription,
+                    descriptionInactivationIndicatorNid, TYPE.RELATIONSHIP);
+            }
             updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
 
             Set<I_RelTuple> latestRelationshipTuples = new HashSet<I_RelTuple>();
             latestRelationshipTuples.addAll(TupleVersionPart.getLatestMatchingTuples(matchingRelationshipTuples));
             for (I_RelTuple tuple : matchingRelationshipTuples) {
                 setRelationshipDto(componentDto, tuple, latestRelationshipTuples.contains(tuple));
+            }
+            for (I_RelTuple latestRelationship : latestRelationshipTuples) {
+                setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), latestRelationship.getRelId(), latestRelationship,
+                    relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP);
+
             }
         }
 
@@ -540,8 +552,6 @@ public class ExportSpecification {
         getBaseConceptDto(relationshipDto, tuple, idParts, latest);
 
         if (latest) {
-            setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple.getRelId(), tuple,
-                relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP ,latest);
             setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
             setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
         }
@@ -580,11 +590,6 @@ public class ExportSpecification {
 
         getBaseConceptDto(descriptionDto, tuple, idParts, latest);
         descriptionDto.setActive(isDescriptionActive(tuple.getStatusId()));
-
-        if (latest) {
-            setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), tuple.getDescId(), tuple,
-                descriptionInactivationIndicatorNid, TYPE.DESCRIPTION ,latest);
-        }
 
         setUuidSctIdIdentifier(descriptionDto, tuple, idParts, TYPE.DESCRIPTION, tuple.getDescId(), latest);
 
@@ -856,9 +861,6 @@ public class ExportSpecification {
             } else {
                 conceptDto.setSnomedId("");
             }
-
-            setComponentInactivationReferenceSet(componentDto.getConceptExtensionDtos(), tuple.getConId(), tuple,
-                conceptInactivationIndicatorNid, TYPE.CONCEPT, latest);
         }
 
 
@@ -942,30 +944,63 @@ public class ExportSpecification {
      * @throws TerminologyException
      */
     private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid,
-            I_AmTuple tuple, int inactivationIndicatorRefsetNid, TYPE type, boolean latest) throws Exception {
+            I_AmTuple tuple, int inactivationIndicatorRefsetNid, TYPE type) throws Exception {
         I_ThinExtByRefVersioned extensionVersioned = null;
-        int rf2InactiveStatus = getRf2Status(tuple.getStatusId());
-        if (rf2InactiveStatus != -1) {
-            // if the status is INACTIVE or ACTIVE there is no need for a
-            // reason. For simplicity, CURRENT will be treated this way too,
-            if (tuple.getStatusId() != activeConcept.getNid() && tuple.getStatusId() != inActiveConcept.getNid()
-                && tuple.getStatusId() != currentConcept.getNid()) {
 
-                extensionVersioned = getThinExtByRefTuple(inactivationIndicatorRefsetNid, 0, componentNid,
-                    rf2InactiveStatus, tuple);
-                TupleVersionPart.getLatestPart(extensionVersioned.getVersions()).setStatusId(activeConcept.getNid());
+        if (tuple != null) {
+            int rf2InactiveStatus = getRf2Status(tuple.getStatusId());
+            if (rf2InactiveStatus != -1) {
+                // if the status is INACTIVE or ACTIVE there is no need for a
+                // reason. For simplicity, CURRENT will be treated this way too,
+                if (tuple.getStatusId() != activeConcept.getNid() && tuple.getStatusId() != inActiveConcept.getNid()
+                    && tuple.getStatusId() != currentConcept.getNid()) {
+
+                    extensionVersioned = getThinExtByRefTuple(inactivationIndicatorRefsetNid, 0, componentNid,
+                        rf2InactiveStatus, tuple);
+
+                    //Fixed for R1 data, remove parts that don't relate to the tuple part
+                    List<I_ThinExtByRefPart> partsToRemove = new ArrayList<I_ThinExtByRefPart>();
+                    for (I_ThinExtByRefPart part : extensionVersioned.getVersions()) {
+                        if(part.getPathId() != tuple.getPathId()
+                                || part.getVersion() != tuple.getVersion()){
+                            partsToRemove.add(part);
+                        }
+                    }
+                    extensionVersioned.getVersions().removeAll(partsToRemove);
+
+                    //Left with one part so make the membership active
+                    extensionVersioned.getVersions().get(0).setStatusId(activeConcept.getNid());
+                }
+            } else {
+                //if no inactivation, check for previous inactivation
+                extensionVersioned = getRefsetExtensionVersioned(inactivationIndicatorRefsetNid, componentNid);
+                if (extensionVersioned != null) {
+                    retireLastestPart(extensionVersioned, tuple);
+                }
             }
-        } else {
-            extensionVersioned = getRefsetExtensionVersioned(inactivationIndicatorRefsetNid, componentNid);
+
             if (extensionVersioned != null) {
-                addRetireLastestPart(extensionVersioned, tuple.getPart());
+                extensionDtos.addAll(extensionProcessor.processList(extensionVersioned,
+                    extensionVersioned.getVersions(), type, false));
             }
         }
+    }
 
-        if (extensionVersioned != null) {
-            extensionDtos.addAll(extensionProcessor.processList(extensionVersioned, extensionVersioned.getVersions(),
-                type, false));
-        }
+    /**
+     * Adds the component to the <code>inactivationIndicatorRefsetNid</code> if
+     * the component is not active current or inactive.
+     *
+     * @param extensionDtos
+     * @param componentNid
+     * @param tuples
+     * @param inactivationIndicatorRefsetNid
+     * @param type
+     * @throws Exception
+     */
+    private void setComponentInactivationReferenceSet(List<ExtensionDto> extensionDtos, int componentNid,
+            Collection<? extends I_AmTuple> tuples, int inactivationIndicatorRefsetNid, TYPE type) throws Exception {
+        setComponentInactivationReferenceSet(extensionDtos, componentNid, TupleVersionPart.getLatestPart(tuples), inactivationIndicatorRefsetNid, type);
+
     }
 
     /**
@@ -1099,15 +1134,13 @@ public class ExportSpecification {
      * @param thinExtByRefVersioned I_ThinExtByRefVersioned
      * @param retireForPart I_AmPart path and version to use for the retired part
      */
-    private void addRetireLastestPart(I_ThinExtByRefVersioned thinExtByRefVersioned, I_AmPart retireForPart) {
+    private void retireLastestPart(I_ThinExtByRefVersioned thinExtByRefVersioned, I_AmPart retireForPart) {
         ThinExtByRefPartConcept latestPart = (ThinExtByRefPartConcept) TupleVersionPart.getLatestPart(thinExtByRefVersioned.getVersions());
-        ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
-        thinExtByRefVersioned.addVersion(conceptExtension);
 
-        conceptExtension.setC1id(latestPart.getC1id());
-        conceptExtension.setPathId(retireForPart.getPathId());
-        conceptExtension.setStatusId(retiredConcept.getNid());
-        conceptExtension.setVersion(retireForPart.getVersion());
+        latestPart.setC1id(latestPart.getC1id());
+        latestPart.setPathId(retireForPart.getPathId());
+        latestPart.setStatusId(retiredConcept.getNid());
+        latestPart.setVersion(retireForPart.getVersion());
     }
 
     /**

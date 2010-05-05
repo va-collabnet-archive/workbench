@@ -66,9 +66,11 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      */
     @Override
     void exportComponent(ComponentDto componentDto) throws Exception {
+        boolean isNewActiveOrRetiringLiveConcept = false;
         for (ConceptDto conceptDto : componentDto.getConceptDtos()) {
             if (conceptDto.isNewActiveOrRetiringLive()) {
-                    if (conceptDto.isLatest()) {
+                if (conceptDto.isLatest()) {
+                    isNewActiveOrRetiringLiveConcept = true;
                     synchronized (conceptFile) {
                         conceptFile.write(getRf1ConceptRow(conceptDto));
                     }
@@ -76,20 +78,22 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
             }
         }
 
-        for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
-            if (descriptionDto.isNewActiveOrRetiringLive()) {
-                if (descriptionDto.isLatest()) {
-                    synchronized (descriptionFile) {
-                        descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+        if (isNewActiveOrRetiringLiveConcept) {
+            for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {
+                if (descriptionDto.isNewActiveOrRetiringLive()) {
+                    if (descriptionDto.isLatest()) {
+                        synchronized (descriptionFile) {
+                            descriptionFile.write(getRf1DescriptionRow(descriptionDto));
+                        }
                     }
                 }
             }
-        }
 
-        for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
-            if (relationshipDto.isLatest() && relationshipDto.isActive()) {
-                synchronized (relationshipFile) {
-                    relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+            for (RelationshipDto relationshipDto : componentDto.getRelationshipDtos()) {
+                if (relationshipDto.isLatest() && relationshipDto.isActive()) {
+                    synchronized (relationshipFile) {
+                        relationshipFile.write(getRf1RelationshipRow(relationshipDto));
+                    }
                 }
             }
         }
