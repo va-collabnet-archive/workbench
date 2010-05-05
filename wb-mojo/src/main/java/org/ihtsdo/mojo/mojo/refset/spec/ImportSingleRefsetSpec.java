@@ -91,8 +91,7 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 		try {
 		    config = Terms.get().getActiveAceFrameConfig();
 		    if (config == null) {
-	            config = Terms.get().newAceFrameConfig();
-	            Terms.get().setActiveAceFrameConfig(config);
+	            throw new MojoExecutionException("You must set up the configuration prior to this call. Please see: vodb-set-default-config and vodb-set-view-paths goals. ");
 		    }
 			reportFile.getParentFile().mkdirs();
 			TupleFileUtil tupleImporter = new TupleFileUtil();
