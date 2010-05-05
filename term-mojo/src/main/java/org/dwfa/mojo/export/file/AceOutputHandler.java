@@ -129,7 +129,7 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
             }
         }
 
-        if(isNewActiveOrRetiringLiveConcept){
+        if (isNewActiveOrRetiringLiveConcept) {
             writeIdRows(componentDto.getConceptDtos());
 
             for (DescriptionDto descriptionDto : componentDto.getDescriptionDtos()) {

@@ -142,7 +142,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
             }
         }
 
-        if(isNewActiveOrRetiringLiveConcept){
+        if (isNewActiveOrRetiringLiveConcept) {
             synchronized (identifierFileFull) {
                 identifierFileFull.write(getRf2IdentifierRows(componentDto.getConceptDtos(), false));
             }
