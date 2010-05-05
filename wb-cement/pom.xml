@@ -109,17 +109,16 @@
 		</pluginManagement>
 	</build>
 	<modules>
-		<module>cement-cs</module>
-		<module>cement-rf2</module>
-		<module>cement-doc</module>
+		<module>cement-ace</module>
 		<module>cement-assembly</module>
-		<!-- <module>cement-java-binding</module>  -->
-		<module>cement-profiles</module>
-		<!--<module>cement-csub</module>-->
-		<module>cement-sab</module>
-		<!--<module>cement-vb</module>-->
 		<module>cement-bdb</module>
+		<module>cement-cs</module>
+		<module>cement-csub</module>
+		<module>cement-doc</module>
+		<module>cement-java-binding</module>
+		<module>cement-profiles</module>
+		<module>cement-rf2</module>
+		<module>cement-sab</module>
+		<module>cement-vb</module>
 	</modules>
-	<!-- Since the cement master is not a "release point", we do not want to declare any dependencies, or other properties
-	that will affect the build/release process of children projects -->
 </project>
