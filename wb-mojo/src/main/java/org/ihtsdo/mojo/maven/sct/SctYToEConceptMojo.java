@@ -1304,6 +1304,10 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             if (line[EXT_VALUE_UUID].charAt(0) == 't' || line[EXT_VALUE_UUID].charAt(0) == 'T')
                 vBool = true;
 
+            // :DEBUG:!!!:
+//            if (uuidComponent.equals(UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de"))) 
+//                getLog().info("FOUND IT");
+
             SctYRefSetRecord tmpRsRec = new SctYRefSetRecord(uuidRefset, uuidMember, uuidComponent,
                     status, revDate, pathIdx, vBool);
 
@@ -1966,10 +1970,10 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // Sort by [COMPONENTID]
             Collections.sort(aRs);
             int aRsMax = aRs.size();
-            int idxRsA = 0;
 
             // ATTACH ENVELOPE CONCEPTS (3 PASS)
             // *** CONCEPTS ***
+            int idxRsA = 0;
             ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fNameStep4Con)));
             try {
                 count = 0;
@@ -2010,8 +2014,18 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 while (obj != null && idxRsA < aRsMax) {
                     SctYRefSetRecord rsRec = aRs.get(idxRsA);
                     SctYDesRecord desRec = (SctYDesRecord) obj;
+
+                    // :DEBUG:!!!:
+//                    UUID debugThis = new UUID(rsRec.componentUuidMsb, rsRec.componentUuidLsb);
+//                    UUID debugThat = new UUID(desRec.desUuidMsb, desRec.desUuidLsb);
+//                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThis)) 
+//                        getLog().info("FOUND THIS");
+//                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThat)) 
+//                        getLog().info("FOUND THAT");
+                    
                     int rsVin = compareMsbLsb(rsRec.componentUuidMsb, rsRec.componentUuidLsb,
                             desRec.desUuidMsb, desRec.desUuidLsb);
+                    
 
                     if (rsVin == 0) {
                         if (rsRec.conUuidMsb != Long.MAX_VALUE)
@@ -2022,8 +2036,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                                             + "\r\nDescription UUID:"
                                             + new UUID(desRec.desUuidMsb, desRec.desUuidLsb));
 
-                        rsRec.conUuidMsb = desRec.desUuidMsb;
-                        rsRec.conUuidLsb = desRec.desUuidLsb;
+                        rsRec.conUuidMsb = desRec.conUuidMsb;
+                        rsRec.conUuidLsb = desRec.conUuidLsb;
                         rsRec.componentType = SctYRefSetRecord.ComponentType.DESCRIPTION;
                         idxRsA++;
                     } else if (rsVin > 0) {
@@ -2043,8 +2057,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             // *** RELATIONSHIPS ***
             ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fNameStep4Rel)));
-            ArrayList<SctYRelRecord> aRel = new ArrayList<SctYRelRecord>();
-
             try {
                 count = 0;
                 idxRsA = 0;
@@ -2064,8 +2076,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                                             + "\r\nRelationship UUID:"
                                             + new UUID(relRec.relUuidMsb, relRec.relUuidLsb));
 
-                        rsRec.conUuidMsb = relRec.relUuidMsb;
-                        rsRec.conUuidLsb = relRec.relUuidLsb;
+                        rsRec.conUuidMsb = relRec.c1UuidMsb;
+                        rsRec.conUuidLsb = relRec.c1UuidLsb;
                         rsRec.componentType = SctYRefSetRecord.ComponentType.RELATIONSHIP;
                         idxRsA++;
                     } else if (rsVin > 0) {
@@ -2586,9 +2598,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         statRsByRs = 0;
 
         // :DEBUG:!!!:
-        int xyzdebug = 0;
-        for (UUID u : yPathArray)
-            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
+//        int xyzdebug = 0;
+//        for (UUID u : yPathArray)
+//            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
 
         getLog().info("*** SctSiToEConcept STEP #7 BEGINNING -- CREATE eCONCEPTS ***");
         long start = System.currentTimeMillis();
@@ -2899,6 +2911,10 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         SctYConRecord cRec0 = conList.get(0);
         UUID theConUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
 
+        // :DEBUG:
+//        if (theConUUID.equals(UUID.fromString("8857ca3c-eeed-57e9-ba25-5d7f3a4ba160"))) 
+//            getLog().info("FOUND IT");
+
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
 
@@ -3169,9 +3185,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 ec.setRefsetUuidMemberUuidForRels(listRefsetUuidMemberUuidForRel);
 
             // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-            if (countRefsetMember < 10)
-                getLog().info(
-                        "Refset Member: " + ec.getConceptAttributes().primordialUuid.toString());
+//            if (countRefsetMember < 10)
+//                getLog().info(
+//                        "Refset Member: " + ec.getConceptAttributes().primordialUuid.toString());
             countRefsetMember++;
 
         }
@@ -3243,8 +3259,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             }
             // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-            if (countRefsetMaster < 10)
-                getLog().info("Refset Master: " + ec.getPrimordialUuid().toString());
+//            if (countRefsetMaster < 10)
+//                getLog().info("Refset Master: " + ec.getPrimordialUuid().toString());
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);
