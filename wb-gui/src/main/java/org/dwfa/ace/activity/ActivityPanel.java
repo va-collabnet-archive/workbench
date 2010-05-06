@@ -24,7 +24,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -305,7 +305,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         }
     }
 
-    private HashSet<I_ShowActivity> showActivityListeners = new HashSet<I_ShowActivity>();
+    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = new CopyOnWriteArraySet<I_ShowActivity>();
 
     public void addShowActivityListener(I_ShowActivity listener) {
         showActivityListeners.add(listener);
