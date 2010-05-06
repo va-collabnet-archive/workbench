@@ -476,4 +476,30 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		}
 	}
 
+    public IntSet getSpecifiedSapNids(IntSet pathIds, long startTime, long endTime) {
+        IntSet specifiedSapNids = new IntSet();
+        IntArrayList values = sapToIntMap.values();
+        if (pathIds != null && pathIds.size() > 0) {
+            for (int i = 0; i < values.size(); i++) {
+                int sapNid = values.getQuick(i);
+                if (pathIds.contains(sapNid)) {
+                    checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+                }
+            }
+        } else {
+            for (int i = 0; i < values.size(); i++) {
+                int sapNid = values.getQuick(i);
+                checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+            }
+        }
+        return specifiedSapNids;
+    }
+
+    private void checkTimeAndAdd(long startTime, long endTime, IntSet specifiedSapNids, int sapNid) {
+        long time = getTime(sapNid);
+        if (time >= startTime && time <= endTime) {
+            specifiedSapNids.add(sapNid);
+        }
+    }
+
 }

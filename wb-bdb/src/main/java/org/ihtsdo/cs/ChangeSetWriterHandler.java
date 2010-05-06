@@ -3,8 +3,6 @@ package org.ihtsdo.cs;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.dwfa.ace.activity.ActivityPanel;
-import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
