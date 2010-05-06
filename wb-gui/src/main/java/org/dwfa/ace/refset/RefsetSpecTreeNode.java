@@ -52,7 +52,11 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
             try {
                 I_DescriptionTuple thisConstraintDesc =
                         thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
-                constraintDesc = thisConstraintDesc.getText().toLowerCase();
+                if (thisConstraintDesc.getText() == null) {
+                    constraintDesc = thisConstraint.toString();
+                } else {
+                    constraintDesc = thisConstraintDesc.getText().toLowerCase();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
