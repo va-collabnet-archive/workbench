@@ -409,11 +409,14 @@ public class ActivityViewer {
         @Override
         protected Boolean doInBackground() throws Exception {
             ArrayList<I_ShowActivity> origOrder = null;
-            synchronized (viewer.activitiesList) {
-                origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            Collections.sort(listToSort, activityComparator);
+            if (origOrder.equals(listToSort)) {
+                return false;
             }
-            Collections.sort(viewer.activitiesList, activityComparator);
-            return origOrder.equals(viewer.activitiesList) == false;
+            viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
+            return true;
         }
 
         @Override
