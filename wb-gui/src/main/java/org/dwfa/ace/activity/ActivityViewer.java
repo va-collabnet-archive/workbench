@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
@@ -39,6 +41,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import net.jini.config.ConfigurationException;
 
@@ -163,6 +167,18 @@ public class ActivityViewer {
             return false;
         }
 
+        @Override
+        public void update() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
     }
 
     private class ActivityViewerFrame extends ComponentFrame {
@@ -206,19 +222,24 @@ public class ActivityViewer {
         }
 
         public void addInternalFrames(JMenu menu) {
-            // TODO Auto-generated method stub
-
+            // nothing to do...
         }
 
     }
 
-    ComponentFrame viewerFrame;
+    private ComponentFrame viewerFrame;
 
-    JPanel activitiesPanel = new JPanel(new GridBagLayout());
+    private JPanel activitiesPanel = new JPanel(new GridBagLayout());
 
-    List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
+    private List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
+    private Set<I_ShowActivity> activitiesSet = new HashSet<I_ShowActivity>();
 
-    static CompleteListener completeListener = new CompleteListener();
+    private static CompleteListener completeListener = new CompleteListener();
+    
+    private static Timer updateTimer = new Timer(2000, null);
+    static {
+        updateTimer.start();
+    }
 
     private ActivityViewer() throws Exception {
         super();
@@ -298,6 +319,7 @@ public class ActivityViewer {
 
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {
+           
             activity.addShowActivityListener(completeListener);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -311,6 +333,9 @@ public class ActivityViewer {
                             }
                         }
                         viewer.activitiesList.add(0, activity);
+                        if (!viewer.activitiesSet.contains(activity)) {
+                            viewer.updateTimer.addActionListener(activity);
+                        }
                         Collections.sort(viewer.activitiesList, activityComparator);
                         synchronized (viewer.activitiesList) {
                             while (viewer.activitiesList.size() > 40) {
@@ -374,46 +399,54 @@ public class ActivityViewer {
         }
     }
 
+    private static class ActivitySorter extends SwingWorker<Boolean, Object> {
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            ArrayList<I_ShowActivity> origOrder = null;
+            synchronized (viewer.activitiesList) {
+                origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            }
+            Collections.sort(viewer.activitiesList, activityComparator);
+            return origOrder.equals(viewer.activitiesList) == false;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                boolean changed = get();
+                if (changed) {
+                    viewer.activitiesPanel.removeAll();
+                    Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
+                    GridBagConstraints gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 0;
+                    gbc.weightx = 1;
+                    gbc.weighty = 0;
+                    gbc.fill = GridBagConstraints.HORIZONTAL;
+                    gbc.anchor = GridBagConstraints.NORTHWEST;
+                    gbc.gridwidth = 1;
+                    gbc.gridheight = 1;
+                    linkToSourceFrameActivityPanel();
+                    for (I_ShowActivity a : viewer.activitiesList) {
+                        viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                        gbc.gridy++;
+                        addSecondaryActivityPanel(secondaryPanels, a);
+                    }
+                    tickleSize();
+                }
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (ExecutionException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        
+    }
     public static void reSort() {
         if (DwfaEnv.isHeadless() == false) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                // TODO turn this into a future task... So sorting does not
-                // occur on event loop...
-                public void run() {
-                    try {
-                        ArrayList<I_ShowActivity> origOrder = null;
-                        synchronized (viewer.activitiesList) {
-                            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
-                        }
-                        Collections.sort(viewer.activitiesList, activityComparator);
-                        if (origOrder.equals(viewer.activitiesList) == false) {
-                            viewer.activitiesPanel.removeAll();
-                            Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                            GridBagConstraints gbc = new GridBagConstraints();
-                            gbc.gridx = 0;
-                            gbc.gridy = 0;
-                            gbc.weightx = 1;
-                            gbc.weighty = 0;
-                            gbc.fill = GridBagConstraints.HORIZONTAL;
-                            gbc.anchor = GridBagConstraints.NORTHWEST;
-                            gbc.gridwidth = 1;
-                            gbc.gridheight = 1;
-                            linkToSourceFrameActivityPanel();
-                            for (I_ShowActivity a : viewer.activitiesList) {
-                                viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                                gbc.gridy++;
-                                addSecondaryActivityPanel(secondaryPanels, a);
-                            }
-                            tickleSize();
-                        }
-                    } catch (HeadlessException e) {
-                        AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-                    }
-                }
-
-            });
-        }
+            new ActivitySorter().execute();
+         }
     }
 
     private static void addSecondaryActivityPanel(final Set<I_ShowActivity> secondaryPanels, final I_ShowActivity a) {
@@ -442,7 +475,9 @@ public class ActivityViewer {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
+                    updateTimer.removeActionListener(activity);
                     viewer.activitiesList.remove(activity);
+                    viewer.activitiesSet.remove(activity);
                     viewer.activitiesPanel.removeAll();
                     GridBagConstraints gbc = new GridBagConstraints();
                     gbc.gridx = 0;
@@ -483,7 +518,6 @@ public class ActivityViewer {
                     if (viewer != null) {
                         viewer.viewerFrame.toFront();
                     }
-                    
                 }
             });
         }
@@ -494,8 +528,7 @@ public class ActivityViewer {
              viewer.viewerFrame.toBack();
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                
-                @Override
+                 @Override
                 public void run() {
                     viewer.viewerFrame.toBack();
                 }

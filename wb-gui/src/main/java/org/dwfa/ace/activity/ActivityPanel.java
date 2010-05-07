@@ -44,7 +44,35 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     private long startTime = System.currentTimeMillis();
     private I_ConfigAceFrame aceFrameConfig;
     private boolean eraseWhenFinishedEnabled = false;
-
+    private String progressInfoUpperStr = "";
+    private String progressInfoLowerStr = "";
+    private int max = Integer.MAX_VALUE;
+    private int value = 0;
+    private boolean indeterminate = true;
+    private boolean removed;
+    
+    public void update() {
+        if (!progressInfoUpper.getText().equals(progressInfoUpperStr)) {
+            progressInfoUpper.setText(progressInfoUpperStr);
+        }
+        if (!progressInfoLower.getText().equals(progressInfoLowerStr)) {
+            progressInfoLower.setText(progressInfoLowerStr);
+        }
+        if (max != progressBar.getMaximum()) {
+            progressBar.setMaximum(max);
+        }
+        if (value != progressBar.getValue()) {
+            progressBar.setValue(value);
+        }
+        if (indeterminate != progressBar.isIndeterminate()) {
+            progressBar.setIndeterminate(indeterminate);
+        }
+        if (secondaryPanel != null) {
+            secondaryPanel.update();
+        }
+    }
+    
+    
     public long getStartTime() {
         return startTime;
     }
@@ -118,16 +146,13 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
             d.width = width;
             return d;
         }
-
     }
 
     private class StopActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             complete();
-
         }
-
     }
 
     /**
@@ -202,44 +227,27 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
 
     @Override
     public void removeActivityFromViewer() {
-        ActivityViewer.removeActivity(this);
+        if (!removed) {
+            removed = true;
+            ActivityViewer.removeActivity(this);
+        }
     }
 
     public JPanel getViewPanel() {
         return this;
     }
 
-    public void setProgressInfoUpper(final String text) {
+    public void setProgressInfoUpper(String text) {
     	assert text != null;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-            	if (text != null) {
-                    progressInfoUpper.setText(text);
-            	} else {
-                    progressInfoUpper.setText("");
-            	}
-            }
-        });
+    	progressInfoUpperStr = text;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoUpper(text);
         }
     }
 
-    public void setProgressInfoLower(final String text) {
+    public void setProgressInfoLower(String text) {
     	assert text != null;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-            	if (text != null) {
-                    if (text.startsWith("<html>")) {
-                        progressInfoLower.setText("<html>   " + text.substring(6));
-                    } else {
-                        progressInfoLower.setText("   " + text);
-                    }
-            	} else {
-                    progressInfoLower.setText("");
-            	}
-            }
-        });
+    	progressInfoLowerStr = text;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setProgressInfoLower(text);
         }
@@ -252,23 +260,12 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         }
     }
 
-    public void setMaximum(final int n) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setMaximum(n);
-            }
-        });
-        for (I_ShowActivity shower : showActivityListeners) {
-            shower.setMaximum(n);
-        }
+    public void setMaximum(int n) {
+        this.max = n;
     }
 
-    public void setValue(final int n) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setValue(n);
-            }
-        });
+    public void setValue(int n) {
+        this.value = n;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setMaximum(progressBar.getMaximum());
             shower.setValue(n);
@@ -316,11 +313,11 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public int getMaximum() {
-        return progressBar.getMaximum();
+        return max;
     }
 
     public int getValue() {
-        return progressBar.getValue();
+        return value;
     }
 
     public boolean isComplete() {
@@ -328,7 +325,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public boolean isIndeterminate() {
-        return progressBar.isIndeterminate();
+        return indeterminate;
     }
 
     I_ShowActivity secondaryPanel;
@@ -369,11 +366,11 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public String getProgressInfoLower() {
-        return progressInfoLower.getText();
+        return progressInfoLowerStr;
     }
 
     public String getProgressInfoUpper() {
-        return progressInfoUpper.getText();
+        return progressInfoUpperStr;
     }
 
     public boolean isEraseWhenFinishedEnabled() {
@@ -384,4 +381,9 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         this.eraseWhenFinishedEnabled = eraseWhenFinishedEnabled;
     }
 
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        update();
+    }
 }

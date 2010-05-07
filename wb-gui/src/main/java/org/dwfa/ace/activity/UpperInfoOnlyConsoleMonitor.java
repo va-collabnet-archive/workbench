@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.activity;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
@@ -159,5 +160,16 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     public void removeActivityFromViewer() {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public void update() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        update();
     }
 }

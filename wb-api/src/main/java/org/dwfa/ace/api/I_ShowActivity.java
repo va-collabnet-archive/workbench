@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public interface I_ShowActivity {
+public interface I_ShowActivity extends ActionListener {
     public JButton getStopButton();
 
     public void setStopButton(JButton stopButton);
@@ -78,4 +78,6 @@ public interface I_ShowActivity {
     public I_ConfigAceFrame getAceFrameConfig();
 
     public void syncWith(I_ShowActivity another);
+    
+    public void update();
 }

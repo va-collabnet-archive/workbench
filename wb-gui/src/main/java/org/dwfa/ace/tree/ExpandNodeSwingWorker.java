@@ -72,6 +72,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     }
 
     boolean hideWorkerId = true;
+    
+    boolean removed = false;
 
     String workerIdStr = " [" + workerId + "]";
 
@@ -122,7 +124,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             if (!continueWork) {
                 activity.complete();
                 updateTimer.stop();
-                if (System.currentTimeMillis() - start < 2000) {
+                if (System.currentTimeMillis() - start < 5000) {
                     activity.removeActivityFromViewer();
                 } else if (lowerProgressMessage.contains("Action programatically stopped")) {
                     activity.removeActivityFromViewer();
