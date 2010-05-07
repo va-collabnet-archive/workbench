@@ -478,7 +478,31 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private int nid;
 	private I_ManageConceptData data;
-	private static int fsDescNid = Integer.MIN_VALUE;
+	public boolean hasMediaExtensions() throws IOException {
+        return data.hasMediaExtensions();
+    }
+
+    public boolean hasExtensionsForComponent(int nid) throws IOException {
+        return data.hasExtensionsForComponent(nid);
+    }
+
+    public boolean hasAttributeExtensions()  throws IOException {
+        return data.hasAttributeExtensions();
+    }
+
+    public boolean hasDescriptionExtensions() throws IOException {
+        return data.hasDescriptionExtensions();
+    }
+
+    public boolean hasExtensionExtensions() throws IOException {
+        return data.hasExtensionExtensions();
+    }
+
+    public boolean hasRelExtensions() throws IOException {
+        return data.hasRelExtensions();
+    }
+
+    private static int fsDescNid = Integer.MIN_VALUE;
 	private static int fsXmlDescNid = Integer.MIN_VALUE;
 
 	private Concept(int nid) throws IOException {

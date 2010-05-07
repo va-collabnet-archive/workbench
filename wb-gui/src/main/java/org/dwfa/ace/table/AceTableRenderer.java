@@ -21,6 +21,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public abstract class AceTableRenderer extends DefaultTableCellRenderer {
@@ -35,22 +36,57 @@ public abstract class AceTableRenderer extends DefaultTableCellRenderer {
     public static Color INACTIVE = Color.LIGHT_GRAY;
     public static Color STRIPE = LEMON_CHIFFON;
     public static Color UNCOMMITTED_COLOR = new Color(128, 224, 72);
+    public static Color EXTENSION_COLOR = Color.DARK_GRAY;
 
-    protected void setBorder(int column, JLabel renderComponent, boolean same, boolean uncommitted) {
+    protected void setBorder(int column, JLabel renderComponent, boolean same, boolean uncommitted, boolean hasExtensions) {
         if (!same) {
             if (uncommitted && column == 0) {
-                renderComponent.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0,
-                    0, Color.LIGHT_GRAY), BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR)));
-
+                if (hasExtensions) {
+                    Border b = BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY), 
+                            BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR));
+                    b = BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(0, 0, 0, 5, EXTENSION_COLOR), 
+                            b);
+                    renderComponent.setBorder(b);
+                } else {
+                    Border b = BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY), 
+                        BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR));
+                    renderComponent.setBorder(b);
+                }
             } else {
-                renderComponent.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+                if (hasExtensions && column == 0) {
+                    Border b = BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY), 
+                        BorderFactory.createMatteBorder(0, 0, 0, 5, EXTENSION_COLOR));
+                    renderComponent.setBorder(b);
+                } else {    
+                    renderComponent.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY));
+                }
             }
         } else {
             if (uncommitted && column == 0) {
-                renderComponent.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0,
-                    0, Color.WHITE), BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR)));
+                if (hasExtensions && column == 0) {
+                    Border b = BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE), 
+                            BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR));
+                    b = BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(0, 0, 0, 5, EXTENSION_COLOR), b);
+                    renderComponent.setBorder(b);
+                } else {
+                    renderComponent.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0,
+                        0, Color.WHITE), BorderFactory.createMatteBorder(0, 3, 0, 0, UNCOMMITTED_COLOR)));
+                }
             } else {
-                renderComponent.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
+                if (hasExtensions && column == 0) {
+                    Border b = BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE), 
+                        BorderFactory.createMatteBorder(0, 0, 0, 5, EXTENSION_COLOR));
+                    renderComponent.setBorder(b);
+                } else {
+                    renderComponent.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
+                }
             }
         }
     }

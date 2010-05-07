@@ -105,6 +105,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             this.part = part;
         }
 
+        @Override
+        public boolean hasExtensions() {
+            return false;
+        }
+
         /*
          * (non-Javadoc)
          * 
@@ -506,6 +511,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		public void setTime(long value) {
 			part.setTime(value);
 		}
+
+        @Override
+        public boolean hasExtensions() {
+            return false;
+        }
     }
 
     /**

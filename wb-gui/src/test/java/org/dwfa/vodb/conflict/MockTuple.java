@@ -66,6 +66,11 @@ public class MockTuple implements I_AmTuple {
         };
     }
 
+    @Override
+    public boolean hasExtensions() {
+        return false;
+    }
+
     public I_AmPart getMutablePart() {
         throw new UnsupportedOperationException();
     }

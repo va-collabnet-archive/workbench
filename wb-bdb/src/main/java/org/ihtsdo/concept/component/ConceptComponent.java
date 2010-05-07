@@ -203,6 +203,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         private boolean dup = false;
 
         @Override
+        public boolean hasExtensions() throws IOException {
+            return ConceptComponent.this.hasExtensions();
+        }
+        @Override
         public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
             return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, pathNid, time);
         }

@@ -54,12 +54,12 @@ public class IdTableRenderer extends AceTableRenderer {
         if (row > 0) {
             StringWithIdTuple prevSwt = (StringWithIdTuple) table.getValueAt(row - 1, column);
             same = swt.getTuple().getDenotation().equals(prevSwt.getTuple().getDenotation());
-            setBorder(column, this, same, uncommitted);
+            setBorder(column, this, same, uncommitted, false);
             if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                 renderComponent.setText("");
             }
         } else {
-            setBorder(column, this, false, uncommitted);
+            setBorder(column, this, false, uncommitted, false);
         }
         if (isSelected == false) {
             renderComponent.setBackground(colorForRow(row));

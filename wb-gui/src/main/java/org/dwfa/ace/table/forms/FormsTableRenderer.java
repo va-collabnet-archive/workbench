@@ -72,7 +72,7 @@ public class FormsTableRenderer extends AceTableRenderer {
             setHorizontalAlignment(SwingConstants.LEFT);
         }
 
-        setBorder(column, this, false, false); // .., same, uncommitted
+        setBorder(column, this, false, false, false); // .., same, uncommitted
 
         renderComponent.setText((String) value);
         return renderComponent;

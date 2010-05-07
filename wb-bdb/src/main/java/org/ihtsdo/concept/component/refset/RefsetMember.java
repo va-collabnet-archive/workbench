@@ -499,5 +499,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	protected void clearVersions() {
 		versions = null;
 	}
+    @Override
+    public boolean hasExtensions() throws IOException {
+        if (getEnclosingConcept().hasExtensionExtensions()) {
+            return getEnclosingConcept().hasExtensionsForComponent(nid);
+        }
+        return false;
+    }
 
 }
