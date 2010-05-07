@@ -29,6 +29,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -231,8 +233,8 @@ public class ActivityViewer {
 
     private JPanel activitiesPanel = new JPanel(new GridBagLayout());
 
-    private List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
-    private Set<I_ShowActivity> activitiesSet = new HashSet<I_ShowActivity>();
+    private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
+    private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
 
     private static CompleteListener completeListener = new CompleteListener();
     
