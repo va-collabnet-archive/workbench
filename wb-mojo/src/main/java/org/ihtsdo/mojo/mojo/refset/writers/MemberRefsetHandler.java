@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -48,10 +49,10 @@ import org.ihtsdo.mojo.maven.transform.UuidSnomedMapHandler;
 import org.ihtsdo.mojo.maven.transform.SctIdGenerator.TYPE;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 
-public abstract class MemberRefsetHandler // extends
-											// IterableFileReader<I_ExtendByRefPart>
-											// {
-{
+public abstract class MemberRefsetHandler {
+	// extends
+	// IterableFileReader<I_ExtendByRefPart>
+	// {
 
 	protected static final String COMPONENT_ID = "COMPONENT_ID";
 	protected static final String STATUS_ID = "STATUS_ID";
@@ -60,14 +61,19 @@ public abstract class MemberRefsetHandler // extends
 	protected static final String REFSET_ID = "REFSET_ID";
 	protected static final String FILE_DELIMITER = "\t";
 	private static final String ID = "MEMBER_ID";
+
 	private static UuidSnomedMapHandler sctGenerator = null;
 	private static File fixedMapDirectory;
 	private static File readWriteMapDirectory;
+
 	private SimpleDateFormat dateFormat = new SimpleDateFormat(
 			"yyyyMMdd'T'hhmmss'Z'");
-	private I_TermFactory tf;
+	// private I_TermFactory tf;
+
 	private StringTokenizer st;
+
 	private Map<String, Object> currentRow;
+
 	private static I_GetConceptData module;
 
 	/**
@@ -174,7 +180,8 @@ public abstract class MemberRefsetHandler // extends
 		StringBuffer formattedLine = new StringBuffer();
 
 		Collection<UUID> statusUuids = tf.getUids(part.getStatusId());
-		String id = getMemberId(memberId, useSctId, componentId, refsetNid);
+		String id = getMemberId(part, memberId, useSctId, componentId,
+				refsetNid);
 		String effectiveDate = getDate(tf, part.getVersion());
 		boolean active = isActiveStatus(statusUuids);
 		String moduleId = toId(tf, getModule().getConceptId(), useSctId);
@@ -209,59 +216,59 @@ public abstract class MemberRefsetHandler // extends
 		return active;
 	}
 
-	/**
-	 * String representation of the refset tuple as a subset.
-	 * 
-	 * @param tf
-	 * @param tuple
-	 *            extension part to format
-	 * @param sctId
-	 *            true if the identifier should be a SNOMED ID, false for UUID
-	 * @return string representation of the part fit for a file of this
-	 *         handler's type
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-	public String formatRefsetAsSubset(I_TermFactory tf,
-			I_ExtendByRefPart part, Integer memberId, String subsetId,
-			int componentNid, boolean sctId) throws TerminologyException,
-			IOException {
+	// /**
+	// * String representation of the refset tuple as a subset.
+	// *
+	// * @param tf
+	// * @param tuple
+	// * extension part to format
+	// * @param sctId
+	// * true if the identifier should be a SNOMED ID, false for UUID
+	// * @return string representation of the part fit for a file of this
+	// * handler's type
+	// * @throws TerminologyException
+	// * @throws IOException
+	// */
+	// public String formatRefsetAsSubset(I_TermFactory tf,
+	// I_ExtendByRefPart part, Integer memberId, String subsetId,
+	// int componentNid, boolean sctId) throws TerminologyException,
+	// IOException {
+	//
+	// try {
+	//
+	// if (part instanceof I_ExtendByRefPartCid) {
+	// I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) part;
+	// Collection<UUID> statusUuids = tf.getUids(conceptPart
+	// .getStatusId());
+	//
+	// int statusInt;
+	// if (isActiveStatus(statusUuids)) {
+	// statusInt = 1;
+	// } else {
+	// statusInt = 0;
+	// }
+	//
+	// // String refsetId = toId(tf, refsetNid, sctId);
+	// String componentId = toId(tf, componentNid, sctId);
+	//
+	// // return refsetId + FILE_DELIMITER + componentId +
+	// // FILE_DELIMITER + statusInt;
+	// return subsetId + FILE_DELIMITER + componentId + FILE_DELIMITER
+	// + statusInt;
+	// } else {
+	// throw new Exception("Part is not of type concept ext " + part);
+	// }
+	//
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// throw new TerminologyException(e.getMessage());
+	// }
+	// }
 
-		try {
-
-			if (part instanceof I_ExtendByRefPartCid) {
-				I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) part;
-				Collection<UUID> statusUuids = tf.getUids(conceptPart
-						.getStatusId());
-
-				int statusInt;
-				if (isActiveStatus(statusUuids)) {
-					statusInt = 1;
-				} else {
-					statusInt = 0;
-				}
-
-				// String refsetId = toId(tf, refsetNid, sctId);
-				String componentId = toId(tf, componentNid, sctId);
-
-				// return refsetId + FILE_DELIMITER + componentId +
-				// FILE_DELIMITER + statusInt;
-				return subsetId + FILE_DELIMITER + componentId + FILE_DELIMITER
-						+ statusInt;
-			} else {
-				throw new Exception("Part is not of type concept ext " + part);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
-		}
-	}
-
-	public String getRefsetSctID(I_TermFactory tf, int refsetNid)
-			throws TerminologyException, IOException {
-		return toId(tf, refsetNid, true);
-	}
+	// public String getRefsetSctID(I_TermFactory tf, int refsetNid)
+	// throws TerminologyException, IOException {
+	// return toId(tf, refsetNid, true);
+	// }
 
 	/**
 	 * @return the header line for the refset file of this type in RF2
@@ -284,7 +291,7 @@ public abstract class MemberRefsetHandler // extends
 	public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart tuple,
 			Integer memberId, int refsetId, int componentId, boolean sctId)
 			throws TerminologyException, IOException {
-		return getMemberId(memberId, sctId, componentId, refsetId)
+		return getMemberId(tuple, memberId, sctId, componentId, refsetId)
 				+ FILE_DELIMITER + toId(tf, tuple.getPathId(), sctId)
 				+ FILE_DELIMITER + getDate(tf, tuple.getVersion())
 				+ FILE_DELIMITER + toId(tf, tuple.getStatusId(), sctId)
@@ -292,34 +299,43 @@ public abstract class MemberRefsetHandler // extends
 				+ toId(tf, componentId, sctId);
 	}
 
-	private String getMemberId(Integer memberId, boolean sctId,
-			int componentNid, int refsetNid)
+	private String getMemberId(I_ExtendByRefPart tuple, Integer memberId,
+			boolean sctId, int componentNid, int refsetNid)
 			throws UnsupportedEncodingException, TerminologyException,
 			IOException {
+		I_TermFactory tf = Terms.get();
 		UUID uuid;
 		if (memberId == null) {
 			// generate new id
 			uuid = UUID.nameUUIDFromBytes(("org.dwfa."
-					+ getTermFactory().getUids(componentNid) + getTermFactory()
-					.getUids(refsetNid)).getBytes("8859_1"));
+					+ tf.getUids(componentNid) + tf.getUids(refsetNid))
+					.getBytes("8859_1"));
 		} else {
-			if (getTermFactory().getUids(memberId) == null) {
+			if (tf.getUids(memberId) == null) {
 				System.out.println("Member id " + memberId
 						+ " has no UUIDs!!! for refset "
-						+ getTermFactory().getConcept(refsetNid)
-						+ " for component "
-						+ getTermFactory().getConcept(componentNid));
+						+ tf.getConcept(refsetNid) + " for component "
+						+ tf.getConcept(componentNid));
 
-				uuid = UUID
-						.nameUUIDFromBytes(("org.dwfa."
-								+ getTermFactory().getUids(componentNid) + getTermFactory()
-								.getUids(refsetNid)).getBytes("8859_1"));
+				uuid = UUID.nameUUIDFromBytes(("org.dwfa."
+						+ tf.getUids(componentNid) + tf.getUids(refsetNid))
+						.getBytes("8859_1"));
 			} else {
-				uuid = getTermFactory().getUids(memberId).iterator().next();
+				uuid = tf.getUids(memberId).iterator().next();
 			}
 		}
 
 		if (sctId) {
+			// int snomedIntId = Terms.get().uuidToNative(
+			// ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
+			// if (tuple instanceof I_Identify) {
+			// I_Identify identify = (I_Identify) tuple;
+			// for (I_IdPart p : identify.getMutableIdParts()) {
+			// if (p.getAuthorityNid() == snomedIntId)
+			// return p.getDenotation().toString();
+			// }
+			// }
+			// return String.valueOf(-1);
 			return Long.toString(getSctGenerator().getWithGeneration(uuid,
 					TYPE.SUBSET));
 		} else {
@@ -352,24 +368,24 @@ public abstract class MemberRefsetHandler // extends
 		}
 	}
 
-	public String generateNewSctId(int refsetId, int subsetVersion)
-			throws TerminologyException, IOException {
-		UUID refsetUuid = tf.getUids(refsetId).iterator().next();
-
-		// generate a new UUID from refset ID + subset version
-		UUID versionedRefsetUuid;
-		try {
-			versionedRefsetUuid = Type5UuidFactory.get(refsetUuid,
-					subsetVersion + "");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getLocalizedMessage());
-		}
-
-		// use this new UUID in the SCT generator
-		return Long.toString(getSctGenerator().getWithGeneration(
-				versionedRefsetUuid, TYPE.CONCEPT));
-	}
+	// public String generateNewSctId(int refsetId, int subsetVersion)
+	// throws TerminologyException, IOException {
+	// UUID refsetUuid = tf.getUids(refsetId).iterator().next();
+	//
+	// // generate a new UUID from refset ID + subset version
+	// UUID versionedRefsetUuid;
+	// try {
+	// versionedRefsetUuid = Type5UuidFactory.get(refsetUuid,
+	// subsetVersion + "");
+	// } catch (NoSuchAlgorithmException e) {
+	// e.printStackTrace();
+	// throw new TerminologyException(e.getLocalizedMessage());
+	// }
+	//
+	// // use this new UUID in the SCT generator
+	// return Long.toString(getSctGenerator().getWithGeneration(
+	// versionedRefsetUuid, TYPE.CONCEPT));
+	// }
 
 	public String getSnomedIntegerId(I_TermFactory tf, int componentId)
 			throws TerminologyException, IOException {
@@ -426,16 +442,16 @@ public abstract class MemberRefsetHandler // extends
 	protected int getAceVersionFromDateString(String string)
 			throws ParseException {
 		Date parsedDate = dateFormat.parse(string);
-		return getTermFactory().convertToThinVersion(parsedDate.getTime());
+		return Terms.get().convertToThinVersion(parsedDate.getTime());
 	}
 
-	protected I_TermFactory getTermFactory() {
-		if (tf == null) {
-			tf = LocalVersionedTerminology.get();
-		}
-
-		return tf;
-	}
+	// protected I_TermFactory getTermFactory() {
+	// if (tf == null) {
+	// tf = LocalVersionedTerminology.get();
+	// }
+	//
+	// return tf;
+	// }
 
 	protected String getNextCurrentRowToken() {
 		return st.nextToken();
@@ -501,7 +517,7 @@ public abstract class MemberRefsetHandler // extends
 	// }
 
 	protected int getNid(UUID id) throws TerminologyException, IOException {
-		return getTermFactory().uuidToNative(id);
+		return Terms.get().uuidToNative(id);
 	}
 
 	public File getFixedMapDirectory() {
