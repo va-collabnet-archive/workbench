@@ -338,7 +338,10 @@ public class ActivityViewer {
                         if (!viewer.activitiesSet.contains(activity)) {
                             viewer.updateTimer.addActionListener(activity);
                         }
-                        Collections.sort(viewer.activitiesList, activityComparator);
+                        
+                        List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+                        Collections.sort(listToSort, activityComparator);
+                        viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
                         synchronized (viewer.activitiesList) {
                             while (viewer.activitiesList.size() > 40) {
                                 viewer.activitiesList.remove(40);
