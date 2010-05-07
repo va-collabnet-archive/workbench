@@ -37,6 +37,8 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
     UpdateTreeSpec(RefsetSpecEditor refsetSpecEditor) {
         this.refsetSpecEditor = refsetSpecEditor;
         frameConfig =  this.refsetSpecEditor.ace.getAceFrameConfig();
+        oldRoot = (RefsetSpecTreeNode) this.refsetSpecEditor.specTree.getModel().getRoot();
+        refsetConcept = (I_GetConceptData) this.refsetSpecEditor.label.getTermComponent();
     }
 
     public boolean cancel = false;
@@ -53,6 +55,8 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
     private I_GetConceptData localRefsetSpecConcept;
     private JTableWithDragImage commentTable;
     private I_ConfigAceFrame frameConfig;
+    private RefsetSpecTreeNode oldRoot;
+    private I_GetConceptData refsetConcept;
 
     private void addChildrenExpandedNodes(RefsetSpecTreeNode node) {
         if (this.refsetSpecEditor.specTree.hasBeenExpanded(new TreePath(node.getPath()))) {
@@ -93,9 +97,6 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
             }
         }
 
-        RefsetSpecTreeNode oldRoot = (RefsetSpecTreeNode) this.refsetSpecEditor.specTree.getModel().getRoot();
-
-        I_GetConceptData refsetConcept = (I_GetConceptData) this.refsetSpecEditor.label.getTermComponent();
         IntSet relTypes = new IntSet();
         this.refsetSpecEditor.refsetSpecConcept = null;
         if (cancel) {
@@ -151,9 +152,25 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
                             extensionMap.get(ext.getComponentId()).add(extNode);
                         } else {
                             AceLog.getAppLog().alertAndLogException(new Exception("Can't find component in map: " + ext.getComponentId()));
-                            AceLog.getAppLog().warning("Can't find component in map: " + ext.getComponentId() + 
-                                "Extension: " + ext + " \n map: " + extensionMap + 
-                                " localRefsetSpecConcept: " + localRefsetSpecConcept.toLongString());
+                            I_GetConceptData conceptWithComponent = Terms.get().getConceptForNid(ext.getComponentId());
+                            StringBuffer msg = new StringBuffer();
+                            msg.append("Can't find component in map: ");
+                            msg.append(ext.getComponentId());
+                            msg.append("\n\nExtension:\n");
+                            msg.append(ext);
+                            msg.append(" \n\n map:\n");
+                            msg.append(extensionMap);
+                            msg.append(" \n\nlocalRefsetSpecConcept:\n");
+                            msg.append(localRefsetSpecConcept.toLongString());
+                            msg.append("\n\nConcept with component:\n");
+                            if (conceptWithComponent != null) {
+                                msg.append(conceptWithComponent.toLongString());
+                            } else {
+                                msg.append("null");
+                            }
+                            msg.append("\n\nlocal refset spec concept:\n");
+                            msg.append(localRefsetSpecConcept.toLongString());
+                            AceLog.getAppLog().warning(msg.toString());
                         }
                     }
                 } else {

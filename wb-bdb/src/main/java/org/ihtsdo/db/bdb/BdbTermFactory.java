@@ -1701,4 +1701,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         pathManager.removeOrigin(path, origin, config);
     }
 
+    @Override
+    public I_GetConceptData getConceptForNid(int componentNid) throws IOException {
+        return Bdb.getConceptForComponent(componentNid);
+    }
+
 }
