@@ -89,7 +89,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid);
-		mergeWithEConcept(eConcept, c);
+		mergeWithEConcept(eConcept, c, true);
 		BdbCommitManager.addUncommittedNoChecks(c);
 		return c;
 	}
@@ -100,10 +100,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid);
         //return populateFromEConcept(eConcept, c);
-        return mergeWithEConcept(eConcept, c);
+        return mergeWithEConcept(eConcept, c, false);
 	}
 	
-	private static Concept mergeWithEConcept(EConcept eConcept, Concept c)
+	private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
 			throws IOException {
 		EConceptAttributes eAttr = eConcept.getConceptAttributes();
 		if (eAttr != null) {
@@ -130,7 +130,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 					}
 				}
 			}
-			LuceneManager.writeToLucene(c.getDescriptions());
+			if (updateLucene) {
+	            LuceneManager.writeToLucene(c.getDescriptions());
+			}
 		}
 		if (eConcept.getRelationships() != null && 
 				eConcept.getRelationships().size() != 0) {
@@ -257,11 +259,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 						c.getData().getRefsetNidMemberNidForRefsetMembersList());
 				c.data.setRefsetNidMemberNidForRefsetMembersList(nidList);
 			}		
-		}
-		if (eConcept.getPrimordialUuid().equals(
-				UUID.fromString("e89c2b90-c85a-3dfb-978e-8df49046592b"))) {
-			AceLog.getAppLog().info("Finished merge: Concept: \n" + 
-					c.toLongString() + "\n\n" + eConcept);
 		}
 		return c;
 	}

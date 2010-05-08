@@ -30,7 +30,7 @@ import org.ihtsdo.db.bdb.Bdb;
 
 public class LuceneManager {
 	
-	public static File luceneDirFile = new File("berkeley-db/lucene");
+	public static File luceneDirFile = new File("target/berkeley-db/lucene");
 	public static File getLuceneDirFile() {
         return luceneDirFile;
     }
