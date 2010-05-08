@@ -99,7 +99,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 				.getPrimordialComponentUuid());
 		assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 		Concept c = get(conceptNid);
-		return populateFromEConcept(eConcept, c);
+        //return populateFromEConcept(eConcept, c);
+        return mergeWithEConcept(eConcept, c);
 	}
 	
 	private static Concept mergeWithEConcept(EConcept eConcept, Concept c)
