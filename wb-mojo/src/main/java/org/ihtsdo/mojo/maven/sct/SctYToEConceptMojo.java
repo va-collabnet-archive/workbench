@@ -1149,7 +1149,13 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // TERM_STRING = 3;
             String termStr = line[TERM_STRING];
             // CAPITALIZATION_STATUS = 4;
-            int capitalization = Integer.parseInt(line[CAPITALIZATION_STATUS_INT]);
+            // int capitalization = Integer.parseInt(line[CAPITALIZATION_STATUS_INT]);
+            String capitalizationStr = line[CAPITALIZATION_STATUS_INT];
+            int capitalization = 0;
+            if (capitalizationStr.startsWith("1") || capitalizationStr.startsWith("t")
+                    || capitalizationStr.startsWith("T"))
+                capitalization = 1;
+
             // DESCRIPTION_TYPE = 5;
             int descriptionType = lookupYDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
             //            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
