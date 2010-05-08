@@ -149,8 +149,6 @@ public class AddTopLevelOr extends AbstractTask {
             if (descriptionUuid != null) {
                 c3Description = Terms.get().getDescription(Terms.get().uuidToNative(descriptionUuid));
             }
-            
-            
 
             I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
             if (refsetSpec != null) {
@@ -159,32 +157,16 @@ public class AddTopLevelOr extends AbstractTask {
                 if (rootNode.getChildCount() == 0) {
                     int refsetId = refsetSpec.getConceptId();
                     int componentId = refsetId;
-
-                    boolean canAdd = true;
-                    canAdd = false;
-                    I_ExtendByRef selectedSpec = (I_ExtendByRef) rootNode.getUserObject();
-                    componentId = selectedSpec.getMemberId();
-                    if (selectedSpec.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize()
-                        .getNid()) {
-                        canAdd = true;
-                    }
-
-                    if (canAdd) {
-                        I_TermFactory tf = Terms.get();
-                        I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
-                        RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
-                        I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(refsetId, componentId,
-                            propMap.getMemberType(), propMap, UUID.randomUUID());
-                        tf.addUncommitted(ext);
-                        configFrame.fireRefsetSpecChanged(ext);
-                    } else {
-                        String msg = "Unable to add spec. Selected parent must be a branching spec.";
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
-                        throw new TaskFailedException(msg);
-                    }
+                    I_TermFactory tf = Terms.get();
+                    I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
+                    RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
+                    I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(refsetId, componentId,
+                        propMap.getMemberType(), propMap, UUID.randomUUID());
+                    tf.addUncommitted(ext);
+                    configFrame.fireRefsetSpecChanged(ext);
                 }
 
-             } else {
+            } else {
                 throw new TaskFailedException("Unable to complete operation. Refset is null.");
             }
             returnCondition = Condition.CONTINUE;
@@ -192,7 +174,6 @@ public class AddTopLevelOr extends AbstractTask {
             ex = e;
         }
     }
-
 
     protected int getRefsetPartTypeId() throws IOException, TerminologyException {
         int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid();
