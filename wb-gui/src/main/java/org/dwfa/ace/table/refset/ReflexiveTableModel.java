@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -58,6 +59,10 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetSpecTreeCellRenderer;
@@ -297,7 +302,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
     protected ArrayList<I_ExtendByRef> allExtensions;
 
-    protected Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
+    protected Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
 
     protected Set<Integer> conceptsToFetch = new HashSet<Integer>();
 
@@ -446,10 +451,23 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 columns[columnIndex].readParamaters);
                 } else {
                     try {
-                        value = columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart());
+                        I_ExtendByRefPart part = tuple.getMutablePart();
+                        if (columns[columnIndex].getReadMethod().getDeclaringClass().isAssignableFrom(part.getClass())) {
+                            value = columns[columnIndex].getReadMethod().invoke(part);
+                        } else {
+                            if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass())) {
+                                value = ((I_ExtendByRefPartBoolean) part).getBooleanValue();
+                            } else if (I_ExtendByRefPartStr.class.isAssignableFrom(part.getClass())) {
+                                value = ((I_ExtendByRefPartStr) part).getStringValue();
+                            } else if (I_ExtendByRefPartInt.class.isAssignableFrom(part.getClass())) {
+                                value = ((I_ExtendByRefPartInt) part).getIntValue();
+                            } else {
+                                value = tuple.getMutablePart().toString();
+                            }
+                        }
                     } catch (Exception e) {
                         value = tuple.getMutablePart().toString();
-                        AceLog.getAppLog().warning(e.getMessage() + ": " + value);
+                        AceLog.getAppLog().warning("ReflexiveTableModel_1: " + e.getMessage() + ": " + value);
                     }
                 }
                 break;
