@@ -562,6 +562,26 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                 </serializedBean>
                 <condition />
               </action>
+              <action name="windows memory xms in batch file" id="14551" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>wb.bat</string>
+                        </object>
+                      </void>
+                      <void property="replaceValue">
+                        <string>-Xms700m</string>
+                      </void>
+                      <void property="searchValue">
+                        <string>-Xms1400m</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
               <action name="osx memory xmx in batch file" id="14162" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
