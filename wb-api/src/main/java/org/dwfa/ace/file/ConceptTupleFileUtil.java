@@ -114,8 +114,8 @@ public class ConceptTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "Concept: statusUuid has no identifier - skipping import of this concept tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Concept: statusUuid matches no identifier in database.");
             }
 
             if (termFactory.hasConcept(termFactory.uuidToNative(conceptUuid))) {

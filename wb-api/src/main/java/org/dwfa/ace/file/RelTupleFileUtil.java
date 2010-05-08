@@ -126,28 +126,28 @@ public class RelTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage = "Rel: c1Uuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: c1Uuid matches no identifier in database.");
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage = "Rel: c2Uuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: c2Uuid matches no identifier in database.");
             }
             if (!termFactory.hasId(charUuid)) {
-                String errorMessage = "Rel: charUuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: charUuid matches no identifier in database.");
             }
             if (!termFactory.hasId(refUuid)) {
-                String errorMessage = "Rel: refUuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: refUuid matches no identifier in database.");
             }
             if (!termFactory.hasId(relTypeUuid)) {
-                String errorMessage = "Rel: relTypeUuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: relTypeUuid matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "Rel: statusUuid has no identifier - skipping import of this relationship.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Rel: statusUuid matches no identifier in database.");
             }
 
             I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 

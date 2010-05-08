@@ -126,35 +126,23 @@ public class ConceptConceptConceptExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage =
-                        "CidCidCid: Refset UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage =
-                        "CidCidCid: Component UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage =
-                        "CidCidCid: c1Uuid UUID has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c1Uuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage =
-                        "CidCidCid: c2Uuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c2Uuid matches no identifier in database.");
             }
             if (!termFactory.hasId(c3Uuid)) {
-                String errorMessage =
-                        "CidCidCid: c3Uuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c3Uuid matches no identifier in database.");
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage =
-                        "CidCidCid: statusUuid has no identifier - skipping import of this concept-concept-concept ext tuple.";
-                throw new Exception(errorMessage);
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: statusUuid matches no identifier in database.");
             }
 
             try {
@@ -186,5 +174,12 @@ public class ConceptConceptConceptExtTupleFileUtil {
             }
         }
         return refsetConcept;
+    }
+
+    public static void writeWarning(BufferedWriter outputFileWriter, int lineCount, String errorMessage)
+            throws IOException {
+        outputFileWriter.write("Warning on line " + lineCount + " : ");
+        outputFileWriter.write(errorMessage);
+        outputFileWriter.newLine();
     }
 }

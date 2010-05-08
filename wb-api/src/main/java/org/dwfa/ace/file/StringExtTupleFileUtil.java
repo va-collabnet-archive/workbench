@@ -118,16 +118,16 @@ public class StringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "Str: Refset UUID has no identifier - skipping import of this string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Str: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "Str: Component UUID has no identifier - skipping import of this string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Str: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "Str: statusUuid has no identifier - skipping import of this string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Str: statusUuid matches no identifier in database.");
             }
             try {
                 refsetHelper.newStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(

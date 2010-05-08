@@ -116,20 +116,20 @@ public class ConceptExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage = "CID: Refset UUID has no identifier - skipping import of this concept ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CID: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage = "CID: Component UUID has no identifier - skipping import of this concept ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CID: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage = "CID: conceptUuid UUID has no identifier - skipping import of this concept ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CID: conceptUuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "CID: statusUuid has no identifier - skipping import of this concept ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CID: statusUuid matches no identifier in database.");
             }
             try {
                 refsetHelper.newConceptRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(

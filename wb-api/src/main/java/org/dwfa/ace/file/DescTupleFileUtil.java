@@ -118,18 +118,18 @@ public class DescTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage = "Desc: conceptUuid has no identifier - skipping import of this desc tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: conceptUuid matches no identifier in database.");
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "Desc: statusUuid has no identifier - skipping import of this desc tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: statusUuid matches no identifier in database.");
             }
 
             if (!termFactory.hasId(typeUuid)) {
-                String errorMessage = "Desc: typeUuid has no identifier - skipping import of this desc tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: typeUuid matches no identifier in database.");
             }
 
             if (termFactory.hasId(conceptUuid)) {

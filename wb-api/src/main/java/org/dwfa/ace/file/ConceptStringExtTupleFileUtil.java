@@ -121,24 +121,20 @@ public class ConceptStringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage =
-                        "CidStr: Refset UUID has no identifier - skipping import of this concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidStr: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage =
-                        "CidStr: Component UUID has no identifier - skipping import of this concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidStr: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(conceptUuid)) {
-                String errorMessage =
-                        "CidStr: conceptUuid UUID has no identifier - skipping import of this concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidStr: conceptUuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage =
-                        "CidStr: statusUuid has no identifier - skipping import of this concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidStr: statusUuid matches no identifier in database.");
             }
             try {
                 refsetHelper.newConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
