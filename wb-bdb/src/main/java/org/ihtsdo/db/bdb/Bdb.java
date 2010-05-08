@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
@@ -129,6 +128,7 @@ public class Bdb {
 			}
 			File bdbDirectory = new File(dbRoot);
 			bdbDirectory.mkdirs();
+			LuceneManager.luceneDirFile = new File(bdbDirectory, "lucene");
 			inform(activity, "Setting up database environment...");
 			mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
 			File readOnlyDir = new File(bdbDirectory, "read-only");
