@@ -31,7 +31,7 @@ public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
             PropertyDescriptor statusTerm = new PropertyDescriptor("statusTerm", getBeanDescriptor().getBeanClass());
             statusTerm.setBound(true);
             statusTerm.setPropertyEditorClass(ConceptLabelPropEditor.class);
-            statusTerm.setDisplayName("<html><font color='green'>status kind:");
+            statusTerm.setDisplayName("<html><font color='green'>concept status kind:");
             statusTerm.setShortDescription("The concept to test for status is kind of.");
 
             PropertyDescriptor rv[] = { statusTerm };
@@ -46,7 +46,7 @@ public class HasStatusSearchInfo extends AbstractSeachTestSearchInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(HasStatus.class);
-        bd.setDisplayName("status kind");
+        bd.setDisplayName("concept status kind");
         return bd;
     }
 }
