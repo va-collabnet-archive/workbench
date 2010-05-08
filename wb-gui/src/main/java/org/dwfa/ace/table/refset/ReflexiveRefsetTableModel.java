@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -69,9 +71,15 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(),
                             host.getConfig().getConflictResolutionStrategy());
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
+                promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
                     promotionRefsetIdentify = Terms.get().getConcept(promotionRefsetId);
+                    Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(promotionRefsetId);
+                    promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>(members.size());
+                    for (I_ExtendByRef ext: members) {
+                        promotionRefsetComponentMap.put(ext.getComponentId(), ext);
+                    }
                 }
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -294,14 +302,19 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
             IllegalAccessException, InvocationTargetException, TerminologyException {
-        for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(extension.getComponentId())) {
-            if (promotionRefsetId == extForMember.getRefsetId()) {
-                List<I_ExtendByRefVersion> promotionTuples =
-                        (List<I_ExtendByRefVersion>) extForMember.getTuples(host.getConfig().getAllowedStatus(), host
-                            .getConfig().getViewPositionSetReadOnly(), 
-                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+        if (promotionRefsetComponentMap != null && 
+                promotionRefsetComponentMap.containsKey(extension.getNid())) {
+            I_ExtendByRef promotionMember = promotionRefsetComponentMap.get(extension.getNid());
+            if (promotionMember != null) {
+                List<I_ExtendByRefVersion> promotionTuples = (List<I_ExtendByRefVersion>) 
+                promotionMember.getTuples(
+                    host.getConfig().getAllowedStatus(), 
+                    host.getConfig().getViewPositionSetReadOnly(),
+                    host.getConfig().getPrecedence(), 
+                    host.getConfig().getConflictResolutionStrategy());
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -331,9 +344,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         return promotionRefsetIdentify;
     }
 
-    Integer refsetId;
-    I_GetConceptData promotionRefsetIdentify;
-    int promotionRefsetId;
+    protected Integer refsetId;
+    protected I_GetConceptData promotionRefsetIdentify;
+    protected int promotionRefsetId;
+    protected Map<Integer, I_ExtendByRef> promotionRefsetComponentMap;
 
     public ReflexiveRefsetTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super(host, columns);
