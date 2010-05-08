@@ -94,28 +94,12 @@ public class TestForIsa extends AbstractConceptTest {
     }
 
     private I_IntSet getIsARelationshipList(final I_TermFactory termFactory) throws Exception {
-        I_GetConceptData snomed_isa = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
-        I_GetConceptData aux_isa = getConceptSafe(termFactory, ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-
-        if (snomed_isa == null && aux_isa == null) {
-            throw new IllegalStateException("Could not find SNOMED 'IS A' or ArchitectonicAuxiliary 'is a'.");
-        }
-
-        I_IntSet isARelationships = getTermFactory().newIntSet();
-        addRelationship(isARelationships, snomed_isa);
-        addRelationship(isARelationships, aux_isa);
-        return isARelationships;
-    }
-
-    private void addRelationship(final I_IntSet relationships, final I_GetConceptData isaConcept) {
-        if (isaConcept != null) {
-            relationships.add(isaConcept.getConceptId());
-        }
+       return getFrameConfig().getDestRelTypes();
     }
 
     private void addWarning(final I_GetConceptData concept, final List<AlertToDataConstraintFailure> alertList) {
         alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
-            "<html>No IS_A relationship", concept));
+            "<html>No Hierarchical relationship", concept));
     }
 
     private List<? extends I_RelTuple> getSourceRelationships(final I_GetConceptData concept) throws Exception {
