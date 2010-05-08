@@ -98,6 +98,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
             statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_EDITABLE.getUids()));
             statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IN_REVIEW.getUids()));
             statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.COMPLETED.getUids()));
+            statuses.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
         } catch (Exception e) {
             e.printStackTrace();
         }
