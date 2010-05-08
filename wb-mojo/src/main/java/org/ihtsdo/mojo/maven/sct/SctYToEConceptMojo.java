@@ -426,23 +426,23 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             return tmp.intValue();
     }
 
-//    // STATUS LOOKUP
-//    private UUID[] yStatusArray;
-//    private String[] yStatusStrArray;
-//
-//    private UUID lookupYStatus(int j) {
-//        return yStatusArray[j + 2];
-//    }
-//
-//    private int lookupYStatusIdx(String status) {
-//        int idx = 0;
-//        while (idx < 12) {
-//            if (status.equalsIgnoreCase(yStatusStrArray[idx]))
-//                break;
-//            idx++;
-//        }
-//        return idx - 2;
-//    }
+    //    // STATUS LOOKUP
+    //    private UUID[] yStatusArray;
+    //    private String[] yStatusStrArray;
+    //
+    //    private UUID lookupYStatus(int j) {
+    //        return yStatusArray[j + 2];
+    //    }
+    //
+    //    private int lookupYStatusIdx(String status) {
+    //        int idx = 0;
+    //        while (idx < 12) {
+    //            if (status.equalsIgnoreCase(yStatusStrArray[idx]))
+    //                break;
+    //            idx++;
+    //        }
+    //        return idx - 2;
+    //    }
 
     // DESCRIPTION TYPE LOOKUP
     private HashMap<String, Integer> yDesTypeUuidMap;
@@ -461,19 +461,19 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             return tmp.intValue();
     }
 
-//    // DESCRIPTION TYPE LOOKUP
-//    private UUID[] yDesTypeArray;
-//    private String[] yDesTypeStrArray;
-//
-//    private int lookupDesTypeIdx(String uuid) {
-//        int idx = 0;
-//        while (idx < 4) {
-//            if (uuid.equalsIgnoreCase(yDesTypeStrArray[idx]))
-//                break;
-//            idx++;
-//        }
-//        return idx;
-//    }
+    //    // DESCRIPTION TYPE LOOKUP
+    //    private UUID[] yDesTypeArray;
+    //    private String[] yDesTypeStrArray;
+    //
+    //    private int lookupDesTypeIdx(String uuid) {
+    //        int idx = 0;
+    //        while (idx < 4) {
+    //            if (uuid.equalsIgnoreCase(yDesTypeStrArray[idx]))
+    //                break;
+    //            idx++;
+    //        }
+    //        return idx;
+    //    }
 
     // RELATIONSHIP CHARACTERISTIC LOOKUP
     private UUID[] yRelCharArray;
@@ -604,51 +604,50 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         // Relationship Role Types
         yRoleTypeList = new ArrayList<RoleTypeEntry>();
 
-
         // Status Array
-//        yStatusArray = new UUID[14];
-//        int i = 0;
-//        int j = -2;
-//        while (j < 12) {
-//            try {
-//                yStatusArray[i] = ArchitectonicAuxiliary.getStatusFromId(j).getUids().iterator()
-//                        .next();
-//            } catch (IOException e) {
-//                yStatusArray[i] = null;
-//                e.printStackTrace();
-//            } catch (TerminologyException e) {
-//                yStatusArray[i] = null;
-//                e.printStackTrace();
-//            }
-//            i++;
-//            j++;
-//        }
+        //        yStatusArray = new UUID[14];
+        //        int i = 0;
+        //        int j = -2;
+        //        while (j < 12) {
+        //            try {
+        //                yStatusArray[i] = ArchitectonicAuxiliary.getStatusFromId(j).getUids().iterator()
+        //                        .next();
+        //            } catch (IOException e) {
+        //                yStatusArray[i] = null;
+        //                e.printStackTrace();
+        //            } catch (TerminologyException e) {
+        //                yStatusArray[i] = null;
+        //                e.printStackTrace();
+        //            }
+        //            i++;
+        //            j++;
+        //        }
 
         // Status String Array
-//        yStatusStrArray = new String[14];
-//        for (int idx = 0; idx < 14; idx++)
-//            yStatusStrArray[idx] = yStatusArray[idx].toString();
+        //        yStatusStrArray = new String[14];
+        //        for (int idx = 0; idx < 14; idx++)
+        //            yStatusStrArray[idx] = yStatusArray[idx].toString();
 
         try {
             // Status Array
-            for (int idx = 0; idx <  12; idx++)
-                lookupYStatusUuidIdx(ArchitectonicAuxiliary.getStatusFromId(idx).getUids().iterator()
-                        .next().toString());
+            for (int idx = 0; idx < 12; idx++)
+                lookupYStatusUuidIdx(ArchitectonicAuxiliary.getStatusFromId(idx).getUids()
+                        .iterator().next().toString());
 
-          // DESCRIPTION TYPES
-          // Setup the standard description types used in SNOMED
-          for (int i = 0; i < 4; i++)
-              lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
-                      .iterator().next().toString());
-//            // DESCRIPTION TYPES
-//            yDesTypeArray = new UUID[4];
-//            for (i = 0; i < 4; i++)
-//                yDesTypeArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
-//                        .iterator().next();
-//            // string lookup array
-//            yDesTypeStrArray = new String[4];
-//            for (int idx = 0; idx < 4; idx++)
-//                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
+            // DESCRIPTION TYPES
+            // Setup the standard description types used in SNOMED
+            for (int i = 0; i < 4; i++)
+                lookupYDesTypeUuidIdx(ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
+                        .iterator().next().toString());
+            //            // DESCRIPTION TYPES
+            //            yDesTypeArray = new UUID[4];
+            //            for (i = 0; i < 4; i++)
+            //                yDesTypeArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
+            //                        .iterator().next();
+            //            // string lookup array
+            //            yDesTypeStrArray = new String[4];
+            //            for (int idx = 0; idx < 4; idx++)
+            //                yDesTypeStrArray[idx] = yDesTypeArray[idx].toString();
 
             // RELATIONSHIP CHARACTERISTIC
             yRelCharArray = new UUID[5];
@@ -1100,7 +1099,11 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             // Status
             int conceptStatus = lookupYStatusUuidIdx(line[CONCEPT_STATUS]);
             // Primitive
-            int isPrimitive = Integer.parseInt(line[ISPRIMITIVE]);
+            String isPrimitiveStr = line[ISPRIMITIVE];
+            int isPrimitive = 0;
+            if (isPrimitiveStr.startsWith("1") || isPrimitiveStr.startsWith("t")
+                    || isPrimitiveStr.startsWith("T"))
+                isPrimitive = 1;
             // Effective Date
             int revDate = lookupYRevDateIdx(line[EFFECTIVE_DATE]);
             // Path UUID
@@ -1149,7 +1152,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             int capitalization = Integer.parseInt(line[CAPITALIZATION_STATUS_INT]);
             // DESCRIPTION_TYPE = 5;
             int descriptionType = lookupYDesTypeUuidIdx(line[DESCRIPTION_TYPE_UUID]);
-//            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
+            //            int descriptionType = lookupDesTypeIdx(line[DESCRIPTION_TYPE_UUID]);
             // LANGUAGE_CODE = 6;
             String langCodeStr = line[LANGUAGE_CODE_STR];
             // EFFFECTIVE_DATE = 7;
@@ -1305,8 +1308,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 vBool = true;
 
             // :DEBUG:!!!:
-//            if (uuidComponent.equals(UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de"))) 
-//                getLog().info("FOUND IT");
+            //            if (uuidComponent.equals(UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de"))) 
+            //                getLog().info("FOUND IT");
 
             SctYRefSetRecord tmpRsRec = new SctYRefSetRecord(uuidRefset, uuidMember, uuidComponent,
                     status, revDate, pathIdx, vBool);
@@ -2016,16 +2019,15 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     SctYDesRecord desRec = (SctYDesRecord) obj;
 
                     // :DEBUG:!!!:
-//                    UUID debugThis = new UUID(rsRec.componentUuidMsb, rsRec.componentUuidLsb);
-//                    UUID debugThat = new UUID(desRec.desUuidMsb, desRec.desUuidLsb);
-//                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThis)) 
-//                        getLog().info("FOUND THIS");
-//                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThat)) 
-//                        getLog().info("FOUND THAT");
-                    
+                    //                    UUID debugThis = new UUID(rsRec.componentUuidMsb, rsRec.componentUuidLsb);
+                    //                    UUID debugThat = new UUID(desRec.desUuidMsb, desRec.desUuidLsb);
+                    //                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThis)) 
+                    //                        getLog().info("FOUND THIS");
+                    //                    if (UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de").equals(debugThat)) 
+                    //                        getLog().info("FOUND THAT");
+
                     int rsVin = compareMsbLsb(rsRec.componentUuidMsb, rsRec.componentUuidLsb,
                             desRec.desUuidMsb, desRec.desUuidLsb);
-                    
 
                     if (rsVin == 0) {
                         if (rsRec.conUuidMsb != Long.MAX_VALUE)
@@ -2598,9 +2600,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         statRsByRs = 0;
 
         // :DEBUG:!!!:
-//        int xyzdebug = 0;
-//        for (UUID u : yPathArray)
-//            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
+        //        int xyzdebug = 0;
+        //        for (UUID u : yPathArray)
+        //            getLog().info("PATH UUID :: " + u + " #=" + xyzdebug++);
 
         getLog().info("*** SctSiToEConcept STEP #7 BEGINNING -- CREATE eCONCEPTS ***");
         long start = System.currentTimeMillis();
@@ -2912,8 +2914,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         UUID theConUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
 
         // :DEBUG:
-//        if (theConUUID.equals(UUID.fromString("8857ca3c-eeed-57e9-ba25-5d7f3a4ba160"))) 
-//            getLog().info("FOUND IT");
+        //        if (theConUUID.equals(UUID.fromString("8857ca3c-eeed-57e9-ba25-5d7f3a4ba160"))) 
+        //            getLog().info("FOUND IT");
 
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
@@ -3161,11 +3163,15 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     listRefsetUuidMemberUuidForDes.add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     listRefsetUuidMemberUuidForDes.add(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                 } else if (r.componentType == SctYRefSetRecord.ComponentType.IMAGE) {
-                    listRefsetUuidMemberUuidForImage.add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
-                    listRefsetUuidMemberUuidForImage.add(new UUID(r.memberUuidMsb, r.memberUuidLsb));
+                    listRefsetUuidMemberUuidForImage
+                            .add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
+                    listRefsetUuidMemberUuidForImage
+                            .add(new UUID(r.memberUuidMsb, r.memberUuidLsb));
                 } else if (r.componentType == SctYRefSetRecord.ComponentType.MEMBER) {
-                    listRefsetUuidMemberUuidForRefsetMember.add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
-                    listRefsetUuidMemberUuidForRefsetMember.add(new UUID(r.memberUuidMsb, r.memberUuidLsb));
+                    listRefsetUuidMemberUuidForRefsetMember.add(new UUID(r.refsetUuidMsb,
+                            r.refsetUuidLsb));
+                    listRefsetUuidMemberUuidForRefsetMember.add(new UUID(r.memberUuidMsb,
+                            r.memberUuidLsb));
                 } else if (r.componentType == SctYRefSetRecord.ComponentType.RELATIONSHIP) {
                     listRefsetUuidMemberUuidForRel.add(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     listRefsetUuidMemberUuidForRel.add(new UUID(r.memberUuidMsb, r.memberUuidLsb));
@@ -3185,9 +3191,9 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 ec.setRefsetUuidMemberUuidForRels(listRefsetUuidMemberUuidForRel);
 
             // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-//            if (countRefsetMember < 10)
-//                getLog().info(
-//                        "Refset Member: " + ec.getConceptAttributes().primordialUuid.toString());
+            //            if (countRefsetMember < 10)
+            //                getLog().info(
+            //                        "Refset Member: " + ec.getConceptAttributes().primordialUuid.toString());
             countRefsetMember++;
 
         }
@@ -3259,8 +3265,8 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
             }
             // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
-//            if (countRefsetMaster < 10)
-//                getLog().info("Refset Master: " + ec.getPrimordialUuid().toString());
+            //            if (countRefsetMaster < 10)
+            //                getLog().info("Refset Master: " + ec.getPrimordialUuid().toString());
             countRefsetMaster++;
 
             ec.setRefsetMembers(listErm);
