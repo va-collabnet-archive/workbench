@@ -22,6 +22,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.util.HashFunction;
 
 public class AlertToDataConstraintFailure {
 
@@ -69,5 +70,33 @@ public class AlertToDataConstraintFailure {
     public I_GetConceptData getConceptWithAlert() {
         return conceptWithAlert;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (AlertToDataConstraintFailure.class.isAssignableFrom(obj.getClass())) {
+            AlertToDataConstraintFailure another = (AlertToDataConstraintFailure) obj;
+            if (!alertMessage.equals(another.alertMessage)) {
+                return false;
+            }
+            if (!conceptWithAlert.equals(another.conceptWithAlert)) {
+                return false;
+            }
+            if (!alertType.equals(another.alertType)) {
+                return false;
+            }
+            if (fixOptions.size() != another.fixOptions.size()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+     }
+
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[] {alertMessage.hashCode(), conceptWithAlert.getNid() });
+    }
+
+
 
 }

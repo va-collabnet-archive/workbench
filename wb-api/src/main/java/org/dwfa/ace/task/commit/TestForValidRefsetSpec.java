@@ -19,7 +19,9 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -122,7 +124,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
         try {
             RefsetSpecQuery q = RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
                 .getRefsetSpecConcept(), specHelper.getMemberRefsetConcept(), computeType);
-            List<String> dangleWarnings = RefsetQueryFactory.removeDangles(q);
+            Set<String> dangleWarnings = new HashSet<String>(RefsetQueryFactory.removeDangles(q));
             for (String warning: dangleWarnings) {
                 alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING, formatAlertMessage(warning),
                     specHelper.getRefsetSpecConcept()));
