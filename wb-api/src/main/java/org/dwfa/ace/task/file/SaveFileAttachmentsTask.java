@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.file;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,7 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -79,13 +81,22 @@ public class SaveFileAttachmentsTask extends AbstractTask {
                 Object attachment = process.readAttachement(key);
                 if (attachment instanceof FileContent) {
                     FileContent fileContent = (FileContent) attachment;
+                    Frame frame = new JFrame();
+                    for (Frame f: JFrame.getFrames()) {
+                        if (f.isActive()) {
+                            frame = f;
+                            break;
+                        }
+                    }
 
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setDialogTitle("Save attachment: " + fileContent.getFilename());
-                    fileChooser.setSelectedFile(new File(fileContent.getFilename()));
-
-                    if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                        File newFile = fileChooser.getSelectedFile();
+                    FileDialog f = new FileDialog(frame,
+                        "Save file", FileDialog.SAVE);
+                    f.setDirectory(System.getProperty("user.dir"));
+                    f.setFile(fileContent.getFilename());
+                    f.setVisible(true); // Display dialog and wait for response
+                    if (f.getFile() != null) {
+                        String fileName = f.getFile();
+                        File newFile = new File(f.getDirectory(), fileName);
 
                         ByteArrayInputStream bais = new ByteArrayInputStream(fileContent.getContents());
                         System.out.println(" Writing: " + newFile.getName() + " bytes: " + fileContent.getContents().length);
