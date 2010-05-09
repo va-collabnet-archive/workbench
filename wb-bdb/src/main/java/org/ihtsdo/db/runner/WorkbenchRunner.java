@@ -532,6 +532,7 @@ public class WorkbenchRunner {
 				// shows the AceLoginDialog
 				userProfile = loginDialog.getUserProfile(lastProfileDir);
 				password = new String(loginDialog.getPassword());
+		        Svn.setConnectedToSvn(loginDialog.connectToSvn());
 
 				wbProperties.setProperty("last-profile-dir", FileIO
 						.getRelativePath(userProfile));
