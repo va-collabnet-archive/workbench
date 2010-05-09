@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -213,7 +214,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                             configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
                         for (I_ExtendByRefVersion t: lastTuple) {
                             for (I_Path p: configFrame.getEditingPathSet()) {
-                                I_ExtendByRefVersion analog = (I_ExtendByRefVersion) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
+                                I_ExtendByRefPart analog = (I_ExtendByRefPart) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
                                 ext.addVersion(analog);
                                 tf.addUncommitted(ext);
                             }
