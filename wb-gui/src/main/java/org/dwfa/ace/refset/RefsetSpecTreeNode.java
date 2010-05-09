@@ -44,6 +44,20 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     private String truthDesc;
     private String clauseDesc;
     private String constraintDesc;
+    private boolean inactive = false;
+    private boolean uncommitted = false;
+
+    public boolean isUncommitted() {
+        return uncommitted;
+    }
+
+    public void setUncommitted(boolean uncommitted) {
+        this.uncommitted = uncommitted;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+    }
 
     public String getConstraintDesc() throws TerminologyException, IOException {
 
@@ -283,5 +297,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     
     public void setHtmlRendering(String htmlRendering) {
         this.htmlRendering = htmlRendering;
+    }
+
+    public boolean isInactive() {
+        return inactive;
     }
 }

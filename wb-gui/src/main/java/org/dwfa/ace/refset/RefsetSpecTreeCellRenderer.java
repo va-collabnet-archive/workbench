@@ -18,6 +18,7 @@ package org.dwfa.ace.refset;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,12 +96,32 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         generateHtmlRendering(new DefaultMutableTreeNode(value));
         return this.getText();
     }
+    
+    
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        paintBorder(g);
+    }
+
+
+
+    private static Color retiredBackgroundColor = new Color(Color.LIGHT_GRAY.getRed(), Color.LIGHT_GRAY.getGreen(), Color.LIGHT_GRAY.getBlue(), 128);
     private void generateHtmlRendering(Object value) {
         try {
             RefsetSpecTreeNode node = (RefsetSpecTreeNode) value;
             if (node.getHtmlRendering() != null) {
                 this.setText(node.getHtmlRendering());
+                if (node.isInactive()) {
+                    setBackground(retiredBackgroundColor);
+                    setOpaque(true);
+                } else {
+                    setOpaque(false);
+                }
+                if (node.isUncommitted()) {
+                    this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
+                }
             } else {
                 if (node.getUserObject() != null
                         && (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass()) || I_ExtendByRefVersion.class.isAssignableFrom(node.getUserObject()
@@ -116,10 +137,15 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                                 configAceFrame.getConflictResolutionStrategy());
                             if (tuples != null && tuples.size() > 0) {
                                 firstTuple = tuples.get(0);
+                            } else {
+                                tuples = (List<I_ExtendByRefVersion>) ext.getTuples(null, 
+                                    configAceFrame.getViewPositionSetReadOnly(), configAceFrame.getPrecedence(),
+                                    configAceFrame.getConflictResolutionStrategy());
                             }
                             if (tuples != null && tuples.size() > 0) {
                                 lastTuple = tuples.get(tuples.size() - 1);
-                                if (lastTuple.getVersion() == Integer.MAX_VALUE) {
+                                if (lastTuple.getTime() == Long.MAX_VALUE) {
+                                    node.setUncommitted(true);
                                     this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
                                 }
                             }
@@ -170,7 +196,8 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                                 AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
                             }
                         } else {
-                            setBackground(Color.LIGHT_GRAY);
+                            node.setInactive(true);
+                            setBackground(retiredBackgroundColor);
                             setOpaque(true);
                             I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
                             tuples = (List<I_ExtendByRefVersion>) ext.getTuples(null, configAceFrame.getViewPositionSetReadOnly(), 
@@ -321,7 +348,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
             viewerImageTypes, configAceFrame.getViewPositionSetReadOnly(),
             configAceFrame.getPrecedence(), configAceFrame.getConflictResolutionStrategy())) {
-            htmlParts.add("<img src='ace:" + imageTuple.getImageId() + "$" + imageTuple.getConceptId()
+            htmlParts.add("<img src='ace:" + imageTuple.getNid() + "$" + imageTuple.getConceptId()
                 + "' align=absbottom>");
         }
     }

@@ -27,6 +27,9 @@ import org.dwfa.vodb.types.IntSet;
 
 class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
 
+    private static int count = 0;
+    private int id;
+    private IntSet cantFindWarning = new IntSet();
     /**
      * 
      */
@@ -36,6 +39,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
      * @param refsetSpecEditor
      */
     UpdateTreeSpec(RefsetSpecEditor refsetSpecEditor) {
+        this.id = count++;
         this.refsetSpecEditor = refsetSpecEditor;
         frameConfig =  this.refsetSpecEditor.ace.getAceFrameConfig();
         oldRoot = (RefsetSpecTreeNode) this.refsetSpecEditor.specTree.getModel().getRoot();
@@ -153,38 +157,43 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
                         if (extensionMap.containsKey(ext.getComponentId())) {
                             extensionMap.get(ext.getComponentId()).add(extNode);
                         } else {
-                            I_GetConceptData conceptWithComponent = Terms.get().getConceptForNid(ext.getComponentId());
-                            StringBuffer msg = new StringBuffer();
-                            msg.append("Warning: Missing parent clause for: [");
-                            msg.append(ext.getComponentId());
-                            msg.append("] ");
-                            msg.append(extNode.toString());
-                            msg.append("\n\nExtension:\n");
-                            msg.append(ext);
-                            msg.append(" \n\n map:\n");
-                            msg.append(extensionMap);
-                            msg.append(" \n\nlocalRefsetSpecConcept:\n");
-                            msg.append(localRefsetSpecConcept.toLongString());
-                            msg.append("\n\nConcept with component:\n");
-                            if (conceptWithComponent != null) {
-                                msg.append(conceptWithComponent.toLongString());
-                            } else {
-                                msg.append("null");
-                            }
-                            msg.append("\n\nlocal refset spec concept:\n");
-                            msg.append(localRefsetSpecConcept.toLongString());
-                            AceLog.getAppLog().warning(msg.toString());
+                            if (!cantFindWarning.contains(ext.getComponentId())) {
+                                cantFindWarning.add(ext.getComponentId());
+                                I_GetConceptData conceptWithComponent = Terms.get().getConceptForNid(ext.getComponentId());
+                                StringBuffer msg = new StringBuffer();
+                                msg.append("Warning: Missing parent clause for: [");
+                                msg.append(ext.getComponentId());
+                                msg.append("] ");
+                                msg.append(extNode.toString());
+                                msg.append("\n\nExtension:\n");
+                                msg.append(ext);
+                                msg.append(" \n\n map:\n");
+                                msg.append(extensionMap);
+                                msg.append(" \n\nlocalRefsetSpecConcept:\n");
+                                msg.append(localRefsetSpecConcept.toLongString());
+                                msg.append("\n\nConcept with component:\n");
+                                if (conceptWithComponent != null) {
+                                    msg.append(conceptWithComponent.toLongString());
+                                } else {
+                                    msg.append("null");
+                                }
+                                msg.append("\n\nlocal refset spec concept:\n");
+                                msg.append(localRefsetSpecConcept.toLongString());
+                                AceLog.getAppLog().warning(msg.toString());
 
-                            msg = new StringBuffer();
-                            msg.append("<html>Warning: Missing parent clause for: [");
-                            msg.append(ext.getComponentId());
-                            msg.append("] ");
-                            msg.append(extNode.toString());
-                            msg.append("<br>Probably the parent was retired, but the children clauses where not.");
-                            msg.append("<br>Please retire all the child clauses. " +
-                            		"<br><br>If the child clauses are not shown, toggle the history button. ");
-                            AceLog.getAppLog().alertAndLogException(new Exception("Can't find component in map: " + ext.getComponentId()));
-                            nodesToRemove.add(extNode);
+                                msg = new StringBuffer();
+                                msg.append("<html>Warning: Missing parent clause for: [");
+                                msg.append(ext.getComponentId());
+                                msg.append("] ");
+                                msg.append(extNode.toString());
+                                msg.append("<br>Probably the parent was retired, but the children clauses where not.");
+                                msg.append("<br>Please retire all the child clauses. " +
+                                        "<br><br>If the child clauses are not shown, toggle the history button. " +
+                                        "<br><br>UpdateTreeSpec: ");
+                                msg.append(id);
+                                AceLog.getAppLog().alertAndLogException(new Exception(msg.toString()));
+                                nodesToRemove.add(extNode);
+                            }
                         }
                     }
                 } else {

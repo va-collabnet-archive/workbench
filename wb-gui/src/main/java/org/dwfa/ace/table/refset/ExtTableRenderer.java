@@ -32,6 +32,11 @@ public class ExtTableRenderer extends AceTableRenderer {
      */
     private static final long serialVersionUID = 1L;
 
+    public ExtTableRenderer() {
+        super();
+        setIgnoreExtensions(true);
+    }
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {

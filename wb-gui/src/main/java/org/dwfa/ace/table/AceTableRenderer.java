@@ -37,8 +37,21 @@ public abstract class AceTableRenderer extends DefaultTableCellRenderer {
     public static Color STRIPE = LEMON_CHIFFON;
     public static Color UNCOMMITTED_COLOR = new Color(128, 224, 72);
     public static Color EXTENSION_COLOR = Color.DARK_GRAY;
+    
+    private boolean ignoreExtensions = false;
+
+    public boolean getIgnoreExtensions() {
+        return ignoreExtensions;
+    }
+
+    public void setIgnoreExtensions(boolean ignoreExtensions) {
+        this.ignoreExtensions = ignoreExtensions;
+    }
 
     protected void setBorder(int column, JLabel renderComponent, boolean same, boolean uncommitted, boolean hasExtensions) {
+        if (ignoreExtensions) {
+            hasExtensions = false;
+        }
         if (!same) {
             if (uncommitted && column == 0) {
                 if (hasExtensions) {
