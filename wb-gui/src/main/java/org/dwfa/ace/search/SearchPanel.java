@@ -577,7 +577,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
         showHistory.setToolTipText("<html>when selected, shows descriptions with any status value (including" +
         		                     "<br>historical descriptions). When not selected, shows only the descriptions " +
-        		                     "<br> with only the allowed status values set in the preferences.");
+        		                     "<br>with the allowed status values set in the preferences.");
         add(showHistory, gbc);
         gbc.gridx++;
 

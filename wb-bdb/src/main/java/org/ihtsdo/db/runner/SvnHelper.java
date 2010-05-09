@@ -128,6 +128,7 @@ public class SvnHelper {
                     LogWithAlerts.getActiveFrame(null), "Would you like to connect over the network to Subversion?",
                     "Confirm network operation", JOptionPane.YES_NO_OPTION));
             }
+            Svn.setConnectedToSvn(connectToSubversion);
             if (connectToSubversion) {
                 if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
                     handleSvnProfileCheckout(wbProperties);

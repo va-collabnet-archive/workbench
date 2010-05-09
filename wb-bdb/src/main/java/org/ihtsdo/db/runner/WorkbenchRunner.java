@@ -54,6 +54,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.svn.Svn;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
@@ -216,6 +217,7 @@ public class WorkbenchRunner {
 			File profileDir = new File("profiles");
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
+	            Svn.setConnectedToSvn(true);
 				new SvnHelper(WorkbenchRunner.class, jiniConfig)
 						.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES));
