@@ -237,6 +237,10 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         return passwordField.getPassword();
     }
 
+    public void setConnectToSvn(boolean connect) {
+        svnConnectCheckBox.setSelected(connect);
+        Svn.setConnectedToSvn(connect);
+    }
     /**
      * True if the user is connecting to SVN
      * 

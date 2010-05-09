@@ -479,6 +479,7 @@ public class WorkbenchRunner {
 				}
 			}
 			loginDialog = new AceLoginDialog(parentFrame);
+			loginDialog.setConnectToSvn(initializeFromSubversion);
 			loginDialog.setLocation((d.width / 2)
 					- (loginDialog.getWidth() / 2), (d.height / 2)
 					- (loginDialog.getHeight() / 2));

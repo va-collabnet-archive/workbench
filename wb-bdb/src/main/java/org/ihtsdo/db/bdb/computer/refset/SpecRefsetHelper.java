@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -1247,6 +1246,36 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
         }
         return filteredList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java
+     * .util.List, org.dwfa.ace.api.I_GetConceptData)
+     */
+    @Override
+    public int countMembersOfType(Collection<? extends I_ExtendByRef> allExtensions,
+            I_GetConceptData requiredPromotionStatusConcept) throws Exception {
+
+        int count = 0;
+
+        for (I_ExtendByRef extension : allExtensions) {
+            I_ExtendByRefPart latestMemberPart = getLatestCurrentPart(extension);
+            if (latestMemberPart == null) {
+                throw new Exception("Member extension exists with no parts.");
+            }
+            I_GetConceptData promotionStatus = null;
+            if (extension != null) {
+                promotionStatus = getPromotionStatus(extension);
+            }
+
+            if (promotionStatus != null
+                && promotionStatus.getConceptId() == requiredPromotionStatusConcept.getConceptId()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private I_GetConceptData getPromotionStatus(I_ExtendByRef promotionExtension) throws Exception {
