@@ -12,8 +12,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -1229,8 +1231,18 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 if (Terms.get().hasConcept(extension.getComponentId())) {
                     filteredList.add(Terms.get().getConcept(extension.getComponentId()));
                 } else {
-                    filteredList.add(Terms.get().getConcept(
-                        Terms.get().getDescription(extension.getComponentId()).getConceptId()));
+                    Object tc = Terms.get().getComponent(extension.getComponentId());
+                    if (I_DescriptionVersioned.class.isAssignableFrom(tc.getClass())) {
+                        I_DescriptionVersioned d = (I_DescriptionVersioned) tc;
+                        filteredList.add(Terms.get().getConcept(d.getConceptId()));
+                    } else if (I_ExtendByRef.class.isAssignableFrom(tc.getClass())) {
+                        I_ExtendByRef ext = (I_ExtendByRef) tc;
+                        if (Terms.get().hasConcept(extension.getComponentId())) {
+                            filteredList.add(Terms.get().getConcept(ext.getComponentId()));
+                        } else {
+                            throw new Exception("Don't know how to filter: " + extension);
+                        }
+                    }
                 }
             }
         }
