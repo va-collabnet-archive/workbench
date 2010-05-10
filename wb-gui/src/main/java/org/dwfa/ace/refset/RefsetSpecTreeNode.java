@@ -17,6 +17,7 @@
 package org.dwfa.ace.refset;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -25,6 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -62,19 +64,38 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     public String getConstraintDesc() throws TerminologyException, IOException {
 
         if (constraintDesc == null) {
-            I_GetConceptData thisConstraint = Terms.get().getConcept(((I_ExtendByRefPartCidCidCid) getExtension().getMutablePart()).getC3id());
-            try {
-                I_DescriptionTuple thisConstraintDesc =
-                        thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
-                if (thisConstraintDesc.getText() == null) {
-                    constraintDesc = thisConstraint.toString();
-                } else {
-                    constraintDesc = thisConstraintDesc.getText().toLowerCase();
+            int constraintNid = ((I_ExtendByRefPartCidCidCid) getExtension().getMutablePart()).getC3id();
+            Object component = Terms.get().getComponent(constraintNid);
+            if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
+                I_GetConceptData thisConstraint = (I_GetConceptData) component;
+                try {
+                    I_DescriptionTuple thisConstraintDesc =
+                            thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
+                    if (thisConstraintDesc.getText() == null) {
+                        constraintDesc = thisConstraint.toString();
+                    } else {
+                        constraintDesc = thisConstraintDesc.getText().toLowerCase();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+                I_DescriptionVersioned thisConstraint = (I_DescriptionVersioned) component;
+                try {
+                    List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
+                    thisConstraint.addTuples(aceConfig.getAllowedStatus(), 
+                                null, aceConfig.getViewPositionSetReadOnly(), matchingTuples, 
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                            
+                    if (matchingTuples.size() == 0) {
+                        constraintDesc = thisConstraint.toString();
+                    } else {
+                        constraintDesc = matchingTuples.get(0).getText().toLowerCase();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
-
         }
 
         return constraintDesc;
