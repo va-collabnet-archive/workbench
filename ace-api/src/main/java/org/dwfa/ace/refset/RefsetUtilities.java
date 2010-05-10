@@ -169,6 +169,7 @@ public abstract class RefsetUtilities {
     public List<Integer> getDescendantsOfConcept(int conceptId) throws IOException, Exception {
 
        List<Integer> descendants = new ArrayList<Integer>(); 
+       descendants.add(conceptId);
        for (I_GetConceptData child : new LineageHelper().getAllDescendants(termFactory.getConcept(conceptId))) {
            descendants.add(child.getConceptId());
        }
