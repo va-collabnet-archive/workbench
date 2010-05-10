@@ -21,6 +21,7 @@ import org.dwfa.maven.sctid.SctIdValidator;
 import org.dwfa.maven.sctid.UuidSnomedDbMapHandler;
 import org.dwfa.maven.sctid.UuidSnomedHandler;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.export.ExportOutputHandler;
 import org.dwfa.tapi.NoMappingException;
@@ -325,7 +326,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
         if (!identifierDtos.isEmpty()) {
             sctId = identifierDtos.get(0).getReferencedSctId();
             try {
-                getCheckSctIdAndAddToDb(sctId, uuid);
+                getCheckSctIdAndAddToDb(sctId, uuid, concept.getProject());
             } catch (NoMappingException nme) {
                 //if (uuidIgnorList.containsKey(uuid)) {
                     sctId = snomedIdHandler.getWithoutGeneration(uuid, SctIdValidator.getInstance().getSctIdNamespace(
@@ -362,7 +363,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             sctId = snomedIdHandler.getWithGeneration(uuid, concept.getNamespace(), type, concept.getProject());
         } else {
             try {
-                getCheckSctIdAndAddToDb(sctId, uuid);
+                getCheckSctIdAndAddToDb(sctId, uuid, concept.getProject());
             } catch (NoMappingException nme) {
                 //if (uuidIgnorList.containsKey(uuid)) {
                     sctId = snomedIdHandler.getWithoutGeneration(uuid, SctIdValidator.getInstance().getSctIdNamespace(
@@ -386,7 +387,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
      * @throws NoMappingException id mapping is not valid
      * @throws Exception Cannot add them to the database
      */
-    private void getCheckSctIdAndAddToDb(Long sctId, UUID uuid) throws NoMappingException, Exception {
+    private void getCheckSctIdAndAddToDb(Long sctId, UUID uuid, PROJECT project) throws NoMappingException, Exception {
         TYPE type = SctIdValidator.getInstance().getSctIdType(sctId.toString());
 
         NAMESPACE namespace = SctIdValidator.getInstance().getSctIdNamespace(sctId.toString());
@@ -401,7 +402,7 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
             }
             throw new NoMappingException(errorMessage);
         } else if (dbSctId == null) {
-            snomedIdHandler.addSctId(uuid, sctId, namespace, type);
+            snomedIdHandler.addSctId(uuid, sctId, namespace, type, project);
         }
     }
 

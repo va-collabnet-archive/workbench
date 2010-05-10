@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 
 import org.dwfa.maven.transform.SctIdGenerator;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.util.id.Type5UuidFactory;
 
@@ -69,7 +70,7 @@ public class UuidSctidMapDbTest extends TestCase {
                     bw.append(Type5UuidFactory.get("second" + Integer.toString(i)).toString());
                 }
                 bw.append("\n");
-                bw.append(SctIdGenerator.generate(i, getRandomNamespace(), getRandomType()));
+                bw.append(SctIdGenerator.generate(i, getRandomProject(), getRandomNamespace(), getRandomType()));
                 bw.append("\n");
             }
             bw.close();
@@ -79,7 +80,7 @@ public class UuidSctidMapDbTest extends TestCase {
             for (int i = 1; i < mapSize + 1; i++) {
                 bw.append(Type5UuidFactory.get("MAP" + Integer.toString(i)).toString());
                 bw.append("\n");
-                bw.append(SctIdGenerator.generate(i, NAMESPACE.NEHTA, getRandomType()));
+                bw.append(SctIdGenerator.generate(i, getRandomProject(), NAMESPACE.NEHTA, getRandomType()));
                 bw.append("\t");
                 bw.append("2008-07-01 00:00:00");
                 bw.append("\n");
@@ -87,7 +88,7 @@ public class UuidSctidMapDbTest extends TestCase {
 
             bw.append(Type5UuidFactory.get("first90000000000000").toString());
             bw.append("\n");
-            bw.append(SctIdGenerator.generate(900000000000000l, NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT));
+            bw.append(SctIdGenerator.generate(900000000000000l, PROJECT.SNOMED_CT, NAMESPACE.SNOMED_META_DATA, TYPE.CONCEPT));
             bw.append("\t");
             bw.append("2008-07-01 00:00:00");
             bw.append("\n");
@@ -99,6 +100,10 @@ public class UuidSctidMapDbTest extends TestCase {
         return NAMESPACE.values()[random.nextInt(NAMESPACE.values().length)];
     }
 
+    private PROJECT getRandomProject() {
+        return PROJECT.values()[random.nextInt(PROJECT.values().length)];
+    }
+
     private TYPE getRandomType() {
         return TYPE.values()[random.nextInt(TYPE.values().length)];
     }
@@ -106,18 +111,18 @@ public class UuidSctidMapDbTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        
+
         if (System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER) == null) {
-            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver", 
+            UuidSctidMapDb.setDatabaseProperties("org.apache.derby.jdbc.EmbeddedDriver",
                 "jdbc:derby:directory:" + testDBMap.getCanonicalPath() + ";create=true;");
 
         } else {
-            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_URL), 
-                System.getProperty(UUID_MAP_TEST_DATABASE_USER), 
+            UuidSctidMapDb.setDatabaseProperties(System.getProperty(UUID_MAP_TEST_DATABASE_DRIVER),
+                System.getProperty(UUID_MAP_TEST_DATABASE_URL),
+                System.getProperty(UUID_MAP_TEST_DATABASE_USER),
                 System.getProperty(UUID_MAP_TEST_DATABASE_PASSWORD));
         }
-        
+
         mapDb = UuidSctidMapDb.getInstance(true);
 
         if (mapDb.isDatabaseInitialised()) {
@@ -126,7 +131,7 @@ public class UuidSctidMapDbTest extends TestCase {
             mapDb.close();
         }
         removeTestFiles();
-        
+
         generateTestMap();
         mapDb.createDb(testFixedMap.getParentFile(), testMap.getParentFile(), true);
 
@@ -134,7 +139,7 @@ public class UuidSctidMapDbTest extends TestCase {
     }
 
     private void removeTestFiles() {
-        FilenameFilter mapFilter = new FilenameFilter() {  
+        FilenameFilter mapFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(".map");
@@ -175,7 +180,7 @@ public class UuidSctidMapDbTest extends TestCase {
             assertEquals("Database driver was not specified as required by the system property \"SctIdMap.driver\"", e.getMessage());
         }
     }
-    
+
     public void testNoDatabaseUrl() throws Exception {
         System.clearProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL);
         try {
@@ -185,7 +190,7 @@ public class UuidSctidMapDbTest extends TestCase {
             assertEquals("Database connection url was not specified as required by the system property \"SctIdMap.databaseConnectionUrl\"", e.getMessage());
         }
     }
-    
+
     public void testRf2DataLoad() throws Exception {
         mapDb.clearDb();
         assertEquals(null, mapDb.getSctId(UUID.fromString("958096af-704d-4a22-a77e-9b9790c67471")));
@@ -196,7 +201,7 @@ public class UuidSctidMapDbTest extends TestCase {
         assertEquals(null, mapDb.getSctId(UUID.fromString("8b836a6a-4d13-477c-a22e-5e8360d6e62c")));
         assertEquals(null, mapDb.getSctId(UUID.fromString("04aaf2d4-8d79-4da8-9c09-2b918bbf5885")));
         assertEquals(null, mapDb.getSctId(UUID.fromString("f30d99a4-c3f1-4821-a25a-9251e21d8a30")));
-        
+
         mapDb.updateDbFromRf2IdFile(new File("src/test/resources/org/dwfa/maven/sctid/test.rf2.ids.txt"));
         assertEquals(new Long(900000000000003029L), mapDb.getSctId(UUID.fromString("958096af-704d-4a22-a77e-9b9790c67471")));
         assertEquals(new Long(900000000000004011L), mapDb.getSctId(UUID.fromString("e7b0a7ec-4d04-3674-9d2f-3a5f8bf18232")));
@@ -207,7 +212,7 @@ public class UuidSctidMapDbTest extends TestCase {
         assertEquals(new Long(17097511000036165L), mapDb.getSctId(UUID.fromString("04aaf2d4-8d79-4da8-9c09-2b918bbf5885")));
         assertEquals(new Long(17128811000036169L), mapDb.getSctId(UUID.fromString("f30d99a4-c3f1-4821-a25a-9251e21d8a30")));
     }
-    
+
     public void testGetSctId() throws Exception {
         Long sctId = mapDb.getSctId(Type5UuidFactory.get("first" + Integer.toString(1)));
         assertTrue(sctId.toString() + " must start with 1", sctId.toString().startsWith("1"));
@@ -240,19 +245,19 @@ public class UuidSctidMapDbTest extends TestCase {
     public void testAddUUIDSctIdEntryList() throws Exception {
         Map<UUID, Long> map = new HashMap<UUID, Long>();
         for (int i = 0; i < 1000; i++) {
-            map.put(UUID.randomUUID(), Long.parseLong(SctIdGenerator.generate(i+1, getRandomNamespace(), getRandomType())));
+            map.put(UUID.randomUUID(), Long.parseLong(SctIdGenerator.generate(i+1, getRandomProject(), getRandomNamespace(), getRandomType())));
         }
-        
+
         mapDb.addUUIDSctIdEntryList(map);
-        
+
         for (UUID uuid : map.keySet()) {
             assertEquals(map.get(uuid), mapDb.getSctId(uuid));
         }
     }
-    
+
     public void testAddUUIDSctIdEntry() throws Exception {
         mapDb.addUUIDSctIdEntry(Type5UuidFactory.get("new" + Integer.toString(1)),
-            Long.valueOf(SctIdGenerator.generate(mapSize + 1, getRandomNamespace(), getRandomType())));
+            Long.valueOf(SctIdGenerator.generate(mapSize + 1, getRandomProject(), getRandomNamespace(), getRandomType())));
         assertTrue(mapDb.getSctId(Type5UuidFactory.get("new" + Integer.toString(1))) != null);
     }
 
@@ -288,7 +293,7 @@ public class UuidSctidMapDbTest extends TestCase {
                 bw.append(Type5UuidFactory.get("second" + Integer.toString(i)).toString());
             }
             bw.append("\n");
-            bw.append(SctIdGenerator.generate(i, getRandomNamespace(), getRandomType()));
+            bw.append(SctIdGenerator.generate(i, getRandomProject(), getRandomNamespace(), getRandomType()));
             bw.append("\n");
         }
         bw.close();
@@ -298,7 +303,7 @@ public class UuidSctidMapDbTest extends TestCase {
         for (int i = 1; i < 10 + 1; i++) {
             bw.append(Type5UuidFactory.get("first" + Integer.toString(i)).toString());
             bw.append("\n");
-            bw.append(SctIdGenerator.generate(i, NAMESPACE.NEHTA, getRandomType()));
+            bw.append(SctIdGenerator.generate(i, PROJECT.AU, NAMESPACE.NEHTA, getRandomType()));
             bw.append("\t");
             bw.append("2008-07-01 00:00:00");
             bw.append("\n");
@@ -306,7 +311,7 @@ public class UuidSctidMapDbTest extends TestCase {
 
         bw.append(Type5UuidFactory.get("first90000000000000").toString());
         bw.append("\n");
-        bw.append(SctIdGenerator.generate(900000000000000l, NAMESPACE.SNOMED_META_DATA, getRandomType()));
+        bw.append(SctIdGenerator.generate(900000000000000l, PROJECT.SNOMED_CT, NAMESPACE.SNOMED_META_DATA, getRandomType()));
         bw.append("\t");
         bw.append("2008-07-01 00:00:00");
         bw.append("\n");
@@ -340,7 +345,7 @@ public class UuidSctidMapDbTest extends TestCase {
                 bw.append(Type5UuidFactory.get("second" + Integer.toString(i)).toString());
             }
             bw.append("\n");
-            bw.append(SctIdGenerator.generate(i, getRandomNamespace(), getRandomType()));
+            bw.append(SctIdGenerator.generate(i, getRandomProject(), getRandomNamespace(), getRandomType()));
             bw.append("\n");
         }
         bw.close();

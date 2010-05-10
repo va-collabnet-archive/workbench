@@ -43,6 +43,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
 import org.dwfa.maven.transform.SctIdGenerator;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.mojo.ConceptConstants;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -1290,7 +1291,7 @@ public class ConceptMockery {
         expect(exportableConceptIdPart.getSource()).andReturn(snomedIntNid).anyTimes();
         expect(exportableConceptIdPart.getStatusId()).andReturn(activeStatusNid);
         expect(exportableConceptIdPart.getVersion()).andReturn(exportVersion).anyTimes();
-        String sctid = SctIdGenerator.generate(sctSequence++, NAMESPACE.NEHTA, type);
+        String sctid = SctIdGenerator.generate(sctSequence++, PROJECT.AU, NAMESPACE.NEHTA, type);
 
         expect(exportableConceptIdPart.getSourceId()).andReturn(sctid).anyTimes();
         idParts.add(exportableConceptIdPart);

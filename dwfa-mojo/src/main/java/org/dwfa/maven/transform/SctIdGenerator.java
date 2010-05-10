@@ -127,17 +127,6 @@ public class SctIdGenerator {
         return mergedid + verhoeffCompute(mergedid);
     }
 
-    public static String generate(long sequence, NAMESPACE namespace, TYPE type) {
-
-        if (sequence <= 0) {
-            throw new RuntimeException("sequence must be > 0");
-        }
-
-        String mergedid = Long.toString(sequence) + namespace.digits + type.digits;
-
-        return mergedid + verhoeffCompute(mergedid);
-    }
-
     public static boolean verhoeffCheck(String idAsString) {
         int check = 0;
 

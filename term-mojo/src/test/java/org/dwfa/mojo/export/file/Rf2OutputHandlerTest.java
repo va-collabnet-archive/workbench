@@ -91,7 +91,7 @@ public class Rf2OutputHandlerTest {
 
         componentDto.getConceptDtos().add(conceptDto);
         setConceptDtoData(conceptDto);
-        conceptDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 32570031000036104l));
+        conceptDto.getIdentifierDtos().add(setIdentifierDtoData(new IdentifierDto(), 325700321000036104l));
         conceptDto.setConceptId(getIdMap(
             conceptDto.getIdentifierDtos().get(0).getConceptId().keySet().iterator().next(), null));
 

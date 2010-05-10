@@ -27,5 +27,5 @@ public interface UuidSnomedHandler {
 
     public Long getWithoutGeneration(UUID id, NAMESPACE namespace, TYPE type) throws Exception;
 
-    void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type) throws Exception;
+    void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type, PROJECT project) throws Exception;
 }

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 
 import org.dwfa.maven.transform.SctIdGenerator;
 import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
+import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.maven.transform.SctIdGenerator.TYPE;
 import org.dwfa.util.id.Type5UuidFactory;
 
@@ -51,7 +52,7 @@ public class DerbyBackedUuidSctidMapTest extends TestCase {
         for (int i = 1; i < mapSize + 1; i++) {
             bw.append(Type5UuidFactory.get("first" + Integer.toString(i)).toString());
             bw.append("\n");
-            bw.append(SctIdGenerator.generate(i, NAMESPACE.NEHTA, getRandomType()));
+            bw.append(SctIdGenerator.generate(i, PROJECT.SNOMED_CT, NAMESPACE.NEHTA, getRandomType()));
             bw.append("\t");
             bw.append("2008-07-01 00:00:00");
             bw.append("\n");
@@ -91,7 +92,7 @@ public class DerbyBackedUuidSctidMapTest extends TestCase {
 
     public void testDbLoad() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
         for (long i = 1; i < dbLoadSize + 1; i++) {
-            mapDb.put(Type5UuidFactory.get("load" + i), Long.valueOf(SctIdGenerator.generate(i, NAMESPACE.NEHTA,
+            mapDb.put(Type5UuidFactory.get("load" + i), Long.valueOf(SctIdGenerator.generate(i, PROJECT.SNOMED_CT, NAMESPACE.NEHTA,
                 getRandomType())));
         }
     }

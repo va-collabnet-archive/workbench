@@ -134,13 +134,12 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
 
             if (sctId == null) {
                 synchronized (writeLock) {
-                    sctId = Long.valueOf(SctIdGenerator.generate(getNextSequenceId(namespace, type, project) + 1,
-                        namespace, type));
+                    sctId = Long.valueOf(SctIdGenerator.generate(getNextSequenceId(namespace, type, project), project, namespace, type));
 
                     if (!SctIdValidator.getInstance().isValidSctId(sctId.toString(), namespace, type)) {
                         throw new Exception("BAD sctid " + namespace + " " + type + " " + sctId);
                     }
-                    addMap(uuid, sctId, namespace, type);
+                    addMap(uuid, sctId, namespace, type, project);
                 }
             }
         }
@@ -159,7 +158,7 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
     private Long getNextSequenceId(NAMESPACE namespace, TYPE type, PROJECT project) {
         Long nextId = 0l;
 
-        Long currrentId = nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type));
+        Long currrentId = nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)) + 1;
 
         Pattern pattern;
         do {
@@ -182,10 +181,10 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @see org.dwfa.maven.sctid.UuidSnomedHandler#addSctId(java.util.UUID, java.lang.Long, org.dwfa.maven.transform.SctIdGenerator.NAMESPACE, org.dwfa.maven.transform.SctIdGenerator.TYPE)
      */
     @Override
-    public void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type) throws Exception {
+    public void addSctId(UUID uuid, Long sctId, NAMESPACE namespace, TYPE type, PROJECT project) throws Exception {
         synchronized (readLock) {
             synchronized (writeLock) {
-                Long mappedId = addMap(uuid, sctId, namespace, type);
+                Long mappedId = addMap(uuid, sctId, namespace, type, project);
 
                 if(mappedId != null && !sctId.equals(mappedId)){
                     throw new Exception("UUID "+ uuid + " has been mapped to " + mappedId + " not " + sctId);
@@ -203,11 +202,11 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @param type TYPE
      * @throws Exception DB error
      */
-    private Long addMap(UUID uuid, Long sctID, NAMESPACE namespace, TYPE type) throws Exception {
+    private Long addMap(UUID uuid, Long sctID, NAMESPACE namespace, TYPE type, PROJECT project) throws Exception {
         Long lastMapping = memoryUuidSctidMap.put(uuid, sctID);
 
         nextSctSequenceMap.put(getNamespaceTypeKey(namespace, type), Math.max(
-            nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)), getSctIdSequencePart(sctID, namespace, type)));
+            nextSctSequenceMap.get(getNamespaceTypeKey(namespace, type)), getSctIdSequencePart(sctID, namespace, type, project)));
 
         if (memoryUuidSctidMap.size() > MAX_CACHE_SIZE) {
             writeMaps();
@@ -294,11 +293,11 @@ public class UuidSnomedDbMapHandler implements UuidSnomedHandler {
      * @param type TYPE
      * @return Long
      */
-    private Long getSctIdSequencePart(Long sctId, NAMESPACE namespace, TYPE type) {
+    private Long getSctIdSequencePart(Long sctId, NAMESPACE namespace, TYPE type, PROJECT project) {
         String sctIdStr = sctId.toString();
 
         return Long.valueOf(sctIdStr.substring(0, sctIdStr.length()
-            - (SctIdValidator.getInstance().getSctIdNamespace(sctIdStr).getDigits().length()
+            - (project.getDigits().length() + SctIdValidator.getInstance().getSctIdNamespace(sctIdStr).getDigits().length()
                 + type.getDigits().length() + 1)));
     }
 
