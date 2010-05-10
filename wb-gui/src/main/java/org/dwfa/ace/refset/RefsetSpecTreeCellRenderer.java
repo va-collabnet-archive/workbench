@@ -110,16 +110,23 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
     private static Color retiredBackgroundColor = new Color(Color.LIGHT_GRAY.getRed(), Color.LIGHT_GRAY.getGreen(), Color.LIGHT_GRAY.getBlue(), 128);
     private void generateHtmlRendering(Object value) {
         try {
-            RefsetSpecTreeNode node = (RefsetSpecTreeNode) value;
-            if (node.getHtmlRendering() != null) {
-                this.setText(node.getHtmlRendering());
-                if (node.isInactive()) {
+            if (RefsetSpecTreeNode.class.isAssignableFrom(value.getClass())) {
+                
+            }
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            RefsetSpecTreeNode rstn = null;
+            if (RefsetSpecTreeNode.class.isAssignableFrom(value.getClass())) {
+                rstn = (RefsetSpecTreeNode) node;
+            }
+            if (rstn != null && rstn.getHtmlRendering() != null) {
+                this.setText(rstn.getHtmlRendering());
+                if (rstn.isInactive()) {
                     setBackground(retiredBackgroundColor);
                     setOpaque(true);
                 } else {
                     setOpaque(false);
                 }
-                if (node.isUncommitted()) {
+                if (rstn.isUncommitted()) {
                     this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
                 }
             } else {
@@ -145,7 +152,9 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                             if (tuples != null && tuples.size() > 0) {
                                 lastTuple = tuples.get(tuples.size() - 1);
                                 if (lastTuple.getTime() == Long.MAX_VALUE) {
-                                    node.setUncommitted(true);
+                                    if (rstn != null) {
+                                        rstn.setUncommitted(true);
+                                    }
                                     this.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, AceTableRenderer.UNCOMMITTED_COLOR));
                                 }
                             }
@@ -196,7 +205,9 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                                 AceLog.getAppLog().log(Level.WARNING, ex.getLocalizedMessage(), ex);
                             }
                         } else {
-                            node.setInactive(true);
+                            if (rstn != null) {
+                                rstn.setInactive(true);
+                            }
                             setBackground(retiredBackgroundColor);
                             setOpaque(true);
                             I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
@@ -247,7 +258,9 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
                         }
                     }
             }
-            node.setHtmlRendering(this.getText());
+            if (rstn != null) {
+                rstn.setHtmlRendering(this.getText());
+            }
         } catch (TerminologyException e) {
            AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {
