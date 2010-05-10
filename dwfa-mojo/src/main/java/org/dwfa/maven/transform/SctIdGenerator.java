@@ -52,7 +52,7 @@ public class SctIdGenerator {
 
     // remove
     public static enum PROJECT {
-        SNOMED_CT(""), AMT("01"), AU("2");
+        SNOMED_CT(""), AMT("01"), AU("");
 
         private String digits;
 

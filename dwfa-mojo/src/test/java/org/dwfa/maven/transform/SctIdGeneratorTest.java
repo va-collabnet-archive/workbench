@@ -30,7 +30,7 @@ public class SctIdGeneratorTest extends TestCase {
     public void testGenerateSctIdAuProject() {
 
         try {
-            assertEquals("121000036104", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AU,
+            assertEquals("11000036103", SctIdGenerator.generate(1, SctIdGenerator.PROJECT.AU,
                     SctIdGenerator.NAMESPACE.NEHTA, SctIdGenerator.TYPE.CONCEPT));
         } catch (Exception e) {
             fail("exception: " + e.getLocalizedMessage());
