@@ -43,6 +43,11 @@ public class ConceptTransferable implements Transferable {
 
     public ConceptTransferable(I_GetConceptData concept) {
         super();
+        try {
+            assert concept.getConceptAttributes() != null;
+        } catch (IOException e1) {
+            throw new RuntimeException(e1);
+        }
         this.conceptTransferable = concept;
 
         try {

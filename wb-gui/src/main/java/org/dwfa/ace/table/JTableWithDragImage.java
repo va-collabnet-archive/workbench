@@ -164,6 +164,7 @@ public class JTableWithDragImage extends JTable {
                 ReflexiveRefsetFieldData fieldData = (ReflexiveRefsetFieldData) columnIdentifier;
                 switch (fieldData.getType()) {
                 case COMPONENT_IDENTIFIER:
+                case CONCEPT_IDENTIFIER:
                     Object component = Terms.get().getComponent(swextt.getId());
                     if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
                         return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
@@ -172,8 +173,6 @@ public class JTableWithDragImage extends JTable {
                         return new DescriptionTransferable(Terms.get().getDescription(swextt.getId()));
                     }
                     throw new UnsupportedOperationException("Component: " + component);
-                case CONCEPT_IDENTIFIER:
-                    return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
                 case STRING:
                     return new StringSelection(swextt.getCellText());
                 case TIME:
