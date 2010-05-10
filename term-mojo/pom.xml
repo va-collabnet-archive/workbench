@@ -18,7 +18,7 @@
     <parent>
         <groupId>au.gov.nehta</groupId>
         <artifactId>ace-modules</artifactId>
-        <version>1.4-SCTAU-R2-RC5</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.gov.nehta</groupId>
@@ -26,9 +26,9 @@
     <packaging>maven-plugin</packaging>
     <name>term mojo</name>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC5/term-mojo</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC5/term-mojo</developerConnection>
-        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC5/term-mojo</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/term-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta/term-mojo</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
     <licenses>
         <license>
