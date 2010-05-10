@@ -6,7 +6,11 @@
 	<packaging>jar</packaging>
 	<name>Workbench Berkeley Database</name>
 	<version>1.0-SNAPSHOT</version>
-	<url>http://maven.apache.org</url>
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-bdb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-dbd</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-bdb/?root=workbench&amp;system=exsy1002</url>
+    </scm>
 	<dependencies>
 		<dependency>
 			<groupId>colt</groupId>
