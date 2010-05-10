@@ -132,7 +132,6 @@ public class ProcessPopupUtil {
                         }
                     }
                     if (newMenu != null) {
-                        menuBar.add(newMenu);
                         newMenu.addSeparator();
                    }
                  } else {
