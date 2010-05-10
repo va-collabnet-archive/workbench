@@ -198,7 +198,7 @@ public class InstructWithDoneAndTodo extends AbstractTask {
         config.setBuilderToggleVisible(false);
         subversionButtonVisible = config.isBuilderToggleVisible();
         config.setSubversionToggleVisible(false);
-        inboxButtonVisible = config.isInboxToggleVisible();
+        inboxButtonVisible = config.isSubversionToggleVisible();
         config.setInboxToggleVisible(false);
         workflowPanel = config.getWorkflowPanel();
     }

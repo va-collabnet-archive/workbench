@@ -112,7 +112,7 @@ public class PromptForNumericInput extends AbstractTask {
         done = false;
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean subversionButtonVisible = config.isBuilderToggleVisible();
+        boolean subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);

@@ -145,7 +145,7 @@ public class PromptUserForInput extends AbstractTask {
         I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        boolean subversionButtonVisible = config.isBuilderToggleVisible();
+        boolean subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
         boolean inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);

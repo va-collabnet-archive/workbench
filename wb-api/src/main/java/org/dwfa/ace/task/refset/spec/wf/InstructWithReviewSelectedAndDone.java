@@ -196,7 +196,7 @@ public class InstructWithReviewSelectedAndDone extends AbstractTask {
 
         builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
-        subversionButtonVisible = config.isBuilderToggleVisible();
+        subversionButtonVisible = config.isSubversionToggleVisible();
         config.setSubversionToggleVisible(false);
         inboxButtonVisible = config.isInboxToggleVisible();
         config.setInboxToggleVisible(false);
