@@ -64,7 +64,9 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
             this.setStatusId(statusNid);
             return this;
         }
-		return new MembershipRevision(statusNid, pathNid, time, this);
+        MembershipRevision newR = new MembershipRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
     @Override

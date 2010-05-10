@@ -58,6 +58,7 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -682,7 +683,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             I_Position viewPosition = config.getViewPositionSet().iterator().next();
 
             for (I_ExtendByRefVersion tuple : tuples) {
-                tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptId(), Long.MAX_VALUE);
+                tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptId(), Long.MAX_VALUE));
             }
             tf.addUncommittedNoChecks(refsetSpec);
             if (writeComment) {
