@@ -10,11 +10,11 @@
     <name>ACE modules multi-module build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the ACE modules (foundation, dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
-    <version>1.4-SCTAU-R2-RC6</version>
+    <version>1.4-SNAPSHOT</version>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC6</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC6</developerConnection>
-        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4-SCTAU-R2-RC6</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/nehta</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
     <ciManagement>
         <system>bamboo</system>
