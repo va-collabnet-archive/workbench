@@ -483,7 +483,7 @@ public class Ace2Rf2 extends AbstractMojo {
                 rf2ConceptRow.setActive(getRF2ActiveFlag(aceConceptRow.getConceptStatusId()));
                 rf2ConceptRow.setModuleSctId(getSctIdWithGeneration(aceConceptRow.getPathUuid(), namespace, project,
                     uuidToSctIdConcept));
-                rf2ConceptRow.setDefiniationStatusSctId(getDefinitionSctId(aceConceptRow.getIsPrimative()));
+                rf2ConceptRow.setDefinitionStatusSctId(getDefinitionSctId(aceConceptRow.getIsPrimative()));
 
                 writeConceptsRow(rf2ConceptWriter, rf2ConceptRow);
                 if (lineCount % 10000 == 0) {

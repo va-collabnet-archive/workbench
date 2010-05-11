@@ -27,6 +27,7 @@ import java.util.UUID;
 public class ConceptDto extends BaseConceptDto implements Concept {
     private Map<UUID, Long> conceptId;
     private String fullySpecifiedName;
+    private UUID definitionStatusUuid;
     private String ctv3Id;
     private String snomedId;
     private boolean isPrimative;
@@ -51,6 +52,20 @@ public class ConceptDto extends BaseConceptDto implements Concept {
      */
     public void setConceptId(Map<UUID, Long> conceptId) {
         this.conceptId = conceptId;
+    }
+
+    /**
+     * @return the definitionStatusUuid
+     */
+    public final UUID getDefinitionStatusUuid() {
+        return definitionStatusUuid;
+    }
+
+    /**
+     * @param definitionStatusUuid the definitionStatusUuid to set
+     */
+    public final void setDefinitionStatusUuid(UUID definitionStatusUuid) {
+        this.definitionStatusUuid = definitionStatusUuid;
     }
 
     /**

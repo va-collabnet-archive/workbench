@@ -134,6 +134,11 @@ public class ExportSpecification {
     private I_GetConceptData preferredDescriptionType;
     /** Synonym desctiption type. */
     private I_GetConceptData synonymDescriptionType;
+    /** definition status */
+    private I_GetConceptData primationDefinitionStatusConcept;
+    /** definition status */
+    private I_GetConceptData fullyDefinedDefinitionStatusConcept;
+
     /** Int set of fsn type. */
     private I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
     /** Int set of fsn type. */
@@ -256,6 +261,8 @@ public class ExportSpecification {
             org.dwfa.ace.refset.ConceptConstants.ACCEPTABLE.getUuids()).getNid();
         rf2PreferredDescriptionTypeNid = termFactory.getConcept(
             org.dwfa.ace.refset.ConceptConstants.PREFERRED.getUuids()).getNid();
+        primationDefinitionStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION.getUids());
+        fullyDefinedDefinitionStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINED_DEFINITION.getUids());
 
         fullySpecifiedDescriptionTypeIntSet.add(fullySpecifiedDescriptionType.getConceptId());
         snomedIsATypeIntSet.add(termFactory.getConcept(org.dwfa.ace.refset.ConceptConstants.SNOMED_IS_A.getUuids()).getConceptId());
@@ -894,11 +901,30 @@ public class ExportSpecification {
         conceptDto.setFullySpecifiedName(fsn);
 
         conceptDto.setPrimative(tuple.isDefined());
+        conceptDto.setDefinitionStatusUuid(getDefinitionStatusUuid(tuple.isDefined()));
         conceptDto.setType(TYPE.CONCEPT);
 
         componentDto.getConceptDtos().add(conceptDto);
 
         return componentDto;
+    }
+
+    /**
+     * Gets the UUID for the concept
+     *
+     * @param definitionInt String 0 = well defined 1 = primative
+     *
+     * @return sctid String
+     * @throws IOException
+     */
+    private UUID getDefinitionStatusUuid(boolean defined) throws IOException {
+        UUID definitionSctId = primationDefinitionStatusConcept.getUids().get(0);
+
+        if (defined) {
+            definitionSctId = fullyDefinedDefinitionStatusConcept.getUids().get(0);
+        }
+
+        return definitionSctId;
     }
 
     /**

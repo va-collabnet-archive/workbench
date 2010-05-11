@@ -448,7 +448,6 @@ public class Rf2OutputHandlerTest {
         Assert.assertEquals(rf2OutputHandler.getReleaseDate(conceptDto), rf2ConceptRow.getEffectiveTime());
         Assert.assertEquals((conceptDto.isActive())?"1":"0", rf2ConceptRow.getActive());
         Assert.assertEquals(getSctId(conceptDto.getPathId(), conceptDto), rf2ConceptRow.getModuleSctId());
-        Assert.assertEquals(getSctId(conceptDto.getStatusId(), conceptDto), rf2ConceptRow.getDefiniationStatusSctId());
     }
 
     private String getSctId(UUID id, Concept concept, TYPE type) throws Exception {
@@ -777,6 +776,7 @@ public class Rf2OutputHandlerTest {
         conceptDto.setProject(PROJECT.AU);
         conceptDto.setPathId(UUID.randomUUID());
         conceptDto.setPrimative(false);
+        conceptDto.setDefinitionStatusUuid(UUID.randomUUID());
         conceptDto.setStatusId(UUID.randomUUID());
         conceptDto.setType(TYPE.CONCEPT);
 

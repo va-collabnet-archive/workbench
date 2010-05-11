@@ -110,7 +110,7 @@ public class Rf2ConceptRow {
     /**
      * @param definiationStatus the definiationStatus to set
      */
-    public final void setDefiniationStatusSctId(String definiationStatusSctId) {
+    public final void setDefinitionStatusSctId(String definiationStatusSctId) {
         this.definiationStatusSctId = definiationStatusSctId;
     }
 }

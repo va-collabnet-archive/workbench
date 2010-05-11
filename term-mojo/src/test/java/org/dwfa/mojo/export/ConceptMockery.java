@@ -138,6 +138,8 @@ public class ConceptMockery {
     int snomedIsANId = Integer.MAX_VALUE - 69;
     int conceptRetiredStatusNid = Integer.MAX_VALUE - 70;
     int pendingMoveStatusNid = Integer.MAX_VALUE - 71;
+    int primitiveDefinitionNid = Integer.MAX_VALUE - 72;
+    int definedDefinitionNid = Integer.MAX_VALUE - 73;
 
     I_GetConceptData activeConceptData;
     I_GetConceptData snomedIntIdConceptData;
@@ -570,6 +572,23 @@ public class ConceptMockery {
         I_GetConceptData enUsConceptData = mockConceptEnum(enUsUuidList,
             ArchitectonicAuxiliary.Concept.EN_US, enUsNid);
         replay(enUsConceptData);
+
+
+        List<UUID> primitiveDefinitionUuidList = new ArrayList<UUID>();
+        primitiveDefinitionUuidList.add(UUID.randomUUID());
+        I_GetConceptData primitiveDefinitionConceptData = mockConceptEnum(primitiveDefinitionUuidList,
+            ArchitectonicAuxiliary.Concept.PRIMITIVE_DEFINITION, primitiveDefinitionNid);
+        expect(termFactory.getConcept(primitiveDefinitionUuidList)).andReturn(primitiveDefinitionConceptData).anyTimes();
+        replay(primitiveDefinitionConceptData);
+
+        List<UUID> definedDefinitionUuidList = new ArrayList<UUID>();
+        definedDefinitionUuidList.add(UUID.randomUUID());
+        I_GetConceptData definedDefinitionConceptData = mockConceptEnum(definedDefinitionUuidList,
+            ArchitectonicAuxiliary.Concept.DEFINED_DEFINITION, definedDefinitionNid);
+        expect(termFactory.getConcept(definedDefinitionUuidList)).andReturn(definedDefinitionConceptData).anyTimes();
+        replay(definedDefinitionConceptData);
+
+
 
         List<UUID> stringExtensionUuidList = new ArrayList<UUID>();
         stringExtensionUuidList.add(UUID.randomUUID());

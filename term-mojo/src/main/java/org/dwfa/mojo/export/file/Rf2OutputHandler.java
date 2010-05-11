@@ -480,7 +480,7 @@ public class Rf2OutputHandler extends SnomedFileFormatOutputHandler {
         conceptRow.setConceptSctId(getSctId(conceptDto).toString());
         conceptRow.setEffectiveTime(getReleaseDate(conceptDto));
         conceptRow.setModuleSctId(getModuleId(conceptDto).toString());
-        conceptRow.setDefiniationStatusSctId(getSctId(conceptDto, conceptDto.getStatusId()).toString());
+        conceptRow.setDefinitionStatusSctId(getSctId(conceptDto, conceptDto.getDefinitionStatusUuid()).toString());
         conceptRow.setActive(getActiveFlag(conceptDto));
 
         return conceptRow;
