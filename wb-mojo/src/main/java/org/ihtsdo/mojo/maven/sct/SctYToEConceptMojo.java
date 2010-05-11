@@ -3131,7 +3131,11 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     rel.setCharacteristicUuid(yRelCharArray[rRec.characteristic]);
                     rel.setRefinabilityUuid(yRelRefArray[rRec.refinability]);
                     rel.setStatusUuid(yStatusUuidArray[rRec.status]);
-                    rel.setPathUuid(yPathArray[rRec.yPath]);
+                    if (rRec.characteristic == 0) // 0=DEFINING
+                        rel.setPathUuid(yPathArray[rRec.yPath]);
+                    else
+                        // 1=Qualifier, 2=Historical, 3=Additional
+                        rel.setPathUuid(uuidPathSnomedCore);
                     rel.setTime(yRevDateArray[rRec.yRevision]);
                     rel.revisions = null;
                 } else {
@@ -3141,7 +3145,11 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     erv.setCharacteristicUuid(yRelCharArray[rRec.characteristic]);
                     erv.setRefinabilityUuid(yRelRefArray[rRec.refinability]);
                     erv.setStatusUuid(yStatusUuidArray[rRec.status]);
-                    erv.setPathUuid(yPathArray[rRec.yPath]);
+                    if (rRec.characteristic == 0) // 0=DEFINING
+                        erv.setPathUuid(yPathArray[rRec.yPath]);
+                    else
+                        // 1=Qualifier, 2=Historical, 3=Additional
+                        erv.setPathUuid(uuidPathSnomedCore);                    
                     erv.setTime(yRevDateArray[rRec.yRevision]);
                     revisions.add(erv);
                 }
