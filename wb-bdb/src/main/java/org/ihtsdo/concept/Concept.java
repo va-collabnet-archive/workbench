@@ -1152,7 +1152,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         for (NidPair pair: relNidTypeNidlist) {
         	int relNid = pair.getNid1();
         	int typeNid = pair.getNid2();
-        	if (allowedTypes.contains(typeNid)) {
+        	if (allowedTypes == null || allowedTypes.contains(typeNid)) {
         		Concept relSource = Bdb.getConceptForComponent(relNid);
         		if (relSource != null) {
                     Relationship r = relSource.getRelationship(relNid);

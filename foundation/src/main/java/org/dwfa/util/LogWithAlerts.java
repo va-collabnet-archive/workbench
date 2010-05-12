@@ -78,21 +78,25 @@ public class LogWithAlerts {
     }
 
     private void alertAndLogPrivate(Component parent, Level level, String message, Throwable ex) {
-        parent = getActiveFrame(parent);
-        getLogger().log(level, message, ex);
-        message = "<html>" + message;
-        if (level.intValue() <= Level.INFO.intValue()) {
-            JOptionPane.showMessageDialog(parent, message, "Information has been logged",
-                JOptionPane.INFORMATION_MESSAGE);
-        } else if (level.intValue() <= Level.WARNING.intValue()) {
-            JOptionPane.showMessageDialog(parent, message, "A warning has been logged", JOptionPane.WARNING_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(parent, message, "An error has been logged", JOptionPane.ERROR_MESSAGE);
-        }
-        if (parent != null) {
-            SwingUtilities.invokeLater(new FocusParentLater(parent));
-        } else {
-            getLogger().log(Level.SEVERE, "No parent for alert");
+        try {
+            parent = getActiveFrame(parent);
+            getLogger().log(level, message, ex);
+            message = "<html>" + message;
+            if (level.intValue() <= Level.INFO.intValue()) {
+                JOptionPane.showMessageDialog(parent, message, "Information has been logged",
+                    JOptionPane.INFORMATION_MESSAGE);
+            } else if (level.intValue() <= Level.WARNING.intValue()) {
+                JOptionPane.showMessageDialog(parent, message, "A warning has been logged", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(parent, message, "An error has been logged", JOptionPane.ERROR_MESSAGE);
+            }
+            if (parent != null) {
+                SwingUtilities.invokeLater(new FocusParentLater(parent));
+            } else {
+                getLogger().log(Level.SEVERE, "No parent for alert");
+            }
+        } catch (Throwable e) {
+            getLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
         }
     }
 
