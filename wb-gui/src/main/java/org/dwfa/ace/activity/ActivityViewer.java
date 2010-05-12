@@ -347,22 +347,24 @@ public class ActivityViewer {
                                 viewer.activitiesList.remove(40);
                             }
                         }
-                        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                        viewer.activitiesPanel.removeAll();
-                        GridBagConstraints gbc = new GridBagConstraints();
-                        gbc.gridx = 0;
-                        gbc.gridy = 0;
-                        gbc.weightx = 1;
-                        gbc.weighty = 0;
-                        gbc.fill = GridBagConstraints.HORIZONTAL;
-                        gbc.anchor = GridBagConstraints.NORTHWEST;
-                        gbc.gridwidth = 1;
-                        gbc.gridheight = 1;
-                        linkToSourceFrameActivityPanel();
-                        for (I_ShowActivity a : viewer.activitiesList) {
-                            viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                            gbc.gridy++;
-                            addSecondaryActivityPanel(secondaryPanels, a);
+                        synchronized (viewer.activitiesPanel) {
+                            viewer.activitiesPanel.removeAll();
+                            GridBagConstraints gbc = new GridBagConstraints();
+                            gbc.gridx = 0;
+                            gbc.gridy = 0;
+                            gbc.weightx = 1;
+                            gbc.weighty = 0;
+                            gbc.fill = GridBagConstraints.HORIZONTAL;
+                            gbc.anchor = GridBagConstraints.NORTHWEST;
+                            gbc.gridwidth = 1;
+                            gbc.gridheight = 1;
+                            linkToSourceFrameActivityPanel();
+                            Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
+                            for (I_ShowActivity a : viewer.activitiesList) {
+                                viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                                gbc.gridy++;
+                                addSecondaryActivityPanel(secondaryPanels, a);
+                            }
                         }
                         tickleSize();
                     } catch (HeadlessException e) {
@@ -424,22 +426,24 @@ public class ActivityViewer {
             try {
                 boolean changed = get();
                 if (changed) {
-                    viewer.activitiesPanel.removeAll();
-                    Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                    GridBagConstraints gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 0;
-                    gbc.weightx = 1;
-                    gbc.weighty = 0;
-                    gbc.fill = GridBagConstraints.HORIZONTAL;
-                    gbc.anchor = GridBagConstraints.NORTHWEST;
-                    gbc.gridwidth = 1;
-                    gbc.gridheight = 1;
-                    linkToSourceFrameActivityPanel();
-                    for (I_ShowActivity a : viewer.activitiesList) {
-                        viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                        gbc.gridy++;
-                        addSecondaryActivityPanel(secondaryPanels, a);
+                    synchronized (viewer.activitiesPanel) {
+                        viewer.activitiesPanel.removeAll();
+                        GridBagConstraints gbc = new GridBagConstraints();
+                        gbc.gridx = 0;
+                        gbc.gridy = 0;
+                        gbc.weightx = 1;
+                        gbc.weighty = 0;
+                        gbc.fill = GridBagConstraints.HORIZONTAL;
+                        gbc.anchor = GridBagConstraints.NORTHWEST;
+                        gbc.gridwidth = 1;
+                        gbc.gridheight = 1;
+                        linkToSourceFrameActivityPanel();
+                        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
+                        for (I_ShowActivity a : viewer.activitiesList) {
+                            viewer.activitiesPanel.add(a.getViewPanel(), gbc);
+                            gbc.gridy++;
+                            addSecondaryActivityPanel(secondaryPanels, a);
+                        }
                     }
                     tickleSize();
                 }
@@ -457,24 +461,19 @@ public class ActivityViewer {
          }
     }
 
-    private static void addSecondaryActivityPanel(final Set<I_ShowActivity> secondaryPanels, final I_ShowActivity a) {
+    private static void addSecondaryActivityPanel(Set<I_ShowActivity> secondaryPanels, I_ShowActivity a) {
         if (DwfaEnv.isHeadless() == false) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
-                        secondaryPanels.add(a.getSecondaryPanel());
-                        for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
-                            a.getSecondaryPanel().getViewPanel().remove(c);
-                        }
-                        if (a.isComplete() == false) {
-                            ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
-                            a.addShowActivityListener(secondaryAP);
-                            a.getSecondaryPanel().getViewPanel().add(secondaryAP);
-                        }
-                    }
+            if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
+                secondaryPanels.add(a.getSecondaryPanel());
+                for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
+                    a.getSecondaryPanel().getViewPanel().remove(c);
                 }
-            });
+                if (a.isComplete() == false) {
+                    ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
+                    a.addShowActivityListener(secondaryAP);
+                    a.getSecondaryPanel().getViewPanel().add(secondaryAP);
+                }
+            }
         }
     }
 

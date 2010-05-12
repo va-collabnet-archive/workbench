@@ -227,7 +227,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                 promotionStatus = getPromotionStatus(promotionExtension);
             }
             if (latestMemberPart == null) {
-                throw new Exception("Member extension exists with no parts.");
+                AceLog.getAppLog().warning("Member extension exists with no parts: " + memberExtension);
             } else {
                 if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptId()
                     || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptId()
