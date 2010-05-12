@@ -231,10 +231,10 @@ public class ActivityViewer {
 
     private ComponentFrame viewerFrame;
 
-    private JPanel activitiesPanel = new JPanel(new GridBagLayout());
-
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
     private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
+
+    private JScrollPane scroller;
 
     private static CompleteListener completeListener = new CompleteListener();
     
@@ -247,31 +247,35 @@ public class ActivityViewer {
         super();
         if (DwfaEnv.isHeadless() == false) {
             viewerFrame = new ActivityViewerFrame();
-            JScrollPane scroller = new JScrollPane();
+            scroller = new JScrollPane();
             scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             viewerFrame.setContentPane(scroller);
             viewerFrame.setLocation(20, 20);
             viewerFrame.setSize(600, 400);
             viewerFrame.setVisible(true);
 
-            JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.gridheight = 1;
-            gbc.weightx = 1.0;
-            gbc.weighty = 0;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            activitiesAndFillerPanel.add(activitiesPanel, gbc);
-
-            gbc.gridy++;
-            gbc.weighty = 1;
-            gbc.fill = GridBagConstraints.BOTH;
-            activitiesAndFillerPanel.add(new JPanel(), gbc);
-            scroller.setViewportView(activitiesAndFillerPanel);
+            setupActivitesPanel(scroller, new JPanel());
         }
 
+    }
+
+    private static void setupActivitesPanel(JScrollPane scroller, JPanel activitiesPanel) {
+        JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        activitiesAndFillerPanel.add(activitiesPanel, gbc);
+
+        gbc.gridy++;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        activitiesAndFillerPanel.add(new JPanel(), gbc);
+        scroller.setViewportView(activitiesAndFillerPanel);
     }
 
     private static ActivityComparator activityComparator = new ActivityComparator();
@@ -347,33 +351,37 @@ public class ActivityViewer {
                                 viewer.activitiesList.remove(40);
                             }
                         }
-                        synchronized (viewer.activitiesPanel) {
-                            viewer.activitiesPanel.removeAll();
-                            GridBagConstraints gbc = new GridBagConstraints();
-                            gbc.gridx = 0;
-                            gbc.gridy = 0;
-                            gbc.weightx = 1;
-                            gbc.weighty = 0;
-                            gbc.fill = GridBagConstraints.HORIZONTAL;
-                            gbc.anchor = GridBagConstraints.NORTHWEST;
-                            gbc.gridwidth = 1;
-                            gbc.gridheight = 1;
-                            linkToSourceFrameActivityPanel();
-                            Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                            for (I_ShowActivity a : viewer.activitiesList) {
-                                viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                                gbc.gridy++;
-                                addSecondaryActivityPanel(secondaryPanels, a);
-                            }
-                        }
+                        updateActivities();
                         tickleSize();
                     } catch (HeadlessException e) {
                         AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
                     }
                 }
 
+ 
             });
         }
+    }
+
+    private static void updateActivities() {
+        JPanel newPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        linkToSourceFrameActivityPanel();
+        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
+        for (I_ShowActivity a : viewer.activitiesList) {
+            newPanel.add(a.getViewPanel(), gbc);
+            gbc.gridy++;
+            addSecondaryActivityPanel(secondaryPanels, a);
+        }
+        setupActivitesPanel(viewer.scroller, newPanel);
     }
 
     private static void linkToSourceFrameActivityPanel() {
@@ -426,25 +434,7 @@ public class ActivityViewer {
             try {
                 boolean changed = get();
                 if (changed) {
-                    synchronized (viewer.activitiesPanel) {
-                        viewer.activitiesPanel.removeAll();
-                        GridBagConstraints gbc = new GridBagConstraints();
-                        gbc.gridx = 0;
-                        gbc.gridy = 0;
-                        gbc.weightx = 1;
-                        gbc.weighty = 0;
-                        gbc.fill = GridBagConstraints.HORIZONTAL;
-                        gbc.anchor = GridBagConstraints.NORTHWEST;
-                        gbc.gridwidth = 1;
-                        gbc.gridheight = 1;
-                        linkToSourceFrameActivityPanel();
-                        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                        for (I_ShowActivity a : viewer.activitiesList) {
-                            viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                            gbc.gridy++;
-                            addSecondaryActivityPanel(secondaryPanels, a);
-                        }
-                    }
+                    updateActivities();
                     tickleSize();
                 }
             } catch (InterruptedException e) {
@@ -485,20 +475,7 @@ public class ActivityViewer {
                     updateTimer.removeActionListener(activity);
                     viewer.activitiesList.remove(activity);
                     viewer.activitiesSet.remove(activity);
-                    viewer.activitiesPanel.removeAll();
-                    GridBagConstraints gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 0;
-                    gbc.weightx = 1;
-                    gbc.weighty = 0;
-                    gbc.fill = GridBagConstraints.HORIZONTAL;
-                    gbc.anchor = GridBagConstraints.NORTHWEST;
-                    gbc.gridwidth = 1;
-                    gbc.gridheight = 1;
-                    for (I_ShowActivity a : viewer.activitiesList) {
-                        viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                        gbc.gridy++;
-                    }
+                    updateActivities();
                     tickleSize();
                 }
             });
