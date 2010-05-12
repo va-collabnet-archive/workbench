@@ -1154,12 +1154,16 @@ public class Concept implements I_Transact, I_GetConceptData {
         	int typeNid = pair.getNid2();
         	if (allowedTypes.contains(typeNid)) {
         		Concept relSource = Bdb.getConceptForComponent(relNid);
-        		Relationship r = relSource.getRelationship(relNid);
-        		if (r != null) {
-        			r.addTuples(allowedStatus, allowedTypes, positions,
-        					returnRels, precedencePolicy, contradictionManager);
+        		if (relSource != null) {
+                    Relationship r = relSource.getRelationship(relNid);
+                    if (r != null) {
+                        r.addTuples(allowedStatus, allowedTypes, positions,
+                                returnRels, precedencePolicy, contradictionManager);
+                    } else {
+                        invalidPairs.add(new NidPair(relNid, typeNid));
+                    }
         		} else {
-        			invalidPairs.add(new NidPair(relNid, typeNid));
+                    invalidPairs.add(new NidPair(relNid, typeNid));
         		}
         	}
         }

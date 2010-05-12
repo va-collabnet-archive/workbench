@@ -166,8 +166,6 @@ public class AddTopLevelOr extends AbstractTask {
                     configFrame.fireRefsetSpecChanged(ext);
                 }
 
-            } else {
-                throw new TaskFailedException("Unable to complete operation. Refset is null.");
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
