@@ -1,8 +1,6 @@
 package org.ihtsdo.bdb.mojo;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -77,10 +75,18 @@ public class GenerateChangeSet extends AbstractMojo  {
      */
     private File output;
 
+    /**
+     * Generated resources directory.
+     * 
+     * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
+     * @required
+     */
+    private File berkeleyDir;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            Bdb.setup(berkeleyDir.getAbsolutePath());
             IntSet pathIds = new IntSet();
             if (pathsToExport != null) {
                 for (ConceptSpec spec: pathsToExport) {
@@ -89,17 +95,18 @@ public class GenerateChangeSet extends AbstractMojo  {
             }
             ChangeSetPolicy changeSetPolicy = ChangeSetPolicy.valueOf(policy);
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile), 
-                new File(output, changeSetFile + ".tmp"), changeSetPolicy);
+                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false);
             ChangeSetWriterHandler.addWriter(writer);
-            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getDateFormat().parse(startDate).getTime(), 
-                TimeUtil.getDateFormat().parse(endDate).getTime());
-            ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-                Bdb.getConceptDb().getConceptIdSet(), System.currentTimeMillis(),
-                sapsToWrite, changeSetPolicy, ChangeSetWriterThreading.MULTI_THREAD);
-            handler.run();
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (ParseException e) {
+            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
+                TimeUtil.getFileDateFormat().parse(endDate).getTime());
+            getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
+            if (sapsToWrite.size() > 0) {
+                ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                    Bdb.getConceptDb().getConceptIdSet(), System.currentTimeMillis(),
+                    sapsToWrite, changeSetPolicy, ChangeSetWriterThreading.MULTI_THREAD);
+                handler.run();
+            }
+        } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }

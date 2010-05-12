@@ -16,9 +16,27 @@
  */
 package org.ihtsdo.mojo.maven.sct;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.io.StreamTokenizer;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,9 +51,7 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.etypes.EConcept;
@@ -50,7 +66,6 @@ import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetMember;
-import org.ihtsdo.etypes.ERefsetMemberMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;

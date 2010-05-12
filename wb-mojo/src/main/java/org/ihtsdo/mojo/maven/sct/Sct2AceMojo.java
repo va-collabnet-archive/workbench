@@ -16,7 +16,20 @@
  */
 package org.ihtsdo.mojo.maven.sct;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StreamTokenizer;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,7 +42,6 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;

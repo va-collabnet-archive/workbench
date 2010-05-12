@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.ihtsdo.mojo.mojo.exporter.publishers.BasicPublisher;
 import org.ihtsdo.mojo.mojo.exporter.publishers.I_PublishConcepts;
 
 /**

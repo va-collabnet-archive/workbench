@@ -33,7 +33,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.ace.file.IterableFileReader;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.ihtsdo.mojo.mojo.refset.writers.BooleanRefsetHandler;
 import org.ihtsdo.mojo.mojo.refset.writers.ConceptConceptConceptRefsetHandler;

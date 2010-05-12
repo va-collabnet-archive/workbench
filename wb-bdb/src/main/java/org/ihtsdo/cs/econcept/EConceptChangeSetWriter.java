@@ -13,6 +13,7 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.etypes.EConcept;
@@ -44,18 +45,21 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	
 	private Semaphore writePermit = new Semaphore(1);
 	
+	private  boolean processNidLists;
+	
 
-    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy) {
+    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy, boolean processNidLists) {
         super();
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
         this.policy = policy;
+        this.processNidLists = processNidLists;
     }
 
 	@Override
 	public void open(I_IntSet commitSapNids) throws IOException {
 	    this.commitSapNids = commitSapNids;
-		computer = new EConceptChangeSetComputer(policy, commitSapNids);
+		computer = new EConceptChangeSetComputer(policy, (IntSet) commitSapNids, processNidLists);
         if (changeSetFile.exists() == false) {
             changeSetFile.getParentFile().mkdirs();
             changeSetFile.createNewFile();
@@ -126,28 +130,30 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	        long start = System.currentTimeMillis();
 			try {
 	            eC = computer.getEConcept(c);
-	            long computeTime = System.currentTimeMillis() - start;
-	            writePermit.acquireUninterruptibly();
-                long permitTime = System.currentTimeMillis() - start - computeTime;
-	            tempOut.writeLong(time);
-                eC.writeExternal(tempOut);
-                long writeTime = System.currentTimeMillis() - start - permitTime - computeTime;
-                long totalTime = System.currentTimeMillis() - start;
-                if (totalTime > 100000) {
-                    AceLog.getAppLog().info("\n##################################################################\n" +
-                        "Exceptional change set write time for concept: \n" + 
-                        "\nCompute time: " + TimeUtil.getElapsedTimeString(computeTime) + 
-                        "\nPermit time: " + TimeUtil.getElapsedTimeString(permitTime) + 
-                        "\nWrite time: " + TimeUtil.getElapsedTimeString(writeTime) + 
-                        "\nTotal time: " + TimeUtil.getElapsedTimeString(totalTime) + 
-                        "\n\neConcept: " + 
-                        eC +
-                        "\n##################################################################\n" +
-                        "\n\nConcept: " + 
-                        c.toLongString() +
-                        "\n##################################################################\n"
-                        );
-                }
+	            if (eC != null) {
+	                long computeTime = System.currentTimeMillis() - start;
+	                writePermit.acquireUninterruptibly();
+	                long permitTime = System.currentTimeMillis() - start - computeTime;
+	                tempOut.writeLong(time);
+	                eC.writeExternal(tempOut);
+	                long writeTime = System.currentTimeMillis() - start - permitTime - computeTime;
+	                long totalTime = System.currentTimeMillis() - start;
+	                if (totalTime > 100000) {
+	                    AceLog.getAppLog().info("\n##################################################################\n" +
+	                        "Exceptional change set write time for concept: \n" + 
+	                        "\nCompute time: " + TimeUtil.getElapsedTimeString(computeTime) + 
+	                        "\nPermit time: " + TimeUtil.getElapsedTimeString(permitTime) + 
+	                        "\nWrite time: " + TimeUtil.getElapsedTimeString(writeTime) + 
+	                        "\nTotal time: " + TimeUtil.getElapsedTimeString(totalTime) + 
+	                        "\n\neConcept: " + 
+	                        eC +
+	                        "\n##################################################################\n" +
+	                        "\n\nConcept: " + 
+	                        c.toLongString() +
+	                        "\n##################################################################\n"
+	                        );
+	                }
+	            }
             } catch (Throwable e) {
                 AceLog.getAppLog().severe("\n##################################################################\n" +
                     "Exception writing change set for concept: \n" + 

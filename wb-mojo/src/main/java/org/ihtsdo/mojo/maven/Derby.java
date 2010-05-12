@@ -16,6 +16,10 @@
  */
 package org.ihtsdo.mojo.maven;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -27,10 +31,6 @@ import org.ihtsdo.mojo.maven.derby.DerbyHashBuilder;
 import org.ihtsdo.mojo.maven.derby.LogFileCreatorImpl;
 import org.ihtsdo.mojo.maven.derby.SQLFileTransformationCopierImpl;
 import org.ihtsdo.mojo.maven.derby.SQLSourceFinderImpl;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Goal which executes derby sql commands to generate a

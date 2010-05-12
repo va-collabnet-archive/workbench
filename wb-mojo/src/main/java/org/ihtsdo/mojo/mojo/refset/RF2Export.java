@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -41,12 +40,12 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
-import org.dwfa.tapi.TerminologyException;
 
 /**
  * 

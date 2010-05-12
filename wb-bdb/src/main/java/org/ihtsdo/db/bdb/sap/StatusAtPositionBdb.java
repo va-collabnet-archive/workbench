@@ -482,7 +482,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
         if (pathIds != null && pathIds.size() > 0) {
             for (int i = 0; i < values.size(); i++) {
                 int sapNid = values.getQuick(i);
-                if (pathIds.contains(sapNid)) {
+                if (pathIds.contains(getPathId(sapNid))) {
                     checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
                 }
             }

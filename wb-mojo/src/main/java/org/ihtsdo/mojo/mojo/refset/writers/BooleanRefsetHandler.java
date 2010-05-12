@@ -22,8 +22,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 public class BooleanRefsetHandler extends MemberRefsetHandler {

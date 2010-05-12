@@ -17,18 +17,13 @@
 package org.ihtsdo.mojo.mojo.refset.spec;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.ComputeDescRefsetFromSpecTask;
 import org.dwfa.ace.task.refset.spec.compute.ComputeRefsetFromSpecTask;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;

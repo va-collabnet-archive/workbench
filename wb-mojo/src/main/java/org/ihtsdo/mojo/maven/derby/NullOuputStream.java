@@ -16,8 +16,8 @@
  */
 package org.ihtsdo.mojo.maven.derby;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public final class NullOuputStream extends OutputStream {
 
