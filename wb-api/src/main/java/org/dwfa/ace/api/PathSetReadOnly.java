@@ -23,10 +23,17 @@ import java.util.Set;
 
 public class PathSetReadOnly implements Set<I_Path> {
 	I_Path[] paths = new I_Path[0];
-
+	I_IntSet pathNids = Terms.get().newIntSet();
+	
+	public I_IntSet getPathNidSet() {
+	    return pathNids;
+	}
 	public PathSetReadOnly(Set<I_Path> paths) {
 		super();
 		this.paths = paths.toArray(this.paths);
+		for (I_Path p: paths) {
+		    pathNids.add(p.getConceptId());
+		}
 	}
 
 	public PathSetReadOnly(I_Path path) {

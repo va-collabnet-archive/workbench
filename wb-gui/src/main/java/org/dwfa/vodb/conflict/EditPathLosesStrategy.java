@@ -35,7 +35,7 @@ public class EditPathLosesStrategy extends ContradictionManagementStrategy {
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         List<T> returnValues = new ArrayList<T>(2);
         for (T v: parts) {
-            if (!config.getEditingPathSetReadOnly().contains(v.getPathId())) {
+            if (!config.getEditingPathSetReadOnly().getPathNidSet().contains(v.getPathId())) {
                 returnValues.add(v);
             }
         }
@@ -48,10 +48,10 @@ public class EditPathLosesStrategy extends ContradictionManagementStrategy {
     @Override
     public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
         List<T> returnValues = new ArrayList<T>(2);
-        if (!config.getEditingPathSetReadOnly().contains(part1.getPathId())) {
+        if (!config.getEditingPathSetReadOnly().getPathNidSet().contains(part1.getPathId())) {
             returnValues.add(part1);
         }
-        if (!config.getEditingPathSetReadOnly().contains(part2.getPathId())) {
+        if (!config.getEditingPathSetReadOnly().getPathNidSet().contains(part2.getPathId())) {
             returnValues.add(part2);
         }
         if (returnValues.size() == 0) {
@@ -65,7 +65,7 @@ public class EditPathLosesStrategy extends ContradictionManagementStrategy {
     public <T extends I_AmTuple> List<T> resolveTuples(List<T> tuples) {
         List<T> returnValues = new ArrayList<T>(2);
         for (T v: tuples) {
-            if (!config.getEditingPathSetReadOnly().contains(v.getPathId())) {
+            if (!config.getEditingPathSetReadOnly().getPathNidSet().contains(v.getPathId())) {
                 returnValues.add(v);
             }
         }
