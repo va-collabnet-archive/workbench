@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,6 @@ import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LineageHelper.FirstRelationOnly;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -52,8 +51,24 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         this.parentRefsetId = getParentRefset();
     }
 
-    public void addParentMembers(Integer... conceptIds) throws Exception {
+    public MarkedParentRefsetHelper(int refsetId, int memberTypeId, boolean markedParentRefset) throws Exception {
+        super();
 
+        if(markedParentRefset){
+            this.parentRefsetId = getParentRefset();
+        } else {
+            this.parentRefsetId = refsetId;
+        }
+
+        this.refsetId = refsetId;
+        this.memberTypeId = memberTypeId;
+        this.refsetHelper = new RefsetHelper(termFactory);
+        this.parentMemberTypeId = termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
+            .getConceptId();
+    }
+
+    public void addParentMembers(Integer... conceptIds) throws Exception {
+        int conceptProcessed = 0;
         Condition[] traversingConditions = new Condition[] { new NotAlreadyVisited() };
 
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
@@ -62,6 +77,9 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         }
 
         for (I_GetConceptData concept : ancestors) {
+            if (++conceptProcessed % 1000 == 0) {
+                logger.info("Concepts processed " + conceptProcessed);
+            }
             newRefsetExtension(parentRefsetId, concept.getConceptId(), I_ThinExtByRefPartConcept.class,
                 new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
         }

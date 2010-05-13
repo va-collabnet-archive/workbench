@@ -563,7 +563,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
             // create a new one...
             try {
                 I_IdVersioned newId = new ThinIdVersioned(nidGenerator.nextId(), idPaths.size());
-                AceLog.getAppLog().info(" NewId: " + newId.getNativeId() + ", paths: " + idPaths);
+                //AceLog.getAppLog().info(" NewId: " + newId.getNativeId() + ", paths: " + idPaths);
                 ThinIdPart idPart = new ThinIdPart();
                 for (I_Path p : idPaths) {
                     idPart.setStatusId(getCurrentStatusNid());
@@ -571,7 +571,7 @@ public class IdWithPartCoresBdb implements I_StoreIdentifiers {
                     idPart.setSource(source);
                     idPart.setSourceId(uid);
                     idPart.setVersion(version);
-                    AceLog.getAppLog().info(" adding version: " + idPart);
+                    //AceLog.getAppLog().info(" adding version: " + idPart);
                     newId.addVersion(idPart);
                 }
                 writeId(newId);
