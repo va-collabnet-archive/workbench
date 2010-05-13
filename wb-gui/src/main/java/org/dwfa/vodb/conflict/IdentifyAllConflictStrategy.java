@@ -43,7 +43,7 @@ import org.dwfa.ace.api.I_AmTuple;
  * @author Dion
  * 
  */
-public class IdentifyAllConflictStrategy extends ConflictManagementStrategy implements Serializable {
+public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -53,7 +53,7 @@ import org.dwfa.ace.api.I_AmTuple;
  * 
  * @author Dion
  */
-public class LastCommitWinsConflictResolutionStrategy extends ConflictManagementStrategy implements Serializable {
+public class LastCommitWinsConflictResolutionStrategy extends ContradictionManagementStrategy implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
