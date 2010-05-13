@@ -281,22 +281,14 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public void addActionListener(final ActionListener l) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                stopButton.addActionListener(l);
-            }
-        });
+        stopButton.addActionListener(l);
         for (I_ShowActivity shower : showActivityListeners) {
             shower.addActionListener(l);
         }
     }
 
     public void removeActionListener(final ActionListener l) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                stopButton.removeActionListener(l);
-            }
-        });
+        stopButton.removeActionListener(l);
         for (I_ShowActivity shower : showActivityListeners) {
             shower.removeActionListener(l);
         }

@@ -274,6 +274,7 @@ public class ActivityViewer {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         activitiesAndFillerPanel.add(new JPanel(), gbc);
+        viewer.viewerFrame.setContentPane(new JPanel());
         viewer.viewerFrame.setContentPane(new JScrollPane(activitiesAndFillerPanel));
     }
 
@@ -376,7 +377,9 @@ public class ActivityViewer {
         linkToSourceFrameActivityPanel();
         Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
         for (I_ShowActivity a : viewer.activitiesList) {
-            newPanel.add(a.getViewPanel(), gbc);
+            JPanel p = a.getViewPanel();
+
+            newPanel.add(p, gbc);
             gbc.gridy++;
             addSecondaryActivityPanel(secondaryPanels, a);
         }
