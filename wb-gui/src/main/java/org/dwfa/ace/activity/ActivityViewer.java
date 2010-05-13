@@ -234,8 +234,6 @@ public class ActivityViewer {
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
     private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
 
-    private JScrollPane scroller;
-
     private static CompleteListener completeListener = new CompleteListener();
     
     private static Timer updateTimer = new Timer(2000, null);
@@ -245,21 +243,22 @@ public class ActivityViewer {
 
     private ActivityViewer() throws Exception {
         super();
+        viewer = this;
         if (DwfaEnv.isHeadless() == false) {
             viewerFrame = new ActivityViewerFrame();
-            scroller = new JScrollPane();
+            JScrollPane scroller = new JScrollPane();
             scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             viewerFrame.setContentPane(scroller);
             viewerFrame.setLocation(20, 20);
             viewerFrame.setSize(600, 400);
             viewerFrame.setVisible(true);
 
-            setupActivitesPanel(scroller, new JPanel());
+            setupActivitesPanel(new JPanel());
         }
 
     }
 
-    private static void setupActivitesPanel(JScrollPane scroller, JPanel activitiesPanel) {
+    private static void setupActivitesPanel(JPanel activitiesPanel) {
         JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -275,7 +274,7 @@ public class ActivityViewer {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         activitiesAndFillerPanel.add(new JPanel(), gbc);
-        scroller.setViewportView(activitiesAndFillerPanel);
+        viewer.viewerFrame.setContentPane(new JScrollPane(activitiesAndFillerPanel));
     }
 
     private static ActivityComparator activityComparator = new ActivityComparator();
@@ -381,7 +380,7 @@ public class ActivityViewer {
             gbc.gridy++;
             addSecondaryActivityPanel(secondaryPanels, a);
         }
-        setupActivitesPanel(viewer.scroller, newPanel);
+        setupActivitesPanel(newPanel);
     }
 
     private static void linkToSourceFrameActivityPanel() {

@@ -449,29 +449,32 @@ public class QueueViewerPanel extends JPanel {
                 process = null;
             } else {
                 try {
-                    if (lsm.getMinSelectionIndex() < table.getRowCount()) {
+                    tableOfQueueEntriesModel.updateQueueData();
+                    if (lsm.getMinSelectionIndex() > -1 && lsm.getMinSelectionIndex() < table.getRowCount()) {
                         int firstSelectedRow = lsm.getMinSelectionIndex();
-                        tableOfQueueEntriesModel.updateQueueData();
-                        I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(table.getRowSorter().convertRowIndexToModel(firstSelectedRow));
-                        if (processMeta != null) {
-                            processEntryID = processMeta.getEntryID();
-                            try {
-                                process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
-                                ProcessPanel processPanel = new ProcessPanel(process, worker, null);
-                                int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                                queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
-                                queueContentsSplitPane.setDividerLocation(dividerLoc);
-                                setupExecuteButton();
-                            } catch (NoMatchingEntryException ex) {
-                                logger.info(" NoMatchingEntry: " + ex);
-                                lsm.clearSelection();
-                                int dividerLoc = queueContentsSplitPane.getDividerLocation();
-                                queueContentsSplitPane.setBottomComponent(new JLabel("No matching entry"));
-                                queueContentsSplitPane.setDividerLocation(dividerLoc);
-                                execute.setText("execute");
-                                execute.setEnabled(false);
-                                process = null;
-                            }
+                        int modelIndex = table.getRowSorter().convertRowIndexToModel(firstSelectedRow);
+                        if (modelIndex > -1 && modelIndex < tableOfQueueEntriesModel.getRowCount()) {
+                            I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(modelIndex);
+                            if (processMeta != null) {
+                                processEntryID = processMeta.getEntryID();
+                                try {
+                                    process = tableOfQueueEntriesModel.getQueue().read(processMeta.getEntryID(), null);
+                                    ProcessPanel processPanel = new ProcessPanel(process, worker, null);
+                                    int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                                    queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
+                                    queueContentsSplitPane.setDividerLocation(dividerLoc);
+                                    setupExecuteButton();
+                                } catch (NoMatchingEntryException ex) {
+                                    logger.info(" NoMatchingEntry: " + ex);
+                                    lsm.clearSelection();
+                                    int dividerLoc = queueContentsSplitPane.getDividerLocation();
+                                    queueContentsSplitPane.setBottomComponent(new JLabel("No matching entry"));
+                                    queueContentsSplitPane.setDividerLocation(dividerLoc);
+                                    execute.setText("execute");
+                                    execute.setEnabled(false);
+                                    process = null;
+                                }
+                        }
                         }
                     } else {
                         lsm.clearSelection();
