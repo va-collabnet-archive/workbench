@@ -805,13 +805,15 @@ public class QueueViewerPanel extends JPanel {
                         
                         EntryID selectedEntry = null;
                         int selectedRow = tableOfQueueEntries.getSelectedRow();
-                        try {
-                            int convertedRow = tableOfQueueEntries.getRowSorter().convertRowIndexToModel(selectedRow);
-                            if (convertedRow >= 0 && convertedRow < tableOfQueueEntries.getRowCount()) {
-                                selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(convertedRow, 6);
+                        if (selectedRow > -1) {
+                            try {
+                                int convertedRow = tableOfQueueEntries.getRowSorter().convertRowIndexToModel(selectedRow);
+                                if (convertedRow >= 0 && convertedRow < tableOfQueueEntries.getRowCount()) {
+                                    selectedEntry = (EntryID) tableOfQueueEntries.getModel().getValueAt(convertedRow, 6);
+                                }
+                            } catch (IndexOutOfBoundsException e) {
+                                logger.log(Level.WARNING, e.toString() + " selected row: " + selectedRow);
                             }
-                        } catch (IndexOutOfBoundsException e) {
-                            logger.log(Level.WARNING, e.toString() + " selected row: " + selectedRow);
                         }
                         tableOfQueueEntriesModel.updateQueueData();
                         if (selectedEntry != null) {
