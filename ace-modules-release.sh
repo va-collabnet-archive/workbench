@@ -18,6 +18,13 @@
 #
 ##############################################################################
 
+##################################
+# No parameters passed fail build
+if [ -z $1 ]; then
+    echo "*** Error! No parameters passed
+    exit 1
+fi
+
 ######################
 # Set basic variables
 #
