@@ -17,9 +17,6 @@
 package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
-import java.util.UUID;
-
-import org.dwfa.util.id.Type3UuidFactory;
 
 public class SctYRelDestRecord implements Comparable<Object>, Serializable {
     private static final long serialVersionUID = 1L;

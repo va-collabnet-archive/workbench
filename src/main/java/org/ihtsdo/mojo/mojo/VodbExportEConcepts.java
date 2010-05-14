@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,9 +13,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.mojo.maven.MojoUtil;
 
 
 /**

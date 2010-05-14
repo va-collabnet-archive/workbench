@@ -16,36 +16,22 @@
  */
 package org.ihtsdo.mojo.maven;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
-import java.security.NoSuchAlgorithmException;
 
-import org.apache.derby.tools.ij;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.util.StringInputStream;
-import org.dwfa.util.io.FileIO;
-import org.ihtsdo.mojo.maven.transform.UuidSnomedMap;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.mojo.maven.transform.UuidSnomedMap;
 
 /**
  * Goal which executes derby sql commands to generate a

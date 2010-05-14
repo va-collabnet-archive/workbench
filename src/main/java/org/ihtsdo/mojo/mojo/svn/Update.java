@@ -27,8 +27,8 @@ import org.dwfa.ace.api.I_HandleSubversion;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.mojo.maven.MojoUtil;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**

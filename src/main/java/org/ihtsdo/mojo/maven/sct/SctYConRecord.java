@@ -18,11 +18,9 @@ package org.ihtsdo.mojo.maven.sct;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type3UuidFactory;
-import org.ihtsdo.etypes.EIdentifier;
 
 class SctYConRecord implements Comparable<Object>, Serializable {
     private static final long serialVersionUID = 1L;

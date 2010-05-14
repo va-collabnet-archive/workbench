@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.mojo.maven.Transform;
-import org.ihtsdo.mojo.maven.transform.AbstractTransform;
 
 /**
  * Transforms a constant to a NID.

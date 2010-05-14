@@ -23,8 +23,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.dwfa.util.text.StringToWord;
+import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 
 public abstract class ProcessWords extends AbstractExport {
 

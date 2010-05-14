@@ -19,9 +19,9 @@ package org.ihtsdo.mojo.maven.transform;
 import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.ihtsdo.mojo.maven.Transform;
-import org.dwfa.tapi.I_ConceptualizeUniversally;
 
 /**
  * Creates a type 5 uuid for a path given a fully specified name.
