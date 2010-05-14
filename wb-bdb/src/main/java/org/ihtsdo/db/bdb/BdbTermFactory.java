@@ -492,6 +492,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public I_Path getPath(int nid) throws TerminologyException, IOException {
+        return pathManager.get(nid);
+    }
+
+    @Override
     public List<I_Path> getPaths() throws Exception {
         return new ArrayList<I_Path>(pathManager.getAll());
     }

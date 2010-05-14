@@ -1,7 +1,6 @@
 package org.dwfa.ace.classifier;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -24,12 +23,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.classifier.DLPanel;
-import org.dwfa.ace.classifier.DiffPathPanel;
-import org.dwfa.ace.classifier.EquivPanel;
-import org.dwfa.ace.classifier.ViewPathPanel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.classify.SnoQuery;
@@ -192,7 +186,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             // CHECK & GET EDIT_PATH
             I_GetConceptData cEditPathObj = config.getClassifierInputPath();
             if (cEditPathObj != null) {
-                I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+                I_Path cEditIPath = tf.getPath(cEditPathObj.getNid());
                 cEditPathPos = new ArrayList<I_Position>();
                 cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
                 addPathOrigins(cEditPathPos, cEditIPath);
@@ -208,11 +202,9 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             }
 
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            AceLog.getAppLog().alertAndLogException(e);
         }
 
         SnoAB.posList = cClassPathPos;

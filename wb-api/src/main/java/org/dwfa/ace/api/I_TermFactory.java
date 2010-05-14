@@ -210,6 +210,7 @@ public interface I_TermFactory {
 
     LogWithAlerts getEditLog();
 
+    I_Path getPath(int nid) throws TerminologyException, IOException;
     I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
     I_Path getPath(UUID... ids) throws TerminologyException, IOException;
