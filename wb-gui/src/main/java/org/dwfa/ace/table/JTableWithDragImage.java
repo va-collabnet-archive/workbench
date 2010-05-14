@@ -167,7 +167,7 @@ public class JTableWithDragImage extends JTable {
                 case CONCEPT_IDENTIFIER:
                     Object component = Terms.get().getComponent(swextt.getId());
                     if (component == null) {
-                        return new StringSelection("null concept for: " + obj);
+                        return new StringSelection("null component for: " + obj + " version: " + swextt.getTuple());
                     }
                     if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
                         return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
