@@ -10,11 +10,6 @@
   <packaging>maven-plugin</packaging>
   <name>Workbench Berkeley Database Mojo</name>
   <url>http://maven.apache.org</url>
-  <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-bdb-mojo</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-bdb-mojo</developerConnection>
-    <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-bdb-mojo/?root=workbench&amp;system=exsy1002</url>
-  </scm>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

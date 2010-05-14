@@ -25,11 +25,6 @@
     <packaging>jar</packaging>
     <name>Workbench API</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
-    <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-api</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-api</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-api/?root=workbench&amp;system=exsy1002</url>
-    </scm>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

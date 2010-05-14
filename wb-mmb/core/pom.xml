@@ -26,11 +26,6 @@
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
-    <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/core</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/core</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
-    </scm>
     <dependencies>
         <dependency>
             <!-- An alternative to:

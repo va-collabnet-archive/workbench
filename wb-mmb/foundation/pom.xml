@@ -56,11 +56,6 @@
 			<version>2.1</version>
 		</dependency>
 	</dependencies>
-  <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/foundation</developerConnection>
-    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
-  </scm>
   <build>
     <plugins>
       <plugin>
