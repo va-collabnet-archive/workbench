@@ -385,7 +385,7 @@ public class RefsetSpecPanel extends JPanel {
         column4.setFieldClass(StringWithExtTuple.class);
         column4.setMin(5);
         column4.setPref(150);
-        column4.setMax(150);
+        column4.setMax(350);
         column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PROMOTION_REFSET_PART);
         column4.setReadMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("getC1id"));
         column4.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setC1id", int.class));

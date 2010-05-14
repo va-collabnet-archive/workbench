@@ -14,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PRECEDENCE;
@@ -301,12 +302,14 @@ public class PositionMapper {
 				if (pathManager == null) {
 					pathManager = BdbPathManager.get();
 				}
-				AceLog.getAppLog().info(
-						"Creating new PositionMapper for: "
-								+ pathConcept.getNid() + ": " 
-								+ pathDesc + " time: "
-								+ TimeUtil.formatDate(destination.getTime()) + 
-								" thread: " + Thread.currentThread().getName());
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+	                AceLog.getAppLog().fine(
+                        "Creating new PositionMapper for: "
+                                + pathConcept.getNid() + ": " 
+                                + pathDesc + " time: "
+                                + TimeUtil.formatDate(destination.getTime()) + 
+                                " thread: " + Thread.currentThread().getName());
+				}
 				Collection<I_Position> origins = 
 					pathManager.getAllPathOrigins(destination.getPath().getConceptId());
 				origins.add(this.destination);

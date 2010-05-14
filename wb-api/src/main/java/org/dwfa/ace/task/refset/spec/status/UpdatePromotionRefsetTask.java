@@ -306,7 +306,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     }
 
     private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) throws TerminologyException, IOException {
-        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(activeFrameConfig.getAllowedStatus(), 
+        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(null, 
             activeFrameConfig.getViewPositionSetReadOnly(), 
             activeFrameConfig.getPrecedence(), 
             activeFrameConfig.getConflictResolutionStrategy());
