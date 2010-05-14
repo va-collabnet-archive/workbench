@@ -1006,4 +1006,12 @@ public class ProcessPanel extends JPanel implements PropertyChangeListener {
         }
 
     }
+
+    public void refresh() {
+        if (lastLayoutDoer != null) {
+            lastLayoutDoer.setStopped(true);
+        }
+        lastLayoutDoer = new DoLayout();
+        SwingUtilities.invokeLater(lastLayoutDoer);
+    }
 }

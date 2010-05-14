@@ -21,7 +21,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -31,8 +30,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -45,10 +44,10 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 /**
- * Computes the members of a refset given a refset spec. This refset
- * spec is the one currently displayed in the refset spec editing panel. The
- * refset spec's "specifies refset" relationship indicates which member refset
- * will be created.
+ * Computes the members of a refset given a refset spec. This refset spec is the
+ * one currently displayed in the refset spec editing panel. The refset spec's
+ * "specifies refset" relationship indicates which member refset will be
+ * created.
  * 
  * @author Chrissy Hill
  * 
@@ -86,64 +85,80 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // Nothing to do
     }
 
-    private Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
+    public Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
 
         if (refset == null) {
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                "No refset in refset spec panel to compute.", "", JOptionPane.ERROR_MESSAGE);
             AceLog.getAppLog().info("No refset in refset spec panel to compute.");
+            if (!DwfaEnv.isHeadless()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                    "No refset in refset spec panel to compute.", "", JOptionPane.ERROR_MESSAGE);
+            }
             return Condition.ITEM_CANCELED;
         }
 
         try {
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true);
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
             I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
+            AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
             RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
             if (refsetSpecHelper.isDescriptionComputeType()) {
                 computeType = RefsetComputeType.DESCRIPTION;
             } else if (refsetSpecHelper.isRelationshipComputeType()) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Invalid refset spec to compute - relationship compute types not supported.", "",
-                    JOptionPane.ERROR_MESSAGE);
                 AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Invalid refset spec to compute - relationship compute types not supported.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
                 return Condition.ITEM_CANCELED;
             }
 
             // verify a valid refset spec construction
             if (refsetSpec == null) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
-                    "", JOptionPane.ERROR_MESSAGE);
                 AceLog.getAppLog().info(
                     "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane
+                        .showMessageDialog(
+                            LogWithAlerts.getActiveFrame(null),
+                            "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
+                            "", JOptionPane.ERROR_MESSAGE);
+                }
                 return Condition.ITEM_CANCELED;
             }
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query =
                     RefsetQueryFactory.createQuery(configFrame, Terms.get(), refsetSpec, refset, computeType);
 
-
             // check validity of query
             if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
                 getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Refset spec has dangling AND/OR. These must have sub-statements.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
             }
 
             computeNestedRefsets(configFrame, showActivityPanel, query);
 
             AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.getInitialText());
 
-            Terms.get().computeRefset(refset.getNid(), query, configFrame);
+            Condition condition = Terms.get().computeRefset(refset.getNid(), query, configFrame);
 
-            if (cancelComputation) {
+            if (cancelComputation || condition == Condition.ITEM_CANCELED) {
                 Terms.get().cancel();
                 getLogger().info("Refset compute cancelled.");
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute cancelled.", "",
-                    JOptionPane.ERROR_MESSAGE);
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute cancelled.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
                 return Condition.ITEM_CANCELED;
             }
 
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete.", "",
+                JOptionPane.INFORMATION_MESSAGE);
             return Condition.ITEM_COMPLETE;
 
         } catch (Exception e) {
@@ -173,9 +188,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 Condition condition =
                         computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
                 if (condition == Condition.ITEM_CANCELED) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Error computing dependant refset: " + Terms.get().getConcept(nestedRefsetId).getInitialText()
-                            + ". Re-run separately.", "", JOptionPane.ERROR_MESSAGE);
+                    if (!DwfaEnv.isHeadless()) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "Error computing dependant refset: "
+                                + Terms.get().getConcept(nestedRefsetId).getInitialText() + ". Re-run separately.", "",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 getNestedRefsets().addAll(nestedRefsets);
             }
@@ -190,15 +208,19 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         try {
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             boolean showActivityPanel = true;
-            excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of a task
+            excludedRefsets = new HashSet<Integer>(); // no excluded refsets
+            // when running as part
+            // of a task
             nestedRefsets = new HashSet<Integer>();
             Condition condition = computeRefset(configFrame, refset, showActivityPanel);
             configFrame.setCommitAbortButtonsVisible(true);
             return condition;
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unable to complete refset compute: "
-                + ex.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+            if (!DwfaEnv.isHeadless()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unable to complete refset compute: "
+                    + ex.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+            }
             try {
                 Terms.get().cancel();
                 configFrame.setCommitAbortButtonsVisible(true);

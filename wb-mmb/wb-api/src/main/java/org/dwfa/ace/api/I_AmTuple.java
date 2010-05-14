@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.api;
 
+import java.io.IOException;
+
 public interface I_AmTuple extends I_AmPart {
 
     public int getNid();
@@ -23,5 +25,7 @@ public interface I_AmTuple extends I_AmPart {
     public I_AmTermComponent getFixedPart();
 
     public I_AmPart getMutablePart();
+    
+    public boolean hasExtensions() throws IOException;
 
 }

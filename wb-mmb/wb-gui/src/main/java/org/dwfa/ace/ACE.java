@@ -107,7 +107,6 @@ import org.dwfa.ace.CdePalette.TOGGLE_DIRECTION;
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.ChangeFramePassword;
 import org.dwfa.ace.actions.Commit;
-import org.dwfa.ace.actions.ImportJavaChangeset;
 import org.dwfa.ace.actions.SaveProfile;
 import org.dwfa.ace.actions.SaveProfileAs;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -1279,7 +1278,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static boolean editMode = true;
 
-    private JMenu fileMenu = new JMenu("File");
+    private JMenu fileMenu;
 
     private JButton commitButton;
 
@@ -1516,7 +1515,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException,
             IllegalAccessException, PropertyVetoException, ClassNotFoundException, NoSuchMethodException {
         this.frame = frame;
-        JMenuBar menuBar = new JMenuBar();
+         JMenuBar menuBar = new JMenuBar();
+         if (fileMenu == null) {
+             fileMenu = new JMenu("File");
+             menuBar.add(fileMenu);
+          }
         JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
         addToMenuBar(menuBar, editMenu, frame);
@@ -1528,7 +1531,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
         this.frame = aceFrame;
-        addFileMenu(menuBar, aceFrame);
+        if (fileMenu == null) {
+            fileMenu = new JMenu("File");
+            menuBar.add(fileMenu, 0);
+         }
+        addFileMenu(menuBar);
         addEditMenu(menuBar, editMenu, aceFrame);
         ProcessPopupUtil.addProcessMenus(menuBar, pluginRoot, menuWorker);
 
@@ -1597,18 +1604,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         menuBar.add(editMenu);
     }
 
-    public void addFileMenu(JMenuBar menuBar, JFrame aceFrame) throws LoginException, ConfigurationException,
+    private void addFileMenu(JMenuBar menuBar) throws LoginException, ConfigurationException,
             IOException, PrivilegedActionException, SecurityException, IntrospectionException,
             InvocationTargetException, IllegalAccessException, PropertyVetoException, ClassNotFoundException,
             NoSuchMethodException {
-        this.frame = aceFrame;
+        JMenuItem menuItem = null;
         if (editMode) {
-            JMenuItem menuItem = null;
             /*
              * menuItem = new JMenuItem("Export Baseline Jar...");
              * menuItem.addActionListener(new WriteJar(aceConfig));
              * fileMenu.add(menuItem); fileMenu.addSeparator();
-             */
             menuItem = new JMenuItem("Import Java Changeset...");
             menuItem.addActionListener(new ImportJavaChangeset(config, aceFrame, aceConfig));
             fileMenu.add(menuItem);
@@ -1617,6 +1622,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             menuItem.addActionListener(new TestTupleCalculator(config, aceFrame, aceConfig));
             fileMenu.add(menuItem);
             fileMenu.addSeparator();
+             */
             /*
              * menuItem = new JMenuItem("Import Changeset Jar...");
              * menuItem.addActionListener(new ImportChangesetJar(config));
@@ -1629,12 +1635,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             menuItem.addActionListener(new ChangeFramePassword(this));
             fileMenu.add(menuItem);
             menuItem = new JMenuItem("Save Profile");
-            menuItem.addActionListener(new SaveProfile(aceFrame));
+            menuItem.addActionListener(new SaveProfile(this.frame));
             fileMenu.add(menuItem);
             menuItem = new JMenuItem("Save Profile As...");
-            menuItem.addActionListener(new SaveProfileAs(aceFrame));
+            menuItem.addActionListener(new SaveProfileAs(this.frame));
             fileMenu.add(menuItem);
-            menuBar.add(fileMenu);
         }
 
     }
@@ -1725,9 +1730,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         // CLASSIFIER TAB
         snoRocketPanel = new SnoRocketTabPanel(this);
-        conceptTabs.addTab("Classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
+        conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
             snoRocketPanel);
 
+        try {
+            Class<JPanel> panelClass = (Class<JPanel>) Class.forName("org.ihtsdo.arena.Arena");
+            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/brush1.png")), 
+                panelClass.newInstance());
+        } catch (ClassNotFoundException e) {
+            // Ignore this exception. 
+        }
+        /*
+        */
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
 
@@ -1883,19 +1897,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public JPanel makeQueueViewerPanel(Configuration config, MasterWorker worker, ServiceItemFilter queueFilter)
             throws Exception {
         queueViewer = new QueueViewerPanel(config, worker, queueFilter);
-        /*
-         * Code to add a popup menu to the queue list...
-         * queueViewer.getTableOfQueues().addMouseListener(new MouseAdapter() {
-         * public void mousePressed(MouseEvent e) { showPopup(e); }
-         * public void mouseReleased(MouseEvent e) { showPopup(e); }
-         * private void showPopup(MouseEvent e) { if (e.isPopupTrigger()) {
-         * JPopupMenu popupMenu = new JPopupMenu(); JMenuItem menuItem = new
-         * JMenuItem("Hide"); //menuItem.addActionListener(new
-         * InsertRowsActionAdapter(this)); popupMenu.add(menuItem); JMenuItem
-         * showItem = new JMenuItem("Show"); //showItem.addActionListener(new
-         * InsertRowsActionAdapter(this)); popupMenu.add(showItem);
-         * popupMenu.show(e.getComponent(), e.getX(), e.getY()); } } });
-         */
         JPanel combinedPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -1910,7 +1911,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.fill = GridBagConstraints.BOTH;
         combinedPanel.add(queueViewer, c);
         return combinedPanel;
-
     }
 
     private JPanel getQueueViewerTopPanel() {
@@ -2062,9 +2062,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         JPanel contradictionConfigPanel = new JPanel(new BorderLayout());
 
         JPanel controlPanel = new JPanel(new GridLayout(3, 1));
-        controlPanel.add(getCheckboxEditor("show conflicts in taxonomy view", "highlightConflictsInTaxonomyView",
+        controlPanel.add(getCheckboxEditor("show contradictions in taxonomy view", "highlightConflictsInTaxonomyView",
             aceFrameConfig.getHighlightConflictsInTaxonomyView(), true));
-        controlPanel.add(getCheckboxEditor("show conflicts in component panel", "highlightConflictsInComponentPanel",
+        controlPanel.add(getCheckboxEditor("show contradictions in component panel", "highlightConflictsInComponentPanel",
             aceFrameConfig.getHighlightConflictsInComponentPanel(), true));
 
         final JTextPane descriptionPanel = new JTextPane();
@@ -2864,7 +2864,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showQueuesActionListener = new QueuesPaletteActionListener();
         showQueuesButton.addActionListener(showQueuesActionListener);
         showQueuesButton.setToolTipText("Show the queue viewer...");
-        showQueuesButton.setVisible(editMode);
         if (aceFrameConfig.getHiddenTopToggles().contains(TopToggleTypes.INBOX)) {
             showQueuesButton.setVisible(false);
         }

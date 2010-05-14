@@ -1,11 +1,15 @@
 package org.ihtsdo.cs;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.dwfa.ace.activity.ActivityPanel;
-import org.dwfa.ace.activity.ActivityViewer;
+import javax.swing.Timer;
+
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
@@ -17,7 +21,7 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 
-public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConceptData {
+public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConceptData, ActionListener {
 
 	private static CopyOnWriteArraySet<I_WriteChangeSet> writers = new CopyOnWriteArraySet<I_WriteChangeSet>();
 	public static AtomicInteger changeSetWriters = new AtomicInteger();
@@ -27,13 +31,14 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private String commitTimeStr;
 	private IntSet sapNidsFromCommit;
     private int conceptCount;
-    private ActivityPanel activity;
+    private I_ShowActivity activity;
     private long startTime = System.currentTimeMillis();
     private AtomicInteger processedCount = new AtomicInteger();
     private AtomicInteger processedChangedCount = new AtomicInteger();
     private int changedCount = Integer.MIN_VALUE;
     private ChangeSetWriterThreading changeSetWriterThreading;
     private ChangeSetPolicy changeSetPolicy;
+    private Timer timer;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
 			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) {
@@ -44,8 +49,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		changedCount = cNidsToWrite.cardinality();
 		this.commitTime = commitTime;
 		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
-		    " gVersion: " + Bdb.gVersion.incrementAndGet() + 
-		    " (" + cNidsToWrite.cardinality() + " total concept changes)";
+		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
+		    " (" + cNidsToWrite.cardinality() + " concepts)";
 		this.sapNidsFromCommit = sapNidsFromCommit;
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
@@ -57,12 +62,15 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
-	        activity = new ActivityPanel(true, null, null);
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...");
 	        activity.setIndeterminate(true);
-	        activity.setProgressInfoUpper("Writing change sets for: " + commitTimeStr + "...");
+	        activity.setProgressInfoUpper("CS writer: " + commitTimeStr + "...");
 	        activity.setProgressInfoLower("Opening change set writers...");
-	        activity.getStopButton().setVisible(false);
-	        ActivityViewer.addActivity(activity);
+	        timer = new Timer(2000, this);
+	        timer.start();
+	        if (activity.getStopButton() != null) {
+	            activity.getStopButton().setVisible(false);
+	        }
 			for (I_WriteChangeSet writer : writers) {
 				writer.open(sapNidsFromCommit);
 			}
@@ -117,24 +125,31 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                 writer.writeChanges(c, commitTime);
             }
         }
-        int completed = processedCount.incrementAndGet();
-        if (completed % 5000 == 0) {
-            activity.setValue(completed);
-            long endTime = System.currentTimeMillis();
-            long elapsed = endTime - startTime;
-            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-
-            String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
-
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + 
-                " processed: " + processedChangedCount + "/" + changedCount);
-        }
     }
+    
+    
 
     @Override
     public boolean continueWork() {
         // user cannot cancel operation
         return true;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        int completed = processedCount.incrementAndGet();
+        activity.setValue(completed);
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+
+        String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
+
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + 
+            " processed: " + processedChangedCount + "/" + changedCount);
+        if (activity.isComplete()) {
+            timer.stop();
+        }
     }
 
 }

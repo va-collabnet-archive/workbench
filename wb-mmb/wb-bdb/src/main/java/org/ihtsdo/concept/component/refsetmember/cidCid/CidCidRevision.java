@@ -81,13 +81,15 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
             this.setStatusId(statusNid);
             return this;
         }
-		return new CidCidRevision(statusNid, pathNid, time, this);
+        CidCidRevision newR = new CidCidRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 
     @Override
     public CidCidRevision makeAnalog() {
-         return new CidCidRevision(getStatusId(), getPathId(), getTime(), this);
+         return  new CidCidRevision(getStatusId(), getPathId(), getTime(), this);
     }
 
 	public CidCidRevision(TupleInput input, 

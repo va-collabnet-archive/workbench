@@ -21,8 +21,8 @@ import java.io.Writer;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
-import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.dwfa.util.text.StringToWord;
+import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 
 public class LowerCaseWordIndex extends AbstractExport {
 

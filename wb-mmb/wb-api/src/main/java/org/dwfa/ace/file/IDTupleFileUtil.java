@@ -86,8 +86,8 @@ public class IDTupleFileUtil {
             long effectiveDate = Long.parseLong(lineParts[6]);
 
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage = "statusUuid has no identifier - skipping import of this ID tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "statusUuid matches no identifier in database.");
             }
 
             if (!termFactory.hasId(primaryUuid)) {

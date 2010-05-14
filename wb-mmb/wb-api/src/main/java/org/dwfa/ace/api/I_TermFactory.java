@@ -41,6 +41,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -49,18 +50,22 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
 public interface I_TermFactory {
-	
-	I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config) throws Exception;
-	I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, 
-			int memberRefsetId, int memberTypeId) throws Exception;
-	I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId) throws Exception;
-	I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config);
-	
-	I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception;
-	
-	void addToWatchList(I_GetConceptData c);
 
-	void removeFromWatchList(I_GetConceptData c);
+    I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config) throws Exception;
+
+    I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId)
+            throws Exception;
+
+    I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId)
+            throws Exception;
+
+    I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config);
+
+    I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception;
+
+    void addToWatchList(I_GetConceptData c);
+
+    void removeFromWatchList(I_GetConceptData c);
 
     String getProperty(String key) throws IOException;
 
@@ -78,14 +83,12 @@ public interface I_TermFactory {
 
     I_GetConceptData newConcept(UUID newConceptId, boolean defined, I_ConfigAceFrame aceFrameConfig)
             throws TerminologyException, IOException;
-    
-	I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined,
-			I_ConfigAceFrame aceConfig, int statusNid)
-	            throws TerminologyException, IOException;
 
-    I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined,
-            I_ConfigAceFrame aceConfig, int statusNid, long time)
-                throws TerminologyException, IOException;
+    I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined, I_ConfigAceFrame aceConfig, int statusNid)
+            throws TerminologyException, IOException;
+
+    I_GetConceptData newConcept(UUID conceptUuid, boolean isDefined, I_ConfigAceFrame aceConfig, int statusNid,
+            long time) throws TerminologyException, IOException;
 
     I_ConfigAceFrame newAceFrameConfig() throws TerminologyException, IOException;
 
@@ -146,7 +149,8 @@ public interface I_TermFactory {
             I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig) throws TerminologyException, IOException;
 
     I_DescriptionVersioned newDescription(UUID newDescriptionId, I_GetConceptData concept, String lang, String text,
-            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveData) throws TerminologyException, IOException;
+            I_GetConceptData descType, I_ConfigAceFrame aceFrameConfig, I_GetConceptData status, long effectiveData)
+            throws TerminologyException, IOException;
 
     /**
      * Gets a description given a description native ID and a concept native ID
@@ -168,8 +172,7 @@ public interface I_TermFactory {
      * @throws ParseException
      * @throws IOException
      */
-    I_DescriptionVersioned getDescription(int dNid) throws TerminologyException,
-            IOException;
+    I_DescriptionVersioned getDescription(int dNid) throws TerminologyException, IOException;
 
     /**
      * Uses the configuration to set default values for the relationship, and
@@ -215,9 +218,8 @@ public interface I_TermFactory {
 
     I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException;
 
-
-	I_Path newPath(Collection<I_Position> positionSet, I_GetConceptData pathConcept,
-			I_ConfigAceFrame commitConfig)  throws TerminologyException, IOException;
+    I_Path newPath(Collection<I_Position> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
+            throws TerminologyException, IOException;
 
     I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException;
 
@@ -228,11 +230,11 @@ public interface I_TermFactory {
     void forget(I_DescriptionVersioned desc) throws IOException;
 
     void forget(I_RelVersioned rel) throws IOException;
-    
+
     void forget(I_ExtendByRef ext) throws IOException;
-    
+
     void forget(I_ConceptAttributeVersioned attr) throws IOException;
-    
+
     void addUncommitted(I_GetConceptData concept);
 
     void addUncommitted(I_ExtendByRef extension);
@@ -259,7 +261,9 @@ public interface I_TermFactory {
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
     public void commit() throws Exception;
-    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws Exception;
+
+    public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading)
+            throws Exception;
 
     void addChangeSetWriter(I_WriteChangeSet writer);
 
@@ -418,7 +422,7 @@ public interface I_TermFactory {
     I_DescriptionPart newDescriptionPart();
 
     /**
-     * @deprecated  use form with <code>UUID memberPrimUuid</code>
+     * @deprecated use form with <code>UUID memberPrimUuid</code>
      * @param refsetId
      * @param memberId
      * @param componentId
@@ -426,15 +430,16 @@ public interface I_TermFactory {
      * @return
      * @throws IOException
      */
-    I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
-            Class<? extends I_ExtendByRefPart> partType) throws IOException;
+    I_ExtendByRef newExtension(int refsetId, int memberId, int componentId, Class<? extends I_ExtendByRefPart> partType)
+            throws IOException;
 
     I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId, int typeId) throws IOException;
-    I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId, 
-    		Class<? extends I_ExtendByRefPart> partType) throws IOException;
+
+    I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId,
+            Class<? extends I_ExtendByRefPart> partType) throws IOException;
 
     /**
-     * @throws IOException 
+     * @throws IOException
      * @deprecated Use {@link #newExtension(int, int, int, int)} using {@link AllowDataCheckSuppression} and
      *             {@link SuppressDataChecks} annotations.
      */
@@ -525,7 +530,7 @@ public interface I_TermFactory {
      * @param displayInViewer If true, the activity will be lodged in the
      *            activity viewer window
      */
-    I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig);
+    I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig, String firstUpperInfo);
 
     I_HandleSubversion getSvnHandler();
 
@@ -558,42 +563,43 @@ public interface I_TermFactory {
      */
     public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
-	public List<UUID> nativeToUuid(int nid) throws IOException;
+    public List<UUID> nativeToUuid(int nid) throws IOException;
 
-	public I_ImageVersioned getImage(UUID fromString) throws IOException;
+    public I_ImageVersioned getImage(UUID fromString) throws IOException;
 
-	public I_ImageVersioned getImage(int parseInt) throws IOException;
+    public I_ImageVersioned getImage(int parseInt) throws IOException;
 
-	public void searchConcepts(I_TrackContinuation iTrackContinuation,
-			I_RepresentIdSet matches, CountDownLatch conceptLatch,
-			List<I_TestSearchResults> criterion,
-			I_ConfigAceFrame differenceSearchConfig) throws IOException, ParseException;
-	
-	public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
+    public void searchConcepts(I_TrackContinuation iTrackContinuation, I_RepresentIdSet matches,
+            CountDownLatch conceptLatch, List<I_TestSearchResults> criterion, I_ConfigAceFrame differenceSearchConfig)
+            throws IOException, ParseException;
 
-	/**
-	 * Close the database. Called on quit. 
-	 * @throws IOException 
-	 */
-	public void close() throws IOException;
-	
-	public I_DescriptionVersioned newDescription(UUID descUuid,
-			I_GetConceptData concept, String string, String description,
-			I_GetConceptData descriptionType,
-			I_ConfigAceFrame activeAceFrameConfig, int statusNid) throws TerminologyException, IOException;
-	
-	public Object getComponent(int nid)  throws TerminologyException, IOException;
-	public void computeRefset(int nid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws TerminologyException, IOException, Exception;
+    public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
 
-	I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid,
-			byte[] image, String textDescription, String format,
-			I_ConfigAceFrame aceConfig) throws IOException, TerminologyException;
-	
+    /**
+     * Close the database. Called on quit.
+     * 
+     * @throws IOException
+     */
+    public void close() throws IOException;
+
+    public I_DescriptionVersioned newDescription(UUID descUuid, I_GetConceptData concept, String string,
+            String description, I_GetConceptData descriptionType, I_ConfigAceFrame activeAceFrameConfig, int statusNid)
+            throws TerminologyException, IOException;
+
+    public Object getComponent(int nid) throws TerminologyException, IOException;
+
+    public Condition computeRefset(int nid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
+            throws TerminologyException, IOException, Exception;
+
+    I_ImageVersioned newImage(UUID imageUuid, int conceptNid, int typeNid, byte[] image, String textDescription,
+            String format, I_ConfigAceFrame aceConfig) throws IOException, TerminologyException;
+
     I_RelVersioned getRelationship(int rNid) throws IOException;
+
     I_RelVersioned newRelationship(UUID relUuid, I_GetConceptData concept, I_GetConceptData concept2,
             I_GetConceptData concept3, I_GetConceptData concept4, I_GetConceptData concept5, I_GetConceptData concept6,
             int group, I_ConfigAceFrame importConfig, long effectiveDate) throws IOException, TerminologyException;
-	
+
     /**
      * <b>newRelationshipNoCheck DOESNOT use the configuration to set default values!</b>
      * newRelationshipNoCheck provides direct access for classifier results write-back.<br>
@@ -604,26 +610,32 @@ public interface I_TermFactory {
      * @throws TerminologyException
      * @throws IOException
      */
-    public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept,
-            int relTypeNid, int c2Nid, int relCharacteristicNid, int relRefinabilityNid,
-            int relStatusNid, int group, int pathNid,
+    public I_RelVersioned newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid, int c2Nid,
+            int relCharacteristicNid, int relRefinabilityNid, int relStatusNid, int group, int pathNid,
             long effectiveDate) throws TerminologyException, IOException;
-    
+
     public void setCheckCreationDataEnabled(boolean enabled);
+
     public boolean isCheckCreationDataEnabled();
-    
+
     public void setCheckCommitDataEnabled(boolean enabled);
+
     public boolean isCheckCommitDataEnabled();
-    
+
     public List<? extends I_Path> getPathChildren(int nid) throws TerminologyException;
-    
+
     public void resetViewPositions();
-    
+
     public void setCacheSize(String cacheSize);
+
     public long getCacheSize();
-    
+
     public void setCachePercent(String cachePercent);
+
     public int getCachePercent();
+
     public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
-    
+
+    public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
+
 }

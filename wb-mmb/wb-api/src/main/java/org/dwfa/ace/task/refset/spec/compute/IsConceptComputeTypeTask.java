@@ -73,7 +73,7 @@ public class IsConceptComputeTypeTask extends AbstractTask {
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_GetConceptData refsetSpecConcept = configFrame.getRefsetSpecInSpecEditor();
 
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept);
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept, configFrame);
             if (refsetSpecHelper.isConceptComputeType()) {
                 return Condition.TRUE;
             } else {

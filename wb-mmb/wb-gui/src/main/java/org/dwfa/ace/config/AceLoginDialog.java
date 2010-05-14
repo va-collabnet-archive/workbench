@@ -37,6 +37,7 @@ import javax.swing.SwingConstants;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.svn.Svn;
 
 /**
  * Login Dialog for ace.
@@ -45,7 +46,7 @@ import org.dwfa.bpa.process.TaskFailedException;
  * 
  * @author steve crow, ean dungey, keith campbell
  */
-public class AceLoginDialog extends javax.swing.JDialog {
+public class AceLoginDialog extends javax.swing.JDialog implements ActionListener {
     private static final long serialVersionUID = -4458854470566944865L;
     private File profile;
 
@@ -80,6 +81,7 @@ public class AceLoginDialog extends javax.swing.JDialog {
 
         svnConnectCheckBox.setSelected(true);
         svnConnectCheckBox.setText("Connect to subversion");
+        svnConnectCheckBox.addActionListener(this);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -235,6 +237,10 @@ public class AceLoginDialog extends javax.swing.JDialog {
         return passwordField.getPassword();
     }
 
+    public void setConnectToSvn(boolean connect) {
+        svnConnectCheckBox.setSelected(connect);
+        Svn.setConnectedToSvn(connect);
+    }
     /**
      * True if the user is connecting to SVN
      * 
@@ -268,4 +274,9 @@ public class AceLoginDialog extends javax.swing.JDialog {
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JComboBox profileSelectionBox;
     private javax.swing.JCheckBox svnConnectCheckBox;
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Svn.setConnectedToSvn(connectToSvn());
+    }
 }

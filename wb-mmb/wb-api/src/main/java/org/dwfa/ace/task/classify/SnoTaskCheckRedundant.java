@@ -126,11 +126,11 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
         try {
             // **** GUI:START: 1. GET STATED PATH SNORELS ****
             continueThisAction = true;
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            String guiStr = "Compare Stated & Inferred 1/3: Get Edit Path";
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
             // activity
             // viewer
             gui.addActionListener(this);
-            String guiStr = "Compare Stated & Inferred 1/3: Get Edit Path";
             gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -156,11 +156,11 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
             }
 
             // **** GUI:START: 2. GET CLASSIFIER PATH DATA ****
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            guiStr = "Compare Stated & Inferred 2/3: Get Classifier Path";
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
             // activity
             // viewer
             gui.addActionListener(this);
-            guiStr = "Compare Stated & Inferred 2/3: Get Classifier Path";
             gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -186,11 +186,11 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
             }
 
             // **** GUI: 3. COMPARE RESULTS ****
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig()); // in
+            guiStr = "Compare Stated & Inferred 3/3: Check Redundant Roles";
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
             // activity
             // viewer
             gui.addActionListener(this);
-            guiStr = "Compare Stated & Inferred 3/3: Check Redundant Roles";
             gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(true);
             // COMPARE RESULTS. Sort is performed in the compare routine.

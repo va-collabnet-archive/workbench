@@ -169,4 +169,7 @@ public interface I_HelpSpecRefset extends I_HelpRefsets {
     public boolean hasConceptRefsetExtensionWithAnyPromotionStatus(int refsetId, int conceptId) throws IOException;
 
     public I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension);
+
+    int countMembersOfType(Collection<? extends I_ExtendByRef> allExtensions,
+            I_GetConceptData requiredPromotionStatusConcept) throws Exception;
 }

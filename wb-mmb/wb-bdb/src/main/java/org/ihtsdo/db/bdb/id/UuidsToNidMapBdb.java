@@ -267,7 +267,6 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 		return newNid;
 	}
 
-
 	public int uuidsToNid(UUID[] uuids) {
 		return uuidsToNid(Arrays.asList(uuids));
 	}

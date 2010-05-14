@@ -115,8 +115,12 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
+import org.dwfa.vodb.conflict.EditPathLosesStrategy;
+import org.dwfa.vodb.conflict.EditPathWinsStrategy;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.conflict.LastCommitWinsConflictResolutionStrategy;
+import org.dwfa.vodb.conflict.ViewPathLosesStrategy;
+import org.dwfa.vodb.conflict.ViewPathWinsStrategy;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
@@ -2396,8 +2400,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public void setCommitAbortButtonsVisible(boolean visible) {
-        aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
-
+        if (aceFrame != null && aceFrame.getCdePanel() != null) {
+            aceFrame.getCdePanel().setCommitAbortButtonsVisible(visible);
+        }
     }
 
     public Map<TOGGLES, I_HoldRefsetPreferences> getRefsetPreferencesMap() {
@@ -2588,6 +2593,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (conflictResolutionStrategy == null) {
             conflictResolutionStrategy = new IdentifyAllConflictStrategy();
         }
+        conflictResolutionStrategy.setConfig(this);
         return conflictResolutionStrategy;
     }
 
@@ -2655,9 +2661,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_ManageContradiction[] getAllConflictResolutionStrategies() {
-        I_ManageContradiction[] strategies = new I_ManageContradiction[2];
+        I_ManageContradiction[] strategies = new I_ManageContradiction[6];
         strategies[0] = new IdentifyAllConflictStrategy();
         strategies[1] = new LastCommitWinsConflictResolutionStrategy();
+        strategies[2] = new ViewPathLosesStrategy();
+        strategies[3] = new ViewPathWinsStrategy();
+        strategies[4] = new EditPathLosesStrategy();
+        strategies[5] = new EditPathWinsStrategy();
         return strategies;
     }
 

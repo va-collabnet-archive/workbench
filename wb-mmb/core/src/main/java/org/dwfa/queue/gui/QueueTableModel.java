@@ -62,7 +62,7 @@ public class QueueTableModel extends AbstractTableModel {
         this.queue = queue;
         updateQueueData();
     }
-
+    
     public void updateQueueData() throws RemoteException, IOException {
 
         Collection<I_DescribeBusinessProcess> newData = queue.getProcessMetaData(new SelectAll());

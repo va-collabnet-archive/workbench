@@ -67,7 +67,9 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 
 	@Override
 	public LongRevision makeAnalog(int statusNid, int pathNid, long time) {
-		return new LongRevision(statusNid, pathNid, time, this);
+        LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 

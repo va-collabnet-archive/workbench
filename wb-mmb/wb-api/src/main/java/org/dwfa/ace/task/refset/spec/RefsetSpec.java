@@ -37,15 +37,17 @@ public class RefsetSpec {
 
     private I_GetConceptData spec;
     private I_TermFactory termFactory;
+    private I_ConfigAceFrame config;
 
     /**
      * Use this constructor if you wish to input the refset spec concept.
      * 
      * @param spec
      */
-    public RefsetSpec(I_GetConceptData spec) {
+    public RefsetSpec(I_GetConceptData spec, I_ConfigAceFrame config) {
         this.spec = spec;
         termFactory = Terms.get();
+        this.config = config;
     }
 
     /**
@@ -55,8 +57,10 @@ public class RefsetSpec {
      * @param concept
      * @param memberRefsetInputted
      */
-    public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted) {
+    public RefsetSpec(I_GetConceptData concept, boolean memberRefsetInputted, 
+            I_ConfigAceFrame config) {
         termFactory = Terms.get();
+        this.config = config;
         if (memberRefsetInputted) {
             try {
                 I_GetConceptData specifiesRefsetRel =
@@ -246,10 +250,9 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptId());
 
         if (concept != null) {
-            //TODO should use the version computer
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, 
+            //TODO should use the version computer/handle contradiction better. 
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, 
+                config.getViewPositionSetReadOnly(), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
@@ -279,10 +282,9 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptId());
 
         if (concept != null) {
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            //TODO should use the version computer
-            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, null, 
+            //TODO should use the version computer/handle contradiction differently
+            List<? extends I_RelTuple> relationships = concept.getDestRelTuples(null, allowedTypes, 
+                config.getViewPositionSetReadOnly(), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
@@ -312,11 +314,10 @@ public class RefsetSpec {
         allowedTypes.add(relationshipType.getConceptId());
 
         if (concept != null) {
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, null, 
+            List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, 
+                config.getViewPositionSetReadOnly(), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
-            //TODO should use the version computer
+            //TODO should use the version computer/handle contradiction differently. 
            for (I_RelTuple rel : relationships) {
                 if (rel.getVersion() > latestVersion) {
                     latestVersion = rel.getVersion();

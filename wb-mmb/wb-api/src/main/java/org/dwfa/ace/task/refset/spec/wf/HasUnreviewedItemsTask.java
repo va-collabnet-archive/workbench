@@ -97,7 +97,9 @@ public class HasUnreviewedItemsTask extends AbstractTask {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         UUID promotionRefsetUuid = (UUID) process.getProperty(promotionUuidPropName);
         if (promotionRefsetUuid == null) {
-            RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor());
+            //TODO use other than termFactory.getActiveAceFrameConfig();
+            RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor(), 
+                Terms.get().getActiveAceFrameConfig());
             promotionRefsetUuid = spec.getPromotionRefsetConcept().getUids().iterator().next();
 
         }

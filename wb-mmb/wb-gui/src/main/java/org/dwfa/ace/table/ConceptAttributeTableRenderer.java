@@ -17,6 +17,7 @@
 package org.dwfa.ace.table;
 
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -51,16 +52,23 @@ public class ConceptAttributeTableRenderer extends AceTableRenderer {
             return renderComponent;
         }
         if (swt.getTuple() != null) {
+            boolean hasExtensions = false;
+            try {
+                hasExtensions = swt.tuple.hasExtensions();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
             if (row > 0) {
                 StringWithConceptTuple prevSwt = (StringWithConceptTuple) table.getValueAt(row - 1, column);
                 same = swt.getTuple().getConId() == prevSwt.getTuple().getConId();
-                setBorder(column, this, same, uncommitted);
+                
+                setBorder(column, this, same, uncommitted, hasExtensions);
                 if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                     renderComponent.setText("");
                 }
             } else {
-                setBorder(column, this, false, uncommitted);
+                setBorder(column, this, false, uncommitted, hasExtensions);
             }
         }
         if (isSelected == false) {

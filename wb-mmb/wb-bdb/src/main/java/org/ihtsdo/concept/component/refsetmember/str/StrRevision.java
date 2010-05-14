@@ -72,7 +72,9 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
             this.setStatusId(statusNid);
             return this;
         }
-		return new StrRevision(statusNid, pathNid, time, this);
+        StrRevision newR = new StrRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 

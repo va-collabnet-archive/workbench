@@ -695,8 +695,8 @@ public class RefsetSpecPanel extends JPanel {
                     I_ExtendByRef tupleVersioned = Terms.get().getExtension(tupleMemberId);
                     refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
                     
-                    for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleVersioned.getComponentId())) {
-                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor());
+                    for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
+                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
                         int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
                         if (promotionRefsetId == extForMember.getRefsetId()) {
                             List<? extends I_ExtendByRefVersion> promotionTuples =
@@ -707,7 +707,6 @@ public class RefsetSpecPanel extends JPanel {
                                 I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
                                 if (promotionPart instanceof I_ExtendByRefPartCid) {
                                     for (I_Path p : aceFrameConfig.getEditingPathSet()) {
-
                                         I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
                                         PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
                                         PROMOTION_STATUS newStatus = null;

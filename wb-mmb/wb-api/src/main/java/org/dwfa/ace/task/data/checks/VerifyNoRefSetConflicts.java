@@ -50,7 +50,7 @@ import org.dwfa.util.bean.Spec;
 /**
  * <h1>VerifyNoRefSetConflicts</h1> <br>
  * <p>
- * The <code>VerifyNoRefSetConflicts</code> class checks for conflicts between
+ * The <code>VerifyNoRefSetConflicts</code> class checks for contradictions between
  * concepts in the hierarchy.
  * </P>
  * 

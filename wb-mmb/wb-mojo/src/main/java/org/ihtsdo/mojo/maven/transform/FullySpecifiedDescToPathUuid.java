@@ -20,8 +20,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import org.ihtsdo.mojo.maven.Transform;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.mojo.maven.Transform;
 
 public class FullySpecifiedDescToPathUuid extends AbstractTransform {
 

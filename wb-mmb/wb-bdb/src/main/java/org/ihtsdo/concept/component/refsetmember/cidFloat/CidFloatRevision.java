@@ -9,7 +9,6 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.cidCidStr.CidCidStrRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidFloatRevision;
 
@@ -74,7 +73,13 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 
 	@Override
 	public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
-		return new CidFloatRevision(statusNid, pathNid, time, this);
+        if (this.getTime() == time && this.getPathId() == pathNid) {
+            this.setStatusId(statusNid);
+            return this;
+        }
+        CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 

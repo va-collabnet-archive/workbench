@@ -131,11 +131,10 @@ public class ProcessPopupUtil {
                             break;
                         }
                     }
-                    if (newMenu == null) {
-                        menuBar.add(newMenu);
-                    }
-                    newMenu.addSeparator();
-                } else {
+                    if (newMenu != null) {
+                        newMenu.addSeparator();
+                   }
+                 } else {
                     String menuName = f.getName();
                     String regex = "_";
                     if (menuName.contains(regex)) {
@@ -161,14 +160,18 @@ public class ProcessPopupUtil {
                                 ois.close();
                                 JMenuItem processMenuItem = new JMenuItem(process.getName());
                                 processMenuItem.addActionListener(processMenuListener);
-                                newMenu.add(processMenuItem);
+                                if (newMenu != null) {
+                                    newMenu.add(processMenuItem);
+                                }
                             } catch (IOException e) {
                                 AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "processing: " + processFile, e);
                             } catch (ClassNotFoundException e) {
                                 AceLog.getAppLog().alertAndLog(null, Level.SEVERE, "processing: " + processFile, e);
                             }
                         } else if (processFile.getName().toLowerCase().endsWith("separator")) {
-                            newMenu.addSeparator();
+                            if (newMenu != null) {
+                                newMenu.addSeparator();
+                            }
                         }
                     }
                 }

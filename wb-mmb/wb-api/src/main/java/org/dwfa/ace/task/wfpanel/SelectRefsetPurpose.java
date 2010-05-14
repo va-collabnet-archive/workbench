@@ -20,7 +20,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -32,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -133,8 +133,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 
     /**
      * Handles actions required by the task after normal task completion (such
-     * as moving a
-     * process to another user's input queue).
+     * as moving a process to another user's input queue).
      * 
      * @return void
      * @param process The currently executing Workflow process
@@ -150,10 +149,8 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
     /**
      * Performs the primary action of the task, which in this case is to present
      * a small user interface to the user which allows them to select a purpose
-     * for this
-     * Refset. Once the purpose is selected, the concept associated with this
-     * purpose
-     * is added as a relationship to the current Refset.
+     * for this Refset. Once the purpose is selected, the concept associated with this
+     * purpose is added as a relationship to the current Refset.
      * 
      * @return The exit condition of the task
      * @param process The currently executing Workflow process
@@ -162,7 +159,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
         try {
             // Present the user interface in the Workflow panel
@@ -174,6 +171,32 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
             }
             restore();
 
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process, worker);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        doRun(process, worker);
+                    }
+                });
+            }
+
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (ExecutionException e) {
+            throw new TaskFailedException(e);
+        }
+
+        return returnCondition;
+    }
+
+    public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
+
+        try {
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
 
@@ -202,34 +225,16 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
                 }
 
                 // Add the relationship
-                Terms.get().newRelationship(UUID.randomUUID(), refsetConcept,
-                    Terms.get().getConcept(relType.ids), selectedPurposeConcept,
-                    Terms.get().getConcept(relCharacteristic.ids),
-                    Terms.get().getConcept(relRefinability.ids),
-                    Terms.get().getConcept(relStatus.ids), 0, config);
+                Terms.get().newRelationship(UUID.randomUUID(), refsetConcept, Terms.get().getConcept(relType.ids),
+                    selectedPurposeConcept, Terms.get().getConcept(relCharacteristic.ids),
+                    Terms.get().getConcept(relRefinability.ids), Terms.get().getConcept(relStatus.ids), 0, config);
 
-                Terms.get().addUncommitted(selectedPurposeConcept);
+                Terms.get().addUncommitted(refsetConcept);
             }
-
-        } catch (InterruptedException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (ExecutionException e) {
-            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnCondition = Condition.ITEM_CANCELED;
         }
-
-        return returnCondition;
     }
 
     /**
@@ -247,8 +252,7 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
 
     /**
      * This subclass allows the task to perform GUI-related work in a dedicated
-     * thread
-     * using a SwingWorker.
+     * thread using a SwingWorker.
      * 
      * @author Perry Reid
      * @version 1.0, October 2009
@@ -291,38 +295,19 @@ public class SelectRefsetPurpose extends PreviousNextOrCancel {
             c.gridx++;
             I_GetConceptData purposeList[] = new I_GetConceptData[8];
             try {
-                // Keith's original suggested list of purposes
-                // purposeList[0] =
-                // Terms.get().getConcept(RefsetAuxiliary.Concept.ANNOTATION_PURPOSE.getUids());
-                // purposeList[1] =
-                // Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE.getUids());
-                // purposeList[2] =
-                // Terms.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
-
                 // Fetch purpose concepts... and place them in an array
-                purposeList[0] =
-                        Terms.get().getConcept(RefsetAuxiliary.Concept.SIMPLE_COMPONENT.getUids());
-                purposeList[1] =
-                        Terms.get().getConcept(RefsetAuxiliary.Concept.NAVIGATION.getUids());
+                purposeList[0] = Terms.get().getConcept(RefsetAuxiliary.Concept.SIMPLE_COMPONENT.getUids());
+                purposeList[1] = Terms.get().getConcept(RefsetAuxiliary.Concept.NAVIGATION.getUids());
                 // Missing: Reference set descriptor
-                purposeList[2] =
-                        Terms.get().getConcept(RefsetAuxiliary.Concept.ATTRIBUTE_VALUE.getUids());
+                purposeList[2] = Terms.get().getConcept(RefsetAuxiliary.Concept.ATTRIBUTE_VALUE.getUids());
                 // Missing: Simple Map
-                purposeList[3] =
-                        Terms.get().getConcept(
-                            RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids());
+                purposeList[3] = Terms.get().getConcept(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids());
                 // Missing: Language dialect
-                purposeList[4] =
-                        Terms.get().getConcept(
-                            RefsetAuxiliary.Concept.QUERY_SPECIFICATION.getUids());
-                purposeList[5] =
-                        Terms.get()
-                            .getConcept(RefsetAuxiliary.Concept.ANNOTATION_PURPOSE.getUids());
+                purposeList[4] = Terms.get().getConcept(RefsetAuxiliary.Concept.QUERY_SPECIFICATION.getUids());
+                purposeList[5] = Terms.get().getConcept(RefsetAuxiliary.Concept.ANNOTATION_PURPOSE.getUids());
                 // Missing: Association
-                purposeList[6] =
-                        Terms.get().getConcept(RefsetAuxiliary.Concept.MODULE_DEPENDENCY.getUids());
-                purposeList[7] =
-                        Terms.get().getConcept(RefsetAuxiliary.Concept.DESC_TYPE_IS.getUids());
+                purposeList[6] = Terms.get().getConcept(RefsetAuxiliary.Concept.MODULE_DEPENDENCY.getUids());
+                purposeList[7] = Terms.get().getConcept(RefsetAuxiliary.Concept.DESC_TYPE_IS.getUids());
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {

@@ -27,8 +27,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -367,7 +369,13 @@ public class RequestForChangePanel extends JPanel {
 
     private Set<I_GetConceptData> getValidEditors() {
         I_GetConceptData selectedRefset = getRefset();
-        Set<I_GetConceptData> editors = new HashSet<I_GetConceptData>();
+        Set<I_GetConceptData> editors = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });;
         try {
             if (selectedRefset != null) {
                 for (I_GetConceptData user : allValidUsers) {
@@ -401,7 +409,13 @@ public class RequestForChangePanel extends JPanel {
 
     private Set<Object> getValidReviewers() {
         I_GetConceptData selectedRefset = getRefset();
-        Set<Object> permissibleReviewers = new HashSet<Object>();
+        Set<Object> permissibleReviewers = new TreeSet<Object>(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
         permissibleReviewers.add(noReviewText);
         try {
             if (selectedRefset == null) {

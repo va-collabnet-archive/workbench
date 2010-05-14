@@ -16,17 +16,17 @@
  */
 package org.ihtsdo.mojo.maven.derby;
 
-import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.util.StringInputStream;
-import org.ihtsdo.mojo.maven.RegexReplace;
-import org.dwfa.util.io.FileIO;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
+
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.StringInputStream;
+import org.dwfa.util.io.FileIO;
+import org.ihtsdo.mojo.maven.RegexReplace;
 
 public final class SQLFileTransformationCopierImpl implements SQLFileTransformationCopier {
 

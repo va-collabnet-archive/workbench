@@ -68,7 +68,9 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
             this.setStatusId(statusNid);
             return this;
         }
-		return new CidRevision(statusNid, pathNid, time, this);
+        CidRevision newR = new CidRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
     @Override

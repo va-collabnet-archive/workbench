@@ -9,7 +9,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.cidCidCid.CidCidCidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERefsetCidCidStrRevision;
 
@@ -86,7 +85,9 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
             this.setStatusId(statusNid);
             return this;
         }
-		return new CidCidStrRevision(statusNid, pathNid, time, this);
+        CidCidStrRevision newR = new CidCidStrRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 

@@ -54,6 +54,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.svn.Svn;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
@@ -151,6 +152,10 @@ public class WorkbenchRunner {
 			setupLookAndFeel();
 			setupSwingExpansionTimerLogging();
 			
+			if (System.getProperty("viewer") != null && System.getProperty("viewer").toLowerCase().startsWith("t")) {
+			    ACE.editMode = false;
+			}
+			
 			if (System.getProperty("newprofile") != null) {
                 File dbFolder = new File("berkeley-db");
                 if (jiniConfig != null) {
@@ -212,6 +217,7 @@ public class WorkbenchRunner {
 			File profileDir = new File("profiles");
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
+	            Svn.setConnectedToSvn(true);
 				new SvnHelper(WorkbenchRunner.class, jiniConfig)
 						.initialSubversionOperationsAndChangeSetImport(new File(
 								"config", WB_PROPERTIES));
@@ -315,7 +321,7 @@ public class WorkbenchRunner {
 							AceConfig.config.getChangeSetWriterFileName()),
 					new File(AceConfig.config.getChangeSetRoot(), "."
 							+ AceConfig.config.getChangeSetWriterFileName()),
-							ChangeSetPolicy.MUTABLE_ONLY));
+							ChangeSetPolicy.MUTABLE_ONLY, true));
 			ChangeSetWriterHandler.addWriter(new CommitLog(new File(
 					AceConfig.config.getChangeSetRoot(), "commitLog.xls"),
 					new File(AceConfig.config.getChangeSetRoot(), "."
@@ -473,6 +479,7 @@ public class WorkbenchRunner {
 				}
 			}
 			loginDialog = new AceLoginDialog(parentFrame);
+			loginDialog.setConnectToSvn(initializeFromSubversion);
 			loginDialog.setLocation((d.width / 2)
 					- (loginDialog.getWidth() / 2), (d.height / 2)
 					- (loginDialog.getHeight() / 2));
@@ -526,6 +533,7 @@ public class WorkbenchRunner {
 				// shows the AceLoginDialog
 				userProfile = loginDialog.getUserProfile(lastProfileDir);
 				password = new String(loginDialog.getPassword());
+		        Svn.setConnectedToSvn(loginDialog.connectToSvn());
 
 				wbProperties.setProperty("last-profile-dir", FileIO
 						.getRelativePath(userProfile));

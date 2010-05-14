@@ -21,23 +21,17 @@
 
 package org.ihtsdo.mojo.maven.importer;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
  * Extended class must have a maven goal and phase annotation

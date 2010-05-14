@@ -69,7 +69,10 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
             this.setStatusId(statusNid);
             return this;
         }
-		return new BooleanRevision(statusNid, pathNid, time, this);
+		BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
+	    primordialComponent.addRevision(newR);
+	    return newR;
+
 	}
 
     @Override

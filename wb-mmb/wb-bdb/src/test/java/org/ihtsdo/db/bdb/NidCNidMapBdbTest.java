@@ -24,17 +24,22 @@ public class NidCNidMapBdbTest {
 
 	@Test
 	public void addRetrieveTest() {
+	    int firstDiff = Integer.MAX_VALUE;
 		for (int i = 0; i < TEST_SIZE; i++) {
-			Bdb.getUuidsToNidMap().uuidToNid(UUID.randomUUID());
+			int nid = Bdb.getUuidsToNidMap().uuidToNid(UUID.randomUUID());
+			if (firstDiff == Integer.MAX_VALUE) {
+			    firstDiff = i - nid;
+			}
+			Assert.assertEquals(nid, i - firstDiff);
 			try {
-				Bdb.getNidCNidMap().setCidForNid(i, Integer.MIN_VALUE + i);
+				Bdb.getNidCNidMap().setCidForNid(Integer.MIN_VALUE + i, nid);
 			} catch (IOException e) {
 				Assert.fail(e.getLocalizedMessage());
 			}
 		}
 		for (int i = 0; i < TEST_SIZE; i++) {
-			Assert.assertEquals(i, 
-					Bdb.getNidCNidMap().getCNid(Integer.MIN_VALUE + i));
+			Assert.assertEquals(Integer.MIN_VALUE + i, 
+					Bdb.getNidCNidMap().getCNid(i - firstDiff));
 		}
 		try {
 			Bdb.close();
@@ -45,8 +50,8 @@ public class NidCNidMapBdbTest {
 		}
 		Bdb.setup(dbTarget);
 		for (int i = 0; i < TEST_SIZE; i++) {
-			Assert.assertEquals(i, 
-					Bdb.getNidCNidMap().getCNid(Integer.MIN_VALUE + i));
+			Assert.assertEquals(Integer.MIN_VALUE + i, 
+					Bdb.getNidCNidMap().getCNid(i - firstDiff));
 		}
 	}
 	

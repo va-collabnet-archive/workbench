@@ -154,7 +154,9 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             UUID refsetSpecUuid = (UUID) process.getProperty(refsetSpecUuidPropName);
             I_GetConceptData statusConcept = termFactory.getConcept(statusTermEntry.getIds());
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
-            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
+            //TODO use other than termFactory.getActiveAceFrameConfig();
+
+            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, Terms.get().getActiveAceFrameConfig());
 
             I_GetConceptData memberRefsetConcept = refsetSpec.getMemberRefsetConcept();
             I_GetConceptData markedParentConcept = refsetSpec.getMarkedParentRefsetConcept();

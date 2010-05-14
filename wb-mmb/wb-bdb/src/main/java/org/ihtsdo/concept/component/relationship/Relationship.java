@@ -26,8 +26,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.image.Image;
-import org.ihtsdo.concept.component.image.ImageRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERelationship;
@@ -691,6 +689,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     public int getTypeNid() {
         return typeNid;
+    }
+
+    @Override
+    public boolean hasExtensions() throws IOException {
+        if (getEnclosingConcept().hasRelExtensions()) {
+            return getEnclosingConcept().hasExtensionsForComponent(nid);
+        }
+        return false;
     }
 
 }

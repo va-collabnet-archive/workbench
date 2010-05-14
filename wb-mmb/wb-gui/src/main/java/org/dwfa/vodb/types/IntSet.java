@@ -158,6 +158,7 @@ public class IntSet implements ListDataListener, I_IntSet {
     }
 
     private synchronized void addNoIntervalAdded(int key) {
+        lastContains = new LastContains();
         if (setValues.length == 0) {
             setValues = new int[1];
             setValues[0] = key;
@@ -212,6 +213,7 @@ public class IntSet implements ListDataListener, I_IntSet {
      * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
      */
     public synchronized IntSet addAll(int[] keys) {
+        lastContains = new LastContains();
     	HashSet<Integer> members = getAsSet();
     	for (int key: keys) {
     		members.add(key);
@@ -246,6 +248,7 @@ public class IntSet implements ListDataListener, I_IntSet {
 	}
 
 	public void replaceWithSet(HashSet<Integer> members) {
+        lastContains = new LastContains();
 		setValues = new int[members.size()];
     	int i = 0;
     	for (int elem: members) {
@@ -260,6 +263,7 @@ public class IntSet implements ListDataListener, I_IntSet {
      * @see org.dwfa.ace.api.I_IntSet#clear()
      */
     public void clear() {
+        lastContains = new LastContains();
         setValues = new int[0];
         intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
     }

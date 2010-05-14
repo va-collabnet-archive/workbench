@@ -235,7 +235,7 @@ public class BdbCommitManager {
 		try {
 		    
 		    if (performCreationTests) {
-	            List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+	            Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 	            dataCheckMap.put(concept, warningsAndErrors);
 	            for (I_TestDataConstraints test : creationTests) {
 	                try {
@@ -434,6 +434,8 @@ public class BdbCommitManager {
         } catch (InterruptedException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (ExecutionException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
         fireCommit();
