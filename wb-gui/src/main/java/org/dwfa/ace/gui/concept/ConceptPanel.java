@@ -292,6 +292,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             super();
             this.items = items;
             this.currentSelection = currentSelection;
+            if (currentSelection >= items.length) {
+                this.currentSelection = items.length - 1;
+            }
         }
 
         public Object getNextValue() {

@@ -59,15 +59,15 @@ public class NidCNidMapBdb extends ComponentBdb {
         }
         maxId = (nidCNidMaps.get().length *  NID_CNID_MAP_SIZE) - Integer.MIN_VALUE; 
 		
-		readMaps(readOnly);
-		readMaps(mutable);
+		readMaps(readOnly, true);
+		readMaps(mutable, false);
 		if (AceLog.getAppLog().isLoggable(Level.FINE)) {
 			printKeys("Read only keys: ", readOnly);
 			printKeys("Mutable keys: " , mutable);
 		}
 	}
 
-	private void readMaps(Database db) {
+	private void readMaps(Database db, boolean readOnly) {
 		CursorConfig cursorConfig = new CursorConfig();
 		cursorConfig.setReadUncommitted(true);
 		Cursor cursor = db.openCursor(null, cursorConfig);
@@ -83,11 +83,18 @@ public class NidCNidMapBdb extends ComponentBdb {
 				while (ti.available() > 0) {
 					nidCNidMaps.get()[index][j++] = ti.readInt();
 					if (nidCNidMaps.get()[index][j-1] == Integer.MAX_VALUE) {
-						maxValueEntries.add("[" + index + "][" + (j-1) + "]");
+						maxValueEntries.add("[" + index + "][" + (j-1) + "]: " + ((index * NID_CNID_MAP_SIZE) + (j-1) + Integer.MIN_VALUE));
 					}
 				}
-				if (maxValueEntries.size() > 0 && index < nidCNidMaps.get().length - 1) {
-					System.out.println("max value entries: " + maxValueEntries);
+				if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+	                if (readOnly) {
+	                    AceLog.getAppLog().fine("\n\nmax value entry count for read only index[" + index + "]: " + maxValueEntries.size());
+	                } else {
+	                    AceLog.getAppLog().fine("\n\nmax value entry count for mutable index[" + index + "]: " + maxValueEntries.size());
+	                    if (maxValueEntries.size() > 0 && index < (nidCNidMaps.get().length - 1)) {
+	                       AceLog.getAppLog().fine("\n\n\nmax value entries: " + maxValueEntries);
+	                     }
+	                }
 				}
 			}
 		} finally {
@@ -179,7 +186,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 		int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
 		assert mapIndex >= 0 && indexInMap >= 0: "mapIndex: " + mapIndex + " indexInMap: " + 
 				indexInMap + " nid: " + nid;
-		if (mapIndex > nidCNidMaps.get().length) {
+		if (mapIndex >= nidCNidMaps.get().length) {
 		    return Integer.MAX_VALUE;
 		}
 		return nidCNidMaps.get()[mapIndex][indexInMap];

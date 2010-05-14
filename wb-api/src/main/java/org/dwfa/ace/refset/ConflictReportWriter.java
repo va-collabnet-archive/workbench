@@ -125,10 +125,10 @@ public class ConflictReportWriter implements Runnable {
                 StringBuffer conflictReport = new StringBuffer();
 
                 Conflict conflicts = conflictMap.get(conceptAId);
-                conflictReport.append(" conflicts because of \"" + getConcept(conceptAId) + "\"\n");
+                conflictReport.append(" contradictions because of \"" + getConcept(conceptAId) + "\"\n");
                 for (Integer conceptBId : conflicts.keySet()) {
                     Subject subjectMap = conflicts.get(conceptBId);
-                    conflictReport.append("\t" + subjectMap.size() + " conflicts with \"" + getConcept(conceptBId)
+                    conflictReport.append("\t" + subjectMap.size() + " contradicts  \"" + getConcept(conceptBId)
                         + "\"\n");
                     conflictCount += subjectMap.size();
                     for (Integer subjectId : subjectMap.keySet()) {
@@ -140,7 +140,7 @@ public class ConflictReportWriter implements Runnable {
                             conflictReport.append("\"" + getConcept(subjectId) + "\": ["
                                 + getConcept((Integer) fieldMap.get(FIELD_NAME.INCL_TYPE_A)) + "]:\""
                                 + getConcept(conceptAId));
-                            conflictReport.append("\" conflicts with ["
+                            conflictReport.append("\" contradicts  ["
                                 + getConcept((Integer) fieldMap.get(FIELD_NAME.INCL_TYPE_B)) + "]:\""
                                 + getConcept(conceptBId) + "\"\n");
                         }
@@ -183,7 +183,7 @@ public class ConflictReportWriter implements Runnable {
     }
 
     /**
-     * Maps one concept with another it conflicts with.
+     * Maps one concept with another it  contradicts.
      * The id of the concept is the index for the grouping level in the report.
      */
     private class ConflictMap extends HashMap<Integer, Conflict> {

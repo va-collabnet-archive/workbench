@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.ihtsdo.mojo.maven.Transform;
-import org.dwfa.tapi.I_ConceptualizeUniversally;
 
 public class SnomedCharacteristicTransform extends AbstractTransform implements I_ReadAndTransform {
 

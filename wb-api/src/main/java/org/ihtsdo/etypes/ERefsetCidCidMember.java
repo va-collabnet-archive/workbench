@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -26,7 +27,11 @@ public class ERefsetCidCidMember extends ERefsetMember<ERefsetCidCidRevision> {
     }
 
     public ERefsetCidCidMember(I_ExtendByRef m) throws TerminologyException, IOException {
-        convert(nidToIdentifier(m.getMemberId()));
+        if (I_Identify.class.isAssignableFrom(m.getClass())) {
+            convert((I_Identify) m);
+        } else {
+            convert(nidToIdentifier(m.getMemberId()));
+        }
         int partCount = m.getMutableParts().size();
         refsetUuid = nidToUuid(m.getRefsetId());
         componentUuid = nidToUuid(m.getComponentId());
@@ -51,7 +56,11 @@ public class ERefsetCidCidMember extends ERefsetMember<ERefsetCidCidRevision> {
     }
 
     public ERefsetCidCidMember(I_ExtendByRefVersion m) throws TerminologyException, IOException {
-        convert(nidToIdentifier(m.getMemberId()));
+        if (I_Identify.class.isAssignableFrom(m.getClass())) {
+            convert((I_Identify) m);
+        } else {
+            convert(nidToIdentifier(m.getMemberId()));
+        }
         refsetUuid = nidToUuid(m.getRefsetId());
         componentUuid = nidToUuid(m.getComponentId());
         I_ExtendByRefPartCidCid part = (I_ExtendByRefPartCidCid) m.getMutablePart();

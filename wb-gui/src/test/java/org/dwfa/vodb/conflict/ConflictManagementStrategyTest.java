@@ -52,7 +52,7 @@ import org.junit.Test;
  */
 public class ConflictManagementStrategyTest {
 
-    class TestConflictResolutionStrategy extends ConflictManagementStrategy {
+    class TestConflictResolutionStrategy extends ContradictionManagementStrategy {
 
         private static final long serialVersionUID = 1L;
 

@@ -83,7 +83,10 @@ public class UpdateOverallSpecStatusTask extends AbstractTask {
             UUID refsetUuid = (UUID) process.getProperty(refsetUuidPropName);
             UUID statusUuid = (UUID) process.getProperty(statusUuidPropName);
 
-            RefsetSpec spec = new RefsetSpec(termFactory.getConcept(refsetUuid), true);
+            //TODO use other than termFactory.getActiveAceFrameConfig();
+
+            RefsetSpec spec = new RefsetSpec(termFactory.getConcept(refsetUuid), true, 
+                Terms.get().getActiveAceFrameConfig());
             spec.modifyOverallSpecStatus(termFactory.getConcept(statusUuid));
 
             Terms.get().getActiveAceFrameConfig().refreshRefsetTab();

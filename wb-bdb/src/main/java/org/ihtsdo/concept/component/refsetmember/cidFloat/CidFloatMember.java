@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidCidStr.CidCidStrRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
@@ -84,7 +82,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
     }
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+	public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
         if (getTime() == time && getPathId() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -96,8 +94,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
     @Override
     public CidFloatRevision makeAnalog() {
-        CidFloatRevision newR = new CidFloatRevision(getStatusId(), getPathId(), getTime(), this);
-        return newR;
+        return new CidFloatRevision(getStatusId(), getPathId(), getTime(), this);
     }
 
 	public int getC1Nid() {

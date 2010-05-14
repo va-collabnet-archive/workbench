@@ -109,7 +109,13 @@ public interface I_ManageConceptData {
 
 	public ConceptComponent<?, ?> getComponent(int nid) throws IOException;
 
-	public List<RefsetMember<?, ?>> getExtensionsForComponent(int nid) throws IOException;
+    public List<RefsetMember<?, ?>> getExtensionsForComponent(int nid) throws IOException;
+    public boolean hasExtensionsForComponent(int nid) throws IOException;
+    public boolean hasMediaExtensions() throws IOException;
+    public boolean hasAttributeExtensions() throws IOException;
+    public boolean hasDescriptionExtensions() throws IOException;
+    public boolean hasRelExtensions() throws IOException;
+    public boolean hasExtensionExtensions() throws IOException;
 
 	public Set<Integer> getDescNidsReadOnly() throws IOException;
 

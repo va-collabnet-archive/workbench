@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -42,6 +43,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.time.TimeUtil;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/promote", type = BeanType.TASK_BEAN) })
 public class PromoteRefset extends AbstractTask {
@@ -145,11 +147,35 @@ public class PromoteRefset extends AbstractTask {
 
     private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, PathSetReadOnly promotionPaths,
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Promoting refset: " + refsetIdentity.toString());
+        activity.setIndeterminate(true);
+        long start = System.currentTimeMillis();
+        Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetIdentity.getConceptId());
+        int completedCount = 1;
+        int size = extensions.size();
+        activity.setValue(completedCount);
+        activity.setMaximum(extensions.size());
+        activity.setIndeterminate(false);
         refsetIdentity.promote(viewPosition, promotionPaths, null, config.getPrecedence());
-        tf.addUncommittedNoChecks(refsetIdentity);
-        for (I_ExtendByRef ext : tf.getRefsetExtensionMembers(refsetIdentity.getConceptId())) {
+        for (I_ExtendByRef ext : extensions) {
             ext.promote(viewPosition, new PathSetReadOnly(promotionPaths), null, config.getPrecedence());
+            if (completedCount % 50 == 0) {
+                activity.setValue(completedCount);
+                long endTime = System.currentTimeMillis();
+                long elapsed = endTime - start;
+                String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+                String remainingStr = TimeUtil.getRemainingTimeString(completedCount, size, elapsed);
+                activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + ".");
+            }
+            completedCount++;
         }
+        tf.addUncommittedNoChecks(refsetIdentity);
+        activity.setValue(size);
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - start;
+        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr);
+        activity.complete();
     }
 
     /**

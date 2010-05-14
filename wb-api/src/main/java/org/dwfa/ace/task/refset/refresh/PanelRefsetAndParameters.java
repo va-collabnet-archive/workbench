@@ -27,8 +27,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -357,8 +359,16 @@ public class PanelRefsetAndParameters extends JPanel {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_GetConceptData userParent =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-            I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
-            return userParent.getDestRelOrigins(allowedTypes);
+            I_IntSet allowedTypes = config.getDestRelTypes();
+            Set<I_GetConceptData> users = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            users.addAll(userParent.getDestRelOrigins(allowedTypes));
+            return users;
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             return getAllUsers();
@@ -368,7 +378,13 @@ public class PanelRefsetAndParameters extends JPanel {
     private Set<? extends I_GetConceptData> getValidEditors() {
         try {
             I_GetConceptData selectedRefset = getRefset();
-            Set<I_GetConceptData> validEditors = new HashSet<I_GetConceptData>();
+            Set<I_GetConceptData> validEditors = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
             if (selectedRefset != null) {
                 for (I_GetConceptData user : getAllUsers()) {
                     if (hasEditorPermission(user, selectedRefset)) {
@@ -385,7 +401,13 @@ public class PanelRefsetAndParameters extends JPanel {
 
     private Set<Object> getValidReviewers() {
         I_GetConceptData selectedRefset = getRefset();
-        Set<Object> permissibleReviewers = new HashSet<Object>();
+        Set<Object> permissibleReviewers = new TreeSet<Object>(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
         permissibleReviewers.add(noReviewText);
         try {
             if (selectedRefset == null) {

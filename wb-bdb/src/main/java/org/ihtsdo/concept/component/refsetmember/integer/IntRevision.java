@@ -71,7 +71,9 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
             this.setStatusId(statusNid);
             return this;
         }
-		return new IntRevision(statusNid, pathNid, time, this);
+        IntRevision newR = new IntRevision(statusNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
 	}
 
 

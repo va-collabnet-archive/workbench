@@ -9,13 +9,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
@@ -43,7 +43,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private AtomicInteger retiredMembers = new AtomicInteger();
     private boolean canceled = false;
     private boolean informed = false;
-    private ActivityPanel activity;
+    private I_ShowActivity activity;
     private long startTime = System.currentTimeMillis();
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
@@ -55,11 +55,13 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         super();
         this.possibleCNids = possibleIds;
         this.frameConfig = frameConfig;
-        conceptCount = Bdb.getConceptDb().getCount();
+        this.refsetNid = refsetNid;
+        this.refsetConcept = Bdb.getConcept(refsetNid);
+        conceptCount = possibleIds.cardinality();
 
-        activity = new ActivityPanel(true, null, null);
+        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString());
         activity.setIndeterminate(true);
-        activity.setProgressInfoUpper("Computing refset");
+        activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
         activity.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -67,9 +69,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             }
         });
         ActivityViewer.addActivity(activity);
-
-        this.refsetNid = refsetNid;
-        this.refsetConcept = Bdb.getConcept(refsetNid);
 
         this.query = query;
         allRefsetMembers = Terms.get().getRefsetExtensionMembers(refsetNid);
@@ -88,9 +87,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         activity.setProgressInfoLower("Starting computation...");
         activity.setValue(0);
-        activity.setMaximum(conceptCount);
+        activity.setMaximum(possibleIds.cardinality());
         activity.setIndeterminate(false);
-        specHelper = new RefsetSpec(refsetConcept, true);
+        specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
 
     }
 
@@ -115,33 +114,33 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             return;
         }
 
-
         if (possibleCNids.isMember(cNid)) {
             Concept concept = fcfc.fetch();
             if (specHelper.isDescriptionComputeType()) {
                 List<? extends I_DescriptionTuple> descriptionTuples =
-                        concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), 
-                        frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                        concept.getDescriptionTuples(null, null, frameConfig.getViewPositionSetReadOnly(), frameConfig
+                            .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                    executeComponent(descVersioned, cNid, descVersioned.getDescId());
+                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig);
                 }
             } else if (specHelper.isConceptComputeType()) {
-                executeComponent(concept, cNid, cNid);
+                executeComponent(concept, cNid, cNid, frameConfig);
             }
         }
     }
 
-    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid) throws Exception {
+    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid, I_ConfigAceFrame config)
+            throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component)) {
+            if (query.execute(component, config)) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();
-                    memberRefsetHelper.newRefsetExtension(refsetNid, componentNid,
-                        ReferenceConcepts.NORMAL_MEMBER.getNid(), false);
+                    memberRefsetHelper.newRefsetExtension(refsetNid, componentNid, ReferenceConcepts.NORMAL_MEMBER
+                        .getNid(), false);
                     memberRefsetHelper.addMarkedParents(new Integer[] { conceptNid });
                 }
             } else {
@@ -153,7 +152,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 }
             }
             int completed = processedCount.incrementAndGet();
-            if (completed % 5000 == 0) {
+            if (completed % 500 == 0) {
                 activity.setValue(completed);
                 if (!canceled) {
                     long endTime = System.currentTimeMillis();
@@ -164,7 +163,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                     String remainingStr = TimeUtil.getRemainingTimeString(completed, conceptCount, elapsed);
 
                     activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
-                        + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: " + retiredMembers.get());
+                        + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
+                        + retiredMembers.get());
                 }
             }
         }

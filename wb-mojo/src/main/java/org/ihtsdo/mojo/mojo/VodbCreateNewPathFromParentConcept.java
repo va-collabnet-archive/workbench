@@ -31,8 +31,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
  *This goal will add all the given concept as path.

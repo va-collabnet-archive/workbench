@@ -32,6 +32,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.TerminologyRuntimeException;
 import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.ihtsdo.mojo.maven.transform.CaseSensitivityToUuidTransform;
 import org.ihtsdo.mojo.maven.transform.UuidToSctConIdWithGeneration;
@@ -46,8 +48,6 @@ import org.ihtsdo.mojo.mojo.file.Rf2ConceptWriter.Rf2ConceptRow;
 import org.ihtsdo.mojo.mojo.file.Rf2DescriptionWriter.Rf2DescriptionRow;
 import org.ihtsdo.mojo.mojo.file.Rf2IdentifierWriter.Rf2IdentifierRow;
 import org.ihtsdo.mojo.mojo.file.Rf2RelationshipWriter.Rf2RelationshipRow;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.tapi.TerminologyRuntimeException;
 
 /**
  * @goal transformAce2Rf2

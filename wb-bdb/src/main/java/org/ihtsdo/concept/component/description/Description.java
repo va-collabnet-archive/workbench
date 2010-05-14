@@ -582,4 +582,12 @@ public class Description
 		versions = null;
 	}
 
+    @Override
+    public boolean hasExtensions() throws IOException {
+        if (getEnclosingConcept().hasDescriptionExtensions()) {
+            return getEnclosingConcept().hasExtensionsForComponent(nid);
+        }
+        return false;
+    }
+
 }

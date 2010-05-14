@@ -839,7 +839,7 @@ public class DLPanel extends JPanel {
                 renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
             }
 
-            setBorder(column, this, false, false); // .., same, uncommitted
+            setBorder(column, this, false, false, false); // .., same, uncommitted
             // if (renderInactive)
             // renderComponent.setBackground(Color.LIGHT_GRAY);
 
@@ -914,7 +914,7 @@ public class DLPanel extends JPanel {
                 }
             }
 
-            setBorder(column, this, false, false); // .., same, uncommitted
+            setBorder(column, this, false, false, false); // .., same, uncommitted
             // if (renderInactive)
             // renderComponent.setBackground(Color.LIGHT_GRAY);
 

@@ -9,17 +9,21 @@
 	<artifactId>wb-bdb</artifactId>
 	<packaging>jar</packaging>
 	<name>Workbench Berkeley Database</name>
-	<url>http://maven.apache.org</url>
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-bdb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-dbd</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-bdb/?root=workbench&amp;system=exsy1002</url>
+    </scm>
 	<dependencies>
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>4.0.103</version>
+		</dependency>
 		<dependency>
 			<groupId>colt</groupId>
 			<artifactId>colt</artifactId>
 			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sleepycat</groupId>
-			<artifactId>je</artifactId>
-			<version>4.0.92</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>

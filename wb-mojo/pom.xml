@@ -10,13 +10,11 @@
 	<packaging>maven-plugin</packaging>
 	<name>Workbench Mojo</name>
 	<description>Workbench Maven Java Objects (mojo)</description>
-	<!--
-		<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace/trunk/dev/pbl-mojo/</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/ace/trunk/dev/pbl-mojo/</developerConnection>
-		<url>https://csfe.aceworkspace.net/integration/viewcvs/viewcvs.cgi/trunk/dev/pbl-mojo/?root=ace&amp;system=exsy1002</url>
-		</scm>
-	-->
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mojo</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-mojo/?root=workbench&amp;system=exsy1002</url>
+    </scm>
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
 	</properties>

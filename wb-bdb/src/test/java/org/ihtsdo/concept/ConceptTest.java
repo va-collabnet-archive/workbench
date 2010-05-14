@@ -25,6 +25,7 @@ import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 public class ConceptTest {
 
@@ -84,6 +85,7 @@ public class ConceptTest {
 	}
 
     @Test
+    @Ignore
     public void testEqualsObject() throws IOException {
         // The contract of the equals method in Object 
         // specifies that equals must implement an equivalence 

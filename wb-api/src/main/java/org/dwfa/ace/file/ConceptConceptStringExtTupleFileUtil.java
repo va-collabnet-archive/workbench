@@ -128,29 +128,24 @@ public class ConceptConceptStringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                String errorMessage =
-                        "CidCidStr: Refset UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidCidStr: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                String errorMessage =
-                        "CidCidStr: Component UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidCidStr: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c1Uuid)) {
-                String errorMessage =
-                        "CidCidStr: c1Uuid UUID has no identifier - skipping import of this concept-concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidCidStr: c1Uuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c2Uuid)) {
-                String errorMessage =
-                        "CidCidStr: c2Uuid has no identifier - skipping import of this concept-concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidCidStr: c2Uuid matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                String errorMessage =
-                        "CidCidStr: statusUuid has no identifier - skipping import of this concept-concept-string ext tuple.";
-                throw new Exception(errorMessage);
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "CidCidStr: statusUuid matches no identifier in database.");
             }
 
             try {

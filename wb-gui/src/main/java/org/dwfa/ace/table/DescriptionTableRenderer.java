@@ -18,6 +18,7 @@ package org.dwfa.ace.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -76,6 +77,12 @@ public class DescriptionTableRenderer extends AceTableRenderer {
                 return renderComponent;
             }
             if (swt.getTuple() != null) {
+                boolean hasExtensions = false;
+                try {
+                    hasExtensions = swt.tuple.hasExtensions();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
                 if (renderInactive) {
                     boolean active = frameConfig.getAllowedStatus().contains(swt.getTuple().getStatusId());
@@ -87,14 +94,14 @@ public class DescriptionTableRenderer extends AceTableRenderer {
                     StringWithDescTuple prevSwt = (StringWithDescTuple) table.getValueAt(row - 1, column);
                     same = swt.getTuple().getDescId() == prevSwt.getTuple().getDescId();
                     if (renderInactive == false) {
-                        setBorder(column, this, same, uncommitted);
+                        setBorder(column, this, same, uncommitted, hasExtensions);
                     }
                     if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                         renderComponent.setText("");
                     }
                 } else {
                     if (renderInactive == false) {
-                        setBorder(column, this, false, uncommitted);
+                        setBorder(column, this, false, uncommitted, hasExtensions);
                     }
                 }
             }

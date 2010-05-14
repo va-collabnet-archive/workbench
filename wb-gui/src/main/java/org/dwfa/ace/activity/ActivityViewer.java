@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +29,13 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -38,6 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.Timer;
 
 import net.jini.config.ConfigurationException;
 
@@ -57,6 +64,11 @@ public class ActivityViewer {
     private static ActivityViewer viewer;
 
     private static class CompleteListener implements I_ShowActivity {
+
+        @Override
+        public void removeActivityFromViewer() {
+            viewer.activitiesList.remove(this);
+        }
 
         public void addActionListener(ActionListener l) {
         }
@@ -157,6 +169,18 @@ public class ActivityViewer {
             return false;
         }
 
+        @Override
+        public void update() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
     }
 
     private class ActivityViewerFrame extends ComponentFrame {
@@ -176,6 +200,7 @@ public class ActivityViewer {
 
         }
 
+        
         @Override
         public int getCount() {
             // TODO Auto-generated method stub
@@ -199,22 +224,26 @@ public class ActivityViewer {
         }
 
         public void addInternalFrames(JMenu menu) {
-            // TODO Auto-generated method stub
-
+            // nothing to do...
         }
 
     }
 
-    ComponentFrame viewerFrame;
+    private ComponentFrame viewerFrame;
 
-    JPanel activitiesPanel = new JPanel(new GridBagLayout());
+    private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
+    private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
 
-    List<I_ShowActivity> activitiesList = new ArrayList<I_ShowActivity>();
-
-    static CompleteListener completeListener = new CompleteListener();
+    private static CompleteListener completeListener = new CompleteListener();
+    
+    private static Timer updateTimer = new Timer(2000, null);
+    static {
+        updateTimer.start();
+    }
 
     private ActivityViewer() throws Exception {
         super();
+        viewer = this;
         if (DwfaEnv.isHeadless() == false) {
             viewerFrame = new ActivityViewerFrame();
             JScrollPane scroller = new JScrollPane();
@@ -224,24 +253,29 @@ public class ActivityViewer {
             viewerFrame.setSize(600, 400);
             viewerFrame.setVisible(true);
 
-            JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.gridheight = 1;
-            gbc.weightx = 1.0;
-            gbc.weighty = 0;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            activitiesAndFillerPanel.add(activitiesPanel, gbc);
-
-            gbc.gridy++;
-            gbc.weighty = 1;
-            gbc.fill = GridBagConstraints.BOTH;
-            activitiesAndFillerPanel.add(new JPanel(), gbc);
-            scroller.setViewportView(activitiesAndFillerPanel);
+            setupActivitesPanel(new JPanel());
         }
 
+    }
+
+    private static void setupActivitesPanel(JPanel activitiesPanel) {
+        JPanel activitiesAndFillerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        activitiesAndFillerPanel.add(activitiesPanel, gbc);
+
+        gbc.gridy++;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        activitiesAndFillerPanel.add(new JPanel(), gbc);
+        viewer.viewerFrame.setContentPane(new JPanel());
+        viewer.viewerFrame.setContentPane(new JScrollPane(activitiesAndFillerPanel));
     }
 
     private static ActivityComparator activityComparator = new ActivityComparator();
@@ -291,6 +325,7 @@ public class ActivityViewer {
 
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {
+           
             activity.addShowActivityListener(completeListener);
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -304,37 +339,51 @@ public class ActivityViewer {
                             }
                         }
                         viewer.activitiesList.add(0, activity);
-                        Collections.sort(viewer.activitiesList, activityComparator);
+                        if (!viewer.activitiesSet.contains(activity)) {
+                            viewer.updateTimer.addActionListener(activity);
+                        }
+                        
+                        List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+                        Collections.sort(listToSort, activityComparator);
+                        viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
                         synchronized (viewer.activitiesList) {
                             while (viewer.activitiesList.size() > 40) {
                                 viewer.activitiesList.remove(40);
                             }
                         }
-                        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                        viewer.activitiesPanel.removeAll();
-                        GridBagConstraints gbc = new GridBagConstraints();
-                        gbc.gridx = 0;
-                        gbc.gridy = 0;
-                        gbc.weightx = 1;
-                        gbc.weighty = 0;
-                        gbc.fill = GridBagConstraints.HORIZONTAL;
-                        gbc.anchor = GridBagConstraints.NORTHWEST;
-                        gbc.gridwidth = 1;
-                        gbc.gridheight = 1;
-                        linkToSourceFrameActivityPanel();
-                        for (I_ShowActivity a : viewer.activitiesList) {
-                            viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                            gbc.gridy++;
-                            addSecondaryActivityPanel(secondaryPanels, a);
-                        }
+                        updateActivities();
                         tickleSize();
                     } catch (HeadlessException e) {
                         AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
                     }
                 }
 
+ 
             });
         }
+    }
+
+    private static void updateActivities() {
+        JPanel newPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        linkToSourceFrameActivityPanel();
+        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
+        for (I_ShowActivity a : viewer.activitiesList) {
+            JPanel p = a.getViewPanel();
+
+            newPanel.add(p, gbc);
+            gbc.gridy++;
+            addSecondaryActivityPanel(secondaryPanels, a);
+        }
+        setupActivitesPanel(newPanel);
     }
 
     private static void linkToSourceFrameActivityPanel() {
@@ -367,66 +416,56 @@ public class ActivityViewer {
         }
     }
 
+    private static class ActivitySorter extends SwingWorker<Boolean, Object> {
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            ArrayList<I_ShowActivity> origOrder = null;
+            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            Collections.sort(listToSort, activityComparator);
+            if (origOrder.equals(listToSort)) {
+                return false;
+            }
+            viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
+            return true;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                boolean changed = get();
+                if (changed) {
+                    updateActivities();
+                    tickleSize();
+                }
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (ExecutionException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
+        
+    }
     public static void reSort() {
         if (DwfaEnv.isHeadless() == false) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                // TODO turn this into a future task... So sorting does not
-                // occur on event loop...
-                public void run() {
-                    try {
-                        ArrayList<I_ShowActivity> origOrder = null;
-                        synchronized (viewer.activitiesList) {
-                            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
-                        }
-                        Collections.sort(viewer.activitiesList, activityComparator);
-                        if (origOrder.equals(viewer.activitiesList) == false) {
-                            viewer.activitiesPanel.removeAll();
-                            Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
-                            GridBagConstraints gbc = new GridBagConstraints();
-                            gbc.gridx = 0;
-                            gbc.gridy = 0;
-                            gbc.weightx = 1;
-                            gbc.weighty = 0;
-                            gbc.fill = GridBagConstraints.HORIZONTAL;
-                            gbc.anchor = GridBagConstraints.NORTHWEST;
-                            gbc.gridwidth = 1;
-                            gbc.gridheight = 1;
-                            linkToSourceFrameActivityPanel();
-                            for (I_ShowActivity a : viewer.activitiesList) {
-                                viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                                gbc.gridy++;
-                                addSecondaryActivityPanel(secondaryPanels, a);
-                            }
-                            tickleSize();
-                        }
-                    } catch (HeadlessException e) {
-                        AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-                    }
-                }
-
-            });
-        }
+            new ActivitySorter().execute();
+         }
     }
 
-    private static void addSecondaryActivityPanel(final Set<I_ShowActivity> secondaryPanels, final I_ShowActivity a) {
+    private static void addSecondaryActivityPanel(Set<I_ShowActivity> secondaryPanels, I_ShowActivity a) {
         if (DwfaEnv.isHeadless() == false) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
-                        secondaryPanels.add(a.getSecondaryPanel());
-                        for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
-                            a.getSecondaryPanel().getViewPanel().remove(c);
-                        }
-                        if (a.isComplete() == false) {
-                            ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
-                            a.addShowActivityListener(secondaryAP);
-                            a.getSecondaryPanel().getViewPanel().add(secondaryAP);
-                        }
-                    }
+            if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
+                secondaryPanels.add(a.getSecondaryPanel());
+                for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
+                    a.getSecondaryPanel().getViewPanel().remove(c);
                 }
-            });
+                if (a.isComplete() == false) {
+                    ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
+                    a.addShowActivityListener(secondaryAP);
+                    a.getSecondaryPanel().getViewPanel().add(secondaryAP);
+                }
+            }
         }
     }
 
@@ -435,21 +474,10 @@ public class ActivityViewer {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
+                    updateTimer.removeActionListener(activity);
                     viewer.activitiesList.remove(activity);
-                    viewer.activitiesPanel.removeAll();
-                    GridBagConstraints gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 0;
-                    gbc.weightx = 1;
-                    gbc.weighty = 0;
-                    gbc.fill = GridBagConstraints.HORIZONTAL;
-                    gbc.anchor = GridBagConstraints.NORTHWEST;
-                    gbc.gridwidth = 1;
-                    gbc.gridheight = 1;
-                    for (I_ShowActivity a : viewer.activitiesList) {
-                        viewer.activitiesPanel.add(a.getViewPanel(), gbc);
-                        gbc.gridy++;
-                    }
+                    viewer.activitiesSet.remove(activity);
+                    updateActivities();
                     tickleSize();
                 }
             });
@@ -465,14 +493,17 @@ public class ActivityViewer {
 
     public static void toFront() {
         if (SwingUtilities.isEventDispatchThread()) {
-            viewer.viewerFrame.toFront();
+            if (viewer != null) {
+                viewer.viewerFrame.toFront();
+            }
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 
                 @Override
                 public void run() {
-                    viewer.viewerFrame.toFront();
-                    
+                    if (viewer != null) {
+                        viewer.viewerFrame.toFront();
+                    }
                 }
             });
         }
@@ -483,12 +514,18 @@ public class ActivityViewer {
              viewer.viewerFrame.toBack();
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                
-                @Override
+                 @Override
                 public void run() {
                     viewer.viewerFrame.toBack();
                 }
             });
         }
+    }
+
+    public static JFrame getActivityFrame() {
+        if (viewer == null) {
+            return null;
+        }
+        return viewer.viewerFrame;
     }
 }

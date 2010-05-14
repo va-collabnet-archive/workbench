@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -88,8 +87,7 @@ public class HasDisapprovedItemsTask extends AbstractTask {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new TaskFailedException(e.getMessage());
+            throw new TaskFailedException(e);
         }
     }
 
@@ -97,7 +95,9 @@ public class HasDisapprovedItemsTask extends AbstractTask {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         UUID promotionRefsetUuid = (UUID) process.getProperty(promotionUuidPropName);
         if (promotionRefsetUuid == null) {
-            RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor());
+            //TODO use other than termFactory.getActiveAceFrameConfig();
+            RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor(), 
+                Terms.get().getActiveAceFrameConfig());
             promotionRefsetUuid = spec.getPromotionRefsetConcept().getUids().iterator().next();
 
         }
@@ -107,17 +107,13 @@ public class HasDisapprovedItemsTask extends AbstractTask {
         I_GetConceptData disapprovedDeletionStatus =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
-        List<I_GetConceptData> disapprovedAdditions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), disapprovedAdditionStatus);
-        List<I_GetConceptData> disapprovedDeletions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), disapprovedDeletionStatus);
-
-        if (disapprovedAdditions.size() > 0) {
+        if (refsetHelper.countMembersOfType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
+            .getConceptId()), disapprovedAdditionStatus) > 0) {
             return true;
         }
-        if (disapprovedDeletions.size() > 0) {
+        
+        if (refsetHelper.countMembersOfType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
+            .getConceptId()), disapprovedDeletionStatus) > 0) {
             return true;
         }
 

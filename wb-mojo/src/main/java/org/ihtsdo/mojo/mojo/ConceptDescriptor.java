@@ -1,3 +1,5 @@
+package org.ihtsdo.mojo.mojo;
+
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
@@ -14,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.mojo.mojo;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+
 
 public class ConceptDescriptor {
 

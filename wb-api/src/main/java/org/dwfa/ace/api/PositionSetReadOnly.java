@@ -23,12 +23,20 @@ import java.util.Set;
 
 public class PositionSetReadOnly  implements Set<I_Position> {
 	I_Position[] positions = new I_Position[0];
-
+    I_IntSet pathNids = Terms.get().newIntSet();
+    
+    public I_IntSet getViewPathNidSet() {
+        return pathNids;
+    }
+ 
 	public PositionSetReadOnly(Set<I_Position> positionSet) {
 		super();
 		if (positionSet != null) {
 			this.positions = positionSet.toArray(this.positions);
 		}
+        for (I_Position p: positionSet) {
+            pathNids.add(p.getPath().getConceptId());
+        }
 	}
 
 	public PositionSetReadOnly(I_Position viewPosition) {

@@ -113,7 +113,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
         delimiter = "\t";
         try {
-            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig());
+            activityPanel = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(),
+                "Exporting refset spec...");
             I_ConfigAceFrame configFrame =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
@@ -163,7 +164,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec);
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config);
         I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         BufferedWriter exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
 

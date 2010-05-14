@@ -25,9 +25,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -117,11 +119,24 @@ public class NewRefsetSpecForm2 extends JPanel {
         String parentString = form1.getSelectedParent();
 
         if (parentString == null) {
-            editors = validUserMap.keySet();
-            reviewers = validUserMap.keySet();
+            editors = new TreeSet<String>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            editors.addAll(validUserMap.keySet());
         } else {
             editors = getPermissibleEditors(parentString);
-            reviewers = getPermissibleReviewers(parentString);
+            reviewers = new TreeSet<String>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            reviewers.addAll(validUserMap.keySet());
         }
 
         int editorIndex = -1;
@@ -151,7 +166,13 @@ public class NewRefsetSpecForm2 extends JPanel {
             if (refset == null) {
                 return validUserMap.keySet();
             }
-            Set<String> permissibleEditors = new HashSet<String>();
+            Set<String> permissibleEditors = new TreeSet<String>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
 
             for (String key : validUserMap.keySet()) {
                 I_GetConceptData concept = validUserMap.get(key);
@@ -174,7 +195,15 @@ public class NewRefsetSpecForm2 extends JPanel {
     private Set<String> getPermissibleReviewers(String refsetString) {
         try {
             // TODO implement after review data check is created
-            return validUserMap.keySet();
+            Set<String> reviewer = new TreeSet<String>(new Comparator<Object>() {
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+            reviewer.addAll(validUserMap.keySet());
+            return reviewer;
         } catch (Exception e) {
             e.printStackTrace();
             return validUserMap.keySet();

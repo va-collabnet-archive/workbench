@@ -7,6 +7,7 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EDescriptionRevision;
@@ -19,8 +20,6 @@ public class DescriptionRevision
 	implements I_DescriptionPart {
 	
 	private static Charset utf8 = Charset.forName("UTF-8");
-	
-	private transient Description description;
 	
 	private String text;
 	private boolean initialCaseSignificant;
@@ -35,11 +34,10 @@ public class DescriptionRevision
         StringBuffer buf = new StringBuffer();
         
         buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" utf8:" + DescriptionRevision.utf8);
-        buf.append(" description:" + this.description);
         buf.append(" text:" + "'" + this.getText() + "'");
         buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
-        buf.append(" typeNid:" + this.getTypeId());
+        buf.append(" typeNid:");
+        ConceptComponent.addNidToBuffer(buf, typeNid);
         buf.append(" lang:" + this.getLang());
         buf.append(super.toString());
         return buf.toString();

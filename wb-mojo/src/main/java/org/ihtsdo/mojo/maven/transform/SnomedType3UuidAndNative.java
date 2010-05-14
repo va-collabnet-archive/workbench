@@ -19,9 +19,9 @@ package org.ihtsdo.mojo.maven.transform;
 import java.util.Map;
 import java.util.UUID;
 
+import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.mojo.maven.I_ReadAndTransform;
 import org.ihtsdo.mojo.maven.Transform;
-import org.dwfa.util.id.Type3UuidFactory;
 
 public class SnomedType3UuidAndNative extends AbstractTransform implements I_ReadAndTransform {
 

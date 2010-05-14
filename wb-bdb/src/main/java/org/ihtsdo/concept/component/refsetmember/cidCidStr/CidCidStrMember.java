@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -15,7 +14,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidCidCid.CidCidCidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidCidStrMember;
@@ -206,7 +204,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
     }
 
 	@Override
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+	public CidCidStrRevision makeAnalog(int statusNid, int pathNid, long time) {
         if (getTime() == time && getPathId() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
@@ -217,8 +215,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
     @Override
     public CidCidStrRevision makeAnalog() {
-        CidCidStrRevision newR = new CidCidStrRevision(getStatusId(), getPathId(), getTime(), this);
-        return newR;
+        return new CidCidStrRevision(getStatusId(), getPathId(), getTime(), this);
     }
 
 	public int getC1Nid() {

@@ -17,6 +17,7 @@
 package org.dwfa.ace.table;
 
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -44,6 +45,12 @@ public class RelationshipTableRenderer extends AceTableRenderer {
             return renderComponent;
         }
         boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
+        boolean hasExtensions = false;
+        try {
+            hasExtensions = swt.tuple.hasExtensions();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if (row > 0) {
             StringWithRelTuple prevSwt = (StringWithRelTuple) table.getValueAt(row - 1, column);
@@ -52,12 +59,12 @@ public class RelationshipTableRenderer extends AceTableRenderer {
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-            setBorder(column, this, same, uncommitted);
+            setBorder(column, this, same, uncommitted, hasExtensions);
             if ((same) && (swt.getCellText().equals(prevSwt.getCellText()))) {
                 renderComponent.setText("");
             }
         } else {
-            setBorder(column, this, false, uncommitted);
+            setBorder(column, this, false, uncommitted, hasExtensions);
         }
 
         if (isSelected == false) {

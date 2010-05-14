@@ -98,7 +98,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
         I_ShowActivity activityPanel = null;
         try {
             activityPanel = Terms.get().newActivityPanel(true,
-                Terms.get().getActiveAceFrameConfig());
+                Terms.get().getActiveAceFrameConfig(), "Importing refset spec from file...");
             String importFileName = (String) process.getProperty(inputFilePropName);
             String outputFileName = (String) process.getProperty(outputFilePropName);
             Object pathObj = process.getProperty(pathUuidPropName);
@@ -121,7 +121,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
             }
 
             activityPanel.setIndeterminate(true);
-            activityPanel.setProgressInfoUpper("Importing refset spec from file : " + importFileName);
+            activityPanel.setProgressInfoUpper("Importing refset spec from file: " + importFileName);
             activityPanel.setProgressInfoLower("<html><font color='black'> In progress.");
 
             TupleFileUtil tupleImporter = new TupleFileUtil();

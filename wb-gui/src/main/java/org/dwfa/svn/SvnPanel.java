@@ -328,31 +328,32 @@ public class SvnPanel extends JPanel {
         this.add(clear, c);
         c.gridy = 5;
         c.gridx = 0;
-        c.gridwidth = 9;
-        c.gridheight = 10;
-        c.weighty = 1;
+        c.weighty = 0;
         c.weightx = 0;
-        c.fill = GridBagConstraints.BOTH;
 
         // check box for whether or not to SVN
         svnConnectCheckBox = new JCheckBox();
-        svnConnectCheckBox.setSelected(true);
+        svnConnectCheckBox.setSelected(Svn.isConnectedToSvn());
         svnConnectCheckBox.setText("Connect to subversion");
         svnConnectCheckBox.addActionListener(new SvnConnectCheckBoxListener());
         c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = 5;
         c.gridx = 0;
         c.gridy++;
         this.add(svnConnectCheckBox, c);
 
+        c.gridwidth = 9;
+        c.gridheight = 10;
+        c.fill = GridBagConstraints.BOTH;
+        c.weighty = 1;
         JEditorPane logOut = new JEditorPane("text/html", "<html>");
         HtmlHandler logHandler = new HtmlHandler(logOut, "svn");
         logHandler.setLevel(Level.INFO);
         SvnLog.addHandler(logHandler);
         clear.addActionListener(new ClearLogListener(logHandler));
         logLevel.addActionListener(new LogLevelListener(logHandler, logLevel));
-
+        c.gridy++;
         this.add(new JScrollPane(logOut), c);
-
     }
 
     /**

@@ -765,4 +765,34 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return isLeaf;
     }
 
+    @Override
+    public boolean hasAttributeExtensions() throws IOException {
+        return getRefsetNidMemberNidForConceptList() == null || getRefsetNidMemberNidForConceptList().size() > 0;
+    }
+
+    @Override
+    public boolean hasDescriptionExtensions() throws IOException {
+        return getRefsetNidMemberNidForDescriptionsList() == null || getRefsetNidMemberNidForDescriptionsList().size() > 0;
+    }
+
+    @Override
+    public boolean hasExtensionExtensions() throws IOException{
+        return getRefsetNidMemberNidForRefsetMembersListRef() == null || getRefsetNidMemberNidForRefsetMembersListRef().size() > 0;
+    }
+
+    @Override
+    public boolean hasExtensionsForComponent(int nid) throws IOException {
+        return getExtensionsForComponent(nid).size() > 0;
+    }
+
+    @Override
+    public boolean hasMediaExtensions() throws IOException {
+        return getRefsetNidMemberNidForImagesListRef() == null || getRefsetNidMemberNidForImagesListRef().size() > 0;
+    }
+
+    @Override
+    public boolean hasRelExtensions() throws IOException {
+        return getRefsetNidMemberNidForRelsList() == null || getRefsetNidMemberNidForRelsList().size() > 0;
+    }
+
 }

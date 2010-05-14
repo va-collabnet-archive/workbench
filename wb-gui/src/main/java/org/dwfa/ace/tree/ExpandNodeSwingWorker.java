@@ -50,6 +50,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
+import org.ihtsdo.time.TimeUtil;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements ActionListener {
 
@@ -71,6 +72,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
     }
 
     boolean hideWorkerId = true;
+    
+    boolean removed = false;
 
     String workerIdStr = " [" + workerId + "]";
 
@@ -80,6 +83,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
     private class ProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
+        long start = System.currentTimeMillis();
 
         ActivityPanel activity;
 
@@ -120,6 +124,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             if (!continueWork) {
                 activity.complete();
                 updateTimer.stop();
+                if (System.currentTimeMillis() - start < 5000) {
+                    activity.removeActivityFromViewer();
+                } else if (lowerProgressMessage.contains("Action programatically stopped")) {
+                    activity.removeActivityFromViewer();
+                }
                 if (lowerProgressMessage.startsWith("counting")) {
                     activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
                         + activity.nextSpinner());
@@ -325,15 +334,18 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
      * Executes on the AWT Event dispatch thread.
      */
     protected void finished() {
+        long elapsedTime = Long.MIN_VALUE;
         try {
             get();
+            elapsedTime = System.currentTimeMillis() - expansionStart;
             if (!canceled) {
                 upperProgressMessage = "Finishing " + node + workerIdStr;
                 if (continueWork) {
                     updateChildrenInNode();
                     upperProgressMessage = "Expansion complete for " + node + workerIdStr;
                     completeLatch = null;
-                    lowerProgressMessage = "Fetched " + node.getChildCount() + " children";
+                    lowerProgressMessage = "Fetched " + node.getChildCount() + " children in " +
+                    TimeUtil.getElapsedTimeString(elapsedTime);
                     if (node.getChildCount() != maxChildren) {
                         upperProgressMessage = "<html><font color=red>Warning for " + node + " expected children = "
                             + maxChildren + " actual: " + node.getChildCount() + workerIdStr;
@@ -351,12 +363,13 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             stopWorkAndRemove("worker threw exception");
             AceLog.getAppLog().alertAndLogException(ex);
         }
-        long elapsedTime = System.currentTimeMillis() - expansionStart;
-
+        if (elapsedTime == Long.MIN_VALUE) {
+            elapsedTime = System.currentTimeMillis() - expansionStart;
+        }
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
+            logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + TimeUtil.getElapsedTimeString(elapsedTime));
         } else if (logTimingInfo) {
-            logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + elapsedTime + " ms.");
+            logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + TimeUtil.getElapsedTimeString(elapsedTime));
         }
         tree.workerFinished(this);
         workers.remove(node.getUserObject());

@@ -15,8 +15,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.activity.ActivityPanel;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.OpenFrames;
@@ -126,6 +128,7 @@ public class Bdb {
 			}
 			File bdbDirectory = new File(dbRoot);
 			bdbDirectory.mkdirs();
+			LuceneManager.luceneDirFile = new File(bdbDirectory, "lucene");
 			inform(activity, "Setting up database environment...");
 			mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
 			File readOnlyDir = new File(bdbDirectory, "read-only");
@@ -252,21 +255,23 @@ public class Bdb {
 	}
 
 	public static void sync() 
-		throws InterruptedException, ExecutionException {
+		throws InterruptedException, ExecutionException, TerminologyException, IOException {
 		syncService.execute(new Sync());
 	}
 	
 	private static class Sync implements Runnable {
 
-	    private ActivityPanel activity;
+	    private I_ShowActivity activity;
 	    private long startTime = System.currentTimeMillis();
 	    
-	    private Sync() {
-	        activity = new ActivityPanel(true, null, null);
+	    private Sync() throws TerminologyException, IOException {
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "Database sync to disk...");
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("Database sync to disk...");
 	        activity.setProgressInfoLower("Starting sync...");
-	        activity.getStopButton().setVisible(false);
+	        if (activity.getStopButton() != null) {
+	            activity.getStopButton().setVisible(false);
+	        }
 	    }
 
 		@Override
@@ -336,45 +341,40 @@ public class Bdb {
 		if (closed == false && mutable != null && mutable.bdbEnv != null) {
 			closed = true;
 			try {
-                AceLog.getAppLog().info("Starting last sync.");
-                System.out.println("Starting last sync.");
+                for (JFrame f: OpenFrames.getFrames()) {
+                    if (f.isVisible() && ActivityViewer.getActivityFrame() != f) {
+                        f.setVisible(false);
+                        f.dispose();
+                    }
+                }
+			    ActivityViewer.toFront();
+			    I_ShowActivity activity = Terms.get().newActivityPanel(true,
+			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence");
+			    if (activity.getStopButton() != null) {
+			        activity.getStopButton().setVisible(false);
+			    }
+                activity.setProgressInfoLower("1/10: Starting sync using service.");
                 assert conceptDb != null: "conceptDb is null...";
                 new Sync().run();
-                AceLog.getAppLog().info("Shutting down sync service.");
-                System.out.println("Shutting down sync service.");
+                activity.setProgressInfoLower("2/10: Shutting down sync service.");
                 syncService.shutdown();
 			    
-                AceLog.getAppLog().info("Closing all JFrames.");
-                System.out.println("Closing all JFrames.");
-		        for (JFrame f: OpenFrames.getFrames()) {
-		            if (f.isVisible()) {
-		                f.setVisible(false);
-		                f.dispose();
-		            }
-		        }
-                AceLog.getAppLog().info("Awaiting termination of sync service.");
-                System.out.println("Awaiting termination of sync service.");
+                activity.setProgressInfoLower("3/10: Awaiting termination of sync service.");
                 syncService.awaitTermination(90, TimeUnit.MINUTES);
 
-                AceLog.getAppLog().info("Starting LuceneManager close.");
-                System.out.println("Starting LuceneManager close.");
+                activity.setProgressInfoLower("4/10: Starting LuceneManager close.");
 		        LuceneManager.close();
 
-                AceLog.getAppLog().info("Starting bdb close.");
-                System.out.println("Starting bdb close.");
-                AceLog.getAppLog().info("Starting PositionMapper close.");
-                System.out.println("Starting PositionMapper close.");
+                activity.setProgressInfoLower("5/10: Starting PositionMapper close.");
 				PositionMapper.close();
-                AceLog.getAppLog().info("Cancel uncommitted changes.");
-                System.out.println("Cancel uncommitted changes.");
+				activity.setProgressInfoLower("6/10: Canceling uncommitted changes.");
 				Terms.get().cancel();
-                AceLog.getAppLog().info("Starting BdbCommitManager shutdown.");
-                System.out.println("Starting BdbCommitManager shutdown.");
+				 activity.setProgressInfoLower("7/10: Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
                 NidDataFromBdb.close();
+                activity.setProgressInfoLower("8/10: Starting mutable.bdbEnv.sync().");
 				mutable.bdbEnv.sync();
-                AceLog.getAppLog().info("mutable.bdbEnv.sync() finished.");
-                System.out.println("mutable.bdbEnv.sync() finished.");
+				activity.setProgressInfoLower("9/10: mutable.bdbEnv.sync() finished.");
 				uuidDb.close();
 				uuidsToNidMapDb.close();
 				nidCidMapDb.close();
@@ -383,6 +383,7 @@ public class Bdb {
 				propDb.close();
 				mutable.bdbEnv.sync();
 				mutable.bdbEnv.close();
+                activity.setProgressInfoLower("10/10: Shutdown complete");
 			} catch (DatabaseException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (Exception e) {

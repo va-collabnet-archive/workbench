@@ -24,7 +24,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * Interface for classes that resolve conflicts - i.e. the scenario where two
+ * Interface for classes that resolve contradictions - i.e. the scenario where two
  * different paths have different data for a given component.
  * <p>
  * Given a component's tuples and an optional time point (latest is assumed
@@ -32,6 +32,8 @@ import org.dwfa.tapi.TerminologyException;
  * "conflict resolved view" of the component at that time point.
  */
 public interface I_ManageContradiction extends Serializable {
+    
+    void setConfig(I_ConfigAceFrame config);
     /**
      * Method to get the display name of this conflict resolution strategy.
      * Note that this is intended to be something meaningful to an end user

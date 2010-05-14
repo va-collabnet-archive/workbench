@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
@@ -27,7 +28,11 @@ public class ERefsetCidLongMember extends ERefsetMember<ERefsetCidLongRevision> 
     }
 
     public ERefsetCidLongMember(I_ExtendByRef m) throws TerminologyException, IOException {
-        convert(nidToIdentifier(m.getMemberId()));
+        if (I_Identify.class.isAssignableFrom(m.getClass())) {
+            convert((I_Identify) m);
+        } else {
+            convert(nidToIdentifier(m.getMemberId()));
+        }
         int partCount = m.getMutableParts().size();
         refsetUuid = nidToUuid(m.getRefsetId());
         componentUuid = nidToUuid(m.getComponentId());

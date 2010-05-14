@@ -357,7 +357,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
             if (refset != null) {
-                RefsetSpec spec = new RefsetSpec(refset, true);
+                RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
                 refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
                 computeTypeValueLabel.setText(spec.getComputeTypeString());
                 if (leftTogglePane != null) {

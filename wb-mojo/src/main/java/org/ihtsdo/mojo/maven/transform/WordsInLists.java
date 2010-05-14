@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.ihtsdo.mojo.maven.Transform;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.mojo.maven.Transform;
 
 public class WordsInLists extends ProcessWords {
 

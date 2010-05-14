@@ -43,8 +43,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.ihtsdo.mojo.maven.ExtractAndProcessSpec.SubstutionSpec;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.mojo.maven.ExtractAndProcessSpec.SubstutionSpec;
 
 /**
  * Goal which writes configuration files to the output directory.

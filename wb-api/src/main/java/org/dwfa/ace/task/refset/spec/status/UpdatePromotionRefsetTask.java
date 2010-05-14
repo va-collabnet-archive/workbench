@@ -20,18 +20,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
@@ -41,10 +47,12 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.time.TimeUtil;
 
 /**
  * Takes a refset spec as input and creates/updates an associated promotion
@@ -74,6 +82,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     private I_GetConceptData reviewedApprovedAdditionStatus;
     private I_GetConceptData reviewedRejectedDeletionStatus;
     private I_GetConceptData reviewedRejectedAdditionStatus;
+    private I_ConfigAceFrame activeFrameConfig;
 
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.ITEM_COMPLETE;
@@ -97,17 +106,15 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+        AceLog.getAppLog().info("Starting " + this.getIdAndName());
+        termFactory = Terms.get();
 
         try {
             ex = null;
             if (SwingUtilities.isEventDispatchThread()) {
-                doRun(process, worker);
+                throw new TaskFailedException("This task cannot be run on the event dispatch thread. ");
             } else {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        doRun(process, worker);
-                    }
-                });
+                doRun(process, worker);
             }
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -121,8 +128,19 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
 
         try {
+            //TODO replace getActiveFrameConfig with a passed in value. 
+            activeFrameConfig = Terms.get().getActiveAceFrameConfig();
+            UUID refsetSpecUuid = (UUID) process.getProperty(refsetSpecUuidPropName);
+            if (refsetSpecUuid == null) {
+                throw new Exception("No refset spec currently in refset spec panel.");
+            }
+            I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
+            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, activeFrameConfig);
+            I_ShowActivity activity = Terms.get().newActivityPanel(true, activeFrameConfig, "Updating refset: " + 
+                refsetSpec.getPromotionRefsetConcept().toString());
+            activity.setIndeterminate(true);
+            long start = System.currentTimeMillis();
 
-            termFactory = Terms.get();
             currentStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             retiredStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             unreviewedStatusConcept =
@@ -132,12 +150,6 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             promotedStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROMOTED.getUids());
             activeStatusConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 
-            UUID refsetSpecUuid = (UUID) process.getProperty(refsetSpecUuidPropName);
-            if (refsetSpecUuid == null) {
-                throw new Exception("No refset spec currently in refset spec panel.");
-            }
-            I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
-            RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
 
             memberRefsetConcept = refsetSpec.getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
@@ -166,12 +178,21 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             Collection<? extends I_ExtendByRef> promotionExtensions =
                     termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
 
-            updatePromotionsRefset(memberExtensions, promotionExtensions);
+            activity.setValue(0);
+            activity.setMaximum(memberExtensions.size());
+            activity.setIndeterminate(false);
+
+            updatePromotionsRefset(memberExtensions, promotionExtensions, activity, start);
 
             process.setProperty(ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey(), termFactory.getUids(
                 promotionRefsetConcept.getConceptId()).iterator().next());
 
             termFactory.commit();
+            long endTime = System.currentTimeMillis();
+            long elapsed = endTime - start;
+            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + " Processed: " + memberExtensions.size());
+            activity.complete();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,19 +205,29 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         returnCondition = Condition.ITEM_COMPLETE;
     }
 
+    // TODO make this process run in parallel...
     private void updatePromotionsRefset(Collection<? extends I_ExtendByRef> memberExtensions,
-                                                   Collection<? extends I_ExtendByRef> promotionExtensions) throws Exception {
+                                                   Collection<? extends I_ExtendByRef> promotionExtensions, 
+                                                              I_ShowActivity activity, 
+                                                              long start) throws Exception {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+        refsetHelper.setAutocommitActive(false);
+        int processed = 0;
+        int size = memberExtensions.size();
+        Map<Integer, I_ExtendByRef> promotionExtMap = new HashMap<Integer, I_ExtendByRef>(promotionExtensions.size());
+        for (I_ExtendByRef promotionExtension: promotionExtensions) {
+            promotionExtMap.put(promotionExtension.getComponentId(), promotionExtension);
+        }
+
         for (I_ExtendByRef memberExtension : memberExtensions) {
             I_ExtendByRefPart latestMemberPart = getLatestPart(memberExtension);
-            I_ExtendByRef promotionExtension =
-                    getExtensionByComponent(memberExtension.getComponentId(), promotionExtensions);
+            I_ExtendByRef promotionExtension = promotionExtMap.get(memberExtension.getNid());
             I_GetConceptData promotionStatus = null;
             if (promotionExtension != null) {
                 promotionStatus = getPromotionStatus(promotionExtension);
             }
             if (latestMemberPart == null) {
-                throw new Exception("Member extension exists with no parts.");
+                AceLog.getAppLog().warning("Member extension exists with no parts: " + memberExtension);
             } else {
                 if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptId()
                     || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptId()
@@ -207,7 +238,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                         // add a new promotion refset member with value
                         // unreviewed addition
                         refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
-                            memberExtension.getComponentId(), 
+                            memberExtension.getNid(), 
                             unreviewedAdditionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
@@ -216,11 +247,8 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
-                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
-                        // memberExtension
-                        // .getComponentId());
                         refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
-                            memberExtension.getComponentId(), 
+                            memberExtension.getNid(), 
                             unreviewedAdditionStatus.getConceptId(), 
                             currentStatusConcept.getConceptId());
                     }
@@ -230,16 +258,13 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                         // add a new promotion refset member with value
                         // unreviewed deletion
                         refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
-                            memberExtension.getComponentId(), 
+                            memberExtension.getNid(), 
                             unreviewedDeletionStatus.getConceptId());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
-                        // refsetHelper.retireConceptExtension(promotionConcept.getConceptId(),
-                        // memberExtension
-                        // .getComponentId());
                         refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
-                            memberExtension.getComponentId(), 
+                            memberExtension.getNid(), 
                             unreviewedDeletionStatus.getConceptId(), 
                             currentStatusConcept.getConceptId());
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
@@ -252,7 +277,18 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                         + termFactory.getConcept(latestMemberPart.getStatusId()).getInitialText());
                 }
             }
-        }
+            if (processed % 50 == 0) {
+                activity.setValue(processed);
+                long endTime = System.currentTimeMillis();
+                long elapsed = endTime - start;
+                String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+                String remainingStr = TimeUtil.getRemainingTimeString(processed, size, elapsed);
+                activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + ".");
+            }
+            processed++;
+       }
+        Terms.get().addUncommittedNoChecks(promotionRefsetConcept);
+        Terms.get().addUncommittedNoChecks(memberRefsetConcept);
     }
 
     private I_GetConceptData getPromotionStatus(I_ExtendByRef promotionExtension) throws Exception {
@@ -269,24 +305,19 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
         }
     }
 
-    private I_ExtendByRef getExtensionByComponent(int componentId, Collection<? extends I_ExtendByRef> promotionExtensions) {
-        for (I_ExtendByRef extension : promotionExtensions) {
-            if (extension.getComponentId() == componentId) {
-                return extension;
-            }
+    private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) throws TerminologyException, IOException {
+        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(activeFrameConfig.getAllowedStatus(), 
+            activeFrameConfig.getViewPositionSetReadOnly(), 
+            activeFrameConfig.getPrecedence(), 
+            activeFrameConfig.getConflictResolutionStrategy());
+        if (versions.size() == 0) {
+            return null;
         }
-        return null;
-    }
-
-    // TODO get this to use the version computer. 
-    private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) {
-        I_ExtendByRefPart latestPart = null;
-        for (I_ExtendByRefPart part : memberExtension.getMutableParts()) {
-            if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
-                latestPart = part;
-            }
+        if (versions.size() > 1) {
+            throw new IOException("Contradiction identified in member extension:\n" +
+                memberExtension + "\n\ncontradiction: " + versions);
         }
-        return latestPart;
+        return versions.get(0);
     }
 
     public int[] getDataContainerIds() {

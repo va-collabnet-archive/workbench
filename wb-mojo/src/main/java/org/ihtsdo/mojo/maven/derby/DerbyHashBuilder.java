@@ -16,12 +16,12 @@
  */
 package org.ihtsdo.mojo.maven.derby;
 
-import org.apache.maven.plugin.logging.Log;
-import org.ihtsdo.mojo.maven.Sha1HashCodeGenerator;
-
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import org.apache.maven.plugin.logging.Log;
+import org.ihtsdo.mojo.maven.Sha1HashCodeGenerator;
 
 public final class DerbyHashBuilder {
 

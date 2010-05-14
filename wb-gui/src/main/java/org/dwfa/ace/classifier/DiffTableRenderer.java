@@ -59,7 +59,7 @@ public class DiffTableRenderer extends AceTableRenderer {
 
         setHorizontalAlignment(SwingConstants.LEFT);
 
-        setBorder(column, this, false, false); // .., same, uncommitted
+        setBorder(column, this, false, false, false); // .., same, uncommitted
         // if (renderInactive) renderComponent.setBackground(Color.LIGHT_GRAY);
 
         renderComponent.setText((String) value);

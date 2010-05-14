@@ -39,9 +39,16 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-public abstract class ConflictManagementStrategy implements I_ManageContradiction {
+public abstract class ContradictionManagementStrategy implements I_ManageContradiction {
 
     private static final long serialVersionUID = 1L;
+    
+    protected transient I_ConfigAceFrame config;
+
+    @Override
+    public void setConfig(I_ConfigAceFrame config) {
+        this.config = config;
+    }
 
     /**
      * Base implementation of the method that determines if a concept is in

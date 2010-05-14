@@ -25,10 +25,12 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.JPanel;
@@ -351,21 +353,27 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
     }
 
     private Set<I_GetConceptData> getValidRefsetSpecs() throws Exception {
-        Set<I_GetConceptData> refsetSpecs = new HashSet<I_GetConceptData>();
+        Set<I_GetConceptData> refsetSpecs = new TreeSet<I_GetConceptData>(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
 
         TestForCreateNewRefsetPermission permissionTest = new TestForCreateNewRefsetPermission();
         Set<I_GetConceptData> permissibleRefsetParents = new HashSet<I_GetConceptData>();
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(this.owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(this.owner));
 
-        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+        I_IntSet allowedTypes = config.getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
                     config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    RefsetSpec spec = new RefsetSpec(child, true);
+                    RefsetSpec spec = new RefsetSpec(child, true, config);
                     if (spec.isEditableRefset()) {
                         refsetSpecs.add(child);
                     }

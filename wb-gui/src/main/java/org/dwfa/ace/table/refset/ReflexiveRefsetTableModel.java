@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -35,6 +37,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetSpecEditor;
@@ -69,15 +72,19 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                             .getConfig().getViewPositionSetReadOnly(), host.getConfig().getPrecedence(),
                             host.getConfig().getConflictResolutionStrategy());
                 Iterator<? extends I_RelTuple> promotionIterator = promotionTuples.iterator();
+                promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>();
                 if (promotionIterator.hasNext()) {
                     promotionRefsetId = promotionTuples.iterator().next().getC2Id();
                     promotionRefsetIdentify = Terms.get().getConcept(promotionRefsetId);
+                    Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(promotionRefsetId);
+                    promotionRefsetComponentMap = new HashMap<Integer, I_ExtendByRef>(members.size());
+                    for (I_ExtendByRef ext: members) {
+                        promotionRefsetComponentMap.put(ext.getComponentId(), ext);
+                    }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
-            } catch (TerminologyException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
+            } 
         }
 
         public TableChangedSwingWorker(Integer componentId) {
@@ -140,6 +147,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
 
                 for (I_ExtendByRefVersion part : allParts) {
                     I_ExtendByRefVersion ebrTuple = (I_ExtendByRefVersion) part;
+                    conceptsToFetch.add(ebrTuple.getStatusId());
                     boolean addPart = true;
                     for (ReflexiveRefsetFieldData col : columns) {
                         if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
@@ -188,18 +196,21 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                         }
                                     case CONCEPT_IDENTIFIER:
                                         I_ExtendByRefPart conceptIdPart = ebrTuple.getMutablePart();
-                                        try {
-                                            Object obj = col.getReadMethod().invoke(conceptIdPart);
-                                            if (obj instanceof Integer) {
-                                                conceptsToFetch.add((Integer) obj);
-                                            } else {
-                                                AceLog.getAppLog().alertAndLogException(
-                                                    new Exception(obj + " is not an instance of Integer"));
-                                            }
-                                        } catch (Exception e) {
-                                            AceLog.getAppLog().warning(
-                                                "ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:"
-                                                    + e.getLocalizedMessage());
+                                        if (conceptIdPart != null) {
+                                            if (I_ExtendByRefPartCid.class.isAssignableFrom(conceptIdPart.getClass())) {
+                                                try {
+                                                    Object obj = col.getReadMethod().invoke(conceptIdPart);
+                                                    if (obj instanceof Integer) {
+                                                        conceptsToFetch.add((Integer) obj);
+                                                    } else {
+                                                        AceLog.getAppLog().alertAndLogException(
+                                                            new Exception(obj + " is not an instance of Integer"));
+                                                    }
+                                                } catch (Exception e) {
+                                                    AceLog.getAppLog().alertAndLogException(new Exception(
+                                                        "ReflexiveRefsetTableModel.CONCEPT_IDENTIFIER:", e));
+                                                }
+                                            } 
                                         }
                                         break;
                                     case STRING:
@@ -212,9 +223,6 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 }
                                 break;
                             case PROMOTION_REFSET_PART:
-                                // TODO need a more efficient manner of getting
-                                // members for a component than
-                                // iterating through all members...
                                 Object obj = getPromotionRefsetValue(extension, col);
                                 if (obj != null) {
                                     if (obj instanceof Integer) {
@@ -294,14 +302,19 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Object getPromotionRefsetValue(I_ExtendByRef extension, ReflexiveRefsetFieldData col) throws IOException,
             IllegalAccessException, InvocationTargetException, TerminologyException {
-        for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(extension.getComponentId())) {
-            if (promotionRefsetId == extForMember.getRefsetId()) {
-                List<I_ExtendByRefVersion> promotionTuples =
-                        (List<I_ExtendByRefVersion>) extForMember.getTuples(host.getConfig().getAllowedStatus(), host
-                            .getConfig().getViewPositionSetReadOnly(), 
-                            host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+        if (promotionRefsetComponentMap != null && 
+                promotionRefsetComponentMap.containsKey(extension.getNid())) {
+            I_ExtendByRef promotionMember = promotionRefsetComponentMap.get(extension.getNid());
+            if (promotionMember != null) {
+                List<I_ExtendByRefVersion> promotionTuples = (List<I_ExtendByRefVersion>) 
+                promotionMember.getTuples(
+                    host.getConfig().getAllowedStatus(), 
+                    host.getConfig().getViewPositionSetReadOnly(),
+                    host.getConfig().getPrecedence(), 
+                    host.getConfig().getConflictResolutionStrategy());
                 if (promotionTuples.size() > 0) {
                     return col.getReadMethod().invoke(promotionTuples.get(0).getMutablePart());
                 }
@@ -331,9 +344,10 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
         return promotionRefsetIdentify;
     }
 
-    Integer refsetId;
-    I_GetConceptData promotionRefsetIdentify;
-    int promotionRefsetId;
+    protected Integer refsetId;
+    protected I_GetConceptData promotionRefsetIdentify;
+    protected int promotionRefsetId;
+    protected Map<Integer, I_ExtendByRef> promotionRefsetComponentMap;
 
     public ReflexiveRefsetTableModel(I_HostConceptPlugins host, ReflexiveRefsetFieldData[] columns) {
         super(host, columns);

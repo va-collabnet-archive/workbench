@@ -17,6 +17,7 @@
 package org.dwfa.ace.table;
 
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -65,7 +66,13 @@ public class ImageTableRenderer extends AceTableRenderer {
             if ((!same) && (icon.getImage().getIconHeight() > table.getRowHeight(row))) {
                 table.setRowHeight(row, icon.getImage().getIconHeight() + 4);
             }
-            setBorder(column, renderComponent, same, uncommitted);
+            boolean hasExtensions = false;
+            try {
+                hasExtensions = icon.tuple.hasExtensions();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            setBorder(column, renderComponent, same, uncommitted, hasExtensions);
             setBackground(isSelected, row, renderComponent);
         }
 
@@ -83,8 +90,14 @@ public class ImageTableRenderer extends AceTableRenderer {
                 renderComponent.setText("");
             }
         }
+        boolean hasExtensions = false;
+        try {
+            hasExtensions = swt.tuple.hasExtensions();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        setBorder(column, renderComponent, same, uncommitted);
+        setBorder(column, renderComponent, same, uncommitted, hasExtensions);
 
         setBackground(isSelected, row, renderComponent);
         TableColumn c = table.getColumnModel().getColumn(column);

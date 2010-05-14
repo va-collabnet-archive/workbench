@@ -35,6 +35,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -92,6 +93,17 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
+        I_GetConceptData snomedRoot = getConceptSafe(Terms.get(),
+            SNOMED.Concept.ROOT.getUids());
+        if (snomedRoot == null)
+            return alertList;
+        if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), 
+                getFrameConfig().getDestRelTypes(), 
+                getFrameConfig().getViewPositionSetReadOnly(), 
+                getFrameConfig().getPrecedence(), 
+                getFrameConfig().getConflictResolutionStrategy())) {
+            return alertList;
+        }
         I_IntSet actives = getActiveStatus(Terms.get());
         HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
         for (I_DescriptionVersioned desc : descriptions) {

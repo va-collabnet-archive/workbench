@@ -16,7 +16,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidMember;
@@ -83,7 +82,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 		
 		@Override
 		public ERefsetCidMember getERefsetMember() throws TerminologyException, IOException {
-			return new ERefsetCidMember(this);
+			return new ERefsetCidMember(this, CidMember.this);
 		}
 
 		@Override

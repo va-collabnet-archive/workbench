@@ -16,17 +16,17 @@
  */
 package org.ihtsdo.mojo.maven.derby;
 
-import org.apache.derby.tools.ij;
-import org.apache.maven.plugin.logging.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import org.apache.derby.tools.ij;
+import org.apache.maven.plugin.logging.Log;
 
 public final class DerbyClientImpl implements DerbyClient {
 

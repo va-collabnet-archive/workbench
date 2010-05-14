@@ -44,7 +44,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.cement.PrimordialId;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 
 /**

@@ -150,14 +150,14 @@ public class SetWFToRequestForChangePanelTask extends AbstractTask {
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromIndividualUserPermissions(owner));
         permissibleRefsetParents.addAll(permissionTest.getValidRefsetsFromRolePermissions(owner));
 
-        I_IntSet allowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+        I_IntSet allowedTypes = config.getDestRelTypes();
 
         for (I_GetConceptData parent : permissibleRefsetParents) {
             Set<? extends I_GetConceptData> children = parent.getDestRelOrigins(null, allowedTypes, null, 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    RefsetSpec spec = new RefsetSpec(child, true);
+                    RefsetSpec spec = new RefsetSpec(child, true, config);
                     if (spec.isEditableRefset()) {
                         refsets.add(child);
                     }

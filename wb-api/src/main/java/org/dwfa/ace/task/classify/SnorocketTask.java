@@ -297,7 +297,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // ** GUI: 1. LOAD DATA INTO CLASSIFIER **
             continueThisAction = true;
-            gui = tf.newActivityPanel(true, config); // in
+            gui = tf.newActivityPanel(true, config, "Classifier 1/5: load data"); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -428,7 +428,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             System.gc();
 
             // ** GUI: 2 RUN CLASSIFIER **
-            gui = tf.newActivityPanel(true, config); // in
+            gui = tf.newActivityPanel(true, config, "Classifier 2/5: classify data"); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -456,7 +456,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // ** GUI: * GET CLASSIFIER EQUIVALENTS **
             // Show in activity viewer
-            gui = tf.newActivityPanel(true, config);
+            gui = tf.newActivityPanel(true, config, "Classifier */*: retrieve equivalent concepts");
             gui.addActionListener(this);
             gui
                     .setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
@@ -486,7 +486,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
 
             // ** GUI: 3 GET CLASSIFIER RESULTS **
-            gui = tf.newActivityPanel(true, config); // in
+            gui = tf.newActivityPanel(true, config, "Classifier 3/5: retrieve solution set"); // in
             // activity
             // viewer
             gui.addActionListener(this);
@@ -527,11 +527,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
-            gui = tf.newActivityPanel(true, config); // in
+            String tmpS = "Classifier 4/5: get previously inferred & compare";
+            gui = tf.newActivityPanel(true, config, tmpS); // in
             // activity
             // viewer
             gui.addActionListener(this);
-            String tmpS = "Classifier 4/5: get previously inferred & compare";
             gui.setProgressInfoUpper(tmpS);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -575,7 +575,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // ** GUI: 5 WRITE BACK RESULTS **
             gui.complete(); // PHASE 5. DONE
-            gui = tf.newActivityPanel(true, config); // in
+            gui = tf.newActivityPanel(true, config, "Classifier 5/5: write back updates"
+                + " to classifier path"); // in
             // activity
             // viewer
             gui.addActionListener(this);

@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceConfiguration;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -99,7 +100,8 @@ public class CreateCommentExtTask extends AbstractTask {
             	AceLog.getAppLog().info("Found comment to add: " + comments);
                 UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
                 if (refsetSpecConcept != null) {
-                    RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept);
+                    //TODO use other than termFactory.getActiveAceFrameConfig();
+                    RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, Terms.get().getActiveAceFrameConfig());
                     I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
                     I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset == null) {

@@ -539,4 +539,12 @@ public class Image
         modified();
 	}
 
+    @Override
+    public boolean hasExtensions() throws IOException {
+        if (getEnclosingConcept().hasMediaExtensions()) {
+            return getEnclosingConcept().hasExtensionsForComponent(nid);
+        }
+        return false;
+    }
+
 }

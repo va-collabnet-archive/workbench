@@ -126,7 +126,9 @@ import java.util.concurrent.TimeoutException;
  * @see <a
  *      href="http://java.sun.com/products/jfc/tsc/articles/threads/threads3.html">The
  *      Last Word in Swing Threads</a>
+ *      @deprecated use javax.swing.SwingWorker
  */
+@Deprecated
 public abstract class SwingWorker<V> implements Future<V>, Runnable {
 
     /**

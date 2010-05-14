@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Path;
@@ -1229,12 +1230,52 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 if (Terms.get().hasConcept(extension.getComponentId())) {
                     filteredList.add(Terms.get().getConcept(extension.getComponentId()));
                 } else {
-                    filteredList.add(Terms.get().getConcept(
-                        Terms.get().getDescription(extension.getComponentId()).getConceptId()));
+                    Object tc = Terms.get().getComponent(extension.getComponentId());
+                    if (I_DescriptionVersioned.class.isAssignableFrom(tc.getClass())) {
+                        I_DescriptionVersioned d = (I_DescriptionVersioned) tc;
+                        filteredList.add(Terms.get().getConcept(d.getConceptId()));
+                    } else if (I_ExtendByRef.class.isAssignableFrom(tc.getClass())) {
+                        I_ExtendByRef ext = (I_ExtendByRef) tc;
+                        if (Terms.get().hasConcept(extension.getComponentId())) {
+                            filteredList.add(Terms.get().getConcept(ext.getComponentId()));
+                        } else {
+                            throw new Exception("Don't know how to filter: " + extension);
+                        }
+                    }
                 }
             }
         }
         return filteredList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java
+     * .util.List, org.dwfa.ace.api.I_GetConceptData)
+     */
+    @Override
+    public int countMembersOfType(Collection<? extends I_ExtendByRef> allExtensions,
+            I_GetConceptData requiredPromotionStatusConcept) throws Exception {
+
+        int count = 0;
+
+        for (I_ExtendByRef extension : allExtensions) {
+            I_ExtendByRefPart latestMemberPart = getLatestCurrentPart(extension);
+            if (latestMemberPart == null) {
+                throw new Exception("Member extension exists with no parts.");
+            }
+            I_GetConceptData promotionStatus = null;
+            if (extension != null) {
+                promotionStatus = getPromotionStatus(extension);
+            }
+
+            if (promotionStatus != null
+                && promotionStatus.getConceptId() == requiredPromotionStatusConcept.getConceptId()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private I_GetConceptData getPromotionStatus(I_ExtendByRef promotionExtension) throws Exception {

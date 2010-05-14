@@ -28,9 +28,9 @@
     <inceptionYear>2005</inceptionYear>
     <description>Workbench Editor GUI </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/vodb</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/vodb</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-gui</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-gui</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-gui/?root=workbench&amp;system=exsy1002</url>
     </scm>
    <distributionManagement>
         <site>
@@ -69,11 +69,6 @@
             <groupId>jung</groupId>
             <artifactId>jung</artifactId>
             <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.dwfa</groupId>
-            <artifactId>icons</artifactId>
-            <version>1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>

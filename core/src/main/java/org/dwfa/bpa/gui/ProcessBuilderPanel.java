@@ -119,6 +119,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
          */
         public void actionPerformed(ActionEvent e) {
             processPanel.getProcess().clearExecutionRecords();
+            processPanel.refresh();
         }
 
     }
@@ -512,6 +513,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
                                 statusMessage.setText("<html><font color='blue'>Process complete: Elapsed time: "
                                     + elapsedTime + " ms.<font color='red'>" + exceptionMessage);
                             }
+                            processPanel.refresh();
                         }
                     });
                 }

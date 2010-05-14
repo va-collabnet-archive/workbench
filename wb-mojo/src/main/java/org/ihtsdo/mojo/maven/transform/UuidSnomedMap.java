@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 import org.ihtsdo.mojo.maven.transform.SctIdGenerator.NAMESPACE;
 import org.ihtsdo.mojo.maven.transform.SctIdGenerator.PROJECT;
 import org.ihtsdo.mojo.maven.transform.SctIdGenerator.TYPE;

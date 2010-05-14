@@ -876,7 +876,6 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.BOOLEAN);
                 refsetDefaults = preferences.getBooleanPreferences();
                 extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.BOOLEAN);
                 extProps.put(REFSET_PROPERTY.BOOLEAN_VALUE, ((I_RefsetDefaultsBoolean) refsetDefaults)
                     .getDefaultForBooleanRefset());
                 break;
@@ -890,27 +889,24 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case CONCEPT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
                 refsetDefaults = preferences.getConceptPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
                     .getDefaultForConceptRefset().getConceptId());
                 break;
             case CON_INT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
                     .getDefaultForConceptRefset().getConceptId());
                 extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults)
                     .getDefaultForIntegerValue());
                 break;
             case INTEGER:
-                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
+                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.INT);
                 refsetDefaults = preferences.getIntegerPreferences();
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STRING_VALUE, refsetDefaults.getDefaultStatusForRefset().getConceptId());
-                extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
                 extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
                     .getDefaultForIntegerRefset());
                 break;
