@@ -14,8 +14,8 @@
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/restructure/wb-mmb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/restructure/wb-mmb</developerConnection>
         <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-mmb/?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
