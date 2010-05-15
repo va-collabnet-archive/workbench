@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.ComputationCanceled;
 
 /**
  * Used to give statistical reporting (progress, time remaining, etc) during a
@@ -248,7 +249,11 @@ public class BatchMonitor {
         activity.setProgressInfoLower("Completed processing " + eventCount + " items in " + timeElapsed);
         logger.info("Batch completed: " + description + ". " + eventCount + " items processed in " + timeElapsed);
         totalEvents = 0;
-        activity.complete();
+        try {
+            activity.complete();
+        } catch (ComputationCanceled e) {
+            throw new BatchCancelledException(e);
+        }
         if (!finishedButton.isVisible()) {
             timer.interrupt();
         }
@@ -262,7 +267,11 @@ public class BatchMonitor {
     public void cancel() {
         isCancelled = true;
         timer.interrupt();
-        activity.complete();
+        try {
+            activity.complete();
+        } catch (ComputationCanceled e) {
+           // Nothing to do...;
+        }
         activity.setProgressInfoLower("Cancelled by user");
     }
 

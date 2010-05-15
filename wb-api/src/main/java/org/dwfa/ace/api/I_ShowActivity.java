@@ -20,6 +20,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
+import org.dwfa.tapi.ComputationCanceled;
+
 public interface I_ShowActivity extends ActionListener {
     public boolean isStopButtonVisible();
 
@@ -55,12 +57,14 @@ public interface I_ShowActivity extends ActionListener {
     
     public void removeStopActionListener(ActionListener l);
 
-    public void complete();
+    public void complete() throws ComputationCanceled;
     
     public void removeActivityFromViewer();
 
-    public boolean isComplete();
+    public boolean isComplete() throws ComputationCanceled;
 
+    public boolean isCompleteForComparison();
+    
     public long getStartTime();
 
     public void setStartTime(long time);
@@ -77,4 +81,6 @@ public interface I_ShowActivity extends ActionListener {
     public I_ConfigAceFrame getAceFrameConfig();
 
     public void update();
+    
+    public boolean isCanceled();
 }

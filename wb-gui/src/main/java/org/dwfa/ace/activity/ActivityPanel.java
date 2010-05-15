@@ -40,6 +40,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.swing.SwingTask;
+import org.dwfa.tapi.ComputationCanceled;
 
 public class ActivityPanel implements I_ShowActivity, AncestorListener {
     
@@ -52,7 +53,18 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-           complete();
+           canceled = true;
+           complete = true;
+           stopButtonVisible = false;
+           progressInfoLowerStr = "canceled by user...";
+           for (I_ShowActivity shower : showActivityListeners) {
+               try {
+                shower.complete();
+               } catch (ComputationCanceled e1) {
+                   // nothing to report. ;
+               }
+           }
+           
            for (ActionListener sal: stopActionListeners.keySet()) {
                sal.actionPerformed(e);
            }
@@ -125,7 +137,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 
             @Override
             public void doRun() {
-                if (isComplete()) {
+                if (complete) {
                     stopButton.setVisible(false);
                     progressBar.setVisible(false);
                     stopButtonVisible = false;
@@ -189,6 +201,8 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     private boolean removed = false;
     private boolean stringPainted = false;
     private boolean stopButtonVisible = true;
+    private boolean canceled = false;
+
     private StopActionListenerPropigator sal = new StopActionListenerPropigator();
     
     public void update() {
@@ -330,11 +344,14 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
-    public void complete() {
+    public void complete() throws ComputationCanceled {
         this.complete = true;
         this.stopButtonVisible = false;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.complete();
+        }
+        if (canceled) {
+            throw new ComputationCanceled();
         }
     }
 
@@ -370,7 +387,14 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         return value;
     }
 
-    public boolean isComplete() {
+    public boolean isComplete() throws ComputationCanceled {
+        if (canceled) {
+            throw new ComputationCanceled();
+        }
+        return this.complete;
+    }
+
+    public boolean isCompleteForComparison() {
         return this.complete;
     }
 
@@ -444,4 +468,14 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
     public void removeStopActionListener(ActionListener l) {
         stopActionListeners.remove(l);
     }
+    
+    
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
 }

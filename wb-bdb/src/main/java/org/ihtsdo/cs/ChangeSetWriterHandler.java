@@ -146,7 +146,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
         activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr + 
             " processed: " + processedChangedCount + "/" + changedCount);
-        if (activity.isComplete()) {
+        if (activity.isCompleteForComparison()) {
             timer.stop();
         }
     }

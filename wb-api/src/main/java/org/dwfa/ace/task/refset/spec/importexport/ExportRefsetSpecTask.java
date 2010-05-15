@@ -33,6 +33,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -118,7 +119,11 @@ public class ExportRefsetSpecTask extends AbstractTask {
             return Condition.CONTINUE;
         } catch (Exception ex) {
             if (activityPanel != null) {
-                activityPanel.complete();
+                try {
+                    activityPanel.complete();
+                } catch (ComputationCanceled e) {
+                    throw new TaskFailedException(ex);
+                }
             }
             throw new TaskFailedException(ex);
         }

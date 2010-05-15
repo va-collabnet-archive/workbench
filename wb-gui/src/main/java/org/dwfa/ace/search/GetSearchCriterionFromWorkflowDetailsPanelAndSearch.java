@@ -51,6 +51,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -286,7 +287,11 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 						+ " Elapsed seconds: " + endTime / 1000;
 				activity.setProgressInfoUpper(upperProgressMessage);
 				activity.setProgressInfoLower(lowerProgressMessage);
-				activity.complete();
+				try {
+                    activity.complete();
+                } catch (ComputationCanceled e1) {
+                   // canceled;
+                }
 				updateTimer.stop();
 			}
 		}

@@ -21,6 +21,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
+import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
@@ -170,7 +171,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         }
     }
 
-    public void addUncommitted() {
+    public void addUncommitted() throws ComputationCanceled {
         BdbCommitManager.addUncommittedNoChecks(refsetConcept);
         BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
         long elapsed = System.currentTimeMillis() - startTime;

@@ -45,6 +45,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
+import org.dwfa.tapi.ComputationCanceled;
 
 public class ImportChangeSetReader implements ActionListener, I_Count {
 
@@ -109,7 +110,11 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 activity.setProgressInfoLower(lowerProgressMessage + processed);
             }
             if (!continueWork) {
-                activity.complete();
+                try {
+                    activity.complete();
+                } catch (ComputationCanceled e1) {
+                    AceLog.getAppLog().alertAndLogException(new Exception("Canceled should never happen in import: ", e1));
+                }
                 updateTimer.stop();
             }
         }

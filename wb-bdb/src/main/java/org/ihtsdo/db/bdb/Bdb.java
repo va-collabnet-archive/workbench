@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.concept.BdbLegacyFixedFactory;
@@ -316,7 +317,9 @@ public class Bdb {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
-			}
+			} catch (ComputationCanceled e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
 		}
 	}
 	

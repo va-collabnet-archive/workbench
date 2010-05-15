@@ -191,6 +191,18 @@ public class ActivityViewer {
             
         }
 
+        @Override
+        public boolean isCanceled() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isCompleteForComparison() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
     }
 
     private class ActivityViewerFrame extends ComponentFrame {
@@ -293,14 +305,14 @@ public class ActivityViewer {
     private static class ActivityComparator implements Comparator<I_ShowActivity> {
 
         public int compare(I_ShowActivity a1, I_ShowActivity a2) {
-            if (a1.isComplete() && a2.isComplete()) {
+            if (a1.isCompleteForComparison() && a2.isCompleteForComparison()) {
                 if (a1.getStartTime() < a2.getStartTime()) {
                     return 1;
                 }
                 return -1;
             }
-            if (a1.isComplete() != a2.isComplete()) {
-                if (a1.isComplete()) {
+            if (a1.isCompleteForComparison() != a2.isCompleteForComparison()) {
+                if (a1.isCompleteForComparison()) {
                     return 1;
                 }
                 return -1;

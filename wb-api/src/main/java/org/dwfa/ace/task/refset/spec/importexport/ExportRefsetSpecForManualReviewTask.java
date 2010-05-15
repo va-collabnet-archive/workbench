@@ -53,6 +53,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.jini.TermEntry;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -149,9 +150,13 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             return returnCondition;
         } catch (Exception ex) {
             if (activityPanel != null) {
-                activityPanel.complete();
+                ex.printStackTrace();
+                try {
+                    activityPanel.complete();
+                } catch (ComputationCanceled e) {
+                    throw new TaskFailedException(ex);
+                }
             }
-            ex.printStackTrace();
             throw new TaskFailedException(ex);
         }
     }

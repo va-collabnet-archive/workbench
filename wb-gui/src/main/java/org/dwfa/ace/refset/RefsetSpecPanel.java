@@ -77,6 +77,7 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -750,7 +751,11 @@ public class RefsetSpecPanel extends JPanel {
             } else {
                 activity.setProgressInfoLower("Cancelled.");
             }
-            activity.complete();
+            try {
+                activity.complete();
+            } catch (ComputationCanceled e1) {
+                // canceled. ;
+            }
             refsetTableModel.clearSelectedTuples();
             selectAllCheckBox.setSelected(false);
             refsetTable.getTableHeader().repaint();

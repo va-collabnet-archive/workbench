@@ -192,4 +192,16 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     public void removeStopActionListener(ActionListener l) {
         // Nothing to do
     }
+
+    @Override
+    public boolean isCanceled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isCompleteForComparison() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

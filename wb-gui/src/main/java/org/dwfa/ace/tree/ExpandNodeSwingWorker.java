@@ -50,6 +50,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.time.TimeUtil;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements ActionListener {
@@ -120,14 +121,16 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             }
             activity.setProgressInfoUpper(upperProgressMessage);
             if (!continueWork) {
-                activity.complete();
+                try {
+                    activity.complete();
+                } catch (ComputationCanceled e1) {
+                    //;
+                }
                 updateTimer.stop();
                 if (System.currentTimeMillis() - start < 1000) {
-                    activity.complete();
                     activity.removeActivityFromViewer();
                 } else if (lowerProgressMessage.contains("Action programatically stopped")) {
-                    activity.complete();
-                    activity.removeActivityFromViewer();
+                     activity.removeActivityFromViewer();
                 }
                 if (lowerProgressMessage.startsWith("counting")) {
                     activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
