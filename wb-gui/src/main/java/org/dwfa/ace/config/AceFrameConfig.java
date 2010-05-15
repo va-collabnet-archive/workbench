@@ -297,7 +297,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_GetConceptData classifierOutputPathConcept;
 
     // 36
-    private I_ManageContradiction conflictResolutionStrategy;
+    private I_ManageContradiction contradictionStrategy;
     private boolean highlightConflictsInTaxonomyView;
     private boolean highlightConflictsInComponentPanel;
 
@@ -491,7 +491,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         writeConceptAsId(classifierOutputPathConcept, out);
 
         // 36
-        out.writeObject(conflictResolutionStrategy);
+        out.writeObject(contradictionStrategy);
         out.writeBoolean(highlightConflictsInComponentPanel);
         out.writeBoolean(highlightConflictsInTaxonomyView);
 
@@ -900,11 +900,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 36) {
-                conflictResolutionStrategy = (I_ManageContradiction) in.readObject();
+                contradictionStrategy = (I_ManageContradiction) in.readObject();
                 highlightConflictsInComponentPanel = in.readBoolean();
                 highlightConflictsInTaxonomyView = in.readBoolean();
             } else {
-                conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+                contradictionStrategy = new IdentifyAllConflictStrategy();
                 highlightConflictsInComponentPanel = false;
                 highlightConflictsInTaxonomyView = false;
             }
@@ -2590,11 +2590,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @return the conflict resolution strategy in use by the profile
      */
     public I_ManageContradiction getConflictResolutionStrategy() {
-        if (conflictResolutionStrategy == null) {
-            conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+        if (contradictionStrategy == null) {
+            contradictionStrategy = new IdentifyAllConflictStrategy();
         }
-        conflictResolutionStrategy.setConfig(this);
-        return conflictResolutionStrategy;
+        contradictionStrategy.setConfig(this);
+        return contradictionStrategy;
     }
 
     /**
@@ -2604,9 +2604,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
 
-        I_ManageContradiction old = this.conflictResolutionStrategy;
+        I_ManageContradiction old = this.contradictionStrategy;
 
-        this.conflictResolutionStrategy = conflictResolutionStrategy;
+        this.contradictionStrategy = conflictResolutionStrategy;
 
         changeSupport.firePropertyChange("conflictResolutionStrategy", old, conflictResolutionStrategy);
     }
@@ -2614,7 +2614,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /**
      * Sets the conflict resolution strategy for this profile
      * 
-     * @param conflictResolutionStrategy
+     * @param contradictionStrategy
      */
     public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
 
