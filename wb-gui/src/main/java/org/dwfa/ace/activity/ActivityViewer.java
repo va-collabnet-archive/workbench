@@ -471,6 +471,7 @@ public class ActivityViewer {
     public static void toFront() {
         if (SwingUtilities.isEventDispatchThread()) {
             if (viewer != null) {
+                viewer.viewerFrame.setVisible(true);
                 viewer.viewerFrame.toFront();
             }
         } else {
@@ -479,6 +480,7 @@ public class ActivityViewer {
                 @Override
                 public void run() {
                     if (viewer != null) {
+                        viewer.viewerFrame.setVisible(true);
                         viewer.viewerFrame.toFront();
                     }
                 }

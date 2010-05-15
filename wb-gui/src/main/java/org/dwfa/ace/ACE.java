@@ -2790,6 +2790,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(new JPanel(), c);
         c.gridx++;
         showProgressButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/gears_view.png")));
+        showProgressButton.setToolTipText("Show the activity viewer, and bring to the front.");
         showProgressButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ActivityViewer.toFront();
