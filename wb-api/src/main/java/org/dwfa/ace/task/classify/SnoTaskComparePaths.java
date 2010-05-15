@@ -129,10 +129,10 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             // ** GUI:START: 1. GET STATED PATH SNORELS **
             continueThisAction = true;
             String guiStr = "Compare Stated & Inferred 1/3: Get Edit Path";
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr, true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -159,10 +159,10 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
 
             // ** GUI:START: 2. GET CLASSIFIER PATH DATA **
             guiStr = "Compare Stated & Inferred 2/3: Get Classifier Path";
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr, true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -189,10 +189,10 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
 
             // ** GUI: 3. COMPARE RESULTS
             guiStr = "Compare Stated & Inferred 3/3: Compare Data";
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), guiStr, true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
              gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(true);
             // COMPARE RESULTS. Sort is performed in the compare routine.

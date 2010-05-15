@@ -38,7 +38,6 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -77,8 +76,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
     private AceConfig config;
 
-    private I_ShowActivity secondaryProgressPanel;
-
     private class ProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
 
@@ -88,7 +85,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
         public ProgressUpdator() {
             super();
-            activity = new ActivityPanel(true, secondaryProgressPanel, config.aceFrames.get(0));
+            activity = new ActivityPanel(config.aceFrames.get(0), false);
             updateTimer = new Timer(1000, this);
             updateTimer.start();
         }
@@ -118,12 +115,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
         }
     }
 
-    public ImportChangeSetReader(final Configuration riverConfig, I_ShowActivity secondaryProgressPanel,
-            Frame parentFrame, AceConfig config) {
-        this(riverConfig, parentFrame, config);
-        this.secondaryProgressPanel = secondaryProgressPanel;
-    }
-
     public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame, AceConfig config) {
         this.config = config;
         try {
@@ -136,7 +127,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 }, null, parentFrame);
 
             ProgressUpdator updater = new ProgressUpdator();
-            updater.activity.addActionListener(this);
+            updater.activity.addRefreshActionListener(this);
             ACE.threadPool.execute(new Runnable() {
                 public void run() {
                     try {

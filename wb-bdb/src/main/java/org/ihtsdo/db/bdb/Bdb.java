@@ -265,13 +265,11 @@ public class Bdb {
 	    private long startTime = System.currentTimeMillis();
 	    
 	    private Sync() throws TerminologyException, IOException {
-	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "Database sync to disk...");
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "Database sync to disk...", false);
+            activity.setStopButtonVisible(false);
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("Database sync to disk...");
 	        activity.setProgressInfoLower("Starting sync...");
-	        if (activity.getStopButton() != null) {
-	            activity.getStopButton().setVisible(false);
-	        }
 	    }
 
 		@Override
@@ -349,10 +347,8 @@ public class Bdb {
                 }
 			    ActivityViewer.toFront();
 			    I_ShowActivity activity = Terms.get().newActivityPanel(true,
-			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence");
-			    if (activity.getStopButton() != null) {
-			        activity.getStopButton().setVisible(false);
-			    }
+			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
+			    activity.setStopButtonVisible(false);
                 activity.setProgressInfoLower("1/10: Starting sync using service.");
                 assert conceptDb != null: "conceptDb is null...";
                 new Sync().run();

@@ -656,12 +656,12 @@ public class RefsetSpecPanel extends JPanel {
             super();
             this.tupleMemberIds = tupleMemberIds;
             this.forApproval = forApproval;
-            activity = new ActivityPanel(true, null, null);
+            activity = new ActivityPanel(aceFrameConfig, true);
             activity.setIndeterminate(true);
             activity.setMaximum(tupleMemberIds.size());
             activity.setProgressInfoUpper("Changing status of selected members");
             activity.setProgressInfoLower("Setting up...");
-            activity.addActionListener(new ActionListener() {
+            activity.addRefreshActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cancel(false);
                 }

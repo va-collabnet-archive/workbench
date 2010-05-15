@@ -2951,12 +2951,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         aceFrame.getCdePanel().setWorkflowDetailSheetDimensions(dim);
     }
 
-    public I_ShowActivity getTopActivityListener() {
-        if (aceFrame == null) {
-            return null;
-        } else {
-            return aceFrame.getCdePanel().getTopActivityListener();
+    public void setTopActivity(I_ShowActivity activity) {
+        if (aceFrame != null) {
+            aceFrame.getCdePanel().setTopActivity(activity);
         }
+    }
+
+    public I_ShowActivity getTopActivity() {
+        if (aceFrame != null) {
+           return aceFrame.getCdePanel().getTopActivity();
+        }
+        return null;
     }
 
     public void fireUpdateHierarchyView() {

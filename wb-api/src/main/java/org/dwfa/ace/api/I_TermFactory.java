@@ -531,7 +531,8 @@ public interface I_TermFactory {
      * @param displayInViewer If true, the activity will be lodged in the
      *            activity viewer window
      */
-    I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig, String firstUpperInfo);
+    I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig, String firstUpperInfo,
+            boolean showStop);
 
     I_HandleSubversion getSvnHandler();
 
@@ -638,5 +639,6 @@ public interface I_TermFactory {
     public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
+
 
 }

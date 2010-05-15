@@ -1272,6 +1272,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public static Timer timer = new Timer();
 
+    public static javax.swing.Timer swingTimer = new javax.swing.Timer(1000, null);
+
     public AceFrameConfig aceFrameConfig;
 
     public static AceConfig aceConfig;
@@ -1397,6 +1399,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public ACE(Configuration config, String pluginRoot) {
         super(new GridBagLayout());
         this.pluginRoot = pluginRoot;
+        this.swingTimer.start();
         try {
             menuWorker = new MasterWorker(config);
 
@@ -1976,8 +1979,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
-    private ActivityPanel activityListener;
+    private ActivityPanel topActivity;
     private JTabbedPane preferencesTab;
+    private JPanel activityPanel;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -3006,11 +3010,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.weightx = 0;
         c.gridx++;
 
-        JPanel activityPanel = new JPanel(new GridLayout(1, 1));
-        activityListener = new ActivityPanel(false, null, aceFrameConfig);
-        activityListener.setEraseWhenFinishedEnabled(true);
-        activityListener.complete();
-        activityPanel.add(activityListener.getViewPanel());
+        activityPanel = new JPanel(new GridLayout(1, 1));
         bottomPanel.add(activityPanel, c);
         c.gridx++;
 
@@ -3066,8 +3066,35 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
-    public I_ShowActivity getTopActivityListener() {
-        return activityListener;
+    public void setTopActivity(I_ShowActivity activity) {
+        if (this.topActivity != null) {
+            swingTimer.removeActionListener(this.topActivity);
+        }
+        this.topActivity = (ActivityPanel) activity;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (activityPanel != null) {
+                    Component[] children = activityPanel.getComponents();
+                    if (children != null) {
+                        for (Component child: children) {
+                            activityPanel.remove(child);
+                        }
+                    }
+                    if (topActivity != null) {
+                        activityPanel.add(topActivity.getViewPanel(false));
+                        swingTimer.addActionListener(topActivity);
+                    } else {
+                        activityPanel.add(new JPanel());
+                    }
+                }
+             }
+        });
+
+    }
+
+    public I_ShowActivity getTopActivity() {
+        return topActivity;
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -3672,4 +3699,5 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setShowPromotionTab(Boolean show) {
         refsetSpecPanel.setShowPromotionTab(show);
     }
+
 }

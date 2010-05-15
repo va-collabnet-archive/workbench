@@ -98,7 +98,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
         I_ShowActivity activityPanel = null;
         try {
             activityPanel = Terms.get().newActivityPanel(true,
-                Terms.get().getActiveAceFrameConfig(), "Importing refset spec from file...");
+                Terms.get().getActiveAceFrameConfig(), "Importing refset spec from file...", true);
             String importFileName = (String) process.getProperty(inputFilePropName);
             String outputFileName = (String) process.getProperty(outputFilePropName);
             Object pathObj = process.getProperty(pathUuidPropName);

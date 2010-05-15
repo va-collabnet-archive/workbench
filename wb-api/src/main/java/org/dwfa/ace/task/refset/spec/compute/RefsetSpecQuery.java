@@ -186,7 +186,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Possible: " + this.toString());
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Possible: " + this.toString(), true);
         activity.setMaximum(statements.size() + subqueries.size());
         activity.setValue(0);
         activity.setIndeterminate(false);

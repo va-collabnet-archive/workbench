@@ -159,7 +159,7 @@ public class BatchMonitor {
     public void start() throws Exception {
         I_TermFactory termFactory = Terms.get();
         activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig(),
-            description);
+            description, true);
         activity.setProgressInfoUpper(description);
         activity.setProgressInfoLower("Commencing...");
         activity.setMaximum((int) totalEvents);
@@ -171,7 +171,7 @@ public class BatchMonitor {
             addMessagePanel();
         }
         addFinishedButton();
-        timer.activity.getViewPanel().validate();
+        timer.activity.getViewPanel(false).validate();
 
         timer.start();
     }
@@ -202,7 +202,7 @@ public class BatchMonitor {
 
         startTime = new Date().getTime();
         lastReportTime = startTime;
-        timer.activity.getViewPanel().add(htmlPanel, c);
+        timer.activity.getViewPanel(false).add(htmlPanel, c);
     }
 
     /**
@@ -225,7 +225,7 @@ public class BatchMonitor {
         c.weightx = 0.0;
         c.anchor = GridBagConstraints.EAST;
         c.fill = GridBagConstraints.HORIZONTAL;
-        timer.activity.getViewPanel().add(finishedButton, c);
+        timer.activity.getViewPanel(false).add(finishedButton, c);
     }
 
     /**
@@ -319,7 +319,7 @@ public class BatchMonitor {
             this.reportCycle = reportCycleMs;
             this.activity = activity;
 
-            this.activity.addActionListener(new ActionListener() {
+            this.activity.addRefreshActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cancel();
                 };
@@ -368,7 +368,7 @@ public class BatchMonitor {
         private static final long serialVersionUID = 8408703041409497746L;
 
         public MonitorDialog(I_ShowActivity activity) {
-            setContentPane(activity.getViewPanel());
+            setContentPane(activity.getViewPanel(false));
         }
     }
 }

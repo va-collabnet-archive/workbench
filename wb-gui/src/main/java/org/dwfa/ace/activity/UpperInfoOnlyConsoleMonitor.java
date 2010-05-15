@@ -42,7 +42,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
         this.startTime = startTime;
     }
 
-    public void addActionListener(ActionListener l) {
+    public void addRefreshActionListener(ActionListener l) {
         // TODO Auto-generated method stub
 
     }
@@ -51,12 +51,12 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
         this.complete = true;
     }
 
-    public JPanel getViewPanel() {
+    public JPanel getViewPanel(boolean showBorder) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void removeActionListener(ActionListener l) {
+    public void removeRefreshActionListener(ActionListener l) {
         // TODO Auto-generated method stub
 
     }
@@ -171,5 +171,25 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     @Override
     public void actionPerformed(ActionEvent e) {
         update();
+    }
+
+    @Override
+    public boolean isStopButtonVisible() {
+        return false;
+    }
+
+    @Override
+    public void setStopButtonVisible(boolean visible) {
+        // Nothing to do
+    }
+
+    @Override
+    public void addStopActionListener(ActionListener l) {
+        // Nothing to do
+    }
+
+    @Override
+    public void removeStopActionListener(ActionListener l) {
+        // Nothing to do
     }
 }

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -137,7 +136,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
             if (showActivityPanel) {
                 computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame, 
-                    "Computing Refset: " + refset.toString());
+                    "Computing Refset: " + refset.toString(), true);
                 computeRefsetActivityPanel.setStringPainted(true);
                 computeRefsetActivityPanel.setValue(0);
                 computeRefsetActivityPanel.setIndeterminate(true);
@@ -188,12 +187,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 c.weighty = 0;
                 c.anchor = GridBagConstraints.EAST;
                 c.fill = GridBagConstraints.HORIZONTAL;
-                JButton cancelButton = computeRefsetActivityPanel.getStopButton();
-                if (cancelButton == null) {
-                    cancelButton = new JButton("Cancel");
-                    computeRefsetActivityPanel.getViewPanel().add(cancelButton, c);
-                }
-                cancelButton.addActionListener(new ButtonListener(this));
+                computeRefsetActivityPanel.addStopActionListener(new ButtonListener(this));
                 computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
             }
 
@@ -321,8 +315,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 if (cancelComputation) {
                     termFactory.cancel();
                     if (showActivityPanel) {
-                        computeRefsetActivityPanel.getStopButton().setEnabled(false);
-                        computeRefsetActivityPanel.getStopButton().setVisible(false);
+                        computeRefsetActivityPanel.setStopButtonVisible(false);
                         progressReportHtmlGenerator.setComplete(true);
                         computeRefsetActivityPanel.complete();
                         computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
@@ -425,8 +418,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 progressReportHtmlGenerator.setComplete(true);
                 computeRefsetActivityPanel.setProgressInfoLower(progressReportHtmlGenerator.toString());
                 computeRefsetActivityPanel.complete();
-                computeRefsetActivityPanel.getStopButton().setEnabled(false);
-                computeRefsetActivityPanel.getStopButton().setVisible(false);
+                computeRefsetActivityPanel.setStopButtonVisible(false);
             }
 
             if (cancelComputation) {

@@ -276,10 +276,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
         try {
             // ** GUI: 1. LOAD DATA INTO CLASSIFIER **
             continueThisAction = true;
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 1/5: load data"); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 1/5: load data", true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper("Classifier 1/5: load data");
             gui.setIndeterminate(false);
             gui.setMaximum(1500000);
@@ -387,10 +387,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             pcEdit = null; // :MEMORY:
 
             // ** GUI: 2 RUN CLASSIFIER **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 2/5: classify data"); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 2/5: classify data", true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper("Classifier 2/5: classify data");
             gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
             gui.setIndeterminate(true);
@@ -414,8 +414,8 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
 
             // ** GUI: * GET CLASSIFIER EQUIVALENTS **
             // Show in activity viewer
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier */*: retrieve equivalent concepts");
-            gui.addActionListener(this);
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier */*: retrieve equivalent concepts", true);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
             gui.setIndeterminate(true);
             // gui.setMaximum(1000000);
@@ -442,10 +442,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             }
 
             // ** GUI: 3 GET CLASSIFIER RESULTS **
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 3/5: retrieve solution set"); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), "Classifier 3/5: retrieve solution set", true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper("Classifier 3/5: retrieve solution set");
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -483,10 +483,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
             String tmpS = "Classifier 4/5: get previously inferred & compare";
-            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), tmpS); // in
+            gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), tmpS, true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
               gui.setProgressInfoUpper(tmpS);
             gui.setIndeterminate(false);
             gui.setMaximum(1000000);
@@ -522,10 +522,10 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             // ** GUI: 5 WRITE BACK RESULTS **
             gui.complete(); // PHASE 5. DONE
             gui = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), 
-                "Classifier 5/5: write back updates to classifier path"); // in
+                "Classifier 5/5: write back updates to classifier path", true); // in
             // activity
             // viewer
-            gui.addActionListener(this);
+            gui.addRefreshActionListener(this);
             gui.setProgressInfoUpper("Classifier 5/5: write back updates" + " to classifier path");
             gui.setIndeterminate(true);
 

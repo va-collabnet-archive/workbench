@@ -37,6 +37,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.ihtsdo.time.TimeUtil;
 
 public abstract class ChangeSetImporter implements ActionListener {
 
@@ -55,11 +56,12 @@ public abstract class ChangeSetImporter implements ActionListener {
     public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets,
             String suffix, String prefix) throws TaskFailedException {
         try {
+            long start = System.currentTimeMillis();
             I_TermFactory tf = Terms.get();
             I_ShowActivity activity = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(), 
-                "Importing " + suffix + " change sets. ");
+                "Importing " + suffix + " change sets. ", false);
             activity.setIndeterminate(true);
-            activity.addActionListener(this);
+            activity.addRefreshActionListener(this);
             String[] validatorArray = new String[] {};
 
             if (validators != null && validators != "") {
@@ -94,6 +96,9 @@ public abstract class ChangeSetImporter implements ActionListener {
             }
             Terms.get().commit();
             activity.setIndeterminate(false);
+            long elapsed = System.currentTimeMillis() - start;
+            String elapsedString = TimeUtil.getElapsedTimeString(elapsed);
+            activity.setProgressInfoLower(elapsedString);
             activity.complete();
         } catch (Exception e) {
             throw new TaskFailedException(e);

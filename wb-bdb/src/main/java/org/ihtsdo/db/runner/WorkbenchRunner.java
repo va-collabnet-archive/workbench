@@ -107,11 +107,11 @@ public class WorkbenchRunner {
 
 			System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
 			long startTime = System.currentTimeMillis();
-			ActivityPanel activity = new ActivityPanel(true, null, null);
+			ActivityPanel activity = new ActivityPanel(null, true);
 			activity.setIndeterminate(true);
 			activity.setProgressInfoUpper("Loading the database");
 			activity.setProgressInfoLower("Setting up the environment...");
-			activity.addActionListener(new ActionListener() {
+			activity.addRefreshActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("System.exit from activity action listener: "
 									+ e.getActionCommand());

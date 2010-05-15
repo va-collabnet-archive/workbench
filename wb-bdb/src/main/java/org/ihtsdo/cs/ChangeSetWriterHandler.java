@@ -62,15 +62,14 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
-	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...");
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...", 
+	            false);
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("CS writer: " + commitTimeStr + "...");
 	        activity.setProgressInfoLower("Opening change set writers...");
 	        timer = new Timer(2000, this);
 	        timer.start();
-	        if (activity.getStopButton() != null) {
-	            activity.getStopButton().setVisible(false);
-	        }
+	        activity.setStopButtonVisible(false);
 			for (I_WriteChangeSet writer : writers) {
 				writer.open(sapNidsFromCommit);
 			}

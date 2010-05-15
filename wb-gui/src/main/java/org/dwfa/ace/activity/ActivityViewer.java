@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.activity;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,7 +32,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -64,13 +61,21 @@ public class ActivityViewer {
     private static ActivityViewer viewer;
 
     private static class CompleteListener implements I_ShowActivity {
+        
+        I_ShowActivity source;
+        
+
+        private CompleteListener(I_ShowActivity source) {
+            super();
+            this.source = source;
+        }
 
         @Override
         public void removeActivityFromViewer() {
             viewer.activitiesList.remove(this);
         }
 
-        public void addActionListener(ActionListener l) {
+        public void addRefreshActionListener(ActionListener l) {
         }
 
         public void addShowActivityListener(I_ShowActivity listener) {
@@ -78,7 +83,7 @@ public class ActivityViewer {
 
         public void complete() {
             reSort();
-        }
+         }
 
         public int getMaximum() {
             return 0;
@@ -92,7 +97,7 @@ public class ActivityViewer {
             return 0;
         }
 
-        public JPanel getViewPanel() {
+        public JPanel getViewPanel(boolean shotBorder) {
             return null;
         }
 
@@ -104,7 +109,7 @@ public class ActivityViewer {
             return false;
         }
 
-        public void removeActionListener(ActionListener l) {
+        public void removeRefreshActionListener(ActionListener l) {
         }
 
         public void removeShowActivityListener(I_ShowActivity listener) {
@@ -129,32 +134,13 @@ public class ActivityViewer {
         public void setValue(int n) {
         }
 
-        public I_ShowActivity getSecondaryPanel() {
-            return null;
-        }
-
-        public void setSecondaryPanel(I_ShowActivity panel) {
-        }
-
+ 
         public void setStringPainted(boolean stringPainted) {
         }
 
-        public JButton getStopButton() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public void setStopButton(JButton stopButton) {
-            // TODO Auto-generated method stub
-
-        }
 
         public I_ConfigAceFrame getAceFrameConfig() {
             return null;
-        }
-
-        public void syncWith(I_ShowActivity another) {
-
         }
 
         public String getProgressInfoLower() {
@@ -177,6 +163,30 @@ public class ActivityViewer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void addStopActionListener(ActionListener l) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public boolean isStopButtonVisible() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void removeStopActionListener(ActionListener l) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void setStopButtonVisible(boolean visible) {
             // TODO Auto-generated method stub
             
         }
@@ -233,10 +243,12 @@ public class ActivityViewer {
 
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
     private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
-
-    private static CompleteListener completeListener = new CompleteListener();
     
-    private static Timer updateTimer = new Timer(2000, null);
+    private static Timer updateTimer = new Timer(1000, null);
+    
+    public static void removeFromUpdateTimer(ActionListener l) {
+        updateTimer.removeActionListener(l);
+    }
     static {
         updateTimer.start();
     }
@@ -252,7 +264,6 @@ public class ActivityViewer {
             viewerFrame.setLocation(20, 20);
             viewerFrame.setSize(600, 400);
             viewerFrame.setVisible(true);
-
             setupActivitesPanel(new JPanel());
         }
 
@@ -274,7 +285,6 @@ public class ActivityViewer {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         activitiesAndFillerPanel.add(new JPanel(), gbc);
-        viewer.viewerFrame.setContentPane(new JPanel());
         viewer.viewerFrame.setContentPane(new JScrollPane(activitiesAndFillerPanel));
     }
 
@@ -326,7 +336,7 @@ public class ActivityViewer {
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {
            
-            activity.addShowActivityListener(completeListener);
+            activity.addShowActivityListener(new CompleteListener(activity));
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -340,15 +350,15 @@ public class ActivityViewer {
                         }
                         viewer.activitiesList.add(0, activity);
                         if (!viewer.activitiesSet.contains(activity)) {
-                            viewer.updateTimer.addActionListener(activity);
+                            ActivityViewer.updateTimer.addActionListener(activity);
                         }
                         
                         List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
                         Collections.sort(listToSort, activityComparator);
                         viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
                         synchronized (viewer.activitiesList) {
-                            while (viewer.activitiesList.size() > 40) {
-                                viewer.activitiesList.remove(40);
+                            while (viewer.activitiesList.size() > 60) {
+                                viewer.activitiesList.remove(60);
                             }
                         }
                         updateActivities();
@@ -375,42 +385,25 @@ public class ActivityViewer {
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         linkToSourceFrameActivityPanel();
-        Set<I_ShowActivity> secondaryPanels = new HashSet<I_ShowActivity>();
         for (I_ShowActivity a : viewer.activitiesList) {
-            JPanel p = a.getViewPanel();
-
-            newPanel.add(p, gbc);
+            newPanel.add(a.getViewPanel(true), gbc);
             gbc.gridy++;
-            addSecondaryActivityPanel(secondaryPanels, a);
         }
         setupActivitesPanel(newPanel);
     }
 
     private static void linkToSourceFrameActivityPanel() {
-        Set<I_ShowActivity> activeActivityListeners = new HashSet<I_ShowActivity>();
         for (I_ShowActivity a : viewer.activitiesList) {
             if (a.getAceFrameConfig() != null) {
-                if (a.getAceFrameConfig().getTopActivityListener() != null) {
-                    a.removeShowActivityListener(a.getAceFrameConfig().getTopActivityListener());
-                    ActionListener[] stopListeners = a.getAceFrameConfig()
-                        .getTopActivityListener()
-                        .getStopButton()
-                        .getActionListeners();
-                    for (ActionListener l : stopListeners) {
-                        a.getAceFrameConfig().getTopActivityListener().getStopButton().removeActionListener(l);
-                    }
+                if (a.getAceFrameConfig().getTopActivity() != null) {
+                    a.getAceFrameConfig().setTopActivity(null);
                 }
             }
         }
         for (I_ShowActivity a : viewer.activitiesList) {
             if (a.getAceFrameConfig() != null) {
-                I_ShowActivity frameActivity = a.getAceFrameConfig().getTopActivityListener();
-                if (frameActivity != null) {
-                    if (activeActivityListeners.contains(frameActivity) == false) {
-                        a.addShowActivityListener(frameActivity);
-                        activeActivityListeners.add(frameActivity);
-                        frameActivity.syncWith(a);
-                    }
+                if (a.getAceFrameConfig().getTopActivity() == null) {
+                    a.getAceFrameConfig().setTopActivity(a);
                 }
             }
         }
@@ -451,22 +444,6 @@ public class ActivityViewer {
         if (DwfaEnv.isHeadless() == false) {
             new ActivitySorter().execute();
          }
-    }
-
-    private static void addSecondaryActivityPanel(Set<I_ShowActivity> secondaryPanels, I_ShowActivity a) {
-        if (DwfaEnv.isHeadless() == false) {
-            if (a.getSecondaryPanel() != null && secondaryPanels.contains(a.getSecondaryPanel()) == false) {
-                secondaryPanels.add(a.getSecondaryPanel());
-                for (Component c : a.getSecondaryPanel().getViewPanel().getComponents()) {
-                    a.getSecondaryPanel().getViewPanel().remove(c);
-                }
-                if (a.isComplete() == false) {
-                    ActivityPanel secondaryAP = new ActivityPanel(false, null, a.getAceFrameConfig());
-                    a.addShowActivityListener(secondaryAP);
-                    a.getSecondaryPanel().getViewPanel().add(secondaryAP);
-                }
-            }
-        }
     }
 
     public static void removeActivity(final I_ShowActivity activity) {

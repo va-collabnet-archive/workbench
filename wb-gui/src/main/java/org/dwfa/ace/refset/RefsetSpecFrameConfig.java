@@ -82,6 +82,14 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
+    public I_ShowActivity getTopActivity() {
+        return frameConfig.getTopActivity();
+    }
+
+    public void setTopActivity(I_ShowActivity activity) {
+        frameConfig.setTopActivity(activity);
+    }
+
     public PRECEDENCE getPrecedence() {
         return frameConfig.getPrecedence();
     }
@@ -1170,10 +1178,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public void fireUpdateHierarchyView() {
         frameConfig.fireUpdateHierarchyView();
-    }
-
-    public I_ShowActivity getTopActivityListener() {
-        return frameConfig.getTopActivityListener();
     }
 
     public boolean searchWithDescTypeFilter() {

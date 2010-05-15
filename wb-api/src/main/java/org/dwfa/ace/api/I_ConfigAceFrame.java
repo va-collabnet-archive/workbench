@@ -525,7 +525,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public I_ManageContradiction[] getAllConflictResolutionStrategies();
 
-    public I_ShowActivity getTopActivityListener();
+    public void setTopActivity(I_ShowActivity activity);
+    public I_ShowActivity getTopActivity();
 
     /**
      * Shows or hides as the activity viewer.

@@ -59,11 +59,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         this.refsetConcept = Bdb.getConcept(refsetNid);
         conceptCount = possibleIds.cardinality();
 
-        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString());
+        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
-        activity.addActionListener(new ActionListener() {
+        activity.addRefreshActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 canceled = true;
             }

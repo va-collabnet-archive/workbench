@@ -245,7 +245,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 
 		boolean firstUpdate = true;
 
-		ActivityPanel activity = new ActivityPanel(true, null, config);
+		ActivityPanel activity = new ActivityPanel(config, true);
 
 		private long startTime;
 
@@ -256,7 +256,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 			this.idSet = idSet;
 			updateTimer = new Timer(1000, this);
 			activity
-					.addActionListener(GetSearchCriterionFromWorkflowDetailsPanelAndSearch.this);
+					.addRefreshActionListener(GetSearchCriterionFromWorkflowDetailsPanelAndSearch.this);
 			actionPerformed(null);
 			updateTimer.start();
 			startTime = System.currentTimeMillis();
