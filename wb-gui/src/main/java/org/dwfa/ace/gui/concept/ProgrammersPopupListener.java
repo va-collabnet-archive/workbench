@@ -169,12 +169,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
 	private void setFromNid() {
 		String nidString = askQuestion("Set panel to new concept:", "Enter nid:", "-2142075612");
-		int cNid = Integer.parseInt(nidString);
+		int nid = Integer.parseInt(nidString);
 		try {
-			I_GetConceptData concept = Terms.get().getConcept(cNid);
+			I_GetConceptData concept = Terms.get().getConceptForNid(nid);
 			this.conceptPanel.setTermComponent(concept);
-		} catch (TerminologyException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
 		} catch (IOException ex) {
 			AceLog.getAppLog().alertAndLogException(ex);
 		}

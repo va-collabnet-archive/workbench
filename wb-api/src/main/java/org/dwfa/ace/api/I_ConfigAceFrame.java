@@ -621,5 +621,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void refreshRefsetTab();
     
     public void setPrecedence(PRECEDENCE precedence);
+    
     public PRECEDENCE getPrecedence();
+    
+    
 }
