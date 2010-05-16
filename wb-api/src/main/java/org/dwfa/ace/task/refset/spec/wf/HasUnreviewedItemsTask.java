@@ -115,7 +115,8 @@ public class HasUnreviewedItemsTask extends AbstractTask {
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
 
         for (I_ExtendByRef r: promotionRefsetConcept.getExtensions()) {
-            List<? extends I_ExtendByRefVersion> versions = r.getTuples(config.getAllowedStatus(), null, 
+            List<? extends I_ExtendByRefVersion> versions = r.getTuples(config.getAllowedStatus(), 
+                config.getViewPositionSetReadOnly(), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             if (versions.size() == 0) {
                 break;
