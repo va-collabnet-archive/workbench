@@ -73,7 +73,7 @@ public class ShowRefsetSpecTask extends AbstractTask {
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-
+        worker.getLogger().info("Starting: " + this.toString());
         try {
 
             I_TermFactory termFactory = Terms.get();

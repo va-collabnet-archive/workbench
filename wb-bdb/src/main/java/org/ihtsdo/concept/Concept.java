@@ -70,6 +70,8 @@ import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.lucene.LuceneManager;
 
+import cern.colt.map.OpenLongObjectHashMap;
+
 public class Concept implements I_Transact, I_GetConceptData {
 
 	public static ReferenceType refType = ReferenceType.WEAK;
@@ -263,21 +265,23 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return c;
 	}
 
-	private static ArrayList<NidPair> mergeNidLists(Concept c,
+	@SuppressWarnings("unchecked")
+    private static ArrayList<NidPair> mergeNidLists(Concept c,
 			List<UUID> uuidPairList, List<NidPair> nidPairList)
 			throws IOException {
-		HashSet<NidPair> pairSet = new HashSet<NidPair>(
-				c.getData().getRefsetNidMemberNidForRefsetMembersList().size());
-		for (NidPair pair: nidPairList) {
-			pairSet.add(pair);
-		}
+	    int maxSize = (uuidPairList.size() / 2) + nidPairList.size();
+	    OpenLongObjectHashMap pairMap = new OpenLongObjectHashMap(maxSize); 
+	    for (NidPair pair: nidPairList) {
+	        pairMap.put(pair.asLong(), pair);
+	    }
 
 		Iterator<UUID> uuidIterator = uuidPairList.iterator();
 		while (uuidIterator.hasNext()) {
-			pairSet.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-					Bdb.uuidToNid(uuidIterator.next())));
+		    NidPair pair = new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
+                Bdb.uuidToNid(uuidIterator.next()));
+		    pairMap.put(pair.asLong(), pair);
 		}
-		return new ArrayList<NidPair>(pairSet);
+		return pairMap.values().toList();
 	}
 
 	private static void getRefsetNidMemberNidForRefsetMembers(

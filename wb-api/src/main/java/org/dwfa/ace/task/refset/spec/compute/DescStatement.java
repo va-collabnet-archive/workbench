@@ -138,7 +138,8 @@ public class DescStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, "Possible: " + this.toString(), true);
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
+            "<html>Possible: <br>" + this.toHtmlFragment(), true);
         activity.setIndeterminate(true);
         long startTime = System.currentTimeMillis();
 

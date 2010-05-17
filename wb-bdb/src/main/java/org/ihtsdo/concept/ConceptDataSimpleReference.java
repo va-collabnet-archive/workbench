@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -307,16 +308,18 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             } else {
                 members.remove(pair);
                 Terms.get().addUncommittedNoChecks(enclosingConcept);
-                StringBuffer buff = new StringBuffer();
-                buff.append("Unable to find extension. RefsetNid: ");
-                buff.append(refsetNid);
-                buff.append(" MemberNid: ");
-                buff.append(memberNid);
-                buff.append("\n\nReferenced from concept: ");
-                buff.append(enclosingConcept.toLongString());
-                buff.append("\n\nRefset concept: ");
-                buff.append(refsetConcept.toLongString());
-                AceLog.getAppLog().warning(buff.toString());
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    StringBuffer buff = new StringBuffer();
+                    buff.append("Unable to find extension. RefsetNid: ");
+                    buff.append(refsetNid);
+                    buff.append(" MemberNid: ");
+                    buff.append(memberNid);
+                    buff.append("\n\nReferenced from concept: ");
+                    buff.append(enclosingConcept.toLongString());
+                    buff.append("\n\nRefset concept: ");
+                    buff.append(refsetConcept.toLongString());
+                    AceLog.getAppLog().warning(buff.toString());
+                }
             }
         }
         return refsetMembers;
@@ -339,16 +342,18 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             } else {
                 members.remove(pair);
                 Terms.get().addUncommittedNoChecks(enclosingConcept);
-                StringBuffer buff = new StringBuffer();
-                buff.append("Unable to find extension. RefsetNid: ");
-                buff.append(refsetNid);
-                buff.append(" MemberNid: ");
-                buff.append(memberNid);
-                buff.append("\n\nReferenced from concept: ");
-                buff.append(enclosingConcept.toLongString());
-                buff.append("\n\nRefset concept: ");
-                buff.append(refsetConcept.toLongString());
-                AceLog.getAppLog().warning(buff.toString());
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    StringBuffer buff = new StringBuffer();
+                    buff.append("Unable to find extension. RefsetNid: ");
+                    buff.append(refsetNid);
+                    buff.append(" MemberNid: ");
+                    buff.append(memberNid);
+                    buff.append("\n\nReferenced from concept: ");
+                    buff.append(enclosingConcept.toLongString());
+                    buff.append("\n\nRefset concept: ");
+                    buff.append(refsetConcept.toLongString());
+                    AceLog.getAppLog().warning(buff.toString());
+                }
             }
         }
         return refsetMembers;

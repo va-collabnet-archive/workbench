@@ -305,6 +305,10 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         this.tokenEnum = tokenEnum;
     }
 
+    public String toHtmlFragment() {
+        return toString();
+    }
+    
     public String toString() {
         StringBuffer buff = new StringBuffer();
         buff.append(!useNotQualifier);
