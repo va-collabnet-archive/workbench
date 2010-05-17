@@ -21,8 +21,7 @@
       <version>2.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.dwfa</groupId>
-  <artifactId>foundation</artifactId>
+  <artifactId>wb-foundation</artifactId>
   <packaging>jar</packaging>
   <name>DWFA foundation module</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html</url>

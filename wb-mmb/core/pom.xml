@@ -21,8 +21,7 @@
         <version>2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dwfa</groupId>
-    <artifactId>core</artifactId>
+    <artifactId>wb-core</artifactId>
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
