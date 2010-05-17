@@ -94,6 +94,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -3061,7 +3062,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
+    private static Timer swingTimer = new Timer(500, null);
+    static {
+        swingTimer.start();
+    }
+    
     public void setTopActivity(I_ShowActivity activity) {
+        if (this.topActivity != null) {
+            swingTimer.removeActionListener(this.topActivity);
+        }
+        this.topActivity = (ActivityPanel) activity;
+        swingTimer.addActionListener(topActivity);
+        
         this.topActivity = (ActivityPanel) activity;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -3081,7 +3093,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
              }
         });
-
     }
 
     public I_ShowActivity getTopActivity() {
