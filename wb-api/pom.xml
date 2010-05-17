@@ -43,8 +43,8 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>org.dwfa</groupId>
-            <artifactId>core</artifactId>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
