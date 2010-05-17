@@ -84,8 +84,8 @@
         </plugins>
     </reporting>
     <modules>
-        <module>foundation</module>
-        <module>core</module>
+        <module>wb-foundation</module>
+        <module>wb-core</module>
         <module>wb-api</module>
         <module>wb-mojo</module>
         <module>wb-gui</module>        
