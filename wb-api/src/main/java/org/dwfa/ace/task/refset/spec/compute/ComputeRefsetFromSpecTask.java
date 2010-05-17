@@ -185,7 +185,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         Set<Integer> nestedRefsets = query.getNestedRefsets();
         this.setNestedRefsets(nestedRefsets);
         for (Integer nestedRefsetId : nestedRefsets) {
-            if (!excludedRefsets.contains(nestedRefsetId)) {
+            if (excludedRefsets == null || !excludedRefsets.contains(nestedRefsetId)) {
 
                 Condition condition =
                         computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
