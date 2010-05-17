@@ -256,15 +256,19 @@ public class ActivityViewer {
     private List<I_ShowActivity> activitiesList = new CopyOnWriteArrayList<I_ShowActivity>();
     private Set<I_ShowActivity> activitiesSet = new CopyOnWriteArraySet<I_ShowActivity>();
     
-    private static Timer updateTimer = new Timer(1000, null);
-    
-    public static void removeFromUpdateTimer(ActionListener l) {
-        updateTimer.removeActionListener(l);
-    }
+    private static Timer updateTimer = new Timer(500, null);
     static {
         updateTimer.start();
     }
-
+   
+    public static void removeFromUpdateTimer(ActionListener l) {
+        updateTimer.removeActionListener(l);
+    }
+ 
+    public static void addToUpdateTimer(ActionListener l) {
+        updateTimer.addActionListener(l);
+    }
+ 
     private ActivityViewer() throws Exception {
         super();
         viewer = this;
@@ -360,12 +364,12 @@ public class ActivityViewer {
                                 AceLog.getAppLog().alertAndLogException(e);
                             }
                         }
-                        viewer.activitiesList.add(0, activity);
                         if (!viewer.activitiesSet.contains(activity)) {
+                            viewer.activitiesSet.add(activity);
                             ActivityViewer.updateTimer.addActionListener(activity);
                         }
                         
-                        List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+                        List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesSet);
                         Collections.sort(listToSort, activityComparator);
                         viewer.activitiesList = new CopyOnWriteArrayList<I_ShowActivity>(listToSort); 
                         synchronized (viewer.activitiesList) {
@@ -427,7 +431,7 @@ public class ActivityViewer {
         protected Boolean doInBackground() throws Exception {
             ArrayList<I_ShowActivity> origOrder = null;
             origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
-            List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesList);
+            List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesSet);
             Collections.sort(listToSort, activityComparator);
             if (origOrder.equals(listToSort)) {
                 return false;

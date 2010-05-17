@@ -668,7 +668,6 @@ public class RefsetSpecPanel extends JPanel {
                 }
             });
             ActivityViewer.addActivity(activity);
-            ActivityViewer.toFront();
         }
 
         @Override

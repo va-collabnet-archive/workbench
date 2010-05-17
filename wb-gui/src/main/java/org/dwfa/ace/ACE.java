@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.Timer;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -1270,10 +1269,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static ExecutorService threadPool =
             Executors.newFixedThreadPool(9, new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
 
-    public static Timer timer = new Timer();
-
-    public static javax.swing.Timer swingTimer = new javax.swing.Timer(1000, null);
-
     public AceFrameConfig aceFrameConfig;
 
     public static AceConfig aceConfig;
@@ -1399,7 +1394,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public ACE(Configuration config, String pluginRoot) {
         super(new GridBagLayout());
         this.pluginRoot = pluginRoot;
-        this.swingTimer.start();
         try {
             menuWorker = new MasterWorker(config);
 
@@ -3068,9 +3062,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     public void setTopActivity(I_ShowActivity activity) {
-        if (this.topActivity != null) {
-            swingTimer.removeActionListener(this.topActivity);
-        }
         this.topActivity = (ActivityPanel) activity;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -3084,7 +3075,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     }
                     if (topActivity != null) {
                         activityPanel.add(topActivity.getViewPanel(false));
-                        swingTimer.addActionListener(topActivity);
                     } else {
                         activityPanel.add(new JPanel());
                     }

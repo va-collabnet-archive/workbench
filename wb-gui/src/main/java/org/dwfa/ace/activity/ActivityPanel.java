@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +38,6 @@ import javax.swing.event.AncestorListener;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.swing.SwingTask;
 import org.dwfa.tapi.ComputationCanceled;
 
 public class ActivityPanel implements I_ShowActivity, AncestorListener {
@@ -86,6 +84,8 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 
         JLabel progressInfoLower = new JLabel();
         
+        boolean showProgress = false;
+        
         boolean stopped = false;
 
         
@@ -97,11 +97,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             progressInfoLower.setText(progressInfoLowerStr);
 
             GridBagConstraints c = new GridBagConstraints();
-
-            JPanel infoGridPanel = new JPanel(new GridLayout(2, 1));
-            infoGridPanel.add(progressInfoUpper);
-            infoGridPanel.add(progressInfoLower);
-            infoGridPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
             c.fill = GridBagConstraints.BOTH;
             c.gridx = 0;
             c.gridy = 0;
@@ -109,15 +104,15 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             c.weightx = 1.0;
             c.weighty = 0;
             c.anchor = GridBagConstraints.WEST;
-            add(infoGridPanel, c);
+            add(makeInfoPanel(), c);
 
             c.weightx = 0.0;
             c.gridx++;
             c.anchor = GridBagConstraints.EAST;
             c.fill = GridBagConstraints.HORIZONTAL;
             progressBar.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+            progressBar.setVisible(false);
             add(progressBar, c);
-            progressBar.setVisible(!complete);
             c.gridx++;
             stopButton.setVisible(stopButtonVisible);
             if (stopButtonVisible) {
@@ -128,15 +123,32 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                 setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
             }
         }
+
+        private JPanel makeInfoPanel() {
+            JPanel infoGridPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.weightx = 1.0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.WEST;
+            infoGridPanel.add(progressInfoUpper, c);
+            c.gridy++;
+            infoGridPanel.add(progressInfoLower, c);
+            infoGridPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+            return infoGridPanel;
+        }
         
-        private class ShowStopAndProgress extends SwingTask {
+        private class ShowStopAndProgress implements ActionListener {
 
             private ShowStopAndProgress() {
                 super();
             }
 
             @Override
-            public void doRun() {
+            public void actionPerformed(ActionEvent e) {
                 if (complete) {
                     stopButton.setVisible(false);
                     progressBar.setVisible(false);
@@ -155,6 +167,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                     stopButton.setVisible(true);
                     progressBar.setVisible(true);
                 }
+                ActivityViewer.removeFromUpdateTimer(this);
             }
 
         }
@@ -166,10 +179,22 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             if (!progressInfoLower.getText().equals(progressInfoLowerStr)) {
                 progressInfoLower.setText(progressInfoLowerStr);
             }
+            if (stopButtonVisible) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
+            }
+            
             if (max != progressBar.getMaximum()) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
                 progressBar.setMaximum(max);
             }
             if (value != progressBar.getValue()) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
                 progressBar.setValue(value);
             }
             if (indeterminate != progressBar.isIndeterminate()) {
@@ -183,9 +208,8 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             if (stopButtonVisible != stopButton.isVisible()) {
                 stopButton.setVisible(stopButtonVisible);
             }
-            
             if (complete && !stopped) {
-                ACE.timer.schedule(new ShowStopAndProgress(), 500);
+                ActivityViewer.addToUpdateTimer(new ShowStopAndProgress());
             }
         }
     }
@@ -454,7 +478,13 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 
     @Override
     public void ancestorRemoved(AncestorEvent event) {
-        panels.remove(event.getComponent());
+        ActivityPanelImpl aPanel = (ActivityPanelImpl) event.getComponent();
+        panels.remove(aPanel);
+        aPanel.removeAncestorListener(this);
+        aPanel.progressBar.setIndeterminate(false);
+        aPanel.progressBar.setEnabled(false);
+        aPanel.removeAll();
+        aPanel.setVisible(false);
     }
 
 

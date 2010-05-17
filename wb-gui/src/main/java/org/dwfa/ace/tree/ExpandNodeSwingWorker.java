@@ -127,14 +127,19 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     //;
                 }
                 updateTimer.stop();
-                if (System.currentTimeMillis() - start < 1000) {
+                boolean alwaysRemove = true;
+                if (alwaysRemove) {
                     activity.removeActivityFromViewer();
-                } else if (lowerProgressMessage.contains("Action programatically stopped")) {
-                     activity.removeActivityFromViewer();
-                }
-                if (lowerProgressMessage.startsWith("counting")) {
-                    activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
-                        + activity.nextSpinner());
+                } else {
+                    if (System.currentTimeMillis() - start < 1000) {
+                        activity.removeActivityFromViewer();
+                    } else if (lowerProgressMessage.contains("Action programatically stopped")) {
+                         activity.removeActivityFromViewer();
+                    }
+                    if (lowerProgressMessage.startsWith("counting")) {
+                        activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
+                            + activity.nextSpinner());
+                    }
                 }
             }
         }
