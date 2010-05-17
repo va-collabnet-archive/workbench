@@ -52,8 +52,8 @@
             <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>org.dwfa</groupId>
-            <artifactId>foundation</artifactId>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-foundation</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
