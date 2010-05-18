@@ -21,7 +21,7 @@ import org.ihtsdo.time.TimeUtil;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
     
-    protected static boolean writeDebugFiles = true;
+    protected static boolean writeDebugFiles = false;
 	/**
 	 * 
 	 */
