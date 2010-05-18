@@ -30,6 +30,7 @@ public abstract class Revision<V extends Revision<V, C>,
 		assert primordialComponent != null;
 		this.sapNid = statusAtPositionNid;
 		this.primordialComponent = primordialComponent;
+		primordialComponent.clearVersions();
 		assert primordialComponent != null;
 		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
@@ -37,12 +38,14 @@ public abstract class Revision<V extends Revision<V, C>,
 	public Revision(int statusNid, int pathNid, long time, C primordialComponent) {
 		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
+        primordialComponent.clearVersions();
 		assert primordialComponent != null;
 		assert sapNid != Integer.MAX_VALUE;
 	}
 	
 	public Revision(TupleInput input, C conceptComponent) {
 		this(input.readInt(), conceptComponent);
+        conceptComponent.clearVersions();
 	}
 
     public Revision() {

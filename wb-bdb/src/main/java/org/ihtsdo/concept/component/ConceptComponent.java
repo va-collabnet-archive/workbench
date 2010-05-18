@@ -1069,6 +1069,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         r.primordialComponent = (C) this;
         c.modified();
+        clearVersions();
         return returnValue;
     }
 
@@ -1389,4 +1390,5 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         v.setDenotation(longId);
         return addIdVersion(v);
     }
+    
 }

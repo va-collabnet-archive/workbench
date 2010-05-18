@@ -173,6 +173,11 @@ public class BdbCommitManager {
 
 	private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
 	public static void addUncommittedNoChecks(I_GetConceptData concept) {
+        if (Bdb.watchList.containsKey(concept.getNid())) {
+            AceLog.getAppLog().info(
+                    "---@@@ Adding uncommitted NO checks: "
+                            + concept.getNid() + " ---@@@ ");
+        }
 	    Concept c = null;
         uncommittedCNidsNoChecks.setMember(concept.getNid());
         c = lastUncommitted.getAndSet((Concept) concept);
@@ -197,7 +202,7 @@ public class BdbCommitManager {
         if (c != null) {
             if (Bdb.watchList.containsKey(c.getNid())) {
                 AceLog.getAppLog().info(
-                        "---@@@ Adding uncommitted NO checks: "
+                        "---@@@ writeUncommitted checks: "
                                 + c.getNid() + " ---@@@ ");
             }
             dbWriterPermit.acquire();
@@ -408,7 +413,7 @@ public class BdbCommitManager {
                         IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
                                 commitTime);
 
-                        if (writeChangeSets) {
+                        if (writeChangeSets && sapNidsFromCommit.size() > 0) {
                             if (changeSetPolicy == null) {
                                 changeSetPolicy = ChangeSetPolicy.OFF;
                             }
