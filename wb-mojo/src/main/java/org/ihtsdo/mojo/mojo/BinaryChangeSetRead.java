@@ -24,7 +24,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.ihtsdo.mojo.maven.MojoUtil;
@@ -82,7 +82,7 @@ public class BinaryChangeSetRead extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory termFactory = Terms.get();
         try {
             I_ReadChangeSet reader = termFactory.newBinaryChangeSetReader(new File(changeSetDir, changeSetFileName));
             if (validate) {

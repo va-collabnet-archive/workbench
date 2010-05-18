@@ -103,7 +103,7 @@ public class ImportAllChangeSets extends AbstractTask {
                 }
             }
         };
-        csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".jcs");
+        csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".eccs");
     }
 
     /**

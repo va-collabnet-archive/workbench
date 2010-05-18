@@ -127,7 +127,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 new FilenameFilter() {
 
                     public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".jcs");
+                        return name.toLowerCase().endsWith(".eccs");
                     }
                 }, null, parentFrame);
 

@@ -122,7 +122,7 @@ public class UserToCentralSyncPkg extends AbstractTask {
             }
 
             List<File> changeSetFiles = new ArrayList<File>();
-            ChangeSetImporter.addAllChangeSetFiles(new File("profiles"), changeSetFiles, ".jcs");
+            ChangeSetImporter.addAllChangeSetFiles(new File("profiles"), changeSetFiles, ".eccs");
             for (File csf : changeSetFiles) {
                 String lastImportSize = csProperties.getProperty(FileIO.getNormalizedRelativePath(csf));
                 if (lastImportSize != null) {
