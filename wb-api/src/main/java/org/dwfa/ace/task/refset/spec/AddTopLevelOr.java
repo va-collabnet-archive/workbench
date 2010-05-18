@@ -1,5 +1,6 @@
 package org.dwfa.ace.task.refset.spec;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,7 +22,6 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -62,7 +62,7 @@ public class AddTopLevelOr extends AbstractTask {
     
     private transient I_ConfigAceFrame configFrame;
     private transient I_GetConceptData refsetConcept;
-    private transient I_GetConceptData refsetSpec;
+    private transient I_GetConceptData refsetInEditor;
 
     protected static Integer trueNid = Integer.MIN_VALUE;
     protected static Integer falseNid = Integer.MIN_VALUE;
@@ -121,6 +121,42 @@ public class AddTopLevelOr extends AbstractTask {
             }
 
             ex = null;
+
+            //TODO pass in frame configuration
+            configFrame = Terms.get().getActiveAceFrameConfig();
+             if (configFrame.getEditingPathSet().size() == 0) {
+                 String msg = "Unable to add spec. Editing path set is empty.";
+                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
+                 throw new TaskFailedException(msg);
+             }
+
+             UUID refsetUuid = (UUID) process.getProperty(refsetPropName);
+
+             refsetConcept = Terms.get().getConcept(refsetUuid);
+             configFrame.setRefsetInSpecEditor(refsetConcept);
+             Thread.sleep(200);
+             
+             refsetInEditor = configFrame.getRefsetInSpecEditor();
+             
+             while (refsetInEditor != refsetConcept) {
+                 Thread.sleep(500);
+                 SwingUtilities.invokeAndWait(new Runnable() {
+                     public void run() {
+                         try {
+                            refsetInEditor = configFrame.getRefsetSpecInSpecEditor();
+                        } catch (IOException e) {
+                            ex = e;
+                        } catch (TerminologyException e) {
+                            ex = e;
+                        }
+                     }
+                 });
+                 if (ex != null) {
+                     throw new TaskFailedException(ex);
+                 }
+             }
+
+            
             if (SwingUtilities.isEventDispatchThread()) {
                 doRun(process, worker);
             } else {
@@ -140,6 +176,10 @@ public class AddTopLevelOr extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
         }
         if (ex != null) {
             throw new TaskFailedException(ex);
@@ -149,51 +189,19 @@ public class AddTopLevelOr extends AbstractTask {
 
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
-            //TODO pass in frame configuration
-           configFrame = Terms.get().getActiveAceFrameConfig();
-            if (configFrame.getEditingPathSet().size() == 0) {
-                String msg = "Unable to add spec. Editing path set is empty.";
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
-                throw new TaskFailedException(msg);
-            }
-
-            UUID refsetUuid = (UUID) process.readAttachement(refsetPropName);
-
-            refsetConcept = Terms.get().getConcept(refsetUuid);
-            refsetSpec = configFrame.getRefsetSpecInSpecEditor();
-            while (refsetSpec != refsetConcept) {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
- 
-                        try {
-                            configFrame.setRefsetInSpecEditor(refsetConcept);
-                            refsetSpec = configFrame.getRefsetSpecInSpecEditor();
-                        } catch (IOException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        } catch (TerminologyException e) {
-                            AceLog.getAppLog().alertAndLogException(e);
-                        }
-                    }
-                });
-                refsetSpec = configFrame.getRefsetSpecInSpecEditor();
-            }
- 
-            if (refsetSpec != null) {
-                JTree specTree = configFrame.getTreeInSpecEditor();
-                DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
-                if (rootNode.getChildCount() == 0) {
-                    int refsetId = refsetSpec.getConceptId();
-                    int componentId = refsetId;
-                    I_TermFactory tf = Terms.get();
-                    I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
-                    RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
-                    I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(refsetId, componentId,
-                        propMap.getMemberType(), propMap, UUID.randomUUID());
-                    tf.addUncommitted(ext);
-                    configFrame.fireRefsetSpecChanged(ext);
-                }
-
+            JTree specTree = configFrame.getTreeInSpecEditor();
+            DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
+            if (rootNode.getChildCount() == 0) {
+                ;
+                int refsetId = Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept, configFrame).iterator().next().getConceptId();
+                int componentId = refsetId;
+                I_TermFactory tf = Terms.get();
+                I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);
+                RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
+                I_ExtendByRef ext = refsetHelper.getOrCreateRefsetExtension(refsetId, componentId,
+                    propMap.getMemberType(), propMap, UUID.randomUUID());
+                tf.addUncommitted(ext);
+                configFrame.fireRefsetSpecChanged(ext);
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {
