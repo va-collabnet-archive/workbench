@@ -21,6 +21,7 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -38,19 +39,30 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class AddTopLevelOr extends AbstractTask {
 
-    private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
-    private String activeDescriptionPropName = ProcessAttachmentKeys.ACTIVE_DESCRIPTION_UUID.getAttachmentKey();
+    private String refsetPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
+    public String getRefsetPropName() {
+        return refsetPropName;
+    }
+
+    public void setRefsetPropName(String refsetPropName) {
+        this.refsetPropName = refsetPropName;
+    }
+
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 4;
+    private static final int dataVersion = 5;
 
     private Boolean clauseIsTrue = true;
     private transient Exception ex = null;
     private transient Condition returnCondition = Condition.CONTINUE;
     protected I_DescriptionVersioned c3Description;
+    
+    private transient I_ConfigAceFrame configFrame;
+    private transient I_GetConceptData refsetConcept;
+    private transient I_GetConceptData refsetSpec;
 
     protected static Integer trueNid = Integer.MIN_VALUE;
     protected static Integer falseNid = Integer.MIN_VALUE;
@@ -61,28 +73,27 @@ public class AddTopLevelOr extends AbstractTask {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeBoolean(clauseIsTrue);
-        out.writeObject(activeConceptPropName);
-        out.writeObject(activeDescriptionPropName);
+        out.writeObject(refsetPropName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion <= dataVersion) {
-            if (objDataVersion < 2) {
-                clauseIsTrue = true;
-            } else {
-                clauseIsTrue = in.readBoolean();
+            if (objDataVersion < 5) {
+                if (objDataVersion >= 2) {
+                    in.readBoolean();
+                } 
+                if (objDataVersion == 3) {
+                    in.readObject();
+                } 
+                if (objDataVersion >= 4) {
+                    in.readObject();
+                } 
             }
-            if (objDataVersion == 3) {
-                activeConceptPropName = (String) in.readObject();
+            if (objDataVersion < 5) {
+                refsetPropName = ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey();
             } else {
-                activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT_UUID.getAttachmentKey();
-            }
-            if (objDataVersion >= 4) {
-                activeDescriptionPropName = (String) in.readObject();
-            } else {
-                activeDescriptionPropName = ProcessAttachmentKeys.ACTIVE_DESCRIPTION_UUID.getAttachmentKey();
+                refsetPropName = (String) in.readObject();
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -138,19 +149,36 @@ public class AddTopLevelOr extends AbstractTask {
 
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
-            I_ConfigAceFrame configFrame = Terms.get().getActiveAceFrameConfig();
+            //TODO pass in frame configuration
+           configFrame = Terms.get().getActiveAceFrameConfig();
             if (configFrame.getEditingPathSet().size() == 0) {
                 String msg = "Unable to add spec. Editing path set is empty.";
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                 throw new TaskFailedException(msg);
             }
 
-            UUID descriptionUuid = (UUID) process.readAttachement(activeDescriptionPropName);
-            if (descriptionUuid != null) {
-                c3Description = Terms.get().getDescription(Terms.get().uuidToNative(descriptionUuid));
-            }
+            UUID refsetUuid = (UUID) process.readAttachement(refsetPropName);
 
-            I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
+            refsetConcept = Terms.get().getConcept(refsetUuid);
+            refsetSpec = configFrame.getRefsetSpecInSpecEditor();
+            while (refsetSpec != refsetConcept) {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+ 
+                        try {
+                            configFrame.setRefsetInSpecEditor(refsetConcept);
+                            refsetSpec = configFrame.getRefsetSpecInSpecEditor();
+                        } catch (IOException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (TerminologyException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    }
+                });
+                refsetSpec = configFrame.getRefsetSpecInSpecEditor();
+            }
+ 
             if (refsetSpec != null) {
                 JTree specTree = configFrame.getTreeInSpecEditor();
                 DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
@@ -208,21 +236,4 @@ public class AddTopLevelOr extends AbstractTask {
     public void setClauseIsTrue(Boolean clauseIsTrue) {
         this.clauseIsTrue = clauseIsTrue;
     }
-
-    public String getActiveConceptPropName() {
-        return activeConceptPropName;
-    }
-
-    public void setActiveConceptPropName(String activeConceptPropName) {
-        this.activeConceptPropName = activeConceptPropName;
-    }
-
-    public String getActiveDescriptionPropName() {
-        return activeDescriptionPropName;
-    }
-
-    public void setActiveDescriptionPropName(String activeDescriptionPropName) {
-        this.activeDescriptionPropName = activeDescriptionPropName;
-    }
-
 }
