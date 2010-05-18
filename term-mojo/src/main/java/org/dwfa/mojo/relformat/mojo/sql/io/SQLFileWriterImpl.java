@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
     }
 
     public void writer(final File file, final Table table, final String outputDirectory,
-            final LineToSQLConverter lineToSQLConverter, final boolean concat, String fileName) {
+            final LineToSQLConverter lineToSQLConverter, final boolean concat, String fileName, boolean hasHeader) {
         BufferedReader reader = null;
         PrintWriter writer = null;
 
@@ -50,8 +50,11 @@ public final class SQLFileWriterImpl implements SQLFileWriter {
             reader = openReader(file);
             writer = openWriter(table, file, outputDirectory, concat);
 
-            String line = reader.readLine();// skip the header line.
+            if (hasHeader) {
+                reader.readLine();
+            }
 
+            String line;
             while ((line = reader.readLine()) != null) {
                 String lineout = lineToSQLConverter.convert(table, line);
                 if (fileName != "") {

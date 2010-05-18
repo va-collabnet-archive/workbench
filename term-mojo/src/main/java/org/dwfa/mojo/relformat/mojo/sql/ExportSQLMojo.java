@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * This plugin exports sql statements from release format files.
- * 
+ *
  * @goal export-release-format-sql
  * @phase process-resources
  */
@@ -55,14 +55,14 @@ public final class ExportSQLMojo extends AbstractMojo {
 
     /**
      * The loction of where the sql files are written.
-     * 
+     *
      * @parameter expression="${project.build.directory}/sql"
      */
     private String outputDirectory;
 
     /**
      * The location from which the ReleaseFormat text files are read.
-     * 
+     *
      * @parameter expression="${basedir}/src/main/resources"
      */
     private File inputDirectory;
@@ -70,14 +70,14 @@ public final class ExportSQLMojo extends AbstractMojo {
     /**
      * Turns verbose logging on/off. You probably want this turned off, unless
      * you are chasing a bug.
-     * 
+     *
      * @parameter default-value="false"
      */
     private boolean verbose;
 
     /**
      * Tells SQL Write to concatenate files into 1 file
-     * 
+     *
      * @parameter default-value="false"
      */
     private boolean concatfiles;
@@ -86,14 +86,14 @@ public final class ExportSQLMojo extends AbstractMojo {
      * The location of the ReleaseConfig.xml file. Mappings between release
      * format files and exported sql
      * files are done through the pom.xml and the ReleaseConfig.xml.
-     * 
+     *
      * @parameter expression="${basedir}/src/main/resources/ReleaseConfig.xml"
      */
     private File releaseFileLocation;
 
     /**
      * The configuration for each ReleaseFormat that is to be exported to sql.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -130,7 +130,7 @@ public final class ExportSQLMojo extends AbstractMojo {
                     logInfo("processing file", aFile);
                     String fileName = "";
                     if (format.getaddfilename()) fileName = aFile.getName();
-                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToSQLConverter, concatfiles, fileName);
+                    sqlFileWriter.writer(aFile, getTable(format), outputDirectory, lineToSQLConverter, concatfiles, fileName, true);
                 }
             } catch (Exception e) {
                 getLog().error(e); // if a format fails, log and keep going to
