@@ -118,7 +118,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                             case BEFORE:
                                 break;
                             case CONTRADICTION:
-                                if (contradictionManager != null) {
+                                if (contradictionManager != null && allowedStatus != null) {
                                     partsForPosition.remove(prevPartToTest);
                                     partsForPosition.addAll(contradictionManager.resolveParts(part, prevPartToTest));
                                 } else {
