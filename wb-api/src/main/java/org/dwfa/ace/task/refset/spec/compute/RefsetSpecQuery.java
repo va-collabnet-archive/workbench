@@ -102,8 +102,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private RefsetSpecExecutionOrderComparator calculationOrderComparator;
     private boolean allComponentsNeedsResort = true;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid) throws TerminologyException, IOException {
+        super(refsetSpecNid);
         // create query object (statements + any sub-queries)
         executionOrderComparator = new RefsetSpecCalculationOrderComparator();
         calculationOrderComparator = new RefsetSpecExecutionOrderComparator();
@@ -141,7 +141,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept);
+        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, getRefsetSpecNid());
         subqueries.add(subquery);
         allComponents.add(subquery);
         allComponentsNeedsResort = true;
@@ -149,8 +149,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -158,8 +158,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -167,8 +167,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -176,8 +176,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            String constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+            String constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -374,7 +374,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             return true;
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling OR.");
+                throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() +
+                    "\n\n" + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {

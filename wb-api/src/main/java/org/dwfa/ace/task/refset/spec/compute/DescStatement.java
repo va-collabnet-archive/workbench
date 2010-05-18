@@ -61,8 +61,9 @@ public class DescStatement extends RefsetSpecStatement {
      * @param queryConstraint
      *            The destination concept (e.g. "paracetamol")
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
-        super(useNotQualifier, queryToken, queryConstraint);
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, 
+            I_AmTermComponent queryConstraint, int refsetSpecNid) {
+        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;
@@ -84,8 +85,8 @@ public class DescStatement extends RefsetSpecStatement {
      * @param queryConstraint
      *            String value for regex or lucene search
      */
-    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint) {
-        super(useNotQualifier, queryToken, queryConstraint);
+    public DescStatement(boolean useNotQualifier, I_GetConceptData queryToken, String queryConstraint, int refsetSpecNid) {
+        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;

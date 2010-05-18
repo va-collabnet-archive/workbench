@@ -138,7 +138,9 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_AmTermComponent constraint) {
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        super(refsetSpecNid);
 
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
@@ -153,8 +155,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The string value for regex or lucene search.
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, String constraint) {
-
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, String constraint, int refsetSpecNid) {
+        super(refsetSpecNid);
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
         this.queryConstraint = constraint;
