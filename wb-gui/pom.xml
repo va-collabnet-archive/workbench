@@ -18,7 +18,7 @@
     <parent>
       <groupId>org.ihtsdo</groupId>
       <artifactId>wb-mmb</artifactId>
-      <version>2.5.1-SNAPSHOT</version>
+      <version>2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-gui</artifactId>
@@ -27,6 +27,22 @@
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html </url>
     <inceptionYear>2005</inceptionYear>
     <description>Workbench Editor GUI </description>
+   <distributionManagement>
+        <site>
+            <id>website</id>
+            <url>file:///ciserver/sites/dwfa</url>
+        </site>
+        <snapshotRepository>
+            <id>archiva04.snapshots</id>
+            <name>Archiva04 Snapshots Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>archiva04.releases</id>
+            <name>Archiva04 Releases Repository</name>
+            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
+        </repository>
+    </distributionManagement>
     <licenses>
         <license>
             <name>Informatics, Inc. End User License Agreement</name>
