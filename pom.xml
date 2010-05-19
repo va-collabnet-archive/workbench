@@ -27,17 +27,17 @@
         <snapshotRepository>
             <id>archiva04.snapshots</id>
             <name>Archiva04 Snapshots Repository</name>
-            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.snapshots</url>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.snapshots</url>
         </snapshotRepository>
         <repository>
             <id>archiva04.releases</id>
             <name>Archiva04 Releases Repository</name>
-            <url>file:///usr/local/apache-archiva-1.2.1/data/repositories/archiva04.releases</url>
+            <url>http://mgr.servers.aceworkspace.net/apps/archiva04/archiva/repository/archiva04.releases</url>
         </repository>
     </distributionManagement>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/restructure/dwfa-pom</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/restructure/dwfa-pom</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
     <issueManagement>
