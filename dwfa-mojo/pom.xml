@@ -36,6 +36,12 @@
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-mojo</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
     </scm>
+    <distributionManagement>
+	<site>
+      <id>samples.site</id>
+      <url>dav:http://tumalo.informatics.com:8080/sites/dwfa-mojo<url>
+    </site>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.doxia</groupId>
