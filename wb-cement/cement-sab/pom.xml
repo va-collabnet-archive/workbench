@@ -317,22 +317,20 @@
 											<variable name="project.version" value="${project.version}"/>
 											<variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
 											<variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
-											<variable name="bundle.file_description" value="IHTSDO Workbench Cement"/>
+											<variable name="bundle.file_description" value="IHTSDO Workbench Beta Release"/>
 											<variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
-											<variable name="bundle.version" value=""/>
+											<variable name="bundle.version" value="test"/>
 											<variable name="bundle.publisher" value="IHTSDO"/>
 											<variable name="bundle.publisher.url" value="http://www.ihtsdo.org"/>
 											<variable name="bundle.vm_args" value="config/start-wb-local.config"/>
 											<variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
 											<variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
-											<variable name="pom.short.name" value="ihtsdo cement sa"/>
+											<variable name="pom.short.name" value="ihtsdo workbench sa"/>
 											<variable name="media.dir" value="${project.build.directory}/site"/>
 											<variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
 											<variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
 											<variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
-											<variable name="bundle.about_box_graphic" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
-											<variable name="bundle.about_box_title" value="About IHTSDO Cement"/>
-											<variable name="bundle.dock_icon" value="IHT_IconFiles1_128x128.icns"/>
+											<variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
 										</install4j>
 									</tasks>
 								</configuration>

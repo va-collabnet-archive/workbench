@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.7" transformSequenceNumber="2">
   <directoryPresets config="${compiler:bundle.directory}" />
-  <application name="${compiler:pom.short.name}" distributionSourceDir="" applicationId="0370-3144-4196-6910" mediaDir="${compiler:media.dir}" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:sys.withJre}" compression="6" lzmaCompression="false" pack200Compression="true" excludeSignedFromPacking="true" keepModificationTimes="true" missingFilesStrategy="warn" shortName="${compiler:pom.short.name}" publisher="${compiler:bundle.publisher}" publisherWeb="${compiler:bundle.publisher.url}" version="${compiler:bundle.version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.6" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="${compiler:pom.short.name}" distributionSourceDir="" applicationId="1024-6156-6951-3976" mediaDir="${compiler:media.dir}" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:sys.withJre}" compression="6" lzmaCompression="false" pack200Compression="true" excludeSignedFromPacking="true" keepModificationTimes="true" missingFilesStrategy="warn" shortName="${compiler:pom.short.name}" publisher="${compiler:bundle.publisher}" publisherWeb="${compiler:bundle.publisher.url}" version="${compiler:bundle.version}" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="1.6" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -26,9 +26,6 @@
       <variable name="bundle.vm_args" value="" />
       <variable name="bundle.vm_main_class" value="" />
       <variable name="bundle.vm_parameters" value="" />
-      <variable name="bundle.about_box_title" value="" />
-      <variable name="bundle.about_box_graphic" value="" />
-      <variable name="bundle.dock_icon" value="" />
     </variables>
   </application>
   <files>
@@ -43,8 +40,6 @@
           <entry location=".DS_Store" fileType="regular" />
           <entry location="pWb.bat" fileType="regular" />
           <entry location="pWbLinux.sh" fileType="regular" />
-          <entry location="wbLinux.sh" fileType="regular" />
-          <entry location="dWbLinux.sh" fileType="regular" />
           <entry location="pWbOsX.sh" fileType="regular" />
         </exclude>
       </dirEntry>
@@ -375,10 +370,10 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                             <string>-Djava.security.properties=conflig/dynamic-policy.security-properties</string>
                           </void>
                           <void index="5">
-                            <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"</string>
+                            <string>-Dorg.dwfa.AboutBoxTitle="About IHTSDO Workbench..."</string>
                           </void>
                           <void index="6">
-                            <string>-Dorg.dwfa.AppMenuName="${compiler:bundle.short_name}"</string>
+                            <string>-Dorg.dwfa.AppMenuName="IHTSDO Workbench"</string>
                           </void>
                           <void index="7">
                             <string>-Dapple.laf.useScreenMenuBar=true</string>
@@ -562,26 +557,6 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                 </serializedBean>
                 <condition />
               </action>
-              <action name="windows memory xms in batch file" id="14551" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
-                      <void property="file">
-                        <object class="java.io.File">
-                          <string>wb.bat</string>
-                        </object>
-                      </void>
-                      <void property="replaceValue">
-                        <string>-Xms700m</string>
-                      </void>
-                      <void property="searchValue">
-                        <string>-Xms1400m</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
               <action name="osx memory xmx in batch file" id="14162" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -698,7 +673,7 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                         <boolean>false</boolean>
                       </void>
                       <void property="replaceValue">
-                        <string>-Dorg.dwfa.AboutBoxTitle=${compiler.bundle.about_box_title}  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
+                        <string>-Dorg.dwfa.AboutBoxTitle="About IHTSDO Workbench"  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
                       </void>
                       <void property="searchValue">
                         <string>-Dorg.dwfa.jiniport=8080</string>
@@ -721,7 +696,7 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                         </object>
                       </void>
                       <void property="replaceValue">
-                        <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
+                        <string>-Dorg.dwfa.AboutBoxTitle="About IHTSDO Workbench"  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
                       </void>
                       <void property="searchValue">
                         <string>-Dorg.dwfa.jiniport=8080</string>
@@ -744,7 +719,7 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                         </object>
                       </void>
                       <void property="replaceValue">
-                        <string>-Dorg.dwfa.AboutBoxTitle="${compiler:bundle.about_box_title}"  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
+                        <string>-Dorg.dwfa.AboutBoxTitle="About IHTSDO Workbench"  -Dorg.dwfa.AboutBoxGraphic=${compiler:about.box}  -Dorg.dwfa.jiniport=8080</string>
                       </void>
                       <void property="searchValue">
                         <string>-Dorg.dwfa.jiniport=8080</string>
@@ -765,62 +740,6 @@ You acknowledge and agree that the Software may be subject to restrictions and c
                       </void>
                       <void property="mode">
                         <string>a+e</string>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="del wbOsX sh files" id="14473" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="sh OSX failed">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="file">
-                        <object class="java.io.File">
-                          <string>wbOsX.sh</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="del bat file" id="14474" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="did not delete bat files">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="file">
-                        <object class="java.io.File">
-                          <string>wb.bat</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="del dWB bat file" id="14512" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="did not delete bat files">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="file">
-                        <object class="java.io.File">
-                          <string>dWb.bat</string>
-                        </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition />
-              </action>
-              <action name="del dWbOsX sh files" id="14513" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="sh OSX failed">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
-                      <void property="file">
-                        <object class="java.io.File">
-                          <string>dWbOsX.sh</string>
-                        </object>
                       </void>
                     </object>
                   </java>
@@ -1148,10 +1067,7 @@ You acknowledge and agree that the Software may be subject to restrictions and c
     <win32 name="Windows" id="19" mediaFileName="${compiler:pom.short.name}_windows_jre" installDir="${compiler:pom.short.name}" overridePrincipalLanguage="false" requires64bit="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_20" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="false">
       <excludedLaunchers />
       <excludedComponents />
-      <excludedBeans>
-        <bean refId="14474" />
-        <bean refId="14512" />
-      </excludedBeans>
+      <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude />
       <variables />
@@ -1161,8 +1077,6 @@ You acknowledge and agree that the Software may be subject to restrictions and c
       <excludedComponents />
       <excludedBeans>
         <bean refId="13851" />
-        <bean refId="14473" />
-        <bean refId="14513" />
       </excludedBeans>
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
       <exclude />
