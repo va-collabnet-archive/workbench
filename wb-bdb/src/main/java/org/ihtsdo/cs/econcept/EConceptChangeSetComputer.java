@@ -68,7 +68,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             minSapNid = commitSapNids.getMin();
             break;
         case MUTABLE_ONLY:
-            maxSapNid = commitSapNids.getMax();
+            maxSapNid = Integer.MAX_VALUE;
             minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
             break;
         default:
