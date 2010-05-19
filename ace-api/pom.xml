@@ -32,12 +32,14 @@
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/ace-api</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm</url>
     </scm>
+    
     <distributionManagement>
 	<site>
       <id>samples.site</id>
-      <url>dav:http://tumalo.informatics.com:8080/sites/aceAPI<url>
+      <url>dav:http://tumalo.informatics.com:8080/sites/aceAPI</url>
     </site>
     </distributionManagement>
+    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
