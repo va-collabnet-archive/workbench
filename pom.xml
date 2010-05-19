@@ -3,7 +3,7 @@
     <groupId>org.dwfa</groupId>
     <artifactId>dwfa-pom</artifactId>
     <packaging>pom</packaging>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
     <name>DWFA Master POM</name>
     <inceptionYear>2004</inceptionYear>
     <description> Distributed Workflow Architecture based on JavaBeans and Jini. </description>
@@ -36,9 +36,9 @@
         </repository>
     </distributionManagement>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/dwfa-pom</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/dwfa-pom-3</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/dwfa-pom-3</developerConnection>
+        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm/tags/dwfa-pom-3</url>
     </scm>
     <issueManagement>
         <system>Tracker</system>
