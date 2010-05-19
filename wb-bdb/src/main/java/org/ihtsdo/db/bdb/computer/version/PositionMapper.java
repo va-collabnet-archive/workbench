@@ -112,6 +112,8 @@ public class PositionMapper {
 		if (version.getTime() == Long.MAX_VALUE) {
 			return true;
 		}
+		assert version.getSapNid() < positionDistance.length: "sapNid: " + version.getSapNid() + 
+		    " length: " + positionDistance.length + " version: " + version;
 		return positionDistance[version.getSapNid()] >= 0;
 	}
 	

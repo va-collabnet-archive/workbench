@@ -116,7 +116,7 @@ public class ERevision implements I_VersionExternally {
         buff.append(" statusUuid:");
         buff.append(this.statusUuid);
         buff.append(" Time:");
-        buff.append("(" + new Date(this.time) + ")");
+        buff.append("(" + new Date(this.time) + " " + this.time + ")");
         return buff.toString();
     }
 

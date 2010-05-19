@@ -333,13 +333,17 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	public IntSet commit(long time) throws IOException {
 		IntSet committedSapNids = new IntSet();
 		synchronized (uncomittedStatusPathEntries) {
+            expandPermit.acquireUninterruptibly();
 			for (int sapNid : uncomittedStatusPathEntries.values()) {
 				changedSinceSync = true;
 				readWriteArray.commitTimes[getReadWriteIndex(sapNid)] = time;
+	            sapToIntMap.put(time, getStatusId(sapNid), getPathId(sapNid), sapNid);
+
 				committedSapNids.add(sapNid);
 			}
 			uncomittedStatusPathEntries.clear();
 			mapperCache.clear();
+			expandPermit.release();
 		}
 		sync();
 		return committedSapNids;

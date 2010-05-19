@@ -177,6 +177,8 @@ public abstract class Revision<V extends Revision<V, C>,
         ConceptComponent.addNidToBuffer(buf, getPathId());
         buf.append(" tm: ");
         buf.append(TimeUtil.formatDate(getTime()));
+        buf.append(" ");
+        buf.append(getTime());
          buf.append(" };");
         return buf.toString();
     }
