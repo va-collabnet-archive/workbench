@@ -137,7 +137,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             I_GetConceptData refsetSpecConcept = termFactory.getConcept(new UUID[] { refsetSpecUuid });
             RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, activeFrameConfig);
             I_ShowActivity activity = Terms.get().newActivityPanel(true, activeFrameConfig, "Updating refset: " + 
-                refsetSpec.getPromotionRefsetConcept().toString());
+                refsetSpec.getPromotionRefsetConcept().toString(), false);
             activity.setIndeterminate(true);
             long start = System.currentTimeMillis();
 
@@ -306,7 +306,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
     }
 
     private I_ExtendByRefPart getLatestPart(I_ExtendByRef memberExtension) throws TerminologyException, IOException {
-        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(activeFrameConfig.getAllowedStatus(), 
+        List<? extends I_ExtendByRefVersion> versions = memberExtension.getTuples(null, 
             activeFrameConfig.getViewPositionSetReadOnly(), 
             activeFrameConfig.getPrecedence(), 
             activeFrameConfig.getConflictResolutionStrategy());

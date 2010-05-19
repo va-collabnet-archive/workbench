@@ -9,20 +9,33 @@ public class NidPair {
 	private int nid2;
 	private int hash;
 	
+	public NidPair(long nids) {
+        super();
+        this.nid1 = (int) nids;
+        this.nid2 = (int) (nids >>> 32);
+	}
+	
 	public NidPair(int nid1, int nid2) {
 		super();
 		this.nid1 = nid1;
 		this.nid2 = nid2;
 		HashFunction.hashCode(new int[] { nid1, nid2 });
 	}
+	
+	public long asLong() {
+        long returnValue = nid2;
+        returnValue = returnValue & 0x00000000FFFFFFFFL;
+        long nid1Long = nid1;
+        nid1Long = nid1Long & 0x00000000FFFFFFFFL;
+        returnValue = returnValue << 32;
+        returnValue = returnValue | nid1Long;
+	    return returnValue;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (NidPair.class.equals(obj.getClass())) {
-			NidPair another = (NidPair) obj;
-			return this.nid1 == another.nid1 && this.nid2 == another.nid2;
-		}
-		return false;
+		NidPair another = (NidPair) obj;
+		return this.nid1 == another.nid1 && this.nid2 == another.nid2;
 	}
 
 	@Override

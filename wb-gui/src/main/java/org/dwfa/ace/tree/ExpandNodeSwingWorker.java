@@ -50,6 +50,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.time.TimeUtil;
 
 public class ExpandNodeSwingWorker extends SwingWorker<Object> implements ActionListener {
@@ -87,17 +88,10 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
         ActivityPanel activity;
 
-        private boolean addToViewer;
 
         public ProgressUpdator(boolean addToViewer) {
             super();
-            this.addToViewer = addToViewer;
-            activity = new ActivityPanel(addToViewer, null, config);
-            updateTimer = new Timer(300, this);
-            updateTimer.start();
-        }
-
-        public void actionPerformed(ActionEvent e) {
+            activity = new ActivityPanel(config, true);
             if (addToViewer) {
                 addToViewer = false;
                 try {
@@ -106,6 +100,11 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     AceLog.getAppLog().alertAndLogException(e1);
                 }
             }
+            updateTimer = new Timer(500, this);
+            updateTimer.start();
+        }
+
+        public void actionPerformed(ActionEvent e) {
             if (lowerProgressMessage.startsWith("counting")) {
                 activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
                     + activity.nextSpinner());
@@ -122,16 +121,25 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             }
             activity.setProgressInfoUpper(upperProgressMessage);
             if (!continueWork) {
-                activity.complete();
-                updateTimer.stop();
-                if (System.currentTimeMillis() - start < 5000) {
-                    activity.removeActivityFromViewer();
-                } else if (lowerProgressMessage.contains("Action programatically stopped")) {
-                    activity.removeActivityFromViewer();
+                try {
+                    activity.complete();
+                } catch (ComputationCanceled e1) {
+                    //;
                 }
-                if (lowerProgressMessage.startsWith("counting")) {
-                    activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
-                        + activity.nextSpinner());
+                updateTimer.stop();
+                boolean alwaysRemove = true;
+                if (alwaysRemove) {
+                    activity.removeActivityFromViewer();
+                } else {
+                    if (System.currentTimeMillis() - start < 1000) {
+                        activity.removeActivityFromViewer();
+                    } else if (lowerProgressMessage.contains("Action programatically stopped")) {
+                         activity.removeActivityFromViewer();
+                    }
+                    if (lowerProgressMessage.startsWith("counting")) {
+                        activity.setProgressInfoLower(lowerProgressMessage + " continueWork:" + continueWork + " "
+                            + activity.nextSpinner());
+                    }
                 }
             }
         }
@@ -288,14 +296,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
 
     @Override
     protected I_UpdateProgress construct() throws Exception {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                ProgressUpdator progressUpdator = new ProgressUpdator(false);
-                treeHelper.setTreeActivityPanel(progressUpdator.activity);
-                progressUpdator.activity.addActionListener(ExpandNodeSwingWorker.this);
-            }
-        });
-        upperProgressMessage = "Construct " + node + workerIdStr;
+        upperProgressMessage = "Expanding for " + node + workerIdStr;
         I_GetConceptData cb = (I_GetConceptData) node.getUserObject();
         I_IntSet allowedStatus = this.config.getAllowedStatus();
         I_IntSet destRelTypes = this.config.getDestRelTypes();
@@ -466,7 +467,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             conceptBeanComparator)));
         upperProgressMessage = "Expanding " + node + workerIdStr;
         ProgressUpdator progressUpdator = new ProgressUpdator(true);
-        progressUpdator.activity.addActionListener(this);
+        progressUpdator.activity.addRefreshActionListener(this);
+        treeHelper.setTreeActivityPanel(progressUpdator.activity);
     }
 
     public void stopWork(String message) {

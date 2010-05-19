@@ -20,4 +20,12 @@ public class BatchCancelledException extends Exception {
 
     private static final long serialVersionUID = 1446287126532020394L;
 
+    public BatchCancelledException() {
+        super();
+    }
+
+    public BatchCancelledException(Throwable cause) {
+        super(cause);
+    }
+
 }

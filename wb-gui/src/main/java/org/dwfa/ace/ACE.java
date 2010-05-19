@@ -62,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.Timer;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -95,6 +94,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -1270,8 +1270,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static ExecutorService threadPool =
             Executors.newFixedThreadPool(9, new NamedThreadFactory(new ThreadGroup("ACE "), "tree expansion "));
 
-    public static Timer timer = new Timer();
-
     public AceFrameConfig aceFrameConfig;
 
     public static AceConfig aceConfig;
@@ -1976,8 +1974,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     boolean svnPositionSet = false;
     private JButton showProgressButton;
-    private ActivityPanel activityListener;
+    private ActivityPanel topActivity;
     private JTabbedPane preferencesTab;
+    private JPanel activityPanel;
 
     private void setInitialSvnPosition() {
         if (svnPositionSet == false) {
@@ -2786,6 +2785,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(new JPanel(), c);
         c.gridx++;
         showProgressButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/gears_view.png")));
+        showProgressButton.setToolTipText("Show the activity viewer, and bring to the front.");
         showProgressButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ActivityViewer.toFront();
@@ -3006,11 +3006,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.weightx = 0;
         c.gridx++;
 
-        JPanel activityPanel = new JPanel(new GridLayout(1, 1));
-        activityListener = new ActivityPanel(false, null, aceFrameConfig);
-        activityListener.setEraseWhenFinishedEnabled(true);
-        activityListener.complete();
-        activityPanel.add(activityListener.getViewPanel());
+        activityPanel = new JPanel(new GridLayout(1, 1));
         bottomPanel.add(activityPanel, c);
         c.gridx++;
 
@@ -3066,8 +3062,41 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.removeLinkedComponent(component);
     }
 
-    public I_ShowActivity getTopActivityListener() {
-        return activityListener;
+    private static Timer swingTimer = new Timer(500, null);
+    static {
+        swingTimer.start();
+    }
+    
+    public void setTopActivity(I_ShowActivity activity) {
+        if (this.topActivity != null) {
+            swingTimer.removeActionListener(this.topActivity);
+        }
+        this.topActivity = (ActivityPanel) activity;
+        swingTimer.addActionListener(topActivity);
+        
+        this.topActivity = (ActivityPanel) activity;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (activityPanel != null) {
+                    Component[] children = activityPanel.getComponents();
+                    if (children != null) {
+                        for (Component child: children) {
+                            activityPanel.remove(child);
+                        }
+                    }
+                    if (topActivity != null) {
+                        activityPanel.add(topActivity.getViewPanel(false));
+                    } else {
+                        activityPanel.add(new JPanel());
+                    }
+                }
+             }
+        });
+    }
+
+    public I_ShowActivity getTopActivity() {
+        return topActivity;
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -3672,4 +3701,5 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public void setShowPromotionTab(Boolean show) {
         refsetSpecPanel.setShowPromotionTab(show);
     }
+
 }

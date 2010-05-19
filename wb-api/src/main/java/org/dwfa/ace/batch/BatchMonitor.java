@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.ComputationCanceled;
 
 /**
  * Used to give statistical reporting (progress, time remaining, etc) during a
@@ -159,7 +160,7 @@ public class BatchMonitor {
     public void start() throws Exception {
         I_TermFactory termFactory = Terms.get();
         activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig(),
-            description);
+            description, true);
         activity.setProgressInfoUpper(description);
         activity.setProgressInfoLower("Commencing...");
         activity.setMaximum((int) totalEvents);
@@ -171,7 +172,7 @@ public class BatchMonitor {
             addMessagePanel();
         }
         addFinishedButton();
-        timer.activity.getViewPanel().validate();
+        timer.activity.getViewPanel(false).validate();
 
         timer.start();
     }
@@ -202,7 +203,7 @@ public class BatchMonitor {
 
         startTime = new Date().getTime();
         lastReportTime = startTime;
-        timer.activity.getViewPanel().add(htmlPanel, c);
+        timer.activity.getViewPanel(false).add(htmlPanel, c);
     }
 
     /**
@@ -225,7 +226,7 @@ public class BatchMonitor {
         c.weightx = 0.0;
         c.anchor = GridBagConstraints.EAST;
         c.fill = GridBagConstraints.HORIZONTAL;
-        timer.activity.getViewPanel().add(finishedButton, c);
+        timer.activity.getViewPanel(false).add(finishedButton, c);
     }
 
     /**
@@ -248,7 +249,11 @@ public class BatchMonitor {
         activity.setProgressInfoLower("Completed processing " + eventCount + " items in " + timeElapsed);
         logger.info("Batch completed: " + description + ". " + eventCount + " items processed in " + timeElapsed);
         totalEvents = 0;
-        activity.complete();
+        try {
+            activity.complete();
+        } catch (ComputationCanceled e) {
+            throw new BatchCancelledException(e);
+        }
         if (!finishedButton.isVisible()) {
             timer.interrupt();
         }
@@ -262,7 +267,11 @@ public class BatchMonitor {
     public void cancel() {
         isCancelled = true;
         timer.interrupt();
-        activity.complete();
+        try {
+            activity.complete();
+        } catch (ComputationCanceled e) {
+           // Nothing to do...;
+        }
         activity.setProgressInfoLower("Cancelled by user");
     }
 
@@ -319,7 +328,7 @@ public class BatchMonitor {
             this.reportCycle = reportCycleMs;
             this.activity = activity;
 
-            this.activity.addActionListener(new ActionListener() {
+            this.activity.addRefreshActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cancel();
                 };
@@ -368,7 +377,7 @@ public class BatchMonitor {
         private static final long serialVersionUID = 8408703041409497746L;
 
         public MonitorDialog(I_ShowActivity activity) {
-            setContentPane(activity.getViewPanel());
+            setContentPane(activity.getViewPanel(false));
         }
     }
 }

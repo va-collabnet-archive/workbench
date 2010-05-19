@@ -192,17 +192,16 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
 				assert i < readWriteArray.statusNids.length : " readWriteIndex: "
 						+ readWriteIndex
-						+ " commitTimes.length: "
+						+ " statusNids.length: "
 						+ readWriteArray.statusNids.length;
 
-				assert i < readOnlyArray.pathNids.length : " readWriteIndex: "
-						+ readWriteIndex + " commitTimes.length: "
+				assert i < readWriteArray.pathNids.length : " readWriteIndex: "
+						+ readWriteIndex + " pathNids.length: "
 						+ readWriteArray.pathNids.length;
 
 				sapToIntMap.put(readWriteArray.commitTimes[i],
 						readWriteArray.statusNids[i],
 						readWriteArray.pathNids[i], readWriteIndex);
-
 			}
 		} catch (DatabaseException e) {
 			throw new IOException(e);
@@ -334,13 +333,17 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	public IntSet commit(long time) throws IOException {
 		IntSet committedSapNids = new IntSet();
 		synchronized (uncomittedStatusPathEntries) {
+            expandPermit.acquireUninterruptibly();
 			for (int sapNid : uncomittedStatusPathEntries.values()) {
 				changedSinceSync = true;
 				readWriteArray.commitTimes[getReadWriteIndex(sapNid)] = time;
+	            sapToIntMap.put(time, getStatusId(sapNid), getPathId(sapNid), sapNid);
+
 				committedSapNids.add(sapNid);
 			}
 			uncomittedStatusPathEntries.clear();
 			mapperCache.clear();
+			expandPermit.release();
 		}
 		sync();
 		return committedSapNids;

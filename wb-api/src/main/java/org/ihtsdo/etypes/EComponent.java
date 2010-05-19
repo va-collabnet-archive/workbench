@@ -223,9 +223,9 @@ public abstract class EComponent<V extends ERevision> extends ERevision {
         buff.append(this.primordialUuid);
         buff.append(" additionalIdComponents:");
         buff.append(this.additionalIds);
+        buff.append(super.toString());
         buff.append(" Revisions:");
         buff.append(this.revisions);
-        buff.append(super.toString());
         return buff.toString();
     }
 

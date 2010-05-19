@@ -77,6 +77,7 @@ import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -385,7 +386,7 @@ public class RefsetSpecPanel extends JPanel {
         column4.setFieldClass(StringWithExtTuple.class);
         column4.setMin(5);
         column4.setPref(150);
-        column4.setMax(150);
+        column4.setMax(350);
         column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PROMOTION_REFSET_PART);
         column4.setReadMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("getC1id"));
         column4.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setC1id", int.class));
@@ -656,18 +657,17 @@ public class RefsetSpecPanel extends JPanel {
             super();
             this.tupleMemberIds = tupleMemberIds;
             this.forApproval = forApproval;
-            activity = new ActivityPanel(true, null, null);
+            activity = new ActivityPanel(aceFrameConfig, true);
             activity.setIndeterminate(true);
             activity.setMaximum(tupleMemberIds.size());
             activity.setProgressInfoUpper("Changing status of selected members");
             activity.setProgressInfoLower("Setting up...");
-            activity.addActionListener(new ActionListener() {
+            activity.addRefreshActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cancel(false);
                 }
             });
             ActivityViewer.addActivity(activity);
-            ActivityViewer.toFront();
         }
 
         @Override
@@ -750,7 +750,11 @@ public class RefsetSpecPanel extends JPanel {
             } else {
                 activity.setProgressInfoLower("Cancelled.");
             }
-            activity.complete();
+            try {
+                activity.complete();
+            } catch (ComputationCanceled e1) {
+                // canceled. ;
+            }
             refsetTableModel.clearSelectedTuples();
             selectAllCheckBox.setSelected(false);
             refsetTable.getTableHeader().repaint();

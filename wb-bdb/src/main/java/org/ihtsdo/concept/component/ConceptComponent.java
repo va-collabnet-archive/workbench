@@ -635,6 +635,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             ConceptComponent.addNidToBuffer(buf, getPathId());
             buf.append(" tm: ");
             buf.append(TimeUtil.formatDate(getTime()));
+            buf.append(" "); 
+            buf.append(getTime());
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
@@ -1069,6 +1071,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         r.primordialComponent = (C) this;
         c.modified();
+        clearVersions();
         return returnValue;
     }
 
@@ -1389,4 +1392,5 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         v.setDenotation(longId);
         return addIdVersion(v);
     }
+    
 }

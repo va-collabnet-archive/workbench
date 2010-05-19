@@ -50,7 +50,7 @@ public class SpecifyOutputFileCancelOrContinue extends AbstractTask {
 
     private String outputFilePropName = "A: OUTPUT_FILE";
     private String prompt = "Select output file: ";
-    private String extension = ".jcs";
+    private String extension = ".eccs";
 
     private static final long serialVersionUID = 1L;
 

@@ -51,8 +51,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      */
-    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint) {
-        super(useNotQualifier, queryToken, queryConstraint);
+    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint, int refsetSpecNid) {
+        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;
@@ -133,9 +133,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
         I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
-            "Possible: " + this.toString());
+            "<html>Possible: <br>" + this.toHtmlFragment(), true);
         activity.setIndeterminate(true);
-        activity.setProgressInfoUpper("Possible: " + this.toString());
         long startTime = System.currentTimeMillis();
         
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();

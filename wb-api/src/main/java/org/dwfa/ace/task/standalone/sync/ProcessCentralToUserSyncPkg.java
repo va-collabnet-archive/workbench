@@ -259,7 +259,7 @@ public class ProcessCentralToUserSyncPkg extends AbstractTask {
                         // do a recursive search for change sets
                         for (File changeSet : changeSets) {
                             String prefix = null;
-                            String[] suffixes = { ".jcs", ".cmrscs" };
+                            String[] suffixes = { ".eccs", ".cmrscs" };
                             boolean excludeHidden = true;
                             List<File> changeSetFiles = new ArrayList<File>();
                             for (String suffix : suffixes) {

@@ -41,7 +41,6 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -183,9 +182,6 @@ public class TermTreeHelper implements PropertyChangeListener {
 
     protected void treeValueChanged(TreeSelectionEvent evt) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
-        String nodeStr = getNodeString(node);
-        String s = evt.isAddedPath() ? "Selected " + nodeStr : "";
-        aceFrameConfig.setStatusMessage(s);
         if (node != null) {
             ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
             if (treeBean != null) {
@@ -204,14 +200,12 @@ public class TermTreeHelper implements PropertyChangeListener {
 
     protected void treeTreeExpanded(TreeExpansionEvent evt) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
-        String nodeStr = getNodeString(node);
         TreeIdPath idPath = new TreeIdPath(evt.getPath());
         synchronized (expansionWorkers) {
             stopWorkersOnPath(idPath, "stopping before expansion");
             I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
             if (userObject != null) {
                 aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
-                aceFrameConfig.setStatusMessage("Expanding " + nodeStr + "...");
                 FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
                 ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
                     node, new CompareConceptBeansForTree(configSnap), this, configSnap);
@@ -225,7 +219,6 @@ public class TermTreeHelper implements PropertyChangeListener {
         TreeIdPath idPath = new TreeIdPath(evt.getPath());
         stopWorkersOnPath(idPath, "stopping for collapse");
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
-        String nodeStr = getNodeString(node);
         node.removeAllChildren();
         I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
 
@@ -241,30 +234,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         model.nodeStructureChanged(node);
         model.setAsksAllowsChildren(true);
 
-        aceFrameConfig.setStatusMessage("Collapsed " + nodeStr);
         return userObject;
-    }
-
-    private String getNodeString(DefaultMutableTreeNode node) {
-        String nodeStr = node.toString();
-        if ((node.getUserObject() != null)
-            && (I_GetConceptData.class.isAssignableFrom(node.getUserObject().getClass()))) {
-            I_GetConceptData concept = (I_GetConceptData) node.getUserObject();
-            try {
-                I_DescriptionTuple desc = concept.getDescTuple(aceFrameConfig.getShortLabelDescPreferenceList(),
-                    aceFrameConfig);
-                if (desc != null) {
-                    nodeStr = desc.getText();
-                } else {
-                    AceLog.getAppLog().info(" descTuple is null: " + concept.toString());
-                    nodeStr = concept.getInitialText();
-                }
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
-
-        }
-        return nodeStr;
     }
 
     private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {

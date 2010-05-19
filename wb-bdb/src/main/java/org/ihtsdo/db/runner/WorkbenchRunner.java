@@ -1,5 +1,6 @@
 package org.ihtsdo.db.runner;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -51,6 +53,7 @@ import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.QueueServer;
@@ -92,6 +95,41 @@ public class WorkbenchRunner {
 		try {
 			AceProtocols.setupExtraProtocols();
 
+			/*
+			 * from http://lists.apple.com/archives/java-dev/2004/oct/msg00591.html
+			 * 
+                The problem is that a ProgressMonitor would cause some kind of background thread 
+                which would throw up junk events which had to be processed, a memory and CPU drain. 
+                Specifically, a ProgressMonitor contains a JProgressBar and a JPBar on Mac OS X uses 
+                AquaProgressBarUI as its look-and-feel. APBarUI is buggy in that even though the 
+                progress bar may no longer be visible, the thread used to animate the progress 
+                bar never stops doing its thing. Each displayed JPBar has its own thread, all 
+                of which get stuck in memory, which can slow things down to a crawl and cause, 
+                as with my application, OutOfMemoryExceptions.
+
+                The solution is to not use AquaProgressBarUI. I have put the following lines in 
+                my code so that my application will use the BasicProgressBarUI instead. 
+                It's ugly but that's a secondary concern.
+
+                javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.basic.BasicProgressBarUI" );
+                javax.swing.UIManager.put( "javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.basic.BasicProgressBarUI") );
+
+			 */
+			if (ComponentFrameBean.MAC_OS_X) {
+			    //javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+	            //javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.synth.SynthProgressBarUI");
+	            //javax.swing.UIManager.put( "javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.synth.SynthProgressBarUI") );
+	            
+	            //System.getProperties().setProperty("swing.defaultlaf", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+
+                javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.basic.BasicProgressBarUI" );
+                javax.swing.UIManager.put( "ProgressBar.foreground", Color.GREEN);
+                javax.swing.UIManager.put( "ProgressBar.background", Color.GRAY);
+                javax.swing.UIManager.put( "ProgressBar.border", BorderFactory.createRaisedBevelBorder());
+	            javax.swing.UIManager.put( "javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.basic.BasicProgressBarUI") );
+
+			}
+
 			WorkbenchRunner.args = args;
 			WorkbenchRunner.lc = lc;
 
@@ -107,11 +145,11 @@ public class WorkbenchRunner {
 
 			System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
 			long startTime = System.currentTimeMillis();
-			ActivityPanel activity = new ActivityPanel(true, null, null);
+			ActivityPanel activity = new ActivityPanel(null, true);
 			activity.setIndeterminate(true);
 			activity.setProgressInfoUpper("Loading the database");
 			activity.setProgressInfoLower("Setting up the environment...");
-			activity.addActionListener(new ActionListener() {
+			activity.addRefreshActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("System.exit from activity action listener: "
 									+ e.getActionCommand());

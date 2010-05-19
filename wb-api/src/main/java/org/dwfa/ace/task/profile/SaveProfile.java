@@ -94,7 +94,7 @@ public class SaveProfile extends AbstractTask {
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
             aceConfig.setChangeSetRoot(changeSetRoot);
-            aceConfig.setChangeSetWriterFileName(username + ".#0#" + UUID.randomUUID().toString() + ".jcs");
+            aceConfig.setChangeSetWriterFileName(username + ".#0#" + UUID.randomUUID().toString() + ".eccs");
 
             File profileFile = new File(userDir, username + ".ace");
             profileFile.getParentFile().mkdirs();

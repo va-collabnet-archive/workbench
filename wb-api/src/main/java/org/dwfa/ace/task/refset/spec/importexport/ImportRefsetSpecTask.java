@@ -35,6 +35,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -98,7 +99,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
         I_ShowActivity activityPanel = null;
         try {
             activityPanel = Terms.get().newActivityPanel(true,
-                Terms.get().getActiveAceFrameConfig(), "Importing refset spec from file...");
+                Terms.get().getActiveAceFrameConfig(), "Importing refset spec from file...", true);
             String importFileName = (String) process.getProperty(inputFilePropName);
             String outputFileName = (String) process.getProperty(outputFilePropName);
             Object pathObj = process.getProperty(pathUuidPropName);
@@ -154,7 +155,11 @@ public class ImportRefsetSpecTask extends AbstractTask {
         } catch (Exception ex) {
             try {
                 if (activityPanel != null) {
-                    activityPanel.complete();
+                    try {
+                        activityPanel.complete();
+                    } catch (ComputationCanceled e) {
+                        // Canceled;
+                    }
                 }
                 Terms.get().cancel();
             } catch (IOException e) {

@@ -216,4 +216,16 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+         return toString().equals(obj.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
+    
+    
 }

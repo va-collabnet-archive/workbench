@@ -23,10 +23,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
@@ -54,8 +57,9 @@ public class HasUnreviewedItemsTask extends AbstractTask {
     private static final int dataVersion = 1;
     private String promotionUuidPropName = ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey();
 
-    private I_TermFactory termFactory;
-    private I_EncodeBusinessProcess process;
+    private transient I_TermFactory termFactory;
+    private transient I_EncodeBusinessProcess process;
+    private transient I_ConfigAceFrame config;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -80,8 +84,10 @@ public class HasUnreviewedItemsTask extends AbstractTask {
         try {
             this.process = process;
             termFactory = Terms.get();
+            //TODO use other than termFactory.getActiveAceFrameConfig();
+            config = Terms.get().getActiveAceFrameConfig();
 
-            if (hasDisapprovedItems()) {
+            if (hasUnreviewedItems()) {
                 return Condition.TRUE;
             } else {
                 return Condition.FALSE;
@@ -93,11 +99,9 @@ public class HasUnreviewedItemsTask extends AbstractTask {
         }
     }
 
-    private boolean hasDisapprovedItems() throws Exception {
-        I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+    private boolean hasUnreviewedItems() throws Exception {
         UUID promotionRefsetUuid = (UUID) process.getProperty(promotionUuidPropName);
         if (promotionRefsetUuid == null) {
-            //TODO use other than termFactory.getActiveAceFrameConfig();
             RefsetSpec spec = new RefsetSpec(termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor(), 
                 Terms.get().getActiveAceFrameConfig());
             promotionRefsetUuid = spec.getPromotionRefsetConcept().getUids().iterator().next();
@@ -109,20 +113,25 @@ public class HasUnreviewedItemsTask extends AbstractTask {
         I_GetConceptData unreviewedDeletionConcept =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids());
 
-        List<I_GetConceptData> unreviewedAdditions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), unreviewedAdditionConcept);
-        List<I_GetConceptData> unreviewedDeletions =
-                refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-                    .getConceptId()), unreviewedDeletionConcept);
-
-        if (unreviewedAdditions.size() > 0) {
-            return true;
+        for (I_ExtendByRef r: promotionRefsetConcept.getExtensions()) {
+            List<? extends I_ExtendByRefVersion> versions = r.getTuples(config.getAllowedStatus(), 
+                config.getViewPositionSetReadOnly(), 
+                config.getPrecedence(), config.getConflictResolutionStrategy());
+            if (versions.size() == 0) {
+                break;
+            } else if (versions.size() > 1) {
+                throw new Exception("Unresolved conflict in promotion set. versions: " + versions + " member: " + r);
+            }
+            I_ExtendByRefVersion v = versions.get(0);
+            I_ExtendByRefPartCid promotionPart = (I_ExtendByRefPartCid) v.getMutablePart();
+            if (unreviewedAdditionConcept.getNid() == promotionPart.getC1id()) {
+                return true;
+            }
+            if (unreviewedDeletionConcept.getNid() == promotionPart.getC1id()) {
+                return true;
+            }
+            
         }
-        if (unreviewedDeletions.size() > 0) {
-            return true;
-        }
-
         return false;
     }
 

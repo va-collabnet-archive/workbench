@@ -82,6 +82,14 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
 
+    public I_ShowActivity getTopActivity() {
+        return baseFrame.getTopActivity();
+    }
+
+    public void setTopActivity(I_ShowActivity activity) {
+        baseFrame.setTopActivity(activity);
+    }
+
     public PRECEDENCE getPrecedence() {
         return baseFrame.getPrecedence();
     }
@@ -1185,10 +1193,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     public void fireUpdateHierarchyView() {
         baseFrame.fireUpdateHierarchyView();
-    }
-
-    public I_ShowActivity getTopActivityListener() {
-        return baseFrame.getTopActivityListener();
     }
 
     public boolean searchWithDescTypeFilter() {

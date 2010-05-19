@@ -72,6 +72,14 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
+    public I_ShowActivity getTopActivity() {
+        return frameConfig.getTopActivity();
+    }
+
+    public void setTopActivity(I_ShowActivity activity) {
+        frameConfig.setTopActivity(activity);
+    }
+
     public PRECEDENCE getPrecedence() {
         return frameConfig.getPrecedence();
     }
@@ -1042,10 +1050,6 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     public void validate() {
         frameConfig.validate();
-    }
-
-    public I_ShowActivity getTopActivityListener() {
-        return frameConfig.getTopActivityListener();
     }
 
     public void fireUpdateHierarchyView() {
