@@ -468,7 +468,7 @@ public class BdbCommitManager {
     }
 
 	public static void commit() {
-	    commit(ChangeSetPolicy.COMPREHENSIVE,
+	    commit(ChangeSetPolicy.MUTABLE_ONLY,
             ChangeSetWriterThreading.SINGLE_THREAD);
 	}
 
