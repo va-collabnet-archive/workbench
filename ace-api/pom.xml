@@ -35,7 +35,6 @@
     <distributionManagement>
 	<site>
       <id>samples.site</id>
-      <name>Samples site</name>
       <url>dav:http://tumalo.informatics.com:8080/sites/aceAPI<url>
     </site>
     </distributionManagement>
