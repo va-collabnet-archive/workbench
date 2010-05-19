@@ -204,11 +204,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 changeSetRoot = (File) in.readObject();
                 changeSetWriterFileName = (String) in.readObject();
                 if (changeSetWriterFileName.contains("#") == false) {
-                    changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
+                    changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".eccs";
                 }
             } else {
                 changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
-                changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".jcs";
+                changeSetWriterFileName = username + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".eccs";
             }
             AceLog.getAppLog().info("changeSetRoot: " + changeSetRoot);
             if (changeSetRoot.equals(new File("profiles/users/null"))) {
@@ -302,9 +302,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         config.aceFrames.add(profile);
 
         if (config.getUsername() == null) {
-            config.setChangeSetWriterFileName("nullUser." + UUID.randomUUID().toString() + ".jcs");
+            config.setChangeSetWriterFileName("nullUser." + UUID.randomUUID().toString() + ".eccs");
         } else {
-            config.setChangeSetWriterFileName(config.getUsername() + "." + UUID.randomUUID().toString() + ".jcs");
+            config.setChangeSetWriterFileName(config.getUsername() + "." + UUID.randomUUID().toString() + ".eccs");
         }
         config.changeSetRoot = new File("profiles" + File.separator + config.getUsername());
 
@@ -417,9 +417,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         Object old = this.username;
         this.username = username;
         if (this.username == null) {
-            this.setChangeSetWriterFileName("nullUser." + UUID.randomUUID().toString() + ".jcs");
+            this.setChangeSetWriterFileName("nullUser." + UUID.randomUUID().toString() + ".eccs");
         } else {
-            this.setChangeSetWriterFileName(this.username + "." + UUID.randomUUID().toString() + ".jcs");
+            this.setChangeSetWriterFileName(this.username + "." + UUID.randomUUID().toString() + ".eccs");
         }
 
         this.changeSetRoot = new File("profiles" + File.separator + username + File.separator + "changesets");
@@ -466,7 +466,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         String[] nameParts = getChangeSetWriterFileName().split("#");
         int sequence = Integer.parseInt(nameParts[1]);
         sequence++;
-        setChangeSetWriterFileName(getUsername() + '#' + sequence + "#" + UUID.randomUUID() + ".jcs");
+        setChangeSetWriterFileName(getUsername() + '#' + sequence + "#" + UUID.randomUUID() + ".eccs");
     }
 
     public File getChangeSetRoot() {

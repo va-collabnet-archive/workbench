@@ -71,6 +71,14 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+    public I_ShowActivity getTopActivity() {
+        return config.getTopActivity();
+    }
+
+    public void setTopActivity(I_ShowActivity activity) {
+        config.setTopActivity(activity);
+    }
+
     public PRECEDENCE getPrecedence() {
         return config.getPrecedence();
     }
@@ -467,10 +475,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList() {
         return config.getTaxonomyRendererOverrideList();
-    }
-
-    public I_ShowActivity getTopActivityListener() {
-        return config.getTopActivityListener();
     }
 
     public I_IntList getTreeDescPreferenceList() {

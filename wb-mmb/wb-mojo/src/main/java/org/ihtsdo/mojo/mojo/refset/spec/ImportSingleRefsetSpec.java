@@ -122,7 +122,7 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 			I_GetConceptData refsetSpec = tupleImporter.importFile(
 					refsetSpecFile, reportFile, config, Terms.get()
 							.newActivityPanel(false, config,
-									"Importing refset spec..."));
+									"Importing refset spec...", true));
 			if (refsetSpec != null) {
 				getLog().info(
 						"Refset is: " + refsetSpec.getInitialText() + " "

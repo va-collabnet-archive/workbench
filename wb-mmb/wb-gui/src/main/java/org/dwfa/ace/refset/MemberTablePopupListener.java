@@ -71,7 +71,7 @@ public class MemberTablePopupListener extends MouseAdapter {
                 	    	I_ExtendByRef newExtension = 
                 	    		refsetHelper.getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(), 
                 	    				selectedObject.getTuple().getComponentId(), REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
-                			Terms.get().addUncommittedNoChecks(newExtension);
+                			Terms.get().addUncommitted(newExtension);
                     	}
                         for (ReflexiveTableModel m : commentTableModels) {
                             m.propertyChange(null);

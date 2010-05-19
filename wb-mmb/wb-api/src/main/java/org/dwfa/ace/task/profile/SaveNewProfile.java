@@ -31,6 +31,7 @@ import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.SubversionData;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.svn.AddSubversionEntry;
@@ -105,7 +106,21 @@ public class SaveNewProfile extends AbstractTask {
                 SubversionData creatorSvd = new SubversionData(null, workingCopyStr);
                 currentProfile.svnCompleteRepoInfo(creatorSvd);
                 String sequenceToFind = "src/main/profiles/";
-                int sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                int sequenceLocation = -1;
+                if (creatorSvd.getRepositoryUrlStr() == null) {
+                    File f = new File(workingCopyStr).getParentFile();
+                    creatorSvd = new SubversionData(null, f.getAbsolutePath());
+                    currentProfile.svnCompleteRepoInfo(creatorSvd);
+                    if (creatorSvd.getRepositoryUrlStr() == null) {
+                        AceLog.getAppLog().alertAndLogException(new Exception("No svn url for: " + f.toString()));
+                        break;
+                    }
+                }
+                sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                if (sequenceLocation == -1) {
+                    sequenceToFind = "src/main/profiles";
+                    sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                }
                 if (sequenceLocation == -1) {
                     sequenceToFind = "src/main/resources/profiles/";
                     sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
@@ -128,7 +143,7 @@ public class SaveNewProfile extends AbstractTask {
             newDbProfile.getAceFrames().add(profileToSave);
             newDbProfile.setChangeSetRoot(changeSetRoot);
             newDbProfile.setChangeSetWriterFileName(profileToSave.getUsername() + "#0#" + UUID.randomUUID().toString()
-                + ".jcs");
+                + ".eccs");
             newDbProfile.setDbFolder(currentDbProfile.getDbFolder());
             newDbProfile.setProfileFile(profileFile);
             newDbProfile.setUsername(profileToSave.getUsername());

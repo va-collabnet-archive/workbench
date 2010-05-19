@@ -72,8 +72,8 @@ public class RefsetQueryFactory {
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
-        query = processNode(root, query, refsetType, configFrame, termFactory);
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid());
+        query = processNode(root, query, refsetType, configFrame, termFactory, refsetSpec.getNid());
                 
         
         return query;
@@ -154,7 +154,7 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
-            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory) throws IOException,
+            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory, int refsetSpecNid) throws IOException,
             TerminologyException, ParseException {
 
         if (query == null) {
@@ -196,7 +196,7 @@ public class RefsetQueryFactory {
                     switch (statementType) {
                     case CONCEPT:
                         if (computeType.equals(RefsetComputeType.CONCEPT)) {
-                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -204,7 +204,7 @@ public class RefsetQueryFactory {
                         }
                     case DESCRIPTION:
                         if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
-                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -212,7 +212,7 @@ public class RefsetQueryFactory {
                         }
                     case RELATIONSHIP:
                         if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
-                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -238,7 +238,7 @@ public class RefsetQueryFactory {
                         throw new TerminologyException(
                             "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
                     case DESCRIPTION:
-                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint);
+                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
                         break;
                     default:
                         throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
@@ -276,7 +276,7 @@ public class RefsetQueryFactory {
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
-                        processNode(childNode, subquery, newComputeType, configFrame, termFactory);
+                        processNode(childNode, subquery, newComputeType, configFrame, termFactory, refsetSpecNid);
                     }
                     if (negate) {
                         subquery.negateQuery();

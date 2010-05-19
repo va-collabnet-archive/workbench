@@ -47,6 +47,25 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	
 	private  boolean processNidLists;
 	
+	private boolean timeStampEnabled = true;
+	
+    public boolean isTimeStampEnabled() {
+        return timeStampEnabled;
+    }
+
+    public void setTimeStampEnabled(boolean timeStampEnabled) {
+        this.timeStampEnabled = timeStampEnabled;
+    }
+
+    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy, 
+            boolean processNidLists, boolean timeStampEnabled) {
+        super();
+        this.changeSetFile = changeSetFile;
+        this.tempFile = tempFile;
+        this.policy = policy;
+        this.processNidLists = processNidLists;
+        this.timeStampEnabled = timeStampEnabled;
+    }
 
     public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy, boolean processNidLists) {
         super();
@@ -134,7 +153,9 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	                long computeTime = System.currentTimeMillis() - start;
 	                writePermit.acquireUninterruptibly();
 	                long permitTime = System.currentTimeMillis() - start - computeTime;
-	                tempOut.writeLong(time);
+	                if (timeStampEnabled) {
+	                    tempOut.writeLong(time);
+	                }
 	                eC.writeExternal(tempOut);
 	                long writeTime = System.currentTimeMillis() - start - permitTime - computeTime;
 	                long totalTime = System.currentTimeMillis() - start;

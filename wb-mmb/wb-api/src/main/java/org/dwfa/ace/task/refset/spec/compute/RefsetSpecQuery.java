@@ -102,8 +102,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private RefsetSpecExecutionOrderComparator calculationOrderComparator;
     private boolean allComponentsNeedsResort = true;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid) throws TerminologyException, IOException {
+        super(refsetSpecNid);
         // create query object (statements + any sub-queries)
         executionOrderComparator = new RefsetSpecCalculationOrderComparator();
         calculationOrderComparator = new RefsetSpecExecutionOrderComparator();
@@ -141,7 +141,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
-        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept);
+        RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, getRefsetSpecNid());
         subqueries.add(subquery);
         allComponents.add(subquery);
         allComponentsNeedsResort = true;
@@ -149,8 +149,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -158,8 +158,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addConceptStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new ConceptStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -167,8 +167,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+            I_AmTermComponent constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -176,8 +176,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     public RefsetSpecStatement addDescStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            String constraint) {
-        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint);
+            String constraint, int refsetSpecNid) {
+        RefsetSpecStatement statement = new DescStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -186,10 +186,11 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Possible: " + this.toString());
+        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, 
+            "<html>Possible: <br>" + this.toHtmlFragment(0), true);
         activity.setMaximum(statements.size() + subqueries.size());
         activity.setValue(0);
-        activity.setIndeterminate(false);
+        activity.setIndeterminate(true);
         long startTime = System.currentTimeMillis();
 
     	if (allComponentsNeedsResort) {
@@ -209,7 +210,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
-                activity.setProgressInfoLower("Processing: " + component.toString());
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
@@ -227,7 +228,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
-                activity.setProgressInfoLower("Processing: " + component.toString());
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
@@ -245,7 +246,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
             }
             for (RefsetSpecComponent component : allComponents) {
-                activity.setProgressInfoLower("Processing: " + component.toString());
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
@@ -262,7 +263,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
-                activity.setProgressInfoLower("Processing: " + component.toString());
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                      possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
@@ -280,9 +281,45 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
         AceLog.getAppLog().info(this + " possibleConceptTime: " + elapsedStr);
         setPossibleConceptsCount(possibleConcepts.cardinality());
-        activity.setProgressInfoLower("Possible concept count: " + possibleConcepts.cardinality());
+        String incomingCount = "All";
+        if (parentPossibleConcepts != null) {
+            incomingCount = "" + parentPossibleConcepts.cardinality();
+        }
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + 
+            "; Incoming count: " + incomingCount + "; Outgoing count: " + possibleConcepts.cardinality());
         activity.complete();
         return possibleConcepts;
+    }
+
+    public String toHtmlFragment(int depth) {
+        try {
+            StringBuffer padding = new StringBuffer();
+            padding.append("<br>&nbsp;");
+            for (int i = 0; i < depth; i++) {
+                padding.append("&nbsp;&nbsp;&nbsp;");
+            }
+            String paddingStr = padding.toString();
+            StringBuffer buff = new StringBuffer();
+            buff.append(groupingType.getTruth() + " " + termFactory.getConcept(groupingType.getNid()).getInitialText());
+            int count = 0;
+            for (RefsetSpecStatement s: statements) {
+                buff.append(paddingStr);
+                buff.append(s.toHtmlFragment());
+                count++;
+                if (count > 4) {
+                    buff.append(paddingStr);
+                    buff.append("<font color='forestgreen'>truncated (count: " + statements.size() + ")...</font>");
+                    break;
+                }
+            }
+            for (RefsetSpecQuery sq: subqueries){
+                buff.append(paddingStr);
+                buff.append(sq.toHtmlFragment(depth + 1));
+            }
+            return buff.toString();
+        } catch (Exception e) {
+            return "UNKNOWN QUERY";
+        }
     }
 
     public String toString() {
@@ -337,7 +374,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             return true;
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling OR.");
+                throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() +
+                    "\n\n" + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {

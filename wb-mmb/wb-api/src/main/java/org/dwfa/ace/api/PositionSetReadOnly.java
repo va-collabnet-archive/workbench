@@ -33,15 +33,16 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 		super();
 		if (positionSet != null) {
 			this.positions = positionSet.toArray(this.positions);
+	        for (I_Position p: positionSet) {
+	            pathNids.add(p.getPath().getConceptId());
+	        }
 		}
-        for (I_Position p: positionSet) {
-            pathNids.add(p.getPath().getConceptId());
-        }
 	}
 
 	public PositionSetReadOnly(I_Position viewPosition) {
 		if (viewPosition != null) {
 			positions = new I_Position[] { viewPosition};
+			pathNids.add(viewPosition.getPath().getConceptId());
 		}
 	}
 

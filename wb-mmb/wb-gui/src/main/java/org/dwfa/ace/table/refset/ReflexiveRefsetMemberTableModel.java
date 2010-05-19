@@ -74,6 +74,10 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
             }
             I_IntSet statusSet = host.getConfig().getAllowedStatus();
             Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
+            if (positionSet == null || positionSet.size() == 0) {
+                AceLog.getAppLog().alertAndLogException(new Exception("View position set is empty: " + 
+                    positionSet));
+            }
             if (host.getShowHistory() == true) {
                 statusSet = null;
                 positionSet = null;

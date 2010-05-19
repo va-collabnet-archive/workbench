@@ -31,18 +31,25 @@ public class IsLeafBinder extends TupleBinding<Boolean> {
         int size = input.readInt();
         for (int i = 0; i < size; i = i + 2) {
             int relNid = input.readInt();
-            int typeId = input.readInt();
-            if (destRelTypes.contains(typeId)) {
+            int typeNid = input.readInt();
+            if (destRelTypes.contains(typeNid)) {
                 try {
-                    Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(relNid);
-                    if (r != null) {
-                        List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-                        r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
-                                .getViewPositionSetReadOnly(), currentVersions, 
-                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
-                        if (currentVersions.size() > 0) {
-                            return false;
+                    if (Bdb.getConceptForComponent(relNid) != null) {
+                        Relationship r = Bdb.getConceptForComponent(relNid).getSourceRel(relNid);
+                        if (r != null) {
+                            List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
+                            r.addTuples(aceConfig.getAllowedStatus(), destRelTypes, aceConfig
+                                    .getViewPositionSetReadOnly(), currentVersions, 
+                                    aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                            if (currentVersions.size() > 0) {
+                                return false;
+                            }
                         }
+                    } else {
+                        AceLog.getAppLog().warning("Relnid: " + relNid + " not associated with a rel. " +
+                            "\n object for relNid: " + Bdb.getComponent(relNid) +
+                            "\n object for typeNid[" + typeNid +
+                            "]: " + Bdb.getComponent(typeNid));
                     }
                 } catch (IOException e) {
                     AceLog.getAppLog().alertAndLogException(e);

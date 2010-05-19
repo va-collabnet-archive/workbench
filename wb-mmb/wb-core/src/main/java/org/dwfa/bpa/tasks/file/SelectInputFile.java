@@ -42,7 +42,7 @@ public class SelectInputFile extends AbstractTask {
 
     private String inputFilePropName = "A: INPUT_FILE";
     private String prompt = "Select input file: ";
-    private String extension = ".jcs";
+    private String extension = ".eccs";
 
     private static final long serialVersionUID = 1L;
 

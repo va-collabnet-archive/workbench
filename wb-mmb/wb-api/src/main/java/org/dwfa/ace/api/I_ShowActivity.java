@@ -18,15 +18,16 @@ package org.dwfa.ace.api;
 
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.dwfa.tapi.ComputationCanceled;
+
 public interface I_ShowActivity extends ActionListener {
-    public JButton getStopButton();
+    public boolean isStopButtonVisible();
 
-    public void setStopButton(JButton stopButton);
+    public void setStopButtonVisible(boolean visible);
 
-    public JPanel getViewPanel();
+    public JPanel getViewPanel(boolean showBorder);
 
     public void setProgressInfoUpper(String text);
 
@@ -48,23 +49,25 @@ public interface I_ShowActivity extends ActionListener {
 
     public int getValue();
 
-    public void addActionListener(ActionListener l);
+    public void addRefreshActionListener(ActionListener l);
 
-    public void removeActionListener(ActionListener l);
+    public void removeRefreshActionListener(ActionListener l);
+    
+    public void addStopActionListener(ActionListener l);
+    
+    public void removeStopActionListener(ActionListener l);
 
-    public void complete();
+    public void complete() throws ComputationCanceled;
     
     public void removeActivityFromViewer();
 
-    public boolean isComplete();
+    public boolean isComplete() throws ComputationCanceled;
 
+    public boolean isCompleteForComparison();
+    
     public long getStartTime();
 
     public void setStartTime(long time);
-
-    public I_ShowActivity getSecondaryPanel();
-
-    public void setSecondaryPanel(I_ShowActivity panel);
 
     public void addShowActivityListener(I_ShowActivity listener);
 
@@ -77,7 +80,7 @@ public interface I_ShowActivity extends ActionListener {
     // the progress bar
     public I_ConfigAceFrame getAceFrameConfig();
 
-    public void syncWith(I_ShowActivity another);
-    
     public void update();
+    
+    public boolean isCanceled();
 }

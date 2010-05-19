@@ -157,8 +157,10 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 return Condition.ITEM_CANCELED;
             }
 
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete.", "",
-                JOptionPane.INFORMATION_MESSAGE);
+            if (!DwfaEnv.isHeadless()) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete.", "",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
             return Condition.ITEM_COMPLETE;
 
         } catch (Exception e) {
@@ -183,7 +185,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         Set<Integer> nestedRefsets = query.getNestedRefsets();
         this.setNestedRefsets(nestedRefsets);
         for (Integer nestedRefsetId : nestedRefsets) {
-            if (!excludedRefsets.contains(nestedRefsetId)) {
+            if (excludedRefsets == null || !excludedRefsets.contains(nestedRefsetId)) {
 
                 Condition condition =
                         computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);

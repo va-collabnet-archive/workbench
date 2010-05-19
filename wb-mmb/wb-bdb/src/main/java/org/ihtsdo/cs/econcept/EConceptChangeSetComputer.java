@@ -68,7 +68,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             minSapNid = commitSapNids.getMin();
             break;
         case MUTABLE_ONLY:
-            maxSapNid = commitSapNids.getMax();
+            maxSapNid = Integer.MAX_VALUE;
             minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
             break;
         default:
@@ -116,8 +116,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private List<ERefsetMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed) throws IOException {
         List<ERefsetMember<?>> eRefsetMembers = new ArrayList<ERefsetMember<?>>(c.getRefsetMembers().size());
         for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
+            ERefsetMember<?> eMember = null;
             for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-                ERefsetMember<?> eMember = null;
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         changed.set(true);

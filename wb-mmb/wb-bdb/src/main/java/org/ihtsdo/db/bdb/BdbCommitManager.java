@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
@@ -162,30 +163,53 @@ public class BdbCommitManager {
 	static {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 		"Change set writer"));
-		dbWriterService = Executors.newCachedThreadPool(new NamedThreadFactory(commitManagerThreadGroup,
-		"Db writer"));
+		dbWriterService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), 
+		    new NamedThreadFactory(commitManagerThreadGroup, "Db writer"));
 		luceneWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 				"Lucene writer"));
 		loadTests("commit", commitTests);
 		loadTests("precommit", creationTests);
 	}
 
+	private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
 	public static void addUncommittedNoChecks(I_GetConceptData concept) {
+        if (Bdb.watchList.containsKey(concept.getNid())) {
+            AceLog.getAppLog().info(
+                    "---@@@ Adding uncommitted NO checks: "
+                            + concept.getNid() + " ---@@@ ");
+        }
+	    Concept c = null;
+        uncommittedCNidsNoChecks.setMember(concept.getNid());
+        c = lastUncommitted.getAndSet((Concept) concept);
+	    if (c == concept) {
+	        c = null;
+	    }
 		try {
-			Concept c = (Concept) concept;
-			dbWriterPermit.acquire();
-            dbWriterService.execute(new SetNidsForCid(c));
-			dbWriterService.execute(new ConceptWriter(c));
-			uncommittedCNidsNoChecks.setMember(c.getNid());
-			if (Bdb.watchList.containsKey(concept.getNid())) {
-				AceLog.getAppLog().info(
-						"---@@@ Adding uncommitted NO checks: "
-								+ concept.getNid() + " ---@@@ ");
-			}
+			writeUncommitted(c);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private static void flushUncommitted() throws InterruptedException {
+	    Concept c = lastUncommitted.getAndSet(null);
+	    if (c != null) {
+            writeUncommitted(c);
+	    }
+	}
+	
+    private static void writeUncommitted(Concept c) throws InterruptedException {
+        if (c != null) {
+            if (Bdb.watchList.containsKey(c.getNid())) {
+                AceLog.getAppLog().info(
+                        "---@@@ writeUncommitted checks: "
+                                + c.getNid() + " ---@@@ ");
+            }
+            dbWriterPermit.acquire();
+            dbWriterService.execute(new SetNidsForCid(c));
+            dbWriterService.execute(new ConceptWriter(c));
+        }
+    }
 
 	public static void addUncommitted(I_ExtendByRef extension) {
 		RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
@@ -305,6 +329,7 @@ public class BdbCommitManager {
         try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
+                    flushUncommitted();
                     performCommit = true;
                     int errorCount = 0;
                     int warningCount = 0;
@@ -388,7 +413,7 @@ public class BdbCommitManager {
                         IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
                                 commitTime);
 
-                        if (writeChangeSets) {
+                        if (writeChangeSets && sapNidsFromCommit.size() > 0) {
                             if (changeSetPolicy == null) {
                                 changeSetPolicy = ChangeSetPolicy.OFF;
                             }
@@ -443,7 +468,7 @@ public class BdbCommitManager {
     }
 
 	public static void commit() {
-	    commit(ChangeSetPolicy.INCREMENTAL,
+	    commit(ChangeSetPolicy.MUTABLE_ONLY,
             ChangeSetWriterThreading.SINGLE_THREAD);
 	}
 

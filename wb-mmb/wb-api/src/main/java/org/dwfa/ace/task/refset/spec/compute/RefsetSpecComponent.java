@@ -28,6 +28,18 @@ import org.dwfa.tapi.TerminologyException;
 
 public abstract class RefsetSpecComponent {
     private int possibleConceptsCount;
+    protected int refsetSpecNid;
+    
+    
+
+    protected RefsetSpecComponent(int refsetSpecNid) {
+        super();
+        this.refsetSpecNid = refsetSpecNid;
+    }
+
+    public int getRefsetSpecNid() {
+        return refsetSpecNid;
+    }
 
     public int getPossibleConceptsCount() {
         return possibleConceptsCount;

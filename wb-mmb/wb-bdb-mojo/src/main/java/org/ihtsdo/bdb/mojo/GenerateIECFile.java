@@ -16,14 +16,14 @@ import org.ihtsdo.time.TimeUtil;
 
 
 /**
- * Goal which loads an EConcept.jbin file into a bdb.
+ * Goal which generates an incremental e-concept (iec) file.
  * 
- * @goal generate-change-set
+ * @goal generate-iec-file
  * 
  * @phase process-sources
  */
 
-public class GenerateChangeSet extends AbstractMojo  {
+public class GenerateIECFile extends AbstractMojo  {
 
     /**
      * Parent of the new path.
@@ -61,7 +61,7 @@ public class GenerateChangeSet extends AbstractMojo  {
     /**
      * End date for inclusion in the change set.
      * 
-     * @parameter default-value="export.eccs"
+     * @parameter default-value="export.iec"
      * @required
      * 
      */
@@ -95,7 +95,7 @@ public class GenerateChangeSet extends AbstractMojo  {
             }
             ChangeSetPolicy changeSetPolicy = ChangeSetPolicy.valueOf(policy);
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile), 
-                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false);
+                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false, false);
             ChangeSetWriterHandler.addWriter(writer);
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
                 TimeUtil.getFileDateFormat().parse(endDate).getTime());

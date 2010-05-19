@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.ihtsdo.concept.BdbLegacyFixedFactory;
@@ -265,13 +266,11 @@ public class Bdb {
 	    private long startTime = System.currentTimeMillis();
 	    
 	    private Sync() throws TerminologyException, IOException {
-	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "Database sync to disk...");
+	        activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "Database sync to disk...", false);
+            activity.setStopButtonVisible(false);
 	        activity.setIndeterminate(true);
 	        activity.setProgressInfoUpper("Database sync to disk...");
 	        activity.setProgressInfoLower("Starting sync...");
-	        if (activity.getStopButton() != null) {
-	            activity.getStopButton().setVisible(false);
-	        }
 	    }
 
 		@Override
@@ -318,7 +317,9 @@ public class Bdb {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
-			}
+			} catch (ComputationCanceled e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
 		}
 	}
 	
@@ -349,10 +350,8 @@ public class Bdb {
                 }
 			    ActivityViewer.toFront();
 			    I_ShowActivity activity = Terms.get().newActivityPanel(true,
-			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence");
-			    if (activity.getStopButton() != null) {
-			        activity.getStopButton().setVisible(false);
-			    }
+			        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
+			    activity.setStopButtonVisible(false);
                 activity.setProgressInfoLower("1/10: Starting sync using service.");
                 assert conceptDb != null: "conceptDb is null...";
                 new Sync().run();

@@ -94,6 +94,7 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -131,6 +132,8 @@ import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
@@ -492,6 +495,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public I_Path getPath(int nid) throws TerminologyException, IOException {
+        return pathManager.get(nid);
+    }
+
+    @Override
     public List<I_Path> getPaths() throws Exception {
         return new ArrayList<I_Path>(pathManager.getAll());
     }
@@ -732,11 +740,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_ShowActivity newActivityPanel(boolean displayInViewer, I_ConfigAceFrame aceFrameConfig,
-            String firstUpperInfo) {
+            String firstUpperInfo, boolean showStop) {
         if (isHeadless()) {
             return new UpperInfoOnlyConsoleMonitor();
         } else {
-            ActivityPanel ap = new ActivityPanel(true, null, aceFrameConfig);
+            ActivityPanel ap = new ActivityPanel(aceFrameConfig, showStop);
             ap.setIndeterminate(true);
             ap.setProgressInfoUpper(firstUpperInfo);
             ap.setProgressInfoLower("");
@@ -753,7 +761,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) throws IOException {
-        throw new UnsupportedOperationException();
+        EConceptChangeSetReader ecr = new EConceptChangeSetReader();
+        ecr.setChangeSetFile(changeSetFile);
+        return ecr;
     }
 
     @Override
@@ -1556,46 +1566,50 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
 
-        I_RepresentIdSet possibleIds;
-        if (specHelper.isConceptComputeType()) {
-            AceLog.getAppLog().info("Computing possible concepts for spec: " + query);
-            possibleIds = query.getPossibleConcepts(frameConfig, null);
-        } else if (specHelper.isDescriptionComputeType()) {
-            possibleIds = query.getPossibleDescriptions(frameConfig, null);
-        } else {
-            throw new Exception("Relationship compute type not supported.");
-        }
-
-        // add the current members to the list of possible concepts to check (in case some need to be retired)
-        possibleIds.or(getIdSetFromIntCollection(currentMembersList));
-        AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
-
-        RefsetComputer computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
-        if (possibleIds.cardinality() > 500) {
-            Bdb.getConceptDb().iterateConceptDataInParallel(computer);
-        } else {
-            I_IterateIds possibleItr = possibleIds.iterator();
-            ConceptFetcher fetcher = new ConceptFetcher();
-            while (possibleItr.next()) {
-                fetcher.setConcept(Concept.get(possibleItr.nid()));
-                computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
+        RefsetComputer computer;
+        try {
+            I_RepresentIdSet possibleIds;
+            if (specHelper.isConceptComputeType()) {
+                AceLog.getAppLog().info("Computing possible concepts for spec: " + query);
+                possibleIds = query.getPossibleConcepts(frameConfig, null);
+            } else if (specHelper.isDescriptionComputeType()) {
+                possibleIds = query.getPossibleDescriptions(frameConfig, null);
+            } else {
+                throw new Exception("Relationship compute type not supported.");
             }
-        }
 
-        computer.addUncommitted();
-        if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
-            frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-            frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-        }
-        BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig.getDbConfig()
-            .getChangeSetWriterThreading());
+            // add the current members to the list of possible concepts to check (in case some need to be retired)
+            possibleIds.or(getIdSetFromIntCollection(currentMembersList));
+            AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
-        if (!computer.continueWork()) {
-            return Condition.ITEM_CANCELED;
-        } else {
-            return Condition.ITEM_COMPLETE;
-        }
+            computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
+            if (possibleIds.cardinality() > 500) {
+                Bdb.getConceptDb().iterateConceptDataInParallel(computer);
+            } else {
+                I_IterateIds possibleItr = possibleIds.iterator();
+                ConceptFetcher fetcher = new ConceptFetcher();
+                while (possibleItr.next()) {
+                    fetcher.setConcept(Concept.get(possibleItr.nid()));
+                    computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
+                }
+            }
 
+            computer.addUncommitted();
+            if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
+                frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+                frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+            }
+            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig.getDbConfig()
+                .getChangeSetWriterThreading());
+            if (!computer.continueWork()) {
+                return Condition.ITEM_CANCELED;
+            } else {
+                return Condition.ITEM_COMPLETE;
+            }
+        } catch (ComputationCanceled e) {
+            // Nothing to do
+        }
+        return Condition.ITEM_CANCELED;
     }
 
     private static class ConceptFetcher implements I_FetchConceptFromCursor {

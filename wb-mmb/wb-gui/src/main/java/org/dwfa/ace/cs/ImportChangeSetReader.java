@@ -38,7 +38,6 @@ import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -46,6 +45,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
+import org.dwfa.tapi.ComputationCanceled;
 
 public class ImportChangeSetReader implements ActionListener, I_Count {
 
@@ -77,8 +77,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
     private AceConfig config;
 
-    private I_ShowActivity secondaryProgressPanel;
-
     private class ProgressUpdator implements I_UpdateProgress {
         Timer updateTimer;
 
@@ -88,7 +86,7 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
 
         public ProgressUpdator() {
             super();
-            activity = new ActivityPanel(true, secondaryProgressPanel, config.aceFrames.get(0));
+            activity = new ActivityPanel(config.aceFrames.get(0), false);
             updateTimer = new Timer(1000, this);
             updateTimer.start();
         }
@@ -112,16 +110,14 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 activity.setProgressInfoLower(lowerProgressMessage + processed);
             }
             if (!continueWork) {
-                activity.complete();
+                try {
+                    activity.complete();
+                } catch (ComputationCanceled e1) {
+                    AceLog.getAppLog().alertAndLogException(new Exception("Canceled should never happen in import: ", e1));
+                }
                 updateTimer.stop();
             }
         }
-    }
-
-    public ImportChangeSetReader(final Configuration riverConfig, I_ShowActivity secondaryProgressPanel,
-            Frame parentFrame, AceConfig config) {
-        this(riverConfig, parentFrame, config);
-        this.secondaryProgressPanel = secondaryProgressPanel;
     }
 
     public ImportChangeSetReader(final Configuration riverConfig, Frame parentFrame, AceConfig config) {
@@ -131,12 +127,12 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                 new FilenameFilter() {
 
                     public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".jcs");
+                        return name.toLowerCase().endsWith(".eccs");
                     }
                 }, null, parentFrame);
 
             ProgressUpdator updater = new ProgressUpdator();
-            updater.activity.addActionListener(this);
+            updater.activity.addRefreshActionListener(this);
             ACE.threadPool.execute(new Runnable() {
                 public void run() {
                     try {

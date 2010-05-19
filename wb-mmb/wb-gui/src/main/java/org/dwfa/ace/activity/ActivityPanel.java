@@ -21,9 +21,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.swing.BorderFactory;
@@ -32,14 +32,187 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.swing.SwingTask;
+import org.dwfa.tapi.ComputationCanceled;
 
-public class ActivityPanel extends JPanel implements I_ShowActivity {
+public class ActivityPanel implements I_ShowActivity, AncestorListener {
+    
+    ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
+    ConcurrentHashMap<ActionListener, ActionListener> listeners = new ConcurrentHashMap<ActionListener, ActionListener>();
+    ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = new ConcurrentHashMap<ActionListener, ActionListener>();
+    
+    
+    private class StopActionListenerPropigator implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+           canceled = true;
+           complete = true;
+           stopButtonVisible = false;
+           progressInfoLowerStr = "canceled by user...";
+           for (I_ShowActivity shower : showActivityListeners) {
+               try {
+                shower.complete();
+               } catch (ComputationCanceled e1) {
+                   // nothing to report. ;
+               }
+           }
+           
+           for (ActionListener sal: stopActionListeners.keySet()) {
+               sal.actionPerformed(e);
+           }
+            
+        }
+        
+    }
+    private class ActivityPanelImpl extends JPanel {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        JProgressBar progressBar = new ActivityProgress(100);
+
+        JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
+
+        JLabel progressInfoUpper = new JLabel();
+
+        JLabel progressInfoLower = new JLabel();
+        
+        boolean showProgress = false;
+        
+        boolean stopped = false;
+
+        
+        public ActivityPanelImpl(boolean showBorder) {
+            super(new GridBagLayout());
+            progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
+            progressInfoUpper.setText(progressInfoUpperStr);
+            progressInfoLower.setFont(new Font("Dialog", 0, 10));
+            progressInfoLower.setText(progressInfoLowerStr);
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.weightx = 1.0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.WEST;
+            add(makeInfoPanel(), c);
+
+            c.weightx = 0.0;
+            c.gridx++;
+            c.anchor = GridBagConstraints.EAST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            progressBar.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+            progressBar.setVisible(false);
+            add(progressBar, c);
+            c.gridx++;
+            stopButton.setVisible(stopButtonVisible);
+            if (stopButtonVisible) {
+                add(stopButton, c);
+            }
+            stopButton.addActionListener(sal);
+            if (showBorder) {
+                setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
+            }
+        }
+
+        private JPanel makeInfoPanel() {
+            JPanel infoGridPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.gridheight = 1;
+            c.weightx = 1.0;
+            c.weighty = 0;
+            c.anchor = GridBagConstraints.WEST;
+            infoGridPanel.add(progressInfoUpper, c);
+            c.gridy++;
+            infoGridPanel.add(progressInfoLower, c);
+            infoGridPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+            return infoGridPanel;
+        }
+        
+        private class ShowStopAndProgress implements ActionListener {
+
+            private ShowStopAndProgress() {
+                super();
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (complete) {
+                    stopButton.setVisible(false);
+                    progressBar.setVisible(false);
+                    stopButtonVisible = false;
+                    if (eraseWhenFinishedEnabled) {
+                        progressInfoLower.setText("");
+                        progressInfoUpper.setText("");
+                        ActivityViewer.removeActivity(ActivityPanel.this);
+                        ActivityViewer.removeFromUpdateTimer(ActivityPanel.this);
+                    }
+                    stopped = true;
+                    if (aceFrameConfig != null && aceFrameConfig.getTopActivity() == ActivityPanel.this) {
+                        aceFrameConfig.setTopActivity(null);
+                    }
+                } else {
+                    stopButton.setVisible(true);
+                    progressBar.setVisible(true);
+                }
+                ActivityViewer.removeFromUpdateTimer(this);
+            }
+
+        }
+
+        public void update() {
+            if (!progressInfoUpper.getText().equals(progressInfoUpperStr)) {
+                progressInfoUpper.setText(progressInfoUpperStr);
+            }
+            if (!progressInfoLower.getText().equals(progressInfoLowerStr)) {
+                progressInfoLower.setText(progressInfoLowerStr);
+            }
+            if (stopButtonVisible) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
+            }
+            
+            if (max != progressBar.getMaximum()) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
+                progressBar.setMaximum(max);
+            }
+            if (value != progressBar.getValue()) {
+                if (progressBar.isVisible() == false) {
+                    progressBar.setVisible(true);
+                }
+                progressBar.setValue(value);
+            }
+            if (indeterminate != progressBar.isIndeterminate()) {
+                progressBar.setIndeterminate(indeterminate);
+            }
+            
+            if (stringPainted != progressBar.isStringPainted()) {
+                progressBar.setStringPainted(stringPainted);
+            }
+            
+            if (stopButtonVisible != stopButton.isVisible()) {
+                stopButton.setVisible(stopButtonVisible);
+            }
+            if (complete && !stopped) {
+                ActivityViewer.addToUpdateTimer(new ShowStopAndProgress());
+            }
+        }
+    }
 
     private long startTime = System.currentTimeMillis();
     private I_ConfigAceFrame aceFrameConfig;
@@ -49,26 +222,19 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     private int max = Integer.MAX_VALUE;
     private int value = 0;
     private boolean indeterminate = true;
-    private boolean removed;
+    private boolean removed = false;
+    private boolean stringPainted = false;
+    private boolean stopButtonVisible = true;
+    private boolean canceled = false;
+
+    private StopActionListenerPropigator sal = new StopActionListenerPropigator();
     
     public void update() {
-        if (!progressInfoUpper.getText().equals(progressInfoUpperStr)) {
-            progressInfoUpper.setText(progressInfoUpperStr);
+        for (ActivityPanelImpl panel: panels.keySet()) {
+            panel.update();
         }
-        if (!progressInfoLower.getText().equals(progressInfoLowerStr)) {
-            progressInfoLower.setText(progressInfoLowerStr);
-        }
-        if (max != progressBar.getMaximum()) {
-            progressBar.setMaximum(max);
-        }
-        if (value != progressBar.getValue()) {
-            progressBar.setValue(value);
-        }
-        if (indeterminate != progressBar.isIndeterminate()) {
-            progressBar.setIndeterminate(indeterminate);
-        }
-        if (secondaryPanel != null) {
-            secondaryPanel.update();
+        if (complete) {
+            ActivityViewer.removeFromUpdateTimer(this);
         }
     }
     
@@ -91,28 +257,6 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         return spinners[spinnerIndex++];
     }
 
-    private class ShowStopAndProgress extends SwingTask {
-
-        private ShowStopAndProgress() {
-            super();
-        }
-
-        @Override
-        public void doRun() {
-            if (isComplete()) {
-                stopButton.setVisible(false);
-                progressBar.setVisible(false);
-                if (eraseWhenFinishedEnabled) {
-                    progressInfoLower.setText("");
-                    progressInfoUpper.setText("");
-                }
-            } else {
-                stopButton.setVisible(true);
-                progressBar.setVisible(true);
-            }
-        }
-
-    }
 
     private class ActivityProgress extends JProgressBar {
         /**
@@ -148,81 +292,29 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         }
     }
 
-    private class StopActionListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-            complete();
-        }
-    }
-
     /**
 	 *
 	 */
     private static final long serialVersionUID = 1L;
 
-    JProgressBar progressBar = new ActivityProgress(100);
-
-    JButton stopButton = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/stop.png")));
-
-    JLabel progressInfoUpper = new JLabel();
-
-    JLabel progressInfoLower = new JLabel();
     private boolean complete = false;
-
-    public void syncWith(I_ShowActivity another) {
-        this.complete = another.isComplete();
-        stopButton.setVisible(false);
-        setIndeterminate(another.isIndeterminate());
-        setMaximum(another.getMaximum());
-        setValue(another.getValue());
-        setProgressInfoUpper(another.getProgressInfoUpper());
-        setProgressInfoLower(another.getProgressInfoLower());
-        ActionListener[] stopListeners = getStopButton().getActionListeners();
-        setStartTime(another.getStartTime());
-        for (ActionListener l : stopListeners) {
-            getStopButton().removeActionListener(l);
-        }
-        for (ActionListener l : another.getStopButton().getActionListeners()) {
-            getStopButton().addActionListener(l);
-        }
-        setStringPainted(another.isStringPainted());
-        ACE.timer.schedule(new ShowStopAndProgress(), 1);
+    
+    public boolean isStopButtonVisible() {
+        return stopButtonVisible;
     }
 
-    public ActivityPanel(boolean showBorder, I_ShowActivity secondaryPanel, I_ConfigAceFrame aceFrameConfig) {
-        super(new GridBagLayout());
-        this.secondaryPanel = secondaryPanel;
-        this.aceFrameConfig = aceFrameConfig;
-        progressInfoUpper.setFont(new Font("Dialog", java.awt.Font.BOLD, 10));
-        progressInfoLower.setFont(new Font("Dialog", 0, 10));
 
-        GridBagConstraints c = new GridBagConstraints();
-
-        JPanel infoGridPanel = new JPanel(new GridLayout(2, 1));
-        infoGridPanel.add(progressInfoUpper);
-        infoGridPanel.add(progressInfoLower);
-        infoGridPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridheight = 1;
-        c.weightx = 1.0;
-        c.weighty = 0;
-        c.anchor = GridBagConstraints.WEST;
-        add(infoGridPanel, c);
-
-        c.weightx = 0.0;
-        c.gridx++;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        progressBar.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-        add(progressBar, c);
-        c.gridx++;
-        add(stopButton, c);
-        stopButton.addActionListener(new StopActionListener());
-        if (showBorder) {
-            setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray));
+    public void setStopButtonVisible(boolean stopButtonVisible) {
+        this.stopButtonVisible = stopButtonVisible;
+        for (I_ShowActivity shower : showActivityListeners) {
+            shower.setStopButtonVisible(stopButtonVisible);
         }
+    }
+
+
+    public ActivityPanel(I_ConfigAceFrame aceFrameConfig, boolean showStop) {
+        this.aceFrameConfig = aceFrameConfig;
+        this.stopButtonVisible = showStop;
     }
 
     @Override
@@ -233,8 +325,12 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         }
     }
 
-    public JPanel getViewPanel() {
-        return this;
+    public JPanel getViewPanel(boolean showBorder) {
+        ActivityPanelImpl viewPanel = new ActivityPanelImpl(showBorder);
+        panels.put(viewPanel, viewPanel);
+        viewPanel.addAncestorListener(this);
+        viewPanel.update();
+        return viewPanel;
     }
 
     public void setProgressInfoUpper(String text) {
@@ -254,7 +350,7 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     }
 
     public void setIndeterminate(boolean newValue) {
-        progressBar.setIndeterminate(newValue);
+        this.indeterminate = newValue;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setIndeterminate(newValue);
         }
@@ -267,30 +363,33 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     public void setValue(int n) {
         this.value = n;
         for (I_ShowActivity shower : showActivityListeners) {
-            shower.setMaximum(progressBar.getMaximum());
+            shower.setMaximum(this.max);
             shower.setValue(n);
         }
     }
 
-    public void complete() {
+    public void complete() throws ComputationCanceled {
         this.complete = true;
-        ACE.timer.schedule(new ShowStopAndProgress(), 1);
+        this.stopButtonVisible = false;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.complete();
         }
-    }
-
-    public void addActionListener(final ActionListener l) {
-        stopButton.addActionListener(l);
-        for (I_ShowActivity shower : showActivityListeners) {
-            shower.addActionListener(l);
+        if (canceled) {
+            throw new ComputationCanceled();
         }
     }
 
-    public void removeActionListener(final ActionListener l) {
-        stopButton.removeActionListener(l);
+    public void addRefreshActionListener(final ActionListener l) {
+        listeners.put(l, l);
         for (I_ShowActivity shower : showActivityListeners) {
-            shower.removeActionListener(l);
+            shower.addRefreshActionListener(l);
+        }
+    }
+
+    public void removeRefreshActionListener(final ActionListener l) {
+        listeners.remove(l);
+        for (I_ShowActivity shower : showActivityListeners) {
+            shower.removeRefreshActionListener(l);
         }
     }
 
@@ -312,7 +411,14 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         return value;
     }
 
-    public boolean isComplete() {
+    public boolean isComplete() throws ComputationCanceled {
+        if (canceled) {
+            throw new ComputationCanceled();
+        }
+        return this.complete;
+    }
+
+    public boolean isCompleteForComparison() {
         return this.complete;
     }
 
@@ -320,37 +426,15 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
         return indeterminate;
     }
 
-    I_ShowActivity secondaryPanel;
-
-    public I_ShowActivity getSecondaryPanel() {
-        return secondaryPanel;
-    }
-
-    public void setSecondaryPanel(I_ShowActivity panel) {
-        this.secondaryPanel = panel;
-    }
-
     public boolean isStringPainted() {
-        return progressBar.isStringPainted();
+        return this.stringPainted;
     }
 
     public void setStringPainted(final boolean stringPainted) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setStringPainted(stringPainted);
-            }
-        });
+        this.stringPainted = stringPainted;
         for (I_ShowActivity shower : showActivityListeners) {
             shower.setStringPainted(stringPainted);
         }
-    }
-
-    public JButton getStopButton() {
-        return stopButton;
-    }
-
-    public void setStopButton(JButton stopButton) {
-        this.stopButton = stopButton;
     }
 
     public I_ConfigAceFrame getAceFrameConfig() {
@@ -378,4 +462,50 @@ public class ActivityPanel extends JPanel implements I_ShowActivity {
     public void actionPerformed(ActionEvent e) {
         update();
     }
+
+
+    @Override
+    public void ancestorAdded(AncestorEvent event) {
+        // Nothing to do...
+    }
+
+
+    @Override
+    public void ancestorMoved(AncestorEvent event) {
+        // Nothing to do...
+    }
+
+
+    @Override
+    public void ancestorRemoved(AncestorEvent event) {
+        ActivityPanelImpl aPanel = (ActivityPanelImpl) event.getComponent();
+        panels.remove(aPanel);
+        aPanel.removeAncestorListener(this);
+        aPanel.progressBar.setIndeterminate(false);
+        aPanel.progressBar.setEnabled(false);
+        aPanel.removeAll();
+        aPanel.setVisible(false);
+    }
+
+
+    @Override
+    public void addStopActionListener(ActionListener l) {
+        stopActionListeners.put(l, l);
+    }
+
+
+    @Override
+    public void removeStopActionListener(ActionListener l) {
+        stopActionListeners.remove(l);
+    }
+    
+    
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
 }

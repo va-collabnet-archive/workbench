@@ -45,11 +45,11 @@ public class ImportAllChangeSets extends AbstractTask {
 
     private Boolean validateChangeSets = true;
 
-    private String validators = ComponentValidator.class.getName();
+    private String validators = null;
 
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 3;
+    private static final int dataVersion = 4;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -72,6 +72,9 @@ public class ImportAllChangeSets extends AbstractTask {
                 validators = (String) in.readObject();
             } else {
                 validators = ComponentValidator.class.getName();
+            }
+            if (objDataVersion < 4) {
+                validators = null;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -103,7 +106,7 @@ public class ImportAllChangeSets extends AbstractTask {
                 }
             }
         };
-        csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".jcs");
+        csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".eccs");
     }
 
     /**

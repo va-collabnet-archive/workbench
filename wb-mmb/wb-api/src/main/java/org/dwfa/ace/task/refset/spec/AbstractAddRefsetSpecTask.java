@@ -154,6 +154,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
+            //TODO pass in frame configuration
             I_ConfigAceFrame configFrame = Terms.get().getActiveAceFrameConfig();
             if (configFrame.getEditingPathSet().size() == 0) {
                 String msg = "Unable to add spec. Editing path set is empty.";

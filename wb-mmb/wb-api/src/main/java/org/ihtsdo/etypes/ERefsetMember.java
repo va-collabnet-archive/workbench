@@ -94,7 +94,6 @@ public abstract class ERefsetMember<V extends ERevision> extends EComponent<V> {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(" refsetUuid:");
         buff.append(this.refsetUuid);
         buff.append(" componentUuid:");
