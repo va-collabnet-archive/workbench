@@ -7,15 +7,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.5.1-rset-inf-SNAPSHOT</version>
+    <version>2.5.1-SNAPSHOT</version>
     <name>Workbench modules multi-module build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb_rset_inf</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb_rset_inf</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb_rset_inf</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-mmb/?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
