@@ -3,7 +3,7 @@
         <parent>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mmb</artifactId>
-            <version>2.5.1-rset-inf-SNAPSHOT</version>
+            <version>2.5.1-rset-inf</version>
         </parent>
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
