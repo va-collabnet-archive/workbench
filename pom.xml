@@ -15,7 +15,7 @@
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_rset_inf</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_rset_inf</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb_rset_inf</url>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_rset_inf</url>
     </scm>
     <properties>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
