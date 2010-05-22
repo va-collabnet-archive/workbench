@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
@@ -21,7 +22,7 @@ import org.ihtsdo.time.TimeUtil;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
     
-    protected static boolean writeDebugFiles = false;
+    protected static boolean writeDebugFiles = System.getProperty("DEBUG_CS", "false").toLowerCase().startsWith("t");
 	/**
 	 * 
 	 */
@@ -30,9 +31,9 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     private File changeSetFile;
     
     private File cswcFile;
-    private transient DataOutputStream cswcOut;
+    private transient FileWriter cswcOut;
     private File csweFile;
-    private transient DataOutputStream csweOut;
+    private transient FileWriter csweOut;
     private I_IntSet commitSapNids;
 
     private File tempFile;
@@ -89,10 +90,10 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
         tempOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(tempFile, true)));
         if (writeDebugFiles) {
             cswcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".cswc");
-            cswcOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cswcFile, true)));
+            cswcOut = new FileWriter(cswcFile, true);
 
             csweFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".cswe");
-            csweOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(csweFile, true)));
+            csweOut = new FileWriter(csweFile, true);
         }
 	}
 
@@ -188,23 +189,23 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                 
             }
 			if (cswcOut != null) {
-                cswcOut.writeUTF("\n*******************************\n");
-                cswcOut.writeUTF(TimeUtil.formatDateForFile(time));
-                cswcOut.writeUTF(" sapNids for commit: ");
-                cswcOut.writeUTF(commitSapNids.toString());
-                cswcOut.writeUTF("\n*******************************\n");
-                cswcOut.writeUTF(c.toLongString());
+                cswcOut.append("\n*******************************\n");
+                cswcOut.append(TimeUtil.formatDateForFile(time));
+                cswcOut.append(" sapNids for commit: ");
+                cswcOut.append(commitSapNids.toString());
+                cswcOut.append("\n*******************************\n");
+                cswcOut.append(c.toLongString());
 			}
             if (csweOut != null) {
-                csweOut.writeUTF("\n*******************************\n");
-                csweOut.writeUTF(TimeUtil.formatDateForFile(time));
-                csweOut.writeUTF(" sapNids for commit: ");
-                csweOut.writeUTF(commitSapNids.toString());
-                csweOut.writeUTF("\n*******************************\n");
+                csweOut.append("\n*******************************\n");
+                csweOut.append(TimeUtil.formatDateForFile(time));
+                csweOut.append(" sapNids for commit: ");
+                csweOut.append(commitSapNids.toString());
+                csweOut.append("\n*******************************\n");
                 if (eC != null) {
-                    csweOut.writeUTF(eC.toString());
+                    csweOut.append(eC.toString());
                 } else {
-                    csweOut.writeUTF("eC == null");
+                    csweOut.append("eC == null");
                 }
             }
 			writePermit.release();

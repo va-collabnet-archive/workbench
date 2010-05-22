@@ -1,14 +1,12 @@
 package org.ihtsdo.cs.econcept;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,9 +43,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     private File changeSetFile;
 
     private File csreFile;
-    private transient DataOutputStream csreOut;
+    private transient FileWriter csreOut;
     private File csrcFile;
-    private transient DataOutputStream csrcOut;
+    private transient FileWriter csrcOut;
 
     private I_Count counter;
 
@@ -97,10 +95,10 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
             try {
                 EConcept eConcept = new EConcept(dataStream);
                 if (csreOut != null) {
-                    csreOut.writeUTF("\n*******************************\n");
-                    csreOut.writeUTF(TimeUtil.formatDateForFile(nextCommitTime()));
-                    csreOut.writeUTF("\n*******************************\n");
-                    csreOut.writeUTF(eConcept.toString());
+                    csreOut.append("\n*******************************\n");
+                    csreOut.append(TimeUtil.formatDateForFile(nextCommitTime()));
+                    csreOut.append("\n*******************************\n");
+                    csreOut.append(eConcept.toString());
                 }
                 //AceLog.getEditLog().info("Reading change set entry: \n" + eConcept);
                 count++;
@@ -177,16 +175,16 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         try {
             assert time != Long.MAX_VALUE;
             if (EConceptChangeSetWriter.writeDebugFiles) {
-                csrcOut.writeUTF("\n*******************************\n");
-                csrcOut.writeUTF(TimeUtil.formatDateForFile(time));
-                csrcOut.writeUTF("\n********** before ***********\n");
+                csrcOut.append("\n*******************************\n");
+                csrcOut.append(TimeUtil.formatDateForFile(time));
+                csrcOut.append("\n********** before ***********\n");
 
                 Concept before = Concept.get(Bdb.uuidToNid(eConcept.getPrimordialUuid()));
-                csrcOut.writeUTF(before.toLongString());
+                csrcOut.append(before.toLongString());
                 csrcOut.flush();
                 Concept after = Concept.mergeAndWrite(eConcept);
-                csrcOut.writeUTF("\n----------- after  -----------\n");
-                csrcOut.writeUTF(after.toLongString());
+                csrcOut.append("\n----------- after  -----------\n");
+                csrcOut.append(after.toLongString());
                 return after;
             } else {
                 return Concept.mergeAndWrite(eConcept);
@@ -231,9 +229,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 
                 if (EConceptChangeSetWriter.writeDebugFiles) {
                     csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");;
-                    csreOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(csreFile, true)));
+                    csreOut = new FileWriter(csreFile, true);
                     csrcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csrc");;
-                    csrcOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(csrcFile, true)));
+                    csrcOut = new FileWriter(csrcFile, true);
                 }
             } else {
                 nextCommit = Long.MAX_VALUE;
