@@ -727,7 +727,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Bdb.gVersion.incrementAndGet();
     }
 
-    @SuppressWarnings("unchecked")
     public void merge(C component) {
         Set<Integer> currentSapNids = getComponentSapNids();
         HashMap<Integer, ConceptComponent<?, ?>.Version> newSapMap = component.getSapMap();
