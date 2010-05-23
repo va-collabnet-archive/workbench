@@ -152,7 +152,12 @@ public class Svn implements I_HandleSubversion {
         return client;
     }
 
-    public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
+    public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive) 
+    		throws TaskFailedException {
+    	return status(svd, authenticator, interactive, false);
+    }
+
+    public static Status[] status(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive, boolean onServer)
             throws TaskFailedException {
 
         if (!isConnectedToSvn()) {
@@ -170,7 +175,6 @@ public class Svn implements I_HandleSubversion {
             + new File(workingCopy).getAbsoluteFile());
         try {
             int depth = Depth.unknown;
-            boolean onServer = false;
             boolean getAll = false;
             boolean noIgnore = false;
             boolean ignoreExternals = false;
@@ -230,22 +234,37 @@ public class Svn implements I_HandleSubversion {
         Svn.getSvnClient().setPrompt(authenticator);
         try {
 
-            Status[] status = status(svd, authenticator, interactive);
+            Status[] status = status(svd, authenticator, interactive, true);
 
             int newFiles = 0;
             int deletedFiles = 0;
             int modifiedFiles = 0;
             for (Status s : status) {
                 if (s.isManaged()) {
-                    if (s.getTextStatusDescription().equalsIgnoreCase("missing")) {
+                    if (s.getTextStatus() == StatusKind.missing) {
                         boolean force = true;
                         boolean keepLocal = false;
                         Map<String, String> revpropTable = new HashMap<String, String>();
                         Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force, keepLocal, revpropTable);
                         SvnLog.info("Removing: " + s.getPath());
                         deletedFiles++;
-                    } else if (s.getTextStatusDescription().equalsIgnoreCase("modified")) {
-                        modifiedFiles++;
+                    } else if (s.isModified()) {
+                    	if (s.getRepositoryTextStatus() == StatusKind.modified) {
+                    		// Conflict exists. 
+                    		StringBuffer msg = new StringBuffer();
+                    		msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
+                    		msg.append(s.getPath());
+                    		msg.append("<br><br>Accept recommendation to revert to version on server?");
+                    		boolean resolve = authenticator.askYesNo("Warning: local mods and server mods", msg.toString(), true);
+                    		if (resolve) {
+                    			revert(s);
+                    		} else {
+                    			throw new TaskFailedException("Conflict between local copy and server: " + s.getPath());
+                    		}
+                    	} else {
+                    		modifiedFiles++;
+                    	}
+
                     }
                 } else if (s.isIgnored() == false) {
                     int depth = Depth.infinity;
@@ -255,6 +274,10 @@ public class Svn implements I_HandleSubversion {
                     Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
                     SvnLog.info("Adding: " + s.getPath());
                     newFiles++;
+                } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
+                	// prevent tree conflict. 
+                    SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
+                	revert(s);
                 } else {
                     SvnLog.info("Not adding: " + s.getPath());
                 }
