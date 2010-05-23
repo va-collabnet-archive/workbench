@@ -266,7 +266,7 @@ public class Svn implements I_HandleSubversion {
                     	}
 
                     }
-                } else if (s.isIgnored() == false) {
+                } else if (s.isIgnored() == false && new File(s.getPath()).exists()) {
                     int depth = Depth.infinity;
                     boolean force = false;
                     boolean noIgnores = false;
