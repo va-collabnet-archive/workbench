@@ -23,6 +23,7 @@
         <include>org.apache.geronimo.specs:geronimo-activation_1.1_spec</include>
         <include>com.sleepycat:je</include>
         <include>org.apache.lucene:lucene-core</include>
+        <include>jgraph:jgraphx</include>
         <include>jung:jung</include>
         <include>commons-collections:commons-collections</include>
         <include>colt:colt</include>
