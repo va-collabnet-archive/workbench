@@ -38,6 +38,12 @@
             <artifactId>wb-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>jgraph</groupId>
+			<artifactId>jgraphx</artifactId>
+			<version>1.4.0.0</version>
+			<optional>false</optional>
+		</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
