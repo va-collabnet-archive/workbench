@@ -8,7 +8,7 @@
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
     <version>2.5.1-trek-inf-SNAPSHOT</version>
-    <name>Workbench modules multi-module build</name>
+    <name>Workbench Multimodule Build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
@@ -91,4 +91,12 @@
         <module>wb-bdb</module>        
         <module>wb-bdb-mojo</module>        
     </modules>
+    <profiles>
+    	<profile>
+    	      <id>bundle</id>
+    	      <modules>
+       			<module>wb-bundle</module>        
+    	      </modules>	
+    	</profile>
+    </profiles>
 </project>

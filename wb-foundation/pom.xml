@@ -23,7 +23,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>wb-foundation</artifactId>
   <packaging>jar</packaging>
-  <name>DWFA foundation module</name>
+  <name>Workbench Foundation</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html</url>
   <inceptionYear>2004</inceptionYear>
   <organization>
