@@ -24,6 +24,39 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>ihtsdo-resources</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa</groupId>
+			<artifactId>icons</artifactId>
+		</dependency>
+		<dependency>
+			<!--
+				A dependency required to use the jini/jehri dynamic provider
+				security model
+			-->
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>jsk-policy</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.nhs.uktc</groupId>
+			<artifactId>nhs-subset-editor-doc</artifactId>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>start</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>jsk-dl</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.dwfa</groupId>
 			<artifactId>ace-ide-admin-bp</artifactId>
 			<scope>runtime-directory</scope>
