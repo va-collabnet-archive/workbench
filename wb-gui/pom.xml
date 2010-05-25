@@ -44,6 +44,11 @@
 			<version>1.4.0.0</version>
 			<optional>false</optional>
 		</dependency>
+		<dependency>
+			<groupId>jgraph</groupId>
+			<artifactId>jgraphx-examples</artifactId>
+			<version>1.4.0.0</version>
+		</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
