@@ -15,7 +15,7 @@ import com.mxgraph.view.mxGraphView;
 
 public class ArenaGraphComponent extends mxGraphComponent
 {
-
+	
     /**
      * 
      */
@@ -28,7 +28,6 @@ public class ArenaGraphComponent extends mxGraphComponent
     public ArenaGraphComponent(mxGraph graph)
     {
         super(graph);
-
         mxGraphView graphView = new mxGraphView(graph)
         {
 

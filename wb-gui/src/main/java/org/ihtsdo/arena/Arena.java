@@ -1,17 +1,17 @@
 package org.ihtsdo.arena;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+
+import org.ihtsdo.arena.editor.ArenaEditor;
 
 public class Arena extends JPanel implements ActionListener {
 
@@ -25,10 +25,8 @@ public class Arena extends JPanel implements ActionListener {
         JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
         addButtons(toolBar);
         add(toolBar, BorderLayout.EAST);
-        JPanel arena = new JPanel();
-        arena.setBackground(Color.GRAY);
-        arena.setBorder(BorderFactory.createLoweredBevelBorder());
-        add(arena, BorderLayout.CENTER);    
+        ArenaEditor editor = new ArenaEditor();
+        add(editor, BorderLayout.CENTER);    
     }
     
     protected void addButtons(JToolBar toolBar) {

@@ -21,6 +21,9 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -33,11 +36,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import javax.swing.border.BevelBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.EnumMap;
+import org.ihtsdo.arena.editor.ArenaEditor.CELL_ATTRIBUTES;
+
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.handler.mxGraphTransferHandler;
@@ -74,7 +85,7 @@ public class SchemaTableRenderer extends JComponent
     /**
      * 
      */
-    protected Object cell;
+    protected mxCell cell;
 
     /**
      * 
@@ -91,20 +102,39 @@ public class SchemaTableRenderer extends JComponent
      */
     public JTable table;
 
+	private JLabel resizeLabel;
+	
+	private EnumMap dataMap;
+
+	private I_HostConceptPlugins host;
+	private I_GetConceptData concept;
+
+	private JLabel label;
+	
     /**
      * 
      */
     @SuppressWarnings("serial")
-    public SchemaTableRenderer(final Object cell,
+    public SchemaTableRenderer(Object cellObj,
             final mxGraphComponent graphContainer)
     {
-        this.cell = cell;
+        this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
+        this.dataMap = (EnumMap) this.cell.getValue();
+        if (this.dataMap != null && dataMap.get(CELL_ATTRIBUTES.LINKED_TAB) != null) {
+        	Integer linkedTab = (Integer) dataMap.get(CELL_ATTRIBUTES.LINKED_TAB);
+            try {
+            	host = Terms.get().getActiveAceFrameConfig().getConceptViewer(linkedTab);
+            	concept = (I_GetConceptData) host.getTermComponent();
+            	host.addPropertyChangeListener("termComponent", new HostListener());
+			} catch (TerminologyException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			} catch (IOException e1) {
+				AceLog.getAppLog().alertAndLogException(e1);
+			}
+        }
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createCompoundBorder(ShadowBorder
-                .getSharedInstance(), BorderFactory
-                .createBevelBorder(BevelBorder.RAISED)));
 
         JPanel title = new JPanel();
         title.setBackground(new Color(149, 173, 239));
@@ -112,12 +142,29 @@ public class SchemaTableRenderer extends JComponent
         title.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
         title.setLayout(new BorderLayout());
 
-        JLabel icon = new JLabel(new ImageIcon(SchemaTableRenderer.class
-                .getResource(IMAGE_PATH + "preferences.gif")));
-        icon.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 1));
-        title.add(icon, BorderLayout.WEST);
+        JButton goToLinkButton = new JButton(new AbstractAction("", new ImageIcon(SchemaTableRenderer.class
+                .getResource("/16x16/plain/pin_green.png"))) {
 
-        JLabel label = new JLabel(String.valueOf(graph.getLabel(cell)));
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Integer linkedTab = -1;
+						if (dataMap != null ) {
+							linkedTab = (Integer) dataMap.get(CELL_ATTRIBUTES.LINKED_TAB);
+						}
+						if (linkedTab != null && linkedTab != -1) {
+							try {
+								Terms.get().getActiveAceFrameConfig().selectConceptViewer(linkedTab);
+							} catch (Exception e1) {
+								AceLog.getAppLog().alertAndLogException(e1);
+							} 
+						}
+					}
+        	
+        });
+        goToLinkButton.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 1));
+        title.add(goToLinkButton, BorderLayout.WEST);
+
+        label = new JLabel(String.valueOf(graph.getLabel(cell)));
         label.setForeground(Color.WHITE);
         label.setFont(title.getFont().deriveFont(Font.BOLD, 11));
         label.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 2));
@@ -130,10 +177,14 @@ public class SchemaTableRenderer extends JComponent
                 SchemaTableRenderer.class.getResource(IMAGE_PATH + "minimize.gif")))
         {
 
+        	boolean collapsed = false;
+        	
             public void actionPerformed(ActionEvent e)
             {
-                graph.foldCells(graph.isCellCollapsed(cell), false,
-                        new Object[] { cell });
+            	resizeLabel.setVisible(collapsed);
+            	collapsed = !collapsed;
+            	
+                graph.foldCells(collapsed, false, new Object[] { cell });
                 ((JButton) e.getSource())
                         .setIcon(new ImageIcon(
                                 SchemaTableRenderer.class
@@ -167,31 +218,38 @@ public class SchemaTableRenderer extends JComponent
         }
 
         scrollPane.getVerticalScrollBar().addAdjustmentListener(
-                new AdjustmentListener()
-                {
+                new AdjustmentListener() {
 
-                    public void adjustmentValueChanged(AdjustmentEvent e)
-                    {
+                    public void adjustmentValueChanged(AdjustmentEvent e) {
                         graphContainer.refresh();
                     }
 
                 });
 
-        label = new JLabel(new ImageIcon(SchemaTableRenderer.class
+        resizeLabel = new JLabel(new ImageIcon(SchemaTableRenderer.class
                 .getResource(IMAGE_PATH + "resize.gif")));
-        label.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
+        resizeLabel.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(label, BorderLayout.EAST);
+        panel.add(resizeLabel, BorderLayout.EAST);
 
         add(panel, BorderLayout.SOUTH);
 
         ResizeHandler resizeHandler = new ResizeHandler();
-        label.addMouseListener(resizeHandler);
-        label.addMouseMotionListener(resizeHandler);
+        resizeLabel.addMouseListener(resizeHandler);
+        resizeLabel.addMouseMotionListener(resizeHandler);
 
-        setMinimumSize(new Dimension(20, 30));
+        setMinimumSize(new Dimension(40, 20));
+        updateLabel();
+    }
+    
+    private void updateLabel() {
+    	if (concept == null) {
+    		label.setText("null");
+    	} else {
+    		label.setText(concept.toString());
+    	}
     }
 
     /**
@@ -239,8 +297,7 @@ public class SchemaTableRenderer extends JComponent
             }
 
             // Initiates a resize event in the handler
-            mxCellHandler handler = graphContainer.getSubHandler().getHandler(
-                    cell);
+            mxCellHandler handler = graphContainer.getSubHandler().getHandler(cell);
 
             if (handler != null)
             {
@@ -526,4 +583,13 @@ public class SchemaTableRenderer extends JComponent
         return null;
     }
 
-}
+    private class HostListener implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			concept = (I_GetConceptData) host.getTermComponent();
+			updateLabel();
+		}
+    	
+    }
+ }

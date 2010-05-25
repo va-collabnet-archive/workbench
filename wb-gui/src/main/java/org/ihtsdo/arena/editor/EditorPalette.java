@@ -334,18 +334,14 @@ public class EditorPalette extends JPanel
         });
 
         // Install the handler for dragging nodes into a graph
-        DragGestureListener dragGestureListener = new DragGestureListener()
-        {
+        DragGestureListener dragGestureListener = new DragGestureListener() {
             /**
              * 
              */
-            public void dragGestureRecognized(DragGestureEvent e)
-            {
-                e
-                        .startDrag(null, mxConstants.EMPTY_IMAGE, new Point(),
+            public void dragGestureRecognized(DragGestureEvent e) {
+                e.startDrag(null, mxConstants.EMPTY_IMAGE, new Point(),
                                 t, null);
             }
-
         };
 
         DragSource dragSource = new DragSource();
@@ -360,8 +356,7 @@ public class EditorPalette extends JPanel
      * @param listener
      * @see com.mxgraph.util.mxEventSource#addListener(java.lang.String, com.mxgraph.util.mxEventSource.mxIEventListener)
      */
-    public void addListener(String eventName, mxIEventListener listener)
-    {
+    public void addListener(String eventName, mxIEventListener listener) {
         eventSource.addListener(eventName, listener);
     }
 
@@ -369,8 +364,7 @@ public class EditorPalette extends JPanel
      * @return
      * @see com.mxgraph.util.mxEventSource#isEventsEnabled()
      */
-    public boolean isEventsEnabled()
-    {
+    public boolean isEventsEnabled() {
         return eventSource.isEventsEnabled();
     }
 
@@ -378,8 +372,7 @@ public class EditorPalette extends JPanel
      * @param listener
      * @see com.mxgraph.util.mxEventSource#removeListener(com.mxgraph.util.mxEventSource.mxIEventListener)
      */
-    public void removeListener(mxIEventListener listener)
-    {
+    public void removeListener(mxIEventListener listener) {
         eventSource.removeListener(listener);
     }
 
@@ -388,8 +381,7 @@ public class EditorPalette extends JPanel
      * @param listener
      * @see com.mxgraph.util.mxEventSource#removeListener(java.lang.String, com.mxgraph.util.mxEventSource.mxIEventListener)
      */
-    public void removeListener(mxIEventListener listener, String eventName)
-    {
+    public void removeListener(mxIEventListener listener, String eventName) {
         eventSource.removeListener(listener, eventName);
     }
 
@@ -397,8 +389,7 @@ public class EditorPalette extends JPanel
      * @param eventsEnabled
      * @see com.mxgraph.util.mxEventSource#setEventsEnabled(boolean)
      */
-    public void setEventsEnabled(boolean eventsEnabled)
-    {
+    public void setEventsEnabled(boolean eventsEnabled) {
         eventSource.setEventsEnabled(eventsEnabled);
     }
 
