@@ -2772,7 +2772,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     countRsByCon++;
                     if (theRsByCon.compareTo(theCon) == IS_LESS)
                         getLog().info(
-                                "ORPHAN REFSET MEMBER RECORD :: "
+                                "ORPHAN REFSET MEMBER RECORD_A :: "
                                         + new UUID(rsByConList.get(0).memberUuidMsb, rsByConList
                                                 .get(0).memberUuidLsb));
                 }
@@ -2791,7 +2791,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     countRsByRs++;
                     if (theRsByRs.compareTo(theCon) == IS_LESS)
                         getLog().info(
-                                "ORPHAN REFSET MEMBER RECORD :: "
+                                "ORPHAN REFSET MEMBER RECORD_B :: "
                                         + new UUID(rsByRsList.get(0).memberUuidMsb, rsByRsList
                                                 .get(0).memberUuidLsb));
                 }
