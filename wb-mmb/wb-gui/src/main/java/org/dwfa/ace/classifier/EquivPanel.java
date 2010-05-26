@@ -118,12 +118,12 @@ public class EquivPanel extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 1;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
         this.add(new JScrollPane(table), c);
     }
 
