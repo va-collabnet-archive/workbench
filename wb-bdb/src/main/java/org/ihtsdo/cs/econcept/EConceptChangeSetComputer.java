@@ -176,8 +176,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private List<EImage> processImages(Concept c, AtomicBoolean changed) throws IOException {
         List<EImage> eImages = new ArrayList<EImage>();
         for (Image img : c.getImages()) {
+            EImage eImg = null;
             for (Image.Version v : img.getTuples()) {
-                EImage eImg = null;
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         changed.set(true);
@@ -210,7 +210,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             for (Relationship.Version v : r.getTuples()) {
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
-
                         changed.set(true);
                         if (ecr == null) {
                             ecr = new ERelationship();
@@ -240,8 +239,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private List<EDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
         List<EDescription> eDescriptions = new ArrayList<EDescription>(c.getDescriptions().size());
         for (Description d : c.getDescriptions()) {
+            EDescription ecd = null;
             for (Description.Version v : d.getTuples()) {
-                EDescription ecd = null;
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     changed.set(true);
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {

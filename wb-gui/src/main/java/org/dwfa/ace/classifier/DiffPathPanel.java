@@ -72,6 +72,7 @@ public class DiffPathPanel extends JPanel {
         // ADDED ISAs
         this.add(new JLabel("Added ISAs:"), c);
         if (SnoQuery.getIsaAdded() != null && SnoQuery.getIsaAdded().size() > 0) {
+
             table = updateTable(SnoQuery.getIsaAdded());
             table.setDragEnabled(true);
             table.setTransferHandler(new TerminologyTransferHandler(table));
@@ -82,8 +83,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs added. --"), c);
@@ -103,8 +110,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs dropped. --"), c);
@@ -123,8 +136,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles added. --"), c);
@@ -147,7 +166,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             c.weightx = 0.5;
