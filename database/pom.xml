@@ -17,9 +17,6 @@
 		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/cement-vodb/trunk</developerConnection>
 		</scm>
 	-->
-	<properties>
-		<org.ihtsdo.wb-mojo.version>1.0-SNAPSHOT</org.ihtsdo.wb-mojo.version>
-	</properties>
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
@@ -61,7 +58,7 @@
 			<plugin>
 				<groupId>org.dwfa</groupId>
 				<artifactId>term-mojo</artifactId>
-				<version>1.43-SNAPSHOT</version>
+				<version>1.43</version>
 				<executions>
 					<execution>
 						<id>vodb-open</id>
@@ -171,7 +168,7 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-bdb-mojo</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
 				<executions>
 					<execution>
 						<id>load-econcepts</id>

@@ -14,7 +14,7 @@
 	<description>Workbench Bundle</description>
 	
 	<properties>
-		<org.ihtsdo.wb-mojo.version>1.0-SNAPSHOT</org.ihtsdo.wb-mojo.version>
+		<org.ihtsdo.wb-mojo.version>2.5.1-trek-inf-SNAPSHOT</org.ihtsdo.wb-mojo.version>
 	</properties>
 	
 	<dependencyManagement>
