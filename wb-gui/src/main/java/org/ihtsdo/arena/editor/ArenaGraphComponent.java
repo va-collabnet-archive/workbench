@@ -3,11 +3,9 @@ package org.ihtsdo.arena.editor;
 
 import java.awt.Component;
 
-import javax.swing.JTable;
-import javax.swing.JViewport;
+import org.dwfa.ace.ACE;
 
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
@@ -20,62 +18,16 @@ public class ArenaGraphComponent extends mxGraphComponent
      * 
      */
     private static final long serialVersionUID = -1152655782652932774L;
+	private ACE ace;
 
     /**
      * 
      * @param graph
      */
-    public ArenaGraphComponent(mxGraph graph)
-    {
+    public ArenaGraphComponent(mxGraph graph, ACE ace) {
         super(graph);
-        mxGraphView graphView = new mxGraphView(graph)
-        {
-
-            /**
-             * 
-             */
-            public void updateFloatingTerminalPoint(mxCellState edge,
-                    mxCellState start, mxCellState end, boolean isSource)
-            {
-                int col = getColumn(edge, isSource);
-
-                if (col >= 0)
-                {
-                    double y = getColumnLocation(edge, start, col);
-                    boolean left = start.getX() > end.getX();
-
-                    if (isSource)
-                    {
-                        double diff = Math.abs(start.getCenterX()
-                                - end.getCenterX())
-                                - start.getWidth() / 2 - end.getWidth() / 2;
-
-                        if (diff < 40)
-                        {
-                            left = !left;
-                        }
-                    }
-
-                    double x = (left) ? start.getX() : start.getX()
-                            + start.getWidth();
-                    double x2 = (left) ? start.getX() - 20 : start.getX()
-                            + start.getWidth() + 20;
-
-                    int index2 = (isSource) ? 1
-                            : edge.getAbsolutePointCount() - 1;
-                    edge.getAbsolutePoints().add(index2, new mxPoint(x2, y));
-
-                    int index = (isSource) ? 0
-                            : edge.getAbsolutePointCount() - 1;
-                    edge.setAbsolutePoint(index, new mxPoint(x, y));
-                }
-                else
-                {
-                    super.updateFloatingTerminalPoint(edge, start, end,
-                            isSource);
-                }
-            }
-        };
+        this.ace = ace;
+        mxGraphView graphView = new mxGraphView(graph);
 
         graph.setView(graphView);
     }
@@ -88,14 +40,10 @@ public class ArenaGraphComponent extends mxGraphComponent
      */
     public int getColumn(mxCellState state, boolean isSource)
     {
-        if (state != null)
-        {
-            if (isSource)
-            {
+        if (state != null) {
+            if (isSource) {
                 return mxUtils.getInt(state.getStyle(), "sourceRow", -1);
-            }
-            else
-            {
+            } else {
                 return mxUtils.getInt(state.getStyle(), "targetRow", -1);
             }
         }
@@ -103,46 +51,14 @@ public class ArenaGraphComponent extends mxGraphComponent
         return -1;
     }
 
-    /**
-     * 
-     */
-    public int getColumnLocation(mxCellState edge, mxCellState terminal,
-            int column)
-    {
-        Component[] c = (Component[]) components.get(terminal.getCell());
-        int y = 0;
-
-        if (c != null)
-        {
-            for (int i = 0; i < c.length; i++)
-            {
-                if (c[i] instanceof SchemaTableRenderer)
-                {
-                    SchemaTableRenderer vertex = (SchemaTableRenderer) c[i];
-
-                    JTable table = vertex.table;
-                    JViewport viewport = (JViewport) table.getParent();
-                    double dy = -viewport.getViewPosition().getY();
-                    y = (int) Math.max(terminal.getY() + 22, terminal.getY()
-                            + Math.min(terminal.getHeight() - 20, 30 + dy
-                                    + column * 16));
-                }
-            }
-        }
-
-        return y;
-    }
 
     /**
      * 
      */
-    public Component[] createComponents(mxCellState state)
-    {
-        if (getGraph().getModel().isVertex(state.getCell()))
-        {
-            return new Component[] { new SchemaTableRenderer(state.getCell(), this) };
+    public Component[] createComponents(mxCellState state) {
+        if (getGraph().getModel().isVertex(state.getCell())) {
+            return new Component[] { new ArenaRenderer(state.getCell(), this, ace) };
         }
-
         return null;
     }
 }

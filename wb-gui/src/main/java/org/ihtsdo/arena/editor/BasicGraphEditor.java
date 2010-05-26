@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -91,11 +90,6 @@ public class BasicGraphEditor extends JPanel
     /**
      * 
      */
-    protected JTabbedPane libraryPane;
-
-    /**
-     * 
-     */
     protected mxUndoManager undoManager;
 
     /**
@@ -151,6 +145,10 @@ public class BasicGraphEditor extends JPanel
         }
     };
 
+	private JSplitPane inner;
+
+	protected EditorPalette editorPalette;
+
     /**
      * 
      */
@@ -190,15 +188,16 @@ public class BasicGraphEditor extends JPanel
         graphOutline = new mxGraphOutline(graphComponent);
 
         // Creates the library pane that contains the tabs with the palettes
-        libraryPane = new JTabbedPane();
 
         // Creates the inner split pane that contains the library with the
         // palettes and the graph outline on the left side of the window
-        JSplitPane inner = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                libraryPane, graphOutline);
+        inner = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        		new JLabel(), graphOutline);
+        editorPalette = createPalette();
+        inner.setTopComponent(editorPalette);
         inner.setDividerLocation(320);
         inner.setResizeWeight(1);
-        inner.setDividerSize(6);
+        inner.setOneTouchExpandable(true);
         inner.setBorder(null);
 
         // Creates the outer split pane that contains the inner split pane and
@@ -206,8 +205,8 @@ public class BasicGraphEditor extends JPanel
         JSplitPane outer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inner,
                 graphComponent);
         outer.setOneTouchExpandable(true);
-        outer.setDividerLocation(200);
-        outer.setDividerSize(6);
+        outer.setDividerLocation(Integer.MAX_VALUE);
+        outer.setOneTouchExpandable(true);
         outer.setBorder(null);
 
         // Creates the status bar
@@ -290,18 +289,16 @@ public class BasicGraphEditor extends JPanel
     /**
      * 
      */
-    public EditorPalette insertPalette(String title)
-    {
+    public EditorPalette createPalette()  {
         final EditorPalette palette = new EditorPalette();
         final JScrollPane scrollPane = new JScrollPane(palette);
         scrollPane
                 .setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane
                 .setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        libraryPane.add(title, scrollPane);
 
         // Updates the widths of the palettes if the container size changes
-        libraryPane.addComponentListener(new ComponentAdapter()
+        inner.addComponentListener(new ComponentAdapter()
         {
             /**
              * 

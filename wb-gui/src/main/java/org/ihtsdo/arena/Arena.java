@@ -9,8 +9,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 
+import org.dwfa.ace.ACE;
 import org.ihtsdo.arena.editor.ArenaEditor;
 
 public class Arena extends JPanel implements ActionListener {
@@ -20,12 +20,14 @@ public class Arena extends JPanel implements ActionListener {
      */
     private static final long serialVersionUID = 1L;
 
-    public Arena() {
+    public Arena(ACE ace) {
         super(new BorderLayout());
+        /*
         JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
         addButtons(toolBar);
         add(toolBar, BorderLayout.EAST);
-        ArenaEditor editor = new ArenaEditor();
+        */
+        ArenaEditor editor = new ArenaEditor(ace);
         add(editor, BorderLayout.CENTER);    
     }
     

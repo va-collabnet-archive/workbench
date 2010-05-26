@@ -55,7 +55,7 @@ public class EditorPalette extends JPanel
     /**
      * 
      */
-    protected Color gradientColor = new Color(117, 195, 173);
+    protected Color gradientColor = new Color(153,153,153);
 
     /**
      * 
@@ -63,7 +63,7 @@ public class EditorPalette extends JPanel
     @SuppressWarnings("serial")
     public EditorPalette()
     {
-        setBackground(new Color(149, 230, 190));
+        setBackground(new Color(191,191,191));
         setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
 
         // Clears the current selection when the background is clicked
@@ -203,6 +203,9 @@ public class EditorPalette extends JPanel
     public void setPreferredWidth(int width)
     {
         int cols = width / 55;
+        if (cols == 0) {
+        	cols = 1;
+        }
         setPreferredSize(new Dimension(width,
                 (getComponentCount() * 55 / cols) + 30));
         revalidate();

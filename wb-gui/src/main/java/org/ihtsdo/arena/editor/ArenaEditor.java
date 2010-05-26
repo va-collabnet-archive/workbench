@@ -4,8 +4,8 @@ import java.awt.BorderLayout;
 
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.util.EnumMap;
 
 import com.mxgraph.model.mxCell;
@@ -16,7 +16,9 @@ import com.mxgraph.view.mxGraph;
 
 public class ArenaEditor extends BasicGraphEditor
 {
-	public enum CELL_ATTRIBUTES { LINKED_TAB };
+	public enum CELL_ATTRIBUTES { LINKED_TAB, COMPONENT_KIND };
+
+	public enum COMPONENT_KIND { CONCEPT, TAXONOMY };
 
     /**
      * 
@@ -26,7 +28,7 @@ public class ArenaEditor extends BasicGraphEditor
     /**
      * 
      */
-    public ArenaEditor()
+    public ArenaEditor(ACE ace)
     {
         super("mxGraph for JFC/Swing", new ArenaGraphComponent(new mxGraph()
         {
@@ -37,7 +39,7 @@ public class ArenaEditor extends BasicGraphEditor
             {
                 return model.isVertex(cell);
             }
-        })
+        }, ace)
 
         {
             /**
@@ -56,30 +58,13 @@ public class ArenaEditor extends BasicGraphEditor
         });
 
         // Creates a single shapes palette
-        EditorPalette shapesPalette = insertPalette("panels");
-        graphOutline.setVisible(false);
-        addPaletteTemplate(shapesPalette, "tab 1", "potion_green", 1);
-        addPaletteTemplate(shapesPalette, "tab 2", "potion_red", 2);
-        addPaletteTemplate(shapesPalette, "tab 3", "text_formula", 3);
-        addPaletteTemplate(shapesPalette, "tab 4", "view", 4);
-        addPaletteTemplate(shapesPalette, "unconnected", "graph_edge_directed", 5);
-        addPaletteTemplate(shapesPalette, "search results", "flag_yellow", 6);
-        addPaletteTemplate(shapesPalette, "taxonomy", "elements_selection", 7);
-        
-        EditorPalette viewPalette = insertPalette("views");
-        addPaletteTemplate(viewPalette, "lineage", "potion_green", 1);
-        addPaletteTemplate(viewPalette, "parents", "potion_green", 2);
-        addPaletteTemplate(viewPalette, "siblings", "potion_green", 3);
-        addPaletteTemplate(viewPalette, "children", "potion_green", 4);
-        addPaletteTemplate(viewPalette, "refset members", "potion_green", 5);
-        addPaletteTemplate(viewPalette, "src rels", "potion_green", 6);
-        addPaletteTemplate(viewPalette, "dest rels", "potion_green", 7);
-        addPaletteTemplate(shapesPalette, "refset spec", "potion_green", 8);
-        addPaletteTemplate(shapesPalette, "refset members", "potion_green", 9);
-       
-        EditorPalette history = insertPalette("history");
-        addPaletteTemplate(history, "history 1", "potion_green", 1);
-        addPaletteTemplate(history, "history 2", "potion_green", 2);
+        graphOutline.setVisible(true);
+        addPaletteTemplate(editorPalette, "tab 1", "view", 1);
+        addPaletteTemplate(editorPalette, "tab 2", "view", 2);
+        addPaletteTemplate(editorPalette, "tab 3", "view", 3);
+        addPaletteTemplate(editorPalette, "tab 4", "view", 4);
+        addPaletteTemplate(editorPalette, "taxonomy", "text_tree", 1, 
+        		new EnumMap().put(CELL_ATTRIBUTES.COMPONENT_KIND, COMPONENT_KIND.TAXONOMY));
 
         getGraphComponent().getGraph().setCellsResizable(false);
         getGraphComponent().setConnectable(false);
@@ -105,11 +90,14 @@ public class ArenaEditor extends BasicGraphEditor
     }
 
     private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link) {
+    	addPaletteTemplate(palette,  label, imageName, link, new EnumMap().put(CELL_ATTRIBUTES.LINKED_TAB, link));
+    }
+    private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link, EnumMap map) {
         mxCell tableTemplate = new mxCell(label, new mxGeometry(20, 20, 200, 200), null);
-        tableTemplate.setValue(new EnumMap().put(CELL_ATTRIBUTES.LINKED_TAB, link));
-        tableTemplate.getGeometry().setAlternateBounds( new mxRectangle(0, 0, 200, 20));
+        tableTemplate.setValue(map);
+        tableTemplate.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 200, 20));
         tableTemplate.setVertex(true);
-        ImageIcon icon = new ImageIcon(GraphEditor.class.getResource("/24x24/plain/" + imageName + ".png"));
+        ImageIcon icon = new ImageIcon(ArenaEditor.class.getResource("/24x24/plain/" + imageName + ".png"));
         palette.addTemplate(label, icon, tableTemplate);
     }
 
@@ -120,22 +108,6 @@ public class ArenaEditor extends BasicGraphEditor
     {
         add(new ArenaEditorToolBar(this, JToolBar.HORIZONTAL),
                 BorderLayout.NORTH);
-    }
-
-    /**
-     * 
-     * @param args
-     */
-    public static void main(String[] args)
-    {
-        try  {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        ArenaEditor editor = new ArenaEditor();
-        editor.createFrame(new ArenaEditorMenuBar(editor)).setVisible(true);
     }
 
 }
