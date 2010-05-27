@@ -168,6 +168,17 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private static boolean debug = false; // :DEBUG:
     private static boolean debugDump = false; // :DEBUG: save to files
 
+    static {
+        if (System.getProperties().get("SnorocketDebug") != null &&
+                System.getProperties().get("SnorocketDebug").toString().toLowerCase().startsWith("t")) {
+            debug = true;
+        }
+        if (System.getProperties().get("SnorocketDebugDump") != null &&
+                System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
+            debugDump = true;
+        }
+    }
+    
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
     }
@@ -242,8 +253,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        debug = false; // :DEBUG:
-        debugDump = false; // :DEBUG: save to files
         
         Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
             public int compare(SnoRel o1, SnoRel o2) {
