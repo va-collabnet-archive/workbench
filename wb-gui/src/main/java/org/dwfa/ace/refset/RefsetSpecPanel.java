@@ -931,29 +931,32 @@ public class RefsetSpecPanel extends JPanel {
         }
     }
 
+    private void updateCheckBoxes() {
+        int checkedCount = 0;
+        int checkBoxColumnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
+        selectAllCheckBox.removeItemListener(selectAllCheckBoxListener);
+
+        boolean[] flags = new boolean[refsetTable.getRowCount()];
+        for (int i = 0; i < refsetTable.getRowCount(); i++) {
+            flags[i] = ((Boolean) refsetTable.getValueAt(i, checkBoxColumnIndex)).booleanValue();
+            if (flags[i]) {
+                checkedCount++;
+            }
+        }
+        if (checkedCount == refsetTable.getRowCount()) {
+            selectAllCheckBox.setSelected(true);
+        }
+        if (checkedCount != refsetTable.getRowCount()) {
+            selectAllCheckBox.setSelected(false);
+        }
+
+        selectAllCheckBox.addItemListener(selectAllCheckBoxListener);
+        refsetTable.getTableHeader().repaint();
+    }
     private class MouseClickListener extends MouseAdapter {
         public void mouseClicked(MouseEvent mouseEvent) {
             if (getShowPromotionCheckBoxes()) {
-                int checkedCount = 0;
-                int checkBoxColumnIndex = refsetTable.getColumnModel().getColumnCount() - 1;
-                selectAllCheckBox.removeItemListener(selectAllCheckBoxListener);
-
-                boolean[] flags = new boolean[refsetTable.getRowCount()];
-                for (int i = 0; i < refsetTable.getRowCount(); i++) {
-                    flags[i] = ((Boolean) refsetTable.getValueAt(i, checkBoxColumnIndex)).booleanValue();
-                    if (flags[i]) {
-                        checkedCount++;
-                    }
-                }
-                if (checkedCount == refsetTable.getRowCount()) {
-                    selectAllCheckBox.setSelected(true);
-                }
-                if (checkedCount != refsetTable.getRowCount()) {
-                    selectAllCheckBox.setSelected(false);
-                }
-
-                selectAllCheckBox.addItemListener(selectAllCheckBoxListener);
-                refsetTable.getTableHeader().repaint();
+                updateCheckBoxes();
             }
         }
     }

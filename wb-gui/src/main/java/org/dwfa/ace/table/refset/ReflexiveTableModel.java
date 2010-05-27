@@ -361,6 +361,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
     }
 
     public void setPromotionFilterId(Integer promotionFilterId) {
+        // clear any checked rows if we've switched to a different promotion filter
+        if ((this.promotionFilterId == null && promotionFilterId != null) ||
+                (this.promotionFilterId != null && promotionFilterId == null) ||
+                (this.promotionFilterId != null && promotionFilterId != null && !this.promotionFilterId.equals(promotionFilterId))) {
+            this.checkedRows.clear();
+        }
         this.promotionFilterId = promotionFilterId;
     }
 
