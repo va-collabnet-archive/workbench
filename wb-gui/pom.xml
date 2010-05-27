@@ -39,13 +39,13 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-			<groupId>jgraph</groupId>
+			<groupId>jgraphx</groupId>
 			<artifactId>jgraphx</artifactId>
 			<version>1.4.0.0</version>
 			<optional>false</optional>
 		</dependency>
 		<dependency>
-			<groupId>jgraph</groupId>
+			<groupId>jgraphx</groupId>
 			<artifactId>jgraphx-examples</artifactId>
 			<version>1.4.0.0</version>
 		</dependency>
