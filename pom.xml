@@ -99,4 +99,36 @@
     	      </modules>	
     	</profile>
     </profiles>
+    <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.
+         These should be pushed into the parent POM -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <!-- To be implemented when servers are clean
+            <checksumPolicy>fail</checksumPolicy>
+            -->
+            <!-- To be reviewed, currently daily is the default
+            <updatePolicy>never</updatePolicy>
+            -->
+        </pluginRepository>
+    </pluginRepositories>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <!-- To be implemented when servers are clean
+            <checksumPolicy>fail</checksumPolicy>
+            -->
+            <!-- To be reviewed, currently daily is the default
+            <updatePolicy>never</updatePolicy>
+            -->
+        </repository>
+    </repositories>
 </project>
