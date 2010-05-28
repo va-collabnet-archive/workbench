@@ -1,7 +1,7 @@
 // Project: maven-dita-plugin
 // Source: src/main/java/info/healthbase/plugins/DitaGenMojo.java
 // perhaps package dwfa.org.ace.maven-mojos/maven-dita.plugin ??
-package info.ihtsdo.mojo.mpjp.dita;
+package org.ihtsdo.mojo.dita;
 
 import java.io.File;
 import java.io.FileFilter;
