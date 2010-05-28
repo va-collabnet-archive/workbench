@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="IDE_translation" xml:lang="en">
+    <title>Translation IDE</title>
+
+    <prolog>
+      <metadata>
+        <keywords>
+          <indexterm>Translation</indexterm>
+        </keywords>
+      </metadata>
+    </prolog>
+
+    <body>
+      <section>The IHTSDO Toolkit provides a strong foundation for a
+      Translation IDE, and for managing dialects. Based on Java, the IHTSDO
+      Toolkit provides full support for internationalization based on support
+      in the Java SE Platform.</section>
+
+      <section>Like the Clinical Terminologist’s IDE, the Translation IDE can
+      be integrated into the CollabNet platform to provide configuration
+      management, issue tracking, and integrated project management
+      capabilities.</section>
+
+      <section id="ac999861"><title>Multi-Lingual Rendering Support<ph>
+      <indexterm>Multi-Lingual </indexterm> </ph></title></section>
+
+      <section>Core Java provides the foundation for internationalization of
+      desktop and server applications. Java provides a development framework
+      that encompasses:</section>
+
+      <ul>
+        <li>Text representation: the Java programming language is based on the
+        Unicode character set, and several libraries implement the Unicode
+        standard.</li>
+
+        <li>Locale identification and localization: Locales in the Java SE
+        platform are just identifiers that can be used to request locale
+        specific behavior in many different areas of functionality.
+        Localization is supported at the most basic level by the
+        ResourceBundle class, which provides access to locale specific
+        objects, including strings.</li>
+
+        <li id="ac999896">Date and time handling: The Java SE platform
+        provides various calendars, and supports conversion to and from
+        calendar independent Date objects. All time zones in the world are
+        supported.<indexterm>date and time </indexterm></li>
+
+        <li>Text processing: The Java SE platform includes character analysis
+        and case mapping, string comparison, breaking text into words and
+        lines, as well as formatting numbers, dates, and time values into
+        strings or parsing them back from strings. Most of these functions are
+        locale dependent.</li>
+
+        <li id="ac999904">Character encoding conversion: The Java SE platform
+        supports converting text between Unicode and other character encodings
+        when reading incoming text from streams or writing outgoing text to
+        streams.<indexterm>character encoding </indexterm></li>
+      </ul>
+
+      <section>The user interface libraries in the Java SE platform enable the
+      development of rich interactive applications. Internationalization
+      aspects include:</section>
+
+      <ul>
+        <li>Text input is the process of entering new text into a document -
+        in the simplest case through typing on a keyboard, but often involving
+        front-end software such as input methods, handwriting recognition, or
+        speech input.</li>
+
+        <li>Text display is a multistep process that includes selecting a
+        font, arranging text into paragraphs and lines, selecting glyphs for
+        characters or character sequences, and rendering these glyphs. Some
+        writing systems require bidirectional text layout for Arabic and
+        Hebrew, or complex character-to-glyph mappings for Arabic, Thai, and
+        the scripts of India. Text display is handled by the Java 2D graphics
+        system and the Swing toolkit for lightweight user interface components
+        and by the AWT for peered user interface components. The IHTSDO
+        Workbench Toolkit utilizes the Swing toolkit and thereby extends
+        Java’s full support for alternative glyph rendering.</li>
+
+        <li>User interface layout needs to accommodate text expansion or
+        shrinkage caused by localization, and match the direction of the
+        user's writing system. For example, English-speaking users expect the
+        tools in a tool bar to be organized from left to right, but users of a
+        right-to-left language such as Arabic expect the tools to be organized
+        from right to left. The IHTSDO Workbench Toolkit utilizes Java’s
+        dynamic layout features, and can respond appropriately to alternative
+        layouts.</li>
+      </ul>
+    </body>
+  </topic>
+
+  <topic id="multi-lingual">
+    <title>Multi-Lingual Search Support</title>
+
+    <body>
+      <section>The IHTSDO Toolkit supports regular-expression based search,
+      and Lucene-based search. The regular-expression based search provides
+      robust pattern matching capability, but no language-specific support.
+      The Lucene search engine provides substantial multi-lingual support, and
+      can be configured as appropriate for any particular combination
+      languages as previously described in the Search subsection of the IHTSDO
+      Toolkit Chapter.</section>
+
+      <section>In addition to open-source integrations with the Lucene search
+      engine, there are commercial add-ons for Lucene that may provide
+      additional value. For example, Teragram has integrated their linguistic
+      tools with Lucene<fn id="ac1000342"> <xref format="html"
+      href="http://www.teragram.com/news/pr20080420lucene.html"
+      scope="external"> <ph>
+      http://www.teragram.com/news/pr20080420lucene.html</ph> </xref>
+      </fn><xref format="dita" href="#multi-lingual/ac1000342" scope="local"
+      type="fn"/>.</section>
+
+      <section>The Teragram integration enables Lucene users to add taxonomies
+      and faceted search to their applications, as well as to correct the
+      spelling of queries and search in multiple languages.</section>
+
+      <section>Other individuals and/or organizations can similarly extend
+      Lucene in either an open or a proprietary way. These extensions can be
+      incorporated into an IHTSDO Workbench Translational IDE as appropriate
+      to meet end-user requirements.</section>
+
+      <section id="ac1000064"><title>Automated-Translation Support</title> The
+      IHTSDO Toolkit does not currently include any internal
+      automated-translation support, however such support can easily be
+      integrated either by connecting to translation services over the web
+      using the IHTSDO Workbench’s business process automation framework, or
+      by direct integration of this functionality into the Workbench
+      Framework.</section>
+
+      <section>Automated-translation support could be provided offline using
+      batch style processing and assignment generation, or interactively by
+      making use of embedded translation components, or a web service—although
+      the interactive web service approach will only allow end-users to
+      perform there work when the web service are available.</section>
+
+      <section>Such automated-translation support can be incorporated into an
+      IHTSDO Workbench Translational IDE as appropriate to meet end-user
+      requirements.</section>
+    </body>
+  </topic>
+</dita>

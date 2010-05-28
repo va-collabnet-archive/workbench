@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic5" xml:lang="en"><title> Processes for Statistics</title>
+ <body>
+  <table id="aq1080279">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Set up root for user and save</b>
+        <indexterm>Process <indexterm>Set up root for user and save</indexterm>
+        </indexterm></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2">
+       <p>This process will set the root for terminlogy editing to the appropriate top level
+        concepts in the IHTSDO Workbench hierarchy. These may include:-</p>
+       <ul>
+        <li>local Auxilliary concept tree, </li>
+        <li>Refset auxilliary concept tree, </li>
+        <li>Terminology auxilliary concept tree, </li>
+        <li>SNOMED CT concept tree. </li>
+       </ul>
+       <p>This process clears the taxonomy root setting in the user’s profile, and adds the
+        appropriate tree roots as top level concepts. It then saves the user’s profile.</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Rationale:</p>
+      </entry>
+      <entry colname="col2">
+       <p>Modellers and Quality Assurance validators need access to concept hierarchies (e.g. the
+        relevant SNOMED CT release), and other editing concepts. Each of these represents a distinct
+        hierarchy, and each and every hierachy needs to be navigatable within the editor in a given
+        session. This process ensures that the required hierachies are loaded and available in the
+        editor's hiearchy navigation window and that concepts in each are available for use in other
+        editing functions, via UUIDs</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2">
+       <p>
+        <ph>manual load only</ph>
+       </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2">
+       <p>manual</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+ </body>
+</topic>

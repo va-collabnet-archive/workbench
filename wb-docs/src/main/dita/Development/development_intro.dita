@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic1" xml:lang="en">
+ <title>The IHTSDO Workbench Development Environment</title>
+ <body>
+  <section>This chapter is aimed at those software developers who intend to programatically extend
+   an IHTSDO Workbench IDE ( e.g. editor of viewer ). Those considering to do so should be both
+   proficient in the java programming language, and be well versed with the exisitng concepts and
+   functionality described in this manual. Experience with automatic software build processes in a
+   collaborative environment would also stand the prospective developer in good stead. This, and the
+   following chapters which constitute the Developers Guide, are only intended to be sufficient in
+   detail to guide prospective developers, rather than be a comprehensive developers’ resource.
+   Those wishing to embark on extending the functionality of IHTSDO Workbench are advised to peruse
+   the available source code and discuss their proposed changes or enhancements with those in the
+   international community who have trodden a similar path before them.</section>
+ </body>
+</topic>

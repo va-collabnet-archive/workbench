@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="Admin" xml:lang="en" title="Administrative Functions">
+    <!-- initially created 2009-07-13 -->
+    <title>Administrative Functions</title>
+    <topicref href="Admin_intro.dita" type="topic" navtitle="Administrative Functions - Introduction">
+        <topicref href="Admin_new_user_creation.dita" type="topic"/>
+        <topicref href="Admin_user_creation_tasks.dita" type="topic"/>
+        <topicref href="Admin_revoke_permissions_tasks.dita" type="topic"/>
+    </topicref>
+</map>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic5" xml:lang="en">
+ <title>Reviewing the Menu Bar</title>
+ <prolog>
+  <metadata>
+   <keywords>
+    <indexterm>Menu Bar </indexterm>
+   </keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The Menu Bar, as shown in <xref href="#topic5/ag947660" type="fig" format="dita"/>,
+   provides tools to manage certain application and configuration functions, as described below,
+   that are typically handled by a system administrator. The functions available via the menu bar
+   may vary from installation to installation, and may include the ability to invoke local business
+   processes.</section>
+  <fig id="ag947660">
+   <title>Menu Bar</title>
+   <image href="../images/Using_The_ACE_Editor_Images/menu_bar.jpg" placement="break"/>
+  </fig>
+  
+  <section id="ag947699">
+   <title>File Menu<ph>  <indexterm>File Menu </indexterm> </ph></title>
+
+  <fig id="file_menu">   <title>File Menu</title>
+   <image href="../images/Using_The_ACE_Editor_Images/menu_file_pulldown_screenshot.jpg"/>
+  </fig>
+   <b>Import Java Changeset - </b> Downloads changes from subversion. <indexterm>Import Java
+    Changeset </indexterm>
+  <p><b>Change Password - </b> Allows you to change your logon password. <indexterm>Change
+    Password </indexterm></p>
+  <p><b>Save Profile - </b>Save the current IHTSDO IDE status (including taxonomy display,
+    displayed icons and windows) in a profile, which is selected at startup. IHTSDO IDE provides
+    another opportunity to save this profile when you quit the application.<indexterm>Save
+    Profile </indexterm></p>
+  <p>   <b>Save Profile As... - </b>
+   Allows you to save an alternate profile.
+  </p>
+   <p>   <b>Generate Java Binding from Refset... - </b> Displays the current version of the application
+    database. <indexterm>database configuration </indexterm>
+   </p>
+   <p>   <b>Show Configuration Info - </b> Displays the current version of the application database.
+    <indexterm>database configuration </indexterm>
+  </p>
+  <p>   <b>Quit - </b> Exits IHTSDO IDE. </p>
+   </section>
+  <section id="ag947800">
+   <title>Edit Menu</title>
+  </section>
+  
+  <section>
+  <fig id="edit_menu">   <title>Edit Menu</title>
+   <image href="../images/Using_The_ACE_Editor_Images/menu_edit_pulldown_screenshot.jpg"/>
+  </fig>
+   <b>Cut, Copy, Paste - </b> Provides access to standard editing functions - Cut, Copy and Paste.
+   You can also access these functions via keyboard shortcuts: Ctrl-X, Ctrl-C, Ctrl-V). </section>
+  
+  <section id="ag947863">
+   <title>Task Menu<ph>
+     <indexterm>task <indexterm>menu</indexterm>
+     </indexterm>
+    </ph></title>
+  </section>
+  <fig id="task_menu">
+   <title>Task Menu</title>
+   <image href="../images/Using_The_ACE_Editor_Images/menu_tasks_pulldown_screenshot.jpg"/>
+  </fig>
+  <section>
+   <b>Export Current Refset Spec - </b> Takes the refset currently in the Refset pane of the
+   Component Panel and exports the corresponding specification refset to a nominated file. </section>
+  <section id="ag970804">
+   <title>Window Menu</title>
+  </section>
+  <fig id="window_menu">
+   <title>Window Menu</title>
+   <image href="../images/Using_The_ACE_Editor_Images/menu_window_pulldown_screenshot.jpg"/>
+  </fig>
+  <section>
+   <b>New - </b> Provides options to create new instances of the Editor Window, Adminstrator Window
+   or Log Viewer. </section>
+  <section>
+   <b>Activity Viewer, User Profile, </b>
+   <b>Workflow Bundle - </b> Provides options to access different instances of IHTSDO Workbench. </section>
+  <section>
+   <title>Help Menu</title>
+   <fig id="help_menu">
+    <title>Help Menu</title>
+    <image href="../images/Using_The_ACE_Editor_Images/menu_help_pulldown_screenshot.jpg"/>
+   </fig>
+   <p><indexterm>help<indexterm>online</indexterm></indexterm><indexterm>documentation</indexterm>
+    <b>Open PDF Guidebook...</b> - Opens the documentation for the IHTSDO Workbench in the default
+    PDF viewer. </p>
+   <p>
+    <b>Open HTML Guidebook...</b> - Opens the documentation for the IHTSDO Workbench in the default
+    HTML browser. </p>
+  </section>
+ </body>
+</topic>

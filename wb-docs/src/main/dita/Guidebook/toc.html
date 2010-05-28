@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<base target="contentwin"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<title>IHTSDO Workbench</title>
+</script--> 
+        <STYLE TYPE="text/css"> 
+                .color { background-color: #ddeeff; }   
+             H1 {font-family: Arial; font-size: 14pt; Color:red} 
+             X_UL  {list-style-type: square ; margin-left:-20px; margin-right:0px;} 
+             X_LI>UL  {list-style-type: disc } 
+             A  { font-family: Arial; font-size:9pt; line-height:12pt} 
+             A     {text-decoration:none; } 
+             A:link                {text-decoration:none; color: black} 
+             A.chapter { font-weight: bold } 
+             A:visited { color: #666666 }   
+             A:hover   { color: #99ccaa } 
+             A:active  { color: orange } 
+             H3.logo   { font-family: Arial; margin: 0pt 0pt; color: darkred } 
+              
+        </STYLE> 
+</head> 
+<body class="color"> 
+<table align="center" bgcolor="white" border="0"> 
+ <tr> 
+   <td><img src="images/IHTSDO_logo.png" width=60px height=50px alt="IHTSDO"></td> 
+   <td><table> 
+         <tr><td><h3 class="logo" align="center">IHTSDO Workbench</h2></td></tr> 
+         <tr><td><h3 class="logo" align="center">CONTENTS</h3></td></tr> 
+       </table></td> 
+ </tr> 
+</table> 
+
+<ul>
+<li><a href="frontCover.html">The IHTSDO Workbench GuideBook</a></li>
+<li><a href="Overviews/workbench_overview.html">IHTSDO Workbench Guide: Documentation status</a></li>
+<li><a href="Overviews/overview_intro.html">Overview of the IHTSDO Toolkit</a>
+<ul>
+<li><a href="Overviews/overview_architecture.html">IHTSDO Workbench Architecture</a></li>
+<li><a href="Overviews/overview_non-proprietary.html">Non-Proprietary Foundation</a></li>
+<li><a href="Overviews/overview_best_practice.html">Best-Practice Based</a></li>
+<li><a href="Overviews/overview_licence.html">Licensing of the IHTSDO Workbench</a></li>
+</ul>
+</li>
+<li><a href="IDE/IDE_overview.html">IHTSDO Workbench and Integrated Development Environments</a>
+<ul>
+<li><a href="IDE/IDE_integration.html">IDE Integration</a></li>
+<li><a href="IDE/IDE_Eclipse.html">Eclipse IDE</a></li>
+<li><a href="IDE/IDE_terminologist.html">Terminologist IDE</a></li>
+<li><a href="IDE/IDE_translation.html">Translation IDE</a></li>
+<li><a href="IDE/IDE_enduser.html">End-User IDE</a></li>
+</ul>
+</li>
+<li><a href="Toolkit/Toolkit_intro.html#topic1">The IHTSDO Toolkit</a>
+<ul>
+<li><a href="Toolkit/Toolkit_frameworks.html#topic1a">The Toolkit Fameworks</a></li>
+<li><a href="Toolkit/Toolkit_version_oriented_terminology.html#topic2">Version-Oriented Terminology Interface</a></li>
+<li><a href="Toolkit/Toolkit_changeset-aware.html#topic3">Change-Set Smart Client Model</a></li>
+<li><a href="Toolkit/Toolkit_versioning_practices.html#topic4">IDE Version Control Best Practices</a></li>
+<li><a href="Toolkit/Toolkit_DWfA.html#topic5">Distributed Workflow Automation Layer</a></li>
+<li><a href="Toolkit/Toolkit_transport.html">Transport Layer</a></li>
+<li><a href="Toolkit/Toolkit_process_builder.html#topic7">Graphical Process Builder</a></li>
+<li><a href="Toolkit/Toolkit_inbox.html">User Inbox</a></li>
+<li><a href="Toolkit/Toolkit_database.html">Embedded Database</a></li>
+<li><a href="Toolkit/Toolkit_lexography.html">Lexographic Analysis, Search, and Spelling</a></li>
+<li><a href="Toolkit/Toolkit_BPA_framework.html">Build Process Automation Framework</a></li>
+<li><a href="Toolkit/Toolkit_term_and_class.html#topic12">Terminologies and Classification Support</a></li>
+<li><a href="Toolkit/Toolkit_markup_support.html#topic13">Markup and Media Support</a></li>
+<li><a href="Toolkit/Toolkit_refsets.html#topic14">Reference Sets</a></li>
+<li><a href="Toolkit/Toolkit_batch_editing.html#topic15">Batch Editing</a></li>
+<li><a href="Toolkit/Toolkit_taxonomy.html#topic16">Taxonomy Navigation and Display</a></li>
+<li><a href="Toolkit/Toolkit_change_mgt.html#topic17">Change and Conflict Management</a></li>
+<li><a href="Toolkit/Toolkit_validation.html#topic18">Data Validation</a></li>
+<li><a href="Toolkit/Toolkit_customization.html#topic19">Customization</a></li>
+</ul>
+</li>
+<li><a href="Editor/Editor_intro.html">Using the IHTSDO Workbench IDE</a>
+<ul>
+<li><a href="Editor/Editor_launching.html">Launching the IHTSDO Workbench</a></li>
+<li><a href="Editor/Editor_hierarchy_view.html">Using the Hierarchy View</a></li>
+<li><a href="Editor/Editor_concept_area.html">Reviewing the Concept Work Area</a></li>
+<li><a href="Editor/Editor_menu_bar.html">Reviewing the Menu Bar</a></li>
+<li><a href="Editor/Editor_paths.html">Understanding and using Paths</a></li>
+<li><a href="Editor/Editor_paths_create.html">Configuring paths for an authoring organisation</a></li>
+<li><a href="Editor/Editor_preferences_panel.html">Understanding the Preferences Panel</a></li>
+<li><a href="Editor/Editor_list_view.html">Using the List View</a></li>
+<li><a href="Editor/Editor_searching.html">Using the Search Function</a></li>
+<li><a href="Editor/Editor_search_variables.html">Using the Search Variables</a></li>
+<li><a href="Editor/Editor_advanced_search.html">Executing an Advanced Search</a></li>
+<li><a href="Editor/Editor_searching_find_similar.html">Finding 'Similar Concepts' Search</a></li>
+<li><a href="Editor/Editor_change_set_submission.html">Submitting a Change Set to the IHTSDO Workspace</a></li>
+<li><a href="Editor/Editor_refsets.html">Using Reference Sets</a></li>
+<li><a href="Editor/Editor_adding_to_spec_refset.html">Adding a Concept to a version 1 Specification Reference Set</a></li>
+<li><a href="Editor/Editor_displaying_spec_refsets.html">Displaying Specification Refset Concept Types in the Hierarchy List</a></li>
+<li><a href="Editor/Editor_displaying_refset_members.html">Displaying Refset Members in the Hierarchy List</a></li>
+<li><a href="Editor/Editor_refset_defaults.html">Changing the Refset Default Values</a></li>
+<li><a href="Editor/Editor_refset_preferences.html">Setting Refset Preferences</a></li>
+<li><a href="Editor/Editor_classifier_preferences.html">Setting Classifier Preferences</a></li>
+<li><a href="Editor/Editor_refset_inclusion_types.html">Inclusion Types (refsets specification type 1 only)</a></li>
+<li><a href="Editor/Editor_keyboard.html">Keyboard shortcuts</a></li>
+<li><a href="Editor/Editor_summary.html">Postscript</a></li>
+</ul>
+</li>
+<li><a href="Adding_Modifying/AddingModifying_intro.html#topic1">Adding and Modifying Concepts</a>
+<ul>
+<li><a href="Adding_Modifying/AddingModifying_concepts.html#topic2">Concepts</a></li>
+<li><a href="Adding_Modifying/AddingModifying_relationships.html#topic3">Relationships</a></li>
+<li><a href="Adding_Modifying/AddingModifying_changesets.html#topic4">Submitting a Change Set to the IHTSDO Workspace</a></li>
+</ul>
+</li>
+<li><a href="Data_Checks/DataChecks_intro.html#topic1">Data Checks and Search Filters</a>
+<ul>
+<li><a href="Data_Checks/DataChecks.html#topic3">DataChecks</a></li>
+</ul>
+</li>
+<li><a href="RefSets/RefSets_intro.html">Reference Sets</a>
+<ul>
+<li><a href="RefSets/RefSets_morphology.html">Reference Set Forms and Types</a></li>
+<li><a href="RefSets/RefSets_autocreation_overview.html">Creating refsets - Overview</a></li>
+<li><a href="RefSets/RefSets_creation_example.html">Example: Creating a Refset</a></li>
+<li><a href="RefSets/RefSets_concepts_autocreation.html">Autogenerating Refset concepts</a></li>
+<li><a href="RefSets/associating_example.html">Example: refset specification construction</a></li>
+<li><a href="RefSets/RefSets_displaying_members.html">Displaying Refset Members</a></li>
+<li><a href="RefSets/RefSets_refresh.html">Requesting a Refset change</a></li>
+<li><a href="RefSets/RefSets_history.html">Refset History</a></li>
+<li><a href="RefSets/RefSets_changing_default_values.html">Changing the Refset Default Values</a></li>
+<li><a href="RefSets/RefSets_preferences.html">Refset Preferences</a></li>
+<li><a href="RefSets/RefSets_query_language.html">Refset Specification Language</a></li>
+<li><a href="RefSets/RefSets_export_import.html">Refset import, compute and export via Maven</a></li>
+<li><a href="RefSets/RefSets_export.html">Exporting a Refset to file</a></li>
+<li><a href="RefSets/Refsets_export-maven.html">Exporting in RF2 format</a></li>
+<li><a href="RefSets/RefSets_import.html">Importing a Refset from a file</a></li>
+<li><a href="RefSets/Subsets_export-maven.html">Refset creation in ACE, followed by Subset export:</a></li>
+<li><a href="RefSets/RefSets_report_intro.html">Refset metadata report generation - overview</a></li>
+<li><a href="RefSets/RefSets_report_tasks.html">Refset metadata report generation - tasks</a></li>
+</ul>
+</li>
+<li><a href="Classifying/Classifying_intro.html#topic1">Using the Classifier</a>
+<ul>
+<li><a href="Classifying/Classifying_using.html">Overview the Classifier</a></li>
+<li><a href="Classifying/Classifying_setup_tasks.html">Setting up for Classifying</a></li>
+<li><a href="Classifying/Classifying_running.html">Running the Classifier</a></li>
+<li><a href="Classifying/Classifying_viewing.html">Viewing Results</a></li>
+<li><a href="Classifying/Classifying_logic.html">Role Logic Editor</a></li>
+</ul>
+</li>
+<li><a href="Admin/Admin_intro.html">Administration functions in the Workbench</a>
+<ul>
+<li><a href="Admin/Admin_new_user_creation.html">User Management</a></li>
+<li><a href="Admin/Admin_user_creation_tasks.html">Steps in creating a user</a></li>
+<li><a href="Admin/Admin_revoke_permissions_tasks.html">Steps in revoking or modifying a user's permissions</a></li>
+</ul>
+</li>
+<li><a href="Task_Library/tlib_intro.html">Standard Task Library</a>
+<ul>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestDescGt256Bytes.html">TestDescGt256Bytes</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForCreateNewRefsetPermission.html">TestForCreateNewRefsetPermission</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForEdgCType2Req.html">TestForEdgCType2Req</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForEdgEType2Req.html">TestForEdgEType2Req</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForEditRefsetPermission.html">TestForEditRefsetPermission</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForFsnValue.html">Test For Fully Specified Name value</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForFullySpecifiedName.html">Test For Fully Specified Name</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForIsa.html">Test For IS_A</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForIsaCycle.html">Test For IS_A Cycle</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForNotNumericFsn.html">Test For Numeric Fsn value</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForNotNumericPreferredTerm.html">Test For Numeric Preferred Term value</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForPreferredTermValue.html">Test For Preferred Term value</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForSelfReferencingRelationships.html">Test For Self-referencing Relationship</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForStatusForRefset.html">Test For Status for Refset</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/TestForUneditedDefaults.html">Test For Unedited Defaults</a></li>
+<li><a href="Task_Library/autogenerated/plugins/commit/VerifySingleMemberPerConceptForRefset.html">VerifySingleMemberPerConceptForRefset</a></li>
+<li><a href="Task_Library/autogenerated/plugins/precommit/TestForInactiveConceptInExtension.html">TestForInactiveConceptInExtension</a></li>
+<li><a href="Task_Library/autogenerated/search/HasStatus.html">HasStatus</a></li>
+<li><a href="Task_Library/autogenerated/search/IsKindOf.html">IsKindOf</a></li>
+<li><a href="Task_Library/autogenerated/search/RefsetMatch.html">RefsetMatch</a></li>
+<li><a href="Task_Library/autogenerated/search/RelSubsumptionMatch.html">RelSubsumptionMatch</a></li>
+<li><a href="Task_Library/autogenerated/tasks/file/SelectInputFile.html">Specify Input File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/file/SpecifyOutputFile.html">Specify Output File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/file/SpecifyOutputFileCancelOrContinue.html">Specify Output File with cancel/continue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/AbortWorkflowTransaction.html">Abort Workflow Transaction</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/Aggregator.html">Aggregator</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/ChangeProcessInstanceId.html">Change Instance Id</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/Complete.html">Process Complete</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/RandomBranch.html">Random Branch</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/StopProcess.html">Stop</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/WaitForInputFieldCancelOrComplete.html">Wait for User Input Field Input Panel Cancel or Complete</a></li>
+<li><a href="Task_Library/autogenerated/tasks/flow tasks/WaitForItemSkipOrComplete.html">Wait for User Input Instruction Panel Skip or Complete</a></li>
+<li><a href="Task_Library/autogenerated/tasks/grid/pwdbreaker/BreakPassword.html">Break Password</a></li>
+<li><a href="Task_Library/autogenerated/tasks/grid/pwdbreaker/ConfigureCryptBreakerWorkspace.html">Create Workspace: Password Breaker</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/AddAllProfilesToAddressList.html">Add All Profiles To Address List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/AddAllVisibleAddressesToAddressList.html">Add All Visible Addresses To Address List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/AddElectronicAddress.html">Add Electronic Address</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/AddElectronicAddressFromProperty.html">Add Electronic Address From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges.html">get addresses and positions and change status from status changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/GetAddressesAndPositionsFromConceptStatusChanges.html">get addresses and positions from status changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/GetAddressesFromConceptStatusChanges.html">get addresses and paths from status changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/GetSelectedAddresses.html">Get Selected Addresses</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/RemoveAllElectronicAddress.html">Remove ALL Addresses</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/RemoveElectronicAddress.html">Remove Selected Electronic Address</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/SetOriginatorFromProfile.html">Set Originator From Profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/address/SetPropertyToProfileUser.html">set property to profile user</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/AddRoot.html">Add Root</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/Alert.html">Alert box</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/AddConceptAndPotDupToList.html">Add Concept and Pot Dup to List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/BatchingAssignments.html">Batch Assignments</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ChooseBusinessProcessFile.html">Choose Business Process</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ChooseHtmlOrTxtFile.html">Choose Instruction File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ChooseUuidFile.html">Choose UUID File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/CopyHtmlFileToProperty.html">Copy Html File to Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/CreateMatchReviewAssignments.html">Create Match Review Assignments</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/GetConceptNameFromConceptUuid.html">Get Concept Name From Uuid</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/GetDetailHtmlDirUuidSetHtmlFileName.html">Get Detail Html Dir and Uuid Set Html Detail File Name</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/LaunchAssignmentProcess.html">Launch Assignment Process</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/LaunchBatchGenAssignmentProcess.html">Launch Generate Assignment Process</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/LaunchBatchGenAssignmentProcessFromAttachment.html">Launch Generate Assignment Process From Attachment</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ReadMatchReviewItemFromAttachment.html">Read Match Review Item From Attachment</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ReadMatchReviewItemFromUrl.html">Read Match Review Item From File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/ReadUuidListListFromUrl.html">Read UUID List List From File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/TakeFirstItemInAttachmentListListReturnUUID.html">Take 1st Item In Attachment List of Lists Return UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/TakeFirstItemInAttachmentListReturnConcept.html">DON'T USE Take 1st Item In Attachment List Return Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/TakeFirstItemInAttachmentListReturnUUID.html">Take 1st Item In Attachment List Return Uuid</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/TakeFirstObjectInAttachmentList.html">Take First Object In Attachment List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/WriteAttachmentToChosenFile.html">Write Attachment to Disk Specify File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/WriteAttachmentToDisk.html">Write Attachment to Disk</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/assignments/WriteUuidListListToDisk.html">Write UUID List List to File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/AttachmentListEmpty.html">Attachment List Empty</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ConvertAllChangeSets.html">Convert all Change Sets</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ConvertAllChangeSetsToXml.html">Convert all Change Sets to XML</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ConvertChangeSet.html">Convert Change Set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ConvertChangeSetToXml.html">Convert Change Set to XML</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ConvertEditPaths.html">Convert Edit Paths Using Map</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/ImportAllChangeSets.html">Import All Change Sets</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/change sets/PutPathsInListView.html">Put Edit Paths from Change Set in List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/classify/Classify.html">Classify</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/classify/SnorocketTask.html">SnorocketTask</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/classify/SnoTaskCheckRedundant.html">SnoTaskCheckRedundant</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/classify/SnoTaskComparePaths.html">SnoTaskComparePaths</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/CloneConcept.html">Clone Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/cmrscs/GenerateTestCmrscs.html">Generate Test CMRSCS Change Set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/cmrscs/ImportCmrscs.html">Import All CMRSCS Change Sets</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/conflict/PutCompletedConceptsWithConflictsInListView.html">put completed concepts with conflicts in list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/conflict/PutCompletedConceptsWithNoConflictsInListView.html">put completed concepts with no conflicts in list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/conflict/PutConflictsInListView.html">put conflicts in list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/AddToTermMap.html">add to term map</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/CopyConceptFromPathToPath.html">copy concept to path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/CopyConceptFromPathToPathWithStatus.html">copy concept to path with status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/CopyConceptFromViewsInProfileToPathWithStatus.html">copy concept to path from views in profile with status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/CopyPathToPathWithStatusMaps.html">copy path to path from views in profile with status maps</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/copy/CopyTermEntryToProperty.html">copy term entry to property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/CreateRefset.html">Create Refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/data checks/VerifyNoPotentialDups.html">Verify concept is not a potential duplicate</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/data checks/VerifyNoRefSetConflicts.html">Verify refset spec has no conflicts</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/data checks/VerifyValidIsADups.html">Verify duplicate concept is resolved</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/data checks/VerifyValidIsNotADups.html">Verify concepts with is_not_a_dup relationships do not have status of dup_pending_retirement</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/Cancel.html">Cancel Changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/Commit.html">Commit Changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/CommitAndPromote.html">Commit and Promote Changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/CommitWithConditionalBranch.html">CommitWithConditionalBranch</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/CountRelParts.html">CountRelParts</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/db/HasUncommittedChanges.html">Has uncommitted changes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/developer/ClearExecutionRecordsTask.html">Clear BP execution records</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/developer/ConceptFromNid.html">Find a Concept from a NID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/developer/FindConceptInfoInDatabase.html">FindConceptInfoInDatabase</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/developer/TestGetUncommittedRefset.html">TestGetUncommittedRefset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/developer/TestIdAllocation.html">TestIdAllocation</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ebr/CountExtensions.html">Count Extensions</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ebr/CountExtensionsInRefset.html">Count Extensions in Refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/ChooseDirectory.html">Choose Directory</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/ChooseFile.html">Choose File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/ChooseTxtFileCancelOrCompleteTask.html">Choose text file cancel or complete</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/ChooseTxtFileTask.html">Choose text file</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/HasFileAttachmentsTask.html">BP has file attachments?</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/ReadConceptListFile.html">Read concept list file</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/SaveFileAttachmentsTask.html">Prompt to save file attachments</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/file/WriteConceptListFile.html">Write concept list file</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/frame/DestroyFrame.html">Destroy Frame</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/frame/NewFrame.html">new frame</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/GenerateConceptSpecFromRefset.html">Generate Concept Spec from Refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/component/DeselectAllComponentToggles.html">Deselect all toggles</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/component/DeselectAllListComponentToggles.html">Deselect all toggles</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/component/SetComponentToggle.html">Set Component</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/component/SetListComponentToggle.html">Set List Component Toggle</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/component/ShowConceptTab.html">Switch to</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/PerformLuceneSearch.html">Query String</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/SetCommitAbortVisible.html">Set Commit/Abort Visible</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/SetFrameName.html">Set Frame Name</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/SetSelectedPreferencesTab.html">Select</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowActivityViewer.html">Show Activity Viewer</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowAddressBook.html">Show or Hide Address Book</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowComponentView.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowHierarchyView.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowHistory.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowListView.html">Show List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowPreferences.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowPreferencesForProfile.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowProcessBuilder.html">Show Process Builder</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowQueueViewer.html">Show Queue Viewer</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowQueueViewerForProfile.html">Show Queue Viewer for Profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/ShowSearch.html">Show Search</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/ClearSignpost.html">Clear Signpost Panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetRefSetPreferences.html">Set refset preferences</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetShowSignpostPanel.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetShowSignpostToggle.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostDetailAndInstruction.html">Set Signpost detail and instruction</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostHtml.html">Set Signpost html</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostToConfigInfo.html">Set Signpost to Config Info</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostToDbProperties.html">Set Signpost to DB Info</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostToDbStats.html">Set Signpost to DB stats</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostToggleEnabled.html">Set Signpost</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/signpost/SetSignpostToggleIcon.html">Set Signpost</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/toptoggle/SetTopToggleVisible.html">Set Top Toggle</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/workflow/detail sheet/ClearWorkflowDetailsSheet.html">Clear Workflow Details Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/workflow/detail sheet/GetPositionSetFromWorkflowDetailsPanel.html">Get Position Set From Details Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/workflow/detail sheet/SetWorkflowDetailsPanelToPositionPanel.html">Set Workflow Details Sheet to Select Positions</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/gui/workflow/detail sheet/ShowWorkflowDetailsSheet.html">Show or Hide</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/instruct/InstructAndWaitDo.html">Instruct and Wait until Done</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/AddChildrenToList.html">Add Children to List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/AddConceptListToListView.html">Add Concept List to List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/AddToListView.html">Add Concept to List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/AddUuidListListToListView.html">Add UUID List list to list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/ConceptListClear.html">Clear Concept List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/ConceptListEmpty.html">Concept List Empty</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/CopyFirstItemInList.html">Copy First Item In List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/CopyItemsToNewList.html">Copy Items To New List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/DeleteMutipleSelectedFromListView.html">Delete multiple concept from list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/GetConceptListFromListView.html">Get Concept List from List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/GetUuidListListFromListView.html">Put UUID List List in property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/PromptSearchReplaceCriteria.html">Prompt Search and Replace Terms in List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/PromptUserToCreateConceptMapFromListView.html">Create Concept Map from Concepts in List View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/SearchReplaceTermsInList.html">Search and Replace Terms in List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/listview/TakeFirstItemInList.html">Take First Item In List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/NewAttachmentListFromChosenFile.html">New Attachment List From Previously Chosen File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/NewAttachmentListFromFile.html">New Attachment List From File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/NewConcept.html">Create New Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/AddOriginToPath.html">add origin to path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/ClearEditPathForProfile.html">clear edit path for profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/IsPath.html">Is a path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/IsValidPath.html">Is valid path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/NewEditPathForUser.html">new edit path for user</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/NewEditPathForUserFromProperty.html">new edit path for user from property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/NewPath.html">new path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/SetEditPath.html">set edit path</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/SetEditPathForProfile.html">add edit path to profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/SetEditPathFromDescription.html">set edit path From Description</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/path/SetEditPathFromProperty.html">Set edit pathfrom property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/AddRootToProfile.html">add root to profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/AddRootToProfileFromProperty.html">add root to profile from property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/ClearRootsInProfile.html">clear roots in profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/CreateUserPathAndQueues.html">Create User Path, User Concept, and User Queues</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/CreateUserPathAndQueuesBasedOnCreatorProfile.html">Create User Path, User Concept, and User Queues Based on Creator</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/EditPopupAdd.html">Add to Edit Popup</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/EditPopupClear.html">Clear Edit Popup</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/EditSetDefault.html">Set Edit Default</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/NewDefaultProfile.html">new default profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/PromptUsernameAndPassword.html">prompt username/password</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/PutCurrentProfileInProperty.html">Put Current Profile in Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/SaveNewProfile.html">Save New Profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/SaveProfile.html">save profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/SetChangeSetRoot.html">set change set root</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/SetPropertiesToUserInfo.html">set user info</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/profile/WriteUserConceptToLog.html">WriteUserConceptToLog</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/PromptForNumericInput.html">Prompt for numeric input</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/PromptUserForInput.html">Prompt user for input</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/IsPropertyNull.html">Check if property is null</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/set/OneItemInSet.html">Check if 1 item in set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/set/TwoOrMoreItemsInSet.html">Check if 2 or more items in set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/set/ZeroItemsInSet.html">Check if: 1) set is null OR 2) zero items in set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetPropertyToConceptFromProperty.html">set property to concept from spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetPropertyToHierarchySelectionUuid.html">Set Property to Hierarchy Selection UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetPropertyToRefsetSpecUuid.html">Set Property to refset spec UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetPropertyToTermEntry.html">set property to term entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetPTStringPropertyFromUuid.html">Set PT String prop from UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/prop/SetUuidPropertyFromTermEntry.html">set UUID property from term entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/AddAllProfilesToVisibleQueues.html">Add All Profiles To Visible Queues</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/AddVisibleQueueFromProperty.html">Add Visible Queue From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/AddVisibleQueueToWorkingProfile.html">Add Visible Queue To Specified Profile From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/MakeQueueConfigInProfileFolder.html">make queue config in profile folder</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/OpenAllInboxes.html">Open All Inboxes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/queue/OpenQueuesInFolder.html">Open Queues in Folder</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/AddRefsetMembersToListView.html">Add Refset members to list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/CreateRefsetMembersetPair.html">Create New Refset/Memberset pair</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/GetWorkingRefset.html">Get working refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/ImportRefsetFromFile.html">Import Refset from File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/ImportRefsetFromLanguageSubsetFile.html">Create Refset from Language Subset File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/AddConceptChildrenToRefset.html">Add concept children to refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/AddConceptToRefset.html">Add concept to refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/AddListViewConceptsToRefset.html">Add concepts from list view to refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/RefreshMemberRefsetUsingListViewConcepts.html">Refresh member refset using list view concepts</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/RemoveConceptChildrenFromRefset.html">Remove concept children from refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/RemoveConceptFromRefset.html">Remove concept from refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/RemoveListViewConceptsFromRefset.html">Remove concepts from list view from refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/WriteRefsetDescriptions.html">Export Refsets to Disk</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/membership/WriteSingleRefsetDescription.html">Export a single Refset to Disk</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/migrate/MigrateAllSpecRefsets.html">Migrate all specification refsets</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/migrate/RegenerateMarkedParents.html">Regenerate marked parents</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/migrate/RetireAllMarkedParents.html">Retire all marked parents</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/RemoveAllConceptsFromRefset.html">Retire all refset members</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/SelectWorkingRefset.html">Select working refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/refset/SetRefsetToShowInTaxonomyView.html">Set Reference Set to Show in Taxonomy View</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/relationship/CreateRelationship.html">Create Relationship from Selected Parent</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/DifferenceFullySpecifiedName.html">DifferenceFullySpecifiedName</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/DifferencePreferredName.html">DifferencePreferredName</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/DifferenceRelsDestination.html">DifferenceRelsDestination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/DifferenceRelsSource.html">DifferenceRelsSource</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/DifferenceRelsSourceOrDestination.html">DifferenceRelsSourceOrDestination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/IterateConcepts.html">Iterate Concepts</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/SetPropValueToNull.html">Set Component to null</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/search/ShowSearchResultSelection.html">ShowSearchResultSelection</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/SetConceptViewToConcept.html">Set Concept View to Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/SetPropertyToHierarchySelection.html">Set Property to Hierarchy Selection</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ShowFileInWebBrowser.html">Show Attachment In Web Browser</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ssync/CentralToUserSyncPkg.html">create central-&gt;user sync package</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ssync/ProcessCentralToUserSyncPkg.html">process central-&gt;user sync package</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ssync/ProcessUserToCentralSyncPackage.html">process user-&gt;central sync package</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/ssync/UserToCentralSyncPkg.html">create user-&gt;central sync package</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/AddAllowedStatusToProfile.html">add allowed status to profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/ChangeConceptStatus.html">Change Concept Status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/ChangeConceptStatusToPropertyValue.html">Change Concept Status to Property Value</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/ChangeRelsOfTypeToStatus.html">Change Rels of Type to Status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/ChangeRelsOfTypeToStatusFromProperties.html">Change Rels of Type to Status from Properties</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/ClearAllowedStatusInProfile.html">clear allowed status in profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/status/PutConceptWithAllowedStatusInListView.html">put concepts with status values in list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/AddSubversionEntry.html">add subversion entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/AddSubversionEntryAndQueueEntry.html">add subversion entry and queue entry from selected directory</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/AddSubversionEntryForUser.html">add subversion entry for user</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/AddSubversionEntryFromDirectory.html">add subversion entry from selected directory</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CheckoutAllSvnEntries.html">Checkout All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CheckoutSelectedProfile.html">checkout selected profile</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CheckoutSvnEntry.html">Checkout Svn Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CleanupAllSvnEntries.html">Cleanup All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CleanupSvnEntry.html">Cleanup Svn Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CommitAllSvnEntries.html">Commit All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/CommitSvnEntry.html">Commit Svn Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/ModifyAllSvnEntries.html">Modify All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/PurgeAllSvnEntries.html">Purge All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/PurgeSvnEntry.html">Purge Svn Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/RemoveSvnEntry.html">Remove Svn Entry (selected from list)</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/UpdateAllSvnEntries.html">Update All Svn Entries</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/svn/UpdateSvnEntry.html">Update Svn Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/TakeFirstItemInAttachmentList.html">Take First Item In Attachment List Return Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/taxonomy/AddAndOrRenderOverride.html">Add And/Or Override</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/taxonomy/AddNoInitialOsFilter.html">Add No Initial 'O's filter</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/taxonomy/ClearRelFilters.html">Clear Rel Filters</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/taxonomy/ClearRenderOverrideList.html">Clear Render Override List</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/taxonomy/SetTaxonomySelection.html">Set Taxonomy Selection to Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/view/AddViewsFromUniversalPositionList.html">add view positions from position list</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/view/ClearViewPositions.html">clear view positions</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/view/SetViewPosition.html">add view position</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/view/SetViewPositionFromProperty.html">add view position from property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/view/SetViewToPositionOnEditPathSet.html">set view to position on edit path set</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/ClearWorkflowPanel.html">Clear Panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InformWithWorkflowPanel.html">Inform</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWait.html">Instruct and Wait</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitNC.html">Instruct and Wait Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitPNC.html">Instruct and Wait Prev, Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitPrevYesNo.html">Instruct and Wait Prev, Yes or No</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitStepOrCancel.html">Instruct and Wait for Step or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitTrueOrFalse.html">Ask and Wait True or False</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructAndWaitYesNo.html">Instruct and Wait Yes or No</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/InstructWithDoneAndTodo.html">Instruct and Wait Done and TODO</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SelectRefsetPurpose.html">Select Refset Purpose</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetAdminUserAndPwdNC.html">Set Administrative User and Pwd Next or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetAdminUserAndPwdPNC.html">Set Administrative User and Pwd Prev, Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetUserAndPwdNC.html">Set User and Pwd Next or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetUserAndPwdPNC.html">Set User and Pwd Prev, Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetUserAndPwdPropsNC.html">Set Props for User and Pwd Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/ide/wfpanel/SetUserAndPwdPropsPNC.html">Set Props for User and Pwd Prev, Next, or Cancel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/IncrementMasterClock.html">Increment Master Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/IncrementWorkerSimulationClock.html">Increment Worker Simulation Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/ResetMasterClock.html">Reset Master Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/ResetWorkerSimulationClock.html">Reset Worker Simulation Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/SetWorkerSimulationClock.html">Set Worker Simulation Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/jehri tasks/clock/SetWorkerSystemClock.html">Set Worker Time To System Clock</a></li>
+<li><a href="Task_Library/autogenerated/tasks/log tasks/LogMessage.html">Log on Specified Log</a></li>
+<li><a href="Task_Library/autogenerated/tasks/log tasks/LogMessageOnWorkerLog.html">Log on Worker Log</a></li>
+<li><a href="Task_Library/autogenerated/tasks/look and feel tasks/SelectLookAndFeel.html">Select Look and Feel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/look and feel tasks/SetMetalLookAndFeel.html">Look and Feel: Metal</a></li>
+<li><a href="Task_Library/autogenerated/tasks/look and feel tasks/SetPlatformLookAndFeel.html">Look and Feel: Platform</a></li>
+<li><a href="Task_Library/autogenerated/tasks/misc tasks/RenderMessage.html">Render Message</a></li>
+<li><a href="Task_Library/autogenerated/tasks/misc tasks/ShowInfoDialog.html">Show Dialog</a></li>
+<li><a href="Task_Library/autogenerated/tasks/misc tasks/ShowInfoDialogFromProperty.html">Show Dialog From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/property tasks/AppendPropertyToProperty.html">Append Property To Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/property tasks/AppendStringToProperty.html">Append String To Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/property tasks/CopyLocalProperty.html">Copy Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/property tasks/SetPropertyFromText.html">Set Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/property tasks/TestPropertyEqualsText.html">Test Property Equals Text</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/attachments/RemoveNonSerializableAttachments.html">Remove Nonserializable Attachments</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/entry/CreateEntryRecord.html">Create Entry Record</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/entry/CreateEntryRecordTwoCriterion.html">Create Entry Record Two Criterion</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/entry/DeleteEntry.html">Delete Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/entry/HideEntry.html">Hide Entry</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/failsafe/LaunchFailsafe.html">Launch Failsafe</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/MoveToDestination.html">Move To Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/MoveToInBox.html">Move To In Box</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/MoveToOutBox.html">Move To Out Box</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueue.html">To Queue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueueParentProcess.html">Parent Process To Queue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueueRootProcess.html">ROOT Process To Queue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueueThreeCriterion.html">To Queue Three Criterion</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueueTwoCriterion.html">To Queue Two Criterion</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToQueueWithEntryRecord.html">To Queue With Entry Record</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToUserSelectedQueue.html">To Selected Queue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/move-to/ToUserSelectedQueueAllGroups.html">To Selected Queue (all groups)</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/set-select/SelectDestination.html">Select Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/set-select/SelectDestinationRootProcess.html">ROOT Process Select Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/set-select/SetDestination.html">Set Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/set-select/SetDestinationParentProcess.html">Parent Process Set Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/set-select/SetDestinationRootProcess.html">ROOT Process Set Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/sync/CreateSyncRecord.html">Create Sync Record</a></li>
+<li><a href="Task_Library/autogenerated/tasks/queue tasks/sync/ToSyncQueue.html">To Sync Queue</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/promote/PromoteConcept.html">Promote Concept</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/promote/PromoteRefset.html">Promote Refset in Spec Panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/AddAndToRefsetSpec.html">Add AND Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/AddConceptContainsDescToRefsetSpec.html">Add concept-contains-desc Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/AddConceptContainsRelToRefsetSpec.html">Add concept-contains-rel Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/AddOrToRefsetSpec.html">Add OR Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/AddStructuralQueryToRefsetSpec.html">Add Structural Query to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ComputeDescRefsetFromSpecTask.html">Compute desc refset from Refset Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ComputeRefsetFromSpecTask.html">Compute concept refset from Refset Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptIs.html">Add Concept Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptIsChildOf.html">Add Concept is Child of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptIsDescendantOf.html">Add Concept is Descendant of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptIsKindOf.html">Add Concept is Kind of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptIsMemberOf.html">Add Concept is Member of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptStatusIs.html">Add Concept Status Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptStatusIsChildOf.html">Add Concept Status Is Child of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptStatusIsDescendantOf.html">Add Concept Status Is Descendant of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ConceptStatusIsKindOf.html">Add Concept Status Is Kind of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/CreateRefsetMetaDataTask.html">Create refset meta data</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionIs.html">Add Description Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionIsMemberOf.html">Add Description Is Member Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionLuceneMatch.html">Add Description Lucene Match Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionRegexMatch.html">Add Description Regex Match Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionStatusIs.html">Add Description Status Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionStatusIsChildOf.html">Add Description Status Is Child of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionStatusIsDescendentOf.html">Add Description Status Is Descendent of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionStatusIsKindOf.html">Add Description Status Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionTypeIs.html">Add Description Type Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionTypeIsChildOf.html">Add Description Type Is Child of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionTypeIsDescendentOf.html">Add Description Type Is Descendent of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/desc/DescriptionTypeIsKindOf.html">Add Description Type Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/export/ExportRefsetSpecForManualReviewTask.html">Export refset spec for manual review</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/export/ExportRefsetSpecTask.html">Export refset spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/export/ImportRefsetSpecTask.html">Import refset spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/IsConceptComputeTypeTask.html">Is concept compute type?</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/RefsetSpecWizardTask.html">Start refset spec wizard</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipCharacteristicIs.html">Add Relationship characteristic is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipCharacteristicIsChildOf.html">Add Relationship characteristic is child of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipCharacteristicIsDescendentOf.html">Add Relationship characteristic is descendent of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipCharacteristicIsKindOf.html">Add Relationship characteristic is kind of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipIsMemberOf.html">Add Relationship Is Member Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipLogicalQuantifierIs.html">Add Relationship Logical Quantifier Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipLogicalQuantifierIsKindOf.html">Add Relationship Logical Quantifier Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipRefinabilityIs.html">Add Relationship Refinability Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipRefinabilityIsChildOf.html">Add Relationship Refinability Is Child Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipRefinabilityIsDescendentOf.html">Add Relationship Refinability Is Descendent Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipRefinabilityIsKindOf.html">Add Relationship Refinability Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipStatusIs.html">Add Relationship Status Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipStatusIsChildOf.html">Add Relationship Status Is Child Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipStatusIsDescendentOf.html">Add Relationship Status Is Descendent Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipStatusIsKindOf.html">Add Relationship Status Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipTypeIs.html">Add Relationship Type Is Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipTypeIsChildOf.html">Add Relationship Type Is Child Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipTypeIsDescendentOf.html">Add Relationship Type Is Descendent Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/rel/RelationshipTypeIsKindOf.html">Add Relationship Type Is Kind Of Clause to RefSet Spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/ShowRefsetSpecTask.html">Show refset spec</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/AddPromotionConceptsToListViewTask.html">Add promotion concepts to list view</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/CalculateNextUserOwnerOrReviewerTask.html">Calculate next user: owner or reviewer</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/CreateCommentExtTask.html">Create comments ext</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetCommentsTask.html">Get comments from panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetDataFromCreateRefsetPanel.html">Get Create Refset Panel Data from WFD Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetRefreshRefsetSpecParamsPanelDataTask.html">Get Refresh Refset Spec Params panel data from WFD Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetRefsetVersionPanelDataTask.html">Get Refset Spec Version panel data from WFD Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetRequestForChangePanelDataTask.html">Get request for change panel data</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetSelectedListTypeTask.html">Get selected list type</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetSelectedOwnerOrReviewerTask.html">Get selected owner or reviewer</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetSelectedRoleModificationTask.html">Get selected role modification - add selected?</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetSelectedUserTask.html">Get selected user</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/GetSnomedVersionPanelDataTask.html">Get SNOMED Version panel data from WFD Sheet</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/grouping/GetNewRefsetGroupingPanelDataTask.html">Get new refset grouping panel data</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/grouping/SetWFToNewRefsetGroupingPanelTask.html">Set WF Panel to new refset grouping panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/HasDisapprovedItemsTask.html">Has members with disapproved promotion status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/InstructWithApproveRejectDone.html">Instruct and Wait: Approve, Reject, Done</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/InstructWithPromotionRefsetAndDone.html">Instruct and Wait: Promotion refset and done</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/InstructWithReviewSelectedAndDone.html">Instruct and Wait: Review selected and Done</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/RefreshRefsetSpecCompareTask.html">RefreshRefsetSpecCompareTask</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/ReviewSelectedSaveAndDone.html">Instruct and Wait: Review selected, Save and Done</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetInboxAddressFromUuidTask.html">Set Inbox addr from UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetPromotionCheckBoxesTask.html">Show/hide promotion check boxes</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetTodoAddressFromUuidTask.html">Set todo addr from UUID</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWDFSheetToRefsetVersionPanelTask.html">Set WFD Sheet to Refset Version panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWfdSheetToCreateRefsetPanel.html">Set WFD Sheet to Create Refset Panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFDSheetToRefreshRefsetSpecParamsPanelTask.html">Set WFD Sheet to Refresh Refset Spec Params panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFDSheetToRefreshRefsetSummaryPanelTask.html">Set WFD Sheet to Refresh Refset Spec Summary panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFDSheetToSnomedVersionPanelTask.html">Set WFD Sheet to SNOMED Version panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToChooseRoleModificationPanelTask.html">Set WF Panel to choose role modification</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToCommentsPanelTask.html">Set WF Panel to comments panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToModifyUserRolePanelTask.html">Set WF Panel to modify user role panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToOwnerOrReviewerPanelTask.html">Set WF Panel to select owner or reviewer panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToRequestForChangePanelTask.html">Set WF Panel to request for change panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToSelectPromotionListPanelTask.html">Set WF Panel to select promotion list panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/SetWFToSelectUserPanelTask.html">Set WF Panel to select user panel</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/UpdatePromotionRefsetTask.html">Update promotion refset</a></li>
+<li><a href="Task_Library/autogenerated/tasks/refset/spec/wf/UpdateRefsetSpecStatusTask.html">Update refset spec status</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetDeadlineRelative.html">Set Deadline</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessDestination.html">Set Destination</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessDestinationFromProp.html">Set Destination From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessName.html">Set Process Name</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessNameFromProp.html">Set Name From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessOrigin.html">Set Process Origin</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessOriginFromProp.html">Set Origin From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessSubject.html">Set Process Subject</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetProcessSubjectFromProp.html">Set Subject From Property</a></li>
+<li><a href="Task_Library/autogenerated/tasks/set tasks/SetSimpleMessageRenderer.html">Set Simple Message Renderer</a></li>
+<li><a href="Task_Library/autogenerated/tasks/start tasks/LaunchProcess.html">Launch Process From Internal Task</a></li>
+<li><a href="Task_Library/autogenerated/tasks/start tasks/LaunchProcessFromURL.html">Launch Process From URL</a></li>
+<li><a href="Task_Library/autogenerated/tasks/start tasks/LoadSetLaunchProcessFromAttachment.html">Load, Set, Launch Process From Attachment</a></li>
+<li><a href="Task_Library/autogenerated/tasks/start tasks/LoadSetLaunchProcessFromFile.html">Load, Set, Launch Process From File</a></li>
+<li><a href="Task_Library/autogenerated/tasks/start tasks/LoadSetLaunchProcessFromURL.html">Load, Set, Launch Process From URL</a></li>
+<li><a href="Task_Library/autogenerated/tasks/web tasks/FetchFromWeb.html">Fetch string from web</a></li>
+<li><a href="Task_Library/autogenerated/tasks/web tasks/OpenWebPage.html">Open Web Page</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker plugins/AddFormCompleterPlugin.html">Add Plugin: I_CompleteForm</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker plugins/AddGetWorkFromQueuePlugin.html">Add Plugin: I_GetWorkFromQueue (address specified)</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker plugins/AddGetWorkFromSelectedQueuePlugin.html">Add Plugin: I_GetWorkFromQueue (user selected)</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker plugins/SetWorkerAttachmentToThisWorker.html">Set Property: Worker Attachment to This Worker</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker/NewGenericWorkerManager.html">New Generic Worker Manager</a></li>
+<li><a href="Task_Library/autogenerated/tasks/worker/NewMasterWorker.html">New Master Worker</a></li>
+<li><a href="Task_Library/autogenerated/tasks/workspace tasks/SetInstruction.html">Instruct User</a></li>
+<li><a href="Task_Library/autogenerated/tasks/workspace tasks/SetWorkspaceVisible.html">Set Workspace Visible</a></li>
+</ul>
+</li>
+<li><a href="Business_Process_Library/bp_library_intro.html">Business Process Library</a>
+<ul>
+<li><a href="Business_Process_Library/autogenerated/admin/menu/Admin/Convert change set edit paths.bp.html">Convert change set paths...</a></li>
+<li><a href="Business_Process_Library/autogenerated/admin/menu/Admin/Modify user role.bp.html">Modify user role</a></li>
+<li><a href="Business_Process_Library/autogenerated/admin/menu/Admin/New refset grouping.bp.html">New refset grouping...</a></li>
+<li><a href="Business_Process_Library/autogenerated/admin/menu/Subversion/add_repo_from_dir.bp.html">Add Repository from Selected Directory...</a></li>
+<li><a href="Business_Process_Library/autogenerated/component/clone.bp.html">clone</a></li>
+<li><a href="Business_Process_Library/autogenerated/component/new_concept.bp.html">new concept</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/add_children.bp.html">add children of selected concept to list</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/changeStatusToSelected.bp.html">Change items to selected status</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/find_and_replace.bp.html">Replace and Replace within Descriptions</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/iterate.bp.html">Iterate over concepts</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/iterate_current.bp.html">mark as current</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/iterate_flag.bp.html">flag concepts in list</a></li>
+<li><a href="Business_Process_Library/autogenerated/list/move_to_new_parent.bp.html">Move items to new parent</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/20_Tasks/10_export_refset.bp.html">Export current refset spec</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/20_Tasks/20_import_refset.bp.html">Import refset spec from file</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/20_Tasks/40_run_classifier.bp.html">Run Classifier</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/20_Tasks/60_ShowDbInfo.bp.html">Show DB Info in Signpost</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/20_Tasks/70_ShowDbStats.bp.html">Show DB Stats in Signpost</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/10_Open PDF Guidebook.bp.html">Open PDF Guidebook...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/20_Open HTML Guidebook....bp.html">Open HTML Guidebook...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/40_Enter feature request.bp.html">Enter feature request...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/50_Enter defect report.bp.html">Enter defect report...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/70_Go to discussion forum.bp.html">Go to discussion forum...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/80_Enter technical question.bp.html">Enter technical question...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/99_Help/90_GotoNHS_Nice.bp.html">Open NICE...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/File/30_launch bp.bp.html">Launch Business Process...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/File/50_GenerateJavaBinding.bp.html">Generate Java Binding from Refset...</a></li>
+<li><a href="Business_Process_Library/autogenerated/menu/File/60_ShowConfigInfo.bp.html">Show Configuration Info...</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/1. add-logical-and.bp.html">Add logical AND</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/2. add-logical-or.bp.html">Add logical OR</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/5. compute refset from refset spec.bp.html">Compute refset from refset spec...</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/6. Create-new-refset-spec.bp.html">Create new refset spec</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/7. Create-refset-change-request.bp.html">Refset change request</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/8. Refresh-refset-spec.bp.html">Refresh Refset Spec</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/attachment-bps/4. Promote refset members.bp.html">Promote refset members</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/attachment-bps/cleanup.bp.html">clean up</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/attachment-bps/manual review.bp.html">Manual Review</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/attachment-bps/SME Viewer Review.bp.html">SME Viewer Review</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-is-child-of-clause.bp.html">Add CONCEPT IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-is-clause.bp.html">Add CONCEPT IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-is-descendant-of-clause.bp.html">Add CONCEPT IS DESCENDANT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-is-kind-of-clause.bp.html">Add CONCEPT IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-is-member-of-clause.bp.html">Add CONCEPT IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-status-is-child-of-clause.bp.html">Add CONCEPT STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-status-is-clause.bp.html">Add CONCEPT STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-status-is-descendant-of-clause.bp.html">Add CONCEPT STATUS IS DESCENDANT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-concept-status-is-kind-of-clause.bp.html">Add CONCEPT STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-is-child-of-clause.bp.html">Add NOT CONCEPT IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-is-clause.bp.html">Add NOT CONCEPT IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-is-descendant-of-clause.bp.html">Add NOT CONCEPT IS DESCENDANT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-is-kind-of-clause.bp.html">Add NOT CONCEPT IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-is-member-of-clause.bp.html">Add NOT CONCEPT IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-status-is-child-of-clause.bp.html">Add NOT CONCEPT STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-status-is-clause.bp.html">Add NOT CONCEPT STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-status-is-descendant-of-clause.bp.html">Add NOT CONCEPT STATUS IS DESCENDANT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/concept/add-not-concept-status-is-kind-of-clause.bp.html">Add NOT CONCEPT STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-has-lucene-match-clause.bp.html">Add DESCRIPTION HAS LUCENE MATCH clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-has-regex-match-clause.bp.html">Add DESCRIPTION HAS REGEX MATCH clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-is-clause.bp.html">Add DESCRIPTION IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-is-member-of-clause.bp.html">Add DESCRIPTION IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-status-is-child-of-clause.bp.html">Add DESCRIPTION STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-status-is-clause.bp.html">Add DESCRIPTION STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-status-is-descendent-of-clause.bp.html">Add DESCRIPTION STATUS IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-status-is-kind-of-clause.bp.html">Add DESCRIPTION STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-type-is-child-of-clause.bp.html">Add DESCRIPTION TYPE IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-type-is-clause.bp.html">Add DESCRIPTION TYPE IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-type-is-descendent-of-clause.bp.html">Add DESCRIPTION TYPE IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-desc-type-is-kind-of-clause.bp.html">Add DESCRIPTION TYPE IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-has-lucene-match-clause.bp.html">Add NOT DESCRIPTION HAS LUCENE MATCH clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-has-regex-match-clause.bp.html">Add NOT DESCRIPTION HAS REGEX MATCH clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-is-clause.bp.html">Add NOT DESCRIPTION IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-is-member-of-clause.bp.html">Add NOT DESCRIPTION IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-status-is-child-of-clause.bp.html">Add NOT DESCRIPTION STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-status-is-clause.bp.html">Add NOT DESCRIPTION STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-status-is-descendent-of-clause.bp.html">Add NOT DESCRIPTION STATUS IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-status-is-kind-of-clause.bp.html">Add NOT DESCRIPTION STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-type-is-child-of-clause.bp.html">Add NOT DESCRIPTION TYPE IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-type-is-clause.bp.html">Add NOT DESCRIPTION TYPE IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-type-is-descendent-of-clause.bp.html">Add NOT DESCRIPTION TYPE IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/desc/add-NOT-desc-type-is-kind-of-clause.bp.html">Add NOT DESCRIPTION TYPE IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-char-is-child-of-clause.bp.html">Add NOT RELATIONSHIP CHAR IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-char-is-clause.bp.html">Add NOT RELATIONSHIP CHAR IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-char-is-descendent-of-clause.bp.html">Add NOT RELATIONSHIP CHAR IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-char-is-kind-of-clause.bp.html">Add NOT RELATIONSHIP CHAR IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-destination-is-child-of-clause.bp.html">Add NOT RELATIONSHIP DESTINATION IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-destination-is-clause.bp.html">Add NOT RELATIONSHIP DESTINATION IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-destination-is-descendent-of-clause.bp.html">Add NOT RELATIONSHIP DESTINATION IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-destination-is-kind-of-clause.bp.html">Add NOT RELATIONSHIP DESTINATION IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-is-member-of-clause.bp.html">Add NOT RELATIONSHIP IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-refinability-is-child-of-clause.bp.html">Add NOT RELATIONSHIP REFINABILITY IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-refinability-is-clause.bp.html">Add NOT RELATIONSHIP REFINABILITY IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-refinability-is-descendent-of-clause.bp.html">Add NOT RELATIONSHIP REFINABILITY IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-refinability-is-kind-of-clause.bp.html">Add NOT RELATIONSHIP REFINABILITY IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-status-is-child-of-clause.bp.html">Add NOT RELATIONSHIP STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-status-is-clause.bp.html">Add NOT RELATIONSHIP STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-status-is-descendent-of-clause.bp.html">Add NOT RELATIONSHIP STATUS IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-status-is-kind-of-clause.bp.html">Add NOT RELATIONSHIP STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-type-is-child-of-clause.bp.html">Add NOT RELATIONSHIP TYPE IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-type-is-clause.bp.html">Add NOT RELATIONSHIP TYPE IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-type-is-descendent-of-clause.bp.html">Add NOT RELATIONSHIP TYPE IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-NOT-rel-type-is-kind-of-clause.bp.html">Add NOT RELATIONSHIP TYPE IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-char-is-child-of-clause.bp.html">Add RELATIONSHIP CHAR IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-char-is-clause.bp.html">Add RELATIONSHIP CHAR IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-char-is-descendent-of-clause.bp.html">Add RELATIONSHIP CHAR IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-char-is-kind-of-clause.bp.html">Add RELATIONSHIP CHAR IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-destination-is-child-of-clause.bp.html">Add RELATIONSHIP DESTINATION IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-destination-is-clause.bp.html">Add RELATIONSHIP DESTINATION IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-destination-is-descendent-of-clause.bp.html">Add RELATIONSHIP DESTINATION IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-destination-is-kind-of-clause.bp.html">Add RELATIONSHIP DESTINATION IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-is-member-of-clause.bp.html">Add RELATIONSHIP IS MEMBER OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-refinability-is-child-of-clause.bp.html">Add RELATIONSHIP REFINABILITY IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-refinability-is-clause.bp.html">Add RELATIONSHIP REFINABILITY IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-refinability-is-descendent-of-clause.bp.html">Add RELATIONSHIP REFINABILITY IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-refinability-is-kind-of-clause.bp.html">Add RELATIONSHIP REFINABILITY IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-status-is-child-of-clause.bp.html">Add RELATIONSHIP STATUS IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-status-is-clause.bp.html">Add RELATIONSHIP STATUS IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-status-is-descendent-of-clause.bp.html">Add RELATIONSHIP STATUS IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-status-is-kind-of-clause.bp.html">Add RELATIONSHIP STATUS IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-type-is-child-of-clause.bp.html">Add RELATIONSHIP TYPE IS CHILD OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-type-is-clause.bp.html">Add RELATIONSHIP TYPE IS clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-type-is-descendent-of-clause.bp.html">Add RELATIONSHIP TYPE IS DESCENDENT OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/branch-popup/rel/add-rel-type-is-kind-of-clause.bp.html">Add RELATIONSHIP TYPE IS KIND OF clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-concept-contains-desc.bp.html">Add CONCEPT CONTAINS DESC clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-concept-contains-rel.bp.html">Add CONCEPT CONTAINS REL clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-logical-and.bp.html">Add logical AND</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-logical-or.bp.html">Add logical OR</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-NOT-concept-contains-desc.bp.html">Add NOT CONCEPT CONTAINS DESC clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-NOT-concept-contains-rel.bp.html">Add NOT CONCEPT CONTAINS REL clause</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-NOT-logical-and.bp.html">Add NOT logical AND</a></li>
+<li><a href="Business_Process_Library/autogenerated/refsetspec/spec-popup/add-NOT-logical-or.bp.html">Add NOT logical OR</a></li>
+<li><a href="Business_Process_Library/autogenerated/search-results/show selection.bp.html">Show selected result...</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/Set taxonomy.bp.html">Set taxonomy selection to concept</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/tab-L1.bp.html">Put concept in tab L1</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/tab-R1.bp.html">Put concept in tab R1</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/tab-R2.bp.html">Put concept in tab R2</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/tab-R3.bp.html">Put concept in tab R3</a></li>
+<li><a href="Business_Process_Library/autogenerated/taxonomy/tab-R4.bp.html">Put concept in tab R4</a></li>
+<li><a href="Business_Process_Library/autogenerated/viewer/synchronize.bp.html">Synchronize with Subversion</a></li>
+</ul>
+</li>
+<li><a href="Workflow/processes_intro.html#topic1">Automating Business Processes</a>
+<ul>
+<li><a href="Workflow/process_builder_tour.html#topic2">Touring the Process Builder</a></li>
+<li><a href="Workflow/process_builder_using.html#topic3">Using the Process Builder</a></li>
+<li><a href="Workflow/process_creation.html#topic4">Exercise - Creating a Business Process</a></li>
+<li><a href="Workflow/process_saving.html#topic5">Saving a Business Process</a></li>
+<li><a href="Workflow/process_loading.html#topic6">Loading a Business Process</a></li>
+<li><a href="Workflow/process_execution.html#topic7">Executing a Process</a></li>
+<li><a href="Workflow/process_exercise_1.html#topic8">Exercise: Creating a Process With a Key</a></li>
+<li><a href="Workflow/process_exercise_2.html#topic9">Test Yourself: Create Another Process</a></li>
+<li><a href="Workflow/processes_term_viewer.html#topic10">Using the Terminology Viewer in Processes</a></li>
+<li><a href="Workflow/process_diagram_history.html#topic11">Viewing Process Diagram History</a></li>
+</ul>
+</li>
+<li><a href="Queues/queues_intro.html#topic1">Using the Queue Viewer</a>
+<ul>
+<li><a href="Queues/queues_accessing.html#topic2">Accessing the Queue Viewer</a></li>
+<li><a href="Queues/queues_touring.html#topic3">Touring the Queue Viewer</a></li>
+<li><a href="Queues/queues_sorting.html#topic4">Sorting the Process List</a></li>
+<li><a href="Queues/queues_view_process.html#topic5">Viewing a Process in a Queue</a></li>
+<li><a href="Queues/queues_process_diagram.html#topic6">Understanding the Process Diagram</a></li>
+<li><a href="Queues/queues_moving_processes.html#topic7">Moving a Process to Different Queues</a></li>
+</ul>
+</li>
+<li><a href="Development/development_intro.html#topic1">The IHTSDO Workbench Development Environment</a>
+<ul>
+<li><a href="Development/development_extending.html#topic2">Extending the IHTSDO Workbench IDE programatically</a></li>
+<li><a href="Development/development_key_concepts.html#topic3">Key Concepts</a></li>
+<li><a href="Development/development_principles.html#topic4">Development Principles</a></li>
+<li><a href="Development/development_modeller.html#topic5">The Terminology Modeller's Environment</a></li>
+<li><a href="Development/development_validator.html#topic6">The Terminology Validator Role</a></li>
+<li><a href="Development/development_eclipse.html#topic7">Setting up Eclipse for IHTSDO Workbench Development</a></li>
+</ul>
+</li>
+<li><a href="Workspace/workspace_intro.html#topic1">About the IHTSDO Workspace</a>
+<ul>
+<li><a href="Workspace/workspace_features.html#topic2">Integrated and On-Demand</a></li>
+<li><a href="Workspace/configuration_management.html#topic3">Configuration Management—CollabNet Subversion</a></li>
+<li><a href="Workspace/layered_api.html#topic4">Layered API Library</a></li>
+<li><a href="Workspace/lifecycle_management.html#topic5">Application Lifecycle Management — CollabNet SourceForge</a></li>
+<li><a href="Workspace/build_test_publish.html#topic6">Build, Test and Publish Services Management—CollabNet CUBiT</a></li>
+<li><a href="Workspace/smart_client_integration.html#topic7">Smart-Client Integration</a></li>
+</ul>
+</li>
+<li><a href="Workflow/tasks_intro.html#topic1">Creating new tasks</a>
+<ul>
+<li><a href="Workflow/task_extensions.html#topic2">Example Task Extensions</a></li>
+<li><a href="Workflow/creating_tasks.html#topic3">Steps to Create A Task</a></li>
+</ul>
+</li>
+<li><a href="Snorocket/Snorocket_intro.html#topic1">Classifier Developer's Guide</a>
+<ul>
+<li><a href="Snorocket/Snorocket_structure.html#topic2">SnoRocket Structure</a></li>
+<li><a href="Snorocket/Snorocket_in_eclipse.html#topic3">Creating Snorocket in Eclipse</a></li>
+<li><a href="Snorocket/Snorocket_integration.html#topic4">Integrating with the Workbench Build</a></li>
+</ul>
+</li>
+<li><a href="Bundles/bundle_intro.html#topic1">Building an application bundle</a>
+<ul>
+<li><a href="Bundles/bundle_structure.html#topic1a">Bundle structure</a></li>
+<li><a href="Bundles/bundle_maven_setup.html#topic2">Setting up for Maven builds</a></li>
+<li><a href="Bundles/bundle_install4j.html#topic3">Installation readiness with Install4j</a></li>
+<li><a href="Bundles/bundle_distribution.html#topic4">Distribution and update via Continuum</a></li>
+</ul>
+</li>
+<li><a href="Maven_Plugins/plugins_intro.html#topic1">Maven Plug-ins</a>
+<ul>
+<li><a href="Maven_Plugins/dwfa_plugins.html#topic2">DWFA Maven Plug-ins</a></li>
+</ul>
+</li>
+<li><a href="Collabnet/collabnet_intro.html#topic1">Using the IHTSDO Workspace on Collabnet</a>
+<ul>
+<li><a href="Collabnet/developers_overview.html#topic1">Using the IHTSDO Workspace on Collabnet</a></li>
+</ul>
+</li>
+<li><a href="Managing_Data/managing_data_intro.html#topic1">Data Import</a>
+<ul>
+<li><a href="Managing_Data/importing_to_database.html#topic2">Terminology Set imports to Versioned Database</a></li>
+</ul>
+</li>
+<li><a href="FAQ/FAQ_intro.html">Troubleshooting questions and answers</a>
+<ul>
+<li><a href="FAQ/FAQ_snomed_code.html">How to determine the SNOMED code of a concept or term?</a></li>
+<li><a href="FAQ/FAQ_terminology_version.html">How to determine the version of a term or a terminology being edited?</a></li>
+<li><a href="FAQ/FAQ_workbench_version.html">How to determine the version of the IHTSDO Workbench Toolkit being used?</a></li>
+<li><a href="FAQ/FAQ_chaining_tasks.html">How to chain together tasks in a business process/workflow ?</a></li>
+<li><a href="FAQ/FAQ_extending.html">How to extend the IHTSDO Workbench Editor menu ?</a></li>
+<li><a href="FAQ/FAQ_setting_user_profiles.html">How to set user profiles?</a></li>
+<li><a href="FAQ/FAQ_help_wont_launch.html">Help won't launch</a></li>
+<li><a href="FAQ/FAQ_memory_issues.html">How to overcome memory issues?</a></li>
+<li><a href="FAQ/FAQ-concept_ID_allocation.html">How are new SNOMED IDs allocated – by sequence or otherwise?</a></li>
+<li><a href="FAQ/FAQ_corrupt_profile.html">How to recover from a corrupt profile?</a></li>
+<li><a href="FAQ/FAQ-taxonomy_wont_display.html">Taxonomy won't display</a></li>
+<li><a href="FAQ/FAQ-refset_ID_allocation.html">When is the SNOMED ID allocated to a refset?</a></li>
+<li><a href="FAQ/FAQ-namespace_ID_allocation.html#namespace_ID_allocation">How are namespaces used in refset creation?</a></li>
+<li><a href="FAQ/FAQ-hardware-recommended.html">What is the recommended hardware configuration for the IDE or Viewer?</a></li>
+<li><a href="FAQ/FAQ-hardware-minimum.html">What is the minimum hardware configuration for the IDE or Viewer?</a></li>
+<li><a href="FAQ/FAQ-create_security_manager.html">Why do I get "access denied" for the runtimePermission createSecurityManager?</a></li>
+<li><a href="FAQ/FAQ-unsatisfiedlinkerror.html">Why do I get an "UnsatisfiedLinkError: no svnjavahl in java.library.path"?</a></li>
+<li><a href="FAQ/FAQ-SSL_negotiation_failed.html">Why do I get an "SSL negotiation failed" error?</a></li>
+</ul>
+</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic4" xml:lang="en"><title>Creation processes</title>
+ <body>
+  <table id="aq1041594">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Add user account</b><indexterm>Process <indexterm>Add user account </indexterm>
+        </indexterm></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Rationale:</p>
+      </entry>
+      <entry colname="col2">
+       <p>Supports the establishment of a user's inital IHTSDO Workbench environment, both on the
+        local machine and on the subversion repository for holding changesets.</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2">
+       <p>
+        <ph>manual load only</ph>
+       </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2">
+       <p>manual</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2">
+       <p>Add user account.bp</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+  <table id="aq1041793">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Create profile folder</b><indexterm>Process <indexterm>Create profile
+          folder</indexterm>
+        </indexterm></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Rationale:</p>
+      </entry>
+      <entry colname="col2">
+       <p>This process is a part of creating new user account. In IHTSDO Workbench, the user's
+        account is composed by a user profile file and associated folders. </p>
+       <p>All the settings are saved in the profile, including the editing path, root concepts and
+        refset setting. The folders for saving the business processes which can be process or queue,
+        and changesets. </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2">
+       <p>
+        <ph>
+        </ph>
+       </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2">
+       <p>manual</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2">
+       <p>Create Profile Folder.bp</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+  <table id="aq1041992">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Create new concept from viewer</b><indexterm>Process <indexterm>Create new concept from
+          viewer</indexterm>
+        </indexterm></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2">
+       <p>This process will replace the default 'new concept' process in the IHTSDO Workbench
+        bundle. The default 'new concept' process create a new concept as the child of selected
+        concept in taxonomy view. When creating new concept in ED project, user's requirement is
+        that create a new concept from concept viewing tab. So this process is created. </p>
+       <p>Firstly the process will find the "active" concept tab which is user viewing, then create
+        a new concept in this tab and add a relationship new concept-is a -viewing concept in this
+        tab. </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1"/>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2">
+       <p>Create new concept from viewer.bp</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+  <table id="aq1042394">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Pop up SCT relationship type</b><indexterm>Process <indexterm>Pop up SCT relationship
+          type</indexterm>
+        </indexterm></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2">
+       <p>Clear the profile setting "rel types for pop up" </p>
+       <p>Find the top category of the editing concept, find all available relationships type in the
+        model. Then put those relationships into "rel types for pop up"</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Rationale:</p>
+      </entry>
+      <entry colname="col2">
+       <p>When users are creating a new SCT concept in IHTSDO IDE, there may be a requirement to
+        adhere to the concept model relevant to that part of the SNOMED hierarchy. For example, when
+        editing concept is a "clinical finding" the model will limit the relationship types during
+        adding relationships. </p>
+       <p>This business process populates the appropriate relationships according to the concept
+        model.</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2">
+       <p>Pop up SCT relationship type.bp</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+ </body>
+</topic>

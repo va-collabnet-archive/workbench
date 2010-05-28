@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="logic">
+  <title>Role Logic Editor</title>
+
+  <body>
+    <p><indexterm>logic<indexterm>editor</indexterm></indexterm><indexterm>role<indexterm>logic
+    editor</indexterm></indexterm>The Logic tab provides a Role Logic Editor.
+    The editor has two main parts: <i>Role Description Logic</i> and
+    <i>Never-Group Roles</i>.</p>
+
+    <section><title>Role Description Logic</title><indexterm>role description
+    logic</indexterm><indexterm>logic<indexterm>role
+    description</indexterm></indexterm><p>The classifier has a general form
+    which is common to Reflexive, Transitive, Left-Identity, Right-Identity
+    and Role Composition.<fig>
+        <title>Role Description Logic Grammar</title>
+
+        <image href="../images/classifier_images/Role_description_logic.jpg"/>
+      </fig></p><p>The Role Description Logic editor works directly with the
+    classifier general form to provide the user with the full classifier
+    capabilities. </p><p>There are two basic steps to creating a role
+    description logic. <fig>
+        <title>steps in creating role description logic</title>
+
+        <image href="../images/classifier_images/logic_identity.jpg"/>
+      </fig></p><p>For example, to create the following right-identity,
+    <codeblock>direct-substance o has-active-ingredient -&gt; direct-substance</codeblock>
+    Step 1. <b>Right Hand Side</b>. First add the Right Hand Side to the
+    declarations list by selecting the Direct Substance in the taxonomy and
+    then clicking the Declaration List (+) add icon:<fig id="reflexive">
+        <title>right-hand side: reflexive</title>
+
+        <image href="../images/classifier_images/logic-reflexive.jpg"/>
+      </fig></p><p>The step 1 will show the right hand side in both the upper
+    RHS (Right Hand Side) list and the Declaration List. The result will also
+    show a reflexive declaration because reflexive, by definition, has an
+    empty left hand side. If we stop here the declaration will simply be
+    reflexive. So, on to the next step.</p><p>Step 2. <b>Left Hand Side</b>.
+    Now, with "Has active ingredient" still selected in the taxonomy, click
+    the LHS (Left Hand Side) add icon <image
+    href="../images/classifier_images/classifier_toggle_smallHS_add_icon.jpg"/>.</p><fig>
+        <title>left-hand side</title>
+
+        <image href="../images/classifier_images/LHS_logic.jpg"/>
+      </fig><p>The right identity is now complete.</p></section>
+
+    <section><title>Never-Group Role
+    List</title><indexterm>role<indexterm>never-group</indexterm></indexterm><p>Roles
+    are added to the Never-Group Role List by:</p><ol>
+        <li>selecting the role concept in the taxonomy list, and then </li>
+
+        <li> and then, clicking the "+" icon <image
+        href="../images/classifier_images/classifier_toggle_smallHS_add_icon.jpg"/>
+        . </li>
+      </ol><p><fig>
+        <title>Adding a Never-Group role</title>
+
+        <image href="../images/classifier_images/part_of.jpg"/>
+      </fig></p></section>
+
+    <section><title>Saving Logic
+    Declarations</title><indexterm>role<indexterm>saving logic
+    declarations</indexterm></indexterm><p>In the current version, role logic
+    edits can be saved and restored from a file. </p><p><image
+    href="../images/classifier_images/save_logic.jpg"/></p></section>
+  </body>
+</topic>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic2" xml:lang="en">
+ <title>The Business Process Catalogue</title>
+ <body>
+  <section>The following pages describe each of the business processes that have already been
+   constructed. A BP is generally considered a plug-in if it resides in one of the specialised
+   locations in an IHTSDO IDE bundle. These locations then determine how the BP can be invoked.
+   Rather then categorising the BPs by their plug-in type, we have chosen below to order the
+   processes by their business function category, dealing with change sets, creation processes,
+   refset processes, etc. However, the plug-in type is also included in each table. There are also a
+   number of business process modules that are loaded and invoked manually by an analyst, usually to
+   establish, configure or modify a modeller's editing environment. These BPs are not usually
+   considered plug-ins, nor are they usually supplied with the application bundle.</section>
+ </body>
+</topic>
+

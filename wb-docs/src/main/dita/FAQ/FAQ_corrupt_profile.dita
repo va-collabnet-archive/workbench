@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="topic9">
+  <title>How to recover from a corrupt profile?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>corrupt profile</indexterm>
+
+        <indexterm>profile<indexterm>recovery</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>If you cannot open a database because the profile is corrupt,
+    here is the sequence of steps to create a new default
+    <codeph>bootstrap.ace</codeph> file:</section>
+
+    <section>1. Delete the <codeph>bootstrap.ace</codeph> file in the bundle
+    directory.</section>
+
+    <section>2. Start up the bundle using the provided script</section>
+
+    <section>3. On startup, the environment will prompt you to with a config
+    file dialog, with a place to enter a username and a password:</section>
+
+    <fig id="baxxx01">
+      <title>Config dialog at startup</title>
+
+      <image href="../images/FAQ_Images/faq_img_4.jpg" placement="break"
+             width="400"/>
+    </fig>
+
+    <section>Enter a new username/password such as user "<ph>bootstrap</ph>"
+    with password of "<ph>visit.bend</ph>"</section>
+
+    <fig id="baxxx02">
+      <title>Example login dialog</title>
+
+      <image href="../images/FAQ_Images/faq_img_5.jpg" placement="break"
+             width="400"/>
+    </fig>
+
+    <section>4. The environment will now create the new default profile and
+    allow you to log in.</section>
+
+    <section>Note that the edit and view paths are not set up, so you may have
+    to edit your preferences pane before expected content will show up in the
+    taxonomy view.</section>
+  </body>
+</topic>

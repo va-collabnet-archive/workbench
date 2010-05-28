@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="namespace_ID_allocation">
+  <title>What is the minimum hardware configuration for the IDE or
+  Viewer?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>hardware
+        configuration<indexterm>minimum</indexterm></indexterm>
+
+        <indexterm>performance<indexterm>hardware
+        configuration</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><ul>
+        <li>Desktop platform capable of running Java 1.6 ( e.g. Windows PC,
+        Linux desktop, Unix desktop, Apple Mac )</li>
+
+        <li>Native display resolution of 1024 by 768.</li>
+
+        <li>2 GBytes of RAM</li>
+
+        <li>5400 RPM hard disk with 5GBytes available space per installed
+        IDE.</li>
+
+        <li>Dual core processor of 2.0 Ghz.</li>
+      </ul></section>
+  </body>
+</topic>

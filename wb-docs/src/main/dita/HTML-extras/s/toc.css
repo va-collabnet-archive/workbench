@@ -1,0 +1,138 @@
+﻿/*  *****************************************************  *
+ *  This style sheet is for every table-of-contents page.  *
+ *  Include after MASTER.CSS.                              *
+ *  *****************************************************  */
+
+body {
+  background-color:#FFFFFF;
+  color:#663333;
+  /* filter:progid:DXImageTransform.Microsoft.Gradient (startColorStr="#EEEEFF", endColorStr="#FFFFEE", gradientType="0"); */
+  font-size:10pt;
+  margin:1em;
+  padding:0px;
+}
+
+/*  ****  */
+/*  List  */
+
+/*  The TOC page supports a possibly large unordered list with multiple 
+    levels. The list looks better if items with long text do not wrap to 
+    multiple lines.  */
+
+li {
+  white-space:nowrap
+}
+
+/*  List items are "folders" if they have a list beneath them. Typically, 
+    this is made explicit by assigning such items to a class named Folder. 
+
+    Scripts that run on the TOC page assign each folder to one of two 
+    classes, Expanded or Collapsed, according to whether any list beneath 
+    them is meant to be visible. These classes are defined here so that they 
+    are interpreted correctly if used in documents. However, such use is not 
+    expected. They should be used only by the scripts. 
+
+    When the scripts do run, they change the styles so that the list under a 
+    folder is displayed only if the folder is expanded. While a folder's 
+    expansion state is not yet defined, any list beneath it must be 
+    invisible. The style for the collapsed state must have precedence (i.e., 
+    be listed last) so that "expand" does not always become "expand all". 
+
+    No rules are actually needed when scripts do not run. The whole TOC 
+    should then be visible, which it will be by default. However, we're as 
+    well to declare all the classes.  */
+
+li.Expanded ul, 
+li.Folder ul {
+  display:block;
+}
+
+li.Collapsed ul {
+  display:none;
+}
+
+/*  The default indentation is much too large. We want just enough to mark 
+    the nesting of levels but also to fit a small image that differentiates 
+    the list items. 
+
+    From at least as far back as version 5.00, Internet Explorer leaves 16px 
+    from the marker box to the principal box, which is then the ideal 
+    "margin-left" to have each marker begin immediately beneath the text of 
+    the preceding item. 
+
+    A smaller margin is presently used as an experiment with generating 
+    sight lines for the levels of expansion.  */
+
+ul {
+  margin:0px 0px 0px 11px;
+  padding:0px;
+}
+
+li.Expanded, 
+li.Folder {
+  border-left:1px #DDDDEE dotted;
+}
+
+/*  A little leading between list items looks nice.  */
+
+li {
+  margin:2px 0px;
+  padding:0px;
+}
+
+/*  For some time, list-item images were set in script. The immediate 
+    motivation was that HTTP logs showed some browsers reading TOC pages 
+    without running the scripts yet hitting hundreds and thousands of times 
+    on the list-item images. It is anyway better all round that if the 
+    scripts don't run then the list items do not have images that suggest 
+    the TOC is interactive. 
+
+    If only for now, set just the non-interactive images in CSS.  */
+
+ul {
+  list-style-image:url('../_images/page.gif');
+}
+
+li.Folder {
+  list-style-image:url('../_images/folder.gif');
+}
+
+/*  *****  */
+/*  Links  */
+
+a {
+  text-decoration:none;
+}
+
+a:link, a:visited {
+  color:#0066CC;
+}
+
+a:hover {
+  background-color:#88AACC;
+  color:#FFFFFF;
+}
+
+/*  At any given time, one link in the TOC is current and is assigned to a 
+    class to pick up a distinctive appearance.  */
+
+a.Current:hover, a.Current:link, a.Current:visited {
+  background-color:#224488;
+  color:#FFFFFF;
+}
+
+/*  ******  */
+/*  Footer  */
+
+/*  Allow that the TOC can be followed by pretty much anything, which will 
+    need to appear well-separated.  */
+
+div.Footer {
+  border-top-style:solid;
+  border-top-width:1px;
+  margin-top:1em;
+  padding-top:1em;
+  width:100%;
+}
+
+/*  Copyright © 2007-2009. Geoff Chappell. All rights reserved.  */

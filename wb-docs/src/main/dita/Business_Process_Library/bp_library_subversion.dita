@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic7" xml:lang="en"><title>Subversion Processes</title>
+ <body>
+  <table id="aq1044795">
+   <tgroup cols="2">
+    <colspec colnum="1" colname="col1" colwidth="114*"/>
+    <colspec colnum="2" colname="col2" colwidth="220*"/>
+    <tbody>
+     <row>
+      <entry namest="col1" nameend="col2">
+       <p><b>Synchronize with Subversion</b></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Description:</p>
+      </entry>
+      <entry colname="col2">
+       <p>This process will synchronize the user's work with the project development subversion
+        server.</p>
+       <p>The IHTSDO IDE will update the users folder with the server UPL which is stored in the uer
+        profile, then commit any change with the comment</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Rationale:</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Availability in Editor: </p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Plug-in type</p>
+      </entry>
+      <entry colname="col2"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>Implementation Package: </p>
+      </entry>
+      <entry colname="col2">
+       <p>Synchronize with Subversion.bp</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+ </body>
+</topic>
