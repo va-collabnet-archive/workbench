@@ -521,6 +521,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return ConceptComponent.this.makeIdAnalog(statusNid, pathNid, time);
         }
 
+        public I_IdPart makeIdAnalog() {
+
+            // if (index >= 0) {
+            // return additionalIdentifierParts.get(index).makeIdAnalog(statusNid, pathNid, time);
+            // }
+            // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
+
+            return ConceptComponent.this.makeIdAnalog(getStatusId(), getPathId(), getTime());
+        }
+
         @Override
         public void setAuthorityNid(int sourceNid) {
             if (index >= 0) {
