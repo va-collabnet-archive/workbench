@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.5.1-trns-tm-SNAPSHOT</version>
+        <version>2.5.1-trns-tm-1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-core</artifactId>
