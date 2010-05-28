@@ -15,16 +15,30 @@
  !  limitations under the License.
  -->
 
-    <parent>
+   <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.5.1-impl-uktc-SNAPSHOT</version>
+        <version>${workbench.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+   <!--   <groupId>org.ihtsdo</groupId> -->
     <artifactId>wb-api</artifactId>
+   <!--   <version>${workbench.version}</version> -->
     <packaging>jar</packaging>
     <name>Workbench API</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
+    <profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>!workbench.version</name>
+				</property>
+			</activation>
+			<properties>
+				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
+			</properties>
+		</profile>
+	</profiles>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

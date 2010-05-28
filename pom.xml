@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
+    <!--  <parent>
         <groupId>org.dwfa</groupId>
         <artifactId>dwfa-pom</artifactId>
         <version>3</version>
-    </parent>
+    </parent> -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.5.1-impl-uktc-SNAPSHOT</version>
+    <version>${workbench.version}</version>
     <name>Workbench modules multi-module build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
@@ -17,6 +17,21 @@
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</developerConnection>
         <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</url>
     </scm>
+    
+    <profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>!workbench.version</name>
+				</property>
+			</activation>
+			<properties>
+				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
+			</properties>
+		</profile>
+	</profiles>
+    
+    
     <properties>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

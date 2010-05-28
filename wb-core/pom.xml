@@ -18,14 +18,32 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.5.1-impl-uktc-SNAPSHOT</version>
-    </parent>
+        <version>${workbench.version}</version>
+    </parent> 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-core</artifactId>
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
+    <profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>!workbench.version</name>
+				</property>
+			</activation>
+			<properties>
+				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
+			</properties>
+		</profile>
+	</profiles>    
     <dependencies>
+            <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <!-- An alternative to:
                 <dependency>
