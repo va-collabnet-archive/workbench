@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.dwfa</groupId>
@@ -89,8 +90,9 @@
         <module>wb-mojo</module>
         <module>wb-gui</module>        
         <module>wb-bdb</module>        
-        <module>wb-bdb-mojo</module>        
-    </modules>
+        <module>wb-bdb-mojo</module>
+    <module>wb-dita-maven-plugin</module>
+  </modules>
     <profiles>
     	<profile>
     	      <id>bundle</id>
