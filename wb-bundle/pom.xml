@@ -114,13 +114,44 @@
 		</pluginManagement>
 	</build>
 	<modules>
-		<module>content-distribution</module>
 		<module>database</module>
-		<module>documentation</module>
-		<module>editor-standalone</module>
-		<module>editor-synchronized</module>
 		<module>java-binding</module>
 		<module>profiles</module>
-		<module>viewer</module>
+		<module>editor-standalone</module>        
 	</modules>
+	<profiles>
+		<profile>
+			<id>bundle-all</id>
+			<modules>
+				<module>viewer</module>        
+				<module>editor-synchronized</module>        
+				<module>documentation</module>        
+				<module>content-distribution</module>        
+			</modules>	
+		</profile>
+		<profile>
+			<id>distribution</id>
+			<modules>
+				<module>content-distribution</module>        
+			</modules>	
+		</profile>
+		<profile>
+			<id>viewer</id>
+			<modules>
+				<module>viewer</module>        
+			</modules>	
+		</profile>
+		<profile>
+			<id>standalone</id>
+			<modules>
+				<module>editor-standalone</module>        
+			</modules>	
+		</profile>
+		<profile>
+			<id>synchronized</id>
+			<modules>
+				<module>editor-synchronized</module>        
+			</modules>	
+		</profile>
+	</profiles>
 </project>
