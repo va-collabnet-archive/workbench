@@ -47,7 +47,6 @@ public class ArenaGraphComponent extends mxGraphComponent
                 return mxUtils.getInt(state.getStyle(), "targetRow", -1);
             }
         }
-
         return -1;
     }
 
