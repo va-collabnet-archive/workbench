@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-bundle</artifactId>
-    <version>2.5.1-trek-inf-SNAPSHOT</version>
+    <version>2.5.1-trek-inf-1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo.wb-bundle</groupId>
   <artifactId>profiles</artifactId>
-  <version>2.5.1-trek-inf-SNAPSHOT</version>
+  <version>2.5.1-trek-inf-1-SNAPSHOT</version>
   <name>Workbench Bundle Profiles</name>
   <description>wb-bundle profiles</description>
   <build>
