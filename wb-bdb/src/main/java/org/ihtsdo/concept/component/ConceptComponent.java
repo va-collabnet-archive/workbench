@@ -317,6 +317,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         public List<IdentifierVersion> getAdditionalIdentifierParts() {
+        	if (additionalIdentifierVersions == null) {
+        		return Collections.unmodifiableList(new ArrayList<IdentifierVersion>());
+        	}
             return Collections.unmodifiableList(additionalIdentifierVersions);
         }
 
