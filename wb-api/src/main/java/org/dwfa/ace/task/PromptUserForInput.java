@@ -33,16 +33,20 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -84,21 +88,28 @@ public class PromptUserForInput extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-
-            JButton stepButton = (JButton) e.getSource();
-            JPanel workflowPanel = (JPanel) stepButton.getParent();
-
-            Component[] components = workflowPanel.getComponents();
-            for (int i = 0; i < components.length; i++) {
-                if (components[i] instanceof JTextField) {
-                    refsetName = ((JTextField) components[i]).getText();
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
                 }
-            }
+            } else {
+                JButton stepButton = (JButton) e.getSource();
+                JPanel workflowPanel = (JPanel) stepButton.getParent();
 
-            returnCondition = Condition.ITEM_COMPLETE;
-            done = true;
-            synchronized (PromptUserForInput.this) {
-                PromptUserForInput.this.notifyAll();
+                Component[] components = workflowPanel.getComponents();
+                for (int i = 0; i < components.length; i++) {
+                    if (components[i] instanceof JTextField) {
+                        refsetName = ((JTextField) components[i]).getText();
+                    }
+                }
+
+                returnCondition = Condition.ITEM_COMPLETE;
+                done = true;
+                synchronized (PromptUserForInput.this) {
+                    PromptUserForInput.this.notifyAll();
+                }
             }
 
         }// End method actionPerformed
@@ -142,7 +153,8 @@ public class PromptUserForInput extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
-        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config =
+                (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
         boolean subversionButtonVisible = config.isSubversionToggleVisible();
@@ -176,15 +188,17 @@ public class PromptUserForInput extends AbstractTask {
                     workflowPanel.add(nameField, c);
                     c.gridx++;
                     c.anchor = GridBagConstraints.EAST;
-                    JButton stepButton = new JButton(new ImageIcon(
-                        InstructAndWait.class.getResource("/16x16/plain/media_step_forward.png")));
+                    JButton stepButton =
+                            new JButton(new ImageIcon(InstructAndWait.class
+                                .getResource("/16x16/plain/media_step_forward.png")));
                     stepButton.setToolTipText("Next step");
                     workflowPanel.add(stepButton, c);
 
                     c.gridx++;
                     stepButton.addActionListener(new StepActionListener());
-                    JButton stopButton = new JButton(new ImageIcon(
-                        InstructAndWait.class.getResource("/16x16/plain/media_stop_red.png")));
+                    JButton stopButton =
+                            new JButton(new ImageIcon(InstructAndWait.class
+                                .getResource("/16x16/plain/media_stop_red.png")));
                     stopButton.setToolTipText("Cancel");
                     workflowPanel.add(stopButton, c);
                     stopButton.addActionListener(new StopActionListener());
