@@ -7,7 +7,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo.wb-bundle</groupId>
   <artifactId>documentation</artifactId>
-  <version>2.5.1-trek-inf-1-SNAPSHOT</version>
   <name>Workbench Bundle Documentation</name>
   <description>Workbench Bundle Documentation assembled from DITA format sources</description>
 </project>
