@@ -8,33 +8,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ihtsdo.wb-bundle</groupId>
 	<artifactId>database</artifactId>
-	<version>2.5.1-trek-inf-1-SNAPSHOT</version>
 	<name>Workbench Bundle Database</name>
 	<description>Workbench Bundle Database</description>
-	<!--
-		<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/cement-vodb/trunk</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/cement-vodb/trunk</developerConnection>
-		</scm>
-	-->
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>ACE Archiva Releases Repository</name>
-			<url>file:///ciserver/repositories/releases </url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>ACE Archiva Snapshots Repository</name>
-			<url>file:///ciserver/repositories/snapshots </url>
-		</snapshotRepository>
-	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.dwfa</groupId>
 				<artifactId>dwfa-mojo</artifactId>
-				<version>2.0.31</version>
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
@@ -58,7 +38,6 @@
 			<plugin>
 				<groupId>org.dwfa</groupId>
 				<artifactId>term-mojo</artifactId>
-				<version>1.43</version>
 				<executions>
 					<execution>
 						<id>vodb-open</id>
@@ -168,7 +147,6 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-bdb-mojo</artifactId>
-				<version>${org.ihtsdo.wb-mojo.version}</version>
 				<executions>
 					<execution>
 						<id>load-econcepts</id>

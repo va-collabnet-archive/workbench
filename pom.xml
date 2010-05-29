@@ -15,6 +15,7 @@
 	
 	<properties>
 		<org.ihtsdo.wb-mojo.version>${project.version}</org.ihtsdo.wb-mojo.version>
+		<org.dwfa.jini.version>2.1</org.dwfa.jini.version>
 	</properties>
 	
 	<dependencyManagement>
@@ -26,37 +27,9 @@
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
-				<!--
-					A dependency required to use the jini/jehri dynamic provider
-					security model
-				-->
-				<groupId>org.dwfa.jini</groupId>
-				<artifactId>jsk-policy</artifactId>
-				<scope>provided</scope>
-				<version>2.1</version>
-			</dependency>
-			<dependency>
 				<groupId>org.dwfa</groupId>
 				<artifactId>icons</artifactId>
 				<version>1.15-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>net.nhs.uktc</groupId>
-				<artifactId>nhs-subset-editor-doc</artifactId>
-				<scope>runtime-directory</scope>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.dwfa.jini</groupId>
-				<artifactId>start</artifactId>
-				<scope>compile</scope>
-				<version>2.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.dwfa.jini</groupId>
-				<artifactId>jsk-dl</artifactId>
-				<scope>compile</scope>
-				<version>2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.ihtsdo</groupId>
@@ -64,14 +37,10 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<!--
-					A dependency required to use the jini/jehri dynamic provider
-					security model
-				-->
-				<groupId>org.dwfa.jini</groupId>
-				<artifactId>jsk-policy</artifactId>
-				<scope>provided</scope>
-				<version>2.1</version>
+				<groupId>net.nhs.uktc</groupId>
+				<artifactId>nhs-subset-editor-doc</artifactId>
+				<scope>runtime-directory</scope>
+				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.dwfa</groupId>
@@ -84,6 +53,28 @@
 				<artifactId>ace-ide-user-bp</artifactId>
 				<scope>runtime-directory</scope>
 				<version>1.4-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.dwfa.jini</groupId>
+				<artifactId>start</artifactId>
+				<scope>compile</scope>
+				<version>${org.dwfa.jini.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.dwfa.jini</groupId>
+				<artifactId>jsk-dl</artifactId>
+				<scope>compile</scope>
+				<version>${org.dwfa.jini.version}</version>
+			</dependency>
+			<dependency>
+				<!--
+					A dependency required to use the jini/jehri dynamic provider
+					security model
+				-->
+				<groupId>org.dwfa.jini</groupId>
+				<artifactId>jsk-policy</artifactId>
+				<scope>provided</scope>
+				<version>${org.dwfa.jini.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -98,17 +89,36 @@
 						<target>1.6</target>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+			        <version>2.4.3</version>
+				</plugin>
 				<plugin>	
-				<groupId>org.ihtsdo</groupId>
-                <artifactId>wb-mojo</artifactId>
-                <version>${org.ihtsdo.wb-mojo.version}</version>
+					<groupId>org.ihtsdo</groupId>
+    	            <artifactId>wb-bdb-mojo</artifactId>
+        	        <version>${org.ihtsdo.wb-mojo.version}</version>
+				</plugin>	
+				<plugin>	
+					<groupId>org.ihtsdo</groupId>
+                	<artifactId>wb-mojo</artifactId>
+                	<version>${org.ihtsdo.wb-mojo.version}</version>
 					<configuration>
-						<stagingDirectory>${user.home}/Sites/
-						</stagingDirectory>
+						<stagingDirectory>${user.home}/Sites/</stagingDirectory>
 						<visibility>priv</visibility>
 						<cubitProject>cement</cubitProject>
 						<siteRoot>${artifactId}</siteRoot>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.dwfa</groupId>
+					<artifactId>dwfa-mojo</artifactId>
+					<version>2.0.31</version>
+				</plugin>
+				<plugin>
+					<groupId>org.dwfa</groupId>
+					<artifactId>term-mojo</artifactId>
+					<version>1.43</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
