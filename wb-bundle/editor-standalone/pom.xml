@@ -63,13 +63,13 @@
 			<artifactId>jsk-dl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.dwfa</groupId>
-			<artifactId>ace-ide-admin-bp</artifactId>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-ide-admin-bp</artifactId>
 			<scope>runtime-directory</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.dwfa</groupId>
-			<artifactId>ace-ide-user-bp</artifactId>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-ide-user-bp</artifactId>
 			<scope>runtime-directory</scope>
 		</dependency>
 		<dependency>
