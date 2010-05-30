@@ -217,6 +217,8 @@ public class ActivityViewer implements ActionListener {
         public ActivityViewerFrame() throws Exception {
             super(null, null);
             getQuitList().clear();
+            setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            setSendToBackInsteadOfClose(true);
         }
 
         @Override

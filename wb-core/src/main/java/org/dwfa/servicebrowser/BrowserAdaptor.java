@@ -22,19 +22,13 @@ package org.dwfa.servicebrowser;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.WindowConstants;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationProvider;
-
-import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.I_InitComponentMenus;
 
 import com.sun.jini.example.browser.Browser;
@@ -88,23 +82,7 @@ public class BrowserAdaptor extends Browser implements I_InitComponentMenus {
      */
     public BrowserAdaptor(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
-        this.args = args;
-        this.lc = lc;
-        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
-            + Arrays.asList(args) + "\n\n******************\n");
-        Configuration config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
-
-        String title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class, "Service Browser");
-        if (count == 0) {
-            this.setTitle(title);
-            count++;
-        } else {
-            this.setTitle(title + " " + count++);
-        }
-        new ComponentFrameBean(args, lc, this, this, this.getJMenuBar());
-
-        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.setVisible(true);
+        throw new UnsupportedOperationException();
     }
 
     public void addAppMenus(JMenuBar mainMenuBar) {

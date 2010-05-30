@@ -49,7 +49,7 @@ public class CoreServices extends ArrayList<ServiceConfigOption> {
         add(CO_LogViewer);
         add(CO_LogViewerNewFrame);
         add(CO_OutboxQueue);
-        add(CO_PhantomFrame);
+        //add(CO_PhantomFrame);
         add(CO_ProcessBuilder);
         // add(CO_SequenceAuthorityOidUuid);
         // add(CO_SequenceAuthorityUuid);

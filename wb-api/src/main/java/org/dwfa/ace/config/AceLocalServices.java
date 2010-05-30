@@ -65,7 +65,7 @@ public class AceLocalServices extends ArrayList<ServiceConfigOption> {
         // add(CoreServices.CO_JavaSpace);
         add(CoreServices.CO_LogManagerService);
         add(CoreServices.CO_LogViewerNewFrame);
-        add(CoreServices.CO_PhantomFrame);
+        // add(CoreServices.CO_PhantomFrame);
         // add(CoreServices.CO_ServiceBrowserNewFrame);
         // add(CO_FormBuilderNewFrame);
         add(CO_AceEditor);
