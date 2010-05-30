@@ -142,13 +142,15 @@
             <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
             <snapshots>
                 <enabled>true</enabled>
-            </snapshots>
-            <!-- To be implemented when servers are clean
-            <checksumPolicy>fail</checksumPolicy>
-            -->
+                <checksumPolicy>fail</checksumPolicy>
             <!-- To be reviewed, currently daily is the default
             <updatePolicy>never</updatePolicy>
             -->
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
         </pluginRepository>
     </pluginRepositories>
     <repositories>
@@ -157,13 +159,15 @@
             <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
             <snapshots>
                 <enabled>true</enabled>
-            </snapshots>
-            <!-- To be implemented when servers are clean
-            <checksumPolicy>fail</checksumPolicy>
-            -->
+                <checksumPolicy>fail</checksumPolicy>
             <!-- To be reviewed, currently daily is the default
             <updatePolicy>never</updatePolicy>
             -->
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
         </repository>
     </repositories>
 </project>
