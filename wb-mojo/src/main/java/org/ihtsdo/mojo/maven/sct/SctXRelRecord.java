@@ -89,7 +89,7 @@ class SctXRelRecord implements Comparable<Object>, Serializable {
     public String toString() {
         UUID uuid = new UUID(uuidMostSigBits, uuidLeastSigBits); // :yyy:
         return uuid + TAB_CHARACTER + id + TAB_CHARACTER + status + TAB_CHARACTER
-                + conceptOneID + TAB_CHARACTER + roleType + TAB_CHARACTER + conceptTwoID;
+                + conceptOneID + TAB_CHARACTER + roleType + TAB_CHARACTER + conceptTwoID + TAB_CHARACTER + group;
     }
 
 }

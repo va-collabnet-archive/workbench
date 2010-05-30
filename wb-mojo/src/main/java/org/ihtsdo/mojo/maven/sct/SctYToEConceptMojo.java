@@ -4553,7 +4553,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     && (a[idx].relUuidLsb == a[idx + 1].relUuidLsb)) {
                 duplIdxList.add(Integer.valueOf(idx));
                 getLog().info(
-                        "WARNING -- Duplicate relationship:" + "\r\n A:" + a[idx] + "\r\n B:"
+                        "::: WARNING -- Logically Duplicate Relationships:" + "\r\n::: A:" + a[idx] + "\r\n::: B:"
                                 + a[idx + 1]);
             }
         if (duplIdxList.size() > 0) {

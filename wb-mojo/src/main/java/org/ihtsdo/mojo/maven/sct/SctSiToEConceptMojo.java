@@ -2483,7 +2483,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     && (a[idx].uuidLeastSigBits == a[idx + 1].uuidLeastSigBits)) {
                 duplIdxList.add(Integer.valueOf(idx));
                 getLog().info(
-                        "WARNING -- Duplicate relationship:" + "\r\n A:" + a[idx] + " B:"
+                        "::: WARNING -- Locigally Duplicate Relationships:" + "\r\n::: A:" + a[idx] + "\r\n::: B:"
                                 + a[idx + 1]);
             }
         if (duplIdxList.size() > 0) {
