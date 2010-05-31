@@ -22,7 +22,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-api</artifactId>
-    <packaging>jar</packaging>
     <name>Workbench API</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
     <dependencies>
@@ -66,20 +65,11 @@
         	<groupId>au.csiro</groupId>
         	<artifactId>snorocket</artifactId>
         	<version>1.1.13</version>
-        	<type>jar</type>
         	<scope>compile</scope>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.dwfa</groupId>
                 <artifactId>pbl-mojo</artifactId>
