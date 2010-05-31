@@ -563,6 +563,10 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 
         cClassSnoRels = null; // :MEMORY:
         cRocketSnoRels = null; // :MEMORY:
+        
+        SnoQuery.setDirty(true);
+        config.fireCommit();
+         
         return Condition.CONTINUE;
     }
 
@@ -1310,7 +1314,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             I_GetConceptData c = tf.getConcept(cNid);
             sb.append(c.getUids().iterator().next() + "\t");
             sb.append(cNid + "\t");
-            sb.append(c.getInitialText() + "\r\n");
+            sb.append(c.getInitialText());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
