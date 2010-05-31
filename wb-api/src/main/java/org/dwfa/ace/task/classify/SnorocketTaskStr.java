@@ -454,6 +454,40 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             if (debug)
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
 
+            // ** GUI: * GET CLASSIFIER EQUIVALENTS **
+            gui = tf.newActivityPanel(true, config,
+                    "Classifier 2/5: classify data", true); // in
+            // activity
+            // viewer
+            gui.addRefreshActionListener(this);
+            gui
+                    .setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
+            gui.setIndeterminate(true);
+            // gui.setMaximum(1000000);
+            // gui.setValue(0);
+
+            // GET CLASSIFER EQUIVALENTS
+            worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
+            startTime = System.currentTimeMillis();
+            ProcessEquiv pe = new ProcessEquiv();
+            rocket.getEquivalents(pe);
+            logger.info(pe.toStringStats(startTime));
+
+            // ** GUI: GET CLASSIFER EQUIVALENTS -- done
+            if (continueThisAction) {
+                gui.setProgressInfoLower("solution set rels = "
+                        + pe.countConSet + ", lapsed time = "
+                        + toStringLapseSec(startTime));
+                gui.complete(); // GET CONCEPT EQUIVALENTS -- done
+                rocket = null; // :MEMORY:
+                pe = null; // :MEMORY:
+            } else {
+                gui.setProgressInfoLower("get evquivalents stopped by user");
+                gui.complete(); // PHASE 1. DONE
+                return Condition.CONTINUE;
+            }
+            System.gc();
+
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
             String tmpS = "Classifier 4/5: get previously inferred & compare";
             gui = tf.newActivityPanel(true, config, tmpS, true);
@@ -512,39 +546,6 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             gui.setProgressInfoLower("writeback completed, lapsed time = "
                     + toStringLapseSec(startTime));
             gui.complete(); // PHASE 5. DONE
-
-            // ** GUI: 6 GET CLASSIFIER EQUIVALENTS **
-            gui = tf.newActivityPanel(true, config,
-                    "Classifier 2/5: classify data", true); // in
-            // activity
-            // viewer
-            gui.addRefreshActionListener(this);
-            gui
-                    .setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
-            gui.setIndeterminate(true);
-            // gui.setMaximum(1000000);
-            // gui.setValue(0);
-
-            // GET CLASSIFER EQUIVALENTS
-            worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
-            startTime = System.currentTimeMillis();
-            ProcessEquiv pe = new ProcessEquiv();
-            rocket.getEquivalents(pe);
-            logger.info(pe.toStringStats(startTime));
-
-            // ** GUI: 6 -- done
-            if (continueThisAction) {
-                gui.setProgressInfoLower("solution set rels = "
-                        + pe.countConSet + ", lapsed time = "
-                        + toStringLapseSec(startTime));
-                gui.complete(); // GET CONCEPT EQUIVALENTS -- done
-                rocket = null; // :MEMORY:
-                pe = null; // :MEMORY:
-            } else {
-                gui.setProgressInfoLower("get evquivalents stopped by user");
-                gui.complete(); // PHASE 1. DONE
-                return Condition.CONTINUE;
-            }
 
         } catch (TerminologyException e) {
             logger.info("\r\n::: TerminologyException");
