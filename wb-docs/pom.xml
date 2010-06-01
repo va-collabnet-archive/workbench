@@ -129,7 +129,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
 
-		<!--  TODO: simplify -->
+    <!--  TODO: simplify -->
         <executions>
           <execution>
             <id>make-doc-date</id>
@@ -169,6 +169,10 @@
             <configuration>
               <useDitaAnt>false</useDitaAnt>
               <useDitaClasspath>true</useDitaClasspath>
+              <!-- attach the generated PDF: this doesn't work in the current version of the dita-maven-plugin
+                   when the ditamap is in a subdirectory, so it is added using the build-helper below 
+              <attach>true</attach>
+              -->
               <antProperties>
                 <transtype>pdf2</transtype>
                 <dita.dir>${dita.dir}</dita.dir>
@@ -181,9 +185,50 @@
                 <!--                
                 <customization.dir>${customization.dir}</customization.dir>
                 <clean.temp>yes</clean.temp>
-				-->
+        -->
               </antProperties>
               <antOpts>-Xmx1600m -Xms1100</antOpts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-dita-sources</id>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/dita-sources.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- to workaround dita-maven-plugin's attach configuration problems -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-pdf</id>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/pdf/Guidebook/Workbench_Guidebook.pdf</file>
+                  <type>pdf</type>
+                </artifact>
+              </artifacts>
             </configuration>
           </execution>
         </executions>
