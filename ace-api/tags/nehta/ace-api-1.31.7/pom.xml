@@ -23,14 +23,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dwfa</groupId>
   <artifactId>ace-api</artifactId>
-  <version>1.31.6</version>
+  <version>1.31.7</version>
   <packaging>jar</packaging>
   <name>ACE API</name>
   <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
   <scm>
-    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31</connection>
-    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31</developerConnection>
-    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/ace-api-1.31</url>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31.7</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/ace-api/tags/ace-api-1.31.7</developerConnection>
+    <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ace/scm/tags/ace-api-1.31.7</url>
   </scm>
   <ciManagement>
     <system>continuum</system>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.dwfa</groupId>
       <artifactId>core</artifactId>
-      <version>2.0.19</version>
+      <version>2.0.19.2</version>
     </dependency>
     <!-- added by lawley to support drag-and-drop -->
 <!-- 
@@ -99,7 +99,13 @@
       <artifactId>svnkit-javahl</artifactId>
       <version>1.2.1.5297</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

@@ -27,12 +27,14 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.util.ListUtil;
 import org.dwfa.ace.task.util.MultiMap;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -59,27 +61,42 @@ import org.apache.lucene.search.Hits;
 public class AddUuidListListToListView extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
     /**
      * Property name for a list of uuid lists, typically used to represent a
      * list of concepts in a transportable way.
      */
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
+    private boolean continueOnError;
+    private List<String> invalidUuids;
+    private String uuidErrorMessage;
+
+    public AddUuidListListToListView() {
+        uuidErrorMessage = "";
+    }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(uuidListListPropName);
+        out.writeBoolean(continueOnError);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            uuidListListPropName = (String) in.readObject();
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
 
+        switch (objDataVersion) {
+            case 0:
+            case 1:
+                uuidListListPropName = (String) in.readObject();
+                break;
+            case 2:
+                uuidListListPropName = (String) in.readObject();
+                continueOnError = in.readBoolean();
+                break;
+            default:
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
@@ -101,6 +118,8 @@ public class AddUuidListListToListView extends AbstractTask {
             final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process.readProperty(uuidListListPropName);
             AceLog.getAppLog().info("Adding list of size: " + idListList.size());
 
+            invalidUuids = new ArrayList<String>();
+
             SwingUtilities.invokeAndWait(new Runnable() {
 
                 public void run() {
@@ -109,10 +128,17 @@ public class AddUuidListListToListView extends AbstractTask {
                             idListList, tf);
 
                     for (I_GetConceptData concept : elements) {
-                        model.addElement(concept);
+                        if (concept != null) {
+                            model.addElement(concept);
+                        }
                     }
                 }
             });
+
+            if (continueOnError && !invalidUuids.isEmpty()) {
+                appendErrorMessages(process);
+                appendErrorObjects(process);
+            }
 
             return Condition.CONTINUE;
         } catch (IntrospectionException e) {
@@ -145,7 +171,21 @@ public class AddUuidListListToListView extends AbstractTask {
 
                     // Not a concept... try a description or
                     // relationship
-                    final int nid = tf.uuidToNative(idList);
+                    int nid = -1;
+                    try {
+                        nid = tf.uuidToNative(idList);
+                    } catch (NoMappingException nme) {
+                        if (!continueOnError) {
+                            throw nme;
+                        }
+                        invalidUuids.add(idList.get(0).toString());
+                        AceLog.getAppLog().log(Level.WARNING, "Invalid UUID: " + idList.get(0).toString());
+                        if (uuidErrorMessage == null || uuidErrorMessage.isEmpty()) {
+                            uuidErrorMessage = nme.getMessage();
+                        }
+                        continue;
+                    }
+
                     List<UUID> uuids = tf.getId(nid).getUIDs();
 
                     if (uuids != null && !uuids.isEmpty()) {
@@ -245,6 +285,14 @@ public class AddUuidListListToListView extends AbstractTask {
         this.uuidListListPropName = uuidListListPropName;
     }
 
+    public boolean isContinueOnError() {
+        return continueOnError;
+    }
+
+    public void setContinueOnError(boolean isContinueOnError) {
+        this.continueOnError = isContinueOnError;
+    }
+
     /**
      * @deprecated Copied from the Head version of I_TermFactory to retrofit this functionality into ace-api-1.31.6
      */
@@ -263,5 +311,45 @@ public class AddUuidListListToListView extends AbstractTask {
             return description;
         }
         throw new TerminologyException("More that one description matched the id " + descriptionId);
+    }
+
+    /**
+     * Convenience method to encapsulate adding error messages to existing error messages.
+     * @param process
+     * @throws IntrospectionException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private void appendErrorMessages(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        StringBuilder errorMessages = new StringBuilder();
+
+        String previousMessages = (String) process.readProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey());
+
+        if (previousMessages != null && !previousMessages.isEmpty()) {
+            errorMessages.append(previousMessages).append("\n");
+        }
+
+        errorMessages.append(uuidErrorMessage);
+
+        process.setProperty(ProcessAttachmentKeys.ERROR_MESSAGE.getAttachmentKey(), errorMessages.toString());
+    }
+
+    /**
+     * Convenience method to encapsulate appending objects to the Object List for use with the {@link WriteToFile} task.
+     * @param process
+     * @throws IntrospectionException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private void appendErrorObjects(I_EncodeBusinessProcess process) throws IntrospectionException,
+            IllegalAccessException, InvocationTargetException {
+        List<Object> objects = new ArrayList<Object>();
+        Object inProperty = process.readProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey());
+        if (inProperty instanceof List) {
+            objects.addAll((List<Object>) inProperty);
+        }
+        objects.addAll(invalidUuids);
+        process.setProperty(ProcessAttachmentKeys.OBJECTS_LIST.getAttachmentKey(), objects);
     }
 }
