@@ -54,10 +54,16 @@ public class EquivTableRenderer extends AceTableRenderer {
             } else {
                 renderComponent.setBackground(colorForRow(row));
                 renderComponent.setForeground(UIManager.getColor("Table.foreground"));
+    			renderComponent
+    			.setText("<html><font face='Dialog' size='3' color='black'>"
+    					+ (String) value);
             }
         } else {
             renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
+			renderComponent
+			.setText("<html><font face='Dialog' size='3' color='white'>"
+					+ (String) value);
         }
 
         setHorizontalAlignment(SwingConstants.LEFT);
@@ -65,7 +71,6 @@ public class EquivTableRenderer extends AceTableRenderer {
         setBorder(column, this, false, false, false); // .., same, uncommitted
         // if (renderInactive) renderComponent.setBackground(Color.LIGHT_GRAY);
 
-        renderComponent.setText((String) value);
         return renderComponent;
     }
 

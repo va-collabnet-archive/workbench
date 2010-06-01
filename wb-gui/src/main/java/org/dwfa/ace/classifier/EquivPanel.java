@@ -139,7 +139,8 @@ public class EquivPanel extends JPanel {
             for (SnoCon sc : scg) {
                 StringBuilder str = new StringBuilder("<html>");
                 I_GetConceptData valueBean = tf.getConcept(sc.id);
-                str.append(valueFont + valueBean.getInitialText());
+                str.append(valueBean.getInitialText());
+                // str.append(valueFont + valueBean.getInitialText());
                 tableStrings[iRow][0] = Integer.toString(iGroup);
                 tableStrings[iRow][1] = str.toString();
                 iRow += 1;
