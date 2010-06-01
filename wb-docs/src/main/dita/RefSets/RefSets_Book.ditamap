@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/bookmap.dtd">
+<bookmap id="book_workbench_guide" xml:lang="en_US">
+  <booktitle>
+    <booklibrary><image
+    href="../images/IHTSDO_logohead_full.png"/></booklibrary>
+
+    <mainbooktitle>Workbench component: Reference Sets</mainbooktitle>
+  </booktitle>
+
+  <bookmeta>
+    <authorinformation>
+      <organizationinfo>
+        <namedetails/>
+
+        <urls>
+          <url>www.ihtsdo.org</url>
+        </urls>
+      </organizationinfo>
+    </authorinformation>
+
+    <author type="creator">Keith Campbell, Susan Castillo, Eric
+    Browne</author>
+
+    <critdates>
+      <created date="February 2010"/>
+    </critdates>
+
+    <keywords>
+      <keyword>IHTSDO</keyword>
+
+      <keyword>Workbench</keyword>
+
+      <keyword>Reference Sets</keyword>
+    </keywords>
+
+    <prodinfo>
+      <prodname>IHTSDO Workbench Component</prodname>
+
+      <vrmlist>
+        <vrm version="1.0"/>
+      </vrmlist>
+    </prodinfo>
+
+    <bookchangehistory>
+      <edited>
+        <organization>IHTSDO</organization>
+
+        <revisionid>1.5</revisionid>
+
+        <completed>
+          <year>2010</year>
+
+          <month>February</month>
+        </completed>
+      </edited>
+    </bookchangehistory>
+
+    <bookrights>
+      <copyrfirst>
+        <year>2010</year>
+      </copyrfirst>
+
+      <!--copyrlast>
+                <year>2010</year>
+            </copyrlast-->
+
+      <bookowner>
+        <organization>IHTSDO</organization>
+      </bookowner>
+    </bookrights>
+  </bookmeta>
+
+  <frontmatter>
+    <booklists>
+      <toc/>
+    </booklists>
+
+    <preface>
+      <!--<topicref href="frontCover.xml" format="dita" type="topic"/>-->
+    </preface>
+  </frontmatter>
+
+  <chapter chunk="" format="ditamap" href="../RefSets/RefSets_NHS.ditamap"
+           navtitle="Reference Sets "/>
+
+  <backmatter>
+    <booklists>
+      <indexlist/>
+    </booklists>
+  </backmatter>
+</bookmap>

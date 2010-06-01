@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="architecture" xml:lang="en">
+  <title>IHTSDO Workbench Architecture</title>
+
+  <body>
+    <section>IHTSDO Workbench is founded upon a loosely–coupled distributed
+    architecture that provides:</section>
+
+    <p>Reliable operations over unreliable networks</p>
+
+    <p>Business–process driven activities that can function reliably (and with
+    high performance) while disconnected from the network</p>
+
+    <p>No single point of system failure</p>
+
+    <section>Such loosely–coupled distributed architectures are common in
+    applications where a rich user experience is required, where user
+    productivity is a primary concern, and where disconnected operations are
+    required. Some well-known applications that use these same architectural
+    principles include e-mail and calendar applications, and most software
+    development environments–such as Eclipse.</section>
+
+    <section>The IHTSDO Workbench architecture can scale computationally and
+    organizationally as the internal needs of the organization expand, and as
+    terminology collaborations expand to include an increasing number of
+    external organizations.</section>
+  </body>
+</topic>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+ 
+ <topic id="topic6" xml:lang="en">
+  <title>Transport Layer</title>
+  <prolog><metadata><keywords><indexterm>transport layer </indexterm></keywords></metadata></prolog>
+  <body>
+   <section>The business processes encoded by the IHTSDO Workbench DWFA Framework are JavaBeans, and
+    can be transported in a transport layer independent manner. </section>
+   <section>The current implementation provides support for using Subversion, SMTP (as a MIME
+    attachment), and Java RMI as the transport layer. Alternative transport layers that use MIME
+    attachments and that have available Java implementations are trivial to support. Processes
+    external to the DFWA framework can also support other transport layers such as FTP or CD-ROM
+    combined with Sneaker Net or postal delivery services. </section>
+  </body>
+ </topic>
+
+</dita>

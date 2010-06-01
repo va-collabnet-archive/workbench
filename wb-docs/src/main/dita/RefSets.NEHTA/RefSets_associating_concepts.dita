@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+ <topic id="topic4" xml:lang="en">
+  <title>Associating Concepts with a Specification Reference Set</title>
+  <body>
+   <section>To create a reference set, you must specify which concepts will be members (and which
+    will not) in the specification refset.</section>
+   <section id="ak1007570">
+    <title>Refset Entries</title>
+   </section>
+   <section>The Refset Entries toggle button <image
+     href="../images/Refsets_Images/refsets_img_3.jpg" placement="inline" width="74" height="40"
+    /> displays or hides the links to reference sets for the selected concept.</section>
+   <section id="ak1007591">
+    <title>Adding a Concept to a Specification Reference Set<ph>
+      <indexterm>Specification Reference Set </indexterm>
+      <indexterm>refset <indexterm>specification</indexterm>
+      </indexterm>
+     </ph></title>
+   </section>
+   <section>To add the selected concept to an existing refset, click on the Add Concept Extension
+    button . The default refset will appear in the refset column. To change this value to another
+    refset, double-click it. A dropdown box will appear with the names of all existing refets;
+    select the desired one. (To select the default refset, see section below.</section>
+   <fig id="ak1015482">
+    <title>Changing the Refset Associated with the Concept</title>
+    <image href="../images/Refsets_Images/refsets_img_5.jpg" placement="break" width="447"
+     height="126"/>
+   </fig>
+   <section id="ak1007627">
+    <title>Selecting the Concept Inclusion Type<ph>
+      <indexterm>Inclusion Type </indexterm>
+     </ph></title>
+   </section>
+   <section>When linking a concept to a refset, its inclusion type must be specified as either
+    exclude individual, exclude lineage, individual include, or lineage include. (See section for a
+    detailed description of these inclusion types.)</section>
+   <section>When the concept is first added to a reference set, an inclusion type will be assigned
+    by default (as set in the Preferences panel). To modify this value, double-click on it in the
+    concept column. A list of values will pop-up; select the desired value. Alternatively, right
+    click on the entry and select Change concept to display the pop-up list.</section>
+   <fig id="ak1007683">
+    <title>Changing the Concept Inclusion Type</title>
+    <image href="../images/Refsets_Images/refsets_img_6.jpg" placement="break" width="436"
+     height="124"/>
+   </fig>
+   <section id="ak1007708">
+    <title>Changing the Refset Association Status<ph>
+      <indexterm>Association Status <indexterm>refset</indexterm>
+      </indexterm>
+     </ph></title>
+   </section>
+   <section>The default refset status is normally set as current. (Other values are defined in the
+    Refset preferences.) To modify this value, double-click on it in the status column. A list of
+    values will pop-up; select the desired value. Alternatively, right-click on the entry and select
+    Change status to display the pop-up list.</section>
+   <fig id="ak1007730">
+    <title>Changing the Refset Association Status</title>
+    <image href="../images/Refsets_Images/refsets_img_7.jpg" placement="break" width="434"
+     height="114"/>
+   </fig>
+   <section id="ak1015597">
+    <title>Committing Changes<ph>
+      <indexterm>Committing Changes <indexterm>refsets</indexterm>
+      </indexterm>
+     </ph></title>
+   </section>
+   <section>The refset associations entered are provisional. No changes are made to the database
+    until you click the commit button (at the bottom right of the win­dow). If you do not wish to
+    apply these entries, click the cancel button (next to the commit button) to clear the
+    provisional refset associations from the display. They will not be applied to the
+    database.</section>
+  </body>
+ </topic>
+

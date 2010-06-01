@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+ <topic id="topic3" xml:lang="en">
+  <title>Creating a Specification Refset Manually<ph>
+    <indexterm>Specification Refset </indexterm>
+    <indexterm>Creating a Specification Refset Manually </indexterm>
+   </ph></title>
+  <body>
+   <section>Once a Member refset has been created, the next step is to create the Speci­fication
+    refset that IHTSDO Workbench will use to populate it. </section>
+   <table id="ak1007264">
+    <tgroup cols="4">
+     <colspec colnum="1" colname="col1" colwidth="66*"/>
+     <colspec colnum="2" colname="col2" colwidth="77*"/>
+     <colspec colnum="3" colname="col3" colwidth="69*"/>
+     <colspec colnum="4" colname="col4" colwidth="130*"/>
+     <tbody>
+      <row>
+       <entry namest="col1" nameend="col4">
+        <p>Specification Reference Set - Source Relationships</p>
+       </entry>
+      </row>
+      <row>
+       <entry colname="col1">
+        <p>Type</p>
+       </entry>
+       <entry colname="col2">
+        <p>Hierarchy Location</p>
+       </entry>
+       <entry colname="col3">
+        <p>Destination</p>
+       </entry>
+       <entry colname="col4">
+        <p>Hierarchy Location</p>
+       </entry>
+      </row>
+      <row>
+       <entry colname="col1">
+        <p>is a</p>
+       </entry>
+       <entry colname="col2">
+        <p>Terminology Auxiliary concept /relationship</p>
+       </entry>
+       <entry colname="col3">
+        <p>refset</p>
+       </entry>
+       <entry colname="col4">
+        <p>Refset Auxiliary Concept</p>
+       </entry>
+      </row>
+      <row>
+       <entry colname="col1">
+        <p>refset type rel</p>
+       </entry>
+       <entry colname="col2">
+        <p>Refset Auxiliary concept /refset relation­ship</p>
+       </entry>
+       <entry colname="col3">
+        <p>concept exten­sions</p>
+       </entry>
+       <entry colname="col4">
+        <p>Refset Auxiliary concept /refset type</p>
+       </entry>
+      </row>
+      <row>
+       <entry colname="col1">
+        <p>refset purpose rel</p>
+       </entry>
+       <entry colname="col2">
+        <p>Refset Auxiliary concept /refset relation­ship</p>
+       </entry>
+       <entry colname="col3">
+        <p>(depends on purpose, e.g. inclusion spec­ification)</p>
+       </entry>
+       <entry colname="col4">
+        <p>Refset Auxiliary concept /refset purpose</p>
+       </entry>
+      </row>
+      <row>
+       <entry colname="col1">
+        <p>generates</p>
+       </entry>
+       <entry colname="col2">
+        <p>Refset Auxiliary concept /refset relation­ship</p>
+       </entry>
+       <entry colname="col3">
+        <p>(name of the member refset)</p>
+       </entry>
+       <entry colname="col4">
+        <p>Refset Auxiliary concept /refset</p>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <fig id="ak1007525">
+    <title>Example specification relationships for a new Refset</title>
+    <image href="../images/Refsets_Images/refsets_img_2.jpg" placement="break" width="480"
+     height="69"/>
+   </fig>
+  </body>
+ </topic>
+
+

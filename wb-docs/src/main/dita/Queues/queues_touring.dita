@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic3" xml:lang="en">
+ <title>Touring the Queue Viewer</title>
+ <body>
+  <section>The Queue Viewer is designed to replicate the look and functionality of an email browser.
+   The viewer contains three primary sections, as shown in <xref href="#topic3/ah922012" type="fig"
+    format="dita"/>.</section>
+  <fig id="ah922012">
+   <title>Queue Viewer with queue list</title>
+   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_3.jpg"
+    placement="break" width="412" height="298"/>
+  </fig>
+  <section id="ah922018">
+   <title>Queue Name List</title>
+  </section>
+  <section>The Queue Name list on the left is similar in function to a list of unopened email
+   messages. </section>
+  <section id="ah922029">
+   <title>Understanding Queue Types<ph>
+     <indexterm>queue types </indexterm>
+    </ph></title>
+  </section>
+  <section>Processes are executed by workers, who generally retrieve them from queues. Queue types
+   include:</section>
+  <ul>
+   <li>Aging Queue: Holds processes that must be aged for a specified time period before continuing
+    execution, such as a process that must wait for results of lab work.</li>
+   <li>Archival Queue: Stores unused or completed processes.</li>
+   <li>Inbox Queues: Several of the queues displayed in <xref href="#topic3/ah922012" type="fig"
+     format="dita"/> are inbox queues used in the simulation example. They include C&amp;P Eye,
+    GME, Eye Care and PCP. In some cases, processes will be held in the inbox queue until a user
+    selects them for action. In other cases, the inbox may be associated with workers that
+    automatically select and execute processes based on criterion such as priority and
+    deadline.</li>
+   <li>Compute Queue: Holds processes awaiting execution based on their priority and deadline.
+    Processes placed on the compute queue must not require human interaction for task
+    completion.</li>
+   <li>Launcher Queue: A queue from which processes can be started or launched.</li>
+   <li>Outbox Queue: Holds processes for delivery to another location by unspecified means, usually
+    via media or some network Sync Queue: Holds processes that must wait for another process to
+    complete before it runs. For example, if a patient must see the doctor, the process cannot be
+    executed before the nurse and diabetic educator see the patient. The processes must sync up to
+    ensure the proper sequence of events.ethod such as SMTP or FTP.</li>
+  </ul>
+  <section id="ah922070">
+   <title>Queue Reading Area</title>
+  </section>
+  <section>The area on the right, the Queue Reading Area, (which is initially empty when IHTSDO
+   Workbench IDE is loaded) provides a space for you to “read” the processes stored in a
+   queue</section>
+  <section>To better understand this functionality, click on the Launcher Queue to open the Queue
+   list, as shown in <xref href="#topic3/ah922012" type="fig" format="dita"/>.</section>
+  <section id="ah922088">
+   <title>Process Diagram Viewing Area</title>
+  </section>
+  <section>The Process Diagram Viewing Area provides a way to display the process diagram associated
+   with a process selected from the Queue Reading Area. See <xref href="queues_view_process.dita#topic5/ah922138" type="fig"
+    format="dita"/>.</section>
+ </body>
+</topic>
+

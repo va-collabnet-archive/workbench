@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+
+
+<topic id="topic4" xml:lang="en">
+<title>Exercise - Creating a Business Process </title>
+<body>
+<section>This exercise will help to illustrate process builder concepts by guiding
+you through the steps of creating a simple process, starting from the
+Process Builder window.</section>
+<section>From the Process Builder window, click on the Process Builder
+icon imme­diately above the task directory. The process diagram panel
+will be pre-loaded with two tasks: “Change Instance ID” and “Set
+Deadline”.</section>
+<section>The “Set Deadline” task represents a deadline and priority
+in a queue by using time increments. Processes are executed in priority
+and deadline order, similar in concept to the date received and priority
+stamps on an email message. The deadline and priority are meaningless
+until the process is sent to a queue.</section>
+<section>Click on the <i>misc tasks</i> directory in the task directory
+list.</section>
+<section>In the task list, click and drag the “Show Dialog” task
+into the Process Dia­gram panel, as shown in <xref
+ href="#topic4/ai935320" type="fig" format="dita"></xref>.</section>
+<section id="ai935309">
+<title>Repositioning a Task Box in the Process Diagram</title>
+</section>
+<section>To reposition a task box in the process diagram, hold down the Shift key
+while you drag the box to its new position.</section>
+<fig id="ai935320">
+<title>Adding the Show Dialog task to the process</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_9.jpg"
+placement="break" width="251" height="264" />
+</fig>
+<section>The Show Dialog task box includes a message area. Type “Hello
+World” in the message area.</section>
+<section id="ai935331">
+<title>Linking Tasks in the Process Diagram</title>
+</section>
+<section>Note that each task box displays an ID number, as in “id: 0” in the
+Change ID task box. This number controls the order in which tasks in
+the process will be executed. Processes must always start with ‘id:
+0” in the first task box.</section>
+<section>To link the Show Dialog task to the process, click on the “Show
+Dialog” heading in the task box, then drag and drop it on the zero
+(0) in the Continue box in the Set Deadline task box. The process diagram
+should look like <xref
+ href="#topic4/ai935349" type="fig" format="dita"></xref>.</section>
+<fig id="ai935349">
+<title>Show Dialog task linked to process</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_10.jpg"
+placement="break" width="118" height="249" />
+</fig>
+<section>Note that the “Id” numbers of the tasks are now in consecutive
+order from zero to two and the blue arrow is connecting the “Set Deadline”
+task to the “Show Dialog” task.</section>
+<section id="ai935360">
+<title>Testing the Process</title>
+</section>
+<section>To test the “Hello World” process you just built, click the Execute
+button in the lower right corner of the window. Your screen should look
+like the one shown in <xref
+ href="#topic4/ai935375" type="fig" format="dita"></xref>.</section>
+<fig id="ai935375">
+<title>Testing the “Hello World” Process</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_11.jpg"
+placement="break" width="281" height="243" />
+</fig>
+<section id="ai935381">
+<title>Adding a Task to the Process</title>
+</section>
+<section>When you execute the “Hello World” process, and then click OK when
+the “Hello World” message displays, you may notice a message in red
+type at the bottom of the window after the “Process Complete” message
+in blue type. This message indicates that the “Show Dialog” task
+did not have a branch, or another task, following it.</section>
+<section>To complete the process, click on the flow directory and click
+and drag the “Process Complete” task to the process diagram panel,
+as shown in <xref
+ href="#topic4/ai935399" type="fig" format="dita"></xref></section>
+<fig id="ai935399">
+<title>Adding the Process Complete task</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_12.jpg"
+placement="break" width="103" height="250" />
+</fig>
+<section>Connect the “Process Complete” task to the “Show Dialog”
+task by clicking and dragging the red Process Complete heading in the
+task box to the zero (0) in the “Continue” box in the “Show Dialog”
+task. The process diagram should now look like the one shown in <xref
+ href="#topic4/ai935413" type="fig" format="dita"></xref>.</section>
+<fig id="ai935413">
+<title>Process Complete task linked to process</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_13.jpg"
+placement="break" width="101" height="250" />
+</fig>
+<section>Click the Execute button to run the process and click OK when
+the “Hello World” message displays. Note that the message at the
+bottom of the win­dow displays only “Process Complete” without any
+conditional informa­tion.</section>
+</body>
+</topic>
+
+
+</dita>

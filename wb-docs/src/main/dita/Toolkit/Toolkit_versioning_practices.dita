@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic4" xml:lang="en">
+ <title>IDE Version Control Best Practices</title>
+ <prolog>
+  <metadata>
+   <keywords><indexterm>version control </indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The IHTSDO Workbench IDE Framework is specifically designed to enable projects to
+   implement industry best practices for version control within a smart client application. It aims
+   to follow in the footsteps of software IDEs—such as Eclipse—that also enable projects to
+   implement these industry best practices. </section>
+  <section>The IHTSDO Workbench IDEs are where clinical terminologists edit terminology, create
+   mapping between terminology systems, translate descriptions, generate reference sets, classify
+   the descriptions logic, and visualize, test, and debug what they or others have built. </section>
+  <section>The IHTSDO Workbench IDEs correspond to the notion of configuration managed workspaces or
+   “sandboxes.” The IDEs allow the clinical terminologist to check out version-controlled components
+   from a central repository (Subversion), and then record all the changes to those components with
+   the intent of subsequently checking those changes back into the central repository.</section>
+  <section>The best practices for managing these IDE workspaces include (Wingerd &amp;
+   Seiwald):</section>
+  <ul>
+   <li>Don't share workspaces. A workspace should have a single purpose, such as an edit/build/test
+    area for a single clinical terminologist, or a build/test/release area for a product release.
+    Sharing workspaces confuses people, just as sharing a desk does. Furthermore, sharing workspaces
+    compromises the systems ability to track activity by user or task.</li>
+   <li>Don't work outside of managed workspaces. Each instance of an IHTSDO Workbench IDE is a
+    loosely coupled managed workspace. Each IDE will generate change sets for all activity by
+    default. These change sets can be coordinated in a transport independent and ad-hoc manner, or
+    can be pre-coordinated on a project basis through use of managed accounts on a Subversion
+    server. This flexibility allows for spontaneous collaboration without imposing a rigid structure
+    on activities where such structure is not necessary or appropriate, while also allowing for
+    strict project control when a more structured approach is desired.</li>
+   <li>Don't use jello views. Data in the IDE workspace does not change unless the clinical
+    terminologist explicitly causes the change. A "jello view" is a workspace where data changes are
+    caused by external events beyond the terminologist’s control. A typical example of a jello view
+    is a workspace built upon a shared database where many users concurrently edit the same content.
+    Jello views are a source of chaos in development. IHTSDO Workbench IDEs give the terminologists
+    control over when their data changes.</li>
+   <li>Stay in sync with the baseline. The quality of a terminologists work depends on how well it
+    meshes with other peoples' work. As changes are checked into the baseline, terminologists should
+    update their workspace and integrate those changes. The IHTSDO Workbench IDE makes this
+    workspace update operation straightforward and unencumbered with tricky or time-consuming
+    procedures. Business processes that are configured by the IHTSDO Workbench IDE developer
+    coordinate this update process.</li>
+   <li>Check in often. Integrating development work requires terminologists to check in their
+    changes as soon as they are ready. The IHTSDO Workbench IDE allows configuration of startup
+    processes, shutdown processes, and on demand processes, that encourage frequent check-ins.</li>
+  </ul>
+ </body>
+</topic>

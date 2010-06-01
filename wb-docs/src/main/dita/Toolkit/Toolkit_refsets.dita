@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="topic14" xml:lang="en">
+    <title>Reference Sets</title>
+
+    <prolog>
+      <metadata>
+        <keywords>
+          <indexterm>reference sets</indexterm>
+
+          <indexterm>refsets</indexterm>
+        </keywords>
+      </metadata>
+    </prolog>
+
+    <body>
+      <section>The IHTSDO Toolkit provides a generic and extensible model for
+      representing reference sets. The model is based on separating the Refset
+      data structure from the Refset purpose. Currently supported Refset types
+      include:</section>
+
+      <table id="ad1002200">
+        <tgroup cols="2">
+          <colspec colname="col1" colnum="1" colwidth="153*"/>
+
+          <colspec colname="col2" colnum="2" colwidth="162*"/>
+
+          <tbody>
+            <row>
+              <entry colname="col1">Membership</entry>
+
+              <entry colname="col2">Boolean</entry>
+            </row>
+
+            <row>
+              <entry colname="col1">Integer</entry>
+
+              <entry colname="col2">Concept</entry>
+            </row>
+
+            <row>
+              <entry colname="col1">String</entry>
+
+              <entry colname="col2">Concept-Integer</entry>
+            </row>
+
+            <row>
+              <entry colname="col1">Concept-Float</entry>
+
+              <entry colname="col2">Language</entry>
+            </row>
+
+            <row>
+              <entry colname="col1">Scoped Language</entry>
+
+              <entry colname="col2"/>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <section id="ad1002315"><title>Membership reference
+      set</title></section>
+
+      <section>A membership reference set is the base or super type of
+      reference set. This type of reference set purely defines membership,
+      i.e., it can only collect members and, unlike other derived formats,
+      cannot attach additional values.</section>
+
+      <section>A membership reference set could be used to define a “formulary
+      reference set”. Membership in this reference set defines that a
+      medication is part of the particular formulary.</section>
+
+      <section id="ad1002351"><title>Concept reference set</title></section>
+
+      <section>The concept reference set extends the membership reference set
+      by adding a concept value to the membership. This allows content
+      developers to effectively add a concept value column to any component
+      within the constraint of a reference set without having to alter the
+      primary files.</section>
+
+      <section>A “medications schedule” concept reference set could indicate
+      the sales restrictions on each medication. For each medication, this
+      reference set could indicate a concept value indicating whether it is
+      “unrestricted sale”, “pharmacy only”, “pharmacy restricted”,
+      “prescription only” or “prescription only - controlled
+      substance”.</section>
+
+      <section id="ad1002387"><title>Concept-integer reference
+      set</title></section>
+
+      <section>The concept-integer reference set extends the membership
+      reference set by adding a concept and integer value tuple to the
+      membership. This allows content developers to effectively add concept
+      and integer value columns as a bound pair to any component within the
+      constraint of a reference set, without having to alter the primary
+      files.</section>
+
+      <section>A "drug/disease interaction" reference set could use a concept
+      integer reference set to link medications (e.g. beta-blockers) with
+      diseases they might exacerbate (e.g. reactive airway disease), and use
+      an integer value to indicate the severity of the interaction.</section>
+
+      <section id="ad1002423"><title>Concept-float reference
+      set</title></section>
+
+      <section>The concept-float reference set extends the membership
+      reference set by adding a concept and float value tuple to the
+      membership. This allows content developers to effectively add concept
+      and float value columns as a bound pair to any component within the
+      constraint of a reference set without having to alter the primary
+      files.</section>
+
+      <section>An “adult male reference normal” reference set could link a
+      laboratory test result with a floating point number representing the
+      average value, and a concept that represents the units of measure of the
+      value.</section>
+
+      <section id="ad1002459"><title>Integer reference set</title></section>
+
+      <section>The integer reference set extends the membership reference set
+      by adding an integer value to the membership. This allows content
+      developers to effectively add an integer value column to any component
+      within the constraint of a reference set without having to alter the
+      primary files.</section>
+
+      <section>A "relationship order" integer reference set could be used to
+      provide alternative ordering for displaying relationships in a
+      hierarchical viewer for a selected concept(s) and its
+      descendants.</section>
+
+      <section id="ad1002531"><title>Boolean reference set</title></section>
+
+      <section>The Boolean reference set extends the membership reference set
+      by adding a Boolean value to the membership. This allows content
+      developers to effectively add a Boolean value column to any component
+      within the constraint of a reference set without having to alter the
+      primary files.</section>
+
+      <section>A “drug availability reference set” indicating whether a drug
+      is available nationally could be a Boolean reference set. A Boolean
+      value of true would indicate that the drug is available, false that the
+      drug is not available, and drugs not included in the reference set would
+      have an unstated availability.</section>
+
+      <section id="ad1002567"><title>String reference set</title></section>
+
+      <section>The String reference set extends the membership reference set
+      by adding a string value to the membership. This allows content
+      developers to effectively add a String value column to any component
+      within the constraint of a reference set without having to alter the
+      primary files.</section>
+
+      <section>A String reference set could be used to annotate components
+      with comments during a quality assurance or distributed development
+      activity.</section>
+
+      <section id="ad1002603"><title>Specification Reference
+      Sets</title></section>
+
+      <section>One use of the Concept Refset is to use it as a “specification”
+      for the generation of another. One advantage of this approach is that
+      the specification of the reference set is strictly versioned using the
+      same methods as the rest of the terminology and metadata content.
+      Another advantage of using a specification is that it is easy to compute
+      potential changes between one version of the terminology and the
+      next.</section>
+
+      <section>Two methodologies have been incorporated into the IHTSDO
+      Workbench for building specification reference sets. The first ( type 1)
+      uses include/exclude concepts to tag concepts belonging to, or
+      explicitly excluded from the target reference set. A more recent and
+      more powerful methodology (type 2) uses a comprehensive query expression
+      grammer to build specification refsets.</section>
+
+      <section>Concept reference sets allow an icon to be associated with each
+      concept associated with the reference set. <xref format="dita"
+      href="#topic14/ad1002655" type="fig"/> shows the inclusion types for a
+      particular type of reference set specification (type 1) developed by the
+      Australian National E-Health Transition Authority.</section>
+
+      <fig id="ad1002655">
+        <title>Inclusion Types</title>
+
+        <image href="../images/Toolkit_Images/inclusion_types.jpg"
+               placement="break"/>
+      </fig>
+
+      <fig id="ad1002676">
+        <title>A Hierarchy with Refset Associations.</title>
+
+        <image href="../images/Toolkit_Images/hierarchy.jpg" placement="break"/>
+      </fig>
+
+      <section>When a reference set specification is created, the taxonomy can
+      display the viewer images of the reference set values associated with
+      each concept. In <xref format="dita" href="#topic14/ad1002676"
+      type="fig"/>, Fizzy drink is associated with a lineage include
+      instruction, Milky drink is associated with an exclude lineage
+      instruction, Cocoa drink is associated with an individual include
+      instruction, Milk shake drink is associated with a lineage include
+      instruction, Milky coffee is associated with an exclude individual
+      instruction, and Sports drink is associated with an exclude individual
+      instruction.</section>
+
+      <section><title>Type 2 Specification Reference Sets</title><p>In this
+      methodology for specifying reference sets, a comprehensive expression
+      language is used to hold the specification, and the Workbench has
+      extensive support for constructing and assembling complex expressions,
+      such as that shown in <xref href="#topic14/specification_type2"/>.<fig
+          id="specification_type2">
+          <title>Refset speciciation editing capability</title>
+
+          <image href="../images/Refsets_Images/specification_type2.jpg"/>
+        </fig></p><p>The above specification expression is designed to create
+      a refset that includes all the concepts from SNOMED, below and including
+      the concept Pneumonia, but excluding 4 explicitly cited concepts.
+      Further details on constructing, editing and viewing refsets using this
+      methodology are available in <xref
+      href="../RefSets/RefSets_intro.dita"/>.</p></section>
+    </body>
+  </topic>
+</dita>

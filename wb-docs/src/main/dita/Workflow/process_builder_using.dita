@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+ <topic id="topic3" xml:lang="en">
+  <title>Using the Process Builder</title>
+  <body>
+   <section>The Process Builder provides a powerful graphical mechanism to constuct workflow process
+    templates that can support and enact an organisation's business processes. A sample business
+    process is illustrated in <xref href="#topic3/ai957968" format="dita"/>. Once con­structed, a
+    business process can be saved, loaded, reedited, and executed as and when required. Each
+    business process is built up from a set of intercon­nected tasks. The tasks must already exist
+    in the IHTSDO Workbench IDE bundle. Each task performs a unit of work. Each task in the standard
+    task library is described in detail in Chapter <xref href="processes_intro.dita#topic1"
+     type="topic" format="dita"/></section>
+   <fig id="ai957968">
+    <title>Sample Process Builder</title>
+    <image href="../images/Creating_Processes_Images/creating_processes_img_6.jpg" placement="break"
+     width="501" height="261"/>
+   </fig>
+   <section>A <ph>business process</ph> can invoke another <ph>business process</ph>. In this sense,
+    the second business process is often referred to as a <i>subprocess</i>. Subprocesses just
+    appear as tasks in the Process Builder. They are differentiated by hav­ing their name
+    underlined, and the word <i>process</i> appearing next to the task Id in the task block in the
+    process layout pane.</section>
+   <section>Each <ph>task</ph> is implemented by a piece of java code, either written generically
+    for the Editor, or written by a software developer/analyst to meet specific local requirements.
+    Each <ph>task </ph>is usually implemented by a single java class file (together with a
+    corresponding BeanInfo class file). Each <ph>business pro­cess</ph> is merely a collection of
+    tasks supplemented with some metadata and flow data. There is no corresponding executable code
+    required to be written to support the business process independent of its constituent tasks.
+    Thus the core of much of the functionality required is contained in the special java files that
+    consititute the task library(ies), and hence the importance of <xref
+     href="processes_intro.dita#topic1" type="topic" format="dita"/>
+   </section>
+   <fig id="ai957982">
+    <title>Subprocess - showing process as task</title>
+    <image href="../images/Creating_Processes_Images/creating_processes_img_7.jpg" placement="break"
+     width="426" height="416"/>
+   </fig>
+   <section>The set of (some 200+) tasks available for constructing a business process or workflow
+    is organised by folder and displayed in the task navigator on the left of the Process Builder.
+    The top level categories of tasks are:</section>
+   <ul>
+    <li>IHTSDO Workbench- basic editor functions, including gui and concept related tasks.</li>
+    <li>log - tasks to log actions undertaken in an editin session</li>
+    <li>sim - simulation tasks</li>
+    <li>web - tasks to interact with web sites</li>
+    <li>grid - tasks to support synchronous multiuser activities</li>
+    <li>queue - tasks to manage instances of business processes and execution queues</li>
+    <li>deadline - timer tasks to ensure processes complete</li>
+    <li>flow tasks - tasks associated with process flow, including branching, completing and
+     aborting process instances.</li>
+    <li>processes - task associated with managing process instances, including launching,
+     getting/setting properties, etc.</li>
+    <li>processes - collection of prebuilt business processes that can be used as provided, or as
+     subprocess tasks in large process.</li>
+   </ul>
+   <section>Note that there appear to be two folders labelled “processes”. The first of these
+    contains tasks for controlling a process, such as loading or launching a process, or
+    setting/copying a process property. The second “processes” folder contains potential
+    subprocesses - tasks which are themselves whole processes. Any process that is saved via the <i
+     >save process</i> button is available, by default, under this folder. These special process
+    tasks appear in the Pro­cess Builder with their names underlined as shown in <xref
+     href="#topic3/ai958004" type="fig" format="dita"/>.</section>
+   <fig id="ai958004">
+    <title>Joining tasks to form a process</title>
+    <image href="../images/Creating_Processes_Images/creating_processes_img_8.jpg" placement="break"
+     width="451" height="442"/>
+   </fig>
+   <section>Building a new business process involves selecting one of the tasks for the new process
+    from the task navigator and dragging and dropping it onto the Process Diagram canvas. This is
+    repeated for each of the component tasks. Each task will be given a task Id, unique within the
+    business process. If the same task is required twice within the same business process, then each
+    use will be given a unique Id. The task Ids are assigned during the process flow definition
+    phase, which involves chaining the tasks together to form a com­plete workflow. This is done
+    task pair by task pair, using the mouse by link­ing a pair's downstream task's <i>title </i>to
+    the <i>continue ID</i> slot in the upstream task. This then populates the upstream Continue Id
+    with the Id of the down­stream task, as show in <xref href="#topic3/ai958004" type="fig"
+     format="dita"/>.</section>
+   <section>When creating a new process, the Process Builder automatically places the two tasks <ph
+     >Change Instance Id</ph> and <ph>Set Deadline</ph> onto the process diagram pane. Additional
+    tasks are selected from the task catalogue and dragged onto the diagram pane. They can be
+    positioned by mouse (+Shift key) or arrow keys. </section>
+   <section>The completed Business Process can then be tested with the Execute button, and saved on
+    the filesystem as a .bp file (serialised javabean), for later resuse. </section>
+  </body>
+ </topic>
+</dita>
