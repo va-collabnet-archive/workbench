@@ -187,7 +187,9 @@
                 <clean.temp>yes</clean.temp>
         -->
               </antProperties>
+<!-- Should not be needed, as only XEP needs the extra memory
               <antOpts>-Xmx1600m -Xms1100</antOpts>
+-->
             </configuration>
           </execution>
         </executions>
