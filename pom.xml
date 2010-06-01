@@ -32,15 +32,15 @@
 				<version>1.15-SNAPSHOT</version>
 			</dependency>
 			<dependency>
+			  <groupId>${project.groupId}</groupId>
+			  <artifactId>documentation</artifactId>
+			  <version>${project.version}</version>
+			  <type>zip</type>
+			</dependency>
+			<dependency>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-bdb</artifactId>
 				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.nhs.uktc</groupId>
-				<artifactId>nhs-subset-editor-doc</artifactId>
-				<scope>runtime-directory</scope>
-				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.ihtsdo</groupId>
