@@ -353,7 +353,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
             // SETUP CONCEPT NID ARRAY
             final int reserved = 2;
-            int margin = cEditSnoCons.size() >> 2; // Add 25%
+            int margin = cEditSnoCons.size() >> 2; // Add 50%
             int[] cNidArray = new int[cEditSnoCons.size() + margin + reserved];
             cNidArray[IFactory_123.TOP_CONCEPT] = IFactory_123.TOP;
             cNidArray[IFactory_123.BOTTOM_CONCEPT] = IFactory_123.BOTTOM;
@@ -391,8 +391,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // SETUP CLASSIFIER
             Snorocket_123 rocket_123 = new Snorocket_123(cNidArray, nextCIdx,
                     rNidArray, nextRIdx, rootNid);
-            // SET ISA
+            
+            // SnomedMetadata :: ISA
             rocket_123.setIsaNid(isaNid);
+            
+            // SnomedMetadata :: ROLE_ROOTS 
             rocket_123.setRoleRoot(isaNid, true); // @@@
             rocket_123.setRoleRoot(rootRoleNid, false);
 
@@ -418,7 +421,30 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 }
             }
 
-            // 
+            /* ****************
+            // SnomedMetadata :: RIGHT_IDENTITIES
+            // direct-substance o has-active-ingredient -> direct-substance
+            // SNOMED IDs {"363701004", "127489000"}
+            
+			// SnomedId "363701004" // direct-substance
+			// 49ee3912-abb7-325c-88ba-a98824b4c47d
+			int nidDirectSubstance = tf.getId(
+					UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
+					.getNid();
+
+			// SnomedId "127489000" // has-active-ingredient
+			// 65bf3b7f-c854-36b5-81c3-4915461020a8
+			int nidHasActiveIngredient = tf.getId(
+					UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
+					.getNid();
+			
+			int lhsData[] = new int[2];
+			lhsData[0] = nidDirectSubstance;
+			lhsData[1] = nidHasActiveIngredient;
+            rocket_123.addRoleComposition(lhsData, nidDirectSubstance);
+            *****************/
+            
+            // ROLE_COMPOSITION List
             ArrayList<SnoDL> dll = SnoDLSet.getDLList();
             if (dll != null) {
                 for (SnoDL sdl : dll) {
@@ -427,7 +453,25 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 }
                 logger.info("\r\n::: [SnorocketTask] Logic Added");
             }
-            // 
+            
+            /* ****************
+            // SnomedMetadata :: NEVER_GROUPED
+            // SnomedId "123005000" // part-of
+            // b4c3f6f9-6937-30fd-8412-d0c77f8a7f73
+            UUID ngUUid = UUID.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73");
+            rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid());
+            // SnomedId "272741003" // laterality
+            ngUUid = UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b");
+            rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid());
+            // SnomedId "127489000" // has-active-ingredient
+            ngUUid = UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8");
+            rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid());
+            // SnomedId "411116001" // has-dose-form
+            ngUUid = UUID.fromString("072e7737-e22e-36b5-89d2-4815f0529c63");
+            rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid());
+            *****************/
+
+            // NEVER_GROUPED List
             ArrayList<SnoConSer> ngl = SnoDLSet.getNeverGroup();
             if (ngl != null) {
                 for (SnoConSer scs : ngl)
@@ -594,6 +638,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 rocket_123 = null; // :MEMORY:
                 return Condition.CONTINUE;
             }
+            System.gc();
 
             if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);                
@@ -1928,18 +1973,21 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     }
                     
                     if (sr.c2Id == Integer.MAX_VALUE) {
-                        sb.append("_INTMAX\r\n");
+                        sb.append("_INTMAX\t");
                     } else {
                         try {
                             I_GetConceptData c2 = tf.getConcept(sr.c2Id);
                             if (c2.getUids().iterator().hasNext()) 
-                                sb.append(c2.getUids().iterator().next()+"\r\n"); 
+                                sb.append(c2.getUids().iterator().next()+"\t"); 
                             else 
-                                sb.append(sr.c2Id + "_INTNoNext\r\n");
+                                sb.append(sr.c2Id + "_INTNoNext\t");
                         } catch (Exception e) {
-                            sb.append(sr.c2Id + "_INTExcept\r\n");
+                            sb.append(sr.c2Id + "_INTExcept\t");
                         }
                     }
+ 
+                    sb.append(sr.group);                   
+                    sb.append("\r\n");
                     
                     bw.write(sb.toString());
                 }
