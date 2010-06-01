@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ns="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <artifactId>wb-mmb</artifactId>
-
     <groupId>org.ihtsdo</groupId>
-
     <version>2.5.1-trek-inf-1-SNAPSHOT</version>
   </parent>
 
@@ -23,76 +17,44 @@
 
   <packaging>pom</packaging>
 
-  <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/dita-maven-plugin/src/it/dita-to-pdf</connection>
-
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/dita-maven-plugin/src/it/dita-to-pdf</developerConnection>
-
-    <url>http://svn.codehaus.org/mojo/trunk/mojo/dita-maven-plugin/src/it/dita-to-pdf</url>
-  </scm>
-
   <properties>
-    <oxygen-basedir>/Applications/eclipse/plugins/com.oxygenxml.editor_10.3.0</oxygen-basedir>
-
-    <dita-ot-basedir>/Users/ericbrowne/software/DITA/DITA-OT1.5.1</dita-ot-basedir>
-
-    <guidebook-dita-basedir>${basedir}/src/main/dita</guidebook-dita-basedir>
-
-    <xep-dir>/Users/ericbrowne/software/XEP</xep-dir>
-
-    <book-dir>Guidebook</book-dir>
-
-    <output-dir>"pdf"</output-dir>
-
-    <pdf-formatter>"xep"</pdf-formatter>
-
-    <ditamap-filename>Workbench_GuideBook.ditamap</ditamap-filename>
-
-    <out-dir-full>${doc-target-dir}/${output-dir}</out-dir-full>
-
-    <customization.dir>${basedir}/src/main/fo/cfg</customization.dir>
+    <dita.dir>${project.build.directory}/dependency/DITA-OT1.5.1</dita.dir>
+    <!-- User must specify this
+    <xep.dir>...</xep.dir>
+     -->
   </properties>
 
   <dependencies>
+<!--  TODO: used with XEP? -->
     <dependency>
       <groupId>net.sourceforge.saxon</groupId>
-
       <artifactId>saxon</artifactId>
-
       <version>9.1.0.8</version>
-
       <optional>true</optional>
     </dependency>
 
+<!--  TODO: used with XEP? -->
     <dependency>
       <groupId>net.sourceforge.saxon</groupId>
-
       <artifactId>saxon</artifactId>
-
       <classifier>dom</classifier>
-
       <version>9.1.0.8</version>
-
       <optional>true</optional>
     </dependency>
 
+<!--  TODO: used with XEP? -->
     <dependency>
       <groupId>com.ibm.icu</groupId>
-
       <artifactId>icu4j</artifactId>
-
       <version>3.4.4</version>
-
       <optional>true</optional>
     </dependency>
 
+<!--  TODO: used with XEP? -->
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
-
       <artifactId>fop</artifactId>
-
       <version>0.95-1</version>
-
       <optional>true</optional>
     </dependency>
 
@@ -101,13 +63,55 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dita-ot</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>net.sf.dita-ot</groupId>
+                  <artifactId>dita-ot-minimal</artifactId>
+                  <version>1.5.1-M6</version>
+                  <type>tar.gz</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-property</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireProperty>
+                  <property>xep.dir</property>
+                  <message>Please ensure that the xep.dir is specified in your settings.xml</message>
+                </requireProperty>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    
       <!--  load ${timestamp} -->
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
-
         <artifactId>buildnumber-maven-plugin</artifactId>
-
         <version>1.0-beta-2</version>
 
         <executions>
@@ -129,11 +133,9 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-
         <artifactId>maven-resources-plugin</artifactId>
 
-        <version>2.4.1</version>
-
+		<!--  TODO: simplify -->
         <executions>
           <execution>
             <id>make-doc-date</id>
@@ -161,52 +163,32 @@
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
-
         <artifactId>dita-maven-plugin</artifactId>
-
         <version>1.0-beta-2</version>
-
         <executions>
           <execution>
             <id>dita2pdf</id>
-
-            <phase>package</phase>
-
+            <phase>process-resources</phase>
             <goals>
               <goal>run</goal>
             </goals>
-
             <configuration>
+            <!--  TODO: unpackt ant.jar into right location instead -->
               <useDitaAnt>false</useDitaAnt>
-
-              <antArguments />
-
               <antProperties>
                 <transtype>pdf2</transtype>
-
-                <dita.dir>/Users/ericbrowne/software/DITA/DITA-OT1.5.1</dita.dir>
-
-                <args.input>/Users/ericbrowne/montage/clients/InformaticsInc/ACE/SVN_synch/wb-mmb_trek_info/wb-docs/src/main/dita/Guidebook/Workbench_Guidebook.ditamap</args.input>
-
+                <dita.dir>${dita.dir}</dita.dir>
+                <args.input>src/main/dita/Guidebook/Workbench_Guidebook.ditamap</args.input>
                 <dita.extname>dita</dita.extname>
-
-                <xep.dir>${xep-dir}</xep.dir>
-
-                <!--                <output.dir>{project.build.directory}/${output-dir} </output.dir>
--->
-
-                <output-dir>pdf</output-dir>
-
-                <!--                <pdf.formatter>{pdf-formatter}</pdf.formatter>
--->
-
+                <output.dir>${project.build.directory}/pdf</output.dir>
+                <xep.dir>${xep.dir}</xep.dir>
                 <pdf.formatter>xep</pdf.formatter>
 
-                <!--                <customization.dir>${customization.dir}</customization.dir>
+                <!--                
+                <customization.dir>${customization.dir}</customization.dir>
                 <clean.temp>yes</clean.temp>
--->
+				-->
               </antProperties>
-
               <antOpts>-Xmx1600m -Xms1100</antOpts>
             </configuration>
           </execution>
