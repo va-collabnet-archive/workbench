@@ -2286,7 +2286,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
     private int compareRelationship(SctXRelRecord c1, SctXRelRecord c2) {
         if (c1.uuidMostSigBits == c2.uuidMostSigBits && c1.uuidLeastSigBits == c2.uuidLeastSigBits) {
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
-                    && (c1.refinability == c2.refinability))
+                    && (c1.refinability == c2.refinability) && (c1.group == c2.group))
                 return 1; // SAME
             else
                 return 2; // MODIFIED
@@ -2455,6 +2455,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             a[relationships] = new SctXRelRecord(relID, status, conceptOneID,
                     relationshipTypeConceptID, conceptTwoID, characteristic, refinability, group);
             relationships++;
+            
+            // :!!!:zzz:
+			if (conceptOneID == 6567006)
+				System.out.println(":::\t" + conceptOneID + "\t" + group + "\t"
+						+ conceptTwoID + "\t" + relationshipTypeConceptID + "\t"
+						+ fName);
 
             // CR
             tokenType = st.nextToken();

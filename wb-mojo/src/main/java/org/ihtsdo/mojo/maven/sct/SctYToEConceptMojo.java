@@ -4356,7 +4356,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     private int compareRelationship(SctYRelRecord c1, SctYRelRecord c2) {
         if (c1.relUuidMsb == c2.relUuidMsb && c1.relUuidLsb == c2.relUuidLsb) {
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
-                    && (c1.refinability == c2.refinability))
+                    && (c1.refinability == c2.refinability) && (c1.group == c2.group))
                 return 1; // SAME
             else
                 return 2; // MODIFIED
