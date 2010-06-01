@@ -23,13 +23,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dwfa</groupId>
     <artifactId>core</artifactId>
-    <version>2.0.19.1</version>
+    <version>2.0.19.2</version>
     <packaging>jar</packaging>
     <name>Core Distributed Workflow Architecture Components</name>
     <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html</url>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/tags/nehta/core-2.0.19.1</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/tags/nehta/core-2.0.19.1</developerConnection>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/tags/nehta/core-2.0.19.2</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/core/tags/nehta/core-2.0.19.2</developerConnection>
         <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm/tags/core-2.0.19</url>
     </scm>
   <ciManagement>
@@ -71,6 +71,18 @@
             <groupId>org.dwfa.jini</groupId>
             <artifactId>browser</artifactId>
             <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
