@@ -1,10 +1,10 @@
 <assembly>
   <formats>
-    <format>tar.gz</format>
+    <format>zip</format>
   </formats>
   <fileSets>
     <fileSet>
-      <directory>src/main/dita</directory>
+      <directory>target/dita-src</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>
