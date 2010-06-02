@@ -82,9 +82,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
-            "<html>Possible: <br>" + this.toHtmlFragment(), true);
-        activity.setIndeterminate(true);
+        I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
         
         queryConstraint = (I_GetConceptData) queryConstraint;
@@ -92,12 +90,10 @@ public class ConceptStatement extends RefsetSpecStatement {
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
-        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case CONCEPT_IS:
             if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
                 possibleConcepts.setNotMember(queryConstraintConcept.getConceptId());
             } else {
@@ -105,10 +101,10 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_CHILD_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+
             if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts.removeAll(results);
             } else {
                 I_RepresentIdSet results = queryConstraintConcept.getPossibleChildOfConcepts(configFrame);
                 possibleConcepts.or(results);
@@ -116,16 +112,16 @@ public class ConceptStatement extends RefsetSpecStatement {
             break;
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
              if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts.removeAll(results);
             } else {
                 I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
                 possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
             Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
@@ -135,8 +131,6 @@ public class ConceptStatement extends RefsetSpecStatement {
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts = termFactory.getConceptIdSet();
-                // possibleConcepts.removeAll(refsetMemberSet);
             } else {
                 possibleConcepts.or(refsetMemberSet);
             }
@@ -145,7 +139,6 @@ public class ConceptStatement extends RefsetSpecStatement {
         case CONCEPT_STATUS_IS_CHILD_OF:
         case CONCEPT_STATUS_IS_DESCENDENT_OF:
         case CONCEPT_STATUS_IS_KIND_OF:
-            // possibleConcepts = termFactory.getConceptIdSet();
             possibleConcepts.or(parentPossibleConcepts);
             break;
         default:
@@ -153,14 +146,26 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
         
-        long endTime = System.currentTimeMillis();
-        long elapsed = endTime - startTime;
-        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
-            "; Outgoing count: " + possibleConcepts.cardinality());
-        activity.complete();
+        if (activity != null) {
+            long endTime = System.currentTimeMillis();
+            long elapsed = endTime - startTime;
+            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
+                "; Outgoing count: " + possibleConcepts.cardinality());
+            activity.complete();
+        }
         return possibleConcepts;
     }
+
+	private I_ShowActivity setupActivityPanel(I_ConfigAceFrame configFrame,
+			I_RepresentIdSet parentPossibleConcepts) {
+		I_ShowActivity activity;
+		activity = Terms.get().newActivityPanel(true, configFrame, 
+		        "<html>Possible: <br>" + this.toHtmlFragment(), true);
+		    activity.setIndeterminate(true);
+		    activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
+		return activity;
+	}
 
     @Override
     public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {
