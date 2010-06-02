@@ -831,7 +831,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         long startTime = System.currentTimeMillis();
         Collections.sort(snorelA);
         Collections.sort(snorelB);
-
+        
         // Typically, A is the Classifier Path (for previously inferred)
         // Typically, B is the SnoRocket Results Set (for newly inferred)
         Iterator<SnoRel> itA = snorelA.iterator();
@@ -1109,9 +1109,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleDropped.add(rel_A);
 
-        if (debug)
-            return;
-        
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
             if (rBean != null) {
@@ -1122,6 +1119,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     // CREATE RELATIONSHIP PART W/ TermFactory
                     rvList.get(0)
                             .makeAnalog(isRETIRED, writeToNid, versionTime);
+                    // :TODO: move addUncommittedNoChecks() to more efficient location.
+                    // more optimal to only call once per concept.
+                    I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
+                    tf.addUncommittedNoChecks(thisC1); 
 
                 } else if (rvList.size() == 0) {
                     logger
@@ -1149,11 +1150,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         + "tf.getRelationship(" + rel_A.relNid + ") == null");
             }
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+	}
 
     private void writeBackCurrent(SnoRel rel_B, int writeToNid, long versionTime)
             throws TerminologyException, IOException {
@@ -1162,15 +1162,17 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleAdded.add(rel_B);
 
-        if (debug)
-            return;
+        I_GetConceptData thisC1 = tf.getConcept(rel_B.c1Id);
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        tf.newRelationshipNoCheck(UUID.randomUUID(), tf.getConcept(rel_B.c1Id),
+        tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1,
                 rel_B.typeId, rel_B.c2Id, isCh_DEFINING_CHARACTERISTIC,
                 isOPTIONAL_REFINABILITY, isCURRENT, rel_B.group, writeToNid,
                 versionTime);
-
+        
+        // :TODO: move addUncommittedNoChecks() to more efficient location.
+        // more optimal to only call once per concept.
+        tf.addUncommittedNoChecks(thisC1); 
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {

@@ -381,7 +381,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             logger.info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
                     + pcEdit.getStats(startTime));
 
-            if (debug) {
+            if (debugDump) {
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpRoles();
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
@@ -496,7 +496,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
                 return Condition.CONTINUE;
             }
 
-            if (debug)
+            if (debugDump)
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
 
             // ** GUI: * GET CLASSIFIER EQUIVALENTS **
@@ -552,7 +552,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
             logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
                     + pcClass.getStats(startTime));
 
-            if (debug)
+            if (debugDump)
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
 
             // ** GUI: 4 -- done
@@ -962,9 +962,6 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleDropped.add(rel_A);
 
-        if (debug)
-            return;
-
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
             if (rBean != null) {
@@ -1015,8 +1012,6 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
         else
             SnoQuery.roleAdded.add(rel_B);
 
-        if (debug)
-            return;
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), tf.getConcept(rel_B.c1Id),
