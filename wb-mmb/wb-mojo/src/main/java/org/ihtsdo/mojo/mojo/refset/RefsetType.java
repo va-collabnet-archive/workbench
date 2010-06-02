@@ -46,129 +46,117 @@ import org.ihtsdo.mojo.mojo.refset.writers.StringRefsetHandler;
 
 enum RefsetType {
 
-	CONCEPT(Concept.CONCEPT_EXTENSION, ConceptRefsetHandler.class,
-			".concept.refset"),
+    CONCEPT(Concept.CONCEPT_EXTENSION, ConceptRefsetHandler.class, ".concept.refset"),
 
-	CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_EXTENSION,
-			ConceptConceptRefsetHandler.class, // TODO
-			".concept.concept.refset"), CONCEPT_CONCEPT_CONCEPT(
-			Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION,
-			ConceptConceptConceptRefsetHandler.class, // TODO
-			".concept.concept.concept.refset"), INTEGER(Concept.INT_EXTENSION,
-			IntegerRefsetHandler.class, ".integer.refset"),
+    CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_EXTENSION, ConceptConceptRefsetHandler.class, // TODO
+            ".concept.concept.refset"),
+    CONCEPT_CONCEPT_CONCEPT(Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION, ConceptConceptConceptRefsetHandler.class, // TODO
+            ".concept.concept.concept.refset"),
+    INTEGER(Concept.INT_EXTENSION, IntegerRefsetHandler.class, ".integer.refset"),
 
-	STRING(Concept.STRING_EXTENSION, StringRefsetHandler.class,
-			".string.refset"),
+    STRING(Concept.STRING_EXTENSION, StringRefsetHandler.class, ".string.refset"),
 
-	BOOLEAN(Concept.BOOLEAN_EXTENSION, BooleanRefsetHandler.class,
-			".boolean.refset"),
+    BOOLEAN(Concept.BOOLEAN_EXTENSION, BooleanRefsetHandler.class, ".boolean.refset"),
 
-	CONCEPT_INTEGER(Concept.CONCEPT_INT_EXTENSION,
-			ConceptIntegerRefsetHandler.class, ".concept.integer.refset"),
+    CONCEPT_INTEGER(Concept.CONCEPT_INT_EXTENSION, ConceptIntegerRefsetHandler.class, ".concept.integer.refset"),
 
-	CONCEPT_DOUBLE(Concept.MEASUREMENT_EXTENSION,
-			ConceptDoubleRefsetHandler.class, ".concept.double.refset");
+    CONCEPT_DOUBLE(Concept.MEASUREMENT_EXTENSION, ConceptDoubleRefsetHandler.class, ".concept.double.refset");
 
-	private Class<? extends MemberRefsetHandler> refsetWriterClass;
-	private MemberRefsetHandler refsetWriter = null;
-	private Concept auxiliaryConcept;
-	private String fileExtension = null;
+    private Class<? extends MemberRefsetHandler> refsetWriterClass;
+    private MemberRefsetHandler refsetWriter = null;
+    private Concept auxiliaryConcept;
+    private String fileExtension = null;
 
-	RefsetType(Concept auxiliaryConcept,
-			Class<? extends MemberRefsetHandler> refsetWriterClass,
-			String fileExtension) {
-		this.auxiliaryConcept = auxiliaryConcept;
-		this.refsetWriterClass = refsetWriterClass;
-		this.fileExtension = fileExtension;
-	}
+    RefsetType(Concept auxiliaryConcept, Class<? extends MemberRefsetHandler> refsetWriterClass, String fileExtension) {
+        this.auxiliaryConcept = auxiliaryConcept;
+        this.refsetWriterClass = refsetWriterClass;
+        this.fileExtension = fileExtension;
+    }
 
-	public static RefsetType findByExtension(I_ExtendByRefPart part) {
-		if (part instanceof I_ExtendByRefPartBoolean) {
-			return BOOLEAN;
-		} else if (part instanceof I_ExtendByRefPartCid) {
-			return CONCEPT;
-		} else if (part instanceof I_ExtendByRefPartCidCid) {
-			return CONCEPT_CONCEPT;
-		} else if (part instanceof I_ExtendByRefPartCidCidCid) {
-			return CONCEPT_CONCEPT_CONCEPT;
-		} else if (part instanceof I_ExtendByRefPartCidInt) {
-			return CONCEPT_INTEGER;
-		} else if (part instanceof I_ExtendByRefPartInt) {
-			return INTEGER;
-		} else if (part instanceof I_ExtendByRefPartStr) {
-			return STRING;
-		} else if (part instanceof I_ExtendByRefPartCidFloat) {
-			return CONCEPT_DOUBLE;
-		}
+    public static RefsetType findByExtension(I_ExtendByRefPart part) {
+        if (part instanceof I_ExtendByRefPartBoolean) {
+            return BOOLEAN;
+        } else if (part instanceof I_ExtendByRefPartCid) {
+            return CONCEPT;
+        } else if (part instanceof I_ExtendByRefPartCidCid) {
+            return CONCEPT_CONCEPT;
+        } else if (part instanceof I_ExtendByRefPartCidCidCid) {
+            return CONCEPT_CONCEPT_CONCEPT;
+        } else if (part instanceof I_ExtendByRefPartCidInt) {
+            return CONCEPT_INTEGER;
+        } else if (part instanceof I_ExtendByRefPartInt) {
+            return INTEGER;
+        } else if (part instanceof I_ExtendByRefPartStr) {
+            return STRING;
+        } else if (part instanceof I_ExtendByRefPartCidFloat) {
+            return CONCEPT_DOUBLE;
+        }
 
-		throw new EnumConstantNotPresentException(RefsetType.class,
-				"No refset type for the class " + part.getClass()
-						+ " exists. Full object is " + part);
-	}
+        throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for the class " + part.getClass()
+            + " exists. Full object is " + part);
+    }
 
-	/**
-	 * @param filename
-	 * @return The appropriate refset type based on the file name.
-	 * @throws EnumConstantNotPresentException
-	 *             where the filename cannot be matched
-	 */
-	public static RefsetType findByFilename(String filename) {
-		for (RefsetType t : RefsetType.values()) {
-			if (t.matches(filename)) {
-				return t;
-			}
-		}
-		throw new EnumConstantNotPresentException(RefsetType.class,
-				"No refset type for " + filename + " exists");
-	}
+    /**
+     * @param filename
+     * @return The appropriate refset type based on the file name.
+     * @throws EnumConstantNotPresentException
+     *             where the filename cannot be matched
+     */
+    public static RefsetType findByFilename(String filename) {
+        for (RefsetType t : RefsetType.values()) {
+            if (t.matches(filename)) {
+                return t;
+            }
+        }
+        throw new EnumConstantNotPresentException(RefsetType.class, "No refset type for " + filename + " exists");
+    }
 
-	private boolean matches(String filename) {
-		return (filename.toLowerCase().endsWith(this.fileExtension));
-	}
+    private boolean matches(String filename) {
+        return (filename.toLowerCase().endsWith(this.fileExtension));
+    }
 
-	public MemberRefsetHandler getRefsetHandler()
-			throws InstantiationException, IllegalAccessException {
-		if (refsetWriter == null) {
-			refsetWriter = refsetWriterClass.newInstance();
-		}
+    public MemberRefsetHandler getRefsetHandler() throws InstantiationException, IllegalAccessException {
+        if (refsetWriter == null) {
+            refsetWriter = refsetWriterClass.newInstance();
+        }
 
-		return refsetWriter;
-	}
+        return refsetWriter;
+    }
 
-	public Concept getAuxiliaryConcept() {
-		return this.auxiliaryConcept;
-	}
+    public Concept getAuxiliaryConcept() {
+        return this.auxiliaryConcept;
+    }
 
-	public String getFileExtension() {
-		return fileExtension;
-	}
+    public String getFileExtension() {
+        return fileExtension;
+    }
 
-	public static FilenameFilter getFileNameFilter() {
+    public static FilenameFilter getFileNameFilter() {
 
-		return new FilenameFilter() {
-			List<String> filenameExtensions;
+        return new FilenameFilter() {
+            List<String> filenameExtensions;
 
-			public boolean accept(File dir, String name) {
-				if (filenameExtensions == null) {
-					filenameExtensions = new ArrayList<String>();
-					for (RefsetType refsetType : RefsetType.values()) {
-						filenameExtensions.add(refsetType.getFileExtension());
-					}
-				}
+            public boolean accept(File dir, String name) {
+                if (filenameExtensions == null) {
+                    filenameExtensions = new ArrayList<String>();
+                    for (RefsetType refsetType : RefsetType.values()) {
+                        filenameExtensions.add(refsetType.getFileExtension());
+                    }
+                }
 
-				for (String extension : filenameExtensions) {
-					if (name.endsWith(extension)) {
-						return true;
-					}
-				}
-				return false;
-			}
+                for (String extension : filenameExtensions) {
+                    if (name.endsWith(extension)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
 
-		};
-	}
+        };
+    }
 
-	public static MemberRefsetHandler getHandlerForFile(
-			File file) throws InstantiationException, IllegalAccessException {
-		return findByFilename(file.getName()).getRefsetHandler();
-	}
+    public static MemberRefsetHandler getHandlerForFile(File file) throws InstantiationException,
+            IllegalAccessException {
+        return findByFilename(file.getName()).getRefsetHandler();
+    }
 }
