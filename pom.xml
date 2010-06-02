@@ -124,6 +124,7 @@
 		</pluginManagement>
 	</build>
 	<modules>
+		<module>documentation</module>        
 		<module>database</module>
 		<module>java-binding</module>
 		<module>profiles</module>
@@ -135,7 +136,6 @@
 			<modules>
 				<module>viewer</module>        
 				<module>editor-synchronized</module>        
-				<module>documentation</module>        
 				<module>content-distribution</module>        
 			</modules>	
 		</profile>
