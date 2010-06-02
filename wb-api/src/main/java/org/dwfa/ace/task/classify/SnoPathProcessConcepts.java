@@ -128,19 +128,15 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
             return;
         }
 
-        // status, position, addUncommitted, returnConflictResolvedLatestState
-        // List<Version> attribs = concept.getConceptAttributeTuples(statusSet,
-        // fromPathPos, false, true);
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, 
                 precedence, contradictionMgr);
 
-        if (attribs.size() == 1) {
+        if (attribs.size() == 1 || (attribs.size() == 0 && doNotCareIfHasSnomedIsa)) {
              List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
                     roleTypeSet, fromPathPos, 
                     precedence, contradictionMgr);
 
-            // ComponentList<Relationship> rels = concept.getSourceRels();
             boolean isaFound = false;
             if (doNotCareIfHasSnomedIsa)
                 isaFound = true;
