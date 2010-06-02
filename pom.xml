@@ -8,15 +8,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.5.1-trek-inf-1-SNAPSHOT</version>
+    <version>2.5.1-trek-1-SNAPSHOT</version>
     <name>Workbench Multimodule Build</name>
     <packaging>pom</packaging>
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_trek_inf</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_trek_inf</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_trek_inf</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</developerConnection>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek</url>
     </scm>
     <properties>
         <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
