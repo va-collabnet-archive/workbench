@@ -24,9 +24,9 @@ import org.dwfa.ace.task.classify.SnoRel;
 
 @SuppressWarnings("serial")
 public class DiffTableModel extends AbstractTableModel {
-    private String[] columnNames = { "<html>" + "<font face='Dialog' size='3' color='green'>Concept 1 - </font>"
-        + "<font face='Dialog' size='3' color='blue'>Role Type - </font>"
-        + "<font face='Dialog' size='3' color='green'>Concept 2" };
+    private String[] columnNames = { "<html>" + "<font face='Dialog' size='3' color='black'>Concept 1 - </font>"
+        + "<font face='Dialog' size='3' color='black'>Role Type - </font>"
+        + "<font face='Dialog' size='3' color='black'>Concept 2" };
 
     private Object[][] data;
     private ArrayList<SnoRel> srl;

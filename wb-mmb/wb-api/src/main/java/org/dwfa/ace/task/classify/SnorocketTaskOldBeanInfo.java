@@ -25,7 +25,7 @@ public class SnorocketTaskOldBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         String s = new String("<html><font color='#0087FF'>");
-        s = s.concat("<center>Classifer (Old)");
+        s = s.concat("<center>Classifier (Old)");
         BeanDescriptor bd = new BeanDescriptor(SnorocketTaskOld.class);
         bd.setDisplayName(s);
         return bd;

@@ -70,6 +70,7 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.AceTableRenderer;
 import org.dwfa.ace.task.classify.SnoConSer;
@@ -77,6 +78,7 @@ import org.dwfa.ace.task.classify.SnoDL;
 import org.dwfa.ace.task.classify.SnoDLSet;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.io.FileIO;
 
 /**
  * Classifier Description Logic Edit Panel
@@ -149,7 +151,38 @@ public class DLPanel extends JPanel {
 
         labelDL = new JLabel();
         labelKRSS = new JLabel();
+        try {
+			if (AceConfig.config.getProperty("dlogic") != null) {
+				readDlFile(new File((String) AceConfig.config.getProperty("dlogic")));
+			}
+		} catch (FileNotFoundException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ClassNotFoundException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
     }
+
+	@SuppressWarnings("unchecked")
+	private void readDlFile(File theFile) throws IOException,
+			FileNotFoundException, ClassNotFoundException {
+		AceConfig.config.setProperty("dlogic", FileIO
+				.getNormalizedRelativePath(theFile));
+		FileInputStream fis = new FileInputStream(theFile);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		ObjectInputStream ois = new ObjectInputStream(bis);
+		ArrayList<SnoDL> dll = (ArrayList<SnoDL>) (ois.readObject());
+		ArrayList<SnoConSer> ng = (ArrayList<SnoConSer>) (ois.readObject());
+		ois.close();
+		SnoDLSet.init();
+		SnoDLSet.setDLList(dll);
+		SnoDLSet.setNeverGroup(ng);
+		tableModelDLEditLhs.update();
+		tableModelDLEditRhs.update();
+		tableModelDLList.update();
+		tableModelNeverGrp.updateDataModelArray();
+	}
 
     private void updateEdit(int index) {
         if (SnoDLSet.getDLList() != null) {
@@ -654,8 +687,7 @@ public class DLPanel extends JPanel {
                 FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
                         "Open Logic", FileDialog.LOAD);
                 //
-                dialog.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(AceConfig.config.getProfileFile().getParentFile().getAbsolutePath());
                 dialog.setFilenameFilter(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
                         return name.endsWith(".dlogic");
@@ -666,29 +698,19 @@ public class DLPanel extends JPanel {
                 // Check response
                 if (dialog.getFile() != null) {
                     File theFile = new File(dialog.getDirectory(), dialog.getFile());
-                    FileInputStream fis = new FileInputStream(theFile);
-                    BufferedInputStream bis = new BufferedInputStream(fis);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    ArrayList<SnoDL> dll = (ArrayList<SnoDL>) (ois.readObject());
-                    ArrayList<SnoConSer> ng = (ArrayList<SnoConSer>) (ois.readObject());
-                    SnoDLSet.init();
-                    SnoDLSet.setDLList(dll);
-                    SnoDLSet.setNeverGroup(ng);
-                    ois.close();
+                    readDlFile(theFile);
                 }
                 // Cleanup
                 dialog.dispose();
             } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (IOException e2) { // from ObjectInputStream
-                e2.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(e2);
             } catch (ClassNotFoundException e3) {
-                e3.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(e3);
             }
-
+            update();
         }
-
     }
 
     private class Listener_BtnFileWrite implements ActionListener {
@@ -698,8 +720,8 @@ public class DLPanel extends JPanel {
                 FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
                         "Save Logic (.dl)", FileDialog.SAVE);
                 //
-                dialog.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(AceConfig.config.getProfileFile().getParentFile().getAbsolutePath());
+                dialog.setName("kb.dlogic");
                 // Display dialog and wait for response
                 dialog.setVisible(true);
                 // Check response
@@ -709,6 +731,11 @@ public class DLPanel extends JPanel {
                         fileName = fileName + ".dlogic";
                     }
                     File binaryFile = new File(dialog.getDirectory(), fileName);
+                    if (AceConfig.config.getProperty("dlogic") != null) {
+                		AceConfig.config.setProperty("dlogic", FileIO
+                				.getNormalizedRelativePath(binaryFile));
+                    }
+
                     FileOutputStream fos = new FileOutputStream(binaryFile);
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
                     ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -720,10 +747,8 @@ public class DLPanel extends JPanel {
                 // Cleanup
                 dialog.dispose();
             } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (IOException e2) { // from ObjectOutputStream
-                e2.printStackTrace();
                 AceLog.getAppLog().alertAndLogException(e2);
             }
 

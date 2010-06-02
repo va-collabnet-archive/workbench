@@ -52,7 +52,11 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes) throws IOException,
+    public boolean everHadSrcRelOfType(int typeNid) throws IOException {
+		return bean.everHadSrcRelOfType(typeNid);
+	}
+
+	public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes) throws IOException,
             TerminologyException {
         return bean.getDestRelOrigins(allowedTypes);
     }

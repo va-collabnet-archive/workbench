@@ -20,9 +20,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 
-public class SnoPathProcessConcepts implements I_ProcessConcepts {
+public class SnoPathProcessInferred implements I_ProcessConcepts {
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
+    // Do not filter 'Is a' on classifier path
+    // The classifier itself is a "filter" what gets dropped.
 
     // STATISTICS COUNTERS
     private int countConSeen;
@@ -50,6 +52,7 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
     private PositionSetReadOnly fromPathPos;
+    private PositionSetReadOnly fromPathPosEditSide;
 
     // GUI
     I_ShowActivity gui;
@@ -57,16 +60,15 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private PRECEDENCE precedence;
     private I_ManageContradiction contradictionMgr;
 
-    public SnoPathProcessConcepts(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
-            I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos, I_ShowActivity gui,
+    public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels,
+            I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos, I_ShowActivity gui,
             PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
         this.logger = logger;
-        this.snocons = snocons;
         this.snorels = snorels;
         this.fromPathPos = pathPos;
+        this.fromPathPosEditSide = pathPosEditSide;
         this.roleTypeSet = roleSet;
         this.statusSet = statSet;
-        //this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
         this.gui = gui;
         this.precedence = precedence;
         this.contradictionMgr = contradictionMgr;
@@ -109,6 +111,10 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                 .uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
     }
 
+    // :TODO: have concept attributes for user created concepts go on the common path.
+    
+    // :TODO: then, simple this routine to not look at both the stated and inferred.
+    
     @Override
     public void processConcept(I_GetConceptData concept) throws Exception {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
@@ -125,23 +131,27 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
             return;
         }
 
+        boolean passToCompare = false;
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, 
                 precedence, contradictionMgr);
 
-        if (attribs.size() == 1) {
+        if (attribs.size() == 1)
+        	passToCompare = true;
+        else if (attribs.size() == 0) {
+        	// check to see if attribute is only on edit path
+            attribs = concept.getConceptAttributeTuples(
+                    statusSet, fromPathPosEditSide, 
+                    precedence, contradictionMgr);
+            if (attribs.size() == 1)
+            	passToCompare = true;
+        }
+        
+        if (passToCompare) {
              List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(statusSet,
                     roleTypeSet, fromPathPos, 
                     precedence, contradictionMgr);
 
-			boolean isaFound = false;
-			for (I_RelTuple rt : relTupList)
-				if (rt.getTypeId() == isaNid)
-					isaFound = true;
-
-            if (isaFound) {
-                if (snocons != null)
-                    snocons.add(new SnoCon(cNid, attribs.get(0).isDefined()));
                 countConAdded++;
 
                 for (I_RelTuple rt : relTupList) {
@@ -177,7 +187,6 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                         }
                     }
                 }
-            }
         } else if (attribs.size() > 1) {
             countConDuplVersion++;
         }
