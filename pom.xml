@@ -90,4 +90,17 @@
         <module>wb-bdb</module>        
         <module>wb-bdb-mojo</module>        
     </modules>
+  <!-- TODO: to be moved into a organisational parent POM -->
+  <distributionManagement>
+    <snapshotRepository>
+      <id>maestro_ihtsdo.wb-snapshots</id>
+      <name>IHTSDO Workbench Snapshots Repository</name>
+      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>maestro_ihtsdo.wb-releases</id>
+      <name>IHTSDO Workbench Releases Repository</name>
+      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
+    </repository>
+  </distributionManagement>
 </project>
