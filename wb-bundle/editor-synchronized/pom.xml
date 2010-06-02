@@ -42,8 +42,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.nhs.uktc</groupId>
-			<artifactId>nhs-subset-editor-doc</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>documentation</artifactId>
+			<type>zip</type>
 			<scope>runtime-directory</scope>
 		</dependency>
 		<dependency>

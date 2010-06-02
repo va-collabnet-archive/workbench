@@ -100,6 +100,7 @@
 					</execution>
 					<execution>
 						<id>unpack-dita-ot</id>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>unpack</goal>
 						</goals>
@@ -116,6 +117,7 @@
 					</execution>
 					<execution>
 						<id>add-transform-libs</id>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
@@ -172,11 +174,65 @@
 				</executions>
 			</plugin>
 
+			<!-- Coerce the DITA scripts into using more memory for XEP -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>adjust-memory</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<replace file="${dita.ot.dir}/demo/fo/build.xml" token='maxmemory="256m"'
+									value='maxmemory="1024m"' />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>dita-maven-plugin</artifactId>
 				<version>1.0-beta-2</version>
+				<configuration>
+					<useDitaAnt>false</useDitaAnt>
+					<useDitaClasspath>true</useDitaClasspath>
+					<antOpts>-Xmx256m</antOpts>
+				</configuration>
 				<executions>
+					<execution>
+						<id>dita2html</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!--
+								attach the generated PDF: this doesn't work in the current
+								version of the dita-maven-plugin when the ditamap is in a
+								subdirectory, so it is added using the build-helper below
+								<attach>true</attach>
+							-->
+							<antProperties>
+								<transtype>xhtml</transtype>
+								<dita.dir>${dita.ot.dir}</dita.dir>
+								<args.input>${dita.src.dir}/Guidebook/Workbench_Guidebook.ditamap</args.input>
+								<dita.extname>dita</dita.extname>
+								<output.dir>${project.build.directory}/xhtml/Guidebook</output.dir>
+								<generate.copy.outer>2</generate.copy.outer>
+
+								<!--
+									<customization.dir>${customization.dir}</customization.dir>
+									<clean.temp>yes</clean.temp>
+								-->
+							</antProperties>
+						</configuration>
+					</execution>
 					<execution>
 						<id>dita2pdf</id>
 						<phase>process-sources</phase>
@@ -184,8 +240,6 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<useDitaAnt>false</useDitaAnt>
-							<useDitaClasspath>true</useDitaClasspath>
 							<!--
 								attach the generated PDF: this doesn't work in the current
 								version of the dita-maven-plugin when the ditamap is in a
@@ -206,12 +260,11 @@
 									<clean.temp>yes</clean.temp>
 								-->
 							</antProperties>
-							<antOpts>-Xmx256m</antOpts>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- to workaround dita-maven-plugin's attach configuration problems -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -234,27 +287,6 @@
 				</executions>
 			</plugin>
 
-			<!-- Coerce the DITA scripts into using more memory for XEP -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>adjust-memory</id>
-						<phase>generate-resources</phase>
-						<configuration>
-							<tasks>
-								<replace file="${dita.ot.dir}/demo/fo/build.xml" token='maxmemory="256m"'
-									value='maxmemory="1664m"' />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin><!--
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -273,6 +305,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		--></plugins>
+		</plugins>
 	</build>
 </project>
