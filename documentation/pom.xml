@@ -269,7 +269,7 @@
 							<antProperties>
 								<transtype>pdf2</transtype>
 								<dita.dir>${dita.ot.dir}</dita.dir>
-								<args.input>${dita.src.dir}/Guidebook/Workbench_Guidebook.ditamap</args.input>
+								<args.input>${dita.src.dir}/Guidebook/Workbench_GuideBook.ditamap</args.input>
 								<dita.extname>dita</dita.extname>
 								<output.dir>${project.build.directory}/pdf</output.dir>
 								<xep.dir>${xep.dir}</xep.dir>
