@@ -221,18 +221,34 @@ public class DiffPathPanel extends JPanel {
 
         for (int i = 0; i < totalRows; i++) {
             SnoRel sr = srl.get(i);
-            StringBuilder str = new StringBuilder("<html>");
+            StringBuilder str = new StringBuilder();
             // CONCEPT_1
             I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
-            str.append(valueFont + c1Bean.getInitialText());
+            str.append(c1Bean.getInitialText());
             // ROLE TYPE
             I_GetConceptData typeBean = tf.getConcept(sr.typeId);
-            str.append(" - </font>" + typeFont + typeBean.getInitialText());
+            str.append(" - " + typeBean.getInitialText());
             // CONCEPT_2
             I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
-            str.append(" - </font>" + valueFont + c2Bean.getInitialText());
+            str.append(" - " + c2Bean.getInitialText());
             tableStrings[i][0] = str.toString();
         }
+
+        
+//        for (int i = 0; i < totalRows; i++) {
+//            SnoRel sr = srl.get(i);
+//            StringBuilder str = new StringBuilder("<html>");
+//            // CONCEPT_1
+//            I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
+//            str.append(valueFont + c1Bean.getInitialText());
+//            // ROLE TYPE
+//            I_GetConceptData typeBean = tf.getConcept(sr.typeId);
+//            str.append(" - </font>" + typeFont + typeBean.getInitialText());
+//            // CONCEPT_2
+//            I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
+//            str.append(" - </font>" + valueFont + c2Bean.getInitialText());
+//            tableStrings[i][0] = str.toString();
+//        }
 
         return tableStrings;
     }

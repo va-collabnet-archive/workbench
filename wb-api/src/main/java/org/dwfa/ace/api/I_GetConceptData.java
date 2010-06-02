@@ -37,6 +37,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException;
 
     public int getConceptId();
+    
+    public boolean everHadSrcRelOfType(int typeNid) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
