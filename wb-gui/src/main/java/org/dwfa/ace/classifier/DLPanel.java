@@ -174,10 +174,14 @@ public class DLPanel extends JPanel {
 		ObjectInputStream ois = new ObjectInputStream(bis);
 		ArrayList<SnoDL> dll = (ArrayList<SnoDL>) (ois.readObject());
 		ArrayList<SnoConSer> ng = (ArrayList<SnoConSer>) (ois.readObject());
+		ois.close();
 		SnoDLSet.init();
 		SnoDLSet.setDLList(dll);
 		SnoDLSet.setNeverGroup(ng);
-		ois.close();
+		tableModelDLEditLhs.update();
+		tableModelDLEditRhs.update();
+		tableModelDLList.update();
+		tableModelNeverGrp.updateDataModelArray();
 	}
 
     private void updateEdit(int index) {
@@ -683,8 +687,7 @@ public class DLPanel extends JPanel {
                 FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
                         "Open Logic", FileDialog.LOAD);
                 //
-                dialog.setDirectory(System.getProperty("user.dir")
-                        + System.getProperty("file.separator") + "logic");
+                dialog.setDirectory(AceConfig.config.getProfileFile().getParentFile().getAbsolutePath());
                 dialog.setFilenameFilter(new FilenameFilter() {
                     public boolean accept(File dir, String name) {
                         return name.endsWith(".dlogic");
@@ -717,7 +720,7 @@ public class DLPanel extends JPanel {
                 FileDialog dialog = new FileDialog((Frame) DLPanel.this.getTopLevelAncestor(),
                         "Save Logic (.dl)", FileDialog.SAVE);
                 //
-                dialog.setDirectory(AceConfig.config.getProfileFile().getParent());
+                dialog.setDirectory(AceConfig.config.getProfileFile().getParentFile().getAbsolutePath());
                 dialog.setName("kb.dlogic");
                 // Display dialog and wait for response
                 dialog.setVisible(true);
