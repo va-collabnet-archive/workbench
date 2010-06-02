@@ -174,18 +174,33 @@
 				</executions>
 			</plugin>
 
-			<!-- Coerce the DITA scripts into using more memory for XEP -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
+			                        <!-- Coerce the DITA scripts into using more memory for XEP -->
 						<id>adjust-memory</id>
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
 								<replace file="${dita.ot.dir}/demo/fo/build.xml" token='maxmemory="256m"'
 									value='maxmemory="1024m"' />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<!-- copy images from source director(ies) -->
+						<id>copy-images</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+							    <copy todir="${project.build.directory}/xhtml/images">
+							      <fileset dir="${dita.src.dir}/images" />
+							    </copy>
 							</tasks>
 						</configuration>
 						<goals>
