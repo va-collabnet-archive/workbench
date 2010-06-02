@@ -298,7 +298,7 @@
 						<configuration>
 							<artifacts>
 								<artifact>
-									<file>${project.build.directory}/pdf/Guidebook/Workbench_Guidebook.pdf</file>
+									<file>${project.build.directory}/pdf/Guidebook/Workbench_GuideBook.pdf</file>
 									<type>pdf</type>
 								</artifact>
 							</artifacts>
