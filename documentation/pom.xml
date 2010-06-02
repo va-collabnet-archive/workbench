@@ -236,7 +236,7 @@
 							<antProperties>
 								<transtype>xhtml</transtype>
 								<dita.dir>${dita.ot.dir}</dita.dir>
-								<args.input>${dita.src.dir}/Guidebook/Workbench_Guidebook.ditamap</args.input>
+								<args.input>${dita.src.dir}/Guidebook/Workbench_GuideBook.ditamap</args.input>
 								<dita.extname>dita</dita.extname>
 								<output.dir>${project.build.directory}/xhtml/Guidebook</output.dir>
 								<generate.copy.outer>2</generate.copy.outer>
