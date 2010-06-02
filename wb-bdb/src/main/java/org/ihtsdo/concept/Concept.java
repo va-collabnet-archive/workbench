@@ -1607,4 +1607,15 @@ public class Concept implements I_Transact, I_GetConceptData {
 	    return ConflictHelper.getCommonConceptAttributeTuples(this,
 	        config);
 	  }
+
+	@Override
+	public boolean everHadSrcRelOfType(int typeNid) throws IOException {
+		ComponentList<Relationship> rels = getSourceRels();
+		for (Relationship r: rels) {
+			if (r.everWasType(typeNid)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
