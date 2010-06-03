@@ -1,0 +1,11 @@
+<body class="color"> 
+<table align="center" bgcolor="white" border="0"> 
+ <tr> 
+   <td><img src="../images/IHTSDO_logo.png" width=60px height=50px alt="IHTSDO"></td> 
+   <td><table> 
+         <tr><td><h3 class="logo" align="center">IHTSDO Workbench</h2></td></tr> 
+         <tr><td><h3 class="logo" align="center">CONTENTS</h3></td></tr> 
+       </table></td> 
+ </tr> 
+</table>
+
