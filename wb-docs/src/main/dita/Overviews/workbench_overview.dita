@@ -22,14 +22,22 @@
           </row>
 
           <row>
-            <entry><b>Date:</b></entry>
+            <entry><b>Project build version:</b></entry>
+            <entry>MVN:project-version</entry>
+          </row>
 
+          <row>
+            <entry><b>Subversion release:</b></entry>
+            <entry>MVN:subversion-project-version</entry>
+          </row>
+
+          <row>
+            <entry><b>Build Date:</b></entry>
             <entry>MVN:release-date</entry>
           </row>
 
           <row>
-            <entry><b>Version:</b></entry>
-
+            <entry><b>Guidebook Version:</b></entry>
             <entry>1.7a</entry>
           </row>
 
