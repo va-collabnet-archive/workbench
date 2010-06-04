@@ -24,6 +24,7 @@
         <include>com.sleepycat:je</include>
         <include>org.apache.lucene:lucene-core</include>
         <include>jgraphx:jgraphx</include>
+        <include>jgraphx:jgraphx-examples</include>
         <include>jung:jung</include>
         <include>commons-collections:commons-collections</include>
         <include>colt:colt</include>

@@ -41,6 +41,12 @@
 			<artifactId>wb-icons</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>jgraphx</groupId>
+			<artifactId>jgraphx-examples</artifactId>
+			<version>1.4.0.0-1</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<!--
 				A dependency required to use the jini/jehri dynamic provider
 				security model
