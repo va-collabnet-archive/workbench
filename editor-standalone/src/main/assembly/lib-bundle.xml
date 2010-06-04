@@ -5,7 +5,7 @@
       <unpack>false</unpack>
       <scope>runtime</scope>
       <includes>
-        <include>org.dwfa:icons</include>
+        <include>org.ihtsdo:wb-icons</include>
         <include>org.ihtsdo:wb-foundation</include>
         <include>org.ihtsdo:wb-core</include>
         <include>org.ihtsdo:wb-api</include>
@@ -23,7 +23,7 @@
         <include>org.apache.geronimo.specs:geronimo-activation_1.1_spec</include>
         <include>com.sleepycat:je</include>
         <include>org.apache.lucene:lucene-core</include>
-        <include>jgraph:jgraphx</include>
+        <include>jgraphx:jgraphx</include>
         <include>jung:jung</include>
         <include>commons-collections:commons-collections</include>
         <include>colt:colt</include>
