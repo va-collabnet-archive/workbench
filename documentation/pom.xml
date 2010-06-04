@@ -29,7 +29,7 @@
 			<artifactId>wb-docs</artifactId>
 			<type>zip</type>
 			<scope>runtime-directory</scope>
-			<version>${project.version}</version>
+			<version>${wb-toolkit.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
