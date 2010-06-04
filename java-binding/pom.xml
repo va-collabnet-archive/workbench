@@ -2,19 +2,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
-		<groupId>org.ihtsdo</groupId>
-		<artifactId>wb-bundle</artifactId>
-		<version>2.5.1-trek-1-SNAPSHOT</version>
+		<groupId>org.ihtsdo.sample</groupId>
+		<artifactId>wb-sample-pa</artifactId>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.ihtsdo.wb-bundle</groupId>
 	<artifactId>java-binding</artifactId>
 	<name>Workbench Bundle Java Binding</name>
 	<description>project that generates a java binding so that java developers can reference
 		terminology content from their programs in a safe, versioned, and reproducible manner. </description>
 	<dependencies>
 		<dependency>
-			<groupId>org.ihtsdo.wb-bundle</groupId>
+			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>database</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime-directory</scope>
@@ -44,7 +43,6 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>${project.version}</version>
 				<extensions>true</extensions>
 				<dependencies>
 					<dependency>
@@ -55,7 +53,7 @@
 					<dependency>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-bdb</artifactId>
-						<version>${project.version}</version>
+						<version>${wb-toolkit.version}</version>
 					</dependency>
 				</dependencies>
 				<executions>
