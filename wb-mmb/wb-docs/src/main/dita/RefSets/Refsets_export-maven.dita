@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/dtd/task.dtd">
+<task id="exporting_rf2">
+  <title>Exporting in RF2 format</title>
+
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Create a member set in the cfh_refset_bundle and commit to SVN.
+        e.g. To create the "Activities of daily living" member set, load the
+        refset into the refset spec panel, and press the compute button. Wait
+        for the computation to finish. Close bundle. Change into the
+        <codeph>target/cfh-subset-sa- bundle.dir/profiles/username</codeph>
+        folder and select the most recently edited <codeph>.jcs </codeph>file.
+        Commit this to SVN by copying it into src/main/profiles/username
+        folder, adding it to SVN, and finally commiting to SVN. This requires
+        Subversion to be installed. </cmd>
+      </step>
+
+      <step>
+        <cmd>Create a module concept as described in the IHTSDO Documentation.
+        This helps identify the origin of particular content within a release.
+        e.g. SNOMED CT International content vs national release content. If
+        no module is specified, a default value of "Workbench Auxiliary" will
+        be used. </cmd>
+      </step>
+
+      <step>
+        <cmd>Check out a copy of the release project from the relevant
+        subversion repository<xref href="#exporting_rf2/cfh_svn_site"
+        scope="local" type="fn"/>. <fn id="cfh_svn_site">e.g.
+        https://csfe.aceworkspace.net/svn/repos/dmd/branches/2009-04-01-trial-1/dev/cfh_refset_release</fn>
+        This requires Subversion to be installed. </cmd>
+      </step>
+
+      <step>
+        <cmd>Update the release project's pom to use the module created in
+        Currently this is set to a dummy value of "Workbench Auxiliary".
+        &lt;execution&gt;</cmd>
+
+        <stepxmp><codeblock>&lt;execution&gt;
+   &lt;id&gt;export-refsets&lt;/id&gt;
+   &lt;phase&gt;generate-test-resources&lt;/phase&gt;
+   &lt;goals&gt;
+      &lt;goal&gt;refset-export&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+      &lt;useRF2&gt;true&lt;/useRF2&gt;
+      &lt;rf2Descriptor&gt;
+         &lt;module&gt;
+ &lt;!-- TODO update to real module FSN/UUID --&gt;
+           &lt;uuid&gt;2faa9260-8fb2-11db-b606-0800200c9a66&lt;/uuid&gt;
+           &lt;description&gt;Workbench Auxiliary&lt;/description&gt;
+         &lt;/module&gt;
+         &lt;namespace&gt;1999999&lt;/namespace&gt; 
+         &lt;project&gt;03&lt;/project&gt;
+         &lt;contentSubType&gt;National&lt;/contentSubType&gt;
+         &lt;countryCode&gt;UK&lt;/countryCode&gt;
+      &lt;/rf2Descriptor&gt;
+ &lt;!-- TODO update to real release version --&gt;
+      &lt;releaseVersion&gt;1&lt;/releaseVersion&gt;
+      &lt;uuidRefsetOutputDirectory&gt;
+        ${project.build.directory}/classes/rf2_uuid/refsets
+      &lt;/uuidRefsetOutputDirectory&gt; ...
+   &lt;/configuration&gt;
+ &lt;/execution&gt;</codeblock></stepxmp>
+      </step>
+
+      <step>
+        <cmd>Update the releaseVersion in the pom file - this identifies the
+        SNOMED CT version the refsets are intended to be used with. It is an
+        8-digit number of the form "<codeph>YYYYMMDD</codeph>". </cmd>
+      </step>
+
+      <step>
+        <cmd>Run an install of the release project using "mvn clean install".
+        This will check out the latest changesets in the bundle, and export
+        any member refsets in RF2. This requires Maven and Java to be
+        installed. Ensure that adequate memory is allocated to Maven by
+        creating a MAVEN_OPTS environmental variable with the value of
+        "<codeph>-Xms700m -Xmx1400m</codeph>".</cmd>
+      </step>
+
+      <step>
+        <cmd>After the build has completed, change into the
+        target/classes/rf2_sctid/refsets directory, and locate the RF2 export
+        files. There will be a file for each member refset. Since the current
+        member set generation also creates "parent" members in addition to
+        "normal" members, these will be included in the export (in their own
+        file). The RF2 files can also be located in the project's generated
+        JAR file - this can be found in the local Maven repository
+        (.m2\repository\net\nhs\uktc\cfh_refset_release\2009.06.01-
+        SNAPSHOT\cfh_refset_release-2009.06.01-SNAPSHOT.jar)</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

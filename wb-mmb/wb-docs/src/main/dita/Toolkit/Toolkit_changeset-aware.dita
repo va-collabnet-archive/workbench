@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+ 
+ <topic id="topic3" xml:lang="en">
+  <title>Change-Set Smart Client Model</title>
+  <prolog><metadata><keywords><indexterm>change sets</indexterm></keywords></metadata></prolog>
+  <body>
+   <section>IHTSDO Workbench data architecture is founded upon an append-only data model where data
+    changes are represented and distributed via a store-and-forward change set model. This
+    append-only foundation eliminates the burdens of transaction isolation encountered in single
+    database resources (since updates to the database are not allowed) and enables concurrent work.
+    The change set model enables enhanced audibility, traceability, and data recovery.</section>
+   <section>The change set model also enables collaborative work via transport-layer independent
+    coordination of change-set files. </section>
+   <section>IHTSDO Workbench uses the Subversion HTTPS protocols for the transport layer secondary
+    to the simplicity and scalability of using Subversion for both the transport layer and for the
+    revision control of the change-set files. In addition, since Subversion offers many types of
+    end-user clients, the change sets can easily be exported or distributed by other means (FTP,
+    SMTP, CD-ROM, network drive, etc), and still easily imported and integrated into a central
+    Subversion repository. </section>
+   <section>The contents of the change sets are easily viewed by importing change sets into the
+    IHTSDO Workspace Editor, where a complete history of all changes can be viewed in a graphical
+    environment. Alternatively, change sets can be processed by other means and loaded into
+    alternative database representation when required.</section>
+   <section>The loose coupling between the change set architecture and the underlying database
+    allows independent migration of the database and of traceability capabilities, thus enabling
+    support for alternative database schemas simplifying system evolution, and providing an
+    opportunity for iron-clad traceability and non-repudiation via change-set enhancement that may
+    span organization and technology boundaries.</section>
+   <section>Changes to the underlying database are based on the change set configuration management
+    model. A baseline of data is established, data may not be deleted only changed, and changes are
+    stored as deltas that describe two revisions of a given set of data – known as change sets.
+    Therefore the baseline data plus all the change sets equals the current data state.</section>
+   <section>This model provides the ability to trace all changes made to the data over time,
+    reliably rebuild the data to a specific point in time and easily see the state of the data at a
+    given point in time.</section>
+   <section>The configuration management model is followed further within the application by
+    providing each user a branch as a way of separating the content developed by one user from
+    another. Each branch (known as a “path” in the IHTSDO Toolkit) has a baseline or “origin”, which
+    may be another path or the root database, and its own set of change sets.</section>
+   <section id="ad999821">When a user synchronizes with the Subversion repository (performed
+    regularly when the application is on-line) any new change sets created will be uploaded to the
+    central repository and ultimately distributed to all other nodes. Equally any new change sets
+    uploaded by other nodes will be downloaded and imported into the local database on the path to
+    which the change sets belong.<indexterm>Subversion </indexterm></section>
+  </body>
+ </topic>
+ 
+</dita>

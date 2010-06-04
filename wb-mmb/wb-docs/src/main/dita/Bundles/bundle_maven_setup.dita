@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic2" xml:lang="en">
+ <title>Setting up for Maven builds</title>
+ <body>
+  <section id="aw1047941">Maven uses a declarative dependency technique and distributed repository
+   approach to constructing applications. Application developers invoke Maven to build an
+   application bundle based on the versions of components specified in one or more POM
+    (<codeph>pom.xml</codeph>) files. IHTSDO Workbench applications rely on a set of prebuilt java class
+   libraries some of which were described in the preceding section as projects and others of which are
+   described briefly in <xref href="#topic2/aw1073878" type="table" format="dita"/> . Developers
+   need to ensure that the appropriate and compatible versions of these java class libraries are
+   utilised in their Maven builds. <indexterm>POM </indexterm></section>
+  <table id="aw1073878"><title>.jar files</title>
+   <desc>
+    <p>Java class library .jar files used by IHTSDO Workbench applications</p>
+   </desc>
+   <tgroup cols="3">
+    <colspec colnum="1" colname="col1" colwidth="113*"/>
+    <colspec colnum="2" colname="col2" colwidth="83*"/>
+    <colspec colnum="3" colname="col3" colwidth="137*"/>
+    <thead>
+     <row>
+      <entry colname="col1">
+       <p>jar file</p>
+      </entry>
+      <entry colname="col2">
+       <p>primary code provider</p>
+      </entry>
+      <entry colname="col3">
+       <p>project and description</p>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>ace-api-1.17.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc.</p>
+      </entry>
+      <entry colname="col3">
+       <p>IHTSDO Workbench API class library </p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>activation-1.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3"/>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>browser-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>jini classes</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>colt-1.2.0.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>CERN-European Organization for Nuclear Research</p>
+      </entry>
+      <entry colname="col3">
+       <p>Scientific algorithms</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>commons-collections-3.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Apache Software Foundation</p>
+      </entry>
+      <entry colname="col3">
+       <p>extensive Collection classes</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>concurrent-1.3.4.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>BEA Systems Inc. and IBM</p>
+      </entry>
+      <entry colname="col3">
+       <p>Concurrency (multithreading) support<fn id="aw1074146">
+         <xref href="http://g.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html"
+          scope="external" format="html">
+          <ph>http://g.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html</ph>
+         </xref>
+        </fn><xref href="#topic2/aw1074146" scope="local" type="fn" format="dita"/></p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>core-2.0.13.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc.</p>
+      </entry>
+      <entry colname="col3">
+       <p>IHTSDO Workbench Distributed Worfklow Architecture core libary</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>foundation-2.0.17.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc.</p>
+      </entry>
+      <entry colname="col3">
+       <p>IHTSDO Workbench Distributed Worfklow Architecture foundation component library</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>icons-1.8.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc. and various sources</p>
+      </entry>
+      <entry colname="col3">
+       <p>IHTSDO Workbench editor icon library</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>jcommon-1.0.0.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>JFree.org</p>
+      </entry>
+      <entry colname="col3">
+       <p> a collection of useful classes used by JFreeChart,</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>je-3.2.74.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Oracle</p>
+      </entry>
+      <entry colname="col3">
+       <p>Berkeley database class library</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>jfreechart-1.0.0.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>JFree.org</p>
+      </entry>
+      <entry colname="col3">
+       <p>2D charting library for visualising business process statistics.</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>jsk-lib-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Apache Software Foundation and Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>Core Jini classes</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>jsk-platform-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc.</p>
+      </entry>
+      <entry colname="col3">
+       <p>IHTSDO Workbench-applied Jini classes</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>jung-1.7.6.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>JUNG contributors <fn id="aw1074249">
+         <xref href="http://jung.sourceforge.net/" scope="external" format="html">
+          <ph>http://jung.sourceforge.net/</ph>
+         </xref>
+        </fn><xref href="#topic2/aw1074249" scope="local" type="fn" format="dita"/></p>
+      </entry>
+      <entry colname="col3">
+       <p>Java Universal Network/Graph Framework - a graphing library used for displaying
+        terminology polyhierarchies</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>lucene-core-2.3.2.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Apache Software Foundation<fn id="aw1074264">
+         <xref href="http://lucene.apache.org" scope="external" format="html">
+          <ph>http://lucene.apache.org</ph>
+         </xref>
+        </fn><xref href="#topic2/aw1074264" scope="local" type="fn" format="dita"/></p>
+      </entry>
+      <entry colname="col3">
+       <p>Lucene Java - high performance search engine library</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>mahalo-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>Mahalo - A Jini(TM) Transaction Manager Service</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>mail-1.4.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>SMTP, IMAP and POP3 e-mail classes</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>reggie-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>Service Registry classes for Jini</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>start-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>Jini starter kit</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>svn-javahl-1.4.4.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Tigris.org</p>
+      </entry>
+      <entry colname="col3">
+       <p>subversion support</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>svnkit-1.1.4.3248.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Tigris.org</p>
+      </entry>
+      <entry colname="col3">
+       <p>subversion support</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>tools-2.1.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Sun Microsystems</p>
+      </entry>
+      <entry colname="col3">
+       <p>Jini tool library</p>
+      </entry>
+     </row>
+     <row>
+      <entry colname="col1">
+       <p>
+        <codeph>vodb-1.20.jar</codeph>
+       </p>
+      </entry>
+      <entry colname="col2">
+       <p>Informatics Inc.</p>
+      </entry>
+      <entry colname="col3">
+       <p>Versioned Object Database - IHTSDO Workbench persistent store for multi-versioned,
+        multiple terminologies.</p>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+ </body>
+</topic>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+  <title>Maven Plug-ins</title>
+  <body>
+    <section id="ax1048269"> Maven is extensible through the use of user-written plugins. These are
+      a set of java classes which extend the Maven-provided base classes to provide specific build
+      features. The Maven plugins comprise one or more “<ph>Mojo</ph>”<ph>
+      </ph>s (the “black magic” or code that provides the plugin capability). Even most of Maven's
+      standard functionality such as compiling java source or produc­ing a jar file is provided by
+      plug-ins available from the primary Maven repository (<xref scope="external" format="html"
+        href="http://repo1.maven.org/">http://repo1.maven.org/</xref>). <indexterm>Maven </indexterm><indexterm
+        >Maven </indexterm><indexterm>Maven </indexterm><indexterm>Maven </indexterm><indexterm
+        >Maven </indexterm><indexterm>maven </indexterm><indexterm>maven </indexterm></section>
+  </body>
+</topic>

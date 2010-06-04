@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic2" xml:lang="en">
+  <title>Overview the Classifier</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>Classifier</indexterm>
+
+        <indexterm>classifier <indexterm>using the</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The SnoRocket Classifier is a highly optimised module for
+    performing complete or incremental classification of SNOMED CT. The IHTSDO
+    Workbench provides support for using this classifier via in-built tasks
+    available from within the Business Process Builder. The classifier related
+    tasks available can be seen in <xref format="dita"
+    href="#topic2/image_0e5e4dcb-de09-4164-a171-b8959ea0dca0" type="fig"/>
+    <fig id="image_0e5e4dcb-de09-4164-a171-b8959ea0dca0">
+        <title>Process Builder pane showing classifier tasks</title>
+
+        <image href="../images/classifier_images/classifier_task.jpg"/>
+      </fig></section>
+
+    <note>The SnoRocket Classifier requires considerable system resources -
+    particularly memory. The Workbench's Java Virtual Machine settings need to
+    configured for sufficient heap space - at least 1200MBytes (
+    <tt>-Xms1200m</tt> in the java startup script, see <xref format="dita"
+    href="../FAQ/FAQ.dita#topic8">How to overcome memory issues?</xref>
+    )</note>
+
+    <note>In order to view the results of running the classifier, ensure that
+    the STATED_INFERRED<indexterm>inferred
+    view</indexterm><indexterm>STATED_INFERRED</indexterm> viewing option is
+    checked in the Component Pane of the Preferences Panel.</note>
+
+    <section>The classifier is executed through a business process plugin and
+    can take several minutes. Once the classifier has been run, the Normal
+    Form results for a given concept can be shown in the component panel, by
+    selecting the <image
+    href="../images/classifier_images/classifier_toggle_small.jpg"
+    id="image_1ddf9941-d323-4b55-bf77-d02eddcbc0a2"/> toggle.</section>
+  </body>
+</topic>

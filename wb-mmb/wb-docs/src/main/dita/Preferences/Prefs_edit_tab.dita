@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+
+ <topic id="edit_tab" xml:lang="en">
+  <title>Edit Tab</title>
+  <topic id="defaults">
+   <title>Defaults</title>
+   <body>
+    <section>
+     <title>Default status</title>
+     <ph>Specifies the initial value of the <i>status</i> field when a new concept is added.</ph>
+    </section>
+    <section>
+     <title>Default image type</title>
+     <ph>Specifies the initial value of the <i>status</i> field in the <b>Image</b> section of the
+      work area when associating an image with a concept.</ph>
+    </section>
+
+    <section>
+     <title>Default description type</title>
+     <ph>Specifies the initial value of the description that will appear in the type field of the
+       <b>Descriptions</b> section of the work area when a new concept is added.</ph>
+    </section>
+
+    <section>
+     <title>Default relationship type</title>
+     <ph>Specifies the initial value in the <i>type</i> field of the <b>Source relationships</b> and
+       <b>Destination relationships</b> sections of the work area when a new concept is added.</ph>
+    </section>
+    <section>
+     <title>Default relationship characteristic</title>
+     <ph>Specifies the initial value in the <i>char</i> (characteristic) field of the <b>Source
+       rela­tionships</b> and <b>Destination relationships</b> sections of the work area when a new
+      concept is added.</ph>
+    </section>
+    <section>
+     <title>Default relationship refinability</title>
+     <ph>Specifies the initial value in the refinability field of the <b>Source relationships</b>
+      and <b>Destination relationships</b> sections of the work area when a new concept is
+      added.</ph>
+    </section>
+   </body>
+  </topic>
+  <topic id="relationship_types">
+   <title>Relationship Types (values for popup)</title>
+   <body>
+    <p>Defines the values available for the relationship type of a concept. These values specify the
+     choices displayed in the type field popup selection boxes in the <b>Source relationships</b>
+     and <b>Destination relationships</b> sections of the work area.</p>
+   </body>
+  </topic>
+  <topic id="relationship_refinability">
+   <title>Relationship Refinability (values for popup)</title>
+   <body>
+    <p>Defines the values available for the refinability of a concept. These values specify the
+     choices displayed in the refinability field popup selection boxes in the Source relationships
+     and Destination relationships sections of the work area.</p>
+   </body>
+  </topic>
+  <topic id="relationship_characteristics">
+   <title>Relationship Characteristics</title>
+   <body>
+    <p>Defines the values available for the characteristics of a concept. These val­ues specify the
+     choices displayed in the char (characteristic) field popup selection boxes in the Source
+     relationships and Destination relationships sections of the work area.</p>
+   </body>
+  </topic>
+  <topic id="description_types">
+   <title>Description Types</title>
+   <body>
+    <p>Defines the values available for the description type of a concept. These values specify the
+     choices displayed in the type field popup selection box in the Descriptions section of the work
+     area.</p>
+   </body>
+  </topic>
+  <topic id="image_types">
+   <title>Image Types</title>
+   <body>
+    <p>Defines the values available for a concept’s image type. These values spec­ify the choices
+     displayed in the type field popup selection box in the Images section of the work area.</p>
+   </body>
+  </topic>
+  <topic id="status_values">
+   <title>Status Values</title>
+   <body>
+    <p>Defines the values available for the status value of a concept. These values specify the
+     choices displayed in the status field popup selection boxes in the Concept attributes, Refset,
+     Descriptions, Source relationships, Destina­tion relationships, and Images sections of the work
+     area.</p>
+   </body>
+  </topic>
+ </topic>
+</dita>

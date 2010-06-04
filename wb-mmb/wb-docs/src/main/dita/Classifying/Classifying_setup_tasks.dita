@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/task.dtd">
+<task id="classifying_steps">
+  <title>Setting up for Classifying</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>classifier<indexterm>setup steps</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <taskbody>
+    <context><p>In many cases, the IHTSDO Workbench will have the Classifier
+    setup already in-place as "Run Classifier" under the Tasks menu. Where
+    installations don't have access to the classifier plugin via the main
+    menu, here is a brief outline of the steps needed to set up (or, to review
+    settings for) the IHTSDO Workbench to run the built-in classifier against
+    editing changes that have been made to a terminology:</p></context>
+
+    <steps>
+      <step>
+        <cmd>Set up the "Edit Path" using the Preferences Panel <image
+        href="../images/classifier_images/preferences_button.jpg"/> as
+        outlined in <xref format="dita"
+        href="../Editor/Editor_classifier_preferences.dita#classifier_prefs">Setting
+        Classifier Preferences</xref>.</cmd>
+
+        <stepxmp>Use the "New Path" tab to establish the new edit
+        path:-</stepxmp>
+
+        <stepresult><fig>
+            <title>create a new edit path</title>
+
+            <image href="../images/classifier_images/path_edit_input.jpg"/>
+          </fig></stepresult>
+      </step>
+
+      <step>
+        <cmd>Create a "Classify Path" using the Preferences Panel.</cmd>
+
+        <stepxmp>Return to the "New Path" of the Preferences Panel, create
+        another path for the classifier...</stepxmp>
+
+        <stepresult><fig>
+            <title>create a new classifier path</title>
+
+            <image href="../images/classifier_images/path_classifier_output.jpg"/>
+          </fig><p>Review the path settings under the Preferences "Path" Tab.
+        Only the "Edit Path" should have "Edit on this path" checked. Both the
+        "Edit Path" and "Classifier Path" should have the "Use position in
+        view" checked.</p><p>The resulting paths should look similar to the
+        following in the Terminology Auxiliary hierarchy in the taxonomy panel
+        ...</p><fig>
+            <title>Path settings displayed in the Taxonomy view</title>
+
+            <image href="../images/classifier_images/paths_in_taxonomy.jpg"/>
+          </fig></stepresult>
+      </step>
+
+      <step>
+        <cmd>Set up the 5 Classifier parameters using the Classifier Tab of
+        the Preferences Panel</cmd>
+
+        <stepxmp>Navigating to the appropriate terms in the taxonomy view,
+        drag and drop the following concepts to their respective targets in
+        the classifier preference pane.</stepxmp>
+
+        <stepresult><table>
+            <title>Drag and Drop editing of classifier preferences</title>
+
+            <tgroup cols="2">
+              <thead>
+                <row>
+                  <entry>Source Concept</entry>
+
+                  <entry>Classifier Parameter</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry>SNOMED CT Concept</entry>
+
+                  <entry>Classification root</entry>
+                </row>
+
+                <row>
+                  <entry>SNOMED CT Concept / Linkage Concept / Attribute / Is
+                  a</entry>
+
+                  <entry>Classification is-a</entry>
+                </row>
+
+                <row>
+                  <entry>SNOMED CT Concept / Linkage Concept / Attribute /
+                  Concept model attribute</entry>
+
+                  <entry>Role root</entry>
+                </row>
+
+                <row>
+                  <entry>Terminology Auxiliary concept / path / development /
+                  Edit Path</entry>
+
+                  <entry>Classification Input Path</entry>
+                </row>
+
+                <row>
+                  <entry>Terminology Auxiliary concept / path / development /
+                  Classifier Path</entry>
+
+                  <entry>Classification Output Path</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>The resulting 5 classification parameters should resemble
+        the following figure ... <fig>
+            <title>typical Classifier preferences</title>
+
+            <image href="../images/classifier_images/classifierpref.jpg"/>
+          </fig></stepresult>
+      </step>
+
+      <step>
+        <cmd>Create a simple "Classifier" Business Process using the Business
+        Process Builder</cmd>
+
+        <substeps>
+          <substep>
+            <cmd>Navigate to the IDE -&gt; Classify category in the task
+            navigator pane</cmd>
+
+            <stepresult><fig>
+                <title>Creating a "Classifier" business process</title>
+
+                <image href="../images/classifier_images/classifier_task.jpg"/>
+              </fig></stepresult>
+          </substep>
+
+          <substep>
+            <cmd>and drag the "Classifier (Current)" onto the process builder
+            pane</cmd>
+          </substep>
+        </substeps>
+      </step>
+
+      <step>
+        <cmd>Store the Classifier Business Process as a menu item by saving in
+        a subfolder of the "plugins/menu" folder.</cmd>
+
+        <stepresult><fig>
+            <title>Saving the "run classifier" process in the menu -&gt; tasks
+            folder of the workbench</title>
+
+            <image href="../images/classifier_images/save_bp.jpg"/>
+          </fig></stepresult>
+      </step>
+
+      <step>
+        <cmd>Enable the 'STATED_INFERRED' check-box in the Component Panel of
+        the preferences pane.</cmd>
+
+        <stepresult><fig>
+            <title>ensure STATED-INFERRED preference is set</title>
+
+            <image href="../images/classifier_images/stated_inferred.jpg"/>
+          </fig></stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

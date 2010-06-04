@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/dtd/task.dtd">
+<task id="associating_example">
+  <title>Example: refset specification construction</title>
+
+  <taskbody>
+    <context>This example shows the procedure used to construct a refset
+    specification expression that selects concepts that have a specific
+    finding site relationship - in this case a <i>Finding Site</i> of <i>Skin
+    structure</i>.</context>
+
+    <steps>
+      <step>
+        <cmd>Create the refset concept as the Owner</cmd>
+      </step>
+
+      <step>
+        <cmd>As the author, launch the Business Process that builds the
+        refset</cmd>
+      </step>
+
+      <step>
+        <cmd>Fill in the purpose</cmd>
+      </step>
+
+      <step>
+        <cmd>Select OR in the specification logic pane and right click</cmd>
+      </step>
+
+      <step>
+        <cmd>select CONCEPT-CONTAINS-REL from the pop-up menu</cmd>
+
+        <stepresult><fig>
+            <title/>
+
+            <image href="../images/Refsets_Images/spec_create_1.jpg"/>
+          </fig></stepresult>
+      </step>
+
+      <step>
+        <cmd>Select the <codeph>CONCEPT-CONTAINS-REL</codeph> token just added
+        and select "AND", either by right clicking and using the pop-up menu,
+        or hitting the <image href="../images/Refsets_Images/icon_and.jpg"/>
+        button.</cmd>
+      </step>
+
+      <step>
+        <cmd>Open the search pane <image
+        href="../images/Using_The_ACE_Editor_Images/icon_search_small.jpg"/> ,
+        if not already open, and search for <i>abrasion of skin</i>.</cmd>
+      </step>
+
+      <step>
+        <cmd>Select select <i>Abrasion AND/OR friction burn of skin</i> in the
+        search pane, and then view this in the concept pane by selecting the
+        appropriate tab.</cmd>
+      </step>
+
+      <step>
+        <cmd>Select Finding site in the destination relationships in the
+        concept pane, drag to the transporter <image
+        href="../images/Using_The_ACE_Editor_Images/icon_transporter_small.png"/>
+        icon, and select <i>Show in taxonomy</i>.</cmd>
+
+        <stepxmp><fig>
+            <title/>
+
+            <image href="../images/Refsets_Images/spec_find_finding_site.jpg"/>
+          </fig>This selects the appropriate concept in the taxonomy so that
+        it can be used in the next step.</stepxmp>
+      </step>
+
+      <step>
+        <cmd>Without changing the selection of <i>Finding Site</i> in the
+        taxonomy, change back to the refSet spec pane and add the
+        RELATIONSHIP-TYPE-IS clause</cmd>
+
+        <stepxmp><fig>
+            <title/>
+
+            <image href="../images/Refsets_Images/creation_wizard_5.jpg"/>
+          </fig></stepxmp>
+
+        <substeps>
+          <substep>
+            <cmd>highlight the <codeph>CONCEPT-CONTAINS-REL</codeph> token and
+            right click.</cmd>
+          </substep>
+
+          <substep>
+            <cmd>under rel, in the pop-up submenu, choose <codeph>add
+            RELATIONSHIP-TYPE-IS clause</codeph>.</cmd>
+          </substep>
+        </substeps>
+
+        <stepxmp><fig>
+            <title>Relationship type added.</title>
+
+            <image href="../images/Refsets_Images/spec_logic_rel-type.jpg"/>
+          </fig></stepxmp>
+      </step>
+
+      <step>
+        <cmd>Select the destination of the relationship - <i>Skin
+        structure</i>, and add the relationship destination clause</cmd>
+
+        <substeps>
+          <substep>
+            <cmd>Switch back to the <i>Abrasion..</i> concept in the search
+            tab of the concept pane</cmd>
+          </substep>
+
+          <substep>
+            <cmd>Left-click on the <i>Skin structure</i> destination in the
+            Source relationships and drag to the transporter <image
+            href="../images/Using_The_ACE_Editor_Images/icon_transporter_small.png"/>
+            to <i>Show in Taxonomy</i>. </cmd>
+          </substep>
+
+          <substep>
+            <cmd>Right-click on the <b>AND</b> clause of the specification
+            expression, and select <codeph>rel</codeph> -&gt; <codeph>Add
+            RELATIONSHIP DESTINATION clause</codeph> from the pop up
+            menu.</cmd>
+          </substep>
+        </substeps>
+
+        <stepxmp><fig>
+            <title>adding the relationship destination clause</title>
+
+            <image href="../images/Refsets_Images/spec_add-rel-dest.jpg"/>
+          </fig></stepxmp>
+
+        <stepxmp>The resultant specification expression should look similar to
+        that below.<fig>
+            <title>final refset specification</title>
+
+            <image href="../images/Refsets_Images/spec_logic_rel-dest.jpg"/>
+          </fig></stepxmp>
+      </step>
+    </steps>
+  </taskbody>
+</task>

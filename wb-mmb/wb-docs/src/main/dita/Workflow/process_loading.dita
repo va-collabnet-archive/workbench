@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+
+
+<topic id="topic6" xml:lang="en">
+<title>Loading a Business Process</title>
+<body>
+<section>To load an existing process, from the Process Builder File drop-down
+menu, click on Read Process. The Open Process dialog shown in <xref
+ href="#topic6/ai929905" type="fig" format="dita"></xref> will display.</section>
+<fig id="ai929905">
+<title>Opening a Process Dialog</title>
+<image
+href="../images/Creating_Processes_Images/creating_processes_img_17.jpg"
+placement="break" width="226" height="168" />
+</fig>
+<section>Navigate to the “Hello World” business process you saved
+and click Open.</section>
+<section>The process is loaded into the Process Diagram panel ready for
+execution.</section>
+</body>
+</topic>
+
+
+</dita>
