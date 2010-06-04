@@ -278,7 +278,7 @@ public class RefsetSpecPanel extends JPanel {
             column5.setColumnName("path");
             column5.setCreationEditable(false);
             column5.setUpdateEditable(false);
-            column5.setFieldClass(StringWithExtTuple.class);
+            column5.setFieldClass(String.class);
             column5.setMin(5);
             column5.setPref(150);
             column5.setMax(150);
@@ -287,6 +287,7 @@ public class RefsetSpecPanel extends JPanel {
             column5.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setPathId", int.class));
             column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
             columns.add(column5);
+            
         }
 
         ReflexiveRefsetCommentTableModel commentTableModel =
