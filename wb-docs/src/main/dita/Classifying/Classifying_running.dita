@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/dtd/task.dtd">
+<task id="classifier_running">
+  <title>Running the Classifier</title>
+
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Start running the classifier from the <i>Menu -&gt; Tasks -&gt;
+        Run Classifier</i> in the main menu
+        bar<indexterm>classifier<indexterm>run</indexterm></indexterm></cmd>
+
+        <stepxmp>The classification process takes minutes to run and consists
+        of a number of passes. Some activity is displayed in the status bar of
+        the workbench as shown below.<p><fig>
+            <title>Classifier progress displayed in status bar</title>
+
+            <image href="../images/classifier_images/running_classifier_status.jpg"/>
+          </fig>The progress can be monitored in the activity viewer. <fig>
+            <title>Classifier progress displayed in Activity Viewer</title>
+
+            <image href="../images/classifier_images/classifier_activity.jpg"/>
+          </fig>More detail is also available in the Workbench log
+        file.</p></stepxmp>
+
+        <stepresult>The running time for the Classifier can vary substantially
+        from machine to machine. The following graphs were measured run on 2.8
+        GHz, single Pentium 4, 32-bit Windows XP system with 2.5GB of RAM and
+        show the memory usage and CPU usage of time respectively. This
+        particular run includes UK Extensions in addition to SNOMED.<fig>
+            <title>typical heap memory usage during classification</title>
+
+            <image href="../images/classifier_images/classifier_memory.jpg"/>
+          </fig><fig>
+            <title>typical CPU usage during classification</title>
+
+            <image href="../images/classifier_images/classifier_CPU.jpg"/>
+          </fig><note>If the classifier is run on a machine with limited
+        computing resources it is recommended to not run other programs at the
+        same time (i.e. take a break from the computer during the run.) This
+        is not so much an issue with higher performance
+        systems.</note></stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

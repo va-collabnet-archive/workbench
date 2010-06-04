@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+ <topic id="topic17" xml:lang="en">
+  <title>Setting Refset Preferences</title>
+  <body>
+   <section>To configure IHTSDO IDE to display refset information in the taxonomy view
+    pane:</section>
+   <section>Under the Refset tab, on the Taxonomy sub-tab, ensure show viewer images in taxonomy
+    view and show refset info in taxonomy view are both checked, as shown in <xref
+     href="#topic17/ag942616" type="fig" format="dita"/>.</section>
+   <fig id="ag942616">
+    <title>Taxonomy View Tab</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_68.jpg"
+     placement="break" width="352" height="163"/>
+   </fig>
+   <section>Next, on the Component Panel tab, ensure that REFSETS is checked, as shown in <xref
+     href="#topic17/ag942866" type="fig" format="dita"/>.</section>
+   <fig id="ag942866">
+    <title>Component Panel Tab</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_69.jpg"
+     placement="break" width="300" height="300"/>
+   </fig>
+  </body>
+ </topic>
+
+ 
+

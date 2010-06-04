@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic4" xml:lang="en">
+ <title>Sorting the Process List</title>
+ <body>
+  <section>The process queue list will initially display in Process ID order. The queue list can be
+   sorted by any of the column headings to group processes according to similar characteristics. For
+   example, click on the Subject column to sort processes by subject. Any processes without a
+   subject will appear at the top of the list, followed by all other processes in alphabetical order
+   according to the subject text, as shown in <xref href="#topic4/ah922118" type="fig" format="dita"
+   />.</section>
+  <fig id="ah922118">
+   <title>Process List Sorting by Subject</title>
+   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_4.jpg"
+    placement="break" width="393" height="126"/>
+  </fig>
+ </body>
+</topic>

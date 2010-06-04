@@ -22,8 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-core</artifactId>
-    <packaging>jar</packaging>
-    <name>Core Distributed Workflow Architecture Components</name>
+    <name>Workbench Core Workflow Architecture Components</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
     <dependencies>
         <dependency>
@@ -59,15 +58,19 @@
         </dependency>
     </dependencies>
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
+      <plugins>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
+         <executions>
+           <execution>
+             <id>attach-sources</id>
+             <goals>
+               <goal>jar</goal>
+             </goals>
+           </execution>
+         </executions>
+        </plugin>
+      </plugins>
     </build>
 </project>

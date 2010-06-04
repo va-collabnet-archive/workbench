@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+  <topic id="topic1" xml:lang="en">
+    <title>Getting Started with the IHTSDO Workbench IDE</title>
+    <body>
+      <section>The IHTSDO Workbench IDE and Viewer are quality assurance tools designed to help
+        users develop standardized terminologies and/or multiple sets of the same terminology. Using
+        the IHTSDO Workbench IDE, vendors can then incorporate standardized terms when developing
+        products and services for clinics, hospitals and other medical organizations. Standardizing
+        the terminology will bring consistency to diagnoses, patient records, insurance claims,
+        etc.</section>
+    </body>
+  </topic>
+ 

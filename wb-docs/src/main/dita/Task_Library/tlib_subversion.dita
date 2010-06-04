@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic13" xml:lang="en">
+ <title>Subversion tasks</title>
+ <abstract>
+  <simpletable id="ap1020718">
+   <strow>
+    <stentry>
+     <b>Checkout All Svn Entries<ph>
+       <indexterm>Task <indexterm>Checkout All Svn Entries</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks out all the changessets from the subversion repository</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CheckoutAllSvnEntries.java<indexterm>Task bean
+        <indexterm>CheckoutAllSvnEntries.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1020917">
+   <strow>
+    <stentry>
+     <b>Checkout Svn Entry<ph>
+       <indexterm>Task <indexterm>Checkout Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks out the requested entry from the subversion repository.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CheckoutSvnEntry.java<indexterm>Task bean <indexterm>CheckoutSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to check out</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1021116">
+   <strow>
+    <stentry>
+     <b>Cleanup All Svn Entries<ph>
+       <indexterm>Task <indexterm>Cleanup All Svn Entries</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the subversion <ph>cleanup</ph> command on all changesets</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CleanupAllSvnEntries.java<indexterm>Task bean
+        <indexterm>CleanupAllSvnEntries.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1021317">
+   <strow>
+    <stentry>
+     <b>Cleanup Svn Entry<ph>
+       <indexterm>Task <indexterm>Cleanup Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>cleanup</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CleanupSvnEntry.java<indexterm>Task bean <indexterm>CleanupSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to process</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1021493">
+   <strow>
+    <stentry>
+     <b>Commit All Svn Entries<ph>
+       <indexterm>Task <indexterm>Commit All Svn Entries</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>commit</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CommitAllSvnEntries.java<indexterm>Task bean <indexterm>CommitAllSvnEntries.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1021699">
+   <strow>
+    <stentry>
+     <b>Commit Svn Entry<ph>
+       <indexterm>Task <indexterm>Commit Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>commit</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CommitSvnEntry.java<indexterm>Task bean <indexterm>CommitSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to check out</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1021901">
+   <strow>
+    <stentry>
+     <b>Purge All Svn Entries<ph>
+       <indexterm>Task <indexterm>Purge All Svn Entries</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion purge command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>PurgeAllSvnEntries.java<indexterm>Task bean <indexterm>PurgeAllSvnEntries.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1022100">
+   <strow>
+    <stentry>
+     <b>Purge Svn Entry<ph>
+       <indexterm>Task <indexterm>Purge Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>purge</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>PurgeSvnEntry.java<indexterm>Task bean <indexterm>PurgeSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to check out</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1022276">
+   <strow>
+    <stentry>
+     <b>Remove Svn Entry<ph>
+       <indexterm>Task <indexterm>Remove Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>RemoveSvnEntry.java<indexterm>Task bean <indexterm>RemoveSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to check out</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1022491">
+   <strow>
+    <stentry>
+     <b>Update All Svn Entries<ph>
+       <indexterm>Task <indexterm>Update All Svn Entries</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>update</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>UpdateAllSvnEntries.java<indexterm>Task bean <indexterm>UpdateAllSvnEntries.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1022693">
+   <strow>
+    <stentry>
+     <b>Update Svn Entry<ph>
+       <indexterm>Task <indexterm>Update Svn Entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>update</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>UpdateSvnEntry.java<indexterm>Task bean <indexterm>UpdateSvnEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>svnEntryString: The subversion entry to check out</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1022895">
+   <strow>
+    <stentry>
+     <b>Add subversion entry<ph>
+       <indexterm>Task <indexterm>Add subversion entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>add</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddSubversionEntry.java<indexterm>Task bean <indexterm>AddSubversionEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>prompt</ph>: the prompt to tell the user what type of subversion entry they are
+      making.</p>
+     <p><ph>keyName</ph>: the identity of the repository</p>
+     <p><ph>repoURL</ph>: the URL of the subversion repository</p>
+     <p><ph>workingCopy</ph>: location of the local working copy relative to the current application
+      executable location.</p>
+     <p><ph>profilePropName</ph>: the process property containing the name of the working
+      profile.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1023112">
+   <strow>
+    <stentry>
+     <b>Add subversion entry for user<ph>
+       <indexterm>Task <indexterm>Add subversion entry for user</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Runs the Subversion <ph>add</ph> command on the named subversion entry.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.svn</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddSubversionEntryForUser.java<indexterm>Task bean
+        <indexterm>AddSubversionEntryForUser.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>prompt</ph>: the prompt to tell the user what type of subversion entry they are
+      making.</p>
+     <p><ph>keyName</ph>: the identity of the repository</p>
+     <p><ph>repoURL</ph>: the URL of the subversion repository</p>
+     <p><ph>workingCopy</ph>: location of the local working copy relative to the current application
+      executable location.</p>
+     <p><ph>userNameProperty</ph>: the key for the user</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>

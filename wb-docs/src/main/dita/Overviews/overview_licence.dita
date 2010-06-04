@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+  <title>Licensing of the IHTSDO Workbench</title>
+
+  <shortdesc>The IHTSDO Workbench comprises a number of components and
+  frameworks. A specific release of the workbench IDE or viewer is usually
+  made available in the form of an application "bundle" that includes one or
+  more terminologies, an integrated database, and the application code. Each
+  bundle is tailored for a particular use, and may be released for a
+  particular target operating environment, replete with an appropriate
+  "installer". Different licences may apply to the the various components of
+  the bundle.</shortdesc>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>licence</indexterm>
+
+        <indexterm>source code</indexterm>
+
+        <indexterm>Apache2</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>Any terminologies supplied with a workbench IDE or viewer will be
+    subject to the licences specific to each terminology. <p/></section>
+
+    <section><title>Source code</title><p>The source code of the IHTSDO
+    Workbench is made available under the Apache Licence, Version 2.0,
+    accessible at:<codeblock><xref format="html"
+          href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</xref></codeblock></p><p>Most
+    source code components are managed by the IHTSDO under subversion control
+    at the Collabnet Teamforge site at:</p><codeblock><xref format="html"
+          href="https://csfe.aceworkspace.net/sf/sfmain/do/home">https://csfe.aceworkspace.net/sf/sfmain/do/home</xref></codeblock></section>
+  </body>
+</topic>

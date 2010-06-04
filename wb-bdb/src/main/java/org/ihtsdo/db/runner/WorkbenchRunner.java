@@ -376,7 +376,14 @@ public class WorkbenchRunner {
 					afc.setMasterConfig(AceConfig.config);
 					boolean login = true;
 					while (login) {
-						if (ace.getUsername().equals(prompter.getUsername()) == false
+						if (frameCount == 1) {
+							if (ace.getPassword().equals(prompter.getPassword())) {
+								if (ace.getUsername().equals(prompter.getUsername()) == false) {
+									AceConfig.config.setUsername(ace.getUsername());
+									prompter.setUsername(ace.getUsername());
+								}
+							}
+						} else if (ace.getUsername().equals(prompter.getUsername()) == false
 								|| ace.getPassword().equals(
 										prompter.getPassword()) == false) {
 							prompter.prompt("Please authenticate for: "

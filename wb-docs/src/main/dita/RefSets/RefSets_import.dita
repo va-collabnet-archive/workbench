@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="refsets_import" xml:lang="en">
+  <title>Importing a Refset from a file</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>importing refsets</indexterm>
+
+        <indexterm>refsets <indexterm>importing</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>A Reference set can be imported from a file. This is achieved via
+    the <i>Import refset spec from file</i> under the main menu heading
+    <i>Refsets</i> as shown in <xref format="dita"
+    href="#refsets_import/import_refset_spec"/>. The format of this file needs
+    to conform to the SNOMED Reference Set Specification ( part of the SNOMED
+    Release Format 2 specification available from the IHTSDO). In order for
+    all users to see the imported reference set, it needs to be imported onto
+    the user's promotion path.<fig id="import_refset_spec">
+        <title>Import/export of refset specifications</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/menu_tasks_pulldown_screenshot.jpg"/>
+      </fig></section>
+  </body>
+</topic>

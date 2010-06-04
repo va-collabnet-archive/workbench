@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="Snorocket_integration" title="Snorocket Classifier" xml:lang="en">
+  <title>Snorocket Classifier</title>
+
+  <topicref href="Snorocket_intro.dita#topic1"
+            navtitle="Integrating the SnoRocket Classifier " type="topic">
+    <topicref href="Snorocket_structure.dita#topic2"
+              navtitle="Snorocket Structure " type="topic"/>
+
+    <topicref href="Snorocket_in_eclipse.dita#topic3"
+              navtitle="Creating Snorocket in Eclipse " type="topic"/>
+
+    <topicref href="Snorocket_integration.dita#topic4"
+              navtitle="Integrating with the Workbench Build " type="topic"/>
+  </topicref>
+</map>

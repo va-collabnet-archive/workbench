@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic2" xml:lang="en">
+ <title>Accessing the Queue Viewer</title>
+ <prolog>
+  <metadata>
+   <keywords>
+    <indexterm>Queue Viewer </indexterm>
+   </keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>From the IHTSDO Workbench IDE window, click on the Queue Viewer icon, which is shown in
+    <xref href="#topic2/ah926600" type="fig" format="dita"/>.</section>
+  <fig id="ah926600">
+   <title>Queue Viewer Icon</title>
+   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_1.jpg"
+    placement="break" width="83" height="64"/>
+  </fig>
+  <section>The Queue Viewer will display in the area of the window where the Component Work Area
+   typically is displayed, as shown in <xref href="#topic2/ah926649" type="fig" format="dita"
+   /></section>
+  <fig id="ah926649">
+   <title>Queue Viewer Window</title>
+   <image href="../images/Using_The_Queue_Viewer_Images/using_the_queue_viewer_img_2.jpg"
+    placement="break" width="470" height="416"/>
+  </fig>
+ </body>
+</topic>
+

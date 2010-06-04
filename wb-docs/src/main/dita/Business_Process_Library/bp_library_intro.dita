@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+ <title>Business Process Library</title>
+ <prolog>
+  <author>Eric Browne</author>
+  <metadata>
+   <keywords>
+    <indexterm>Business Process<indexterm>library</indexterm><indexterm>plugins</indexterm></indexterm>
+    <indexterm>plugins<indexterm>business process</indexterm></indexterm>
+    <indexterm>plugins<index-see>process</index-see></indexterm>
+   </keywords>
+  </metadata>
+ </prolog>
+ 
+ <body>
+  <section>The Business Process Library comprises a set of business processes that support the
+   terminology development environment of an organisation. Business Processes are constructed using
+   the Business Process IDE as described in <xref href="../Workflow/processes_intro.dita#topic1"
+    type="topic" format="dita"/>, and saved to the analyst's local disk. Business Processes that are
+   to be run by modellers or other end users should normally be incorporated into the IHTSDO
+   Workbench IDE distributed to users' machines. Other Business Processes, e.g. those supporting
+   administrative activities such as configuring modeller's environment, may not be built into the
+   distribution bundle. </section>
+  <section>A Business Process (BP) utilises the <b>plugin</b> framework of IHTSDO Workbench and
+   could be configured to be invoked through several means, by chosing the appropriate location in
+   the IDE bundle folder/directory structure:</section>
+  <ul>
+   <li>a BP can be invoked using a button in IHTSDO IDE. The button can be attached to one or more
+    of a number of panels in IHTSDO IDE.</li>
+   <li>a BP can be invoked from the IHTSDO IDE menu.</li>
+   <li>a BP can be loaded into the business process editor from the user's filesystem and executed
+    therein. This is useful for administrative processes undertaken by analysts, such a configuring
+    a particular user's modelling or validating environment.</li>
+   <li>a BP could be invoked by the system as a subprocess of a larger Business Process.</li>
+   <li>A BP could be invoked by the system as part of an inbuilt system process. For example, the <i
+     >precommit</i> and <i>commit</i> folders store business processes that are executed as part of
+    the commit action within the IHTSDO IDE.</li>
+  </ul>
+  <section>The mechanism for BP invocation is controlled in the IHTSDO IDE by the corresponding
+   serialised BP object ( a file with extension .bp) built by the Business Process Editor being
+   located in an appropriate subfolder of the “plugin” folder in the executable bundle. This chapter
+   tries to describe all of the above Business Process types.</section>
+  <section>The following pages describe each of the business processes that have already been
+   constructed. A BP is generally considered a plug-in if it resides in one of the specialised
+   locations in an IHTSDO IDE bundle. These locations then determine how the BP can be invoked.
+   Rather then categorising the BPs by their plug-in type, we have chosen below to order the
+   processes by their business function category, dealing with change sets, creation processes,
+   refset processes, etc. However, the plug-in type is also included in each table. There are also a
+   number of business process modules that are loaded and invoked manually by an analyst, usually to
+   establish, configure or modify a modeller's editing environment. These BPs are not usually
+   considered plug-ins, nor are they usually supplied with the application bundle.</section>
+  
+ </body>
+</topic>

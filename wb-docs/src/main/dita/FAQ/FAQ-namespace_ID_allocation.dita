@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="namespace_ID_allocation">
+  <title>How are namespaces used in refset creation?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>namespaces<indexterm>in refset
+        creation</indexterm></indexterm>
+
+        <indexterm>refsets<indexterm>and namespaces</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><title>e.g. The UK (1000000) and UK Drug Ext (1000001) namespace
+    identifiers are part of new SNOMED ID’s. How is the distinction made for
+    new content such as refset creation as to which extension it
+    belongs?</title><p>Currently the ID generator derives the namespace and
+    project code from the name of the SCT ID mapping files stored in the
+    release project's <codeph>src/main/sct-uuid-maps</codeph>
+    folder.</p><p>e.g. the branched NHS cfh release project currently has
+    mapping files named <codeph>NHS-REFSET- ....txt</codeph>.</p><p>The first
+    part indicates the namespace, and the second is the project. A default
+    configuration of these was set up in
+    <codeph>dwfa-mojo:org.dwfa.maven.transform.SctIdGenerator</codeph>.
+    <codeph>NHS</codeph>=namespace (value of 1999999),
+    <codeph>refset</codeph>=project (value of 03).</p></section>
+  </body>
+</topic>
