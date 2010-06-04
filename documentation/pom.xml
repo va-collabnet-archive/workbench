@@ -49,7 +49,7 @@
             <plugin>
                 <groupId>org.ihtsdo</groupId>
                 <artifactId>wb-dita-maven-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>${wb-toolkit.version}</version>
                 <executions>
                     <execution>
                         <id>generate-dita</id>
