@@ -416,8 +416,8 @@
                         </goals>
                          <configuration>
                             <file>target/xhtml/Guidebook/toc.html</file>
-                            <tokenFile>src/main/resources/htmlhead.replacetoken</tokenFile>
-                            <valueFile>src/main/resources/htmlhead.replacevalue</valueFile>
+                            <tokenFile>${basedir}/src/main/resources/htmlhead.replacetoken</tokenFile>
+                            <valueFile>${basedir}/src/main/resources/htmlhead.replacevalue</valueFile>
                             <regexFlags>
                                 <regexFlag>CASE_INSENSITIVE</regexFlag>
                             </regexFlags>                            
@@ -431,8 +431,8 @@
                         </goals>
                         <configuration>
                             <file>target/xhtml/Guidebook/toc.html</file>
-                            <tokenFile>src/main/resources/htmlbody.replacetoken</tokenFile>
-                            <valueFile>src/main/resources/htmlbody.replacevalue</valueFile>
+                            <tokenFile>${basedir}/src/main/resources/htmlbody.replacetoken</tokenFile>
+                            <valueFile>${basedir}/src/main/resources/htmlbody.replacevalue</valueFile>
                             <regexFlags>
                                 <regexFlag>CASE_INSENSITIVE</regexFlag>
                             </regexFlags>                            
