@@ -2772,7 +2772,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     countRsByCon++;
                     if (theRsByCon.compareTo(theCon) == IS_LESS)
                         getLog().info(
-                                "ORPHAN REFSET MEMBER RECORD :: "
+                                "ORPHAN REFSET MEMBER RECORD_A :: "
                                         + new UUID(rsByConList.get(0).memberUuidMsb, rsByConList
                                                 .get(0).memberUuidLsb));
                 }
@@ -2791,7 +2791,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     countRsByRs++;
                     if (theRsByRs.compareTo(theCon) == IS_LESS)
                         getLog().info(
-                                "ORPHAN REFSET MEMBER RECORD :: "
+                                "ORPHAN REFSET MEMBER RECORD_B :: "
                                         + new UUID(rsByRsList.get(0).memberUuidMsb, rsByRsList
                                                 .get(0).memberUuidLsb));
                 }
@@ -4356,7 +4356,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
     private int compareRelationship(SctYRelRecord c1, SctYRelRecord c2) {
         if (c1.relUuidMsb == c2.relUuidMsb && c1.relUuidLsb == c2.relUuidLsb) {
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
-                    && (c1.refinability == c2.refinability))
+                    && (c1.refinability == c2.refinability) && (c1.group == c2.group))
                 return 1; // SAME
             else
                 return 2; // MODIFIED
@@ -4553,7 +4553,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     && (a[idx].relUuidLsb == a[idx + 1].relUuidLsb)) {
                 duplIdxList.add(Integer.valueOf(idx));
                 getLog().info(
-                        "WARNING -- Duplicate relationship:" + "\r\n A:" + a[idx] + "\r\n B:"
+                        "::: WARNING -- Logically Duplicate Relationships:" + "\r\n::: A:" + a[idx] + "\r\n::: B:"
                                 + a[idx + 1]);
             }
         if (duplIdxList.size() > 0) {
