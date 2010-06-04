@@ -97,44 +97,6 @@
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>
   </modules>
-    <profiles>
-        <profile>
-            <id>bundle-all</id>
-            <modules>
-                <module>wb-bundle</module>        
-            </modules>    
-        </profile>
-        <profile>
-              <id>bundle</id>
-              <modules>
-                   <module>wb-bundle</module>        
-              </modules>    
-        </profile>
-        <profile>
-            <id>distribution</id>
-            <modules>
-                <module>wb-bundle</module>        
-            </modules>    
-        </profile>
-        <profile>
-            <id>viewer</id>
-            <modules>
-                <module>wb-bundle</module>        
-            </modules>    
-        </profile>
-        <profile>
-            <id>standalone</id>
-            <modules>
-                <module>wb-bundle</module>        
-            </modules>    
-        </profile>
-        <profile>
-            <id>synchronized</id>
-            <modules>
-                <module>wb-bundle</module>        
-            </modules>    
-        </profile>
-    </profiles>
     <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.
          These should be pushed into the parent POM -->
     <pluginRepositories>
