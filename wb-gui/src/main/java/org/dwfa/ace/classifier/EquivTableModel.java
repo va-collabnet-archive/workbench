@@ -23,7 +23,7 @@ import org.dwfa.ace.task.classify.SnoConGrpList;
 
 @SuppressWarnings("serial")
 public class EquivTableModel extends AbstractTableModel {
-    private String[] columnNames = { "#", "<html><font face='Dialog' size='3' color='green'>Concept" };
+    private String[] columnNames = { "#", "<html><font face='Dialog' size='3' color='black'>Concept" };
 
     private Object[][] data;
     private SnoConGrpList dataList;

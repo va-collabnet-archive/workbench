@@ -35,7 +35,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -50,8 +49,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -65,13 +62,13 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-import au.csiro.snorocket.core.IFactory_123;
-import au.csiro.snorocket.snapi.Snorocket_123;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
+import au.csiro.snorocket.snapi.Snorocket;
+import au.csiro.snorocket.snapi.I_Snorocket.I_Callback;
+import au.csiro.snorocket.snapi.I_Snorocket.I_EquivalentCallback;
+
+// import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataConCallback;
+// import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataRelCallback;
+// import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataRoleCallback;
 
 /**
  * 
@@ -98,9 +95,11 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
  * <p>
  * <p>
  * <ul>
+ * 
  */
+
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
-public class SnorocketTask extends AbstractTask implements ActionListener {
+public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final int dataVersion = 1;
 
@@ -160,27 +159,16 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 	// USER INTERFACE
 	private Logger logger;
-	private I_TermFactory tf = null;
-	private I_ConfigAceFrame config = null;
+	I_TermFactory tf = null;
+	I_ConfigAceFrame config = null;
 	private PRECEDENCE precedence;
 	private I_ManageContradiction contradictionMgr;
-	private I_ShowActivity gui = null;
+	I_ShowActivity gui = null;
 	private boolean continueThisAction = true;
 
-	// INTERNAL
-	private static boolean debug = false; // :DEBUG:
-	private static boolean debugDump = false; // :DEBUG: save to files
-    
-    static {
-    	if (System.getProperties().get("SnorocketDebug") != null &&
-    			System.getProperties().get("SnorocketDebug").toString().toLowerCase().startsWith("t")) {
-    		debug = true;
-    	}
-    	if (System.getProperties().get("SnorocketDebugDump") != null &&
-    			System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
-    		debugDump = true;
-    	}
-    }
+	// :DEBUG:
+	private static boolean debug = false;
+	private static boolean debugDump = false;
 
 	static {
 		if (System.getProperties().get("SnorocketDebug") != null
@@ -202,8 +190,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 	/**
 	 * <b><font color=blue>ProcessResults</font></b><br>
-	 * Retrieves results from classifier.<br>
-	 * <br>
 	 * <b>First Classification Run</b><br>
 	 * <i>The Classifier may create a new part for an existing relationship.<br>
 	 * </i> PROCESS:<br>
@@ -221,20 +207,37 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 	 * Case C. ABSENT: WAS in previous, NOT in current. Set status to RETIRED.
 	 * 
 	 */
+
 	private class ProcessResults implements I_Callback {
 		private List<SnoRel> snorels;
 		private int countRel = 0; // STATISTICS COUNTER
 
 		public ProcessResults(List<SnoRel> snorels) {
 			this.snorels = snorels;
-			this.countRel = 0;
 		}
 
-		public void addRelationship(int conceptId1, int roleId, int conceptId2,
-				int group) {
+		public String toStringStats(long startTime) {
+			StringBuffer s = new StringBuffer();
+			s.append("\r\n::: [SnorocketTask] ProcessResults()");
+			if (startTime > 0) {
+				long lapseTime = System.currentTimeMillis() - startTime;
+				s.append("\r\n::: [Time] Get Solution Set: \t" + lapseTime
+						+ "\t(mS)\t" + (((float) lapseTime / 1000) / 60)
+						+ "\t(min)");
+				s.append("\r\n");
+			}
+			s.append("\r\n::: Solution Set Relationships:\t" + countRel);
+			s.append("\r\n::: ");
+			return s.toString();
+		}
+
+		@Override
+		public void addRelationship(String conceptId1, String roleId,
+				String conceptId2, int group) {
 			countRel++;
-			SnoRel relationship = new SnoRel(conceptId1, conceptId2, roleId,
-					group);
+			SnoRel relationship = new SnoRel(Integer.valueOf(conceptId1)
+					.intValue(), Integer.valueOf(conceptId2).intValue(),
+					Integer.valueOf(roleId).intValue(), group, countRel);
 			snorels.add(relationship);
 			if (countRel % 25000 == 0) {
 				// ** GUI: ProcessResults
@@ -251,66 +254,27 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			SnoQuery.clearEquiv();
 		}
 
-		public void equivalent(ArrayList<Integer> equivalentConcepts) {
+		public void equivalent(Collection<String> equivalentConcepts) {
 			SnoQuery.equivCon.add(new SnoConGrp(equivalentConcepts));
 			countConSet += 1;
 		}
 
-	}
-
-	private class ProcessInternalDataCon implements I_InternalDataConCallback {
-		private List<SnoCon> snocons;
-
-		public ProcessInternalDataCon(List<SnoCon> snocons) {
-			super();
-			this.snocons = snocons;
-		}
-
-		@Override
-		public void processConData(int cId) {
-			snocons.add(new SnoCon(cId, false));
-		}
-
-	}
-
-	private class ProcessInternalDataRel implements I_InternalDataRelCallback {
-		private List<SnoRel> snorels;
-
-		public ProcessInternalDataRel(List<SnoRel> snorels) {
-			super();
-			this.snorels = snorels;
-		}
-
-		@Override
-		public void processRelData(int c1Id, int roleId, int c2Id, int group) {
-			snorels.add(new SnoRel(c1Id, c2Id, roleId, group));
+		public String toStringStats(long startTime) {
+			StringBuffer s = new StringBuffer();
+			s.append("\r\n::: [SnorocketTask] ProcessEquiv()");
+			if (startTime > 0) {
+				long lapseTime = System.currentTimeMillis() - startTime;
+				s.append("\r\n::: [Time] Get Equivalents: \t" + lapseTime
+						+ "\t(mS)\t" + (((float) lapseTime / 1000) / 60)
+						+ "\t(min)");
+				s.append("\r\n");
+			}
+			s.append("\r\n::: Equivalent concept sets:\t" + countConSet);
+			s.append("\r\n::: ");
+			return s.toString();
 		}
 
 	}
-
-	private class ProcessInternalDataRole implements I_InternalDataRoleCallback {
-		private List<SnoCon> snocons;
-
-		public ProcessInternalDataRole(List<SnoCon> snocons) {
-			super();
-			this.snocons = snocons;
-		}
-
-		@Override
-		public void processRoleData(int cId) {
-			snocons.add(new SnoCon(cId, false));
-		}
-
-	}
-
-	/**
-	 * POSSIBLE APPROACHES FOR RECIEVING DATA FROM NEW DATABASE<br>
-	 * 1. Get List<SnoCon>, use List<SnoCon> as post processing filter.<br>
-	 * 2. Get List<SnoCon>, use List<SnoCon> as filter in second pass.<br>
-	 * 3. Get List<SnoCon>, use List<SnoCon> in individually get Rels in loop.<br>
-	 * 4. Check relationship C2 while processing path.<br>
-	 * 5. Modify processConcepts internal.<br>
-	 */
 
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 			throws TaskFailedException {
@@ -336,166 +300,132 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			logger.info(toStringPathPos(cClassPathPos, "Classifier Path"));
 			// logger.info(toStringFocusSet(tf));
 
-			// ** GUI: 1. LOAD DATA INTO CLASSIFIER **
+			// SETUP CLASSIFIER :zzz:
+			Snorocket rocket = new Snorocket();
+
+			// SnomedMetadata :: ISA
+			// c93a30b9-ba77-3adb-a9b8-4589c9f8fb25 'Is a' NotDefined
+			rocket.setIsa(String.valueOf(isaNid));
+			rocket.addConcept(String.valueOf(rootNid), false); // @@@
+			rocket.rootConceptStr = String.valueOf(rootNid);
+
+			// SnomedMetadata :: ROLE_ROOTS
+			// c93a30b9-ba77-3adb-a9b8-4589c9f8fb25 'Is a' INCLUSIVE
+			rocket.addRoleRoot(String.valueOf(isaNid), true); // @@@:zzz:
+			// 6155818b-09ed-388e-82ce-caa143423e99 'Concept Model Attribute'
+			// SnomedId "410662002" NOT_INCLUSIVE
+			rocket.addRoleRoot(String.valueOf(rootRoleNid), false);
+
+			// SnomedMetadata :: NEVER_GROUPED
+			// SnomedId "123005000" // part-of
+			// b4c3f6f9-6937-30fd-8412-d0c77f8a7f73
+			UUID ngUUid = UUID
+					.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "272741003" // laterality
+			ngUUid = UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "127489000" // has-active-ingredient
+			ngUUid = UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "411116001" // has-dose-form
+			ngUUid = UUID.fromString("072e7737-e22e-36b5-89d2-4815f0529c63");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+
+			// SnomedMetadata :: RIGHT_IDENTITIES
+			// direct-substance o has-active-ingredient -> direct-substance
+			// SNOMED IDs {"363701004", "127489000"}
+
+			// SnomedId "363701004" // direct-substance
+			// 49ee3912-abb7-325c-88ba-a98824b4c47d
+			int nidDirectSubstance = tf.getId(
+					UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
+					.getNid();
+
+			// SnomedId "127489000" // has-active-ingredient
+			// 65bf3b7f-c854-36b5-81c3-4915461020a8
+			int nidHasActiveIngredient = tf.getId(
+					UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
+					.getNid();
+
+			String lhsData[] = new String[2];
+			lhsData[0] = String.valueOf(nidDirectSubstance);
+			lhsData[1] = String.valueOf(nidHasActiveIngredient);
+			String rhsData = String.valueOf(nidDirectSubstance);
+			rocket.addRoleComposition(lhsData, rhsData);
+
+			// ** GUI: 1. LOAD DATA **
 			continueThisAction = true;
 			gui = tf.newActivityPanel(true, config,
-					"Classifier 1/5: load data", true); // in
-			// activity
-			// viewer
+					"Classifier 1/5: load data", true);
 			gui.addRefreshActionListener(this);
 			gui.setProgressInfoUpper("Classifier 1/5: load data");
 			gui.setIndeterminate(false);
-			gui.setMaximum(1500000);
+			gui.setMaximum(1000000);
 			gui.setValue(0);
+
+			// GET EDIT_PATH RELS & ADD TO SNOROCKET
+			cEditSnoCons = new ArrayList<SnoCon>();
+			cEditSnoRels = new ArrayList<SnoRel>();
 			long startTime = System.currentTimeMillis();
 
 			// SETUP ROLE NID ARRAY
-			int[] rNidArray = setupRoleNids();
-			int nextRIdx = rNidArray.length;
+			setupRoleNids();
 
-			// GET EDIT_PATH CONCEPTS AND RELATIONSHIPS
 			cEditSnoCons = new ArrayList<SnoCon>();
 			cEditSnoRels = new ArrayList<SnoRel>();
 			SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger,
 					cEditSnoCons, cEditSnoRels, allowedRoleTypes, statusSet,
 					cEditPosSet, gui, precedence, contradictionMgr);
-			tf.iterateConcepts(pcEdit); // :!!!:
-			// Bdb.getConceptDb().iterateConceptDataInSequence(pcEdit);
+			tf.iterateConcepts(pcEdit);
 			logger.info("\r\n::: [SnorocketTask] GET STATED PATH DATA"
 					+ pcEdit.getStats(startTime));
 
-			// SETUP CONCEPT NID ARRAY
-			final int reserved = 2;
-			int margin = cEditSnoCons.size() >> 2; // Add 50%
-			int[] cNidArray = new int[cEditSnoCons.size() + margin + reserved];
-			cNidArray[IFactory_123.TOP_CONCEPT] = IFactory_123.TOP;
-			cNidArray[IFactory_123.BOTTOM_CONCEPT] = IFactory_123.BOTTOM;
+			if (debugDump) {
+				dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
+				dumpRoles();
+				dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
+			}
 
 			Collections.sort(cEditSnoCons);
-			if (cEditSnoCons.get(0).id <= Integer.MIN_VALUE + reserved)
-				throw new TaskFailedException(
-						"::: SNOROCKET: TOP & BOTTOM nids NOT reserved");
-			int nextCIdx = reserved;
 			for (SnoCon sc : cEditSnoCons)
-				cNidArray[nextCIdx++] = sc.id;
-			// Fill array to make binary search work correctly.
-			Arrays.fill(cNidArray, nextCIdx, cNidArray.length,
-					Integer.MAX_VALUE);
+				rocket.addConcept(String.valueOf(sc.id), sc.isDefined);
 
-			if (debugDump) {
-				// FILTER RELATIONSHIPS
-				/* Snorocket_123 is self filtering on C2 */
-				int last = cEditSnoRels.size();
-				for (int idx = last - 1; idx > -1; idx--)
-					if (Arrays.binarySearch(cNidArray,
-							cEditSnoRels.get(idx).c2Id) < 0)
-						cEditSnoRels.remove(idx);
-
-				dumpSnoCon(cEditSnoCons, "SnoConEdit_RawNid.txt", 1);
-				dumpSnoRel(cEditSnoRels, "SnoRelEdit_RawNid.txt", 1);
-
-				dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
-				dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
-
-				dumpSnoCon(cEditSnoCons, "SnoConEditData_compare.txt", 5);
-				dumpSnoRel(cEditSnoRels, "SnoRelEditData_compare.txt", 5);
-			}
-
-			// SETUP CLASSIFIER
-			Snorocket_123 rocket_123 = new Snorocket_123(cNidArray, nextCIdx,
-					rNidArray, nextRIdx, rootNid);
-
-			// SnomedMetadata :: ISA
-			rocket_123.setIsaNid(isaNid);
-
-			// SnomedMetadata :: ROLE_ROOTS
-			rocket_123.setRoleRoot(isaNid, true); // @@@
-			rocket_123.setRoleRoot(rootRoleNid, false);
-
-			// SET DEFINED CONCEPTS
-			for (int i = 0; i < cEditSnoCons.size(); i++)
-				if (cEditSnoCons.get(i).isDefined)
-					rocket_123.setConceptIdxAsDefined(i + reserved);
-
-			// ADD RELATIONSHIPS
 			Collections.sort(cEditSnoRels);
-			for (SnoRel sr : cEditSnoRels) {
-				int err = rocket_123.addRelationship(sr.c1Id, sr.typeId,
-						sr.c2Id, sr.group);
-				if (debugDump && err > 0) {
-					StringBuilder sb = new StringBuilder();
-					if ((err & 1) == 1)
-						sb.append(" --UNDEFINED_C1-- ");
-					if ((err & 2) == 2)
-						sb.append(" --UNDEFINED_ROLE-- ");
-					if ((err & 4) == 4)
-						sb.append(" --UNDEFINED_C2-- ");
-					logger.info("\r\n::: " + sb + dumpSnoRelStr(sr));
-				}
-			}
+			for (SnoRel sr : cEditSnoRels)
+				rocket.addRelationship(String.valueOf(sr.c1Id), String
+						.valueOf(sr.typeId), String.valueOf(sr.c2Id), sr.group);
+			logger.info("\r\n::: [SnorocketTask] SORTED & ADDED CONs, RELs"
+					+ " *** LAPSE TIME = " + toStringLapseSec(startTime)
+					+ " ***");
 
-			/* ****************
-			 * // SnomedMetadata :: RIGHT_IDENTITIES // direct-substance o
-			 * has-active-ingredient -> direct-substance // SNOMED IDs
-			 * {"363701004", "127489000"}
-			 * 
-			 * // SnomedId "363701004" // direct-substance //
-			 * 49ee3912-abb7-325c-88ba-a98824b4c47d int nidDirectSubstance =
-			 * tf.getId(
-			 * UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
-			 * .getNid();
-			 * 
-			 * // SnomedId "127489000" // has-active-ingredient //
-			 * 65bf3b7f-c854-36b5-81c3-4915461020a8 int nidHasActiveIngredient =
-			 * tf.getId(
-			 * UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
-			 * .getNid();
-			 * 
-			 * int lhsData[] = new int[2]; lhsData[0] = nidDirectSubstance;
-			 * lhsData[1] = nidHasActiveIngredient;
-			 * rocket_123.addRoleComposition(lhsData, nidDirectSubstance);
-			 * ***************
-			 */
-
-			// ROLE_COMPOSITION List
+			// ROLE COMPOSITION
 			ArrayList<SnoDL> dll = SnoDLSet.getDLList();
 			if (dll != null) {
 				for (SnoDL sdl : dll) {
-					rocket_123.addRoleComposition(sdl.getLhsNids(), sdl
-							.getRhsNid());
+					int[] lhsNidArray = sdl.getLhsNids();
+					int lhsNidArraySize = lhsNidArray.length;
+					String[] lhsStrArray = new String[lhsNidArraySize];
+					for (int i = 0; i < lhsNidArraySize; i++)
+						lhsStrArray[i] = String.valueOf(lhsNidArray[i]);
+					String rhsStr = String.valueOf(sdl.getRhsNid());
+					rocket.addRoleComposition(lhsStrArray, rhsStr);
 				}
 				logger.info("\r\n::: [SnorocketTask] Logic Added");
 			}
 
-			/* ****************
-			 * // SnomedMetadata :: NEVER_GROUPED // SnomedId "123005000" //
-			 * part-of // b4c3f6f9-6937-30fd-8412-d0c77f8a7f73 UUID ngUUid =
-			 * UUID.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73");
-			 * rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid()); //
-			 * SnomedId "272741003" // laterality ngUUid =
-			 * UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b");
-			 * rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid()); //
-			 * SnomedId "127489000" // has-active-ingredient ngUUid =
-			 * UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8");
-			 * rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid()); //
-			 * SnomedId "411116001" // has-dose-form ngUUid =
-			 * UUID.fromString("072e7737-e22e-36b5-89d2-4815f0529c63");
-			 * rocket_123.setRoleNeverGrouped(tf.getId(ngUUid).getNid());
-			 * ***************
-			 */
-
-			// NEVER_GROUPED List
+			// NEVER GROUPED
 			ArrayList<SnoConSer> ngl = SnoDLSet.getNeverGroup();
 			if (ngl != null) {
 				for (SnoConSer scs : ngl)
-					rocket_123.setRoleNeverGrouped(scs.id);
+					rocket.addRoleNeverGrouped(String.valueOf(scs.id));
 
 				logger.info("\r\n::: [SnorocketTask] \"Never-Grouped\" Added");
 			}
-
-			logger.info("\r\n::: [SnorocketTask] SORTED & ADDED CONs, RELs"
-					+ " *** LAPSE TIME = " + toStringLapseSec(startTime)
-					+ " ***");
 
 			// ** GUI: 1. LOAD DATA -- done **
 			if (continueThisAction) {
@@ -508,11 +438,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 				gui.complete(); // PHASE 1. DONE
 				return Condition.CONTINUE;
 			}
-
-			cEditSnoCons = null; // :MEMORY:
 			cEditSnoRels = null; // :MEMORY:
 			pcEdit = null; // :MEMORY:
-			System.gc();
 
 			// ** GUI: 2 RUN CLASSIFIER **
 			gui = tf.newActivityPanel(true, config,
@@ -524,57 +451,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
 			gui.setIndeterminate(true);
 
-			if (debugDump) {
-				ArrayList<SnoCon> dataCon = new ArrayList<SnoCon>();
-				ArrayList<SnoRel> dataRel = new ArrayList<SnoRel>();
-				ArrayList<SnoCon> dataRole = new ArrayList<SnoCon>();
-
-				ProcessInternalDataCon dConProc = new ProcessInternalDataCon(
-						dataCon);
-				ProcessInternalDataRel dRelProc = new ProcessInternalDataRel(
-						dataRel);
-				ProcessInternalDataRole dRoleProc = new ProcessInternalDataRole(
-						dataRole);
-
-				rocket_123.getInternalDataCon(dConProc);
-				rocket_123.getInternalDataRel(dRelProc);
-				rocket_123.getInternalDataRole(dRoleProc);
-
-				dumpSnoCon(dataCon, "Rocket123InputIDataCon_compare.txt", 5);
-				dumpSnoRel(dataRel, "Rocket123InputIDataRelIdx_compare.txt", 5);
-				dumpSnoCon(dataRole, "Rocket123InputIDataRole_compare.txt", 5);
-
-				ArrayList<SnoRel> dataSnoRelNid = new ArrayList<SnoRel>();
-
-				int maxCon = dataCon.size();
-				int maxRole = dataRole.size();
-				for (SnoRel srd : dataRel) {
-					int iC1 = Integer.MIN_VALUE;
-					int iRole = Integer.MIN_VALUE;
-					int iC2 = Integer.MIN_VALUE;
-					int iG = Integer.MIN_VALUE;
-
-					if (srd.c1Id < maxCon)
-						iC1 = dataCon.get(srd.c1Id).id;
-					if (srd.typeId < maxRole)
-						iRole = dataRole.get(srd.typeId).id;
-					if (srd.c2Id < maxCon)
-						iC2 = dataCon.get(srd.c2Id).id;
-					iG = srd.group;
-					dataSnoRelNid.add(new SnoRel(iC1, iC2, iRole, iG));
-				}
-				dumpSnoRel(dataSnoRelNid,
-						"Rocket123InputIDataRelNid_compare.txt", 5);
-
-				dataCon = null;
-				dataRel = null;
-				dataSnoRelNid = null;
-			}
-
 			// RUN CLASSIFIER
 			startTime = System.currentTimeMillis();
 			logger.info("::: Starting Classifier... ");
-			rocket_123.classify();
+			rocket.classify();
 			logger.info("::: Time to classify (ms): "
 					+ (System.currentTimeMillis() - startTime));
 
@@ -585,38 +465,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 				gui.complete();
 			} else {
 				gui.setProgressInfoLower("classification stopped by user");
-				gui.complete(); // PHASE 1. DONE
-				return Condition.CONTINUE;
-			}
-
-			// ** GUI: * GET CLASSIFIER EQUIVALENTS **
-			// Show in activity viewer
-			gui = tf.newActivityPanel(true, config,
-					"Classifier */*: retrieve equivalent concepts", true);
-			gui.addRefreshActionListener(this);
-			gui
-					.setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
-			gui.setIndeterminate(true);
-			// gui.setMaximum(1000000);
-			// gui.setValue(0);
-
-			// GET CLASSIFER EQUIVALENTS
-			worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
-			startTime = System.currentTimeMillis();
-			ProcessEquiv pe = new ProcessEquiv();
-			rocket_123.getEquivalents(pe);
-			logger.info("\r\n::: [SnorocketTask] ProcessEquiv() count="
-					+ pe.countConSet + " time= " + toStringLapseSec(startTime));
-
-			// ** GUI: * -- done
-			if (continueThisAction) {
-				gui.setProgressInfoLower("solution set rels = "
-						+ pe.countConSet + ", lapsed time = "
-						+ toStringLapseSec(startTime));
-				gui.complete(); // GET CONCEPT EQUIVALENTS -- done
-				pe = null; // :MEMORY:
-			} else {
-				gui.setProgressInfoLower("get evquivalents stopped by user");
 				gui.complete(); // PHASE 1. DONE
 				return Condition.CONTINUE;
 			}
@@ -637,9 +485,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			worker.getLogger().info("::: GET CLASSIFIER RESULTS...");
 			startTime = System.currentTimeMillis();
 			ProcessResults pr = new ProcessResults(cRocketSnoRels);
-			rocket_123.getDistributionFormRelationships(pr);
-			logger.info("\r\n::: [SnorocketTask] GET CLASSIFIER RESULTS count="
-					+ pr.countRel + " time= " + toStringLapseSec(startTime));
+			rocket.getDistributionFormRelationships(pr);
+			logger.info(pr.toStringStats(startTime));
 
 			// ** GUI: 3 -- done
 			if (continueThisAction) {
@@ -647,26 +494,52 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 						+ ", lapsed time = " + toStringLapseSec(startTime));
 				gui.complete(); // 3 GET CLASSIFIER RESULTS -- done
 				pr = null; // :MEMORY:
-				rocket_123 = null; // :MEMORY:
-				System.gc();
 			} else {
 				gui.setProgressInfoLower("classification stopped by user");
 				gui.complete(); // PHASE 1. DONE
-				rocket_123 = null; // :MEMORY:
+				return Condition.CONTINUE;
+			}
+
+			if (debugDump)
+				dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
+
+			// ** GUI: * GET CLASSIFIER EQUIVALENTS **
+			gui = tf.newActivityPanel(true, config,
+					"Classifier 2/5: classify data", true); // in
+			// activity
+			// viewer
+			gui.addRefreshActionListener(this);
+			gui
+					.setProgressInfoUpper("Classifier */*: retrieve equivalent concepts");
+			gui.setIndeterminate(true);
+			// gui.setMaximum(1000000);
+			// gui.setValue(0);
+
+			// GET CLASSIFER EQUIVALENTS
+			worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
+			startTime = System.currentTimeMillis();
+			ProcessEquiv pe = new ProcessEquiv();
+			rocket.getEquivalents(pe);
+			logger.info(pe.toStringStats(startTime));
+
+			// ** GUI: GET CLASSIFER EQUIVALENTS -- done
+			if (continueThisAction) {
+				gui.setProgressInfoLower("solution set rels = "
+						+ pe.countConSet + ", lapsed time = "
+						+ toStringLapseSec(startTime));
+				gui.complete(); // GET CONCEPT EQUIVALENTS -- done
+				rocket = null; // :MEMORY:
+				pe = null; // :MEMORY:
+			} else {
+				gui.setProgressInfoLower("get evquivalents stopped by user");
+				gui.complete(); // PHASE 1. DONE
 				return Condition.CONTINUE;
 			}
 			System.gc();
 
-			if (debugDump) {
-				dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
-				dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);
-			}
-
 			// ** GUI: 4 GET CLASSIFIER PATH DATA **
 			String tmpS = "Classifier 4/5: get previously inferred & compare";
-			gui = tf.newActivityPanel(true, config, tmpS, true); // in
-			// activity
-			// viewer
+			gui = tf.newActivityPanel(true, config, tmpS, true);
 			gui.addRefreshActionListener(this);
 			gui.setProgressInfoUpper(tmpS);
 			gui.setIndeterminate(false);
@@ -683,16 +556,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"
 					+ pcClass.getStats(startTime));
 
-			// FILTER RELATIONSHIPS
-			int last = cClassSnoRels.size();
-			for (int idx = last - 1; idx > -1; idx--)
-				if (Arrays.binarySearch(cNidArray, cClassSnoRels.get(idx).c2Id) < 0)
-					cClassSnoRels.remove(idx);
-
-			if (debugDump) {
+			if (debugDump)
 				dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
-				dumpSnoRel(cClassSnoRels, "SnoRelCPathData_compare.txt", 5);
-			}
 
 			// ** GUI: 4 -- done
 			if (continueThisAction) {
@@ -711,7 +576,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			gui.complete(); // PHASE 5. DONE
 			gui = tf.newActivityPanel(true, config,
 					"Classifier 5/5: write back updates"
-							+ " to classifier path", true);
+							+ " to classifier path", true); // in
+			// activity
+			// viewer
 			gui.addRefreshActionListener(this);
 			gui.setProgressInfoUpper("Classifier 5/5: write back updates"
 					+ " to classifier path");
@@ -721,36 +588,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			startTime = System.currentTimeMillis();
 			logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels,
 					cClassPathNid));
-
-			// Commit
-			tf.commit(ChangeSetPolicy.OFF,
-					ChangeSetWriterThreading.SINGLE_THREAD);
-
 			logger.info("\r\n::: *** WRITEBACK *** LAPSED TIME =\t"
 					+ toStringLapseSec(startTime) + " ***");
-
-			if (debugDump) {
-
-				ArrayList<SnoRel> sqrl = SnoQuery.getIsaAdded();
-				dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_full.txt", 4);
-				dumpSnoRel(SnoQuery.getIsaAdded(), "SnoRelIsaAdd_compare.txt",
-						5);
-
-				sqrl = SnoQuery.getIsaDropped();
-				dumpSnoRel(sqrl, "SnoRelIsaDrop_full.txt", 4);
-				dumpSnoRel(sqrl, "SnoRelIsaDrop_compare.txt", 5);
-
-				sqrl = SnoQuery.getRoleAdded();
-				dumpSnoRel(sqrl, "SnoRelRoleAdd_full.txt", 4);
-				dumpSnoRel(sqrl, "SnoRelRoleAdd_compare.txt", 5);
-
-				sqrl = SnoQuery.getRoleDropped();
-				dumpSnoRel(sqrl, "SnoRelRoleDrop_full.txt", 4);
-				dumpSnoRel(sqrl, "SnoRelRoleDrop_compare.txt", 5);
-
-				SnoConGrpList sqcgl = SnoQuery.getEquiv();
-				dumpSnoConGrpList(sqcgl, "SnoConEquiv_compare.txt");
-			}
 
 			// ** GUI: 5 COMPLETE **
 			gui.setProgressInfoLower("writeback completed, lapsed time = "
@@ -780,7 +619,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		return Condition.CONTINUE;
 	}
 
-	private void getPathOrigins(List<I_Position> origins, I_Path p) {
+	private void addPathOrigins(List<I_Position> origins, I_Path p) {
 		List<I_Position> thisLevel = new ArrayList<I_Position>();
 
 		for (I_Position o : p.getOrigins()) {
@@ -1137,11 +976,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 					// CREATE RELATIONSHIP PART W/ TermFactory
 					rvList.get(0)
 							.makeAnalog(isRETIRED, writeToNid, versionTime);
-					// :TODO: move addUncommittedNoChecks() to more efficient
-					// location.
-					// more optimal to only call once per concept.
-					I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
-					tf.addUncommittedNoChecks(thisC1);
 
 				} else if (rvList.size() == 0) {
 					logger
@@ -1170,7 +1004,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			}
 
 		} catch (Exception e) {
-			throw new IOException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -1181,17 +1016,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		else
 			SnoQuery.roleAdded.add(rel_B);
 
-		I_GetConceptData thisC1 = tf.getConcept(rel_B.c1Id);
 		// @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
 		// CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-		tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId,
-				rel_B.c2Id, isCh_DEFINING_CHARACTERISTIC,
+		tf.newRelationshipNoCheck(UUID.randomUUID(), tf.getConcept(rel_B.c1Id),
+				rel_B.typeId, rel_B.c2Id, isCh_DEFINING_CHARACTERISTIC,
 				isOPTIONAL_REFINABILITY, isCURRENT, rel_B.group, writeToNid,
 				versionTime);
 
-		// :TODO: move addUncommittedNoChecks() to more efficient location.
-		// more optimal to only call once per concept.
-		tf.addUncommittedNoChecks(thisC1);
 	}
 
 	private int compareSnoRel(SnoRel inR, SnoRel outR) {
@@ -1212,6 +1043,78 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 			return 3; // DROPPED
 		}
 	} // compareSnoRel
+
+	private int[] setupRoleNids() throws TerminologyException, IOException {
+		int countRelDuplVersion = 0;
+		LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
+
+		I_GetConceptData rootConcept = tf.getConcept(rootRoleNid);
+		Collection<? extends I_RelVersioned> thisLevel = rootConcept
+				.getDestRels();
+		while (thisLevel.size() > 0) {
+			ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
+			for (I_RelVersioned rv : thisLevel) {
+				I_RelPart rPart1 = null;
+				for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
+					for (I_RelPart rPart : rv.getMutableParts()) {
+						if (pos.getPath().getConceptId() == rPart.getPathId()) {
+							if (rPart1 == null) {
+								rPart1 = rPart; // ... KEEP FIRST_INSTANCE
+							} else if (rPart1.getVersion() < rPart.getVersion()) {
+								rPart1 = rPart; // ... KEEP MORE_RECENT PART
+							} else if (rPart1.getVersion() == rPart
+									.getVersion()) {
+								countRelDuplVersion++;
+								if (rPart.getStatusId() == isCURRENT)
+									rPart1 = rPart; // KEEP CURRENT PART
+							}
+						}
+					}
+					if (rPart1 != null)
+						break; // IF FOUND ON THIS PATH, STOP SEARCHING
+				}
+
+				if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
+						&& (rPart1.getTypeId() == isaNid)) {
+					// KEEP C1 AS RESULT
+					resultSet.add(rv.getC1Id());
+
+					// GET C1 DESTINATION RELS FOR NEXT LEVEL
+					I_GetConceptData c1 = tf.getConcept(rv.getC1Id());
+					Collection<? extends I_RelVersioned> c1Rels = c1
+							.getDestRels();
+					for (I_RelVersioned nextRel : c1Rels)
+						nextLevel.add(nextRel);
+				}
+			} // for thisLevel
+
+			thisLevel = nextLevel;
+		} // while thisLevel
+
+		// IS-A is outside the active SNOMED role root
+		resultSet.add(isaNid);
+
+		// prepare the role nid array.
+		int[] resultInt = new int[resultSet.size()];
+		int i = 0;
+		for (Integer rNid : resultSet) {
+			resultInt[i] = rNid;
+			i++;
+		}
+		Arrays.sort(resultInt);
+
+		// 
+		StringBuilder sb = new StringBuilder("::: ALLOWED ROLES = "
+				+ resultInt.length + "\t **\r\n");
+		for (int cNid : resultInt) {
+			sb.append(":::   \t" + toStringCNid(cNid) + "\r\n");
+		}
+		logger.info(sb.toString());
+
+		allowedRoleTypes = tf.newIntSet();
+		allowedRoleTypes.addAll(resultInt);
+		return resultInt;
+	}
 
 	private Condition setupCoreNids() {
 		I_TermFactory tf = Terms.get();
@@ -1343,7 +1246,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 			cEditPathPos = new ArrayList<I_Position>();
 			cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
-			getPathOrigins(cEditPathPos, cEditIPath);
+			setupPathOrigins(cEditPathPos, cEditIPath);
 
 			// GET ALL CLASSIFER_PATH ORIGINS
 			I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
@@ -1362,7 +1265,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 			cClassPathPos = new ArrayList<I_Position>();
 			cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
-			getPathOrigins(cClassPathPos, cClassIPath);
+			setupPathOrigins(cClassPathPos, cClassIPath);
 
 		} catch (TerminologyException e) {
 			// TODO Auto-generated catch block
@@ -1375,19 +1278,51 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		return Condition.CONTINUE;
 	}
 
+	private void setupPathOrigins(List<I_Position> origins, I_Path p) {
+		List<I_Position> thisLevel = new ArrayList<I_Position>();
+
+		for (I_Position o : p.getOrigins()) {
+			origins.add(o);
+			thisLevel.add(o);
+		}
+
+		// do a breadth first traversal of path origins.
+		while (thisLevel.size() > 0) {
+			List<I_Position> nextLevel = new ArrayList<I_Position>();
+			for (I_Position p1 : thisLevel) {
+				for (I_Position p2 : p1.getPath().getOrigins())
+					if ((origins.contains(p2) == false)
+							&& (p2.getPath().getConceptId() != workbenchAuxPath)) {
+						origins.add(p2);
+						nextLevel.add(p2);
+					}
+			}
+
+			thisLevel = nextLevel;
+		}
+	}
+
 	/**
 	 * 
 	 * @return Classifier input and output paths as a string.
 	 */
 	private String toStringPathPos(List<I_Position> pathPos, String pStr) {
 		// BUILD STRING
-		StringBuilder s = new StringBuilder();
-		s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr + "\r\n");
-		for (I_Position position : pathPos) {
-			s.append("::: ... PATH:\t"
-					+ toStringCNid(position.getPath().getConceptId()) + "\r\n");
+		StringBuffer s = new StringBuffer();
+		s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr);
+		try {
+			for (I_Position position : pathPos) {
+				s.append("\r\n::: ... PathID:\t"
+						+ position.getPath().getConceptId() + "\tVersion:\t"
+						+ position.getVersion() + "\tUUIDs:\t"
+						+ position.getPath().getUniversal());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
 		}
-		s.append(":::");
+		s.append("\r\n:::");
 		return s.toString();
 	}
 
@@ -1558,144 +1493,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		return CONTINUE_CONDITION;
 	}
 
-	// 
-	private int[] setupRoleNids() throws TerminologyException, IOException {
-		int countRelDuplVersion = 0;
-		LinkedHashSet<Integer> resultSet = new LinkedHashSet<Integer>();
-
-		I_GetConceptData rootConcept = tf.getConcept(rootRoleNid);
-		Collection<? extends I_RelVersioned> thisLevel = rootConcept
-				.getDestRels();
-		while (thisLevel.size() > 0) {
-			ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-			for (I_RelVersioned rv : thisLevel) {
-				I_RelPart rPart1 = null;
-				for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
-					for (I_RelPart rPart : rv.getMutableParts()) {
-						if (pos.getPath().getConceptId() == rPart.getPathId()) {
-							if (rPart1 == null) {
-								rPart1 = rPart; // ... KEEP FIRST_INSTANCE
-							} else if (rPart1.getVersion() < rPart.getVersion()) {
-								rPart1 = rPart; // ... KEEP MORE_RECENT PART
-							} else if (rPart1.getVersion() == rPart
-									.getVersion()) {
-								countRelDuplVersion++;
-								if (rPart.getStatusId() == isCURRENT)
-									rPart1 = rPart; // KEEP CURRENT PART
-							}
-						}
-					}
-					if (rPart1 != null)
-						break; // IF FOUND ON THIS PATH, STOP SEARCHING
-				}
-
-				if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
-						&& (rPart1.getTypeId() == isaNid)) {
-					// KEEP C1 AS RESULT
-					resultSet.add(rv.getC1Id());
-
-					// GET C1 DESTINATION RELS FOR NEXT LEVEL
-					I_GetConceptData c1 = tf.getConcept(rv.getC1Id());
-					Collection<? extends I_RelVersioned> c1Rels = c1
-							.getDestRels();
-					for (I_RelVersioned nextRel : c1Rels)
-						nextLevel.add(nextRel);
-				}
-			} // for thisLevel
-
-			thisLevel = nextLevel;
-		} // while thisLevel
-
-		// IS-A is outside the active SNOMED role root
-		resultSet.add(isaNid);
-
-		// prepare the role nid array.
-		int[] resultInt = new int[resultSet.size()];
-		int i = 0;
-		for (Integer rNid : resultSet) {
-			resultInt[i] = rNid;
-			i++;
-		}
-		Arrays.sort(resultInt);
-
-		// 
-		StringBuilder sb = new StringBuilder("::: ALLOWED ROLES = "
-				+ resultInt.length + "\t **\r\n");
-		for (int cNid : resultInt) {
-			sb.append(":::   \t" + toStringCNid(cNid) + "\r\n");
-		}
-		logger.info(sb.toString());
-
-		allowedRoleTypes = tf.newIntSet();
-		allowedRoleTypes.addAll(resultInt);
-		return resultInt;
-	}
-
-	// GET ROLES
-	private ArrayList<SnoRel> getRoles() { // SORT BY [ROLE-C1-GROUP-C2]
-		ArrayList<SnoRel> results = new ArrayList<SnoRel>();
-		boolean countRolesVerbose = true;
-
-		Comparator<SnoRel> comp = new Comparator<SnoRel>() {
-			public int compare(SnoRel o1, SnoRel o2) {
-				int thisMore = 1;
-				int thisLess = -1;
-				if (o1.typeId > o2.typeId) {
-					return thisMore;
-				} else if (o1.typeId < o2.typeId) {
-					return thisLess;
-				} else {
-					if (o1.c1Id > o2.c1Id) {
-						return thisMore;
-					} else if (o1.c1Id < o2.c1Id) {
-						return thisLess;
-					} else {
-
-						if (o1.group > o2.group) {
-							return thisMore;
-						} else if (o1.group < o2.group) {
-							return thisLess;
-						} else {
-
-							if (o1.c2Id > o2.c2Id) {
-								return thisMore;
-							} else if (o1.c2Id < o2.c2Id) {
-								return thisLess;
-							} else {
-								return 0; // this == received
-							}
-						}
-					}
-				}
-			} // compare()
-		};
-
-		Collections.sort(cEditSnoRels, comp);
-
-		int roleCount = 0;
-		int lastRole = Integer.MIN_VALUE;
-		StringBuilder sb = new StringBuilder(4096);
-		for (SnoRel sr : cEditSnoRels) {
-			if (sr.typeId != lastRole) {
-				roleCount += 1;
-				results.add(sr);
-				if (countRolesVerbose) {
-					sb.append("::: "
-							+ SnoTable.toStringIsaAncestry(sr.typeId,
-									cEditPathPos) + "\r\n");
-				}
-			}
-			lastRole = sr.typeId;
-		}
-		logger.info("\r\n::: [SnorocketTask] COUNTED ROLES == " + roleCount
-				+ "\r\n" + sb);
-		return results;
-	}
-
-	// dumps role-types to console
+	// :DEBUG: dumps role-types to console
 	private void dumpRoles() { // SORT BY [ROLE-C1-GROUP-C2]
-		boolean countRolesFlag = true;
-		boolean countRolesVerboseFlag = true;
+		boolean countRoles = true;
+		boolean countRolesVerbose = true; // :DEBUG:
 
 		Comparator<SnoRel> comp = new Comparator<SnoRel>() {
 			public int compare(SnoRel o1, SnoRel o2) {
@@ -1733,23 +1534,23 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
 		Collections.sort(cEditSnoRels, comp);
 
-		if (countRolesFlag) {
-			int countRoles = 0;
-			int lastRole = Integer.MIN_VALUE;
-			StringBuilder sb = new StringBuilder(4096);
-			for (SnoRel sr : cEditSnoRels) {
-				if (sr.typeId != lastRole) {
-					countRoles += 1;
-					if (countRolesVerboseFlag) {
-						sb.append("::: "
-								+ SnoTable.toStringIsaAncestry(sr.typeId,
+		if (countRoles) {
+			int debugCountRoles = 0;
+			int debugLastRole = Integer.MIN_VALUE;
+			StringBuilder debugSB = new StringBuilder(4096);
+			for (SnoRel debugSR : cEditSnoRels) {
+				if (debugSR.typeId != debugLastRole) {
+					debugCountRoles += 1;
+					if (countRolesVerbose) {
+						debugSB.append("::: "
+								+ SnoTable.toStringIsaAncestry(debugSR.typeId,
 										cEditPathPos) + "\r\n");
 					}
 				}
-				lastRole = sr.typeId;
+				debugLastRole = debugSR.typeId;
 			}
-			logger.info("\r\n::: [SnorocketTask] COUNTED ROLES == "
-					+ countRoles + "\r\n" + sb);
+			logger.info("\r\n::: [SnorocketTask] :DEBUG: COUNTED ROLES == "
+					+ debugCountRoles + "\r\n" + debugSB);
 		}
 	}
 
@@ -1854,65 +1655,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 		}
 	}
 
-	// dump equivalent concepts to file
-	private void dumpSnoConGrpList(SnoConGrpList scgl, String fName) {
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
-			// "COMPARE" UUIDs, //NIDs, Initial Text
-			int setNumber = 1;
-			for (SnoConGrp scg : scgl) {
-				for (SnoCon sc : scg) {
-					I_GetConceptData c = tf.getConcept(sc.id);
-					bw.write(c.getUids().get(0).toString() + "\tset=\t"
-							+ setNumber + "\t");
-					bw.write(c.getInitialText() + "\r\n");
-				}
-				setNumber++;
-			}
-
-			bw.flush();
-			bw.close();
-		} catch (TerminologyException e) {
-			// due to tf.getConcept()
-			e.printStackTrace();
-		} catch (IOException e) {
-			// due to new FileWriter
-			e.printStackTrace();
-		}
-	}
-
-	// dumps relationships to a file
-	private String dumpSnoRelStr(SnoRel sr) {
-		StringBuilder sb = new StringBuilder();
-		try {
-			I_GetConceptData c1 = tf.getConcept(sr.c1Id);
-			I_GetConceptData t = tf.getConcept(sr.typeId);
-			I_GetConceptData c2 = tf.getConcept(sr.c2Id);
-			int g = sr.group;
-			sb.append(c1.getUids().iterator().next() + "\t"
-					+ t.getUids().iterator().next() + "\t"
-					+ c2.getUids().iterator().next() + "\t" + g + "\t<br>\t");
-			sb.append(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t"
-					+ sr.group + "\t<br>\t");
-			sb.append("|" + c1.getInitialText() + "\t|" + t.getInitialText()
-					+ "\t|" + c2.getInitialText() + "\t" + g + "\r\n");
-
-			sb.append("\tc2 status: ** ");
-			for (I_ConceptAttributePart mp : c2.getConceptAttributes()
-					.getMutableParts())
-				sb.append(toStringCNid(mp.getStatusId()) + " ** ");
-
-			return sb.toString();
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return sb.toString();
-	}
-
 	private void dumpSnoRel(List<SnoRel> srl, String fName, int format) {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
@@ -1998,23 +1740,19 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 					}
 
 					if (sr.c2Id == Integer.MAX_VALUE) {
-						sb.append("_INTMAX\t");
+						sb.append("_INTMAX\r\n");
 					} else {
 						try {
 							I_GetConceptData c2 = tf.getConcept(sr.c2Id);
 							if (c2.getUids().iterator().hasNext())
-								sb
-										.append(c2.getUids().iterator().next()
-												+ "\t");
+								sb.append(c2.getUids().iterator().next()
+										+ "\r\n");
 							else
-								sb.append(sr.c2Id + "_INTNoNext\t");
+								sb.append(sr.c2Id + "_INTNoNext\r\n");
 						} catch (Exception e) {
-							sb.append(sr.c2Id + "_INTExcept\t");
+							sb.append(sr.c2Id + "_INTExcept\r\n");
 						}
 					}
-
-					sb.append(sr.group);
-					sb.append("\r\n");
 
 					bw.write(sb.toString());
 				}

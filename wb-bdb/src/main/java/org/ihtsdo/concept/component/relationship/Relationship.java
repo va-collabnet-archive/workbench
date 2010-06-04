@@ -699,4 +699,19 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return false;
     }
 
+
+	public boolean everWasType(int typeNid) {
+		if (this.typeNid == typeNid) {
+			return true;
+		}
+		if (revisions != null) {
+			for (RelationshipRevision rv: revisions) {
+				if (rv.getTypeId() == typeNid) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }

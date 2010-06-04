@@ -118,12 +118,12 @@ public class EquivPanel extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.FIRST_LINE_START;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 1;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
         this.add(new JScrollPane(table), c);
     }
 
@@ -139,7 +139,8 @@ public class EquivPanel extends JPanel {
             for (SnoCon sc : scg) {
                 StringBuilder str = new StringBuilder("<html>");
                 I_GetConceptData valueBean = tf.getConcept(sc.id);
-                str.append(valueFont + valueBean.getInitialText());
+                str.append(valueBean.getInitialText());
+                // str.append(valueFont + valueBean.getInitialText());
                 tableStrings[iRow][0] = Integer.toString(iGroup);
                 tableStrings[iRow][1] = str.toString();
                 iRow += 1;

@@ -317,6 +317,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         public List<IdentifierVersion> getAdditionalIdentifierParts() {
+        	if (additionalIdentifierVersions == null) {
+        		return Collections.unmodifiableList(new ArrayList<IdentifierVersion>());
+        	}
             return Collections.unmodifiableList(additionalIdentifierVersions);
         }
 
@@ -737,7 +740,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Bdb.gVersion.incrementAndGet();
     }
 
-    @SuppressWarnings("unchecked")
     public void merge(C component) {
         Set<Integer> currentSapNids = getComponentSapNids();
         HashMap<Integer, ConceptComponent<?, ?>.Version> newSapMap = component.getSapMap();
@@ -745,7 +747,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         for (ConceptComponent<?, ?>.Version v : newSapMap.values()) {
             assert !currentSapNids.contains(v.getSapNid()) : "currentSapNids: " + currentSapNids + " v: " + v
                 + " newSapMap: " + newSapMap;
-            assert 
             addRevision((R) v.makeAnalog());
         }
 

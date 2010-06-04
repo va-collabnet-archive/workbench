@@ -33,16 +33,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.DetailSheetClientProperties;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.LogWithAlerts;
 
 public abstract class PreviousNextOrCancel extends AbstractTask {
 
@@ -97,10 +101,18 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.CONTINUE;
-            done = true;
-            synchronized (PreviousNextOrCancel.this) {
-                PreviousNextOrCancel.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                synchronized (PreviousNextOrCancel.this) {
+                    PreviousNextOrCancel.this.notifyAll();
+                }
             }
         }
     }
@@ -164,14 +176,15 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             cont = cont.getParent();
         }
         JPanel detailsSheet = config.getWorkflowDetailsSheet();
-        if (detailsSheet.isVisible() && 
-                detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS) != null) {
-            JComponent componentToFocus = (JComponent) detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS);
+        if (detailsSheet.isVisible()
+            && detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS) != null) {
+            JComponent componentToFocus =
+                    (JComponent) detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS);
             componentToFocus.requestFocusInWindow();
         } else {
             continueButton.requestFocusInWindow();
         }
-         workflowPanel.repaint();
+        workflowPanel.repaint();
     }
 
     protected abstract boolean showPrevious();

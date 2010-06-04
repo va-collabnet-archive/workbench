@@ -42,9 +42,15 @@ import org.dwfa.tapi.ComputationCanceled;
 
 public class ActivityPanel implements I_ShowActivity, AncestorListener {
     
-    ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
-    ConcurrentHashMap<ActionListener, ActionListener> listeners = new ConcurrentHashMap<ActionListener, ActionListener>();
-    ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = new ConcurrentHashMap<ActionListener, ActionListener>();
+	private ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = 
+    			new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
+    private ConcurrentHashMap<ActionListener, ActionListener> listeners = 
+    			new ConcurrentHashMap<ActionListener, ActionListener>();
+    private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = 
+    			new ConcurrentHashMap<ActionListener, ActionListener>();
+    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = 
+    			new CopyOnWriteArraySet<I_ShowActivity>();
+
     
     
     private class StopActionListenerPropigator implements ActionListener {
@@ -392,8 +398,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
             shower.removeRefreshActionListener(l);
         }
     }
-
-    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = new CopyOnWriteArraySet<I_ShowActivity>();
 
     public void addShowActivityListener(I_ShowActivity listener) {
         showActivityListeners.add(listener);

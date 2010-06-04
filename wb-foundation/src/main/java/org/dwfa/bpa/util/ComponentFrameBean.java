@@ -117,23 +117,23 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     // OSXAdapter class.
     public static boolean MAC_OS_X = (System.getProperty("os.name").toLowerCase().startsWith("mac os x"));
 
-    private JFrame frame;
+    private ComponentFrame frame;
 
     private I_InitComponentMenus compMenuIniter;
 
     private boolean hiddenFrame;
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             boolean hiddenFrame) throws Exception {
         this(args, lc, frame, compMenuIniter, new JMenuBar(), hiddenFrame);
     }
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter)
+    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter)
             throws Exception {
         this(args, lc, frame, compMenuIniter, new JMenuBar());
     }
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             JMenuBar mainMenuBar) throws Exception {
         this(args, lc, frame, compMenuIniter, mainMenuBar, false);
     }
@@ -142,7 +142,7 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
      * @param title
      * @throws Exception
      */
-    public ComponentFrameBean(String[] args, LifeCycle lc, JFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             JMenuBar mainMenuBar, boolean hiddenFrame) throws Exception {
         super();
         // Ask AWT which menu modifier we should be using.
@@ -495,20 +495,33 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
     }
 
     public void windowClosing(WindowEvent e) {
-        boolean okToClose = false;
-        if (ComponentFrame.class.isAssignableFrom(this.frame.getClass())) {
-            ComponentFrame cf = (ComponentFrame) this.frame;
-            okToClose = cf.okToClose();
-        } else {
-            okToClose = (this.frame.getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE);
-        }
+    	if (frame.sendToBackInsteadOfClose()) {
+            if (SwingUtilities.isEventDispatchThread()) {
+            	frame.toBack();
+           } else {
+               SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                   public void run() {
+                    	frame.toBack();
+                   }
+               });
+           }
+    	} else {
+            boolean okToClose = false;
+            if (ComponentFrame.class.isAssignableFrom(this.frame.getClass())) {
+                ComponentFrame cf = (ComponentFrame) this.frame;
+                okToClose = cf.okToClose();
+            } else {
+                okToClose = (this.frame.getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE);
+            }
 
-        if (okToClose) {
-            OpenFrames.removeFrameListener(this);
-            OpenFrames.removeFrame(this.frame);
-            this.frame.setVisible(false);
-            this.frame.dispose();
-        }
+            if (okToClose) {
+                OpenFrames.removeFrameListener(this);
+                OpenFrames.removeFrame(this.frame);
+                this.frame.setVisible(false);
+                this.frame.dispose();
+            }
+    	}
     }
 
     public void windowClosed(WindowEvent e) {

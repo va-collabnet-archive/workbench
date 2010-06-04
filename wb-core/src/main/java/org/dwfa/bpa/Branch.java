@@ -24,7 +24,7 @@ import org.dwfa.bpa.process.Condition;
  */
 public class Branch implements I_Branch {
 
-    private static final long serialVersionUID = 8984276903055679737L
+    private static final long serialVersionUID = 8984276903055679737L;
 
     /**
      * @see java.lang.Object#equals(java.lang.Object)
