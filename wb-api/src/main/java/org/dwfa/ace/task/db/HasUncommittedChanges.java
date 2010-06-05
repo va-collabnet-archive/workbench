@@ -20,12 +20,17 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -58,6 +63,19 @@ public class HasUncommittedChanges extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+        	if (Terms.get().getUncommitted().size() > 0) {
+        		if (SwingUtilities.isEventDispatchThread()) {
+        			askToCommit();
+        		} else {
+        			SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
+						public void run() {
+		        			askToCommit();
+						}
+					});
+        		}
+                
+            }
             if (Terms.get().getUncommitted().size() > 0) {
                 return Condition.TRUE;
             } else {
@@ -68,6 +86,21 @@ public class HasUncommittedChanges extends AbstractTask {
             throw new TaskFailedException(e);
         }
     }
+
+	private void askToCommit() {
+		int n = JOptionPane.showConfirmDialog(
+			    OpenFrames.getActiveFrame(),
+			    "Would you like to commit changes before proceeding?",
+			    "Uncommitted Changes",
+			    JOptionPane.YES_NO_OPTION);     
+		if (n == JOptionPane.YES_OPTION) {
+			try {
+				Terms.get().commit();
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		}
+	}
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
