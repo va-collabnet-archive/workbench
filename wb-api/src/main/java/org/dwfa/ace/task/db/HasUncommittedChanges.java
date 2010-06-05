@@ -23,6 +23,7 @@ import java.util.Collection;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
@@ -31,6 +32,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -88,15 +90,42 @@ public class HasUncommittedChanges extends AbstractTask {
     }
 
 	private void askToCommit() {
-		int n = JOptionPane.showConfirmDialog(
+		Object[] options = {"Commit Changes",
+                "Cancel Changes",
+                "Do Nothing"};
+		int n = JOptionPane.showOptionDialog(
 			    OpenFrames.getActiveFrame(),
-			    "Would you like to commit changes before proceeding?",
+			    "How would you like to proceed?",
 			    "Uncommitted Changes",
-			    JOptionPane.YES_NO_OPTION);     
+			    JOptionPane.YES_NO_CANCEL_OPTION,
+			    JOptionPane.QUESTION_MESSAGE,
+			    null,
+			    options,
+			    options[2]);     
 		if (n == JOptionPane.YES_OPTION) {
 			try {
 				Terms.get().commit();
 			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		} else if (n == JOptionPane.NO_OPTION) {
+			try {
+				Terms.get().cancel();
+			} catch (Exception e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		} else {
+            try {
+				if (Terms.get().getActiveAceFrameConfig() != null) {
+				    I_ConfigAceFrame activeFrame = Terms.get().getActiveAceFrameConfig();
+				    for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig()
+				            .getAceFrames()) {
+				        frameConfig.setCommitEnabled(true);
+				    }
+				}
+			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
