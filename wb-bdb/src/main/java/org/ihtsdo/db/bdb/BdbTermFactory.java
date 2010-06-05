@@ -1260,7 +1260,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public List<UUID> nativeToUuid(int nid) throws IOException {
         Concept concept = Bdb.getConceptForComponent(nid);
-        if (concept != null) {
+        if (concept != null && concept.isCanceled() == false) {
             return concept.getUidsForComponent(nid);
         }
         return null;
