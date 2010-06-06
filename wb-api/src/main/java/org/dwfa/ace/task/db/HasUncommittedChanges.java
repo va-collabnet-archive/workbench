@@ -101,7 +101,7 @@ public class HasUncommittedChanges extends AbstractTask {
 			    JOptionPane.QUESTION_MESSAGE,
 			    null,
 			    options,
-			    options[2]);     
+			    options[0]);     
 		if (n == JOptionPane.YES_OPTION) {
 			try {
 				Terms.get().commit();
