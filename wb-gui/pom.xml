@@ -55,11 +55,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jung</groupId>
-            <artifactId>jung</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <dependency>
             <!-- svnkit dependency -->
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>

@@ -49,8 +49,8 @@ public class GraphPlugin extends AbstractPlugin {
     private GRAPH_LAYOUTS graphLayout = GRAPH_LAYOUTS.KKLayout;
 
     private transient JPanel graphWrapperPanel = new JPanel(new GridBagLayout());
-    private transient JPanel graphPanel;
-    private transient JPanel fillerPanel;
+    private transient JComponent graphPanel;
+    private transient JComponent fillerPanel;
     private transient GridBagConstraints gbc = new GridBagConstraints();
     private transient boolean initialize = true;
 
@@ -95,7 +95,7 @@ public class GraphPlugin extends AbstractPlugin {
                 graphWrapperPanel.remove(fillerPanel);
             }
             if (showComponent()) {
-                graphPanel = new GraphPanel(graphLayout, this, graphWrapperPanel.getSize());
+                graphPanel = new JLabel("Not reimplemented in JGraph yet...");
                 graphWrapperPanel.add(graphPanel, gbc);
                 SwingUtilities.invokeLater(new Runnable() {
 
