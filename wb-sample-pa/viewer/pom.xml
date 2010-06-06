@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.ihtsdo.sample</groupId>
+    <artifactId>wb-sample-pa</artifactId>
+    <version>2.5.4-nehta-1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>viewer</artifactId>
+  <name>Workbench Bundle Viewer</name>
+  <description>workbench bundle viewer</description>
+  
+  <profiles>
+    <profile>
+      <id>install4j</id>
+      <modules>
+        <module>installer-osx</module>        
+        <module>installer-linux</module>        
+        <module>installer-windows</module>        
+      </modules>	
+    </profile>
+  </profiles>
+  
+</project>

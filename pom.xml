@@ -89,6 +89,7 @@
         <module>wb-gui</module>        
         <module>wb-bdb</module>        
         <module>wb-bdb-mojo</module>        
+        <module>wb-sample-pa</module>        
     </modules>
   <!-- TODO: to be moved into a organisational parent POM -->
   <distributionManagement>
