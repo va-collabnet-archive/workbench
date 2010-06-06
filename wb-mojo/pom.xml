@@ -12,7 +12,6 @@
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
