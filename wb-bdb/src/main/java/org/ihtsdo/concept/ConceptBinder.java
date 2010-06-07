@@ -46,7 +46,7 @@ public class ConceptBinder extends TupleBinding<Concept> {
 
 	@Override
 	public void objectToEntry(Concept concept, TupleOutput finalOutput) {
-
+		AceLog.getAppLog().info("ConceptBinder objectToEntry Starting to write: " + concept.toLongString());
 		try {
 			long dataVersion = concept.getDataVersion();
 			if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -56,9 +56,14 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			boolean primordial = conceptData.getReadOnlyBytes().length == 0
 					&& conceptData.getReadWriteBytes().length == 0;
 
+			ConceptAttributes cav = conceptData.getConceptAttributesIfChanged();
+			StringBuffer buff = new StringBuffer();
+			buff.append(cav);
+			AceLog.getAppLog().info("objectToEntry ConceptAttributes = "+buff.toString());
 			byte[] attrOutput = getAttributeBytes(conceptData, primordial,
 					OFFSETS.ATTRIBUTES, conceptData.getConceptAttributesIfChanged(),
 					new ConceptAttributesBinder());
+			AceLog.getAppLog().info("objectToEntry attrOutput length= "+attrOutput.length);
 			byte[] descOutput = getComponentBytes(conceptData, primordial,
 					OFFSETS.DESCRIPTIONS, conceptData.getDescriptionsIfChanged(),
 					new DescriptionBinder());
