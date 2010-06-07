@@ -2015,7 +2015,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
         int width = 600;
-        int height = 775;
+        int height = 675;
         preferencesPalette.setSize(width, height);
 
         Rectangle topBounds = getTopBoundsForPalette();
