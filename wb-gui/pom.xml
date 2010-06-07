@@ -18,7 +18,7 @@
    <parent>
       <groupId>org.ihtsdo</groupId>
       <artifactId>wb-mmb</artifactId>
-      <version>${workbench.version}</version>
+      <version>impl-uktc-1.0-SNAPSHOT</version> 
     </parent> 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-gui</artifactId>
@@ -32,7 +32,7 @@
             <name>Informatics, Inc. End User License Agreement</name>
         </license>
     </licenses>
-    <profiles>
+   <!--   <profiles>
 		<profile>
 			<activation>
 				<property>
@@ -43,7 +43,7 @@
 				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
 			</properties>
 		</profile>
-	</profiles>    
+	</profiles>  -->  
     <dependencies>
         <dependency>
             <groupId>org.ihtsdo</groupId>

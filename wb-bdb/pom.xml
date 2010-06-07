@@ -3,12 +3,12 @@
         <parent>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mmb</artifactId>
-            <version>${workbench.version}</version>
+            <version>impl-uktc-1.0-SNAPSHOT</version>
         </parent>
 	<artifactId>wb-bdb</artifactId> 
 	<packaging>jar</packaging>
 	<name>Workbench Berkeley Database</name>
-	<profiles>
+	<!--  <profiles>
 		<profile>
 			<activation>
 				<property>
@@ -19,7 +19,7 @@
 				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
 			</properties>
 		</profile>
-	</profiles>
+	</profiles> -->
 	<dependencies>
 		<dependency>
 			<groupId>com.sleepycat</groupId>
