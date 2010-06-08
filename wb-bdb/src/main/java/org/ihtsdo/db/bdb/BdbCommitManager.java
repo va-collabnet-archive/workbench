@@ -161,6 +161,10 @@ public class BdbCommitManager {
     private static boolean writeChangeSets = true;
 	
 	static {
+		reset();
+	}
+
+	public static void reset() {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 		"Change set writer"));
 		dbWriterService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), 

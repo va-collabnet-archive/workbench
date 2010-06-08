@@ -567,4 +567,10 @@ public class MemoryTermServer implements I_StoreLocalFixedTerminology {
     public void setExclusions(TaxonomySpec[] exclusions) {
         this.exclusions = exclusions;
     }
+
+	@Override
+	public Collection<I_ConceptualizeLocally> getConcepts() throws IOException,
+			TerminologyException {
+		return conceptMap.values();
+	}
 }
