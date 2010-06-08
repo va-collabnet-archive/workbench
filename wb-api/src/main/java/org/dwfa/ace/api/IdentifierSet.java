@@ -27,6 +27,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 
     protected OpenBitSet bitSet;
     private int offset = Integer.MIN_VALUE;
+    private int toStringMax = 10;
 
     public IdentifierSet(OpenBitSet bitSet) {
         super();
@@ -162,7 +163,7 @@ public class IdentifierSet implements I_RepresentIdSet {
 		int cardinality = (int) bitSet.cardinality();
 		try {
 			buff.append("[");
-			while (count < 10 && idIterator.next()) {
+			while (count < toStringMax && idIterator.next()) {
 				try {
 					buff.append(Terms.get().getComponent(idIterator.nid()).toString());
 				} catch (TerminologyException e) {
@@ -181,7 +182,13 @@ public class IdentifierSet implements I_RepresentIdSet {
 		}
 		return buff.toString();
 	}
-    public void clear() {
+    public int getToStringMax() {
+		return toStringMax;
+	}
+	public void setToStringMax(int toStringMax) {
+		this.toStringMax = toStringMax;
+	}
+	public void clear() {
         bitSet.clear(0, bitSet.capacity());
     }
 }

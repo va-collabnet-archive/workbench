@@ -82,7 +82,7 @@ public class CementLoadTest {
 			Bdb.getConceptDb().iterateConceptDataInParallel(addProcessor);
 			System.out.println("Unprocessed: " + addProcessor.getCids().cardinality());
 			if (addProcessor.getCids().cardinality() != 0) {
-				System.out.println("Unprocessed nids: " + addProcessor.getCids());
+				System.out.println("Unprocessed nids[0]: " + addProcessor.getCids());
 			}
 			Assert.assertEquals(0, addProcessor.getCids().cardinality());
 			Bdb.commit();
@@ -91,7 +91,7 @@ public class CementLoadTest {
 			Bdb.getConceptDb().iterateConceptDataInParallel(csidp);
 			System.out.println("Unmatched: " + csidp.getCids().cardinality());
 			if (csidp.getCids().cardinality() != 0) {
-				System.out.println("Unprocessed nids: " + csidp.getCids());
+				System.out.println("Unprocessed nids[1]: " + csidp.getCids());
 			}
 			Assert.assertEquals(0, csidp.getCids().cardinality());
 			Bdb.close();
@@ -102,7 +102,7 @@ public class CementLoadTest {
 			Bdb.close();
 			System.out.println("Unmatched: " + csidp.getCids().cardinality());
 			if (csidp.getCids().cardinality() != 0) {
-				System.out.println("Unprocessed nids: " + csidp.getCids());
+				System.out.println("Unprocessed nids[2]: " + csidp.getCids());
 			}
 			Assert.assertEquals(0, csidp.getCids().cardinality());
 		} catch (Exception e) {
