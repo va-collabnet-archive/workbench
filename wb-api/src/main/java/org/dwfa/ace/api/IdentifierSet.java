@@ -191,4 +191,14 @@ public class IdentifierSet implements I_RepresentIdSet {
 	public void clear() {
         bitSet.clear(0, bitSet.capacity());
     }
+	@Override
+	public boolean equals(Object obj) {
+		if (IdentifierSet.class.isAssignableFrom(obj.getClass())) {
+			IdentifierSet another = (IdentifierSet) obj;
+			return this.bitSet.equals(another.bitSet);
+		}
+		return super.equals(obj);
+	}
+	
+	
 }
