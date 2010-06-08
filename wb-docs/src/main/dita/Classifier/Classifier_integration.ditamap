@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="Classifier_integration" title="IHTSDO Classifier" xml:lang="en">
+  <title>The IHTSDO Classifier</title>
+
+  <topicref href="Classifier_intro.dita#topic1"
+            navtitle="Integrating the IHTSDO Classifier " type="topic">
+    <topicref href="Classifier_structure.dita#topic2"
+              navtitle="Classifier Structure " type="topic"/>
+
+    <topicref href="Classifier_in_eclipse.dita#topic3"
+              navtitle="Creating Snorocket in Eclipse " type="topic"/>
+
+    <topicref href="Classifier_integration.dita#topic4"
+              navtitle="Integrating with the Workbench Build " type="topic"/>
+  </topicref>
+</map>

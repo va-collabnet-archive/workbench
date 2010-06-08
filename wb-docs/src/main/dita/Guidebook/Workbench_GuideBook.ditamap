@@ -117,8 +117,9 @@
   <chapter format="ditamap" href="../Workflow/CreatingTasks.ditamap"
            navtitle="Creating new tasks"/>
 
-  <chapter format="ditamap" href="../Snorocket/Snorocket_integration.ditamap"
-           navtitle="Integrating the SnoRocket Classifier "/>
+  <chapter format="ditamap"
+           href="../Classifier/Classifier_integration.ditamap"
+           navtitle="Integrating the IHTSDO Classifier "/>
 
   <chapter format="ditamap" href="../Bundles/BuildingBundle.ditamap"
            navtitle="Building an application bundle"/>

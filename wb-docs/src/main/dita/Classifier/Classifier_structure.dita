@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic2">
+  <title>The IHTSDO Classifier structure</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>classifier<indexterm>structure</indexterm></indexterm>
+
+        <indexterm>classifier <indexterm>SnoRocket</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p>The source build is structured using a Maven parent project structure.
+    The snorocket-parent project aggregates 5 modules.</p>
+
+    <section><codeph><b>snorocket-parent</b></codeph><ph>:</ph> The Maven
+    parent module. Nothing but the POM.</section>
+
+    <section><codeph><b>snorocket-core</b>: au.csiro.snorocket.core</codeph>
+    The core algorithm implementation, at the level of the underlying EL+
+    description logic rather than being SNOMED-specific.</section>
+
+    <section><codeph><b>snorocket-snapi</b>: au.csiro.snorocket.snapi</codeph>
+    An abstraction layer over the Core to provide a set of SNOMED-centric APIs
+    and post-processing (SNAPI == SNomed API)</section>
+
+    <section><codeph><b>snorocket</b>: au.csiro.snorocket</codeph> A
+    command-line harness including parsers for various file formats (SNOMED
+    distribution tables, KRSS, etc)</section>
+
+    <section><codeph><b>snorocket-bridge</b>: au.csiro.snorocket.ace</codeph>
+    The bridge code that connects Workbench's
+    <codeph>I_SnorocketFactory</codeph> to a concrete implementation of
+    <codeph>au.csiro.snorocket.snapi.I_Snorocket </codeph></section>
+
+    <section><codeph><b>snorocket-tests</b>: au.csiro.snorocket</codeph> A
+    batch of test input files and some code to check that snorocket produces
+    output isomorphic to the SNOMED distributions (the isomorphism part is
+    because group numbers are not preserved, nor are relationship IDs or file
+    ordering).</section>
+  </body>
+</topic>

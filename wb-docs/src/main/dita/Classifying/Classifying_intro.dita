@@ -16,19 +16,19 @@
 
   <body>
     <section>The IHTSDO Workbench IDE contains a high performance classifier
-    (the SnoRocket Classifier<fn id="ar1003160"><xref format="html"
+    (the IHTSDO Classifier <fn id="ar1003160"><xref format="html"
     href="http://e-hrc.net " scope="external"> from The Australian E-Health
     Research Centre. Licensing conditions apply. ( visit http://e-hrc.net for
     further details.)</xref></fn>) for validating the inferred relationships
     inherent in the terminology, according to the Description Logics upon
     which SNOMED CT is based. <xref format="dita" href="#topic1/ar1003160"
-    scope="local" type="fn"/>. The SnoRocket Classifier is a highly optimised
+    scope="local" type="fn"/>. The IHTSDO Classifier is a highly optimised
     module for performing complete or incremental classification of SNOMED CT
     and which can be configured through business process plugins in a number
     of ways. Additional information on configuration and performance
     characteristics for developers can be found in <xref format="dita"
-    href="../Snorocket/Snorocket_intro.dita#topic1">Integrating the SnoRocket
-    Classifier</xref>.</section>
+    href="../Classifier/Classifier_intro.dita#topic1">Integrating the IHTSDO
+    Classifier </xref>.</section>
 
     <section>In most instances, the Workbench IDE is bundled with a Classifier
     plugin, accessable via the main menu. The following sections illustrate

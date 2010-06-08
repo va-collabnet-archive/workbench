@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic5" xml:lang="en">
+  <title>Create a Workbench Process to Classify</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>classifier <indexterm>creating a Business
+        Process</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>Use the tasks NewClassifier
+    (<ph>org.dwfa.ace.task.classify.NewClassifier</ph>) followed by
+    <ph>Load&amp;Classify (org.dwfa.ace.task.classify.LoadClassifyWrite</ph>)
+    as shown in <xref format="dita" href="#topic5/ar999528"
+    type="fig"/></section>
+
+    <section>Note that writing the inferred relationships back into the
+    Workbench database is not part of the existing Workbench Classifier
+    integration.</section>
+
+    <fig id="ar999528">
+      <title>Classifier business process</title>
+
+      <image href="../images/classifier_images/classifier_workflow.jpg"
+             placement="break"/>
+    </fig>
+  </body>
+</topic>

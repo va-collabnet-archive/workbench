@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+  <title>Classifier Developer's Guide</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Snorocket Classifier</indexterm>
+
+        <indexterm>classifier<indexterm>IHTSDO</indexterm></indexterm>
+
+        <indexterm>classifier <indexterm>SnoRocket</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The IHTSDO Classifier<xref format="dita" href="#topic1/ar1003160"
+    scope="local" type="fn"/> is a highly optimised module for performing
+    classification of SNOMED CT. The original classifier code was developed by
+    the Australian E-Health Research Group and was known as "SnoRocket". It
+    has now been incorporated into the IHTSDO Workbench and licenced under the
+    Apache 2 Licence.<fn id="ar1003160"><xref format="html"
+    href="http://aehrc.com " scope="external"> AEHRC - The Australian E-Health
+    Research Centre. ( http://aehrc.com )</xref></fn></section>
+  </body>
+</topic>
