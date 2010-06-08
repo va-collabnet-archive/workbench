@@ -75,8 +75,9 @@ public class CementLoadTest {
 			Bdb.close();
 			
 			Bdb.setup(dbTarget);
-			I_RepresentIdSet cids = Bdb.getConceptDb().getConceptIdSet();
-			I_RepresentIdSet roCids = Bdb.getConceptDb().getReadOnlyConceptIdSet();
+			IdentifierSet cids = (IdentifierSet) Bdb.getConceptDb().getConceptIdSet();
+			IdentifierSet roCids = Bdb.getConceptDb().getReadOnlyConceptIdSet();
+			System.out.println("Differences: " + cids.getDifferences(roCids));
 			System.out.println("Concept count: " + cids.cardinality());
 			System.out.println("roCids count: " + roCids.cardinality());
 			Assert.assertTrue(cids.equals(roCids));

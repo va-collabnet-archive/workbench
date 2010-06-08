@@ -153,7 +153,7 @@ public class ConceptBdb extends ComponentBdb {
             ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
         	AceLog.getAppLog().info("Iterate in parallel. first: " + first + 
         			" last: " + last +
-        			"count: " + count);
+        			" count: " + count);
             Future<Boolean> f = iteratorService.submit(pci);
             futures.add(f);
         }

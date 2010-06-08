@@ -200,5 +200,27 @@ public class IdentifierSet implements I_RepresentIdSet {
 		return super.equals(obj);
 	}
 	
-	
+	public String getDifferences(IdentifierSet that) throws IOException {
+		StringBuffer buff = new StringBuffer();
+		buff.append("this->that differences: \n");
+		I_IterateIds thisItr = this.iterator();
+		while (thisItr.next()) {
+			if (!that.isMember(thisItr.nid())) {
+				buff.append("   that missing: ");
+				buff.append(thisItr.nid());
+				buff.append("\n");
+			}
+		}
+		
+		buff.append("\n\nthat->this differences: \n");
+		I_IterateIds thatItr = this.iterator();
+		while (thatItr.next()) {
+			if (!this.isMember(thatItr.nid())) {
+				buff.append("   this missing: ");
+				buff.append(thatItr.nid());
+				buff.append("\n");
+			}
+		}
+		return buff.toString();
+	}
 }
