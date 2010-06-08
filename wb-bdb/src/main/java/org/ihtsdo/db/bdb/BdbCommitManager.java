@@ -684,8 +684,7 @@ public class BdbCommitManager {
         } else {
             // have to forget "all" references to component...
             c.getRefsetMembers().remove(m);
-            NidPair toRemove = new NidPair(m.getRefsetId(), m.getMemberId());
-            c.getData().getMemberNids().remove(toRemove);
+            c.getData().getMemberNids().remove(m.getMemberId());
             m.setStatusAtPositionNid(-1);
         }
         c.modified();
