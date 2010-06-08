@@ -86,6 +86,23 @@ public class GenerateScripts extends AbstractMojo {
      */
     private File targetDirectory;
 
+    /**
+     * A text label that will be placed on the top panel in the application. This is useful
+     * in clearly identify the configuration of the build (eg a test configuration)
+     * 
+     * @parameter
+     */
+    private String aceTopPanelLabel; 
+    
+    /**
+     * The location of an image file that will be placed on the top panel in the application.
+     * This should be a URI to the location of an image in a loaded jar (eg /images/mylabel.png)
+     * 
+     * @parameter
+     */
+    private String aceTopPanelImage; 
+    
+    
     private static final String fileSep = System.getProperty("file.separator", "/");
 
     public void execute() throws MojoExecutionException {
@@ -233,7 +250,7 @@ public class GenerateScripts extends AbstractMojo {
      * @author adrian
      * 
      */
-    private static abstract class Scripter {
+    private abstract class Scripter {
 
         File scriptFile;
         String libDir;
@@ -311,6 +328,14 @@ public class GenerateScripts extends AbstractMojo {
                 writeLine(fw, "-Dapple.laf.useScreenMenuBar=true");
             }
 
+            if (aceTopPanelLabel != null) {
+                writeFileLine(fw, "-Dtoppanel.text=\"" + aceTopPanelLabel + "\"");
+            }
+            
+            if (aceTopPanelImage != null) {
+                writeFileLine(fw, "-Dtoppanel.image=" + aceTopPanelImage);
+            }
+            
             // write JINI security options
             writeFileLine(fw, "-Djava.util.logging.config.file=config/logging.properties");
             writeFileLine(fw, "-Djava.security.policy=config/dwa.policy");
@@ -394,7 +419,7 @@ public class GenerateScripts extends AbstractMojo {
          * @param count The number of times to repeat it
          * @return The repeated string
          */
-        protected static String repeat(String base, int count) {
+        protected String repeat(String base, int count) {
             String rv = "";
             for (int ii = 0; ii < count; ii++) {
                 rv += base;
@@ -441,7 +466,7 @@ public class GenerateScripts extends AbstractMojo {
      * @author adrian
      * 
      */
-    private static class WindowsScripter extends Scripter {
+    private class WindowsScripter extends Scripter {
 
         public WindowsScripter(File scriptFile, String libDir) {
             super(scriptFile, libDir);
@@ -470,7 +495,7 @@ public class GenerateScripts extends AbstractMojo {
      * @author adrian
      * 
      */
-    private static class PosixScripter extends Scripter {
+    private class PosixScripter extends Scripter {
 
         public PosixScripter(File scriptFile, String libDir) {
             super(scriptFile, libDir);
@@ -499,7 +524,7 @@ public class GenerateScripts extends AbstractMojo {
      * @author adrian
      * 
      */
-    private static class OSXScripter extends PosixScripter {
+    private class OSXScripter extends PosixScripter {
         public OSXScripter(File scriptFile, String libDir) {
             super(scriptFile, libDir);
         }
