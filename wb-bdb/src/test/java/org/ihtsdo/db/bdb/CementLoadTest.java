@@ -76,17 +76,17 @@ public class CementLoadTest {
 			
 			Bdb.setup(dbTarget);
 			I_RepresentIdSet cids = Bdb.getConceptDb().getConceptIdSet();
-			System.out.println("Concept count: " + cids.cardinality());
+			System.out.println("cementLoadTest Concept count: " + cids.cardinality());
 			
 			AddStringIdProcessor addProcessor  = new AddStringIdProcessor(cids);
 			Bdb.getConceptDb().iterateConceptDataInParallel(addProcessor);
-			System.out.println("Unprocessed: " + addProcessor.getCids().cardinality());
+			System.out.println("cementLoadTest Unprocessed: " + addProcessor.getCids().cardinality());
 			Assert.assertEquals(0, addProcessor.getCids().cardinality());
 			Bdb.commit();
 			
 			CheckStringIdProcessor csidp = new CheckStringIdProcessor(cids);
 			Bdb.getConceptDb().iterateConceptDataInParallel(csidp);
-			System.out.println("Unmatched: " + csidp.getCids().cardinality());
+			System.out.println("cementLoadTest Unmatched: " + csidp.getCids().cardinality());
 			Assert.assertEquals(0, csidp.getCids().cardinality());
 			Bdb.close();
 			
