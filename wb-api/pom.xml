@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
             <artifactId>svnkit-javahl</artifactId>
-            <version>1.2.1.5297</version>
+            <version>${svnkit.version}</version>
         </dependency>
         <dependency>
         	<groupId>au.csiro</groupId>
@@ -92,15 +92,6 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.dwfa</groupId>
-                <artifactId>pbl-mojo</artifactId>
-                <version>1.1</version>
-                <configuration>
-                    <cubitProject>cubitci</cubitProject>
-                    <siteRoot>ace-api</siteRoot>
                 </configuration>
             </plugin>
         </plugins>
