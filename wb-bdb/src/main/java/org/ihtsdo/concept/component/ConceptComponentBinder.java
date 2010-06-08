@@ -119,17 +119,26 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	@Override
 	public void objectToEntry(Collection<C> conceptComponentList, TupleOutput output) {
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
+		AceLog.getAppLog().info("ConceptComponentBinder objectToEntry conceptComponentList.size() = "+conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
 			componentsEncountered.incrementAndGet();
+			AceLog.getAppLog().info("conceptComponent.primordialSapNid = "+conceptComponent.primordialSapNid);
+			AceLog.getAppLog().info("maxReadOnlyStatusAtPositionId = "+maxReadOnlyStatusAtPositionId);
+			AceLog.getAppLog().info("conceptComponent.getTime() = "+conceptComponent.getTime());
 			if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId &&
 					conceptComponent.getTime() != Long.MIN_VALUE) {
+				AceLog.getAppLog().info("conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId &&conceptComponent.getTime() != Long.MIN_VALUE");
 				componentListToWrite.add(conceptComponent);
 			} else {
+				AceLog.getAppLog().info("!!!conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId &&conceptComponent.getTime() != Long.MIN_VALUE");
 				if (conceptComponent.revisions != null) {
+					AceLog.getAppLog().info("conceptComponent.revisions != null");
 					for (V part: conceptComponent.revisions) {
+						AceLog.getAppLog().info("V part: conceptComponent.revisions");
 						assert part.getStatusAtPositionNid() != Integer.MAX_VALUE;
 						if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId &&
 								part.getTime() != Long.MIN_VALUE) {
+							AceLog.getAppLog().info("part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId && part.getTime() != Long.MIN_VALUE");
 							componentListToWrite.add(conceptComponent);
 							break;
 						}
@@ -137,6 +146,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 				}
 			}
 		}
+		AceLog.getAppLog().info("componentListToWrite.size() = "+componentListToWrite.size());
 		output.writeInt(componentListToWrite.size()); // List size
 		for (C conceptComponent: componentListToWrite) {
 			componentsWritten.incrementAndGet();

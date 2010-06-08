@@ -885,9 +885,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
         // Start writing
-
+        AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb partsToWrite.size() = "+partsToWrite.size());
         output.writeShort(partsToWrite.size());
         for (IdentifierVersion p : partsToWrite) {
+        	AceLog.getAppLog().info("writeIdentifierToBdb IdentifierVersion p = "+p.toString());
             p.getType().writeType(output);
             p.writeIdPartToBdb(output);
         }
