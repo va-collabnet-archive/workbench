@@ -124,6 +124,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
+    	
+    	AceLog.getAppLog().info("hasUncommittedId cc = "+cc);
+    	AceLog.getAppLog().info("hasUncommittedId cc.getAdditionalIdentifierParts() = "+cc.getAdditionalIdentifierParts());
+    	
         if (cc != null && cc.getAdditionalIdentifierParts() != null) {
         	AceLog.getAppLog().info("hasUncommittedId cc != null && cc.getAdditionalIdentifierParts() != null");
         	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
