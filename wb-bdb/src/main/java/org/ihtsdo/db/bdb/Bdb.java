@@ -125,6 +125,7 @@ public class Bdb {
 		try {
 			closed = false;
 			BdbCommitManager.reset();
+			NidDataFromBdb.resetExecutorPool();
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
 				// ensure all OFFSETS are initialized prior to multi-threading. 
 			}
