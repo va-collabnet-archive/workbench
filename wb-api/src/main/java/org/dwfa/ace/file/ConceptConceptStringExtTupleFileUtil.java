@@ -100,10 +100,11 @@ public class ConceptConceptStringExtTupleFileUtil {
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
-                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
+                        String errorMessage =
+                                "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                } 
+                }
                 statusUuid = UUID.fromString(lineParts[9]);
             } catch (Exception e) {
                 String errorMessage = "CidCidStr: Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -128,32 +129,33 @@ public class ConceptConceptStringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidCidStr: Refset UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidCidStr: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidCidStr: Component UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidCidStr: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c1Uuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidCidStr: c1Uuid UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidCidStr: c1Uuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c2Uuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidCidStr: c2Uuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidCidStr: c2Uuid matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidCidStr: statusUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidCidStr: statusUuid matches no identifier in database.");
             }
 
             try {
-                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory
-                    .getId(componentUuid).getNid(), termFactory.getId(c1Uuid).getNid(), termFactory.getId(c2Uuid)
-                    .getNid(), strValue, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
+                refsetHelper.newConceptConceptStringRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
+                    .uuidToNative(componentUuid), termFactory.uuidToNative(c1Uuid), termFactory.uuidToNative(c2Uuid),
+                    strValue, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
-                String errorMessage = "CidCidStr: Exception thrown while creating new concept-concept-string refset extension";
+                String errorMessage =
+                        "CidCidStr: Exception thrown while creating new concept-concept-string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);
                 outputFileWriter.newLine();
@@ -162,7 +164,8 @@ public class ConceptConceptStringExtTupleFileUtil {
 
         } catch (Exception e) {
             String errorMessage =
-                    "CidCidStr: Exception thrown while importing concept-concept-string ext tuple : " + e.getLocalizedMessage();
+                    "CidCidStr: Exception thrown while importing concept-concept-string ext tuple : "
+                        + e.getLocalizedMessage();
             try {
                 outputFileWriter.write("Error on line " + lineCount + " : ");
                 outputFileWriter.write(errorMessage);

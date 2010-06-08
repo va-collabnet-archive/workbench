@@ -24,6 +24,7 @@ import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionBinder;
+import org.ihtsdo.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.image.ImageBinder;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -83,7 +84,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
     
     public boolean hasUncommittedComponents() {
-        if (hasUncommittedVersion(attributes.get())) {
+        if (hasUncommittedVersion(attributes.get()) ||
+        		hasUncommittedId(attributes.get())) {
             return true;
         }
         if (hasUncommittedVersion(srcRels.get())) {
@@ -101,16 +103,32 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return false;
     }
 
+
     private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
         if (componentList != null) {
             for (ConceptComponent<?, ?> cc: componentList) {
                 if (hasUncommittedVersion(cc)) {
                     return true;
                 }
+                if (hasUncommittedId(cc)) {
+                    return true;
+                }
             }
         }
         return false;
     }
+
+    private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
+        if (cc != null && cc.getAdditionalIdentifierParts() != null) {
+        	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
+        		if (idv.getTime() == Long.MAX_VALUE) {
+                    return true;
+        		}
+        	}
+        }
+        return false;
+    }
+
 
     private boolean hasUncommittedVersion(ConceptComponent<?, ?> cc) {
         if (cc != null) {

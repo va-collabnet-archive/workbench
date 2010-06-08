@@ -161,6 +161,10 @@ public class BdbCommitManager {
     private static boolean writeChangeSets = true;
 	
 	static {
+		reset();
+	}
+
+	public static void reset() {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 		"Change set writer"));
 		dbWriterService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), 
@@ -684,8 +688,7 @@ public class BdbCommitManager {
         } else {
             // have to forget "all" references to component...
             c.getRefsetMembers().remove(m);
-            NidPair toRemove = new NidPair(m.getRefsetId(), m.getMemberId());
-            c.getData().getMemberNids().remove(toRemove);
+            c.getData().getMemberNids().remove(m.getMemberId());
             m.setStatusAtPositionNid(-1);
         }
         c.modified();

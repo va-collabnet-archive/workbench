@@ -19,8 +19,7 @@
  */
 package org.dwfa.bpa.util;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -44,16 +41,6 @@ import javax.swing.event.ListDataListener;
 public class OpenFrames implements PropertyChangeListener {
 
     private static OpenFrames singleton = new OpenFrames();
-
-    static {
-        try {
-            if (GraphicsEnvironment.isHeadless() == false) {
-                singleton.addFrame(new PhantomFrame(null, null));
-            }
-        } catch (Exception e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, e.getLocalizedMessage(), e);
-        }
-    }
 
     private Collection<JFrame> frames;
 
@@ -194,5 +181,14 @@ public class OpenFrames implements PropertyChangeListener {
         }
         return items;
     }
+
+	public static Component getActiveFrame() {
+		for (JFrame f: singleton.frames) {
+			if (f.isActive()) {
+				return f;
+			}
+		}		
+		return new JFrame();
+	}
 
 }

@@ -316,8 +316,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return "Version: " + ConceptComponent.this.toString();
         }
 
-        public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
-            return additionalIdentifierParts;
+        public List<IdentifierVersion> getAdditionalIdentifierParts() {
+        	if (additionalIdentifierVersions == null) {
+        		return Collections.unmodifiableList(new ArrayList<IdentifierVersion>());
+        	}
+            return Collections.unmodifiableList(additionalIdentifierVersions);
         }
 
         @Override
@@ -423,7 +426,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         public int getSapNid() {
             if (index >= 0) {
-                return additionalIdentifierParts.get(index).getSapNid();
+                return additionalIdentifierVersions.get(index).getSapNid();
             }
             return primordialSapNid;
         }
@@ -494,7 +497,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public I_IdPart getMutableIdPart() {
             if (index >= 0) {
-                return additionalIdentifierParts.get(index);
+                return additionalIdentifierVersions.get(index);
             }
             return this;
         }
@@ -519,6 +522,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
 
             return ConceptComponent.this.makeIdAnalog(statusNid, pathNid, time);
+        }
+
+        public I_IdPart makeIdAnalog() {
+
+            // if (index >= 0) {
+            // return additionalIdentifierParts.get(index).makeIdAnalog(statusNid, pathNid, time);
+            // }
+            // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
+
+            return ConceptComponent.this.makeIdAnalog(getStatusId(), getPathId(), getTime());
         }
 
         @Override
@@ -585,7 +598,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public CopyOnWriteArrayList<R> revisions;
 
-    private ArrayList<IdentifierVersion> additionalIdentifierParts;
+    private ArrayList<IdentifierVersion> additionalIdentifierVersions;
 
     private ArrayList<IdVersion> idVersions;
     
@@ -641,7 +654,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
         buf.append(" xtraIds:");
-        buf.append(additionalIdentifierParts);
+        buf.append(additionalIdentifierVersions);
         buf.append(" xtraVersions: ");
         buf.append(revisions);
         buf.append("};");
@@ -652,13 +665,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public Set<Integer> getIdSapNids() {
         int size = 1;
-        if (idVersions != null) {
-            size = size + idVersions.size();
+        if (additionalIdentifierVersions != null) {
+            size = size + additionalIdentifierVersions.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
         sapNids.add(primordialSapNid);
-        if (idVersions != null) {
-            for (IdVersion id : idVersions) {
+        if (additionalIdentifierVersions != null) {
+            for (IdentifierVersion id : additionalIdentifierVersions) {
                 sapNids.add(id.getSapNid());
             }
         }
@@ -727,7 +740,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Bdb.gVersion.incrementAndGet();
     }
 
-    @SuppressWarnings("unchecked")
     public void merge(C component) {
         Set<Integer> currentSapNids = getComponentSapNids();
         HashMap<Integer, ConceptComponent<?, ?>.Version> newSapMap = component.getSapMap();
@@ -735,7 +747,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         for (ConceptComponent<?, ?>.Version v : newSapMap.values()) {
             assert !currentSapNids.contains(v.getSapNid()) : "currentSapNids: " + currentSapNids + " v: " + v
                 + " newSapMap: " + newSapMap;
-            assert 
             addRevision((R) v.makeAnalog());
         }
 
@@ -797,24 +808,25 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (list == null || list.size() == 0) {
             return;
         }
-        additionalIdentifierParts = new ArrayList<IdentifierVersion>(list.size());
+        additionalIdentifierVersions = new ArrayList<IdentifierVersion>(list.size());
         for (EIdentifier idv : list) {
             Object denotation = idv.getDenotation();
             switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
             case LONG:
-                additionalIdentifierParts.add(new IdentifierVersionLong((EIdentifierLong) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionLong((EIdentifierLong) idv));
                 break;
             case STRING:
-                additionalIdentifierParts.add(new IdentifierVersionString((EIdentifierString) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionString((EIdentifierString) idv));
                 break;
             case UUID:
                 Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
-                additionalIdentifierParts.add(new IdentifierVersionUuid((EIdentifierUuid) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionUuid((EIdentifierUuid) idv));
                 break;
             default:
                 throw new UnsupportedOperationException();
             }
         }
+        idVersions = null;
     }
 
     /*
@@ -844,32 +856,33 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         primordialUNid = input.readInt();
         int listSize = input.readShort();
         if (listSize != 0) {
-            additionalIdentifierParts = new ArrayList<IdentifierVersion>(listSize);
+            additionalIdentifierVersions = new ArrayList<IdentifierVersion>(listSize);
         }
         for (int i = 0; i < listSize; i++) {
             switch (IDENTIFIER_PART_TYPES.readType(input)) {
             case LONG:
                 IdentifierVersionLong idvl = new IdentifierVersionLong(input);
                 if (idvl.getTime() != Long.MIN_VALUE) {
-                    additionalIdentifierParts.add(idvl);
+                    additionalIdentifierVersions.add(idvl);
                 }
                 break;
             case STRING:
                 IdentifierVersionString idvs = new IdentifierVersionString(input);
                 if (idvs.getTime() != Long.MIN_VALUE) {
-                    additionalIdentifierParts.add(idvs);
+                    additionalIdentifierVersions.add(idvs);
                 }
                 break;
             case UUID:
                 IdentifierVersionUuid idvu = new IdentifierVersionUuid(input);
                 if (idvu.getTime() != Long.MIN_VALUE) {
-                    additionalIdentifierParts.add(idvu);
+                    additionalIdentifierVersions.add(idvu);
                 }
                 break;
             default:
                 throw new UnsupportedOperationException();
             }
         }
+        idVersions = null;
     }
 
     private final void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
@@ -877,18 +890,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         output.writeInt(primordialUNid);
         List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
-        if (additionalIdentifierParts != null) {
-            for (IdentifierVersion p : additionalIdentifierParts) {
+        if (additionalIdentifierVersions != null) {
+            for (IdentifierVersion p : additionalIdentifierVersions) {
                 if (p.getSapNid() > maxReadOnlyStatusAtPositionNid && p.getTime() != Long.MIN_VALUE) {
                     partsToWrite.add(p);
                 }
             }
         }
         // Start writing
-        AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb partsToWrite.size() = "+partsToWrite.size());
+
         output.writeShort(partsToWrite.size());
         for (IdentifierVersion p : partsToWrite) {
-        	AceLog.getAppLog().info("writeIdentifierToBdb IdentifierVersion p = "+p.toString());
             p.getType().writeType(output);
             p.writeIdPartToBdb(output);
         }
@@ -900,10 +912,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public boolean addIdVersion(IdentifierVersion srcId) {
-        if (additionalIdentifierParts == null) {
-            additionalIdentifierParts = new ArrayList<IdentifierVersion>();
+        if (additionalIdentifierVersions == null) {
+            additionalIdentifierVersions = new ArrayList<IdentifierVersion>();
         }
-        boolean returnValue = additionalIdentifierParts.add(srcId);
+        boolean returnValue = additionalIdentifierVersions.add(srcId);
+        idVersions = null;
         Concept c = getEnclosingConcept();
         c.modified();
         return returnValue;
@@ -912,8 +925,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public final List<I_IdVersion> getIdVersions() {
         List<I_IdVersion> returnValues = new ArrayList<I_IdVersion>();
-        if (additionalIdentifierParts != null) {
-            returnValues.addAll(additionalIdentifierParts);
+        if (additionalIdentifierVersions != null) {
+            returnValues.addAll(additionalIdentifierVersions);
         }
         returnValues.add(this);
         return Collections.unmodifiableList(returnValues);
@@ -954,8 +967,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final List<UUID> getUUIDs() {
         List<UUID> returnValues = new ArrayList<UUID>();
         returnValues.add(Bdb.getUuidDb().getUuid(primordialUNid));
-        if (additionalIdentifierParts != null) {
-            for (IdentifierVersion idv : additionalIdentifierParts) {
+        if (additionalIdentifierVersions != null) {
+            for (IdentifierVersion idv : additionalIdentifierVersions) {
                 if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
                     IdentifierVersionUuid uuidPart = (IdentifierVersionUuid) idv;
                     returnValues.add(uuidPart.getUuid());
@@ -968,10 +981,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException {
         UniversalAceIdentification universal = new UniversalAceIdentification(1);
-        if (additionalIdentifierParts == null) {
+        if (additionalIdentifierVersions == null) {
             universal = new UniversalAceIdentification(1);
         } else {
-            universal = new UniversalAceIdentification(additionalIdentifierParts.size() + 1);
+            universal = new UniversalAceIdentification(additionalIdentifierVersions.size() + 1);
         }
         UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
         universalPart.setIdStatus(getUuids(getStatusId()));
@@ -980,8 +993,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         universalPart.setSourceId(getDenotation());
         universalPart.setTime(getTime());
         universal.addVersion(universalPart);
-        if (additionalIdentifierParts != null) {
-            for (IdentifierVersion part : additionalIdentifierParts) {
+        if (additionalIdentifierVersions != null) {
+            for (IdentifierVersion part : additionalIdentifierVersions) {
                 universalPart = new UniversalAceIdentificationPart();
                 universalPart.setIdStatus(getUuids(part.getStatusId()));
                 universalPart.setPathId(getUuids(part.getPathId()));
@@ -996,7 +1009,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public boolean hasMutableIdPart(I_IdPart newPart) {
-        return additionalIdentifierParts.contains(newPart);
+        return additionalIdentifierVersions.contains(newPart);
     }
 
     public final boolean addMutablePart(R version) {
@@ -1044,15 +1057,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final List<IdVersion> getMutableIdParts() {
         if (idVersions == null) {
             int count = 1;
-            if (additionalIdentifierParts != null) {
-                count = count + additionalIdentifierParts.size();
+            if (additionalIdentifierVersions != null) {
+                count = count + additionalIdentifierVersions.size();
             }
             idVersions = new ArrayList<IdVersion>(count);
             idVersions.add(new IdVersion());
-        }
-        if (additionalIdentifierParts != null) {
-            for (int i = 0; i < additionalIdentifierParts.size(); i++) {
-                idVersions.add(new IdVersion(i));
+            if (additionalIdentifierVersions != null) {
+                for (int i = 0; i < additionalIdentifierVersions.size(); i++) {
+                    idVersions.add(new IdVersion(i));
+                }
             }
         }
         return Collections.unmodifiableList(idVersions);
@@ -1229,14 +1242,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (this.primordialUNid != another.primordialUNid) {
             return false;
         }
-        if (this.additionalIdentifierParts != null && another.additionalIdentifierParts == null) {
+        if (this.additionalIdentifierVersions != null && another.additionalIdentifierVersions == null) {
             return false;
         }
-        if (this.additionalIdentifierParts == null && another.additionalIdentifierParts != null) {
+        if (this.additionalIdentifierVersions == null && another.additionalIdentifierVersions != null) {
             return false;
         }
-        if (this.additionalIdentifierParts != null) {
-            if (this.additionalIdentifierParts.equals(another.additionalIdentifierParts) == false) {
+        if (this.additionalIdentifierVersions != null) {
+            if (this.additionalIdentifierVersions.equals(another.additionalIdentifierVersions) == false) {
                 return false;
             }
         }
@@ -1283,11 +1296,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 + this.primordialUNid + "\n" + "\t\tanother.primordialUNid = " + another.primordialUNid + "\n");
         }
 
-        if (this.additionalIdentifierParts != null) {
-            if (this.additionalIdentifierParts.equals(another.additionalIdentifierParts) == false) {
+        if (this.additionalIdentifierVersions != null) {
+            if (this.additionalIdentifierVersions.equals(another.additionalIdentifierVersions) == false) {
                 buf.append("\tConceptComponent.additionalIdentifierParts not equal: \n"
-                    + "\t\tthis.additionalIdentifierParts = " + this.additionalIdentifierParts + "\n"
-                    + "\t\tanother.additionalIdentifierParts = " + another.additionalIdentifierParts + "\n");
+                    + "\t\tthis.additionalIdentifierParts = " + this.additionalIdentifierVersions + "\n"
+                    + "\t\tanother.additionalIdentifierParts = " + another.additionalIdentifierVersions + "\n");
             }
         }
 
@@ -1348,8 +1361,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (this.getTime() == Long.MAX_VALUE) {
             return true;
         }
-        if (additionalIdentifierParts != null) {
-            for (IdentifierVersion idv : additionalIdentifierParts) {
+        if (additionalIdentifierVersions != null) {
+            for (IdentifierVersion idv : additionalIdentifierVersions) {
                 if (idv.getTime() == Long.MAX_VALUE) {
                     return true;
                 }
@@ -1370,7 +1383,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
-        return additionalIdentifierParts;
+        return additionalIdentifierVersions;
     }
 
     public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time) {

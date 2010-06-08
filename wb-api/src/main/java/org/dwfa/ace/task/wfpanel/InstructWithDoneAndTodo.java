@@ -34,18 +34,22 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.swing.SwingWorker;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -101,10 +105,18 @@ public class InstructWithDoneAndTodo extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.CONTINUE;
-            done = true;
-            synchronized (InstructWithDoneAndTodo.this) {
-                InstructWithDoneAndTodo.this.notifyAll();
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                synchronized (InstructWithDoneAndTodo.this) {
+                    InstructWithDoneAndTodo.this.notifyAll();
+                }
             }
         }
     }

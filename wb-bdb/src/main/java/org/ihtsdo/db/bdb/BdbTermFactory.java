@@ -133,7 +133,6 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
-import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
@@ -1261,7 +1260,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public List<UUID> nativeToUuid(int nid) throws IOException {
         Concept concept = Bdb.getConceptForComponent(nid);
-        if (concept != null) {
+        if (concept != null && concept.isCanceled() == false) {
             return concept.getUidsForComponent(nid);
         }
         return null;

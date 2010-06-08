@@ -72,6 +72,7 @@ public class DiffPathPanel extends JPanel {
         // ADDED ISAs
         this.add(new JLabel("Added ISAs:"), c);
         if (SnoQuery.getIsaAdded() != null && SnoQuery.getIsaAdded().size() > 0) {
+
             table = updateTable(SnoQuery.getIsaAdded());
             table.setDragEnabled(true);
             table.setTransferHandler(new TerminologyTransferHandler(table));
@@ -82,8 +83,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs added. --"), c);
@@ -103,8 +110,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs dropped. --"), c);
@@ -123,8 +136,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
             c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles added. --"), c);
@@ -147,7 +166,14 @@ public class DiffPathPanel extends JPanel {
             table.setRowHeight(rowHeight);
             table.setPreferredScrollableViewportSize(new Dimension(tWide, rowHeight * table.getRowCount()));
 
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.gridy += 1;
             this.add(new JScrollPane(table), c);
+            c.fill = GridBagConstraints.NONE;
+            c.weightx = 0;
+            c.weighty = 0;
         } else {
             c.gridy += 1;
             c.weightx = 0.5;
@@ -195,18 +221,34 @@ public class DiffPathPanel extends JPanel {
 
         for (int i = 0; i < totalRows; i++) {
             SnoRel sr = srl.get(i);
-            StringBuilder str = new StringBuilder("<html>");
+            StringBuilder str = new StringBuilder();
             // CONCEPT_1
             I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
-            str.append(valueFont + c1Bean.getInitialText());
+            str.append(c1Bean.getInitialText());
             // ROLE TYPE
             I_GetConceptData typeBean = tf.getConcept(sr.typeId);
-            str.append(" - </font>" + typeFont + typeBean.getInitialText());
+            str.append(" - " + typeBean.getInitialText());
             // CONCEPT_2
             I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
-            str.append(" - </font>" + valueFont + c2Bean.getInitialText());
+            str.append(" - " + c2Bean.getInitialText());
             tableStrings[i][0] = str.toString();
         }
+
+        
+//        for (int i = 0; i < totalRows; i++) {
+//            SnoRel sr = srl.get(i);
+//            StringBuilder str = new StringBuilder("<html>");
+//            // CONCEPT_1
+//            I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
+//            str.append(valueFont + c1Bean.getInitialText());
+//            // ROLE TYPE
+//            I_GetConceptData typeBean = tf.getConcept(sr.typeId);
+//            str.append(" - </font>" + typeFont + typeBean.getInitialText());
+//            // CONCEPT_2
+//            I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
+//            str.append(" - </font>" + valueFont + c2Bean.getInitialText());
+//            tableStrings[i][0] = str.toString();
+//        }
 
         return tableStrings;
     }

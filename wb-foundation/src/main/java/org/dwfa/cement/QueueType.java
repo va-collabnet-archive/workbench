@@ -40,7 +40,7 @@ public class QueueType implements I_AddToMemoryTermServer {
     public enum Concept implements I_ConceptEnumeration, I_ConceptualizeUniversally {
         QUEUE_TYPE("Queue Type"), AGING_QUEUE("aging queue", QUEUE_TYPE), ARCHIVAL_QUEUE("archival queue", QUEUE_TYPE), COMPUTE_QUEUE("compute queue", QUEUE_TYPE), INBOX_QUEUE("inbox queue", QUEUE_TYPE), LAUNCHER_QUEUE("launcher queue", QUEUE_TYPE), OUTBOX_QUEUE("outbox queue", QUEUE_TYPE), SYNCHRONIZATION_QUEUE("synchronization queue", QUEUE_TYPE), WEB_QUEUE("web queue", QUEUE_TYPE), ;
 
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -59,7 +59,12 @@ public class QueueType implements I_AddToMemoryTermServer {
             return descriptions_S;
         }
 
-        private Concept(String descriptionString) {
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
+
+		private Concept(String descriptionString) {
             this(new String[] { descriptionString }, new I_ConceptualizeUniversally[] {});
         }
 
