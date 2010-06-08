@@ -76,6 +76,8 @@ public class CementLoadTest {
 			
 			Bdb.setup(dbTarget);
 			I_RepresentIdSet cids = Bdb.getConceptDb().getConceptIdSet();
+			I_RepresentIdSet roCids = Bdb.getConceptDb().getReadOnlyConceptIdSet();
+			Assert.assertEquals(cids, roCids);
 			System.out.println("Concept count: " + cids.cardinality());
 			
 			AddStringIdProcessor addProcessor  = new AddStringIdProcessor(cids);
