@@ -32,6 +32,7 @@ import org.ihtsdo.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
@@ -151,6 +152,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
                 enclosingConcept)));
         }
+        handleCanceledComponents();
         return srcRels.get();
     }
 
@@ -159,6 +161,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
                 OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return descriptions.get();
     }
 
@@ -242,13 +245,49 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return refsetMembers.get();
     }
+
+	private void handleCanceledComponents() {
+		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
+			if (refsetMembers != null) {
+	        	removeCanceledFromList(refsetMembers.get());
+			}
+			if (descriptions != null) {
+	        	removeCanceledFromList(descriptions.get());
+			}
+			if (images != null) {
+	        	removeCanceledFromList(images.get());
+			}
+			if (srcRels != null) {
+	        	removeCanceledFromList(srcRels.get());
+			}
+        }
+		lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
+	}
+
+	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
+		if (ccList != null) {
+			synchronized (ccList) {
+				List<Integer> toRemove = new ArrayList<Integer>();
+				for (int i = ccList.size() -1; i > -1; i--) {
+					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
+							toRemove.add(i);
+					}
+				}
+				for (Integer i: toRemove) {
+					ccList.remove(i);
+				}
+			}
+		}
+	}
 
     public AddImageList getImages() throws IOException {
         if (images.get() == null) {
             images.compareAndSet(null, new AddImageList(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
         }
+        handleCanceledComponents();
         return images.get();
     }
 

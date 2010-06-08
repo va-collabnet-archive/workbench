@@ -62,7 +62,6 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 
@@ -139,6 +138,11 @@ public class BdbCommitManager {
 	private static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
 	private static long lastCommit = Bdb.gVersion.incrementAndGet();
+	private static long lastCancel = Integer.MIN_VALUE;
+
+	public static long getLastCancel() {
+		return lastCancel;
+	}
 
 	public static void addUncommittedNoChecks(I_ExtendByRef extension) {
 		RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
@@ -330,7 +334,8 @@ public class BdbCommitManager {
     private static boolean performCommit = false;
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-        try {
+    	lastCommit = Bdb.gVersion.incrementAndGet();
+    	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
@@ -525,6 +530,7 @@ public class BdbCommitManager {
     }
 
     public static void cancel() {
+    	lastCancel = Bdb.gVersion.incrementAndGet();
     	synchronized (uncommittedCNids) {
     		synchronized (uncommittedCNidsNoChecks) {
     			try {
