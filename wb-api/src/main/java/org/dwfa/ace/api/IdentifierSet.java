@@ -62,7 +62,7 @@ public class IdentifierSet implements I_RepresentIdSet {
      * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#setMember(int)
      */
-    public void setMember(int nid) {
+    public synchronized void setMember(int nid) {
     	int index = nid + offset;
     	bitSet.ensureCapacity(index);
         bitSet.set(index);
@@ -73,7 +73,7 @@ public class IdentifierSet implements I_RepresentIdSet {
      * 
      * @see org.dwfa.ace.api.I_RepresentIdSet#setNotMember(int)
      */
-    public void setNotMember(int nid) {
+    public synchronized void setNotMember(int nid) {
     	int index = nid + offset;
     	bitSet.ensureCapacity(index);
         bitSet.clear(index);
