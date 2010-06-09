@@ -10,6 +10,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -122,7 +123,11 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     @Override
     public long getTime() {
-        return sapBdb.getTime(statusAtPositionNid);
+    	
+    	AceLog.getAppLog().info(">>>>>>>>>>> IdentifierVersion.getTime() statusAtPositionNid= "+statusAtPositionNid);
+    	long timeL = sapBdb.getTime(statusAtPositionNid);
+    	AceLog.getAppLog().info(">>>>>>>>>>> IdentifierVersion timeL = "+timeL);
+        return timeL;
     }
 
     @Override
