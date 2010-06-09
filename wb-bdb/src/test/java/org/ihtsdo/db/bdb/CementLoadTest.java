@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
@@ -116,7 +117,6 @@ public class CementLoadTest {
 			Bdb.setup(dbTarget);
 			csidp = new CheckStringIdProcessor(cids);
 			Bdb.getConceptDb().iterateConceptDataInParallel(csidp);
-			Bdb.close();
 			System.out.println("Unmatched: " + csidp.getCids().cardinality());
 			if (csidp.getCids().cardinality() != 0) {
 				System.out.println("Unprocessed nids[2]: " + csidp.getCids());
@@ -129,6 +129,14 @@ public class CementLoadTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.toString());
+		} finally {
+			try {
+				Bdb.close();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
