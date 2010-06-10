@@ -92,7 +92,12 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             REL_DESTINATION_IS_CHILD_OF(new String[] { "REL DESTINATION IS CHILD OF", "rel destination is child of" }, SPEC_QUERY_TOKEN), 
             REL_DESTINATION_IS_DESCENDENT_OF(new String[] { "REL DESTINATION IS DESCENDENT OF", "rel destination is descendent of" }, SPEC_QUERY_TOKEN), 
             REL_DESTINATION_IS_KIND_OF(new String[] { "REL DESTINATION IS KIND OF", "rel destination is kind of" }, SPEC_QUERY_TOKEN),
-            
+
+		DIFFERENCE_V1_IS(new String[] { "V1 IS", "V1 IS" }, SPEC_GROUPING), DIFFERENCE_V2_IS(
+				new String[] { "V2 IS", "V2 IS" }, SPEC_GROUPING), DIFFERENCE_V1_GROUPING(
+				new String[] { "V1", "V1" }, SPEC_GROUPING), DIFFERENCE_V2_GROUPING(
+				new String[] { "V2", "V2" }, SPEC_GROUPING),
+
             DIFFERENCE_QUERY(new String[] {
             "Difference Query", "difference query" }, SPEC_QUERY_TOKEN), DIFFERENCE_CONFIGURATION(new String[] {
             "DIFFERENCE CONFIGURATION", "difference configuration" }, DIFFERENCE_QUERY), DIFFERENCE_STATISTICS(new String[] {
