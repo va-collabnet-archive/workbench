@@ -94,7 +94,13 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         REL_DESTINATION_IS(RefsetAuxiliary.Concept.REL_DESTINATION_IS),
         REL_DESTINATION_IS_KIND_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_KIND_OF),
         REL_DESTINATION_IS_CHILD_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_CHILD_OF),
-        REL_DESTINATION_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_DESCENDENT_OF);
+        REL_DESTINATION_IS_DESCENDENT_OF(RefsetAuxiliary.Concept.REL_DESTINATION_IS_DESCENDENT_OF),
+        
+        ADDED_CONCEPT(RefsetAuxiliary.Concept.ADDED_CONCEPT),
+        ADDED_DESCRIPTION(RefsetAuxiliary.Concept.ADDED_DESCRIPTION),
+        ADDED_RELATIONSHIP(RefsetAuxiliary.Concept.ADDED_RELATIONSHIP);
+        
+        
 
         protected int nid;
 

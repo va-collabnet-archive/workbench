@@ -68,7 +68,12 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, true),
         NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
         CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
-        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false);
+        NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false),
+        V1_IS(RefsetAuxiliary.Concept.DIFFERENCE_V1_IS, true),
+        V2_IS(RefsetAuxiliary.Concept.DIFFERENCE_V2_IS, true),
+        V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true),
+        V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true)
+        ;
 
         private int nid;
         private boolean truth;
@@ -126,19 +131,27 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return statements;
     }
 
-    private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
-        if (concept.getConceptId() == GROUPING_TYPE.AND.nid) {
-            return GROUPING_TYPE.AND;
-        } else if (concept.getConceptId() == GROUPING_TYPE.OR.nid) {
-            return GROUPING_TYPE.OR;
-        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_REL.nid) {
-            return GROUPING_TYPE.CONCEPT_CONTAINS_REL;
-        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_DESC.nid) {
-            return GROUPING_TYPE.CONCEPT_CONTAINS_DESC;
-        } else {
-            throw new TerminologyException("No valid grouping token specified : " + concept.getInitialText());
-        }
-    }
+	private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept)
+			throws TerminologyException, IOException {
+		for (GROUPING_TYPE gt : GROUPING_TYPE.values()) {
+			if (concept.getConceptId() == gt.nid)
+				return gt;
+		}
+		// if (concept.getConceptId() == GROUPING_TYPE.AND.nid) {
+		// return GROUPING_TYPE.AND;
+		// } else if (concept.getConceptId() == GROUPING_TYPE.OR.nid) {
+		// return GROUPING_TYPE.OR;
+		// } else if (concept.getConceptId() ==
+		// GROUPING_TYPE.CONCEPT_CONTAINS_REL.nid) {
+		// return GROUPING_TYPE.CONCEPT_CONTAINS_REL;
+		// } else if (concept.getConceptId() ==
+		// GROUPING_TYPE.CONCEPT_CONTAINS_DESC.nid) {
+		// return GROUPING_TYPE.CONCEPT_CONTAINS_DESC;
+		// } else {
+		throw new TerminologyException("No valid grouping token specified : "
+				+ concept.getInitialText());
+		// }
+	}
 
     public RefsetSpecQuery addSubquery(I_GetConceptData groupingConcept) throws TerminologyException, IOException {
         RefsetSpecQuery subquery = new RefsetSpecQuery(groupingConcept, getRefsetSpecNid());
