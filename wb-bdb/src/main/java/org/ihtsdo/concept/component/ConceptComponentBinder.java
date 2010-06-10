@@ -121,8 +121,10 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
 			componentsEncountered.incrementAndGet();
+			AceLog.getAppLog().info("ConceptComponentBinder objectToEntry  conceptComponent = "+conceptComponent.toString());
 			if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId &&
 					conceptComponent.getTime() != Long.MIN_VALUE) {
+				AceLog.getAppLog().info("ConceptComponentBinder objectToEntry  conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId && conceptComponent.getTime() != Long.MIN_VALUE");
 				componentListToWrite.add(conceptComponent);
 			} else {
 				if (conceptComponent.revisions != null) {
@@ -130,6 +132,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 						assert part.getStatusAtPositionNid() != Integer.MAX_VALUE;
 						if (part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId &&
 								part.getTime() != Long.MIN_VALUE) {
+							AceLog.getAppLog().info("ConceptComponentBinder objectToEntry  part.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId && part.getTime() != Long.MIN_VALUE");
 							componentListToWrite.add(conceptComponent);
 							break;
 						}
@@ -138,6 +141,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 			}
 		}
 		output.writeInt(componentListToWrite.size()); // List size
+		AceLog.getAppLog().info("ConceptComponentBinder objectToEntry componentListToWrite.size() = "+componentListToWrite.size()); 
 		for (C conceptComponent: componentListToWrite) {
 			componentsWritten.incrementAndGet();
 			conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);

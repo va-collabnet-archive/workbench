@@ -79,6 +79,8 @@ public class ConceptBdb extends ComponentBdb {
         ConceptBinder binder = new ConceptBinder();
         DatabaseEntry key = new DatabaseEntry();
         int cNid = concept.getNid();
+        AceLog.getAppLog().info("ConceptBdb.writeConcept cNid = "+cNid);
+        AceLog.getAppLog().info("ConceptBdb.writeConcept concept  = "+concept.toLongString());
         conceptIdSet.setMember(cNid);
         IntegerBinding.intToEntry(cNid, key);
         DatabaseEntry value = new DatabaseEntry();
@@ -90,6 +92,8 @@ public class ConceptBdb extends ComponentBdb {
             }
             binder.objectToEntry(concept, value);
             concept.resetNidData();
+           // AceLog.getAppLog().info("ConceptBdb.writeConcept adding to mutable key = "+key);
+           // AceLog.getAppLog().info("ConceptBdb.writeConcept adding to mutable value = "+value);
             mutable.put(null, key, value);
             concept.setLastWrite(writeVersion);
         }

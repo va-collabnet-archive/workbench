@@ -84,8 +84,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
     
     public boolean hasUncommittedComponents() {
-        if (hasUncommittedVersion(attributes.get()) ||
-        		hasUncommittedId(attributes.get())) {
+    	
+    	boolean UCV = hasUncommittedVersion(attributes.get());
+    	boolean UCID = hasUncommittedId(attributes.get());
+    	
+    	AceLog.getAppLog().info("hasUncommittedComponents UCV = "+UCV);
+    	AceLog.getAppLog().info("hasUncommittedComponents UCID = "+UCID);
+    	
+        if (UCV || UCID) {
             return true;
         }
         if (hasUncommittedVersion(srcRels.get())) {
@@ -105,41 +111,48 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
 
     private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
-    	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion called");
+    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion called");
         if (componentList != null) {
-        	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList != null");
+        	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList != null");
             for (ConceptComponent<?, ?> cc: componentList) {
                 if (hasUncommittedVersion(cc)) {
-                	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedVersion(cc)");
+                	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedVersion(cc)");
                     return true;
                 }
                 if (hasUncommittedId(cc)) {
-                	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedId(cc)");
+                	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedId(cc)");
                     return true;
                 }
             }
         }
-        AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList == null");
+       // AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList == null");
         return false;
     }
 
     private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
     	
-    	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc = "+cc);
-    	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc.getAdditionalIdentifierParts() = "+cc.getAdditionalIdentifierParts());
+    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc = "+cc);
+    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc.getAdditionalIdentifierParts() = "+cc.getAdditionalIdentifierParts());
+    	
+    	Long testL = new Long("1272363173000");
     	
         if (cc != null && cc.getAdditionalIdentifierParts() != null) {
-        	AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc != null && cc.getAdditionalIdentifierParts() != null");
+        	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc != null && cc.getAdditionalIdentifierParts() != null");
         	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
-        		AceLog.getAppLog().info(">>>>>>>>>>> idv.getTime() = "+idv.getTime());
-        		AceLog.getAppLog().info(">>>>>>>>>>> Long.MAX_VALUE = "+Long.MAX_VALUE);
+        		//AceLog.getAppLog().info(">>>>>>>>>>> idv.getTime() = "+idv.getTime());
+        		//AceLog.getAppLog().info(">>>>>>>>>>> Long.MAX_VALUE = "+Long.MAX_VALUE);
         		if (idv.getTime() == Long.MAX_VALUE) {
-        			AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId idv.getTime() == Long.MAX_VALUE");
+        			//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId idv.getTime() == Long.MAX_VALUE");
                     return true;
         		}
+        		if (idv.getTime() == testL) {
+        			AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId idv.getTime() == 1272363173000");
+                    //return true;
+        		}
+        		
         	}
         }
-        AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc == null || cc.getAdditionalIdentifierParts() == null");
+       // AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc == null || cc.getAdditionalIdentifierParts() == null");
         return false;
     }
 

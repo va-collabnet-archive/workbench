@@ -33,22 +33,29 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     protected IdentifierVersion(int statusNid, int pathNid, long time) {
         this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
+        //AceLog.getAppLog().info("IdentifierVersion(int statusNid, int pathNid, long time) called");
     }
 
     protected IdentifierVersion(int statusNid, int pathNid, long time, IdentifierVersion idVersion) {
         this(statusNid, pathNid, time);
         this.authorityNid = idVersion.authorityNid;
+        //AceLog.getAppLog().info("IdentifierVersion(int statusNid, int pathNid, long time, IdentifierVersion idVersion) called");
     }
 
     protected IdentifierVersion(TupleInput input) {
         super();
+        //AceLog.getAppLog().info("IdentifierVersion(TupleInput input) called");
         statusAtPositionNid = input.readInt();
         authorityNid = input.readInt();
+        //AceLog.getAppLog().info("IdentifierVersion(TupleInput input) called statusAtPositionNid = "+statusAtPositionNid);
+        //AceLog.getAppLog().info("IdentifierVersion(TupleInput input) called authorityNid = "+authorityNid);
+        
 
     }
 
     protected IdentifierVersion(EIdentifier idv) {
         super();
+        //AceLog.getAppLog().info("IdentifierVersion(EIdentifier idv) called");
         this.statusAtPositionNid =
                 sapBdb.getSapNid(Bdb.uuidToNid(idv.getStatusUuid()), Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
         this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
@@ -56,6 +63,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     protected IdentifierVersion() {
         super();
+        AceLog.getAppLog().info("IdentifierVersion() called");
     }
 
     /*
@@ -77,8 +85,10 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public abstract ConceptComponent.IDENTIFIER_PART_TYPES getType();
 
     public final void writeIdPartToBdb(TupleOutput output) {
+    	AceLog.getAppLog().info("IdentifierVersion writeIdPartToBdb called");
         output.writeInt(statusAtPositionNid);
         output.writeInt(authorityNid);
+        AceLog.getAppLog().info("IdentifierVersion writeIdPartToBdb calling writeSourceIdToBdb(output)");
         writeSourceIdToBdb(output);
     }
 
@@ -124,10 +134,11 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     @Override
     public long getTime() {
     	
-    	AceLog.getAppLog().info(">>>>>>>>>>> IdentifierVersion.getTime() statusAtPositionNid= "+statusAtPositionNid);
+    	/*AceLog.getAppLog().info(">>>>>>>>>>> IdentifierVersion.getTime() statusAtPositionNid= "+statusAtPositionNid);
     	long timeL = sapBdb.getTime(statusAtPositionNid);
     	AceLog.getAppLog().info(">>>>>>>>>>> IdentifierVersion timeL = "+timeL);
-        return timeL;
+        return timeL;*/
+    	return sapBdb.getTime(statusAtPositionNid);
     }
 
     @Override

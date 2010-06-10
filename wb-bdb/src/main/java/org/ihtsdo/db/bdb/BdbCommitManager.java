@@ -209,9 +209,13 @@ public class BdbCommitManager {
                         "---@@@ writeUncommitted checks: "
                                 + c.getNid() + " ---@@@ ");
             }
+            AceLog.getAppLog().info("BdbCommitManager writeUncommitted called");
             dbWriterPermit.acquire();
+            //AceLog.getAppLog().info("BdbCommitManager writeUncommitted dbWriterPermit.acquired");
             dbWriterService.execute(new SetNidsForCid(c));
+            //AceLog.getAppLog().info("BdbCommitManager writeUncommitted set SetNidsForCid");
             dbWriterService.execute(new ConceptWriter(c));
+            AceLog.getAppLog().info("BdbCommitManager writeUncommitted Finished");
         }
     }
 
@@ -330,9 +334,11 @@ public class BdbCommitManager {
     private static boolean performCommit = false;
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
+    	AceLog.getAppLog().info("BdbCommitManager.commit(ChangeSetPolicy changeSetPolicy,ChangeSetWriterThreading changeSetWriterThreading) called");
         try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
+                	AceLog.getAppLog().info("BdbCommitManager.commit flushUncommitted performCreationTests = "+performCreationTests);
                     flushUncommitted();
                     performCommit = true;
                     int errorCount = 0;
@@ -343,6 +349,7 @@ public class BdbCommitManager {
                         while (uncommittedCNidItr.next()) {
                             List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                             Concept concept = Concept.get(uncommittedCNidItr.nid());
+                            AceLog.getAppLog().info("BdbCommitManager.commit concept being checked = "+concept.toLongString());
                             dataCheckMap.put(concept, warningsAndErrors);
                             for (I_TestDataConstraints test : commitTests) {
                                 try {
@@ -368,6 +375,8 @@ public class BdbCommitManager {
                         }
                     }
                     
+                    //AceLog.getAppLog().info("BdbCommitManager.commit errorCount= "+errorCount);
+                    //AceLog.getAppLog().info("BdbCommitManager.commit warningCount= "+warningCount);
                     if (errorCount + warningCount != 0) {
                         if (errorCount > 0) {
                             performCommit = false;
@@ -410,7 +419,7 @@ public class BdbCommitManager {
                             }
                         }
                     }
-                    
+                    AceLog.getAppLog().info("BdbCommitManager.commit performCommit= "+performCommit);
                     if (performCommit) {
                         KindOfComputer.reset();
                         long commitTime = System.currentTimeMillis();
@@ -456,6 +465,7 @@ public class BdbCommitManager {
                 }
             }
             if (performCommit) {
+            	AceLog.getAppLog().info("BdbCommitManager.commit about to Bdb.sync() performCommit= "+performCommit);
                 Bdb.sync();
             }
         } catch (IOException e1) {
@@ -467,8 +477,11 @@ public class BdbCommitManager {
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
+        //AceLog.getAppLog().info("BdbCommitManager.commit fireCommit() ");
         fireCommit();
+        //AceLog.getAppLog().info("BdbCommitManager.commit updateFrames() ");
         updateFrames();
+        AceLog.getAppLog().info("BdbCommitManager.commit FINISHED ");
     }
 
 	public static void commit() {

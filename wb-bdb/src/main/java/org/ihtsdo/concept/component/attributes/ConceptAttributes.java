@@ -23,6 +23,7 @@ import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -179,11 +180,16 @@ public class ConceptAttributes
 	@Override
 	public void writeToBdb(TupleOutput output,
 			int maxReadOnlyStatusAtPositionNid) {
+		AceLog.getAppLog().info("ConceptAttributes writeToBdb called for CA of "+this.toString());
 		List<ConceptAttributesRevision> partsToWrite = new ArrayList<ConceptAttributesRevision>();
+		AceLog.getAppLog().info("ConceptAttributes writeToBdb partsToWrite size = "+partsToWrite.size());
 		if (revisions != null) {
+			AceLog.getAppLog().info("ConceptAttributes writeToBdb revisions != null");
 			for (ConceptAttributesRevision p : revisions) {
+				AceLog.getAppLog().info("ConceptAttributes writeToBdb ConceptAttributesRevision p = "+p.toString());
 				if (p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid &&
 						p.getTime() != Long.MIN_VALUE) {
+					AceLog.getAppLog().info("ConceptAttributes writeToBdb partsToWrite.add(p)");
 					partsToWrite.add(p);
 				}
 			}
@@ -192,6 +198,7 @@ public class ConceptAttributes
 		output.writeBoolean(defined);
 		output.writeShort(partsToWrite.size());
 		for (ConceptAttributesRevision p : partsToWrite) {
+			AceLog.getAppLog().info("ConceptAttributes writeToBdb writing parts)");
 			p.writePartToBdb(output);
 		}
 	}
