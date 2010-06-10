@@ -9,11 +9,18 @@
 	<artifactId>database</artifactId>
 	<name>Workbench Bundle Database</name>
 	<description>Workbench Bundle Database</description>
+	<dependencies>
+		<dependency>
+    		<groupId>org.ihtsdo</groupId>
+    		<artifactId>wb-bdb</artifactId>
+    		<version>${project.version}</version>
+  		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.dwfa</groupId>
-				<artifactId>dwfa-mojo</artifactId>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
