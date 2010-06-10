@@ -1,7 +1,6 @@
 package org.ihtsdo.concept.component.identifier;
 
 import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.etypes.EIdentifierString;
 
@@ -49,7 +48,6 @@ public class IdentifierVersionString extends IdentifierVersion {
 
     @Override
     protected void writeSourceIdToBdb(TupleOutput output) {
-    	AceLog.getAppLog().info("IdentifierVersionString writeSourceIdToBdb called stringDenotation = "+stringDenotation);
         output.writeString(stringDenotation);
     }
 

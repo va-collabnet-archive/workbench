@@ -4,20 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.ConceptComponentBinder;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
-import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionBinder;
 import org.ihtsdo.concept.component.image.ImageBinder;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -58,26 +55,12 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			I_ManageConceptData conceptData = concept.getData();
 			boolean primordial = conceptData.getReadOnlyBytes().length == 0
 					&& conceptData.getReadWriteBytes().length == 0;
-			
-			ConceptAttributes ca = conceptData.getConceptAttributesIfChanged();
-			
-			AceLog.getAppLog().info("Concept Binder objectToEntry CA = "+ca);
 
 			byte[] attrOutput = getAttributeBytes(conceptData, primordial,
-					OFFSETS.ATTRIBUTES, ca,
+					OFFSETS.ATTRIBUTES, conceptData.getConceptAttributesIfChanged(),
 					new ConceptAttributesBinder());
-			
-			ComponentList<Description> descs = conceptData.getDescriptionsIfChanged();
-			
-			
-			
-			/*for (Iterator<Description> it1 = descs.iterator(); it1.hasNext();) {
-				Description desc =  it1.next();
-				AceLog.getAppLog().info("Concept Binder objectToEntry Desc = "+desc);
-			}*/
-			
 			byte[] descOutput = getComponentBytes(conceptData, primordial,
-					OFFSETS.DESCRIPTIONS, descs,
+					OFFSETS.DESCRIPTIONS, conceptData.getDescriptionsIfChanged(),
 					new DescriptionBinder());
 			byte[] relOutput = getComponentBytes(conceptData, primordial,
 					OFFSETS.SOURCE_RELS, conceptData.getSourceRelsIfChanged(),
@@ -229,21 +212,15 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			throws InterruptedException, ExecutionException, IOException {
 		assert offset != null && offset.prev != null: "offset is malformed: " + offset;
 		byte[] componentBytes;
-		AceLog.getAppLog().info("ConceptBinder.getAttributeBytes primordial = " +primordial);
 		if (!primordial && attributes == null) {
 			componentBytes = getPreviousData(conceptData, offset, OFFSETS.values()[offset.ordinal() + 1]);
 		} else {
-			AceLog.getAppLog().info("ConceptBinder.getAttributeBytes primordial && att !=null " );
 			TupleOutput output = new TupleOutput();
 			if (attributes != null && attributes.getTime() != Long.MIN_VALUE) {
-				AceLog.getAppLog().info("ConceptBinder.getAttributeBytes attributes != null && attributes.getTime() != Long.MIN_VALUE " );
 				List<ConceptAttributes> attrList = new ArrayList<ConceptAttributes>();
 				attrList.add(attributes);
-				AceLog.getAppLog().info("ConceptBinder.getAttributeBytes attrList.size = "+attrList.size());
 				conceptComponentBinder.objectToEntry(attrList, output);
 				componentBytes = output.toByteArray();
-				//AceLog.getAppLog().info("ConceptBinder.getAttributeBytes output.toString()= "+output.toString());
-				AceLog.getAppLog().info("ConceptBinder.getAttributeBytes componentBytes.length = "+componentBytes.length);
 			} else {
 				componentBytes = zeroOutputArray;
 			}

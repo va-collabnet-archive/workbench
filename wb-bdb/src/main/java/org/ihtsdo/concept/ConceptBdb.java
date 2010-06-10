@@ -79,8 +79,6 @@ public class ConceptBdb extends ComponentBdb {
         ConceptBinder binder = new ConceptBinder();
         DatabaseEntry key = new DatabaseEntry();
         int cNid = concept.getNid();
-        AceLog.getAppLog().info("ConceptBdb.writeConcept cNid = "+cNid);
-        AceLog.getAppLog().info("ConceptBdb.writeConcept concept  = "+concept.toLongString());
         conceptIdSet.setMember(cNid);
         IntegerBinding.intToEntry(cNid, key);
         DatabaseEntry value = new DatabaseEntry();
@@ -92,8 +90,6 @@ public class ConceptBdb extends ComponentBdb {
             }
             binder.objectToEntry(concept, value);
             concept.resetNidData();
-           // AceLog.getAppLog().info("ConceptBdb.writeConcept adding to mutable key = "+key);
-           // AceLog.getAppLog().info("ConceptBdb.writeConcept adding to mutable value = "+value);
             mutable.put(null, key, value);
             concept.setLastWrite(writeVersion);
         }
@@ -134,9 +130,11 @@ public class ConceptBdb extends ComponentBdb {
 
     private void iterateConceptData(I_ProcessUnfetchedConceptData processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
+    	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
         IdentifierSet ids = (IdentifierSet) getReadOnlyConceptIdSet();
         int cardinality = ids.cardinality();
         int idsPerParallelConceptIterator = cardinality / executors;
+    	//AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
         I_IterateIds idsItr = ids.iterator();
         List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
         int sum = 0;
@@ -153,6 +151,9 @@ public class ConceptBdb extends ComponentBdb {
             }
             sum = sum + count;
             ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
+//        	AceLog.getAppLog().info("Iterate in parallel. first: " + first + 
+//        			" last: " + last +
+//        			" count: " + count);
             Future<Boolean> f = iteratorService.submit(pci);
             futures.add(f);
         }

@@ -125,6 +125,7 @@ public class Bdb {
 		try {
 			closed = false;
 			BdbCommitManager.reset();
+			NidDataFromBdb.resetExecutorPool();
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
 				// ensure all OFFSETS are initialized prior to multi-threading. 
 			}
@@ -282,43 +283,35 @@ public class Bdb {
 	            activity.setMaximum(8);
 				setProperty(G_VERSION, Long.toString(gVersion.incrementAndGet()));
                 activity.setProgressInfoLower("Writing uuidDb... ");
-                AceLog.getAppLog().info("Writing uuidDb...");
 				uuidDb.sync();
                 activity.setValue(1);
                 activity.setProgressInfoLower("Writing uuidsToNidMapDb... ");
-                AceLog.getAppLog().info("Writing uuidsToNidMapDb...");
 				uuidsToNidMapDb.sync();
                 activity.setValue(2);
 				nidCidMapDb.sync();
                 activity.setValue(3);
                 activity.setProgressInfoLower("Writing statusAtPositionDb... ");
-                AceLog.getAppLog().info("Writing statusAtPositionDb... ");
 				statusAtPositionDb.sync();
                 activity.setValue(4);
                 activity.setProgressInfoLower("Writing conceptDb... ");
-                AceLog.getAppLog().info("Writing conceptDb..");
 				conceptDb.sync();
                 activity.setValue(5);
                 activity.setProgressInfoLower("Writing propDb... ");
-                AceLog.getAppLog().info("Writing propDb...");
 				propDb.sync();
                 activity.setProgressInfoLower("Writing mutable environment... ");
-                AceLog.getAppLog().info("Writing mutable environment...");
                 activity.setValue(6);
 				mutable.bdbEnv.sync();
                 activity.setProgressInfoLower("Writing readonly environment... ");
-               
                 activity.setValue(7);
-				//if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
-					AceLog.getAppLog().info("Writing readonly environment...");
+				if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 					readOnly.bdbEnv.sync();
-				//}
+				}
                 activity.setValue(8);
                 long endTime = System.currentTimeMillis();
 
                 long elapsed = endTime - startTime;
                 String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-                AceLog.getAppLog().info("Database sync complete. Elapsed: " + elapsedStr);
+
                 activity.setProgressInfoUpper("Database sync complete.");
                 activity.setProgressInfoLower("Elapsed: " + elapsedStr);
                 activity.complete();

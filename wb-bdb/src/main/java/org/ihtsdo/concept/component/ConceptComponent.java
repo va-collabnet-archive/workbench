@@ -886,38 +886,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     private final void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-    	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb called");
         assert primordialSapNid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         output.writeInt(primordialUNid);
         List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
-        
         if (additionalIdentifierVersions != null) {
-        	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb additionalIdentifierVersions.size() = "+additionalIdentifierVersions.size());
             for (IdentifierVersion p : additionalIdentifierVersions) {
-            	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb IdentifierVersion (p) = "+p.toString() +" type = "+p.getType());
-            	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb p.getSapNid() = "+p.getSapNid());
-            	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb maxReadOnlyStatusAtPositionNid = "+maxReadOnlyStatusAtPositionNid);
-            	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb p.getTime() = "+p.getTime());
-            	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb Long.MIN_VALUE = "+Long.MIN_VALUE);
-            	
                 if (p.getSapNid() > maxReadOnlyStatusAtPositionNid && p.getTime() != Long.MIN_VALUE) {
-                	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb partsToWrite.add(p) = "+p.toString());
                     partsToWrite.add(p);
                 }
-                else if(p.getSapNid() == 0) {
-                	AceLog.getAppLog().info("SAPNID = 0!!! ConceptComponent writeIdentifierToBdb partsToWrite.add(p) = "+p.toString());
-                	partsToWrite.add(p);
-                }
-                	
-                
             }
         }
         // Start writing
 
         output.writeShort(partsToWrite.size());
         for (IdentifierVersion p : partsToWrite) {
-        	AceLog.getAppLog().info("ConceptComponent writeIdentifierToBdb Writing parts type = "+p.getType());
             p.getType().writeType(output);
             p.writeIdPartToBdb(output);
         }
@@ -1404,10 +1387,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time) {
-        /*IdentifierVersionString v = new IdentifierVersionString();
+        IdentifierVersionString v = new IdentifierVersionString();
         v.setAuthorityNid(authorityNid);
-        v.setDenotation(stringId);*/
-    	IdentifierVersionString v = new IdentifierVersionString(statusNid,pathNid,time,stringId,authorityNid);
+        v.setDenotation(stringId);
         return addIdVersion(v);
     }
 

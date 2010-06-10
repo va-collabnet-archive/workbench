@@ -1487,9 +1487,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public boolean isUncommitted() {
-		boolean isUC = data.isUncommitted();
-		AceLog.getAppLog().info(">>>>>>>>>>> Concept isUncommitted called isUC = "+isUC);
-		return isUC;
+		return data.isUncommitted();
 	}
 
 	public boolean isUnwritten() {

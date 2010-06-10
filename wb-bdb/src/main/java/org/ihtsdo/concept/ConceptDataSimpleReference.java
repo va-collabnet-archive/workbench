@@ -32,6 +32,7 @@ import org.ihtsdo.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
@@ -84,14 +85,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
     
     public boolean hasUncommittedComponents() {
-    	
-    	boolean UCV = hasUncommittedVersion(attributes.get());
-    	boolean UCID = hasUncommittedId(attributes.get());
-    	
-    	AceLog.getAppLog().info("hasUncommittedComponents UCV = "+UCV);
-    	AceLog.getAppLog().info("hasUncommittedComponents UCID = "+UCID);
-    	
-        if (UCV || UCID) {
+        if (hasUncommittedVersion(attributes.get()) ||
+        		hasUncommittedId(attributes.get())) {
             return true;
         }
         if (hasUncommittedVersion(srcRels.get())) {
@@ -111,48 +106,27 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
 
     private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
-    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion called");
         if (componentList != null) {
-        	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList != null");
             for (ConceptComponent<?, ?> cc: componentList) {
                 if (hasUncommittedVersion(cc)) {
-                	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedVersion(cc)");
                     return true;
                 }
                 if (hasUncommittedId(cc)) {
-                	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion hasUncommittedId(cc)");
                     return true;
                 }
             }
         }
-       // AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedVersion componentList == null");
         return false;
     }
 
     private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
-    	
-    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc = "+cc);
-    	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc.getAdditionalIdentifierParts() = "+cc.getAdditionalIdentifierParts());
-    	
-    	Long testL = new Long("1272363173000");
-    	
         if (cc != null && cc.getAdditionalIdentifierParts() != null) {
-        	//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc != null && cc.getAdditionalIdentifierParts() != null");
         	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
-        		//AceLog.getAppLog().info(">>>>>>>>>>> idv.getTime() = "+idv.getTime());
-        		//AceLog.getAppLog().info(">>>>>>>>>>> Long.MAX_VALUE = "+Long.MAX_VALUE);
         		if (idv.getTime() == Long.MAX_VALUE) {
-        			//AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId idv.getTime() == Long.MAX_VALUE");
                     return true;
         		}
-        		if (idv.getTime() == testL) {
-        			AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId idv.getTime() == 1272363173000");
-                    //return true;
-        		}
-        		
         	}
         }
-       // AceLog.getAppLog().info(">>>>>>>>>>> hasUncommittedId cc == null || cc.getAdditionalIdentifierParts() == null");
         return false;
     }
 
@@ -178,6 +152,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
                 enclosingConcept)));
         }
+        handleCanceledComponents();
         return srcRels.get();
     }
 
@@ -186,6 +161,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
                 OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return descriptions.get();
     }
 
@@ -269,13 +245,49 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return refsetMembers.get();
     }
+
+	private void handleCanceledComponents() {
+		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
+			if (refsetMembers != null) {
+	        	removeCanceledFromList(refsetMembers.get());
+			}
+			if (descriptions != null) {
+	        	removeCanceledFromList(descriptions.get());
+			}
+			if (images != null) {
+	        	removeCanceledFromList(images.get());
+			}
+			if (srcRels != null) {
+	        	removeCanceledFromList(srcRels.get());
+			}
+        }
+		lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
+	}
+
+	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
+		if (ccList != null) {
+			synchronized (ccList) {
+				List<Integer> toRemove = new ArrayList<Integer>();
+				for (int i = ccList.size() -1; i > -1; i--) {
+					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
+							toRemove.add(i);
+					}
+				}
+				for (Integer i: toRemove) {
+					ccList.remove(i);
+				}
+			}
+		}
+	}
 
     public AddImageList getImages() throws IOException {
         if (images.get() == null) {
             images.compareAndSet(null, new AddImageList(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
         }
+        handleCanceledComponents();
         return images.get();
     }
 

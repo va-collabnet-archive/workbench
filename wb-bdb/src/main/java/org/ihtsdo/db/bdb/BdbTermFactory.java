@@ -205,7 +205,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public void addUncommittedNoChecks(I_GetConceptData concept) {
-    	AceLog.getAppLog().info("BdbTermFactory addUncommittedNoChecks called");
         BdbCommitManager.addUncommittedNoChecks(concept);
     }
 

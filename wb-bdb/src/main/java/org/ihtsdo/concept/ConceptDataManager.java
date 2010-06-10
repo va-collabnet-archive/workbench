@@ -243,6 +243,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	protected long lastChange = Long.MIN_VALUE;
 	protected long lastWrite = Long.MIN_VALUE;
+	protected long lastExtinctRemoval = Long.MIN_VALUE;
 
 	public void modified() {
 		lastChange = Bdb.gVersion.incrementAndGet();
@@ -496,12 +497,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	@Override
 	public final boolean isUncommitted() {
-		AceLog.getAppLog().info("ConceptDataManager isUncommitted lastChange = "+lastChange);
-		AceLog.getAppLog().info("ConceptDataManager isUncommitted BdbCommitManager.getLastCommit() = "+BdbCommitManager.getLastCommit());
 	    if (lastChange > BdbCommitManager.getLastCommit()) {
-	    	boolean hasUC = hasUncommittedComponents();
-	    	AceLog.getAppLog().info("ConceptDataManager isUncommitted hasUC = "+hasUC);
-	        return hasUC;
+	        return hasUncommittedComponents();
 	    }
 		return false;
 	}
