@@ -19,6 +19,7 @@
  */
 package org.dwfa.bpa.util;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -180,5 +181,14 @@ public class OpenFrames implements PropertyChangeListener {
         }
         return items;
     }
+
+	public static Component getActiveFrame() {
+		for (JFrame f: singleton.frames) {
+			if (f.isActive()) {
+				return f;
+			}
+		}		
+		return new JFrame();
+	}
 
 }
