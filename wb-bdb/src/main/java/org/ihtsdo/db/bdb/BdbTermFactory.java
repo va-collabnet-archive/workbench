@@ -1539,7 +1539,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
-        AceLog.getAppLog().info("Computing RefsetSpecQuery: " + query);
+        AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
         List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
         for (String warning : dangleWarnings) {
             AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
@@ -1569,10 +1569,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         try {
             I_RepresentIdSet possibleIds;
             if (specHelper.isConceptComputeType()) {
-                AceLog.getAppLog().info("Computing possible concepts for spec: " + query);
-                possibleIds = query.getPossibleConcepts(frameConfig, null);
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
+                possibleIds = query.getPossibleConceptsInterruptable(frameConfig, null);
+
             } else if (specHelper.isDescriptionComputeType()) {
-                possibleIds = query.getPossibleDescriptions(frameConfig, null);
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
+                possibleIds = query.getPossibleDescriptionsInterruptable(frameConfig, null);
             } else {
                 throw new Exception("Relationship compute type not supported.");
             }
@@ -1583,8 +1585,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
             computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
             if (possibleIds.cardinality() > 500) {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
                 Bdb.getConceptDb().iterateConceptDataInParallel(computer);
             } else {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
                 I_IterateIds possibleItr = possibleIds.iterator();
                 ConceptFetcher fetcher = new ConceptFetcher();
                 while (possibleItr.next()) {
@@ -1593,13 +1597,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 }
             }
 
+            if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
             computer.addUncommitted();
             if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
                 frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
                 frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
             }
-            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig.getDbConfig()
-                .getChangeSetWriterThreading());
+
+            if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
+            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig
+                .getDbConfig().getChangeSetWriterThreading());
             if (!computer.continueWork()) {
                 return Condition.ITEM_CANCELED;
             } else {
@@ -1607,8 +1622,35 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         } catch (ComputationCanceled e) {
             // Nothing to do
+        } catch (InterruptedException e) {
+            // Nothing to do
+        } catch (ExecutionException e) {
+            if (getRootCause(e) instanceof TerminologyException) {
+                throw new TerminologyException(e.getMessage());
+            } else if (getRootCause(e) instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else if (getRootCause(e) instanceof ComputationCanceled) {
+                // Nothing to do
+            } else if (getRootCause(e) instanceof InterruptedException) {
+                // Nothing to do
+            } else {
+
+                e.printStackTrace();
+                throw new TerminologyException(e);
+            }
         }
         return Condition.ITEM_CANCELED;
+    }
+
+    private Throwable getRootCause(Exception e) {
+        Throwable prevCause = e;
+        Throwable rootCause = e.getCause();
+        while (rootCause != null) {
+            prevCause = rootCause;
+            rootCause = rootCause.getCause();
+        }
+
+        return prevCause;
     }
 
     private static class ConceptFetcher implements I_FetchConceptFromCursor {
