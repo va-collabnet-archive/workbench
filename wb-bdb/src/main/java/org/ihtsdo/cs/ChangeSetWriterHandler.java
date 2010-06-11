@@ -16,6 +16,7 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.svn.Svn;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
@@ -58,6 +59,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
 		this.changeSetPolicy = changeSetPolicy;
+		Svn.rwl.readLock().lock();
 	}
 
 	@Override
@@ -107,6 +109,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+		Svn.rwl.readLock().unlock();
 	}
 
 	public static void addWriter(I_WriteChangeSet writer) {

@@ -48,6 +48,7 @@ import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.svn.Svn;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
@@ -335,6 +336,8 @@ public class BdbCommitManager {
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
     	lastCommit = Bdb.gVersion.incrementAndGet();
+    	lastCommit = Bdb.gVersion.incrementAndGet();
+		Svn.rwl.readLock().lock();
     	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
@@ -471,6 +474,8 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        } finally {
+        	Svn.rwl.readLock().unlock();
         }
         fireCommit();
         updateFrames();
