@@ -80,11 +80,10 @@ public class DescTupleFileUtil {
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
-                        String errorMessage =
-                                "No path with identifier: " + pathUuid + " and no path override specified";
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                }
+                } 
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
                 String errorMessage = "Desc: Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -119,47 +118,48 @@ public class DescTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(conceptUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "Desc: conceptUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: conceptUuid matches no identifier in database.");
             }
+
             if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "Desc: statusUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: statusUuid matches no identifier in database.");
             }
+
             if (!termFactory.hasId(typeUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "Desc: typeUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Desc: typeUuid matches no identifier in database.");
             }
 
             if (termFactory.hasId(conceptUuid)) {
                 int conceptId = termFactory.uuidToNative(conceptUuid);
                 int dNid = termFactory.uuidToNative(descUuid);
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
-
+                
                 I_DescriptionVersioned idv = termFactory.getDescription(dNid);
                 I_GetConceptData typeConcept = termFactory.getConcept(typeUuid);
                 I_GetConceptData statusConcept = termFactory.getConcept(statusUuid);
-                I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid"));
+                I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 
                 if (idv == null) {
-                    idv =
-                            termFactory.newDescription(descUuid, concept, lang, text, typeConcept, importConfig,
-                                statusConcept, effectiveDate);
+                    idv = termFactory.newDescription(descUuid, concept, lang, text, typeConcept, importConfig, statusConcept, effectiveDate);
                     termFactory.addUncommittedNoChecks(concept);
                 } else {
                     boolean found = false;
-                    for (I_DescriptionTuple idt : idv.getTuples()) {
-                        if (lang.equals(idt.getLang()) && text.equals(idt.getText())
-                            && typeConcept.getNid() == idt.getTypeId() && statusConcept.getNid() == idt.getStatusId()
-                            && pathConcept.getNid() == idt.getPathId()) {
+                    for (I_DescriptionTuple idt: idv.getTuples()) {
+                        if (lang.equals(idt.getLang()) &&
+                                text.equals(idt.getText()) &&
+                                typeConcept.getNid() == idt.getTypeId() &&
+                                statusConcept.getNid() == idt.getStatusId() &&
+                                pathConcept.getNid() == idt.getPathId()) {
                             found = true;
                             break;
                         }
                     }
-
+                    
                     if (!found) {
-                        I_DescriptionPart newPart =
-                                (I_DescriptionPart) idv.getTuples().iterator().next().makeAnalog(
-                                    statusConcept.getNid(), pathConcept.getNid(), effectiveDate);
+                        I_DescriptionPart newPart = (I_DescriptionPart) idv.getTuples().iterator().next().makeAnalog(statusConcept.getNid(), 
+                            pathConcept.getNid(), effectiveDate);
                         newPart.setLang(lang);
                         newPart.setText(text);
                         newPart.setTypeId(typeConcept.getNid());
@@ -169,8 +169,7 @@ public class DescTupleFileUtil {
                 }
             } else {
                 outputFileWriter.write("Desc: Error on line " + lineCount + " : ");
-                outputFileWriter.write("No concept id : " + conceptUuid + " for desc: " + descUuid + "\nLind: "
-                    + inputLine);
+                outputFileWriter.write("No concept id : " + conceptUuid + " for desc: " + descUuid + "\nLind: " + inputLine);
                 outputFileWriter.newLine();
                 return false;
             }

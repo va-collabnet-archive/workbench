@@ -247,7 +247,7 @@ public class JTreeWithDragImage extends JTree {
         this(config, null);
     }
 
-	protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
+    protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
         super();
         this.config = config;
         this.helper = helper;

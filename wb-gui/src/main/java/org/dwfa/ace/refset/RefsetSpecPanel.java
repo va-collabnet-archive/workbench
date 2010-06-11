@@ -285,9 +285,8 @@ public class RefsetSpecPanel extends JPanel {
             column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
             column5.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getPathId"));
             column5.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setPathId", int.class));
-            column5.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
+            column5.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
             columns.add(column5);
-
         }
 
         ReflexiveRefsetCommentTableModel commentTableModel =
@@ -325,7 +324,6 @@ public class RefsetSpecPanel extends JPanel {
         commentTable.setDefaultRenderer(Integer.class, renderer);
         commentTable.setDefaultRenderer(Double.class, renderer);
         commentTable.setDefaultRenderer(String.class, renderer);
-
         return commentTable;
     }
 
@@ -589,9 +587,10 @@ public class RefsetSpecPanel extends JPanel {
             try {
                 new ProcessSelectionWorker(tupleMemberIds, false).execute();
             } catch (Exception e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
+               AceLog.getAppLog().alertAndLogException(e1);
             }
         }
+
 
     }
 
@@ -602,11 +601,11 @@ public class RefsetSpecPanel extends JPanel {
             try {
                 new ProcessSelectionWorker(tupleMemberIds, true).execute();
             } catch (Exception e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
+               AceLog.getAppLog().alertAndLogException(e1);
             }
         }
     }
-
+    
     private static HashMap<Integer, PROMOTION_STATUS> promotionStatusMap = new HashMap<Integer, PROMOTION_STATUS>();
 
     private enum PROMOTION_STATUS {
@@ -616,14 +615,14 @@ public class RefsetSpecPanel extends JPanel {
         REVIEWED_NOT_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION),
         UNREVIEWED_NEW_ADDITION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION),
         UNREVIEWED_NEW_DELETION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION);
-
+        
         private int nid;
 
         public int getNid() {
             return nid;
         }
 
-        private PROMOTION_STATUS(I_ConceptualizeUniversally c) {
+        private PROMOTION_STATUS(I_ConceptualizeUniversally c){
             try {
                 nid = c.localize().getNid();
                 promotionStatusMap.put(nid, this);
@@ -633,17 +632,17 @@ public class RefsetSpecPanel extends JPanel {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-
+        
         public static PROMOTION_STATUS get(int nid) throws TerminologyException, IOException {
-            return promotionStatusMap.get(nid);
+           return promotionStatusMap.get(nid);
         }
-
+        
     }
 
     /**
-     * @TODO modify implementation to report progress using the swing worker methods.
+     * @TODO modify implementation to report progress using the swing worker methods. 
      * @author kec
-     * 
+     *
      */
     private class ProcessSelectionWorker extends SwingWorker<Boolean, Void> {
 
@@ -653,7 +652,7 @@ public class RefsetSpecPanel extends JPanel {
         boolean forApproval;
         int processed = 0;
         private long startTime = System.currentTimeMillis();
-
+        
         private ProcessSelectionWorker(Set<Integer> tupleMemberIds, boolean forApproval) throws Exception {
             super();
             this.tupleMemberIds = tupleMemberIds;
@@ -673,75 +672,75 @@ public class RefsetSpecPanel extends JPanel {
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-            IntSet currentSet = new IntSet();
-            currentSet.add(currentNid);
-            Set<I_GetConceptData> refsetConcepts = new HashSet<I_GetConceptData>();
-            activity.setIndeterminate(false);
-            activity.setProgressInfoLower("Processing...");
-            PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
-            for (Integer tupleMemberId : tupleMemberIds) {
-                if (isCancelled()) {
-                    Terms.get().cancel();
-                    return false;
-                }
-                if (processed % 500 == 0) {
-                    activity.setValue(processed++);
-                    long endTime = System.currentTimeMillis();
-                    long elapsed = endTime - startTime;
-                    String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-                    String remainingStr = TimeUtil.getRemainingTimeString(processed, tupleMemberIds.size(), elapsed);
-                    activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr);
-                }
-                I_ExtendByRef tupleVersioned = Terms.get().getExtension(tupleMemberId);
-                refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
+                int currentNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+                IntSet currentSet = new IntSet();
+                currentSet.add(currentNid);
+                Set<I_GetConceptData> refsetConcepts = new HashSet<I_GetConceptData>();
+                activity.setIndeterminate(false);
+                activity.setProgressInfoLower("Processing...");
+                PathSetReadOnly promotionPath = new PathSetReadOnly(aceFrameConfig.getPromotionPathSet());
+                for (Integer tupleMemberId : tupleMemberIds) {
+                    if (isCancelled()) {
+                        Terms.get().cancel();
+                        return false;
+                    }
+                    if (processed % 500 == 0) {
+                        activity.setValue(processed++);
+                            long endTime = System.currentTimeMillis();
+                            long elapsed = endTime - startTime;
+                            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+                            String remainingStr = TimeUtil.getRemainingTimeString(processed, tupleMemberIds.size(), elapsed);
+                            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr);
+                    }
+                    I_ExtendByRef tupleVersioned = Terms.get().getExtension(tupleMemberId);
+                    refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
+                    
+                    for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
+                        RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
+                        int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
+                        if (promotionRefsetId == extForMember.getRefsetId()) {
+                            List<? extends I_ExtendByRefVersion> promotionTuples =
+                                    extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
+                                        .getViewPositionSetReadOnly(), aceFrameConfig.getPrecedence(),
+                                        aceFrameConfig.getConflictResolutionStrategy());
+                            if (promotionTuples.size() > 0) {
+                                I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                                if (promotionPart instanceof I_ExtendByRefPartCid) {
+                                    for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+                                        I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
+                                        PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
+                                        PROMOTION_STATUS newStatus = null;
+                                        if (forApproval) {
+                                            newStatus = getNewStatusForApproval(oldStatus);
+                                        } else {
+                                            newStatus = getNewStatusForDisapproval(oldStatus);
+                                        }
 
-                for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
-                    RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
-                    int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
-                    if (promotionRefsetId == extForMember.getRefsetId()) {
-                        List<? extends I_ExtendByRefVersion> promotionTuples =
-                                extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
-                                    .getViewPositionSetReadOnly(), aceFrameConfig.getPrecedence(), aceFrameConfig
-                                    .getConflictResolutionStrategy());
-                        if (promotionTuples.size() > 0) {
-                            I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
-                            if (promotionPart instanceof I_ExtendByRefPartCid) {
-                                for (I_Path p : aceFrameConfig.getEditingPathSet()) {
-                                    I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
-                                    PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
-                                    PROMOTION_STATUS newStatus = null;
-                                    if (forApproval) {
-                                        newStatus = getNewStatusForApproval(oldStatus);
-                                    } else {
-                                        newStatus = getNewStatusForDisapproval(oldStatus);
-                                    }
-
-                                    if (newStatus != null) {
-                                        I_ExtendByRefPartCid analog =
-                                                (I_ExtendByRefPartCid) partToPromote.makeAnalog(promotionPart
-                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
-                                        analog.setC1id(newStatus.getNid());
-
-                                        extForMember.addVersion(analog);
-                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
-                                            currentSet, aceFrameConfig.getPrecedence());
+                                        if (newStatus != null) {
+                                            I_ExtendByRefPartCid analog = (I_ExtendByRefPartCid) 
+                                                partToPromote.makeAnalog(promotionPart.getStatusId(), 
+                                                    p.getConceptId(), Long.MAX_VALUE);
+                                            analog.setC1id(newStatus.getNid());
+                                        
+                                            extForMember.addVersion(analog);
+                                            extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
+                                                currentSet, aceFrameConfig.getPrecedence());
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            for (I_GetConceptData refset : refsetConcepts) {
-                Terms.get().addUncommittedNoChecks(refset);
-            }
-            Terms.get().commit();
+                for (I_GetConceptData refset: refsetConcepts) {
+                    Terms.get().addUncommittedNoChecks(refset);
+                }
+                Terms.get().commit();
 
             return true;
         }
-
+        
         @Override
         public void done() {
             long elapsed = System.currentTimeMillis() - startTime;
@@ -766,7 +765,7 @@ public class RefsetSpecPanel extends JPanel {
             }
         }
     }
-
+    
     private PROMOTION_STATUS getNewStatusForApproval(PROMOTION_STATUS oldStatus) {
         if (oldStatus == null) {
             return null;
@@ -785,10 +784,10 @@ public class RefsetSpecPanel extends JPanel {
         case UNREVIEWED_NEW_DELETION:
             return PROMOTION_STATUS.REVIEWED_APPROVED_DELETION;
         default:
-            throw new RuntimeException("Can't handle promotion status: " + oldStatus);
+           throw new RuntimeException("Can't handle promotion status: " + oldStatus);
         }
     }
-
+    
     private PROMOTION_STATUS getNewStatusForDisapproval(PROMOTION_STATUS oldStatus) {
         if (oldStatus == null) {
             return null;
@@ -807,10 +806,10 @@ public class RefsetSpecPanel extends JPanel {
         case UNREVIEWED_NEW_DELETION:
             return PROMOTION_STATUS.REVIEWED_NOT_APPROVED_DELETION;
         default:
-            throw new RuntimeException("Can't handle promotion status: " + oldStatus);
+           throw new RuntimeException("Can't handle promotion status: " + oldStatus);
         }
     }
-
+    
     public boolean getShowPromotionCheckBoxes() {
         return showPromotionCheckBoxes;
     }
@@ -954,7 +953,6 @@ public class RefsetSpecPanel extends JPanel {
         selectAllCheckBox.addItemListener(selectAllCheckBoxListener);
         refsetTable.getTableHeader().repaint();
     }
-
     private class MouseClickListener extends MouseAdapter {
         public void mouseClicked(MouseEvent mouseEvent) {
             if (getShowPromotionCheckBoxes()) {

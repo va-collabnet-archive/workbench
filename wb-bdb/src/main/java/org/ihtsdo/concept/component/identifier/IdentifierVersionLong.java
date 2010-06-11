@@ -25,12 +25,6 @@ public class IdentifierVersionLong extends IdentifierVersion {
         longDenotation = (Long) another.getDenotation();
     }
 
-    public IdentifierVersionLong(int statusNid, int pathNid, long time, int authority, long longDenotation) {
-        super(statusNid, pathNid, time, authority);
-        this.longDenotation = longDenotation;
-    }
-
-
     public IdentifierVersionLong() {
         super();
     }

@@ -3,7 +3,7 @@
         <parent>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mmb</artifactId>
-            <version>2.5.4-SNAPSHOT</version>
+            <version>2.5.4-nehta-1-SNAPSHOT</version>
         </parent>
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
@@ -124,6 +124,16 @@
 				<directory>./TextFiles</directory>
 			</resource>
 		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 	<reporting>
 		<plugins>

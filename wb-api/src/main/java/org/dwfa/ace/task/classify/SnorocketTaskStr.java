@@ -300,7 +300,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			logger.info(toStringPathPos(cClassPathPos, "Classifier Path"));
 			// logger.info(toStringFocusSet(tf));
 
-			// SETUP CLASSIFIER
+			// SETUP CLASSIFIER :zzz:
 			Snorocket rocket = new Snorocket();
 
 			// SnomedMetadata :: ISA
@@ -311,52 +311,52 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 
 			// SnomedMetadata :: ROLE_ROOTS
 			// c93a30b9-ba77-3adb-a9b8-4589c9f8fb25 'Is a' INCLUSIVE
-			rocket.addRoleRoot(String.valueOf(isaNid), true);
+			rocket.addRoleRoot(String.valueOf(isaNid), true); // @@@:zzz:
 			// 6155818b-09ed-388e-82ce-caa143423e99 'Concept Model Attribute'
 			// SnomedId "410662002" NOT_INCLUSIVE
 			rocket.addRoleRoot(String.valueOf(rootRoleNid), false);
 
-//			// SnomedMetadata :: NEVER_GROUPED
-//			// SnomedId "123005000" // part-of
-//			// b4c3f6f9-6937-30fd-8412-d0c77f8a7f73
-//			UUID ngUUid = UUID
-//					.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73");
-//			rocket.addRoleNeverGrouped(String
-//					.valueOf(tf.getId(ngUUid).getNid()));
-//			// SnomedId "272741003" // laterality
-//			ngUUid = UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b");
-//			rocket.addRoleNeverGrouped(String
-//					.valueOf(tf.getId(ngUUid).getNid()));
-//			// SnomedId "127489000" // has-active-ingredient
-//			ngUUid = UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8");
-//			rocket.addRoleNeverGrouped(String
-//					.valueOf(tf.getId(ngUUid).getNid()));
-//			// SnomedId "411116001" // has-dose-form
-//			ngUUid = UUID.fromString("072e7737-e22e-36b5-89d2-4815f0529c63");
-//			rocket.addRoleNeverGrouped(String
-//					.valueOf(tf.getId(ngUUid).getNid()));
-//
-//			// SnomedMetadata :: RIGHT_IDENTITIES
-//			// direct-substance o has-active-ingredient -> direct-substance
-//			// SNOMED IDs {"363701004", "127489000"}
-//
-//			// SnomedId "363701004" // direct-substance
-//			// 49ee3912-abb7-325c-88ba-a98824b4c47d
-//			int nidDirectSubstance = tf.getId(
-//					UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
-//					.getNid();
-//
-//			// SnomedId "127489000" // has-active-ingredient
-//			// 65bf3b7f-c854-36b5-81c3-4915461020a8
-//			int nidHasActiveIngredient = tf.getId(
-//					UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
-//					.getNid();
-//
-//			String lhsData[] = new String[2];
-//			lhsData[0] = String.valueOf(nidDirectSubstance);
-//			lhsData[1] = String.valueOf(nidHasActiveIngredient);
-//			String rhsData = String.valueOf(nidDirectSubstance);
-//			rocket.addRoleComposition(lhsData, rhsData);
+			// SnomedMetadata :: NEVER_GROUPED
+			// SnomedId "123005000" // part-of
+			// b4c3f6f9-6937-30fd-8412-d0c77f8a7f73
+			UUID ngUUid = UUID
+					.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "272741003" // laterality
+			ngUUid = UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "127489000" // has-active-ingredient
+			ngUUid = UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+			// SnomedId "411116001" // has-dose-form
+			ngUUid = UUID.fromString("072e7737-e22e-36b5-89d2-4815f0529c63");
+			rocket.addRoleNeverGrouped(String
+					.valueOf(tf.getId(ngUUid).getNid()));
+
+			// SnomedMetadata :: RIGHT_IDENTITIES
+			// direct-substance o has-active-ingredient -> direct-substance
+			// SNOMED IDs {"363701004", "127489000"}
+
+			// SnomedId "363701004" // direct-substance
+			// 49ee3912-abb7-325c-88ba-a98824b4c47d
+			int nidDirectSubstance = tf.getId(
+					UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
+					.getNid();
+
+			// SnomedId "127489000" // has-active-ingredient
+			// 65bf3b7f-c854-36b5-81c3-4915461020a8
+			int nidHasActiveIngredient = tf.getId(
+					UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
+					.getNid();
+
+			String lhsData[] = new String[2];
+			lhsData[0] = String.valueOf(nidDirectSubstance);
+			lhsData[1] = String.valueOf(nidHasActiveIngredient);
+			String rhsData = String.valueOf(nidDirectSubstance);
+			rocket.addRoleComposition(lhsData, rhsData);
 
 			// ** GUI: 1. LOAD DATA **
 			continueThisAction = true;

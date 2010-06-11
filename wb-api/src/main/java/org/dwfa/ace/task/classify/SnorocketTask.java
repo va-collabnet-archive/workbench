@@ -170,17 +170,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 	// INTERNAL
 	private static boolean debug = false; // :DEBUG:
 	private static boolean debugDump = false; // :DEBUG: save to files
-    
-    static {
-    	if (System.getProperties().get("SnorocketDebug") != null &&
-    			System.getProperties().get("SnorocketDebug").toString().toLowerCase().startsWith("t")) {
-    		debug = true;
-    	}
-    	if (System.getProperties().get("SnorocketDebugDump") != null &&
-    			System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
-    		debugDump = true;
-    	}
-    }
 
 	static {
 		if (System.getProperties().get("SnorocketDebug") != null

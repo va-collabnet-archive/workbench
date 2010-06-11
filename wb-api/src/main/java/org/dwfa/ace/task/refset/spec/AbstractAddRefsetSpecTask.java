@@ -154,10 +154,10 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
     private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
-            // TODO pass in frame configuration
+            //TODO pass in frame configuration
             I_ConfigAceFrame configFrame = Terms.get().getActiveAceFrameConfig();
             if (configFrame.getEditingPathSet().size() == 0) {
-                String msg = "Unable to add to spec. Editing path set is empty.";
+                String msg = "Unable to add spec. Editing path set is empty.";
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                 throw new TaskFailedException(msg);
             }
@@ -195,31 +195,27 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     I_ExtendByRef ext =
                             refsetHelper.getOrCreateRefsetExtension(refsetId, componentId, propMap.getMemberType(),
                                 propMap, UUID.randomUUID());
-
-                    List<? extends I_ExtendByRefVersion> tuples =
-                            ext.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(),
-                                configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+                    
+                    List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(), 
+                        configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
                     if (tuples.size() > 0) {
                         boolean added = false;
-                        for (I_ExtendByRefVersion t : tuples) {
+                        for (I_ExtendByRefVersion t: tuples) {
                             if (t.getTime() == Long.MAX_VALUE) {
                                 tf.addUncommitted(ext);
                                 added = true;
                             }
                         }
                         if (!added) {
-                            String msg = "Unable to add to spec. Equivalent specification already exists.";
+                            String msg = "Unable to add spec. Equivalent specification already exists.";
                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                         }
                     } else {
-                        List<? extends I_ExtendByRefVersion> lastTuple =
-                                ext.getTuples(null, configFrame.getViewPositionSetReadOnly(), configFrame
-                                    .getPrecedence(), configFrame.getConflictResolutionStrategy());
-                        for (I_ExtendByRefVersion t : lastTuple) {
-                            for (I_Path p : configFrame.getEditingPathSet()) {
-                                I_ExtendByRefPart analog =
-                                        (I_ExtendByRefPart) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT
-                                            .localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
+                        List<? extends I_ExtendByRefVersion> lastTuple = ext.getTuples(null, configFrame.getViewPositionSetReadOnly(), 
+                            configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+                        for (I_ExtendByRefVersion t: lastTuple) {
+                            for (I_Path p: configFrame.getEditingPathSet()) {
+                                I_ExtendByRefPart analog = (I_ExtendByRefPart) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
                                 ext.addVersion(analog);
                                 tf.addUncommitted(ext);
                             }
@@ -227,13 +223,12 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                     }
                     configFrame.fireRefsetSpecChanged(ext);
                 } else {
-                    String msg = "Unable to add to spec. Selected parent must be a branching spec.";
+                    String msg = "Unable to add spec. Selected parent must be a branching spec.";
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                     throw new TaskFailedException(msg);
                 }
             } else {
-                String msg = "Unable to add to spec. No valid refset in the refset spec panel.";
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
+                throw new TaskFailedException("Unable to complete operation. Refset is null.");
             }
             returnCondition = Condition.CONTINUE;
         } catch (Exception e) {

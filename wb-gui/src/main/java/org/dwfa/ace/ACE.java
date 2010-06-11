@@ -183,7 +183,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
-import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -1509,7 +1508,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     javax.swing.Timer startupTimer;
-	private Arena arena;
     
     public JMenuBar createMenuBar(JFrame frame) throws LoginException, SecurityException, ConfigurationException,
             IOException, PrivilegedActionException, IntrospectionException, InvocationTargetException,
@@ -1732,20 +1730,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         snoRocketPanel = new SnoRocketTabPanel(this);
         conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
             snoRocketPanel);
-        
-        JSplitPane arenaSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-        arenaSplit.setOneTouchExpandable(true);
-        arena = new Arena(this);
-        arenaSplit.setTopComponent(arena);
-        ConceptPanel arenaConceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, this, 
-        		LINK_TYPE.ARENA_LINK, true,
-                Integer.MIN_VALUE);
-        arenaSplit.setBottomComponent(arenaConceptPanel);
-        arenaSplit.setDividerLocation(Integer.MAX_VALUE);
 
-        conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
-        		arenaSplit);
-
+        try {
+            Class<JPanel> panelClass = (Class<JPanel>) Class.forName("org.ihtsdo.arena.Arena");
+            conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/brush1.png")), 
+                panelClass.newInstance());
+        } catch (ClassNotFoundException e) {
+            // Ignore this exception. 
+        }
         /*
         */
         conceptTabs.setMinimumSize(new Dimension(0, 0));
@@ -1790,11 +1782,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return content;
     }
 
-    public Arena getArena() {
-		return arena;
-	}
-
-	public JComponent getDataCheckListScroller() {
+    public JComponent getDataCheckListScroller() {
         if (dataCheckListScroller == null) {
             dataCheckListModel = new UncommittedListModel();
             dataCheckListPanel = new JPanel(new GridBagLayout());
@@ -2027,7 +2015,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());
 
         int width = 600;
-        int height = 675;
+        int height = 775;
         preferencesPalette.setSize(width, height);
 
         Rectangle topBounds = getTopBoundsForPalette();

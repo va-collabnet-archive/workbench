@@ -2456,6 +2456,12 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
                     relationshipTypeConceptID, conceptTwoID, characteristic, refinability, group);
             relationships++;
             
+            // :!!!:zzz:
+			if (conceptOneID == 6567006)
+				System.out.println(":::\t" + conceptOneID + "\t" + group + "\t"
+						+ conceptTwoID + "\t" + relationshipTypeConceptID + "\t"
+						+ fName);
+
             // CR
             tokenType = st.nextToken();
             // LF

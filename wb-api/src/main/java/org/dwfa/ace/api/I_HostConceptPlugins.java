@@ -32,9 +32,7 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
     public static final String USE_PREFS = "usePrefs";
 
     public enum HOST_ENUM {
-        CONCEPT_PANEL_L1, CONCEPT_PANEL_R1, CONCEPT_PANEL_R2, 
-        CONCEPT_PANEL_R3, CONCEPT_PANEL_R4, CONCEPT_PANEL_LIST_VIEW, 
-        CONCPET_PANEL_DATA_CHECK, REFSET_SPEC, ARENA_PANEL;
+        CONCEPT_PANEL_L1, CONCEPT_PANEL_R1, CONCEPT_PANEL_R2, CONCEPT_PANEL_R3, CONCEPT_PANEL_R4, CONCEPT_PANEL_LIST_VIEW, CONCPET_PANEL_DATA_CHECK, REFSET_SPEC;
     }
 
     public enum TOGGLES {
@@ -94,8 +92,7 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
     }
 
     public enum LINK_TYPE {
-        UNLINKED, SEARCH_LINK, TREE_LINK, 
-        DATA_CHECK_LINK, LIST_LINK, ARENA_LINK
+        UNLINKED, SEARCH_LINK, TREE_LINK, DATA_CHECK_LINK, LIST_LINK
     };
 
     public boolean getShowHistory();

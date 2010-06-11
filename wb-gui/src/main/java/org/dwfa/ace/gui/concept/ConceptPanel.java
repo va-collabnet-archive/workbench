@@ -264,8 +264,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
     public static ImageIcon SMALL_ALERT_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/warning.png"));
 
-    public static ImageIcon ARENA_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png"));
-
     public ImageIcon tabIcon;
 
     private JTabbedPane conceptTabs;
@@ -382,12 +380,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 } else if (value == DATA_CHECK_LINK_ICON) {
                     setToolTipText("This panel is linked to the data check selection");
                     tabIcon = SMALL_ALERT_LINK_ICON;
-                } else if (value == SMALL_ALERT_LINK_ICON) {
-                    setToolTipText("This panel is linked to the last selected concept in the arena");
-                    tabIcon = ARENA_LINK_ICON;
-                } else if (value == ARENA_LINK_ICON) {
-                    setToolTipText("This panel is linked to the search selection");
-                    tabIcon = SMALL_SEARCH_LINK_ICON;
                 }
             }
         }
@@ -884,7 +876,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             dataCheckListener = new TermComponentDataCheckSelectionListener(this);
             ace.addDataCheckListener(dataCheckListener);
             break;
-        case ARENA_LINK:
         }
     }
 

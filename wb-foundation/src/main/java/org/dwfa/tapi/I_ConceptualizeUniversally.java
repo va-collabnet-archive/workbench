@@ -19,11 +19,8 @@ package org.dwfa.tapi;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public interface I_ConceptualizeUniversally extends I_Conceptualize, I_ManifestUniversally {
-
-    public UUID getPrimoridalUid() throws IOException, TerminologyException;
 
     public boolean isPrimitive(I_StoreUniversalFixedTerminology termStore) throws IOException, TerminologyException;
 

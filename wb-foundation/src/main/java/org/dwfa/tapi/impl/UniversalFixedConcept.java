@@ -35,7 +35,7 @@ public class UniversalFixedConcept implements I_ConceptualizeUniversally {
 	 * 
 	 */
     private static final long serialVersionUID = 1L;
-    private ArrayList<UUID> uids;
+    private Collection<UUID> uids;
     private Boolean primitive;
     private transient Collection<I_DescribeConceptUniversally> descriptions;
     private transient Collection<I_RelateConceptsUniversally> sourceRels;
@@ -43,7 +43,7 @@ public class UniversalFixedConcept implements I_ConceptualizeUniversally {
 
     private UniversalFixedConcept(Collection<UUID> uids) {
         super();
-        this.uids = new ArrayList<UUID>(uids);
+        this.uids = uids;
     }
 
     public static UniversalFixedConcept get(Collection<UUID> uids) {
@@ -176,10 +176,5 @@ public class UniversalFixedConcept implements I_ConceptualizeUniversally {
         }
         return null;
     }
-
-	@Override
-	public UUID getPrimoridalUid() throws IOException, TerminologyException {
-		return uids.get(0);
-	}
 
 }

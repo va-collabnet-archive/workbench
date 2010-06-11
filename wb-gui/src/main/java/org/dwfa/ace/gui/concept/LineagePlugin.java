@@ -21,8 +21,6 @@ import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -39,7 +37,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -55,10 +52,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.tapi.TerminologyException;
-import org.intsdo.util.swing.GuiUtil;
 
-public class LineagePlugin extends AbstractPlugin 
-	implements HierarchyListener {
+public class LineagePlugin extends AbstractPlugin {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
@@ -113,7 +108,6 @@ public class LineagePlugin extends AbstractPlugin
     private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException, TerminologyException {
         setHost(host);
         JPanel lineagePanel = new JPanel(new GridBagLayout());
-        lineagePanel.addHierarchyListener(this);
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
@@ -157,33 +151,32 @@ public class LineagePlugin extends AbstractPlugin
         filler.setPreferredSize(new Dimension(40, 20));
         lineagePanel.add(filler, c);
         c.gridx++;
-        c.weightx = 0.1;
+        c.weightx = 1.0;
         c.weighty = 0.0;
         lineagePanel.add(lineageTree, c);
         lineageTree.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.GRAY));
 
-        c.weightx = 1.0;
-        JPanel eastFiller = new JPanel();
-        eastFiller.setMaximumSize(new Dimension(40, 20));
-        eastFiller.setMinimumSize(new Dimension(40, 20));
-        eastFiller.setPreferredSize(new Dimension(40, 20));
-        eastFiller.setBackground(Color.white);
-        eastFiller.setOpaque(true);
-        c.weightx = 1.0;
+        JPanel filler2 = new JPanel();
+        filler2.setMaximumSize(new Dimension(40, 20));
+        filler2.setMinimumSize(new Dimension(40, 20));
+        filler2.setPreferredSize(new Dimension(40, 20));
+        filler2.setBackground(Color.white);
+        filler2.setOpaque(true);
+        c.weightx = 0.0;
         c.gridx++;
-        eastFiller.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY));
-        lineagePanel.add(eastFiller, c);
+        filler2.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY));
+        lineagePanel.add(filler2, c);
 
         lineagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
             BorderFactory.createLineBorder(Color.GRAY)));
         return lineagePanel;
     }
- 
+
     private void updateLineageModel() throws IOException, TerminologyException {
         DefaultTreeModel model = (DefaultTreeModel) lineageTree.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         model.setRoot(root);
- 
+
         I_GetConceptData bean = (I_GetConceptData) getHost().getTermComponent();
         if (bean != null) {
             lineageRenderer.setFocusBean(bean);
@@ -202,14 +195,6 @@ public class LineagePlugin extends AbstractPlugin
             for (int i = 0; i < 100; i++) {
                 lineageTree.expandRow(i);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-			        GuiUtil.tickle(lineageTree);
-			        GuiUtil.tickle(lineagePanel);
-				}
-			});
         } else {
             root.add(new DefaultMutableTreeNode(" "));
             model.nodeStructureChanged(root);
@@ -278,20 +263,4 @@ public class LineagePlugin extends AbstractPlugin
         return TOGGLES.LINEAGE.getPluginId();
     }
 
-	@Override
-	public void hierarchyChanged(HierarchyEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					updateLineageModel();
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (TerminologyException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
-		});
-	}
 }

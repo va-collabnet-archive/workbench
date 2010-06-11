@@ -78,11 +78,10 @@ public class ConceptTupleFileUtil {
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
-                        String errorMessage =
-                                "No path with identifier: " + pathUuid + " and no path override specified";
+                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                }
+                } 
                 statusUuid = UUID.fromString(lineParts[4]);
             } catch (Exception e) {
                 String errorMessage = "Concept: Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -115,22 +114,22 @@ public class ConceptTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "Concept: statusUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "Concept: statusUuid matches no identifier in database.");
             }
 
             if (termFactory.hasConcept(termFactory.uuidToNative(conceptUuid))) {
 
-                int conceptId = termFactory.uuidToNative(conceptUuid);
+                int conceptId = termFactory.getId(conceptUuid).getNid();
                 I_IntSet allowedStatus = termFactory.newIntSet();
-                allowedStatus.add(termFactory.uuidToNative(statusUuid));
+                allowedStatus.add(termFactory.getId(statusUuid).getNid());
                 I_GetConceptData concept = termFactory.getConcept(conceptId);
                 lastConcept = concept;
 
                 // check if the part exists
                 List<? extends I_ConceptAttributeTuple> parts =
-                        concept.getConceptAttributeTuples(allowedStatus, null, importConfig.getPrecedence(),
-                            importConfig.getConflictResolutionStrategy());
+                        concept.getConceptAttributeTuples(allowedStatus, null,
+                            importConfig.getPrecedence(), importConfig.getConflictResolutionStrategy());
 
                 I_ConceptAttributeTuple latestTuple = null;
                 for (I_ConceptAttributeTuple part : parts) {
@@ -142,10 +141,12 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    for (I_Path p : importConfig.getEditingPathSet()) {
+                    for (I_Path p: importConfig.getEditingPathSet()) {
                         I_ConceptAttributePart newPart =
-                                (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
-                                    termFactory.uuidToNative(statusUuid), p.getConceptId(), effectiveDate);
+                            (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
+                                termFactory.getId(statusUuid).getNid(), 
+                                p.getConceptId(),
+                                effectiveDate);
                         newPart.setDefined(isDefined);
                     }
                     termFactory.addUncommittedNoChecks(concept);
@@ -153,8 +154,8 @@ public class ConceptTupleFileUtil {
             } else {
                 // need to create concept
                 I_GetConceptData newConcept =
-                        termFactory.newConcept(conceptUuid, isDefined, importConfig, termFactory
-                            .uuidToNative(statusUuid), effectiveDate);
+                        termFactory.newConcept(conceptUuid, isDefined, importConfig, 
+                            termFactory.getId(statusUuid).getNid(), effectiveDate);
                 lastConcept = newConcept;
                 termFactory.addUncommittedNoChecks(newConcept);
             }

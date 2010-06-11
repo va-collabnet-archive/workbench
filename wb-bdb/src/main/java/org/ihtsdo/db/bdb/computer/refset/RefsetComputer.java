@@ -25,30 +25,12 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
-import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.time.TimeUtil;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
-    public class StopActionListener implements ActionListener {
-
-        RefsetComputer computer;
-
-        public StopActionListener(RefsetComputer computer) {
-            this.computer = computer;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            canceled = true;
-            List<ParallelConceptIterator> pcis = computer.getParallelConceptIterators();
-            for (ParallelConceptIterator pci : pcis) {
-                pci.getCurrentThread().interrupt();
-            }
-        }
-    }
-
     private int refsetNid;
     private RefsetSpecQuery query;
     private Collection<? extends I_ExtendByRef> allRefsetMembers;
@@ -78,12 +60,15 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         this.refsetConcept = Bdb.getConcept(refsetNid);
         conceptCount = possibleIds.cardinality();
 
-        activity =
-                Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
+        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
-        activity.addStopActionListener(new StopActionListener(this));
+        activity.addRefreshActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canceled = true;
+            }
+        });
         ActivityViewer.addActivity(activity);
 
         this.query = query;
@@ -207,16 +192,5 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     @Override
     public boolean continueWork() {
         return !canceled;
-    }
-
-    List<ParallelConceptIterator> pcis;
-
-    @Override
-    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
-        this.pcis = pcis;
-    }
-
-    public List<ParallelConceptIterator> getParallelConceptIterators() {
-        return pcis;
     }
 }

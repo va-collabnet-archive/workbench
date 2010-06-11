@@ -41,8 +41,7 @@ public class ChangeFramePassword implements ActionListener {
             I_ConfigAceFrame frameConfig = acePanel.getAceFrameConfig();
             SvnPrompter prompter = new SvnPrompter();
             prompter.setParentContainer(acePanel);
-            String oldUser = frameConfig.getUsername();
-             if (prompter.prompt("Current username/password", frameConfig.getUsername())) {
+            if (prompter.prompt("Current username/password", frameConfig.getUsername())) {
                 if (prompter.getUsername() != null) {
                     if (prompter.getUsername().equals(frameConfig.getUsername()) == false) {
                         throw new AuthenticationException("username does not match");
@@ -56,9 +55,6 @@ public class ChangeFramePassword implements ActionListener {
                 if (prompter.prompt("New username/password", AceConfig.config.getUsername())) {
                     frameConfig.setUsername(prompter.getUsername());
                     frameConfig.setPassword(prompter.getPassword());
-                    if (acePanel.getAceFrameConfig().getDbConfig().getUsername().equals(oldUser)) {
-                    	frameConfig.getDbConfig().setUsername(prompter.getUsername());
-                    }
                 }
             }
 

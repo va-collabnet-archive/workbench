@@ -1387,17 +1387,23 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionString v = new IdentifierVersionString(statusNid, pathNid, time, authorityNid, stringId);
+        IdentifierVersionString v = new IdentifierVersionString();
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(stringId);
         return addIdVersion(v);
     }
 
     public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionUuid v = new IdentifierVersionUuid(statusNid, pathNid, time, authorityNid, uuidId);
+        IdentifierVersionUuid v = new IdentifierVersionUuid();
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(uuidId);
         return addIdVersion(v);
     }
 
     public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionLong v = new IdentifierVersionLong(statusNid, pathNid, time, authorityNid, longId);
+        IdentifierVersionLong v = new IdentifierVersionLong();
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(longId);
         return addIdVersion(v);
     }
     

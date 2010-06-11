@@ -40,7 +40,7 @@ public class HL7 implements I_AddToMemoryTermServer {
     public enum Concept implements I_ConceptualizeUniversally {
         HL7("HL7 Concept"), ENTITY_NAME("entity name part concept", HL7), FAMILY_NAME("family name", ENTITY_NAME), GIVEN_NAME("given name", ENTITY_NAME), NAME_PREFIX("name prefix", ENTITY_NAME), NAME_SUFFIX("name suffix", ENTITY_NAME), NAME_DELIMITER("name delimiter", ENTITY_NAME);
 
-        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
+        private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -66,12 +66,7 @@ public class HL7 implements I_AddToMemoryTermServer {
             }
         }
 
-		@Override
-		public UUID getPrimoridalUid() throws IOException, TerminologyException {
-			return conceptUids.get(0);
-		}
-
-		public boolean isPrimitive(I_StoreUniversalFixedTerminology server) {
+        public boolean isPrimitive(I_StoreUniversalFixedTerminology server) {
             return true;
         }
 

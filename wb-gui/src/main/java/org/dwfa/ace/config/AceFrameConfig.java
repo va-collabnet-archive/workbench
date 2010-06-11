@@ -466,9 +466,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             out.writeObject(keyStr);
             IntList il = new IntList();
             for (I_GetConceptData concept : tabHistoryMap.get(keyStr)) {
-            	if (concept.isCanceled() != true) {
-                    il.add(concept.getConceptId());
-            	}
+                il.add(concept.getConceptId());
             }
             IntList.writeIntList(out, il);
         }

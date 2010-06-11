@@ -74,32 +74,33 @@ public class IDTupleFileUtil {
 
             if ((Boolean) importConfig.getProperty("override") == false) {
                 UUID pathUuid = UUID.fromString(lineParts[4]);
-                if (!Terms.get().hasPath(Terms.get().uuidToNative(pathUuid))) {
-                    String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
+                if (!Terms.get().hasId(pathUuid)) {
+                    String errorMessage = "pathUuid has no identifier - skipping import of this string ext tuple.";
                     throw new Exception(errorMessage);
                 }
                 importConfig.getEditingPathSet().clear();
                 importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                 importConfig.setProperty("pathUuid", pathUuid);
-            }
+            } 
             UUID statusUuid = UUID.fromString(lineParts[5]);
             long effectiveDate = Long.parseLong(lineParts[6]);
 
             if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "statusUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.
+                writeWarning(outputFileWriter, lineCount, "statusUuid matches no identifier in database.");
             }
+
             if (!termFactory.hasId(primaryUuid)) {
                 termFactory.uuidToNative(primaryUuid);
             }
 
             I_Identify versioned = termFactory.getId(primaryUuid);
-            I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid"));
+            I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 
 
             if (versioned != null) {
-
+                
                 boolean found = false;
-                for (I_IdVersion idv : versioned.getIdVersions()) {
+                for (I_IdVersion idv: versioned.getIdVersions()) {
                     if (idv.getDenotation().toString().equals(sourceId)) {
                         found = true;
                         break;
@@ -107,17 +108,15 @@ public class IDTupleFileUtil {
                 }
 
                 if (!found) {
-                    if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator()
-                        .next())) {
+                    if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator().next())) {
                         versioned.addUuidId(UUID.fromString(sourceId), termFactory.uuidToNative(sourceSystemUuid),
                             termFactory.uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
-                    } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
-                        .iterator().next())) {
+                    } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())) {
                         versioned.addLongId(new Long(sourceId), termFactory.uuidToNative(sourceSystemUuid), termFactory
                             .uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
                     } else {
-                        versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid), termFactory
-                            .uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
+                        versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid), 
+                            termFactory.uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
                         // use string as default
                     }
 

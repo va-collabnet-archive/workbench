@@ -99,7 +99,7 @@ public class SNOMED {
 
         Disability_evaluation_procedure(UUID.fromString("b7de93d6-2944-3606-b072-649dfe3ca2d9")), Physician_visit_with_evaluation_AND_OR_management_service(UUID.fromString("50161b46-590d-3f79-a65b-7af8c0d83aaf")), Retinal_surgeon(UUID.fromString("d5b735e2-1173-3a59-80d6-4fc2ee8ef540")), Medical_ophthalmologist(UUID.fromString("539ab168-f4be-38d9-ae44-e4dcf6171685")), Family_medicine_specialist(UUID.fromString("a1f66d56-15ac-3a95-ab25-fd360d7c4da1")), Internal_medicine_specialist(UUID.fromString("24250060-2c4a-3193-9a6d-98abeee4077f"));
 
-        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
+        private Collection<UUID> conceptUids = new ArrayList<UUID>();
 
         private Concept(UUID id) {
             this.conceptUids.add(id);
@@ -112,10 +112,6 @@ public class SNOMED {
         public Collection<UUID> getUids() {
             return conceptUids;
         }
-		@Override
-		public UUID getPrimoridalUid() throws IOException, TerminologyException {
-			return conceptUids.get(0);
-		}
 
         public boolean isUniversal() {
             return true;

@@ -34,14 +34,8 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
         this.statusAtPositionNid = sapBdb.getSapNid(statusNid, pathNid, time);
     }
 
-    protected IdentifierVersion(int statusNid, int pathNid, long time, int authorityNid) {
-        this(statusNid, pathNid, time);
-        this.authorityNid = authorityNid;
-    }
-
     protected IdentifierVersion(int statusNid, int pathNid, long time, IdentifierVersion idVersion) {
         this(statusNid, pathNid, time);
-        this.authorityNid = idVersion.authorityNid;
     }
 
     protected IdentifierVersion(TupleInput input) {
