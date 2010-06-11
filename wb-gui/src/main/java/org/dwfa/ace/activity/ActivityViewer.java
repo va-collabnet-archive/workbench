@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.activity;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
@@ -51,6 +50,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.ComponentFrame;
+import org.intsdo.util.swing.GuiUtil;
 
 /**
  * TODO get this viewer to work more directly with the java 6 Swing worker.  
@@ -541,10 +541,7 @@ public class ActivityViewer implements ActionListener {
 	                viewer.viewerFrame.setContentPane(new JScrollPane(get()));
 					boolean tickle = true;
 					if (tickle) {
-				        Dimension size = viewer.viewerFrame.getSize();
-				        Dimension tempSize = new Dimension(size.width, size.height + 1);
-				        viewer.viewerFrame.setSize(tempSize);
-				        viewer.viewerFrame.setSize(size);
+						GuiUtil.tickle(viewer.viewerFrame);
 					}
 				} catch (InterruptedException e) {
 					AceLog.getAppLog().alertAndLogException(e);
@@ -552,6 +549,7 @@ public class ActivityViewer implements ActionListener {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 	        }
+
 	        
 	    }
 
