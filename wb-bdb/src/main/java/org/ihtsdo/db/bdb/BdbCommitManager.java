@@ -84,7 +84,7 @@ public class BdbCommitManager {
 		@Override
 		public void run() {
 			try {
-				while (c.isUnwritten()) {
+				while (c.isUnwritten() && ! c.isCanceled()) {
 					Bdb.getConceptDb().writeConcept(c);
 				}
 			} catch (Exception e) {
