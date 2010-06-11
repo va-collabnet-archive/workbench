@@ -36,6 +36,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 public class EConcept implements I_AmChangeSetObject {
@@ -506,6 +507,19 @@ public class EConcept implements I_AmChangeSetObject {
     	}
 	}
 
+    public EConcept(I_ConceptualizeUniversally uConcept) throws IOException, TerminologyException {
+    	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+       	UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+       	long time = System.currentTimeMillis();
+        conceptAttributes = new EConceptAttributes();
+        conceptAttributes.defined = false;
+    	conceptAttributes.setStatusUuid(currentUuid);
+    	conceptAttributes.primordialUuid = uConcept.getPrimoridalUid();
+    	conceptAttributes.setPathUuid(pathUuid);
+    	conceptAttributes.setTime(time);
+    	//TODO implement other types...
+	}
+
 	/**
 	 * @TODO remove componentRefsetMap added to get around bug in current database implementation!
 	 * @param c
@@ -640,7 +654,7 @@ public class EConcept implements I_AmChangeSetObject {
         }
     }
 
-    public List<EImage> getImages() {
+	public List<EImage> getImages() {
         return images;
     }
 

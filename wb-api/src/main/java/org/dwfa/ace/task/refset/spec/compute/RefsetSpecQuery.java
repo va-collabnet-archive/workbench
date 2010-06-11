@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +25,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -36,6 +43,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
@@ -106,8 +114,10 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private RefsetSpecCalculationOrderComparator executionOrderComparator;
     private RefsetSpecExecutionOrderComparator calculationOrderComparator;
     private boolean allComponentsNeedsResort = true;
+    private boolean continueComputation = true;
 
-    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid) throws TerminologyException, IOException {
+    public RefsetSpecQuery(I_GetConceptData groupingConcept, int refsetSpecNid) throws TerminologyException,
+            IOException {
         super(refsetSpecNid);
         // create query object (statements + any sub-queries)
         executionOrderComparator = new RefsetSpecCalculationOrderComparator();
@@ -121,8 +131,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         termFactory = Terms.get();
 
         totalStatementCount = 0;
+        continueComputation = true;
     }
-    
+
     public ArrayList<RefsetSpecQuery> getSubqueries() {
         return subqueries;
     }
@@ -163,7 +174,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public RefsetSpecStatement addRelStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
             I_AmTermComponent constraint, int refsetSpecNid) {
-        RefsetSpecStatement statement = new RelationshipStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
+        RefsetSpecStatement statement =
+                new RelationshipStatement(useNotQualifier, groupingToken, constraint, refsetSpecNid);
         statements.add(statement);
         allComponents.add(statement);
         allComponentsNeedsResort = true;
@@ -197,19 +209,77 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return statement;
     }
 
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
-            throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, 
-            "<html>Possible: <br>" + this.toHtmlFragment(0), true);
+    @SuppressWarnings("unchecked")
+    public I_RepresentIdSet getPossibleConceptsInterruptable(final I_ConfigAceFrame config,
+            final I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException,
+            ComputationCanceled {
+
+        FutureTask task = new FutureTask(new Callable<I_RepresentIdSet>() {
+            public I_RepresentIdSet call() throws Exception {
+
+                return getPossibleConcepts(config, parentPossibleConcepts);
+
+            }
+        });
+
+        Executor ex = Executors.newFixedThreadPool(1);
+        ex.execute(task);
+
+        I_RepresentIdSet results;
+        try {
+            results = (I_RepresentIdSet) task.get();
+            if (results == null) {
+                throw new ComputationCanceled("Compute cancelled");
+            }
+            return results;
+        } catch (InterruptedException e) {
+            throw new ComputationCanceled("Compute cancelled");
+        } catch (ExecutionException e) {
+            if (getRootCause(e) instanceof TerminologyException) {
+                throw new TerminologyException(e.getMessage());
+            } else if (getRootCause(e) instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else if (getRootCause(e) instanceof ComputationCanceled) {
+                throw new ComputationCanceled(e.getMessage());
+            } else if (getRootCause(e) instanceof InterruptedException) {
+                throw new ComputationCanceled(e.getMessage());
+            } else {
+                System.out.println(">>>>> UNKNOWN exception cause : " + getRootCause(e));
+                e.printStackTrace();
+                throw new TerminologyException(e);
+            }
+        }
+    }
+
+    private Throwable getRootCause(Exception e) {
+        Throwable prevCause = e;
+        Throwable rootCause = e.getCause();
+        while (rootCause != null) {
+            prevCause = rootCause;
+            rootCause = rootCause.getCause();
+        }
+
+        return prevCause;
+    }
+
+    public I_RepresentIdSet getPossibleConcepts(final I_ConfigAceFrame config,
+            final I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException,
+            ComputationCanceled {
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
+        I_ShowActivity activity =
+                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(0), true);
         activity.setMaximum(statements.size() + subqueries.size());
         activity.setValue(0);
         activity.setIndeterminate(true);
+        activity.addStopActionListener(new StopActionListener(this, Thread.currentThread()));
         long startTime = System.currentTimeMillis();
 
-    	if (allComponentsNeedsResort) {
+        if (allComponentsNeedsResort) {
             Collections.sort(allComponents, calculationOrderComparator);
             allComponentsNeedsResort = false;
-    	}
+        }
 
         AceLog.getAppLog().info(">> Start of " + this.toString());
         I_RepresentIdSet possibleConcepts = null;
@@ -223,6 +293,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
@@ -241,6 +314,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
@@ -259,6 +335,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
             }
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
@@ -267,6 +346,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 }
                 activity.setValue(activity.getValue() + 1);
             }
+            break;
         case CONCEPT_CONTAINS_REL:
         case NOT_CONCEPT_CONTAINS_REL:
             if (statements.size() == 0 && subqueries.size() == 0) {
@@ -276,9 +356,12 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 activity.setProgressInfoLower("Initializing...");
                 if (possibleConcepts == null) {
-                     possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
+                    possibleConcepts = component.getPossibleConcepts(config, parentPossibleConcepts);
                 } else {
                     possibleConcepts.or(component.getPossibleConcepts(config, parentPossibleConcepts));
                 }
@@ -298,10 +381,15 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         if (parentPossibleConcepts != null) {
             incomingCount = "" + parentPossibleConcepts.cardinality();
         }
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + 
-            "; Incoming count: " + incomingCount + "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Incoming count: " + incomingCount
+            + "; Outgoing count: " + possibleConcepts.cardinality());
+
         activity.complete();
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
         return possibleConcepts;
+
     }
 
     public String toHtmlFragment(int depth) {
@@ -315,7 +403,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             StringBuffer buff = new StringBuffer();
             buff.append(groupingType.getTruth() + " " + termFactory.getConcept(groupingType.getNid()).getInitialText());
             int count = 0;
-            for (RefsetSpecStatement s: statements) {
+            for (RefsetSpecStatement s : statements) {
                 buff.append(paddingStr);
                 buff.append(s.toHtmlFragment());
                 count++;
@@ -325,7 +413,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     break;
                 }
             }
-            for (RefsetSpecQuery sq: subqueries){
+            for (RefsetSpecQuery sq : subqueries) {
                 buff.append(paddingStr);
                 buff.append(sq.toHtmlFragment(depth + 1));
             }
@@ -339,11 +427,11 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         try {
             StringBuffer buff = new StringBuffer();
             buff.append(groupingType.getTruth() + " " + termFactory.getConcept(groupingType.getNid()).getInitialText());
-            for (RefsetSpecStatement s: statements) {
+            for (RefsetSpecStatement s : statements) {
                 buff.append("\n    ");
                 buff.append(s.toString());
             }
-            for (RefsetSpecQuery sq: subqueries){
+            for (RefsetSpecQuery sq : subqueries) {
                 buff.append("\n    ");
                 buff.append(sq.toString());
             }
@@ -360,12 +448,17 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      * @throws TerminologyException
      * @throws IOException
      */
-    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
+    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException,
+            TerminologyException, ComputationCanceled {
 
-    	if (allComponentsNeedsResort) {
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
+
+        if (allComponentsNeedsResort) {
             Collections.sort(allComponents, executionOrderComparator);
             allComponentsNeedsResort = false;
-    	}
+        }
 
         // process all statements and subqueries
         switch (groupingType) {
@@ -375,6 +468,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (!specComponent.execute(component, config)) {
                     // can exit the AND early, as at least one statement is
                     // returning false
@@ -387,11 +483,14 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             return true;
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() +
-                    "\n\n" + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
+                throw new TerminologyException("Spec is invalid - dangling OR.\n\n" + this.toString() + "\n\n"
+                    + Terms.get().getConcept(getRefsetSpecNid()).toLongString());
             }
 
             for (RefsetSpecComponent specComponent : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (specComponent.execute(component, config)) {
                     // exit the OR statement early, as at least one statement
                     // has returned true
@@ -416,8 +515,11 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     }
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component, 
-            I_ConfigAceFrame config) throws TerminologyException, IOException {
+    private boolean executeConceptContainsDesc(I_AmTermComponent component, I_ConfigAceFrame config)
+            throws TerminologyException, IOException, ComputationCanceled {
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
         if (statements.size() == 0 && subqueries.size() == 0) {
             throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
         }
@@ -425,14 +527,16 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         I_GetConceptData descriptionConcept = (I_GetConceptData) component;
         List<? extends I_DescriptionTuple> descriptionTuples =
                 descriptionConcept.getDescriptionTuples(null, null, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                    .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
         for (I_DescriptionTuple tuple : descriptionTuples) {
             I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
             boolean valid = false;
 
             for (RefsetSpecStatement statement : statements) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (!statement.execute(descVersioned, config)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
@@ -444,6 +548,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (!subquery.execute(descVersioned, config)) {
                     // can exit the execution early, as at least one query is
                     // returning false
@@ -462,7 +569,11 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {
+    private boolean executeConceptContainsRel(I_AmTermComponent component, I_ConfigAceFrame config)
+            throws TerminologyException, IOException, ComputationCanceled {
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
         if (statements.size() == 0 && subqueries.size() == 0) {
             throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
         }
@@ -474,6 +585,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             boolean valid = false;
 
             for (RefsetSpecStatement statement : statements) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (!statement.execute(versionedTuple, config)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
@@ -485,6 +599,9 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
 
             for (RefsetSpecQuery subquery : subqueries) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
                 if (!subquery.execute(versionedTuple, config)) {
                     // can exit the execution early, as at least one query is
                     // returning false
@@ -592,13 +709,64 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         this.groupingType = groupingType;
     }
 
-    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleDescriptions)
-            throws TerminologyException, IOException {
+    @SuppressWarnings("unchecked")
+    public I_RepresentIdSet getPossibleDescriptionsInterruptable(final I_ConfigAceFrame config,
+            final I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException,
+            ComputationCanceled {
 
-    	if (allComponentsNeedsResort) {
+        FutureTask task = new FutureTask(new Callable<I_RepresentIdSet>() {
+            public I_RepresentIdSet call() throws Exception {
+                return getPossibleDescriptions(config, parentPossibleDescriptions);
+            }
+        });
+
+        Executor ex = Executors.newFixedThreadPool(1);
+        ex.execute(task);
+
+        I_RepresentIdSet results;
+        try {
+            results = (I_RepresentIdSet) task.get();
+            if (results == null) {
+                throw new ComputationCanceled("Compute cancelled");
+            }
+            return results;
+        } catch (InterruptedException e) {
+            throw new ComputationCanceled("Compute cancelled");
+        } catch (ExecutionException e) {
+            if (getRootCause(e) instanceof TerminologyException) {
+                throw new TerminologyException(e.getMessage());
+            } else if (getRootCause(e) instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else if (getRootCause(e) instanceof ComputationCanceled) {
+                throw new ComputationCanceled(e.getMessage());
+            } else if (getRootCause(e) instanceof InterruptedException) {
+                throw new ComputationCanceled(e.getMessage());
+            } else {
+                System.out.println(">>>>> UNKNOWN exception cause : " + getRootCause(e));
+                e.printStackTrace();
+                throw new TerminologyException(e);
+            }
+        }
+    }
+
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleDescriptions)
+            throws TerminologyException, IOException, ComputationCanceled {
+
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
+
+        I_ShowActivity activity =
+                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(0), true);
+        activity.setMaximum(statements.size() + subqueries.size());
+        activity.setValue(0);
+        activity.setIndeterminate(true);
+        activity.addStopActionListener(new StopActionListener(this, Thread.currentThread()));
+
+        if (allComponentsNeedsResort) {
             Collections.sort(allComponents, calculationOrderComparator);
             allComponentsNeedsResort = false;
-    	}
+        }
 
         long startTime = System.currentTimeMillis();
         AceLog.getAppLog().info(">> Start of " + this.toString());
@@ -607,43 +775,69 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         switch (groupingType) {
         case AND:
             if (statements.size() == 0 && subqueries.size() == 0) {
-                throw new TerminologyException("Spec is invalid - dangling AND.");
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
+                throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleDescriptions == null) {
                     possibleDescriptions = component.getPossibleDescriptions(config, parentPossibleDescriptions);
                 } else {
                     possibleDescriptions.and(component.getPossibleDescriptions(config, possibleDescriptions));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
 
             break;
 
         case OR:
             if (statements.size() == 0 && subqueries.size() == 0) {
+                activity.complete();
+                activity.setProgressInfoLower("Spec is invalid - dangling AND.");
                 throw new TerminologyException("Spec is invalid - dangling OR.");
             }
 
             for (RefsetSpecComponent component : allComponents) {
+                if (!continueComputation) {
+                    throw new ComputationCanceled("Compute cancelled");
+                }
+                activity.setProgressInfoLower("Initializing...");
                 if (possibleDescriptions == null) {
                     possibleDescriptions = component.getPossibleDescriptions(config, parentPossibleDescriptions);
                 } else {
                     possibleDescriptions.or(component.getPossibleDescriptions(config, parentPossibleDescriptions));
                 }
+                activity.setValue(activity.getValue() + 1);
             }
 
             break;
         case CONCEPT_CONTAINS_DESC:
+            activity.complete();
+            activity
+                .setProgressInfoLower("Concept-contains-desc is not supported within a description refset calculation.");
             throw new TerminologyException(
                 "Concept-contains-desc is not supported within a description refset calculation.");
         case NOT_CONCEPT_CONTAINS_DESC:
+            activity.complete();
+            activity
+                .setProgressInfoLower("NOT Concept-contains-desc is not supported within a description refset calculation.");
             throw new TerminologyException(
                 "NOT Concept-contains-desc is not supported within a description refset calculation.");
         case CONCEPT_CONTAINS_REL:
+            activity.complete();
+            activity
+                .setProgressInfoLower("Concept-contains-rel is not supported within a description refset calculation.");
             throw new TerminologyException(
                 "Concept-contains-rel is not supported within a description refset calculation.");
         case NOT_CONCEPT_CONTAINS_REL:
+            activity.complete();
+            activity
+                .setProgressInfoLower("NOT Concept-contains-rel is not supported within a description refset calculation.");
             throw new TerminologyException(
                 "NOT Concept-contains-rel is not supported within a description refset calculation.");
         default:
@@ -654,12 +848,43 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         long seconds = (elapsedTime % 60000) / 1000;
         AceLog.getAppLog().info(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
         setPossibleConceptsCount(possibleDescriptions.cardinality());
+        String incomingCount = "All";
+        if (parentPossibleDescriptions != null) {
+            incomingCount = "" + parentPossibleDescriptions.cardinality();
+        }
+        activity.setProgressInfoLower("Elapsed: " + elapsedTime + "; Incoming count: " + incomingCount
+            + "; Outgoing count: " + possibleDescriptions.cardinality());
+        activity.complete();
+        if (!continueComputation) {
+            throw new ComputationCanceled("Compute cancelled");
+        }
         return possibleDescriptions;
+
     }
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
             throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships unimplemented.");
+    }
+
+    public class StopActionListener implements ActionListener {
+
+        RefsetSpecQuery query;
+        Thread queryThread;
+
+        public StopActionListener(RefsetSpecQuery query, Thread queryThread) {
+            this.query = query;
+            this.queryThread = queryThread;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            query.setContinueComputation(false);
+            queryThread.interrupt();
+        }
+    }
+
+    public void setContinueComputation(boolean continueComputation) {
+        this.continueComputation = continueComputation;
     }
 }
