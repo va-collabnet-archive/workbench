@@ -1,4 +1,0 @@
-/* Grant all permissions to local JAR files */
-grant codeBase "file:${/}-" {
-    permission java.security.AllPermission;
-};
