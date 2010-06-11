@@ -130,4 +130,10 @@ public class BdbLegacyFixedFactory implements I_StoreLocalFixedTerminology {
         }
     }
 
+	@Override
+	public Collection<I_ConceptualizeLocally> getConcepts() throws IOException,
+			TerminologyException {
+		throw new UnsupportedOperationException();
+	}
+
 }

@@ -566,7 +566,7 @@ public interface I_TermFactory {
     public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
-
+ 
     public I_ImageVersioned getImage(UUID fromString) throws IOException;
 
     public I_ImageVersioned getImage(int parseInt) throws IOException;
@@ -639,6 +639,7 @@ public interface I_TermFactory {
     public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
+
 
 
 }

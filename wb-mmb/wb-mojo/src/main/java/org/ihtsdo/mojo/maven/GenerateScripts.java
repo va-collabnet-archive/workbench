@@ -169,7 +169,6 @@ public class GenerateScripts extends AbstractMojo {
                 true, false);
             startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "Jehri Bundle", true, false,
                 false, true);
-            configureScript(jars);
         } else {
             for (String name : scriptNames) {
                 l.info("generating script: " + name);
@@ -520,34 +519,4 @@ public class GenerateScripts extends AbstractMojo {
         }
     }
 
-    /**
-     * @param jars
-     * @throws MojoExecutionException
-     */
-    private void configureScript(File[] jars) throws MojoExecutionException {
-        File unixScript = new File(outputDirectory + fileSep + scriptOutputDir + fileSep + "configure.sh");
-        try {
-            FileWriter fw = new FileWriter(unixScript);
-            // fw.write("export
-            // DYLD_LIBRARY_PATH=lib/osx:$DYLD_LIBRARY_PATH\n");
-            fw.write("/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/bin/java -jar lib/");
-            for (File f : jars) {
-                if (f.getName().startsWith("configurator-")) {
-                    fw.write(f.getName());
-                    break;
-                }
-            }
-            fw.close();
-            if (System.getProperty("os.name").startsWith("Windows") == false) {
-                try {
-                    Runtime.getRuntime().exec("chmod a+x " + unixScript.getPath());
-                } catch (RuntimeException e) {
-                    // Ignore, may be running on windows, and the permissions
-                    // don't matter there...;
-                }
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Error creating script file.", e);
-        }
-    }
 }

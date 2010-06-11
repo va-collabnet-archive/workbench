@@ -245,7 +245,7 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
 
         ASSERTION_CONDITION(new String[] { "Assertion condition" }, new I_ConceptualizeUniversally[] { DOCUMENT_AUXILIARY }, new int[] { 10 }), UNKNOWN(new String[] { "Unknown" }, new I_ConceptualizeUniversally[] { ASSERTION_CONDITION }, new int[] { 20 }), NOT_ASKED(new String[] { "Not asked" }, new I_ConceptualizeUniversally[] { UNKNOWN }, new int[] { 30 }), SOURCE_DOES_NOT_KNOW(new String[] { "Source does not know" }, new I_ConceptualizeUniversally[] { UNKNOWN }, new int[] { 40 }), UNKNOWABLE_TEMPORARY(new String[] { "Temporarily unknowable" }, new I_ConceptualizeUniversally[] { UNKNOWN }, new int[] { 50 }), UNKNOWABLE_PERMANENT(new String[] { "Permanently unknowable" }, new I_ConceptualizeUniversally[] { UNKNOWN }, new int[] { 60 }), KNOWN(new String[] { "Known" }, new I_ConceptualizeUniversally[] { ASSERTION_CONDITION }, new int[] { 70 }), DEFAULT_KNOWN(new String[] { "Default value" }, new I_ConceptualizeUniversally[] { KNOWN }, new int[] { 80 }), CONFIRMED_KNOWN(new String[] { "Confirmed default" }, new I_ConceptualizeUniversally[] { KNOWN }, new int[] { 90 }), ORIGINAL_VALUE(new String[] { "Original value" }, new I_ConceptualizeUniversally[] { KNOWN }, new int[] { 100 }), ;
 
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -361,6 +361,11 @@ public class DocumentAuxiliary implements I_AddToMemoryTermServer {
         public I_ConceptualizeLocally localize() throws IOException, TerminologyException {
             return LocalFixedConcept.get(getUids(), primitive);
         }
+
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
     }
 
     private static HashMap<I_ManifestUniversally, HashMap<I_ConceptualizeUniversally, I_ExtendUniversally>> extensions = new HashMap<I_ManifestUniversally, HashMap<I_ConceptualizeUniversally, I_ExtendUniversally>>();
