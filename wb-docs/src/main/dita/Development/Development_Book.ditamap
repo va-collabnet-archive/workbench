@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/bookmap.dtd">
+<bookmap id="book_workbench_guide">
+    <booktitle>
+        <mainbooktitle>Workbench component: Development</mainbooktitle>
+    </booktitle>
+    <bookmeta>
+        <author type="creator">Keith Campbell</author>
+        <author type="contributor">Susan Castillo, Eric Browne</author>
+        <keywords>
+            <keyword>IHTSDO</keyword>
+            <keyword>Workbench</keyword>
+            <keyword>Development</keyword>
+        </keywords>
+        <prodinfo>
+            <prodname>IHTSDO Workbench Component</prodname>
+            <vrmlist>
+                <vrm version="1.0"/>
+            </vrmlist>
+        </prodinfo>
+        <bookrights>
+            <copyrfirst>
+                <year>2009</year>
+            </copyrfirst>
+            <!--copyrlast>
+                <year>2009</year>
+            </copyrlast-->
+            <bookowner>
+                <organization>IHTSDO</organization>
+            </bookowner>
+        </bookrights>
+    </bookmeta>
+    <frontmatter>
+        <booklists>
+            <toc/>
+        </booklists>
+        <preface>
+            <!--<topicref href="frontCover.xml" format="dita" type="topic"/>-->
+ 
+        </preface>
+    </frontmatter>
+
+    <chapter href="../Development/Development.ditamap" format="ditamap" navtitle="Development ">
+    </chapter>
+    <backmatter>
+        <booklists>
+            <indexlist/>
+        </booklists>
+    </backmatter>
+</bookmap>

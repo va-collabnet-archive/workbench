@@ -6,7 +6,6 @@
             <version>2.5.4-nehta-1-SNAPSHOT</version>
         </parent>
 	<artifactId>wb-bdb</artifactId>
-	<packaging>jar</packaging>
 	<name>Workbench Berkeley Database</name>
 	<dependencies>
 		<dependency>
@@ -53,15 +52,5 @@
 				<directory>./TextFiles</directory>
 			</resource>
 		</resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-	       </plugins>
 	     </build>
 </project>

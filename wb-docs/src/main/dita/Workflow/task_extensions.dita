@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+<topic id="topic2" xml:lang="en">
+ <title>Example Task Extensions</title>
+ <body>
+  <section>There are several simple tasks that can be used as the basis of extending the workflow
+   environment by adding your own tasks. Here are some:</section>
+  <section> 1. <codeph>au.com.ncch.bpa.tasks.web.FetchFromWeb</codeph> A task that reads a string from a URL, parses
+   the string, and presents the string to the user in a dialog. This task demonstrates how tasks can
+   connecting to servers over the network, and do something with those results.</section>
+  <section> 2. <codeph>org.dwfa.bpa.tasks.dialog.ShowInfoDialog</codeph> A task that displays a message to the user.
+   The message was set when the process was created in the process builder, using standard JavaBeans
+   property editor conventions.</section>
+ </body>
+</topic>

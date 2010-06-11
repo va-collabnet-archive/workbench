@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+
+ <topic id="topic3" xml:lang="en">
+  <title>Using the Hierarchy View </title>
+  <prolog><metadata><keywords><indexterm>Hierarchy View </indexterm></keywords></metadata></prolog>
+  <body>
+   <section>The Hierarchy View includes two tabs: taxonomy and data checks.</section>
+   <section>The <i>Taxonomy </i>tab contains sets of concepts that are commonly used for patient
+    diagnoses and records. The “pluses” to the left of each concept indicate that sub-levels, or
+    children of the parent concept, exist. Click on a plus sign to view cascading sub-levels under
+    each concept. For example, if you click on the “SNOMED CT Concept” lever, the list will expand
+    as shown in <xref href="#topic3/ag929137" type="fig" format="dita"/>. </section>
+   <fig id="ag929137">
+    <title>Expanded Hierarchy List</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_10.jpg"
+     placement="break" width="262" height="255"/>
+   </fig>
+   <section>Similarly, if you continue to click on the levers (or triangles) next to each sub-level,
+    you can view additional levels of the concept. At the same time, you will note that the concept
+    hierarchy information for the selected hierarchy displays in the Concept Work Area. </section>
+   <section id="ag929147">
+    <title>Reviewing the Hierarchy View</title>
+   </section>
+   <section>The arrows next to concepts in the hierarchy view denote relationships. The example
+    shown in <xref href="#topic3/ag929158" type="fig" format="dita"/> includes several types of
+    arrows, to indicate relationships within the hierarchy.</section>
+   <fig id="ag929158">
+    <title>Hierarchy View of Relationships</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_11.jpg"
+     placement="break" width="288" height="204"/>
+   </fig>
+   <section>Levers are used to open and close parent and child views: </section>
+   <ul>
+    <li>Parent/child view: The lever’s (or triangle) toggling will show or hide the children of the
+     parent. </li>
+    <li>Green vertical “up” arrow: Opens and closes additional parents, as in “Reason not stated
+     concept”.</li>
+    <li>Green angled arrow: Indicates the “open” state of the vertical arrow. </li>
+   </ul>
+   <section>A concept may appear in more than one place in the hierarchy. For example, <i>aspirin
+     </i><i>is both a salicylate product and an antiplatelet agent. It appears in the child
+     hierarchies of both parent concepts. Concepts like aspirin that have more than one parent
+     concept are said to have </i><i>multiple lineage</i><i>, and are indicated in the hierarchy
+     view with a green up-arrow, as shown in </i><xref href="#topic3/ag945484" type="fig"
+     format="dita"/>.</section>
+   <fig id="ag945484">
+    <title>Aspirin Lineage </title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_12.jpg"
+     placement="break" width="249" height="100"/>
+   </fig>
+   <section>Double-click on the green up-arrow to display a list of a concept’s other parent
+    concepts, as shown in <xref href="#topic3/ag945512" type="fig" format="dita"/>. The up-arrow
+    will change to a diagonal arrow. Double-click this symbol to collapse the list.</section>
+   <fig id="ag945512">
+    <title>Aspirin Concept Showing Additional Lineage</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_12.5.jpg"
+     placement="break" width="229" height="142"/>
+   </fig>
+   <section id="ag945534">
+    <title>Using the Data Checks Tab<ph>
+      <indexterm>Data Check tab </indexterm>
+     </ph></title>
+   </section>
+   <section>When IHTSDO Workbench detects a data inconsistency in a concept, the data checks tab
+    will automatically display an error message. If resolutions are available, they are displayed in
+    the Fixes field, as shown in <xref href="#topic3/ag966105" type="fig" format="dita"/>. When all
+    errors are resolved, the screen will automatically display the taxonomy tab.</section>
+   <section>You may be able to submit a concept with data checks if the basis of the data check is
+    permissive. You may be prompted to state whether you want to continue with the submit
+    process.</section>
+   <fig id="ag966105">
+    <title>Data Check Tab Displaying Error Message</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_13.jpg"
+     placement="break" width="337" height="151"/>
+   </fig>
+  </body>
+ </topic>
+
+ 

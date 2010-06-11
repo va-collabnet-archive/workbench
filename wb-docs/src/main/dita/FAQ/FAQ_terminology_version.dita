@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="terminology_version">
+  <title>How to determine the version of a term or a terminology being
+  edited?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>version of terminology<indexterm>how to
+        determine</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The IHTSDO Workbench Editor can support multiple version of
+    multiple terminologies simultaneously. Each user can select which
+    combination of versions and terminologies should be displayed. This is
+    done via the preferences panel as illustrated in <xref format="dita"
+    href="../Editor/Editor_preferences_panel.dita#topic6/ag937245"
+    type="fig"/></section>
+  </body>
+</topic>

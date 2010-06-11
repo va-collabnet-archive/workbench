@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+ 
+ <topic id="topic19" xml:lang="en">
+  <title>Customization</title>
+  <prolog><metadata><keywords><indexterm>customization </indexterm></keywords></metadata></prolog>
+  <body>
+   <section>The IHTSDO Workbench IDE framework is designed from the ground up for customization.
+    Developers can customize the environment by writing data check plugins, custom search filters,
+    and custom business process tasks. These custom tasks that can script the environment, interact
+    with the user, interact with the database, and provide alternative visualizations or custom
+    functionality. </section>
+   <section id="ad1003197">The CSIRO classifier integration is one example of a custom integration
+    accomplished through the distributed workflow automation which later uses custom tasks.
+   </section>
+  </body>
+ </topic>
+

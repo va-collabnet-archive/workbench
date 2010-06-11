@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>wb-mmb</artifactId>
+		<groupId>org.ihtsdo</groupId>
+		<version>2.6.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>wb-docs</artifactId>
+	<name>Generate documentation from DITA sources</name>
+
+	<description>Take a set of DITA files and transform them to various output formats using the
+    DITA Open Toolkit. The output format produced is controlled by maven profiles - see the end
+    of the pom.xml file. </description>
+
+	<packaging>pom</packaging>
+
+	<profiles>
+		<profile>
+			<id>pdf</id>
+			<properties>
+				<dita.ot.dir>${project.build.directory}/dependency/DITA-OT1.5.1</dita.ot.dir>
+				<!-- User must specify this
+    <xep.dir>...</xep.dir>
+     -->
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack-dita-ot</id>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>net.sf.dita-ot</groupId>
+											<artifactId>dita-ot-minimal</artifactId>
+											<version>1.5.1-M6</version>
+											<type>tar.gz</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>add-transform-libs</id>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${dita.ot.dir}/lib</outputDirectory>
+									<artifactItems>
+										<artifactItem>
+											<groupId>net.sourceforge.saxon</groupId>
+											<artifactId>saxon</artifactId>
+											<version>9.1.0.8</version>
+										</artifactItem>
+										<artifactItem>
+											<groupId>net.sourceforge.saxon</groupId>
+											<artifactId>saxon</artifactId>
+											<version>9.1.0.8</version>
+											<classifier>dom</classifier>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.ibm.icu</groupId>
+											<artifactId>icu4j</artifactId>
+											<version>3.4.4</version>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>enforce-property</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireProperty>
+											<property>xep.dir</property>
+											<message>Please ensure that the xep.dir is specified in your
+												settings.xml</message>
+										</requireProperty>
+										<requireProperty>
+											<property>env.ANT_HOME</property>
+											<message>Please ensure that the ANT_HOME environment variable
+												is set to point to your ANT installation</message>
+										</requireProperty>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>dita-maven-plugin</artifactId>
+						<version>1.0-beta-2</version>
+						<executions>
+							<execution>
+								<id>dita2pdf</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<useDitaAnt>false</useDitaAnt>
+									<useDitaClasspath>true</useDitaClasspath>
+									<!--
+										attach the generated PDF: this doesn't work in the current
+										version of the dita-maven-plugin when the ditamap is in a
+										subdirectory, so it is added using the build-helper below
+										<attach>true</attach>
+									-->
+									<antProperties>
+										<transtype>pdf2</transtype>
+										<dita.dir>${dita.ot.dir}</dita.dir>
+										<args.input>${dita.src.dir}/Guidebook/Workbench_Guidebook.ditamap</args.input>
+										<dita.extname>dita</dita.extname>
+										<output.dir>${project.build.directory}/pdf</output.dir>
+										<xep.dir>${xep.dir}</xep.dir>
+										<pdf.formatter>xep</pdf.formatter>
+
+										<!--
+											<customization.dir>${customization.dir}</customization.dir>
+											<clean.temp>yes</clean.temp>
+										-->
+									</antProperties>
+									<antOpts>-Xmx256m</antOpts>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- to workaround dita-maven-plugin's attach configuration problems -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-pdf</id>
+								<goals>
+									<goal>attach-artifact</goal>
+								</goals>
+								<configuration>
+									<artifacts>
+										<artifact>
+											<file>${project.build.directory}/pdf/Guidebook/Workbench_Guidebook.pdf</file>
+											<type>pdf</type>
+										</artifact>
+									</artifacts>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Coerce the DITA scripts into using more memory for XEP -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>adjust-memory</id>
+								<phase>generate-resources</phase>
+								<configuration>
+									<tasks>
+										<replace file="${dita.ot.dir}/demo/fo/build.xml" token="maxmemory=&quot;256m&quot;" value="maxmemory=&quot;1024m&quot;" />
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<properties>
+		<wb.src.dir>${project.build.directory}/wb-sources</wb.src.dir>
+		<dita.src.dir>${project.build.directory}/dita-src</dita.src.dir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wb-api</artifactId>
+			<version>${project.version}</version>
+			<type>java-source</type>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wb-core</artifactId>
+			<version>${project.version}</version>
+			<type>java-source</type>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${wb.src.dir}</outputDirectory>
+							<includeTypes>java-source</includeTypes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>wb-dita-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<id>generate-dita</id>
+						<phase>process-sources</phase>
+						<configuration>
+							<ditamapFileName>TaskLibrary.ditamap</ditamapFileName>
+							<inputDirectories>
+								<param>${wb.src.dir}/org/dwfa/ace/task</param>
+								<param>${wb.src.dir}/org/dwfa/clock/task</param>
+								<param>${wb.src.dir}/org/dwfa/bpa/tasks</param>
+								<param>${wb.src.dir}/org/dwfa/bpa/worker/task</param>
+								<param>${wb.src.dir}/org/dwfa/queue/bpa/tasks</param>
+							</inputDirectories>
+							<outputDirectory>${dita.src.dir}/Task_Library/autogenerated</outputDirectory>
+						</configuration>
+						<goals>
+							<goal>gen-tasks</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--  load ${timestamp} -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-2</version>
+
+				<executions>
+					<execution>
+						<phase>validate</phase>
+
+						<goals>
+							<goal>create</goal>
+						</goals>
+
+						<configuration>
+							<timestampFormat>{0,date,MMMMM dd yyyy}</timestampFormat>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-doc-date</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/dita</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<outputDirectory>${dita.src.dir}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-dita-sources</id>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/dita-sources.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

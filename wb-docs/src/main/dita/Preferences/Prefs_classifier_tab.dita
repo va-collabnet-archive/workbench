@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+ <topic id="classifier_tab" xml:lang="en">
+  <title>Classifier Tab</title>
+  <shortdesc>
+   <ph>This tab applies to the inbuilt classifier task as described in <xref
+     href="../Classifying/Classifying_intro.dita#topic1" format="dita">Reference
+    Sets</xref><!--<xref href="../Snorocket/Snorocket_intro.dita#topic1"
+     type="topic" format="dita"/>-->.</ph>
+   <ph>For details of reference set preference settings, see section <xref
+     href="../Editor/Editor_classifier_preferences.dita#classifier_prefs" type="topic" format="dita"
+    />.</ph>
+  </shortdesc>
+ </topic>
+</dita>

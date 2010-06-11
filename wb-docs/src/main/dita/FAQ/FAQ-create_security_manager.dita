@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="namespace_ID_allocation">
+  <title>Why do I get "access denied" for the runtimePermission
+  <i>createSecurityManager</i>?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>access
+        denied<indexterm>createSecurityManager</indexterm></indexterm>
+
+        <indexterm><indexterm>createSecurityManager</indexterm><indexterm>access
+        denied</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><p>You need to install the file
+    <codeph>jsk-policy-2.1.jar</codeph> into the JRE's extension folder. The
+    <codeph>jsk-policy-2.1.jar</codeph> file can be found in the
+    <codeph>lib-ext</codeph> directory of your bundle. On Windows, this
+    install location is in <codeph>\lib\ext</codeph> sub-directory of the
+    JRE's extension folder. For example :</p><codeblock>C:\Program Files\Jav\jre1.6.0_02\lib\ext</codeblock><note>Copy
+    the file from the bundle to the JRE's extension folder. If there is
+    already a file in this location, make a backup first, since there may be
+    another application installed on the machine which is dependent on its
+    settings.</note></section>
+  </body>
+</topic>

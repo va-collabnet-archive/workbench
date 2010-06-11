@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic8" xml:lang="en">
+ <title>Using the Search Function </title>
+ <prolog>
+  <metadata>
+   <keywords><indexterm>searching </indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The search function will typically be the first step in locating, changing and saving a
+   concept and descriptions in the hierarchy. The search function area provides a way to search for
+   a complete or partial concept name. The search reviews all of the hierarchies, or just the
+   hierarchy specified in the Root field (<xref href="#topic8/ag935505" type="section" format="dita"
+   />) and then displays a list of every concept matching your search criteria. Using more advanced
+   criteria, you can search within a specified portion of the hierarchy, within reference sets, or
+   relationship type and destination. The results displayed after a search comprise the set of
+   descriptions (terms) that match the criteria, and depending on the search type, the results might
+   be ranked.</section>
+  <fig id="ag935383">
+   <title>Search Area of IHTSDO Workbench IDE</title>
+   <image href="../images/Using_The_ACE_Editor_Images/search_pane.jpg" placement="break"/>
+  </fig>
+  <section id="ag935389">
+   <title>Area Resizing Arrows<ph>
+     <indexterm>search area </indexterm>
+    </ph></title>
+  </section>
+  <section>Click on these arrows to increase or decrease/hide the size of the search function area.
+   You can also resize the search function area by hovering the cursor over the upper border of the
+   area, then clicking and dragging the border to the desired position.</section>
+  <section id="ag935400">
+   <title>Query Field</title>
+  </section>
+  <section>To launch a search, use the query field to enter search criteria, i.e., the concept you
+   want to locate in the hierarchy or hierarchies. If this field is left blank, then additional
+   criteria must be supplied using the <image
+    href="../images/Using_The_ACE_Editor_Images/icon_add_search_criterion_small.png"
+    id="image_31e80c21-5901-4362-b3a7-4b823643e0a2"/> button. You can also drag a concept from the
+   taxonomy pane or from a field in the concept work pane. To initiate the search, click on the
+   binoculars button <image href="../images/Using_The_ACE_Editor_Images/icon_search_small.png"
+    id="image_d3f2ce49-54b7-4123-9eaf-c136ec5715da"/> to the right of the query field. </section>
+  <section id="ag935411">
+   <title>Regex<ph>
+     <indexterm>regex </indexterm>
+     <indexterm>search <indexterm>regex</indexterm>
+     </indexterm>
+    </ph></title>
+  </section>
+  <section>As an alternative to a Lucene search, select this option to search for regular
+   expressions, i.e., very specific expressions that do not require specification of any variables. </section>
+  <section id="ag935422">
+   <title>Lucene<ph>
+     <indexterm>Lucene </indexterm>
+     <indexterm>search <indexterm>lucene</indexterm>
+     </indexterm>
+    </ph></title>
+  </section>
+  <section>Select this option to search for lucene expressions, which is the preferred search
+   method. The Lucene search uses a rapid indexing method that produces results much faster than the
+   Regex search option.<fn id="ag939574">Apache Lucene is a high-performance, full-featured text
+    search engine library written entirely in Java. It is a technology suitable for nearly any
+    application that requires full-text search, especially cross-platform.</fn><xref
+    href="#topic8/ag939574" scope="local" type="fn" format="dita"/>
+  </section>
+  <section><title>Lucene terms</title> A query is broken up into terms and operators. There are two
+   types of terms: Single Terms and Phrases. A Single Term is a single word such as <i>test</i> or
+    <i>hello</i>. A Phrase is a group of words surrounded by double quotes such as <i>"hello
+    dolly"</i>. Multiple terms can be combined together with Boolean operators to form a more
+   complex query (see below). </section>
+  <section>Lucene allows you to modify query terms, which provides a wide range of searching
+   options. </section>
+  <section id="ag939650">Wildcard Searches<indexterm>wildcard searches </indexterm><indexterm>search
+     <indexterm>wildcard</indexterm>
+   </indexterm></section>
+  <ul>
+   <li>To perform a single character wildcard search, use the <i>?</i> symbol. A single character
+    wildcard search looks for terms that match the single character replaced with the <i>?</i>. For
+    example, to search for test or text, type <i>te?t</i></li>
+   <li>To perform a multiple character wildcard search, use the <i>*</i> symbol. For example, to
+    search for test, tests or tester, type<i> test*</i>.</li>
+   <li>You can also use the wildcard search in the middle of a term, such as<i> te*t</i></li>
+   <li>You cannot use a <i>*</i> or <i>?</i> symbol as the first character of a search.</li>
+  </ul>
+  <section id="ag939661">Fuzzy Searches<indexterm>search <indexterm>fuzzy</indexterm>
+   </indexterm><indexterm>fuzzy search </indexterm><indexterm>search <indexterm>soundex</indexterm>
+   </indexterm><indexterm>soundex search </indexterm></section>
+  <section>Fuzzy searches find terms that are similar, such as foam and roams. </section>
+  <ul>
+   <li>To perform a fuzzy search, use the tilde ~ symbol at the end of a single word term. For
+    example, to search for a term similar in spelling to “roam”, use the fuzzy search<i>
+    roam~</i>.</li>
+  </ul>
+  <section><title>Proximity Searches</title><indexterm>proximity search</indexterm><indexterm
+     >search<indexterm>proximity</indexterm></indexterm> A proximity search finds words within a
+   specific distance away. </section>
+  <ul>
+   <li>To perform a proximity search, use the tilde ~ symbol at the end of a phrase. For example, to
+    search for aspirin and pressure within 10 words of each other in a document, type <i>"pressure
+     aspirin"~10</i>
+   </li>
+  </ul>
+  <section id="ag939748"><title>Boosting a Term</title><indexterm>search <indexterm>boosting a
+     term</indexterm>
+   </indexterm></section>
+  <section>Lucene provides the relevance level of matching concepts based on the terms found. To
+   boost a term, use the caret ^ symbol with a boost factor (a number) at the end of the term you
+   are searching. The higher the boost factor, the more relevant the term. </section>
+  <ul>
+   <li>For example, if you want the term “aspirin” to be more relevant, you can boost it using the ^
+    symbol along with the boost factor, such as “aspirin^4 pressure”.</li>
+   <li>This will make concepts with the term aspirin appear more relevant.</li>
+   <li>You can also boost phrase terms such as “aspirin pressure”^4 “hypertension treatment”</li>
+   <li>The default boost factor is 1.</li>
+  </ul>
+  <section id="ag939826"><title>Boolean Operators</title><indexterm>search <indexterm
+     >operators</indexterm>
+   </indexterm></section>
+  <section>Lucene supports Boolean terms AND, +, OR, NOT and -. Boolean operators must be in all
+   caps. The OR operator is the default conjunction operator, so if there is no Boolean operator
+   between two terms, OR is used. </section>
+  <ul>
+   <li>OR: Links two terms and finds a matching document if either of the terms exist in a document.
+    For example, to search for concepts that contain either aspirin pressure or just aspirin, type
+    “aspirin pressure” aspirin or this variation: “aspirin pressure” OR aspirin</li>
+   <li>AND: Matches concepts where both terms exist anywhere in the text of a concept. To search for
+    concepts containing aspirin pressure and hypertension treatment, type “aspirin pressure” AND
+    “hypertension treatment”.</li>
+   <li>+: Requires that the term after the + symbol exist somewhere in a concept. To search for
+    concepts that must contain aspirin and may contain pressure, type +aspirin pressure.</li>
+   <li>NOT: Excludes documents that contain the term after NOT. The symbol ! can be used in place of
+    the word NOT. To search for concepts that contain aspirin pressure but not hypertension
+    treatment, type “aspirin pressure” NOT “hypertension treatment”.</li>
+   <li>Note: NOT cannot be used with just one term, such as NOT “aspirin pressure”.</li>
+   <li>The - or prohibit operator excludes concepts that contain the term after the - symbol. To
+    search for concepts that contain aspirin pressure but not hypertension treatment, type “aspirin
+    pressure” - “hypertension treatment”</li>
+  </ul>
+  <section><title>Grouping</title>Lucene supports parentheses to group clauses to form sub-queries,
+   which can be used to control the boolean logic for a query. To search for either aspirin or
+   pressure and hypertension, type (aspirin OR pressure) AND hypertension.</section>
+  <section id="ag939612">
+   <title>Status Kind - Advanced Search</title>
+  </section>
+  <section>To further define a search using additional criteria, click on the Plus symbol on the
+   left of the Query field. An additional search line, the “Status Kind” row, will appear, as shown
+   in <xref href="#topic8/ag949777" type="fig" format="dita"/>.</section>
+  <fig id="ag949777">
+   <title>Search - Status Kind Function</title>
+   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_50.jpg"
+    placement="break" width="420" height="105"/>
+  </fig>
+  <section>The drop-down list in the advanced search line is used to select the type of search
+   criteria to use. Use the Exclude matches checkbox to retrieve concepts not matching the search
+   criteria. </section>
+  <section>A number of advanced search lines can be “stacked” to filter results by mulitple
+   criteria. Click the plus sign button to add addtional search lines. Click a search line’s “X”
+   button to remove the field. Additional advanced searches include:</section>
+  <ul>
+   <li><i>Status Kind</i> - filters a search by concept status (e.g., current, duplicate, retired,
+    inactive, etc.). Only those concepts with a matching status type will be returned.</li>
+   <li><i>Is Child of </i>- filters a search by hierarchy branch. Only concepts under the selected
+    parent concept will be returned.</li>
+   <li><i>Refset Member</i> - filters a search by returning only those concepts that are members of
+    the specified refset.</li>
+   <li><i>Relationship /Kind</i> - filters a search by relationship type (as entered in the type
+    kind field) and the relationship destination (as entered in the restriction kind field).</li>
+  </ul>
+  <section id="ag951692">
+   <title>List View Button</title>
+  </section>
+  <section>Often it is useful to transfer the search results into the List View pane of the main
+   Concept panel. This transfer can be enabled by clicking the List View Button <image
+    href="../images/Using_The_ACE_Editor_Images/icon_search_to_list_small.png"
+    id="image_8d7d00a4-281c-4200-ad77-0e28b69389fd"/> to add results of the current search to the
+   List View tab in the Concept Work Area. <note>If the List already contains concepts, then these
+    will not be overwritten, but appended to. The List View contains <b>concepts</b>, whereas the
+    search panel results are <b>descriptions</b>. Only the concepts corresponding to each search
+    result term are transferred into the List. </note></section>
+  <section id="ag950391">
+   <title>Hide Search Criteria Button</title>
+  </section>
+  <section>Click the Hide Search Criteria Button to hide or reveal the current search
+   criteria.</section>
+  <section id="ag935483">
+   <title>Score</title>
+  </section>
+  <section>Using an algorithm, the Score ranks search results, based on how well the search phrase
+   matches the resulting concepts.</section>
+  <section id="ag935494">
+   <title>Text</title>
+  </section>
+  <section>The text description of the search result.</section>
+  <section id="ag935505">
+   <title>Root<ph>
+     <indexterm>root <indexterm>of hierachy</indexterm>
+     </indexterm>
+    </ph></title>
+  </section>
+  <section>The root hierarchy - one of the hierarchies available in the Hierarchy View - to be
+   searched. The field default is “Empty,” meaning all hierarchies will be searched.To specify a
+   root, select a hierarchy from the Hierarchy View, then drag and drop or copy and paste the
+   description into the Root field. The search will retrieve only the concepts available in the
+   selected hierarchy.</section>
+  <section>
+   <title>Linking search result terms to concepts in the taxonomy</title>
+   <p>The location within the taxonomy hierarchy of the concept corresponding to a search result
+    item can be found by clicking on the result item. This functionality needs to be enabled by
+    using the taxonomy link toggle <image
+     href="../images/Using_The_ACE_Editor_Images/icon_carabiner_taxonomy_small.png"
+     id="image_a0b081aa-5c3b-40e2-a160-410142a1bef2"/>. If the main Concept Panel is configured with
+    its visible tabbed pane also linked to the taxonomy, then this too will also be populated with
+    the corresponding concept.</p>
+   <p>The results of such a linking are illustrated in <xref
+     href="#topic8/fig_search_taxonomy_linking" format="dita"/>. <fig
+     id="fig_search_taxonomy_linking"><title>Locating a search result term in the taxonomy</title>
+     <image href="../images/Using_The_ACE_Editor_Images/search_taxonomy_link.jpg"/>
+    </fig></p>
+  </section>
+ </body>
+</topic>

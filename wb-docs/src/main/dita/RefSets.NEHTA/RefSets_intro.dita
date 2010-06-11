@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+ <title>Reference Sets</title>
+ <prolog>
+  <metadata>
+   <keywords>
+    <indexterm>Reference Sets </indexterm>
+   </keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>A <ph>refset</ph> is a set of concepts, descriptions, or relationships that are
+   appropriate to a particular language, dialect, country, specialty, organization, user or context.
+   In its simplest form, a refset is a list of Universally Unique Identifiers (UUIDs). Each UUID
+   refers to one component of the hierarchy, and makes it a member of the refset (a refset
+   member).</section>
+  <section id="ak1006794">In IHTSDO IDE, there are two types of refsets: Specification refsets are
+   created by users, who explicitly define which concepts in the hierarchy are to be included in (or
+   excluded from) the refset being defined. Using Inclusion Types, users may include or exclude
+   individual concepts or whole branches of the concept hierarchy. (See <xref
+    href="RefSets_inclusion_types.dita#topic9" type="topic" format="dita"/> for a detailed
+   explanation of how inclusion types work.) These Specification refsets are processed by software
+   algorithms in IHTSDO Workbench to generate Member refsets, whose members contain all the concepts
+   specified for inclusion in their corresponding Specification refset.<indexterm>Inclusion Types
+    </indexterm><indexterm>Member refsets </indexterm><indexterm>refset <indexterm
+     >member</indexterm>
+   </indexterm></section>
+  <section>The following sections illustrate how to create a refset grouping containing
+   concepts.</section>
+  <table id="ak1006889">
+   <tgroup cols="1">
+    <colspec colnum="1" colname="col1" colwidth="324*"/>
+    <tbody>
+     <row>
+      <entry colname="col1">
+       <note>Before creating any reference sets, IHTSDO IDE must be properly configured. See<xref
+         href="../Preferences/Prefs_intro.dita" type="topic" format="dita"/>.</note>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+ </body>
+</topic>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="IDE_enduser" xml:lang="en">
+    <title>End-User IDE</title>
+
+    <body>
+      <section id="ac1000242">The IHTSDO Workbench IDE can also be configured
+      for wide distribution to end-users. For example, the Australian
+      Medicine’s Terminology (AMT) v1.4 (and later) viewer is available in a
+      downloadable form from a secure NEHTA website. The data bundled with the
+      viewer contains SNOMED CT identifiers and therefore requires interested
+      stakeholders to have licensed SNOMED CT through NEHTA prior to obtaining
+      it for review.<indexterm>SNOMED </indexterm><indexterm>NEHTA
+      </indexterm></section>
+
+      <section id="ac1000254">The AMT Viewer has all editing functions
+      disabled, but if desired, edit functions could be enabled to allow for
+      automated terminology submissions. <indexterm>AMT Viewer
+      </indexterm></section>
+
+      <section>Even without editing functionality enabled, End-User IDE’s
+      could have business process plugins data collection and automated
+      submission for defect reports, or new term requests. These automated
+      submission processes are transport layer independent, and can therefore
+      integrate with receiving systems that use Web Services, Java RMI, SMTP,
+      or Subversion as their transport layer.</section>
+
+      <fig id="ac1000288">
+        <title>NEHTA End-User IDE with editing functions disabled, but custom
+        business processes to provide users with domain-specific
+        visualizations.<ph><indexterm>NEHTA </indexterm></ph></title>
+
+        <image align="center"
+               href="../images/Ide_Support_Images/domain_specific.jpg"
+               placement="break"/>
+      </fig>
+    </body>
+  </topic>
+</dita>

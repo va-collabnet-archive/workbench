@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic4" xml:lang="en">
+ <title>Reviewing the Concept Work Area</title>
+ <prolog>
+  <metadata>
+   <keywords><indexterm>Concept Work Area </indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The Concept Work Area provides an array of tools to assist you in adding and modifying
+   concepts, modifying source and destination relationships and submitting change sets via the
+   Subversion Panel. </section>
+  <section id="ag936964">
+   <title>Reviewing the Concept Work Area Toggles</title>
+  </section>
+  <section>The row of buttons (shown in <xref href="#topic4/ag936991" type="fig" format="dita"/>)
+   immediately above the concept work area provides the following universal functions.</section>
+  <fig id="ag936991">
+   <title>Concept Work Area Toggles </title>
+   <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_14.jpg"
+    placement="break" width="366" height="639"/>
+  </fig>
+  <section id="ag936997"><title>ID Toggle</title><ph>
+    <indexterm>ID Toggle </indexterm>
+    <indexterm>toggle <indexterm>identifiers</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section id="ag937000">Displays or hides the Universally Unique Identifier (UUID), and SNOMED ID
+   of the selected concept, a record ID specific to the item on the screen. Also displays the UUIDs
+   of the concept’s associated descriptions and relationships.<indexterm>UUID </indexterm><indexterm
+    >SNOMED </indexterm><indexterm>code <indexterm>SNOMED</indexterm>
+   </indexterm><indexterm>code <indexterm>UUID</indexterm>
+   </indexterm><indexterm>identifier <indexterm>SNOMED</indexterm>
+   </indexterm><indexterm>concept code </indexterm></section>
+  <section id="ag937008"><title>Concept Attributes Toggle</title><ph>
+    <indexterm>Concept Attributes Toggle </indexterm>
+    <indexterm>toggle <indexterm>concept attributes</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides the attributes or state of completion of the concept. Concept
+   attributes include:</section>
+  <ul>
+   <li>Status of the concept (current, retired, etc.) <i>Note: </i>A concept can be retired if it is
+    too ambiguous.</li>
+   <li>Whether the concept has been fully defined (true/false). Most concepts are defined, and their
+    defined attribute is set as true. However, there are abstract or theoretical concepts that are
+    not defined, for example, the cornerstone concept at the top of a hierarchy. For such concepts,
+    the value of the defined attribute should be set as false. </li>
+  </ul>
+  <section>Click on the History toggle to view the status of each section of the concept in the work
+   area.</section>
+  <section id="ag937037"><title>Descriptions Toggle</title><ph>
+    <indexterm>Descriptions Toggle </indexterm>
+    <indexterm>toggle <indexterm>descriptions</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides all of the descriptions associated with a concept, whether they are
+   synonyms or represent the preferred name, fully specified name, or other description
+   type.</section>
+  <section id="ag937048"><title>Source Relationships Toggle</title><ph>
+    <indexterm>Source Relationships Toggle </indexterm>
+    <indexterm>toggle <indexterm>source relationships</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides the “is a” source relationships for which the selected concept is a
+   parent. It also displays the other AMT and SNOMED-specific relationships for which this concept
+   is the source.</section>
+  <section id="ag937059"><title>Destination Relationships Toggle</title><ph>
+    <indexterm>Destination Relationships Toggle </indexterm>
+    <indexterm>toggle <indexterm>destination relationships</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides the “is a” destination relationships for which the selected concept is
+   the child. It also displays other AMT and SNOMED-specific relationships for which this concept is
+   the destination.</section>
+  <section id="ag937070"><title>Lineage Toggle</title><ph>
+    <indexterm>Lineage Toggle </indexterm>
+    <indexterm>toggle <indexterm>lineage</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides a visual aid of the lineage, or parent relationships, of the selected
+   concept. The selected concept is designated with blue arrows to highlight where its multiple
+   lineages, if any, exist.</section>
+  <section id="ag937081"><title>Lineage Graph Toggle</title><ph>
+    <indexterm>Lineage Graph Toggle </indexterm>
+    <indexterm>toggle <indexterm>lineage graph</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides access to the lineage graph tool, which provides a dimensional view of
+   the concept currently displayed in the concept work area of the screen. The lineage graph toggle
+   is controlled via a checkbox in the Component tab of the Preferences Panel.</section>
+  <section id="ag945408"><title>Images Toggle</title><ph>
+    <indexterm>Images Toggle </indexterm>
+    <indexterm>toggle <indexterm>images</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides access to the image (such as a logo or photo) upload task associated
+   with the selected concept.</section>
+  <section id="ag937092"><title>Conflicts Toggle</title><ph>
+    <indexterm>Conflicts Toggle </indexterm>
+    <indexterm>toggle <indexterm>conflicts</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays or hides the Conflicts section of the work area, where differences in concept
+   definitions can be analyzed and resolved.</section>
+  <section id="ag937103"><title>Refsets Toggle</title><ph>
+    <indexterm>Refsets Toggle </indexterm>
+    <indexterm>toggle <indexterm>refsets</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Displays information about the reference sets associated with the selected
+   concept.</section>
+  <section id="ag937114"><title>Preferences Toggle</title><ph>
+    <indexterm>Preferences Toggle </indexterm>
+    <indexterm>toggle <indexterm>preferences</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Changes the view to display preferences.</section>
+  <section id="ag937125"><title>Description History Toggle</title><ph>
+    <indexterm>Description History Toggle </indexterm>
+    <indexterm>toggle <indexterm>description history</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Provides a view of all states of the descriptions added to and removed from this concept
+   and the path in which the changes were made.</section>
+  <section id="ag937136">
+   <title>Preferences Toggle</title>
+  </section>
+  <section>Uses specified preferences to filter the information displayed to the user.</section>
+  <section id="ag937147"><title>New Concept Toggle</title><ph>
+    <indexterm>New Concept Toggle </indexterm>
+    <indexterm>toggle <indexterm>new concept</indexterm>
+    </indexterm>
+   </ph>
+  </section>
+  <section>Creates a new concept as the child of the currently selected concept in the hierarchy
+   viewer.</section>
+  <section id="ag937158"><title>Concept Linkage Toggle (above Process Icons)</title><ph>
+    <indexterm>Concept Linkage Toggle </indexterm>
+    <indexterm>toggle <indexterm>concept linkage</indexterm>
+    </indexterm>
+   </ph>
+   <fig id="ag937169">
+    <title>Concept Linkage Toggle and Spinners</title>
+    <image href="../images/Using_The_ACE_Editor_Images/concept_spinners.jpg" placement="break"/>
+   </fig></section>
+  <section>The Concept Linkage toggle or “spinner” determines whether the currently selected concept
+   is linked to the hierarchy or some other view. Click on the spinner arrows next to the concept
+   linkage icon to link and unlink the current concept from the hierarchy. You may link link any
+   tab’s display to the concept selected in the hierarchy pane, the search window, or the data
+   checks window; or you may choose nto to link to any window. Select the tab whose linkage you wish
+   to change and then select a new linkage using the linkage spinner. Using the Concept Linkage
+   toggle provides more control over the environment you are working in.</section>
+ </body>
+</topic>

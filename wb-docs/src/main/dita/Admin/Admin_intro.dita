@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="admin_into" xml:lang="en">
+    <title>Administration functions in the Workbench</title>
+    <prolog>
+        <author>Eric Browne</author>
+        <metadata>
+            <keywords>
+                <indexterm>administration </indexterm>
+                <indexterm>administration functions<index-see-also>preferences</index-see-also></indexterm>
+            </keywords>
+        </metadata>
+    </prolog>
+    <body>
+        <section>Administration tasks can be performed by a Workbench administrator. Mostly these
+            funtions are available through a separate Administrator's window.</section>
+    </body>
+</topic>

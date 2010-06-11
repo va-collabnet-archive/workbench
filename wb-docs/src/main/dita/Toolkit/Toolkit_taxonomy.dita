@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic16" xml:lang="en">
+ <title>Taxonomy Navigation and Display</title>
+ <prolog>
+  <metadata>
+   <keywords><indexterm>navigation <indexterm>taxonomy</indexterm></indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The IHTSDO Workbench IDE Framework provides multiple visualizations to help users
+   comprehend content that may contain multiple parents. For example, aspirin is both a salicylate
+   product and an antiplatelet agent. It appears in the child hierarchies of both parent concepts.
+   Concepts like aspirin that have more than one parent concept are said to have multiple
+   lineage.</section>
+  <section>In the taxonomy view, concepts with multiple parents are indicated with a green up-arrow
+   symbol, as shown in <xref href="#topic16/ad1002852" type="fig" format="dita"/>. Double-clicking
+   on this symbol will display a list of the concept’s other parent concepts, as shown in <xref
+    href="#topic16/ad1008022" type="fig" format="dita"/>. The up-arrow symbol will change to a
+   diagonal arrow. Double-click this symbol to collapse the list.</section>
+  <fig id="ad1002852">
+   <title>Concept “Aspirin” showing multiple lineage symbol</title>
+   <image href="../images/Toolkit_Images/toolkit_img_14.jpg" placement="break"/>
+  </fig>
+  <fig id="ad1008022">
+   <title>Concept “Aspirin” showing its other parent concept</title>
+   <image href="../images/Toolkit_Images/toolkit_img_15.jpg" placement="break"/>
+  </fig>
+  <section>In <xref href="#topic16/ad1002947" type="fig" format="dita"/>, <xref
+    href="#topic16/ad1002979" type="fig" format="dita"/> and <xref href="#topic16/ad1007169"
+    type="fig" format="dita"/>, three different visualizations for the concept “Amputation stump”
+   are presented. </section>
+  <section>In <xref href="#topic16/ad1002947" type="fig" format="dita"/>, the standard taxonomy view
+   is show with a second parent opened and expanded all the way back up to the top SNOMED CT
+   Concept. This visualization uses a standard tree viewer as the basis of the representation, but
+   expands the standard visualization by allowing all secondary parents to be expanded within the
+   viewer— using different icons, and a different direction to help the user comprehend the multiple
+   parentage being shown. </section>
+  <section>One advantage of this visualization is that you can view the siblings and children of the
+   concept at the same time that the multiple parentages are shown. </section>
+  <fig id="ad1002947">
+   <title>Taxonomy view showing “Amputation Stump”</title>
+   <image href="../images/Toolkit_Images/toolkit_img_16.jpg" placement="break"/>
+  </fig>
+  <section><xref href="#topic16/ad1002979" type="fig" format="dita"/> shows a lineage tree rendering
+   that only displays the multiple parentage, and pre-expands the tree to show the entire parent
+   lineage for the focused concept. The focused concept appears multiple times in blue. It appears
+   one time for each route between the focus concept and the top SNOMED CT concept. In this case
+   there are two different routes, and thus the focus concept appears twice. In this representation
+   the visualization is shown pre-expanded to the proper levels to help the user comprehend the
+   lineage. </section>
+  <fig id="ad1002979">
+   <title>Lineage tree view showing “Amputation Stump”<image
+     href="../images/Toolkit_Images/toolkit_img_17.jpg" placement="break"/></title>
+  </fig>
+  <section><xref href="#topic16/ad1007169" type="fig" format="dita"/> shows a lineage graph
+   rendering that only displays the multiple parentages. An advantage of this approach is that the
+   visualization often makes the lineage easier to comprehend, but the visualization is not as
+   compact as the previous visualizations, and does not show siblings and children like the taxonomy
+   view visualization does. </section>
+  <fig id="ad1007169">
+   <title>Lineage graph view showing “Amputation Stump”</title>
+   <image href="../images/Toolkit_Images/toolkit_img_18.jpg" placement="break"/>
+  </fig>
+ </body>
+</topic>
