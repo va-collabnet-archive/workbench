@@ -31,6 +31,15 @@ public class NidDataFromBdb implements I_GetNidData {
 
 	private static ExecutorService executorPool;
 	
+	static {
+		resetExecutorPool();
+	}
+
+	public static void resetExecutorPool() {
+		executorPool = Executors.newCachedThreadPool(new NamedThreadFactory(nidDataThreadGroup,
+				"Nid data service"));
+	}
+	
 	public static void close() {
 	    if (executorPool != null) {
 	        AceLog.getAppLog().info("Shutting down NidDataFromBdb executor pool.");
@@ -50,10 +59,6 @@ public class NidDataFromBdb implements I_GetNidData {
 		super();
 		this.nid = nid;
 		
-		if (executorPool == null) {
-			executorPool = Executors.newCachedThreadPool(new NamedThreadFactory(nidDataThreadGroup,
-			"Nid data service"));
-		}
 		readOnlyFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadOnly()));
 		readWriteFuture = executorPool.submit(new GetNidData(nid, Bdb.getConceptDb().getReadWrite()));
 	}

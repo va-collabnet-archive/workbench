@@ -2,7 +2,9 @@ package org.ihtsdo.cs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Timer;
@@ -18,6 +20,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 
@@ -149,6 +152,12 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         if (activity.isCompleteForComparison()) {
             timer.stop();
         }
+    }
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        // TODO Auto-generated method stub
+        
     }
 
 }
