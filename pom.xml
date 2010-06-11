@@ -13,9 +13,9 @@
     <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
                  dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit-2.5.x</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit-2.5.x</developerConnection>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit-2.5.x</url>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -92,9 +92,11 @@
         <module>wb-mojo</module>
         <module>wb-gui</module>        
         <module>wb-bdb</module>        
-        <module>wb-bdb-mojo</module>        
+        <module>wb-bdb-mojo</module>       
+        <!-- 
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>
+         --> 
     </modules>
     <profiles>
         <profile>
@@ -153,17 +155,4 @@
             </releases>
         </repository>
     </repositories>
-  <!-- TODO: to be moved into a organisational parent POM -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>maestro_ihtsdo.wb-snapshots</id>
-      <name>IHTSDO Workbench Snapshots Repository</name>
-      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>maestro_ihtsdo.wb-releases</id>
-      <name>IHTSDO Workbench Releases Repository</name>
-      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
-    </repository>
-  </distributionManagement>
 </project>
