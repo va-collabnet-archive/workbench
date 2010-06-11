@@ -243,6 +243,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	protected long lastChange = Long.MIN_VALUE;
 	protected long lastWrite = Long.MIN_VALUE;
+	protected long lastExtinctRemoval = Long.MIN_VALUE;
 
 	public void modified() {
 		lastChange = Bdb.gVersion.incrementAndGet();
