@@ -90,7 +90,8 @@ public class RelTupleFileUtil {
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
-                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
+                        String errorMessage =
+                                "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
                 }
@@ -125,67 +126,62 @@ public class RelTupleFileUtil {
 
             I_TermFactory termFactory = Terms.get();
 
-            if (!termFactory.hasId(c1Uuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: c1Uuid matches no identifier in database.");
-            }
-            if (!termFactory.hasId(c2Uuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: c2Uuid matches no identifier in database.");
-            }
-            if (!termFactory.hasId(charUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: charUuid matches no identifier in database.");
-            }
-            if (!termFactory.hasId(refUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: refUuid matches no identifier in database.");
-            }
-            if (!termFactory.hasId(relTypeUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: relTypeUuid matches no identifier in database.");
-            }
-            if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "Rel: statusUuid matches no identifier in database.");
-            }
-
-            I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid")); 
+            I_GetConceptData pathConcept = termFactory.getConcept((UUID) importConfig.getProperty("pathUuid"));
 
             I_GetConceptData concept = termFactory.getConcept(new UUID[] { c1Uuid });
             int rNid = termFactory.uuidToNative(relUuid);
             assert rNid != Integer.MAX_VALUE;
             I_RelVersioned irv = termFactory.getRelationship(rNid);
-            
+
+            if (!termFactory.hasId(c1Uuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: c1Uuid matches no identifier in database.");
+            }
+            if (!termFactory.hasId(c2Uuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: c2Uuid matches no identifier in database.");
+            }
+            if (!termFactory.hasId(charUuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: charUuid matches no identifier in database.");
+            }
+            if (!termFactory.hasId(refUuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: refUuid matches no identifier in database.");
+            }
+            if (!termFactory.hasId(relTypeUuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: relTypeUuid matches no identifier in database.");
+            }
+            if (!termFactory.hasId(statusUuid)) {
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "Rel: statusUuid matches no identifier in database.");
+            }
+
             if (irv == null) {
-                irv = termFactory.newRelationship(relUuid, concept, 
-                    termFactory.getConcept(relTypeUuid), 
-                    termFactory.getConcept(c2Uuid), 
-                    termFactory.getConcept(charUuid), 
-                    termFactory.getConcept(refUuid), 
-                    termFactory.getConcept(statusUuid), 
-                    group, 
-                    importConfig, 
-                    effectiveDate);
+                irv =
+                        termFactory.newRelationship(relUuid, concept, termFactory.getConcept(relTypeUuid), termFactory
+                            .getConcept(c2Uuid), termFactory.getConcept(charUuid), termFactory.getConcept(refUuid),
+                            termFactory.getConcept(statusUuid), group, importConfig, effectiveDate);
                 termFactory.addUncommittedNoChecks(concept);
             } else {
                 boolean found = false;
-                for (I_RelTuple irt: irv.getTuples()) {
-                    if (termFactory.getConcept(relTypeUuid).getNid() == irt.getTypeId() &&
-                            termFactory.getConcept(c2Uuid).getNid() == irt.getC2Id() &&
-                            termFactory.getConcept(charUuid).getNid() == irt.getCharacteristicId() && 
-                            termFactory.getConcept(refUuid).getNid() == irt.getRefinabilityId() &&
-                            termFactory.getConcept(statusUuid).getNid() == irt.getStatusId() &&
-                            group == irt.getGroup() &&
-                            pathConcept.getNid() == irt.getPathId()) {
+                for (I_RelTuple irt : irv.getTuples()) {
+                    if (termFactory.getConcept(relTypeUuid).getNid() == irt.getTypeId()
+                        && termFactory.getConcept(c2Uuid).getNid() == irt.getC2Id()
+                        && termFactory.getConcept(charUuid).getNid() == irt.getCharacteristicId()
+                        && termFactory.getConcept(refUuid).getNid() == irt.getRefinabilityId()
+                        && termFactory.getConcept(statusUuid).getNid() == irt.getStatusId() && group == irt.getGroup()
+                        && pathConcept.getNid() == irt.getPathId()) {
                         found = true;
                         break;
                     }
                 }
-                
+
                 if (!found) {
-                    I_RelPart newPart = (I_RelPart) irv.getTuples().iterator().next().makeAnalog(termFactory.getConcept(statusUuid).getNid(), 
-                        pathConcept.getNid(), effectiveDate);
+                    I_RelPart newPart =
+                            (I_RelPart) irv.getTuples().iterator().next().makeAnalog(
+                                termFactory.getConcept(statusUuid).getNid(), pathConcept.getNid(), effectiveDate);
                     newPart.setTypeId(termFactory.getConcept(relTypeUuid).getNid());
                     newPart.setCharacteristicId(termFactory.getConcept(charUuid).getNid());
                     newPart.setRefinabilityId(termFactory.getConcept(refUuid).getNid());

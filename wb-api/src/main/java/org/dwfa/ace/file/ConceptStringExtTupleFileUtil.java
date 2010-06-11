@@ -93,10 +93,11 @@ public class ConceptStringExtTupleFileUtil {
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
                     } else {
-                        String errorMessage = "No path with identifier: " + pathUuid + " and no path override specified";
+                        String errorMessage =
+                                "No path with identifier: " + pathUuid + " and no path override specified";
                         throw new Exception(errorMessage);
                     }
-                } 
+                }
                 statusUuid = UUID.fromString(lineParts[8]);
             } catch (Exception e) {
                 String errorMessage = "CidStr: Cannot parse UUID from string -> UUID " + e.getMessage();
@@ -121,25 +122,25 @@ public class ConceptStringExtTupleFileUtil {
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidStr: Refset UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidStr: Refset UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(componentUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidStr: Component UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidStr: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(conceptUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidStr: conceptUuid UUID matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidStr: conceptUuid UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(statusUuid)) {
-                ConceptConceptConceptExtTupleFileUtil.
-                writeWarning(outputFileWriter, lineCount, "CidStr: statusUuid matches no identifier in database.");
+                ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
+                    "CidStr: statusUuid matches no identifier in database.");
             }
             try {
-                refsetHelper.newConceptStringRefsetExtension(termFactory.getId(refsetUuid).getNid(), termFactory.getId(
-                    componentUuid).getNid(), termFactory.getId(conceptUuid).getNid(), extString, memberUuid, (UUID) importConfig.getProperty("pathUuid"),
-                    statusUuid, effectiveDate);
+                refsetHelper.newConceptStringRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
+                    .uuidToNative(componentUuid), termFactory.uuidToNative(conceptUuid), extString, memberUuid,
+                    (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "CidStr: Exception thrown while creating new concept string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");
