@@ -21,6 +21,14 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
+				<version>${project.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.ihtsdo</groupId>
+						<artifactId>wb-cement</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>export-cement-taxonomy</id>
