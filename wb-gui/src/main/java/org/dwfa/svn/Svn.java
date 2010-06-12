@@ -225,7 +225,7 @@ public class Svn implements I_HandleSubversion {
 		}
 	}
 
-	private static I_ShowActivity setupActivityPanel(String message)
+	public static I_ShowActivity setupActivityPanel(String message)
 			throws TaskFailedException {
 		try {
 			I_ShowActivity activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), message, false);

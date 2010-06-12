@@ -357,6 +357,13 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
             termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
             termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
+            
+            termFactory.addUncommittedNoChecks(memberRefset);
+            termFactory.addUncommittedNoChecks(refsetSpec);
+            termFactory.addUncommittedNoChecks(markedParent);
+            termFactory.addUncommittedNoChecks(promotionRefset);
+            termFactory.addUncommittedNoChecks(commentsRefset);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -378,8 +385,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             UUID conceptUuid = UUID.randomUUID();
 
             I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, isDefined, aceConfig, status.getNid());
-
-            termFactory.addUncommittedNoChecks(newConcept);
             return newConcept;
         } catch (Exception e) {
             e.printStackTrace();

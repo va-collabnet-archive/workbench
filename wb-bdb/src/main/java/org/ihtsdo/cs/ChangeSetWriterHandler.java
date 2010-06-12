@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Timer;
@@ -59,11 +58,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.changeSetWriterThreading = changeSetWriterThreading;
 		changeSetWriters.incrementAndGet();
 		this.changeSetPolicy = changeSetPolicy;
-		Svn.rwl.readLock().lock();
 	}
 
 	@Override
 	public void run() {
+		Svn.rwl.readLock().lock();
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
@@ -108,8 +107,9 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.complete();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} finally {
+			Svn.rwl.readLock().unlock();
 		}
-		Svn.rwl.readLock().unlock();
 	}
 
 	public static void addWriter(I_WriteChangeSet writer) {
