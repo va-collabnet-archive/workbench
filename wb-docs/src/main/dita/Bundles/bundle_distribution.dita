@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+<topic id="topic4" xml:lang="en">
+<title>Distribution and update via Continuum</title>
+<body>
+<section>Continuum is an Apache product for managing automatic updates and synchronisation
+of deployments in a distributed environment. </section>
+
+</body>
+</topic>
+

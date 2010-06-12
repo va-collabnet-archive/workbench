@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic1" xml:lang="en">
+ <title>Using the IHTSDO Workbench IDE</title>
+ <body>
+  <p>The International Health Terminology Standard Development Organisation (IHTSDO) Workspace IDE
+   supports agile methods for developing and maintaining concepts. The main window provides a number
+   of features and functions to help you locate and modify concepts, as well as check for
+   compatibility with other concepts. </p>
+  <p>Documentation and online help for the Editor is available from the Help menu. Users can choose either a searchable, 
+   printable PDF version of the IHTSDO Workbench Guidebook, or browsable HTML pages</p>
+ </body>
+</topic>

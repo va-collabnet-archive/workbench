@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="edit_paths" xml:lang="en">
+  <title>Understanding and using Paths</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>paths</indexterm>
+
+        <indexterm>paths<indexterm>editing</indexterm><indexterm>viewing</indexterm><indexterm>promotion</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The IHTSDO Workbench uses a powerful concept called a
+    <b>"path"</b>, in order to treat different parts of the terminology
+    hierarchy or hierarchies for different purposes. Each path has a unique
+    name and also starting point within the available set of terminology
+    hierarchies and versions. Paths can be used to restrict what is viewed,
+    what is edited, what is shared amongst co-workers, what is "promoted" for
+    processing by others, and for a range of other potential uses.</section>
+
+    <section id="ag"><title>About Paths</title>In a collaborative authoring
+    environment, each terminology author/editor might have his/her own editing
+    path. The path is specified as a concept in the taxonomy hierarchy such
+    that all descendent concepts are included in the named path. A concept can
+    lie on multiple paths. A path can inherit from other paths, by specifying
+    those parent paths as origins, somewhat like "styles" in word processors.
+    Disjoint paths can be almagamated into a single path. For example, <xref
+    href="#edit_paths/butterfly_diagram"/> shows a new path being created to
+    "join" two separate SNOMED CT extensions ( <i>UK Extension</i> and <i>UK
+    Drug Extension</i> ) into a single logical entity.</section>
+
+    <section><title>Editing
+    Path</title><indexterm>path<indexterm>editing</indexterm></indexterm><indexterm>path<indexterm>authoring<index-see-also>path<indexterm>editing</indexterm></index-see-also></indexterm></indexterm><indexterm>path<indexterm>development<index-see-also>path<indexterm>editing</indexterm></index-see-also></indexterm></indexterm><p>Sometimes
+    also referred to as "authoring path" or "developer path". There should
+    normally be one editing path for each user who is editing a terminology.
+    Changes to a terminology result in "changesets", stamped with the username
+    and a unique UUID of the path, as files on the filesystem in
+    the<codeblock>profiles/<i>&lt;username&gt;</i>/changesets</codeblock>
+    folder of the application bundle. These changesets are associated with a
+    specific path ( usually the Edit path ) set in the user's preference
+    panel.</p></section>
+
+    <section><title>Viewing
+    Path</title><indexterm>path<indexterm>viewing</indexterm></indexterm><indexterm>viewing
+    path</indexterm><p>A viewing path simply establishes the visibility of all
+    concepts belonging to the path. Visibility of the concepts in a path can
+    be toggled on/off using the preferences panel. Similarly, the concepts of
+    a path can be distinguished using a unique colour associated with the
+    path. There is no limit to the number of viewing paths which a user can
+    set. For those familiar with relational databases, a viewing path is
+    somewhat akin to a "view" into the data.</p></section>
+
+    <section><title>Promotion
+    Path</title><indexterm>path<indexterm>promotion</indexterm></indexterm><indexterm>promotion
+    path</indexterm><p>The promotion path is normally used in a collaborative
+    environment workflow for passing changes onto a reviewer or co-author once
+    a set of changes to the terminology are deemed finished by the
+    author.</p></section>
+
+    <section><title>Other Paths</title><p>Classifier Path - see <xref
+    href="../Classifying/Classifying_intro.dita#topic1"/></p></section>
+
+    <section id="editors_paths"><title>Editors' workflow and
+    paths</title><p>When a new user needs to be configured into a
+    collaborative authoring/editing environment, a number of paths need to be
+    established, usually by a systems administrator, as part of the adding new
+    user process ( see <xref
+    href="../Admin/Admin_new_user_creation.dita#new_user_creation"/>). The
+    following "butterfly"<indexterm>workflow<indexterm>editor's
+    paths</indexterm></indexterm> <indexterm>butterfly
+    diagram</indexterm>diagram, <xref href="#edit_paths/butterfly_diagram"/>,
+    illustrates the paths that might be required to support two independent
+    authors editing a terminology and synching and merging their changes into
+    a new version for ultimate release. <fig id="butterfly_diagram">
+        <title>"Butterfly" diagram of authors' edits and paths</title>
+
+        <image href="../images/Refsets_Images/butterfly4-7-10B-1.jpg"/>
+      </fig></p><p>The working paths of the two authors are <i>Author 1
+    dev,</i> <i>Author 2 dev</i>, <i>Author 1 promote</i>, <i>Author 2
+    promote</i>. The "dev" paths are the respective development paths of each
+    author, kept private to each author. The "promote" paths are the
+    respective paths used to promote the work of each author for sharing. All
+    the underlined paths may need to be established over and above the initial
+    existing paths shipped with the Workbench bundle. The <i>developer
+    template path</i> and the <i>promotion template path</i> are used as the
+    basis for cloning to produce each authors' development and promotion path
+    respectively. The names chosen for these paths are for illustrative
+    purposes only. Change sets produced by each author are labelled, for
+    example, ca1-<i>n</i> for author 1 and are timestamped e.g. <i>@t14</i> to
+    illustrate the sequence of edits by each author.</p></section>
+  </body>
+</topic>

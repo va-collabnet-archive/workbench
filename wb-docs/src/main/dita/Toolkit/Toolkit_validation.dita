@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic18" xml:lang="en">
+ <title>Data Validation</title>
+ <prolog>
+  <metadata>
+   <keywords><indexterm>data checking </indexterm><indexterm>validation</indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The IHTSDO Workbench IDE Framework enables structured data checks to occurring concept
+   creation, and at commit time. These data checks can be made optional, and only provide a warning
+   message, or they can be made mandatory and the user will be unable to commit changes while a
+   particular data check fails. </section>
+  <section><xref href="#topic18/ad1003165" type="fig" format="dita"/> shows an example of data
+   checks that have identified unedited default values that are currently uncommitted. These data
+   check warnings are presented without the use of modal dialogs, and are therefore less intrusive
+   to the user. At commit time, if the data checks have not been resolved, a modal dialog is
+   presented to the user, and the commit is unable to continue.</section>
+  <fig id="ad1003165">
+   <title>Dynamic data validation checks are performed and presented to the user in an IHTSDO
+    Workbench IDE.</title>
+   <image href="../images/Toolkit_Images/data_validation.jpg" placement="break"/>
+  </fig>
+ </body>
+</topic>

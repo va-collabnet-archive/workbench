@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="namespace_ID_allocation">
+  <title>Why do I get an "UnsatisfiedLinkError: no svnjavahl in
+  java.library.path"?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>UnsatisfiedLinkError<indexterm>no
+        svnjavahl</indexterm></indexterm>
+
+        <indexterm><indexterm>svnjavahl</indexterm><indexterm>UnsatisfiedLinkError</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><p>On Windows, you need to install the Collabnet Subversion
+    client on your computer. After successful installation, you additionally
+    need to copy the files in the svn folder of your bundle to the collabnet
+    subversion client installation folder to enable the Java binding. The
+    target folder is typically:<codeblock>C:\Program Files\Collabnet Subversion</codeblock></p></section>
+  </body>
+</topic>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="import-export">
+  <title>Refset import, compute and export via Maven</title>
+
+  <body>
+    <section><title>Project Checkout</title></section>
+
+    <note>The following procedures should be carried out by an experienced
+    software engineer, familiar with the Maven build process.</note>
+
+    <note>The names and locations of refsets and files are examples only, and
+    will need to be changed appropriately.</note>
+
+    <p>Check out the appropriate project branch containing the refsets from
+    the workspace area ( e.g. <codeblock>https://csfe.aceworkspace.net/svn/repos/dmd/branches/2009-04-01-trial-1/dev/cfh_refset_release</codeblock></p>
+
+    <p>Ensure that adequate memory is allocated to Maven by creating a
+    <codeph>MAVEN_OPTS</codeph> environmental variable with the value of
+    <codeblock><codeph>-Xms700m -Xmx1400m</codeph> </codeblock></p>
+
+    <p>A sample project has been initially configured to import, compute and
+    export <i>Sleep_Removed and Alcohol</i> refsets. </p>
+
+    <section><title>Build procedure:</title></section>
+
+    <p><ol>
+        <li>To run, open a command prompt, <codeph>cd</codeph> to the working
+        directory where the above project was checked out.</li>
+
+        <li>Type in <codeblock>mvn clean install -e</codeblock></li>
+
+        <li>Wait for project build to complete. This will take approximately
+        10 minutes, depending on computer speed.</li>
+      </ol></p>
+
+    <section><title>Viewing the results (RF2 and subset export files for
+    Sleep_Removed refset spec): </title></section>
+
+    <p>After the build has completed, change into the
+    <codeph>target/classes/rf2_sctid/refsets</codeph> directory, and locate
+    the RF2 export files. There will be a file for each refset. Since the
+    current member set generation also creates "parent" members in addition to
+    "normal" members, these will be included in the export (in their own
+    file). The RF2 files can also be located in the project's generated JAR
+    file - this can be found in the local Maven repository, which will look
+    something like:<codeblock>.m2\repository\net\nhs\uktc\cfh_refset_release\2009.06.01-SNAPSHOT\cfh_refset_release- 2009.06.01-SNAPSHOT.jar</codeblock></p>
+
+    <p>To view the import summary report, cd to target/reports and open the
+    relevant files. There is a report file for each refset spec that is
+    imported (currently 2 refset specs are imported, so there should be two
+    reports). Modifying the POM file to export additional refsets: The project
+    has been initially configured to import, compute and export
+    <i>Sleep_Removed and Alcohol</i> refsets. </p>
+
+    <ol>
+      <li>Add refset import file. To import an additional refset spec, the
+      tuple file (e.g. Activities of daily living.txt) must be added to the
+      cfh_refset_release project in the following directory:
+      <codeph>src/main/resources/refset_specs</codeph>. Ideally, the file
+      should be added to SVN and committed, before the build is run.</li>
+
+      <li>Add import mojo execution. The pom.xml must be updated prior to the
+      build being run. A new execution of the
+      <codeph>import-single-refset-spec</codeph> mojo must be added to pom
+      file. This should be added after the existing execution (for
+      Sleep_Removed.txt and Alcohol.txt), using the same phase, so that it
+      runs in the correct order.<p/><p>Below is a template that can be used
+      when adding the mojo execution code to the pom. The two bolded file
+      names must be updated to the relevant file names. refsetSpecFile refers
+      to the file added to src/main/resources/refset_specs which contains the
+      refset specification's tuples, and reportFile is a new unique file name
+      that will contain this refset spec's import summary report. The ID tag
+      must also be updated to a unique name. e.g. to import “<i>Activities of
+      daily living</i>” refset this could be set to
+      “<i>import-activities-daily-living-refset</i>”.<codeblock>execution&gt;
+   &lt;id&gt;<b>import-sleep-removed</b>&lt;/id&gt;
+   &lt;phase&gt;process-resources&lt;/phase&gt;
+   &lt;goals&gt;
+      &lt;goal&gt;import-single-refset-spec&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+      &lt;refsetSpecFile&gt;
+${project.basedir}<b>/src/main/resources/refset_specs/Sleep_Removed.txt</b>
+      &lt;/refsetSpecFile&gt;
+         &lt;reportFile&gt;
+${project.basedir}<b>/target/reports/Sleep_Removed_report.txt</b>
+         &lt;/reportFile&gt;
+      &lt;!-- &lt;editPathDescriptor&gt;&lt;uuid&gt;&lt;/uuid&gt;&lt;description&gt;&lt;/description&gt;
+           &lt;/editPathDescriptor &gt;	--&gt;
+   &lt;/configuration&gt; 
+&lt;/execution&gt;</codeblock></p><p>The <codeph>editPathDescriptor</codeph>
+      parameter has been commented out; however, this can be used if you wish
+      to override the path data in the refset spec file with a different path.
+      To do this, uncomment the <codeph>editPathDescriptor</codeph>, and enter
+      the UUID and a description of the path you wish to override
+      with.</p><p/></li>
+
+      <li>Add compute mojo execution. A mojo execution must added to compute
+      the membership of the refset, as per the following
+      example/template:<codeblock> &lt;execution&gt;
+    &lt;id&gt;<b><i>compute-sleep-removed-membership</i></b>&lt;/id&gt;
+    &lt;phase&gt;process-classes&lt;/phase&gt;
+    &lt;goals&gt;
+       &lt;goal&gt;compute-single-refset-membership&lt;/goal&gt;
+    &lt;/goals&gt;
+    &lt;configuration&gt;
+       &lt;refsetSpecDescriptor&gt;
+          &lt;uuid&gt;<b><i>01f42c08-f013-396a-b189-d81b4384f012</i></b>&lt;/uuid&gt;
+          &lt;description&gt;<i><b>Sleep_Removed ref set Spec</b></i>&lt;/description&gt;
+       &lt;/refsetSpecDescriptor&gt;
+    &lt;/configuration&gt;
+ &lt;/execution&gt;</codeblock> The three fields in bold must be updated – a
+      unique value for the ID tag, and the UUID and a description used by the
+      new refset spec.<p/></li>
+
+      <li>Add refset inclusion spec to the existing RF2 export mojo execution.
+      <codeblock>&lt;execution&gt;
+   &lt;id&gt;export-refsets&lt;/id&gt;
+    &lt;phase&gt;generate-test-resources&lt;/phase&gt;
+    &lt;goals&gt;
+       &lt;goal&gt;rf2-export&lt;/goal&gt;
+    &lt;/goals&gt;
+    &lt;configuration&gt;
+       &lt;rf2Descriptor&gt;
+          &lt;module&gt;
+             &lt;!-- TODO update to real module FSN/UUID --&gt;
+             &lt;uuid&gt;2faa9260-8fb2-11db-b606-0800200c9a66&lt;/uuid&gt;
+             &lt;description&gt;Workbench Auxiliary&lt;/description&gt;
+          &lt;/module&gt;
+          &lt;namespace&gt;1999999&lt;/namespace&gt;
+          &lt;project&gt;03&lt;/project&gt;
+          &lt;contentSubType&gt;National&lt;/contentSubType&gt;
+          &lt;countryCode&gt;UK&lt;/countryCode&gt; 
+       &lt;/rf2Descriptor&gt;
+       &lt;releaseVersion&gt;1&lt;/releaseVersion&gt;
+ &lt;!-- TODO update to real release version --&gt; 
+       &lt;uuidRefsetOutputDirectory&gt;
+${project.build.directory}/classes/rf2_uuid/refsets
+       &lt;/uuidRefsetOutputDirectory&gt;
+       &lt;sctidRefsetOutputDirectory&gt;
+${project.build.directory}/classes/rf2_sctid/refsets
+       &lt;/sctidRefsetOutputDirectory&gt;
+       &lt;readWriteMapDirectory&gt;
+            src/main/sct-uuid-maps 
+       &lt;/readWriteMapDirectory&gt;
+       &lt;refsetInclusionSpecs&gt;
+          &lt;refsetInclusionSpec&gt;
+             &lt;refsetConcept&gt; 
+                &lt;uuid&gt;338a65cb-9b55-3d69-a563-aaf030829da7&lt;/uuid&gt; 
+                &lt;description&gt;Alcohol&lt;/description&gt;
+             &lt;/refsetConcept&gt;
+          &lt;/refsetInclusionSpec&gt;
+          &lt;refsetInclusionSpec&gt; 
+             &lt;exportFile&gt;sleep_removed.txt&lt;/exportFile&gt;
+             &lt;refsetConcept&gt;
+                &lt;uuid&gt;5f3f1763-7678-3688-9141-3b94c9c4acc0&lt;/uuid&gt; 
+                &lt;description&gt;Sleep_Removed&lt;/description&gt;
+             &lt;/refsetConcept&gt;
+          &lt;/refsetInclusionSpec&gt;
+          <b>&lt;refsetInclusionSpec&gt;
+             &lt;exportFile&gt;newrefset.txt&lt;/exportFile&gt;
+             &lt;refsetConcept&gt;
+                &lt;uuid&gt;5f3f1763-7678-3688-9141-3b94c9c4acc0&lt;/uuid&gt;
+                &lt;description&gt;new refset description&lt;/description&gt;
+             &lt;/refsetConcept&gt;
+          &lt;/refsetInclusionSpec&gt;</b>
+       &lt;/refsetInclusionSpecs&gt;
+   &lt;/configuration&gt;
+&lt;/execution&gt;</codeblock> <p>A new refset inclusion spec tag needs to be
+      added for each refset that is to be exported in RF2. In the example
+      above, the third refset inclusion spec is the new one, that should be
+      modified to include the new refset details.</p><p>The exportFile tag can
+      be used to <b>override</b> the RF2 file naming conventions – by default
+      (if left undefined/empty) this will use RF2 file naming convention. As
+      seen above, the exportFile tag is optional. </p><p>A refsetConcept tag
+      must be added that specifies the UUID and a description of the refset to
+      be exported. e.g. after computing the <i>Sleep_Removed</i> refset spec,
+      the generated refsets would include: <i>Sleep_Removed</i>,
+      <i>Sleep_Removed marked parents</i>, <i>Sleep_Removed refset spec</i>
+      etc. By not including these in the refset inclusion spec, they will be
+      filtered out when exporting the refsets. You may export multiple
+      refsets, by specifying each in it's own refset inclusion spec
+      tag.</p></li>
+
+      <li>Add refset inclusion spec to subset export mojo execution. Similarly
+      to the RF2 export, a refset inclusion spec needs to be added to the
+      subset-export mojo execution.<p/><codeblock>&lt;execution&gt;
+   &lt;id&gt;export-subsets&lt;/id&gt;
+   &lt;phase&gt;generate-test-resources&lt;/phase&gt;
+   &lt;goals&gt;
+      &lt;goal&gt;subset-export&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+      &lt;releaseVersion&gt;20090401&lt;/releaseVersion&gt;
+      &lt;!-- TODO update to real release version --&gt;
+      &lt;subsetOutputDirectory&gt;
+${project.build.directory}/classes/subset_sctid/subsets
+      &lt;/subsetOutputDirectory&gt;
+      &lt;countryCode&gt;uk&lt;/countryCode&gt; 
+      &lt;readWriteMapDirectory&gt;
+        src/main/sct-uuid-maps
+      &lt;/readWriteMapDirectory&gt; 
+      &lt;refsetInclusionSpecs&gt;
+         &lt;refsetInclusionSpec&gt;
+            &lt;refsetConcept&gt;
+               &lt;uuid&gt;338a65cb-9b55-3d69-a563-aaf030829da7&lt;/uuid&gt;
+               &lt;description&gt;Alcohol&lt;/description&gt;
+            &lt;/refsetConcept&gt;
+         &lt;/refsetInclusionSpec&gt;
+         &lt;refsetInclusionSpec&gt;
+            &lt;exportFile&gt;sleep_removed.txt&lt;/exportFile&gt;
+            &lt;refsetConcept&gt;
+               &lt;uuid&gt;5f3f1763-7678-3688-9141-3b94c9c4acc0&lt;/uuid&gt;
+               &lt;description&gt;Sleep_Removed&lt;/description&gt;
+            &lt;/refsetConcept&gt;
+         &lt;/refsetInclusionSpec&gt;
+         <b>&lt;refsetInclusionSpec&gt;
+            &lt;exportFile&gt;newrefset.txt&lt;/exportFile&gt;
+            &lt;refsetConcept&gt;
+               &lt;uuid&gt;5f3f1763-7678-3688-9141-3b94c9c4acc0&lt;/uuid&gt;
+               &lt;description&gt;new refset description&lt;/description&gt;
+            &lt;/refsetConcept&gt;
+         &lt;/refsetInclusionSpec&gt;</b>
+      &lt;/refsetInclusionSpecs&gt;
+   &lt;/configuration&gt;
+&lt;/execution&gt;</codeblock><p>To preserve a subset original ID, it must be
+      attached to the refset member concept (not the refset spec concept).
+      e.g., after modifying the original Alcohol file to attach to the refset
+      member concept, the following file was generated:</p><p><codeblock>  SUBSETID     SUBSETORIGINALID  SUBSETVERSION SUBSETNAME   SUBSETTYPE   LANGUAGECODE   REALMID   CONTEXTID
+21031999999102   911000000134      UNKNOWN     Alcohol       UNKNOWN         en         UNKNOWN    UNKNOWN
+ 5031999999108      UNKNOWN        UNKNOWN   Sleep_Removed   UNKNOWN         en         UNKNOWN    UNKNOWN</codeblock></p><p/></li>
+    </ol>
+
+    <section><title>Limitations</title><p>Currently the import and compute
+    mojos have been written to handle a single refset, meaning that each
+    refset spec must have its own mojo execution.</p></section>
+  </body>
+</topic>

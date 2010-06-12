@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="UsingEditor" title="Using the Editor" xml:lang="en_US">
+  <title>Using the Workbench Editor</title>
+
+  <topicref href="Editor_intro.dita" navtitle="Using the IHTSDO Workbench IDE"
+            type="topic">
+    <topicref href="Editor_launching.dita"
+              navtitle="Launching the IHTSDO Workbench" type="topic"/>
+
+    <topicref href="Editor_hierarchy_view.dita"
+              navtitle="Using the Hierarchy View " type="topic"/>
+
+    <topicref href="Editor_concept_area.dita"
+              navtitle="Reviewing the Concept Work Area" type="topic"/>
+
+    <topicref href="Editor_menu_bar.dita" navtitle="Reviewing the Menu Bar"
+              type="topic"/>
+
+    <topicref href="Editor_paths.dita" type="topic"/>
+
+    <topicref href="Editor_paths_create.dita" type="topic"/>
+
+    <topicref href="Editor_preferences_panel.dita"
+              navtitle="Understanding the Preferences Panel" type="topic"/>
+
+    <topicref href="Editor_list_view.dita" navtitle="Using the List View "
+              type="topic"/>
+
+    <topicref href="Editor_searching.dita"
+              navtitle="Using the Search Function " type="topic"/>
+
+    <topicref href="Editor_search_variables.dita"
+              navtitle="Using the Search Variables " type="topic"/>
+
+    <topicref href="Editor_advanced_search.dita"
+              navtitle="Executing an Advanced Search" type="topic"/>
+
+    <topicref href="Editor_searching_find_similar.dita"
+              navtitle="Find Similar Concepts Search" type="topic"/>
+
+    <topicref href="Editor_change_set_submission.dita"
+              navtitle="Submitting a Change Set to the IHTSDO Workspace"
+              type="topic"/>
+
+    <topicref href="Editor_refsets.dita" navtitle="Using Reference Sets"
+              type="topic"/>
+
+    <topicref href="Editor_adding_to_spec_refset.dita"
+              navtitle="Adding a Concept to a Specification Reference Set"
+              type="topic"/>
+
+    <topicref href="Editor_displaying_spec_refsets.dita"
+              navtitle="Displaying Specification Refset Concept Types in the Hierarchy List"
+              type="topic"/>
+
+    <topicref href="Editor_displaying_refset_members.dita"
+              navtitle="Displaying Refset Members in the Hierarchy List"
+              type="topic"/>
+
+    <topicref href="Editor_refset_defaults.dita"
+              navtitle="Changing the Refset Default Values" type="topic"/>
+
+    <topicref href="Editor_refset_preferences.dita"
+              navtitle="Setting Refset Preferences" type="topic"/>
+
+    <topicref format="dita" href="Editor_classifier_preferences.dita"
+              locktitle="yes" navtitle="Setting Classifier Preferences"
+              type="topic"/>
+
+    <topicref href="Editor_refset_inclusion_types.dita"
+              navtitle="Inclusion Types" type="topic"/>
+
+    <topicref href="Editor_keyboard.dita" navtitle="Keyboard shortcuts"
+              type="topic"/>
+
+    <topicref href="Editor_summary.dita" navtitle="Conclusion" type="topic"/>
+  </topicref>
+</map>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+ 
+ <topic id="topic7" xml:lang="en">
+  <title>Graphical Process Builder</title>
+  <prolog><author>Keith Campbell</author>
+   <metadata><keywords><indexterm>Process Builder </indexterm></keywords></metadata>
+  </prolog>
+  <body>
+   <section>The IHTSDO Workbench IDE provides a graphical process builder for creating business
+    processes, shown in <xref href="#topic7/ad1006776" type="fig" format="dita"/>. The graphical
+    process builder enables processes to be created, saved, and restored. These processes can in
+    turn be used as tasks in other processes allowing for data encapsulation and process reuse. </section>
+   <fig id="ad1006776">
+    <title>The IHTSDO Workbench DWFA Framework's Graphical Process Builder</title>
+    <image href="../images/Toolkit_Images/graphical_process_builder.jpg" placement="break"/>
+   </fig>
+   <section>The availability of the process builder within the IHTSDO Workbench IDEs are
+    configurable by the IDE developer. This configurability allows this functionality to be exposed
+    to some users for some tasks, and also allows this functionality to be omitted when this
+    functionality is inappropriate for the anticipated tasks or end users. </section>
+   <section>Business processes are created by dragging task components listed on the left hand side
+    of the process builder to the process diagram on the right hand side, and then connecting the
+    tasks together to form a defined sequence. </section>
+   <section><xref href="#topic7/ad1016211" type="fig" format="dita"/> presents a prototypical
+    dual-independent review workflow presented as a UML “swimlane” activity diagram. Workflows such
+    as presented in that diagram can be implemented using the DWFA framework. </section>
+   <section>The graphical correspondence between the graphical process builder and the UML activity
+    diagrams simplifies workflow implement from UML specifications. </section>
+   <fig id="ad1016211">
+    <title>Example dual-independent review workflow</title>
+    <!--<image href="../images/Toolkit_Images/toolkit_img_4a.jpg" placement="break" width="367"  height="469"/> -->
+    <image href="../images/Toolkit_Images/duplicate_review.jpg" placement="break"/>
+   </fig>
+  </body>
+ </topic>
+ 
+

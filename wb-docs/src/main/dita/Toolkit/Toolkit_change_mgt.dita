@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+ 
+ <topic id="topic17" xml:lang="en">
+  <title>Change and Conflict Management</title>
+  <prolog><metadata><keywords><indexterm>conflict management </indexterm></keywords></metadata></prolog>
+  <body>
+   <section>The IHTSDO Toolkit provides means to graphically present changes between any set of two
+    or more development positions, and allows the user to visualize differences—and quickly resolve
+    any differences if desired—within a simple interface.</section>
+   <section>If you have selected more than one view path, the Conflicts toggle displays (or hides) a
+    view of conflicts between those paths. <xref href="#topic17/ad1008071" type="fig" format="dita"
+    /> shows this interface populated with the shared components, the differences, and each of the
+    original definitions of the concept “Trigger point (body structure)” in the 31-JAN-2003 release,
+    and the latest SNOMED release. </section>
+   <section>The resolution panel on the upper left of the conflicts view shows the common
+    (agreeing) components of the conflicting versions. The upper right panel shows the differences
+    between the versions, and the bottom panels show the original definitions. </section>
+   <section>The color coding of the differences helps the user trace the differences back to their
+    source. </section>
+   <section>Using this view, users can add components to the resolution by double clicking on them.
+    The implement button will make the necessary changes on the current editing path to implement
+    the resolution. </section>
+   <fig id="ad1008071">
+    <title>Conflicts View showing “Trigger point (body structure)”</title>
+    <image href="../images/Toolkit_Images/toolkit_img_19.jpg" placement="break" />
+   </fig>
+  </body>
+ </topic>
+ 
+

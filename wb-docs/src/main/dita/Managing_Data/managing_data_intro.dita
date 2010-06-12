@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+<topic id="topic1" xml:lang="en">
+<title>Data Import</title>
+ <prolog><metadata><keywords><indexterm>Import of termsets</indexterm></keywords></metadata></prolog>
+ <body><p>Different user requirements will determine what versions of what terminologies 
+  need to be preloaded into the inbuilt database. The Workbench supports the importing 
+  of individual terminology sets into the versioned database</p></body>
+</topic>
+

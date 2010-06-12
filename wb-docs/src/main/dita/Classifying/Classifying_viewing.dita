@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/dtd/task.dtd">
+<task id="viewing_results">
+  <title>Viewing Results</title>
+
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Toggle the results view in the concept panel using the view
+        button <image
+        href="../images/classifier_images/classifier_toggle_small.jpg"/>.
+        </cmd>
+
+        <stepresult>At the bottom of the concept panel, the results of the
+        classifier can be seen. There are 4 tabs, labelled <b>Normal
+        Forms</b>, <b>Differences</b>, <b>Equivalents</b> and
+        <b>Logic</b>.<p>The Normal Forms tab provides a concise representation
+        of the relationships for the selected concept, expressed for each of
+        the available forms. These forms are respectively:-<ul>
+            <li>Stated form (SF)<indexterm>stated
+            form</indexterm><indexterm>SF</indexterm></li>
+          </ul></p><p><ul>
+            <li>Inferred
+            (I)<indexterm>inferred</indexterm><indexterm>I</indexterm></li>
+          </ul></p><p><ul>
+            <li>Distributed Normal Form (DN)<indexterm>distributed normal
+            form</indexterm><indexterm>DN</indexterm></li>
+          </ul></p><p><ul>
+            <li>Authoring Normal Form (AN)<indexterm>authoring normal
+            form</indexterm><indexterm>AN</indexterm></li>
+          </ul></p><p><ul>
+            <li>Short Canonical Form (SC)<indexterm>short canonical
+            form</indexterm><indexterm>SC</indexterm></li>
+          </ul></p><p><ul>
+            <li>Long Canonical Form (LC)<indexterm>long canonical
+            form</indexterm><indexterm>LC</indexterm></li>
+          </ul></p><p/><fig>
+            <title>Normal Form Tab showing all relationships for a given
+            concept as determined by the Classifier</title>
+
+            <image href="../images/classifier_images/classifier_view.jpg"/>
+          </fig><p> </p></stepresult>
+      </step>
+    </steps>
+  </taskbody>
+</task>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic11" xml:lang="en">
+ <title>Build Process Automation Framework</title>
+ <prolog>
+  <author>Keith Campbell</author>
+  <metadata>
+   <keywords><indexterm>Build Process Automation Framework</indexterm><indexterm>BPA
+     framework</indexterm></keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>The build process automation framework is founded on Maven. Because of this foundation,
+   we are able to leverage a large software development community and a build tool that provides the
+   following benefits:</section>
+  <ul>
+   <li>Simple project setup that follows best practices - get a new project or module started in
+    seconds</li>
+   <li>Consistent usage across all projects means no ramp up time for new developers coming onto a
+    project</li>
+   <li>Superior dependency management including automatic updating and automatic dependency closures
+    (also known as transitive dependencies)</li>
+   <li>Able to easily work with multiple projects at the same time</li>
+   <li>A large and growing repository of libraries and metadata to use out of the box, and
+    arrangements in place with the largest open source projects for real-time availability of their
+    latest releases</li>
+   <li>Extensible, with the ability to easily write plugins in Java or scripting languages</li>
+   <li>Instant access to new features with little or no extra configuration</li>
+   <li>Model based builds: Maven is able to build any number of projects into predefined output
+    types such as a JAR, WAR, or distribution based on metadata about the project, without the need
+    to do any scripting in most cases.</li>
+   <li>Coherent site of project information: Using the same metadata as for the build process, Maven
+    is able to generate a web site or PDF including any documentation you care to add, and adds to
+    that standard reports about the state of development of the project.</li>
+   <li>Release management and distribution publication: Without much additional configuration, Maven
+    will integrate with your source control system such as Subversion and manage the release of a
+    project based on a certain tag. It can also publish this to a distribution location for use by
+    other projects. Maven is able to publish individual outputs such as a JAR, an archive including
+    other dependencies and documentation, or as a source distribution.</li>
+   <li id="ad1001961">Dependency management: Maven encourages the use of a central repository of
+    JARs and other dependencies. Maven comes with a mechanism that your project's clients can use to
+    download any JARs required for building your project from a central JAR repository. This
+    mechanism allows users of Maven to reuse JARs across projects and encourages communication
+    between projects to ensure that backward compatibility issues are dealt with.<indexterm>jar
+     files </indexterm></li>
+  </ul>
+  <section>Taken together, these features will allow IHTSDO and Release Centers to standardize and
+   automate the terminology development process, resulting in increased productivity,
+   responsiveness, and product quality. </section>
+ </body>
+</topic>

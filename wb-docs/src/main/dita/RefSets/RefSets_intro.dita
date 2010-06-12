@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en">
+  <title>Reference Sets</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>reference sets</indexterm>
+
+        <indexterm>subsets<index-see-also>refsets</index-see-also></indexterm>
+
+        <indexterm>refsets</indexterm>
+
+        <!--    <indexterm>refsets<index-see-also>reference sets</index-see-also></indexterm>-->
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>Reference sets, or <i>Refsets</i> as they are more commonly
+    known, are formal representations for identifying subsets of a terminology
+    for specific purposes, and which conform to the IHTSDO's reference set
+    specifications. Uses can include language specific termsets, value sets
+    for constraining data element values, mappings between two terminologies,
+    navigation support for data entry, and many other potential applications.
+    A <ph>refset</ph> is a set of concepts, descriptions, or relationships
+    that are appropriate to a particular language, dialect, country,
+    specialty, organization, user or context. In its simplest form, a refset
+    is a list of Universally Unique Identifiers (UUIDs), where each UUID
+    refers to one component of the terminology hierarchy, and makes it a
+    member of the refset (a refset member).</section>
+
+    <section id="refsets"><title>SNOMED CT Refsets</title><p>During 2008 and
+    2009 IHTSDO evolved their Refset specification and aligned it with the
+    SNOMED Release Format version 2. The Refset Specification is designed to
+    replace the earlier <xref format="dita" href="#topic1/subsets"/>
+    specification developed by the College of American
+    Pathologists.</p></section>
+
+    <section id="subsets"><title>SNOMED CT Subsets</title><p>The original
+    SNOMED CT Subset specification has been deemed inadequate to support the
+    current and future requirements of IHTSDO and its affiliates. It will be
+    deprecated over time. </p> <note>Whilst the IHTSDO Workbench IDE provides
+    for the creation and management of Refsets, it now also supports the
+    ability to import legacy SNOMED CT Subsets for conversion to Refsets. It
+    is also possible to export Subsets using the Maven build tool, as
+    described in <xref href="Subsets_export-maven.dita#subset_export-maven"
+    id="S"/> </note></section>
+  </body>
+</topic>

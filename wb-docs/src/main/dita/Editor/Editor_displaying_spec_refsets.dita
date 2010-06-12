@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+ <topic id="topic14" xml:lang="en">
+  <title>Displaying Specification Refset Concept Types in the Hierarchy List</title>
+  <body>
+   <section>IHTSDO IDE can be set to display icons in the hierarchy list next to those concepts that
+    are members of one or more specification refsets. An icon is shown for each refset of which the
+    concept is a member. There may be more than one icon per concept. The type of icon indicates the
+    concept type associated with the membership in the refset, as shown in </section>
+   <fig id="ag942140">
+    <title>Refset Concept Types in Hierarchy List</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_62.jpg"
+     placement="break" width="230" height="120"/>
+   </fig>
+   <section>The display of these icons must be enabled in the Preferences settings, under the View
+    tab, on the refset sub-tab (under Refsets to show in taxonomy view). To add a refset, drag it
+    from the hierarchy view pane onto the refset sub-tab, as shown in . To disable the display of
+    icons for an associated refset, highlight the refset in the list and press the Delete
+    key.</section>
+   <fig id="ag942163">
+    <title>Enabling Display of Concept Refset Types in Preferences Panel</title>
+    <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_63.jpg"
+     placement="break" width="469" height="283"/>
+   </fig>
+  </body>
+ </topic>
+
+ 

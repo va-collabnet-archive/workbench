@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="import-export">
+  <title>Refset metadata report generation - overview</title>
+
+  <body>
+    <note>The following procedures should be carried out by an experienced
+    software engineer, familiar with the Maven build process.</note>
+
+    <p>The following sections describe the usage of the
+    <codeph>RefsetListing</codeph> Maven mojo in
+    <codeph>org.dwfa.mojo.refset</codeph> of the Workbench's
+    <codeph>term-mojo</codeph> module. This mojo produces an HTML formatted
+    report of the refset metadata in the Workbench database. The Maven POM
+    should do a “<codeph>vodb-open</codeph>” prior to the
+    “<codeph>refset-listing</codeph>” goal, followed by a
+    “<codeph>vodb-close</codeph>”. </p>
+  </body>
+</topic>

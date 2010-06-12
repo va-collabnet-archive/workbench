@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="IDE_terminologist" xml:lang="en">
+    <title>Terminologist IDE</title>
+
+    <body>
+      <section>The Clinical Terminologist’s IDE can be integrated into the
+      CollabNet platform in an equivalent way that software developer’s IDEs
+      are integrated. Today, the integration supports integration with the
+      configuration management functions of the CollabNet platform, but future
+      efforts could integrate the Clinical Terminologist’s IDE into the issue
+      and project tracker functions of the platform as well. Such integration
+      would allow for integration of the Clinical Terminologist IDEs with
+      trackers that might manage new term submissions, defect identification,
+      and project management.</section>
+
+      <section>A prototypical Clinical Terminologist IDE is shown in <xref
+      format="dita" href="#IDE_terminologist/ac999578" type="fig"/>. Within
+      this IDE, the terminologist can view content via taxonomy navigation and
+      advanced search, add new or edit existing content, develop business
+      processes to automate batch activities, create maps from one terminology
+      or classification to another, develop reference sets, manage dialects,
+      review historical content, and complete scripted assignments delivered
+      to them in an inbox.</section>
+
+      <section>This basic Clinical Terminologist IDE has been used, and
+      customized by several organizations to meet their development
+      needs.</section>
+
+      <fig id="ac999578">
+        <title>Prototypical Terminologist IDE demonstrating browsing of
+        polyhierarchies, comprehensive history tracking, and inexact search
+        with hierarchy exclusion filter.</title>
+
+        <image align="center"
+               href="../images/Ide_Support_Images/typical_IDE.jpg"
+               placement="break"/>
+      </fig>
+
+      <section/>
+
+      <section id="ac999683">Australia’s National Center for Classification in
+      Health (NCCH) has taken the Clinical Terminologist’s IDE and have been
+      using it to develop mappings between classification systems and SNOMED,
+      and have also been creating SNOMED and classification system extensions
+      using the IHTSDO Workbench IDE.<indexterm>NCCH </indexterm></section>
+
+      <section>An example of how NCCH is using the IHTSDO Workbench IDE is
+      shown in <xref format="dita" href="#IDE_terminologist/ac999719"
+      type="fig"/>. In this Figure, note that theEmergency Department (ED)
+      concept “Blunt injury – heel” shows two relationships of type “map to
+      extension.” In this example, the original ED term and meaning needed to
+      be preserved, but there was no existing SNOMED CT concept that exactly
+      captured the meaning. Two modelers independently created a new SNOMED CT
+      extension concept “Blunt injury of heel,” and used the relationship type
+      “map to extension” to link the original ED term with the new SNOMED CT
+      concept. Since both modelers independently created the map, and the
+      extension concept, the NCCH extension now has a ‘duplicate’ that is
+      easily removed via an IHTSDO Workbench business process that they
+      created.</section>
+
+      <fig id="ac999719">
+        <title>Mapping IDE demonstrating mapping to an extension concept with
+        dual modeling</title>
+
+        <image align="center"
+               href="../images/Ide_Support_Images/idesupport_img_4.jpg"
+               placement="break"/>
+      </fig>
+
+      <section>In this example, they have also demonstrated that their
+      modelers can create mapping and extension content understandably,
+      reproducibly, and usefully (URU) via a dual modeling and
+      mapping.</section>
+
+      <section id="ac999739">NCCH has also been using the IHTSDO Workbench IDE
+      to track mapping progress. <xref format="dita"
+      href="#IDE_terminologist/ac999783" type="fig"/> and <xref format="dita"
+      href="#IDE_terminologist/ac999804" type="fig"/> show example metrics
+      that they have been derived from the IHTSDO Workbench Environment.
+      <indexterm>mapping </indexterm></section>
+
+      <fig id="ac999783">
+        <title>Overall Mapping Progress</title>
+
+        <image align="center"
+               href="../images/Ide_Support_Images/NCCH_mapping_pie.jpg"
+               placement="break"/>
+      </fig>
+
+      <fig id="ac999804">
+        <title>IHTSDO Workbench Authoring - Ongoing</title>
+
+        <image align="center"
+               href="../images/Ide_Support_Images/NCCH_authoring_pie.jpg"
+               placement="break"/>
+      </fig>
+    </body>
+  </topic>
+</dita>

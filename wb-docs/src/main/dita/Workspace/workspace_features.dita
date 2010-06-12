@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic2" xml:lang="en">
+ <title>Integrated and On-Demand</title>
+ <body>
+  <section>There are other options for each of the components provided by the IHTSDO Workspace, and
+   some of those options are available on demand as a service. One area that sets the IHTSDO
+   Workspace apart from other offerings is the level of integration between all the components, and
+   being able to access this integration on-demand by a group wholly dedicated to service and
+   support of distributed and collaborative development environments. </section>
+  <section>If the on-demand applications are not integrated, users will become weary of jumping from
+   one application to the other to access the data they need. For example, a worker who uses
+   on-demand issues management software, collaboration software, and version control software, would
+   find they have to move in and out of different environments to perform different tasks.</section>
+  <section>Accessing these applications from various providers on the Internet will become taxing on
+   workers who crave an easy to use common platform, accessible by anyone, at anytime, to conduct
+   all of their business-critical operations.</section>
+  <section>By using an integrated CollabNet platform, workers can reach beyond the confines of their
+   offices with anyone they need to do business with - customers, partners, and suppliers - all
+   without any barriers. </section>
+  <section>In addition, the CollabNet platform can authenticate against an external single-sign-on
+   provider, allowing future integrations that span provider boundaries as required. </section>
+ </body>
+</topic>
+

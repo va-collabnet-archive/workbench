@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic12" xml:lang="en">
+ <title>Terminologies and Classification Support<ph><indexterm>classifications
+  </indexterm></ph></title>
+ <body>
+  <section>The IHTSDO Toolkit provides a framework for both terminology and classification
+   development, without requiring any special “schema changes” to import terminologies of
+   alternative structures. </section>
+  <section>We have already imported SNOMED CT, ICD-10-AM, ICD-9, ED (Australian Emergency Department
+   Termset), CATCH (Australian Classification and Terminology of Community Health), and the
+   Australian Medicines Terminology. </section>
+  <section>The IHTSDO Toolkit supports these alternative terminologies by using meta-data taxonomies
+   to define their relationship, descriptions, and other attributes. The terminology or
+   classification is then loaded into the embedded databases, and end-users can view, modify, and
+   map between the terminologies and classifications within their environment as appropriate.
+  </section>
+ </body>
+</topic>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/task.dtd">
+<task id="taskId">
+  <title>Steps in creating a refset</title>
+
+  <shortdesc/>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>creating refsets<indexterm>steps</indexterm></indexterm>
+
+        <indexterm>refsets <indexterm>creating</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <taskbody>
+    <context><p>The following steps outline the long-hand process of using the
+    IHTSDO Workbench IDE to construct a new concept refset<table
+        id="ak1006889">
+        <tgroup cols="1">
+          <colspec colname="col1" colnum="1" colwidth="324*"/>
+
+          <tbody>
+            <row>
+              <entry colname="col1"><note>In more recent versions of the
+              Workbench, a Refset creation 'wizard' ( an executable business
+              process ) guides you through the process of creating a refset.
+              For further information about this wizard, see <xref
+              href="RefSets_creation_example.dita#creation_example"/></note></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table></p></context>
+
+    <steps>
+      <step>
+        <cmd>Ensure that Preferences Settings are appropriate for Refset
+        creation.</cmd>
+      </step>
+
+      <step>
+        <cmd>Determine the appropriate name for the refset, observing any
+        editorial policies.</cmd>
+      </step>
+
+      <step>
+        <cmd>Create the <b>member refset</b> concept using the Component
+        Panel.Either the <i>add new concept</i> <image
+        href="../images/Using_The_ACE_Editor_Images/icon_new_concept.png"
+        id="image_f446b2fc-c416-4757-a504-6b0fc2018ae9"/>button or the
+        <i>clone concept</i> <image
+        href="../images/Using_The_ACE_Editor_Images/icon_clone_concept.png"
+        id="image_d1329d80-4d31-4d9e-b8ec-2734493d4b47"/>button can be
+        used.</cmd>
+      </step>
+
+      <step>
+        <cmd>Create the associated <b>parent member refset</b> concept using
+        the Component Panel.</cmd>
+      </step>
+
+      <step>
+        <cmd>Create the associated <b>specification refset</b> concept using
+        the Component Panel.</cmd>
+      </step>
+
+      <step>
+        <cmd>Load the member refset concept into the special Refset
+        Specification tab of the Component Panel.</cmd>
+      </step>
+
+      <step>
+        <cmd>Create the refset specification expression using the supported
+        Query Language constructs available from the right-click enabled
+        pop-up choice box.</cmd>
+      </step>
+
+      <step>
+        <cmd>Commit the changes</cmd>
+      </step>
+
+      <step>
+        <cmd>Compute the refset membership from the specification using the
+        <i>compute refset</i> <image
+        href="../images/Using_The_ACE_Editor_Images/icon_compute_refset.png"
+        id="image_81de1683-3cc0-42eb-8e22-c3b972929474"/>button. This can take
+        some time to process. Progress is displayed in the separate Activity
+        Viewer window.</cmd>
+      </step>
+
+      <step>
+        <cmd>Visually check the content of the refset using the hierarchy view
+        of the Component Panel. Refset members are denoted by a paper
+        clip<image
+        href="../images/Using_The_ACE_Editor_Images/icon_paperclip_small.png"
+        id="image_e57f6b24-315a-4ac3-9f7a-01a9a30bd40e"/> ; parents and
+        ancestors of the members are displayed by a pin <image
+        href="../images/Using_The_ACE_Editor_Images/icon_pin.png"
+        id="image_291520a4-55cd-45dd-91ce-199e12f714aa"/>. For large refsets,
+        more extensive review processes will be warranted.</cmd>
+      </step>
+    </steps>
+
+    <postreq><note>Steps 3-5 can be automated using the create refset concept
+    group button <image
+    href="../images/Using_The_ACE_Editor_Images/icon_create_refset_concept_group_small.png"
+    id="image_018addd4-35cb-4c5b-ae0b-4de5e70acf81"/> and following the
+    instructions at the top right of the window as illustrated in <xref
+    format="dita"
+    href="RefSets_concepts_autocreation.dita#autogenerating_concepts/fig_rf00008"/>.</note></postreq>
+  </taskbody>
+</task>

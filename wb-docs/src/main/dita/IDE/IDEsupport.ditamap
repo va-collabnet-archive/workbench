@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="IDEsupport" xml:lang="en">
+ <title>"Integrated Development Environments"</title>
+ <topicref href="IDE_overview.dita" >
+
+  <topicref href="IDE_integration.dita" type="topic" navtitle="IDE Integration"> </topicref>
+  <topicref href="IDE_Eclipse.dita" type="topic" navtitle="Eclipse Integration"> </topicref>
+  <topicref href="IDE_terminologist.dita" type="topic" navtitle="Terminologist IDE"> </topicref>
+  <topicref href="IDE_translation.dita" type="topic" navtitle="Translation IDE"> </topicref>
+  <topicref href="IDE_enduser.dita" type="topic" navtitle="End-User IDE"> </topicref>
+ </topicref>
+</map>

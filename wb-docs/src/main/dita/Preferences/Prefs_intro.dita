@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic1" xml:lang="en">
+    <title>Setting Preferences</title>
+    <prolog>
+        <metadata>
+            <keywords>
+                <indexterm>settings</indexterm>
+                <indexterm>preferences</indexterm>
+            </keywords>
+        </metadata>
+    </prolog>
+    <body>
+        <p>The behaviour of most IHTSDO IDE parameters is set in the Preferences panel. To display
+            the Preferences tabs, click on the Display Preferences <image
+                href="../images/prefs_images/prefs_img_1.jpg" placement="inline" width="38"
+                height="24"/> button. The sub-tabs displayed depend upon which parent tab is
+            selected.</p>
+    </body>
+</topic>
+
+

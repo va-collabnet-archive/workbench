@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic1" xml:lang="en">
+ <title>About the IHTSDO Workspace</title>
+ <body>
+  <section id="au999325">The IHTSDO Workspace is comprised of three CollabNet products: CollabNet
+   SourceForge Enterprise Edition (CSFE), CollabNet CUBiT and CollabNet Subversion. These three
+   products all work together to provide the robust, secure collaborative platform that is required
+   to support terminology development organisations’ members and licensees in the collaborative
+   development, advancement, and delivery of terminologies such as SNOMED CT
+    worldwide.<indexterm>CollabNet </indexterm><indexterm>CSFE </indexterm><indexterm>CUBiT
+   </indexterm></section>
+  <section>With more than 1.2 million users, CollabNet is the most widely used platform for
+   Distributed Software Development. CollabNet transforms the way software is being developed by
+   simplifying distributed development and enabling organizations to leverage global development
+   talents to deliver better products and innovate faster. </section>
+  <section>Using the CollabNet platform, worldwide project members that are geographically
+   distributed can work as “one team” throughout the lifecycle of a project, regardless of their
+   location. Unlike traditional development tools, CollabNet supports globally distributed teams in
+   a cost-effective way, providing savings through reduced development infrastructure costs,
+   increased productivity, improved project visibility and shared access to software assets. </section>
+  <section>More than 500 companies rely on CollabNet for their distributed development,
+   off-shoring, outsourcing and partner co-development efforts.</section>
+  <section>
+   Founded upon open source
+    principles, <xref href="http://www.open.collab.net" scope="external" format="html">CollabNet</xref> 
+   is also the company behind Subversion, the next-generation Software
+    Configuration Management solution. Subversion was named sole leader in standalone SCM in the
+    Forrester Wave report for Software Configuration and Change Management, Q2, 2007.
+  </section>
+  <section>The CollabNet platform reduces development, build and test infrastructure costs by
+   enabling central support of geographically distributed teams and eliminating the need to
+   replicate or install local software asset repositories. Many CollabNet customers have cut their
+   development infrastructure costs by up to 50 percent.</section>
+  <section>CollabNet products enable collaboration, which improves transparency and productivity
+   through project dashboards and integrated wiki, forum, mailing list, and document management
+   tools that support global search, role-based security, and universal web/e-mail/RSS access. </section>
+  <section>With CollabNet, development teams become more efficient and collaborate more openly. Many
+   CollabNet customers have experienced reduced time-to-market, delivered error-free projects ahead
+   of schedule, and increased their market leadership.</section>
+  <section>In summary, the IHTSDO Workbench workspace will allows organisations and their members
+   and licensees to:</section>
+  <ul>
+   <li>Rapidly gain visibility, traceability and governance across terminology development and the
+    tools and processes used to create a terminology release</li>
+   <li>Unify the terminology development lifecycle tools and processes into a common, integrated
+    platform</li>
+   <li>Accelerate terminology development and innovation</li>
+   <li>Accelerate creation of and distribution of terminology development tools and processes</li>
+   <li>Provide a common terminology development platform</li>
+   <li>Eliminate the time spent configuring servers and reduce costs through optimizing servers
+    across a global distributed pool</li>
+   <li>Reduce terminology build cycles and increase quality by providing a continuous integration
+    and release environment</li>
+   <li>Manage costs at each stage with comprehensive rollup reports by server, user, and
+    project</li>
+   <li>Provide certifiable quality and traceability for governance and change management through
+    comprehensive audit logs, dashboards, and reporting</li>
+   <li>Publish a release</li>
+  </ul>
+  <section>IHTSDO Workbench provides end-to-end support for distributed development and application
+   lifecycle management, and allows integration of this end-to-end support directly into Integrated
+   Development Environments such as Eclipse. </section>
+ </body>
+</topic>
+

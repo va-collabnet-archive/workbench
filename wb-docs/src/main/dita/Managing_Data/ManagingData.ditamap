@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="ManagingData" xml:lang="en" title="managing data">
+
+ <title>Data Import</title>
+ <topicref href="managing_data_intro.dita#topic1" type="topic" navtitle="Data Import">
+  <topicref href="importing_to_database.dita#topic2" type="topic"   navtitle="Terminology Set imports to Versioned Database">  </topicref>
+ </topicref>
+</map>

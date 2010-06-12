@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+<topic id="topic1" xml:lang="en">
+ <title>Creating new tasks</title>
+ <body>
+  <section>The IHTSDO Workbench Editor's functionality can be extended through building business
+   processes based on predefined tasks. Although there are over two hundred separate tasks already
+   available as components for a business process, there may well be a requirement for a developer
+   to create or modify one or more tasks for building any given business process . This chapter
+   gives guidance on how to accomplish this. </section>
+ </body>
+</topic>
+
