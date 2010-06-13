@@ -512,5 +512,14 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
 
     public void cancel() {
     	this.canceled = true;
+        this.complete = true;
+        this.stopButtonVisible = false;
+        for (I_ShowActivity shower : showActivityListeners) {
+            try {
+				shower.complete();
+			} catch (ComputationCanceled e) {
+				// Nothing to do...
+			}
+        }
     }
 }

@@ -47,6 +47,10 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             for (ParallelConceptIterator pci : pcis) {
                 pci.getCurrentThread().interrupt();
             }
+            for (I_ShowActivity a: activities) {
+            	a.cancel();
+        		a.setProgressInfoLower("Cancelled.");
+            }
         }
     }
 
@@ -64,7 +68,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private boolean canceled = false;
     private boolean informed = false;
     private I_ShowActivity activity;
-    private Collection<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+    private Collection<I_ShowActivity> activities;
     private long startTime = System.currentTimeMillis();
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
@@ -72,8 +76,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private RefsetSpec specHelper;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
-            I_RepresentIdSet possibleIds) throws Exception {
+            I_RepresentIdSet possibleIds, HashSet<I_ShowActivity> activities) throws Exception {
         super();
+        this.activities = activities;
         this.possibleCNids = possibleIds;
         this.frameConfig = frameConfig;
         this.refsetNid = refsetNid;

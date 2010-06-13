@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -881,6 +882,28 @@ public class Concept implements I_Transact, I_GetConceptData {
         return first.getText();
     }
 
+    @Override
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
+    		I_ShowActivity activity) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
+        	if (activity.isCanceled()) {
+        		
+        	}
+            int relNid = pair.getNid1();
+            int typeNid = pair.getNid2();
+            if (isATypes.contains(typeNid)) {
+                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
+                Concept origin = Bdb.getConceptForComponent(relNid);
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, 
+                		isATypes, activity);
+            }
+        }
+        return possibleKindOfConcepts;
+    }
+
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
         I_IntSet isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
@@ -910,7 +933,29 @@ public class Concept implements I_Transact, I_GetConceptData {
         return possibleChildOfConcepts;
     }
 
-    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
+    		I_IntSet isATypes, I_ShowActivity activity)
+            throws IOException {
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
+        	if (activity.isCanceled()) {
+        		return;
+        	}
+            int relNid = pair.getNid1();
+            int typeNid = pair.getNid2();
+            if (isATypes.contains(typeNid)) {
+                int destNid = Bdb.getNidCNidMap().getCNid(relNid);
+                if (!possibleKindOfConcepts.isMember(destNid)) {
+                    possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
+                    Concept origin = Bdb.getConceptForComponent(relNid);
+                    origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes, activity);
+                }
+            }
+        }
+    }
+
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
+    		I_IntSet isATypes)
             throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {

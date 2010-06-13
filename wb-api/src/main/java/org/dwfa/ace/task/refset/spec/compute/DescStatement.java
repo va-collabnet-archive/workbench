@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,6 +52,21 @@ import org.ihtsdo.time.TimeUtil;
  * 
  */
 public class DescStatement extends RefsetSpecStatement {
+
+	private Collection<I_ShowActivity> activities;
+	private StopActionListener stopListener = new StopActionListener();
+    
+    private class StopActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (I_ShowActivity a: activities) {
+				a.cancel();
+			}
+			
+		}
+    	
+    }
 
     /**
      * Constructor for refset spec statement.
@@ -136,14 +153,25 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
+	private I_ShowActivity setupActivityPanel(I_ConfigAceFrame configFrame,
+			I_RepresentIdSet parentPossibleConcepts) {
+		I_ShowActivity activity;
+		activity = Terms.get().newActivityPanel(true, configFrame, 
+		        "<html>Possible: <br>" + this.toHtmlFragment(), true);
+		    activity.setIndeterminate(true);
+		    activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
+		    activity.addStopActionListener(stopListener);
+		return activity;
+	}
+
+    
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, 
     		I_RepresentIdSet parentPossibleConcepts, 
 			Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
-            "<html>Possible: <br>" + this.toHtmlFragment(), true);
-        activity.setIndeterminate(true);
+        I_ShowActivity activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+        activities.add(activity);
         long startTime = System.currentTimeMillis();
 
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();

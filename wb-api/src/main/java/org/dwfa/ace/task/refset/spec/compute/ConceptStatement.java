@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +47,20 @@ import org.ihtsdo.time.TimeUtil;
 public class ConceptStatement extends RefsetSpecStatement {
 
     I_GetConceptData queryConstraintConcept;
+	private Collection<I_ShowActivity> activities;
+	private StopActionListener stopListener = new StopActionListener();
+    
+    private class StopActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (I_ShowActivity a: activities) {
+				a.cancel();
+			}
+			
+		}
+    	
+    }
 
     /**
      * Constructor for refset spec statement.
@@ -89,6 +105,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             throws TerminologyException, IOException {
         I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
+        this.activities = activities;
         
         queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
@@ -107,6 +124,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             break;
         case CONCEPT_IS_CHILD_OF:
             activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
 
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
@@ -118,15 +136,18 @@ public class ConceptStatement extends RefsetSpecStatement {
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
             activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
              if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
             } else {
-                I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
+                I_RepresentIdSet results = 
+                	queryConstraintConcept.getPossibleKindOfConcepts(configFrame, activity);
                 possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
             activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
             Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
@@ -169,6 +190,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 		        "<html>Possible: <br>" + this.toHtmlFragment(), true);
 		    activity.setIndeterminate(true);
 		    activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
+		    activity.addStopActionListener(stopListener);
 		return activity;
 	}
 

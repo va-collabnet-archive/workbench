@@ -136,6 +136,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throws TerminologyException, IOException {
         I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
             "<html>Possible: <br>" + this.toHtmlFragment(), true);
+        activities.add(activity);
         activity.setIndeterminate(true);
         long startTime = System.currentTimeMillis();
         

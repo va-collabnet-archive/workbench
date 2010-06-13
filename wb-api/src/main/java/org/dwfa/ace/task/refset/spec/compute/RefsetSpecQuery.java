@@ -279,6 +279,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 		}
 		I_ShowActivity activity = Terms.get().newActivityPanel(true, config,
 				"<html>Possible: <br>" + this.toHtmlFragment(0), true);
+		activities.add(activity);
 		activity.setMaximum(statements.size() + subqueries.size());
 		activity.setValue(0);
 		activity.setIndeterminate(true);
