@@ -1570,11 +1570,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             I_RepresentIdSet possibleIds;
             if (specHelper.isConceptComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
-                possibleIds = query.getPossibleConceptsInterruptable(frameConfig, null);
+                possibleIds = query.getPossibleConceptsInterruptable(frameConfig, null,
+                		new HashSet<I_ShowActivity>());
 
             } else if (specHelper.isDescriptionComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
-                possibleIds = query.getPossibleDescriptionsInterruptable(frameConfig, null);
+                possibleIds = query.getPossibleDescriptionsInterruptable(frameConfig, null,
+                		new HashSet<I_ShowActivity>());
             } else {
                 throw new Exception("Relationship compute type not supported.");
             }
@@ -1639,6 +1641,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 throw new TerminologyException(e);
             }
         }
+        // Clean up any sub-activities...
+        
+        
         return Condition.ITEM_CANCELED;
     }
 

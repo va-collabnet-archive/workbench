@@ -64,7 +64,8 @@ public class ActivityViewer implements ActionListener {
 
     private static class CompleteListener implements I_ShowActivity {
         
-        I_ShowActivity source;
+        @SuppressWarnings("unused")
+		I_ShowActivity source;
         
 
         private CompleteListener(I_ShowActivity source) {
@@ -160,51 +161,48 @@ public class ActivityViewer implements ActionListener {
 
         @Override
         public void update() {
-            // TODO Auto-generated method stub
-            
+            // Nothing to do
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
-            
+            // Nothing to do
         }
 
         @Override
         public void addStopActionListener(ActionListener l) {
-            // TODO Auto-generated method stub
-            
+            // Nothing to do
         }
 
         @Override
         public boolean isStopButtonVisible() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void removeStopActionListener(ActionListener l) {
-            // TODO Auto-generated method stub
-            
+            // Nothing to do
         }
 
         @Override
         public void setStopButtonVisible(boolean visible) {
-            // TODO Auto-generated method stub
-            
+            // Nothing to do
         }
 
         @Override
         public boolean isCanceled() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public boolean isCompleteForComparison() {
-            // TODO Auto-generated method stub
             return false;
         }
+
+		@Override
+		public void cancel() {
+	        // Nothing to do
+		}
 
     }
 
@@ -223,14 +221,12 @@ public class ActivityViewer implements ActionListener {
 
         @Override
         public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
-            // TODO Auto-generated method stub
-
+            // Nothing to do
         }
 
         
         @Override
         public int getCount() {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -246,7 +242,6 @@ public class ActivityViewer implements ActionListener {
 
         @Override
         public JMenu getQuitMenu() {
-            // TODO Auto-generated method stub
             return null;
         }
 

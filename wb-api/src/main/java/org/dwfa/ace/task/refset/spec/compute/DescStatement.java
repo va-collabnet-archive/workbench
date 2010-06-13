@@ -137,7 +137,9 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, 
+    		I_RepresentIdSet parentPossibleConcepts, 
+			Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException {
         I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
             "<html>Possible: <br>" + this.toHtmlFragment(), true);
@@ -172,7 +174,8 @@ public class DescStatement extends RefsetSpecStatement {
 
             break;
         case DESC_LUCENE_MATCH:
-            getPossibleDescriptions(configFrame, termFactory.getEmptyIdSet());
+            getPossibleDescriptions(configFrame, termFactory.getEmptyIdSet(),
+            		activities);
             if (possibleLuceneConcMatches != null) {
                 possibleConcepts.or(possibleLuceneConcMatches);
             }
@@ -205,7 +208,9 @@ public class DescStatement extends RefsetSpecStatement {
     I_RepresentIdSet possibleLuceneDescMatches;
     I_RepresentIdSet possibleLuceneConcMatches;
     public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleDescriptions) throws TerminologyException, IOException {
+            I_RepresentIdSet parentPossibleDescriptions, 
+			Collection<I_ShowActivity> activities) 
+    	throws TerminologyException, IOException {
 
         I_RepresentIdSet possibleDescriptions = termFactory.getEmptyIdSet();
         possibleLuceneDescMatches = null;
@@ -301,7 +306,9 @@ public class DescStatement extends RefsetSpecStatement {
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+            I_RepresentIdSet parentPossibleConcepts, 
+			Collection<I_ShowActivity> activities) 
+    	throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in desc statement unsupported operation.");
     }
 

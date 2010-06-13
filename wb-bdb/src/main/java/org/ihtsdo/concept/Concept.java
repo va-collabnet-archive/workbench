@@ -524,9 +524,6 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     public Collection<Description> getDescriptions() throws IOException {
-        if (isCanceled()) {
-            return new ComponentList<Description>(new ArrayList<Description>());
-        }
         return data.getDescriptions();
     }
 
@@ -808,8 +805,9 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     public String getInitialText() throws IOException {
+    	String prefix = "";
         if (isCanceled()) {
-            return "canceled";
+        	prefix = "canceled: ";
         }
 
         try {
@@ -822,16 +820,16 @@ public class Concept implements I_Transact, I_GetConceptData {
                             this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
                                 AceConfig.config.getAceFrames().get(0));
                     if (tuple != null) {
-                        return tuple.getText();
+                        return prefix + tuple.getText();
                     }
                 }
             }
-            return getText();
+            return prefix + getText();
         } catch (IndexOutOfBoundsException e) {
             try {
-                return getText();
+                return prefix + getText();
             } catch (IndexOutOfBoundsException e2) {
-                return nid + " has no desc";
+                return prefix + nid + " has no desc";
             }
         }
     }
@@ -1093,7 +1091,7 @@ public class Concept implements I_Transact, I_GetConceptData {
             synchronized (relNidTypeNidlist) {
                 for (NidPair pair : invalidPairs) {
                     if (relNidTypeNidlist.forget(pair)) {
-                        Terms.get().addUncommittedNoChecks(this);
+                    	BdbCommitManager.writeImmediate(this);
                     }
                 }
             }

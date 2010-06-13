@@ -130,7 +130,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, 
+    		I_RepresentIdSet parentPossibleConcepts, 
+    		Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException {
         I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
             "<html>Possible: <br>" + this.toHtmlFragment(), true);
@@ -204,14 +206,18 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
-            throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, 
+    		I_RepresentIdSet parentPossibleConcepts, 
+			Collection<I_ShowActivity> activities)
+        throws TerminologyException, IOException {
         throw new TerminologyException("Get possible descriptions in rel statement unsupported operation.");
     }
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+            I_RepresentIdSet parentPossibleConcepts, 
+			Collection<I_ShowActivity> activities) 
+    	throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in rel statement unsupported operation.");
     }
 

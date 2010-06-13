@@ -89,7 +89,7 @@ public class HasUncommittedChanges extends AbstractTask {
         }
     }
 
-	private void askToCommit() {
+	public static void askToCommit() {
 		Object[] options = {"Commit Changes",
                 "Cancel Changes",
                 "Do Nothing"};

@@ -228,6 +228,7 @@ public class Description
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(this.getClass().getSimpleName() + ":{");
+        buf.append("cNid: " + this.enclosingConceptNid + " ");
         buf.append("text: '" + this.getText() + "'");
         buf.append(" caseSig: " + isInitialCaseSignificant());
         buf.append(" type:");

@@ -92,7 +92,7 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 	                        }
 						} else {
 						    AceLog.getAppLog().warning("\n########## Suppressing refset member:\n     " + refsetMember +
-						        "\n##########");
+						        "\n##########" );
 						}
 					} else {
 					    refsetMember.merge(factory.create(nid, typeNid, enclosingConcept, input));

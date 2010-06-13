@@ -364,7 +364,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");
@@ -398,7 +398,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 }
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");

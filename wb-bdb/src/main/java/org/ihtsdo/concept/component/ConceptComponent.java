@@ -787,7 +787,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 Concept c = getEnclosingConcept();
                 clearVersions();
                 c.modified();
-                BdbCommitManager.addUncommittedNoChecks(c);
+            	BdbCommitManager.writeImmediate(c);
                 return larger;
             }
             return dup2;

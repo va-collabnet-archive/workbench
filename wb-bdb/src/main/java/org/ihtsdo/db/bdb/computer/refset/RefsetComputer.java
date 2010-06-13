@@ -6,6 +6,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,6 +64,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private boolean canceled = false;
     private boolean informed = false;
     private I_ShowActivity activity;
+    private Collection<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
     private long startTime = System.currentTimeMillis();
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
@@ -79,7 +81,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         conceptCount = possibleIds.cardinality();
 
         activity =
-                Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
+                Terms.get().newActivityPanel(true, frameConfig, 
+                		"Computing refset: " + refsetConcept.toString(), true);
+        activities.add(activity);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
@@ -138,20 +142,23 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                             .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig);
+                    executeComponent(descVersioned, cNid, 
+                    		descVersioned.getDescId(), frameConfig, activities);
                 }
             } else if (specHelper.isConceptComputeType()) {
-                executeComponent(concept, cNid, cNid, frameConfig);
+                executeComponent(concept, cNid, cNid, frameConfig, activities);
             }
         }
     }
 
-    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid, I_ConfigAceFrame config)
+    private void executeComponent(I_AmTermComponent component, int conceptNid, 
+    		int componentNid, I_ConfigAceFrame config, 
+    		Collection<I_ShowActivity> activities)
             throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component, config)) {
+            if (query.execute(component, config, activities)) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();
@@ -181,6 +188,15 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                     activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
                         + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                         + retiredMembers.get());
+                } else {
+                	for (I_ShowActivity a: activities) {
+                		if (!a.isComplete()) {
+                    		if (!a.isComplete()) {
+                        		a.cancel();
+                        		a.setProgressInfoLower("Cancelled.");
+                    		}
+                		}
+                	}
                 }
             }
         }
@@ -196,6 +212,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 + newMembers.get() + " Ret: " + retiredMembers.get());
         } else {
             activity.setProgressInfoLower("Cancelled.");
+        	for (I_ShowActivity a: activities) {
+        		if (!a.isComplete()) {
+            		a.cancel();
+            		a.setProgressInfoLower("Cancelled.");
+        		}
+        	}
         }
         activity.complete();
     }

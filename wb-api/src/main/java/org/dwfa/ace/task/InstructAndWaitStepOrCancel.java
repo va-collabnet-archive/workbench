@@ -37,7 +37,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -86,6 +90,14 @@ public class InstructAndWaitStepOrCancel extends AbstractTask {
          */
         public void actionPerformed(ActionEvent e) {
             if (Terms.get().getUncommitted().size() > 0) {
+            	if (Terms.get().getUncommitted().size() > 0) {
+            		for (I_Transact c: Terms.get().getUncommitted()) {
+            			AceLog.getAppLog().warning("Uncommitted changes to: " 
+            					+ ((I_GetConceptData) c).toLongString());
+            			
+            		}
+            		HasUncommittedChanges.askToCommit();
+            	}
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "There are uncommitted changes - please cancel or commit before continuing.", "",
