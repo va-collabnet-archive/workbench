@@ -449,13 +449,15 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
                 I_GetConceptData rootConcept = Terms.get().getConcept(rootNid);
                 for (int memberNid : rootConcept.getConceptMemberNidsForRefset(new IntSet(refsets.getListArray()))) {
-                    I_ExtendByRef ext = Terms.get().getExtension(memberNid);
-                    List<? extends I_ExtendByRefVersion> tuples =
-                            ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
-                                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-                    if (tuples != null && tuples.size() > 0) {
-                        refsetRoots.add(rootNid);
-                    }
+                	I_ExtendByRef ext = Terms.get().getExtension(memberNid);
+                	if (ext != null) {
+                		List<? extends I_ExtendByRefVersion> tuples =
+                			ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
+                					frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                		if (tuples != null && tuples.size() > 0) {
+                			refsetRoots.add(rootNid);
+                		}
+                	}
                 }
             }
         } catch (IOException e) {
