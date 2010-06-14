@@ -271,14 +271,25 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private EConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
         EConceptAttributes eca = null;
         for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
+        	/*AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v ="+v.toString());
+        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v.getSapNid() ="+v.getSapNid());
+        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes minSapNid ="+minSapNid);
+        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes maxSapNid ="+maxSapNid);
+        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v.getTime() ="+v.getTime());*/
+        	
+        	
             if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                 changed.set(true);
+                //AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes changed.set(true)");
                 if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
+                	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes commitSapNids == null || commitSapNids.contains(v.getSapNid())");
                     if (eca == null) {
+                    	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca == null");
                         eca = new EConceptAttributes();
                         eca.setDefined(v.isDefined());
                         setupFirstVersion(eca, v);
                     } else {
+                    	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca != null");
                         EConceptAttributesRevision ecv = new EConceptAttributesRevision();
                         ecv.setDefined(v.isDefined());
                         setupRevision(eca, v, ecv);
@@ -286,6 +297,10 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                 }
             }
         }
+       /* if(eca != null) {
+        AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca = "+eca.toString());
+        }
+        else{AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca = null");}*/
         return eca;
     }
 
@@ -306,10 +321,15 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
         ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
         ec.setTime(v.getTime());
+       // AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion");
         if (v.getAdditionalIdentifierParts() != null) {
+        	//AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion v.getAdditionalIdentifierParts() != null");
+        	List<EIdentifier> additionalIdComponents = new ArrayList<EIdentifier>();
             for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
+            	//AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion idv = "+idv);
                 EIdentifier eIdv = null;
                 if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                	//AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE");
                     if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
                         eIdv = new EIdentifierLong();
                     } else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
@@ -318,12 +338,20 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                         eIdv = new EIdentifierUuid();
                     }
                     eIdv.setDenotation(idv.getDenotation());
+                  //  AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion eIdv.getDenotation() = "+eIdv.getDenotation());
+                  //  AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion eIdv = "+eIdv);
                     eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
                     eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathId()));
                     eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusId()));
                     eIdv.setTime(idv.getTime());
+                    additionalIdComponents.add(eIdv);
                 }
             }
+            if(additionalIdComponents.size() > 0) {
+            	//AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion additionalIdComponents.size() =  "+additionalIdComponents.size()); 
+            	ec.setAdditionalIdComponents(additionalIdComponents);
+            }
         }
+        //AceLog.getAppLog().info("EConceptChangeSetComputer setupFirstVersion final ec = "+ec);  
     }
 }
