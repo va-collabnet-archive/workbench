@@ -1030,7 +1030,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         for (I_Path p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
-                propMap.setProperties((I_ExtendByRefPart) member);
+                propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
                 I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
                 propMap.setProperties(revision);

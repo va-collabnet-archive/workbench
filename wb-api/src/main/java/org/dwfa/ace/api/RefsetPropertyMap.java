@@ -140,7 +140,54 @@ public class RefsetPropertyMap {
 		}
 	}
 	
-    public boolean validate(I_ExtendByRefPart part) {
+	public void setPropertiesExceptSap(I_ExtendByRefPart part) {
+		for (Entry<REFSET_PROPERTY, Object> entry: properties.entrySet()) {
+			switch (entry.getKey()) {
+			case BOOLEAN_VALUE:
+				I_ExtendByRefPartBoolean booleanPart = (I_ExtendByRefPartBoolean) part;
+				booleanPart.setBooleanValue((Boolean) entry.getValue());
+				break;
+			case CID_ONE:
+				I_ExtendByRefPartCid c1part = (I_ExtendByRefPartCid) part;
+				c1part.setC1id((Integer) entry.getValue());
+				break;
+			case CID_THREE:
+				I_ExtendByRefPartCidCidCid c3part = (I_ExtendByRefPartCidCidCid) part;
+				c3part.setC3id((Integer) entry.getValue());
+				break;
+			case CID_TWO:
+				I_ExtendByRefPartCidCid c2part = (I_ExtendByRefPartCidCid) part;
+				c2part.setC2id((Integer) entry.getValue());
+				break;
+			case INTEGER_VALUE:
+				I_ExtendByRefPartInt intPart = (I_ExtendByRefPartInt) part;
+				intPart.setIntValue((Integer) entry.getValue());
+				break;
+			case PATH:
+				// SAP property
+				break;
+			case STATUS:
+				// SAP property
+				break;
+			case STRING_VALUE:
+				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) part;
+				strPart.setStringValue((String) entry.getValue());
+				break;
+			case VERSION:	
+				// SAP Property
+				break;
+			case TIME:
+				// SAP Property
+				break;
+
+			default:
+				throw new RuntimeException("Can't handle: " + entry.getKey());
+			}
+		}
+	}
+
+	
+	public boolean validate(I_ExtendByRefPart part) {
     	if (memberType != null) {
     		if (REFSET_TYPES.classToType(part.getClass()) != memberType) {
     			return false;
