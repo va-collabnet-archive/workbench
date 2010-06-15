@@ -576,6 +576,7 @@ public interface I_TermFactory {
             throws IOException, ParseException;
 
     public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
+    public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException;
 
     /**
      * Close the database. Called on quit.

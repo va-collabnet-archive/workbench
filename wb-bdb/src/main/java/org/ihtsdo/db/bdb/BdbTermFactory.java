@@ -1533,6 +1533,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException {
+        return pathManager.existsFast(pathConceptId);
+    }
+
+    @Override
     public Object getComponent(int nid) throws TerminologyException, IOException {
         return Bdb.getComponent(nid);
     }

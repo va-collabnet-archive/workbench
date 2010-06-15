@@ -95,13 +95,13 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         for (I_Position p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
-            for (V part : versions) {
-                if (part.getTime() == Long.MIN_VALUE) {
-                    continue;
+            nextpart: for (V part : versions) {
+               if (part.getTime() == Long.MIN_VALUE) {
+                    continue nextpart;
                 }
                 if (allowedTypes != null) {
                     if (allowedTypes.contains(((I_AmTypedPart) part).getTypeId()) == false) {
-                        continue;
+                        continue nextpart;
                     }
                 }
                 if (mapper.onRoute(part)) {
@@ -185,20 +185,19 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             return;
         }
         HashSet<V> versionsToAdd = new HashSet<V>();
-        HashSet<V> uncommittedVersions = new HashSet<V>();
         HashSet<V> rejectedVersions = new HashSet<V>();
-        for (V part : versions) {
+        nextpart: for (V part : versions) {
             if (part.getTime() == Long.MIN_VALUE) {
                 rejectedVersions.add(part);
-                continue;
+                continue nextpart;
             }
             if (allowedStatus != null && allowedStatus.contains(part.getStatusId()) == false) {
                 rejectedVersions.add(part);
-                continue;
+                continue nextpart;
             }
             if (allowedTypes != null && allowedTypes.contains(((I_AmTypedPart) part).getTypeId()) == false) {
                 rejectedVersions.add(part);
-                continue;
+                continue nextpart;
             }
             versionsToAdd.add(part);
         }
@@ -217,11 +216,6 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         SortedSet<V> sortedVersionsToAdd = new TreeSet<V>(new SortVersionsByTime());
         sortedVersionsToAdd.addAll(versionsToAdd);
         specifiedVersions.addAll(sortedVersionsToAdd);
-        for (V version : uncommittedVersions) {
-            if (allowedTypes == null || allowedTypes.contains(((I_AmTypedPart) version).getTypeId()) == true) {
-                specifiedVersions.add(version);
-            }
-        }
     }
 
 }

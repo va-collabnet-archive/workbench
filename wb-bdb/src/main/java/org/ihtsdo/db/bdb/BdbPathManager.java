@@ -140,6 +140,12 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	    }
 	    return getFromDisk(cNid) != null;
 	}
+	public boolean existsFast(int cNid) throws TerminologyException, IOException {
+	    if (pathMap.containsKey(cNid)) {
+	        return true;
+	    }
+	    return false;
+	}
 
 	public I_Path get(int nid) throws PathNotExistsException,
 			TerminologyException, IOException {
