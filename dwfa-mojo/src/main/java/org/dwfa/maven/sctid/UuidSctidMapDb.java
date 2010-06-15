@@ -649,6 +649,58 @@ public class UuidSctidMapDb {
     }
 
     /**
+     * Updated using the list of files
+     *
+     * @param mapFile File array
+     * @throws SQLException
+     * @throws IOException
+     */
+    public void updateDbFromSctMapFiles(File... mapFile) throws SQLException, IOException {
+        logger.info("Start importing read write mapping files");
+        if (isDerbyEmbeddedDatabase()) {
+            File data = File.createTempFile("UuidSctid", "rwmap");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(data, false));
+
+            for (File file : mapFile) {
+                logger.info("importing file " + file);
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                String uuidLine;
+
+                while ((uuidLine = reader.readLine()) != null) {
+                    String sctid  = reader.readLine().split("\t")[0];
+
+                    for (String uuidStr : uuidLine.split("\t")) {
+                        UUID uuid = UUID.fromString(uuidStr);
+
+                        writer.append(uuid.getMostSignificantBits() + "");
+                        writer.append("\t");
+                        writer.append(uuid.getLeastSignificantBits() + "");
+                        writer.append("\t");
+                        writer.append(sctid);
+                        writer.append("\t");
+                        writer.append(getSctIdType(sctid) + "");
+                        writer.append("\t");
+                        writer.append(getSctIdNamespace(sctid) + "");
+                        writer.append(System.getProperty("line.separator"));
+                    }
+                }
+                reader.close();
+            }
+
+            writer.close();
+
+            logger.info("Call import");
+            runSql("CALL SYSCS_UTIL.SYSCS_IMPORT_TABLE (null,'UUID_SCT_MAP','" + data.getAbsolutePath() + "','\t','\"',null,0)");
+            data.delete();
+        } else {
+            for (File file : mapFile) {
+                updateDbFromSctMapFile(file);
+            }
+        }
+        logger.info("Finished importing read write mapping files");
+    }
+
+    /**
      * Creates a new DB from a UUID sctId map file.
      *
      * @param mapFile mapping flat file.
@@ -933,7 +985,7 @@ public class UuidSctidMapDb {
     private void createConstraints() throws SQLException {
         runSql("ALTER TABLE UUID_SCT_MAP ADD CONSTRAINT SCT_TYPE_FK FOREIGN KEY (TYPE_ID) REFERENCES SCT_TYPE (SCT_TYPE_ID)");
         runSql("ALTER TABLE UUID_SCT_MAP ADD CONSTRAINT SCT_NAMESPACE_FK FOREIGN KEY (NAMESPACE_ID) REFERENCES SCT_NAMESPACE (SCT_NAMESPACE_ID)");
-        runSql("ALTER TABLE UUID_SCT_MAP ADD CONSTRAINT UNIQUE_UUID UNIQUE (MSB, LSB)");
+        runSql("ALTER TABLE UUID_SCT_MAP ADD CONSTRAINT UNIQUE_UUID UNIQUE (MSB, LSB, SCTID)");
         conn.commit();
     }
 

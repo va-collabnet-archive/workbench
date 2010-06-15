@@ -88,6 +88,13 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
     File[] rf2IdFiles;
 
     /**
+     * read write files
+     *
+     * @parameter
+     */
+    File[] readWriteMapFiles;
+
+    /**
      * Validates the map files and logs error message if duplicate UUIDs are
      * found.
      *
@@ -109,6 +116,7 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
             if (fixIdMapDirectory != null) {
                 mapDbInstance.openDb(fixIdMapDirectory, readWriteMapDirectory, validate);
             } else {
+                mapDbInstance.setValidate(validate);
                 mapDbInstance.openDb();
             }
 
@@ -118,6 +126,10 @@ public class UpdateUuidSctidMapDb extends AbstractMojo {
                 for (File rf2IdFile : aceIdFiles) {
                     mapDbInstance.updateDbFromAceIdFile(rf2IdFile);
                 }
+            }
+
+            if(readWriteMapFiles != null){
+                mapDbInstance.updateDbFromSctMapFiles(readWriteMapFiles);
             }
         } catch (SQLException e) {
             throw new MojoExecutionException("SQLException ", e);
