@@ -1312,11 +1312,68 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.setup(homeFile.getAbsolutePath());
     }
 
+    private static class ConceptSearcher implements I_ProcessConceptData {
+
+        private CountDownLatch conceptLatch;
+        private I_TrackContinuation tracker;
+        private Semaphore checkSemaphore;
+        private List<I_TestSearchResults> checkList;
+        private I_ConfigAceFrame config;
+        private I_RepresentIdSet matches;
+
+        public ConceptSearcher(CountDownLatch conceptLatch, 
+        		I_TrackContinuation tracker,
+                List<I_TestSearchResults> checkList, 
+                I_ConfigAceFrame config, I_RepresentIdSet matches) {
+            super();
+            this.conceptLatch = conceptLatch;
+            this.tracker = tracker;
+            this.checkList = checkList;
+            this.config = config;
+            this.matches = matches;
+        }
+
+        @Override
+        public void processConceptData(Concept concept) throws Exception {
+
+        	
+            if (tracker.continueWork()) {
+            	boolean failed = false;
+                for (I_TestSearchResults test : checkList) {
+                    if (test.test(concept, config) == false) {
+                        failed = true;
+                        break;
+                    }
+                }
+                if (!failed) {
+                	matches.setMember(concept.getNid());
+                }
+
+                conceptLatch.countDown();
+            } else {
+                while (conceptLatch.getCount() > 0) {
+                    conceptLatch.countDown();
+                }
+            }
+        }
+
+        @Override
+        public boolean continueWork() {
+            return tracker.continueWork();
+        }
+    }
+
     @Override
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
-        throw new UnsupportedOperationException();
+    	ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
+    	try {
+			Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
+		} catch (Exception e) {
+			throw new IOException();
+		}
+
     }
 
     @Override
