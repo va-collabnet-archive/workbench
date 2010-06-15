@@ -77,8 +77,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         NOT_CONCEPT_CONTAINS_REL(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_REL_GROUPING, false),
         CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, true),
         NOT_CONCEPT_CONTAINS_DESC(RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING, false),
-        V1_IS(RefsetAuxiliary.Concept.DIFFERENCE_V1_IS, true),
-        V2_IS(RefsetAuxiliary.Concept.DIFFERENCE_V2_IS, true),
         V1(RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING, true),
         V2(RefsetAuxiliary.Concept.DIFFERENCE_V2_GROUPING, true)
         ;

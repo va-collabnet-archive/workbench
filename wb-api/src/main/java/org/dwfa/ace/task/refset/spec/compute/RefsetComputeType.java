@@ -3,6 +3,7 @@ package org.dwfa.ace.task.refset.spec.compute;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecStatement.QUERY_TOKENS;
+import org.dwfa.cement.RefsetAuxiliary;
 
 public enum RefsetComputeType {
 
@@ -35,9 +36,6 @@ public enum RefsetComputeType {
 		case NOT_CONCEPT_CONTAINS_DESC:
 		case CONCEPT_CONTAINS_DESC:
 			return DESCRIPTION;
-		case V1_IS:
-		case V2_IS:
-			return CONCEPT;
 		case V1:
 		case V2:
 			return CONCEPT;
@@ -111,10 +109,26 @@ public enum RefsetComputeType {
 		case REL_DESTINATION_IS_CHILD_OF:
 		case REL_DESTINATION_IS_DESCENDENT_OF:
 			return RELATIONSHIP;
+		case V1_IS:
+		case V2_IS:
 		case ADDED_CONCEPT:
 		case ADDED_DESCRIPTION:
 		case ADDED_RELATIONSHIP:
+		case CHANGED_CONCEPT_STATUS:
+		case CHANGED_CONCEPT_DEFINED:
 			return CONCEPT;
+		case CHANGED_DESCRIPTION_CASE:
+		case CHANGED_DESCRIPTION_LANGUAGE:
+		case CHANGED_DESCRIPTION_STATUS:
+		case CHANGED_DESCRIPTION_TERM:
+		case CHANGED_DESCRIPTION_TYPE:
+			return DESCRIPTION;
+		case CHANGED_RELATIONSHIP_CHARACTERISTIC:
+		case CHANGED_RELATIONSHIP_GROUP:
+		case CHANGED_RELATIONSHIP_REFINABILITY:
+		case CHANGED_RELATIONSHIP_STATUS:
+		case CHANGED_RELATIONSHIP_TYPE:
+			return RELATIONSHIP;
 		default:
 			throw new RuntimeException("Can't handle queryToken: "
 					+ groupingToken);

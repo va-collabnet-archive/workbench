@@ -32,7 +32,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/diff", type = BeanType.TASK_BEAN) })
-public class DiffV2IsRefsetSpec extends AbstractAddRefsetSpecTask {
+public class DiffV2IsRefsetSpec extends AddStructuralQueryToRefsetSpec {
 	/**
 	 * 
 	 */
@@ -54,29 +54,9 @@ public class DiffV2IsRefsetSpec extends AbstractAddRefsetSpecTask {
 		}
 	}
 
-	protected int getRefsetPartTypeId() throws IOException,
+	protected int getStructuralQueryTokenId() throws IOException,
 			TerminologyException {
-		int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION
-				.localize().getNid();
-		return typeId;
-	}
-
-	@Override
-	protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf,
-			I_ConfigAceFrame configFrame) throws IOException,
-			TerminologyException {
-		RefsetPropertyMap refsetMap = new RefsetPropertyMap(
-				REFSET_TYPES.CID_CID);
-		if (getClauseIsTrue()) {
-			refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
-		} else {
-			refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
-		}
-		int nid = RefsetAuxiliary.Concept.DIFFERENCE_V2_IS.localize().getNid();
-		refsetMap.put(REFSET_PROPERTY.CID_TWO, nid);
-		refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus()
-				.getNid());
-		return refsetMap;
+		return RefsetAuxiliary.Concept.DIFFERENCE_V2_IS.localize().getNid();
 	}
 
 }

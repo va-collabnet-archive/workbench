@@ -33,9 +33,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/diff", type = BeanType.TASK_BEAN) })
 public class DiffAddV1ToRefsetSpec extends AbstractAddRefsetSpecTask {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 	private static final int dataVersion = 1;
@@ -72,7 +70,8 @@ public class DiffAddV1ToRefsetSpec extends AbstractAddRefsetSpecTask {
 		} else {
 			refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
 		}
-		int nid = RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING.localize().getNid();
+		int nid = RefsetAuxiliary.Concept.DIFFERENCE_V1_GROUPING.localize()
+				.getNid();
 		refsetMap.put(REFSET_PROPERTY.CID_TWO, nid);
 		refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus()
 				.getNid());
