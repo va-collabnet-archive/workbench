@@ -56,12 +56,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>documentation</artifactId>
-			<type>zip</type>
-			<scope>runtime-directory</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.dwfa.jini</groupId>
 			<artifactId>start</artifactId>
 		</dependency>
@@ -249,6 +243,17 @@
 		</plugins>
 	</build>
 	<profiles>
+		<profile>
+			<id>build-all</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>documentation</artifactId>
+					<type>zip</type>
+					<scope>runtime-directory</scope>
+				</dependency>
+			</dependencies>
+		</profile>
 		<profile>
 			<id>install4j-x</id>
 			<build>
