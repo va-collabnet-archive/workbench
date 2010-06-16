@@ -198,6 +198,12 @@ public class ExportSpecification {
     /** release part for new content namely ADRS members */
     ThinConPart releasePart;
 
+    /** Get the full concept history */
+    private boolean fullExport = false;
+
+    /** Generate/update a language reference set */
+    private boolean generateLangaugeRefset = false;
+
     /***/
     private PROJECT defaultProject;
 
@@ -304,7 +310,6 @@ public class ExportSpecification {
         //TODO this needs to be re factored...
         adrsNid = termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9")).getNid();
 
-        structuralRefsets.add(adrsNid);
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6f1e56b5-c127-4f0b-97fa-cb72c76ad58a")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("ef010cf1-cf06-4c8a-9684-a040e61b319d")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("f8834d2f-4e2d-4793-a9e0-5190391ad277")).getNid());
@@ -358,7 +363,7 @@ public class ExportSpecification {
                 if (position.isLastest()) {
                     setComponentTuples(concept, latestPostionMatchingConceptTuples,
                         latestPostionMatchingDescriptionTuples, latestPostionMatchingRelationshipTuples, position);
-                } else {
+                } else if (fullExport) {
                     setComponentTuples(concept, matchingConceptTuples, matchingDescriptionTuples,
                         matchingRelationshipTuples, position);
                 }
@@ -387,7 +392,10 @@ public class ExportSpecification {
                 setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), latestDescription.getDescId(), latestDescription,
                     descriptionInactivationIndicatorNid, TYPE.RELATIONSHIP);
             }
-            updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
+
+            if (generateLangaugeRefset) {
+                updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
+            }
 
             Set<I_RelTuple> latestRelationshipTuples = new HashSet<I_RelTuple>();
             latestRelationshipTuples.addAll(TupleVersionPart.getLatestMatchingTuples(matchingRelationshipTuples));
@@ -1713,7 +1721,8 @@ public class ExportSpecification {
 
             for (I_ThinExtByRefPart t : list) {
                 I_GetConceptData refsetConcept = termFactory.getConcept(thinExtByRefVersioned.getRefsetId());
-                if (isExportableConcept(refsetConcept)) {
+                if (isExportableConcept(refsetConcept)
+                         && isActive(TupleVersionPart.getLatestPart(refsetConcept.getConceptAttributeTuples(null, null, false, false)).getStatusId())) {
                     I_AmExtensionProcessor<T> extensionProcessor = extensionMap.get(thinExtByRefVersioned.getTypeId());
                     if(extensionProcessor != null){
                         ExtensionDto extensionDto = extensionProcessor.getExtensionDto(thinExtByRefVersioned, (T) t, type, t.getVersion() == latestPart.getVersion());

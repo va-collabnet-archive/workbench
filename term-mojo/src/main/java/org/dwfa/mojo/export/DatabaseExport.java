@@ -266,7 +266,9 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             setTestOriginPositions(releasePathDateMap, positions);
 
             for (PositionDescriptor positionDescriptor : positionsForExport) {
-                positions.add(new Position(positionDescriptor));
+                Position position = new Position(positionDescriptor);
+                position.setLastest(true);
+                positions.add(position);
             }
 
             rf2OutputHandler = new Rf2OutputHandler(
