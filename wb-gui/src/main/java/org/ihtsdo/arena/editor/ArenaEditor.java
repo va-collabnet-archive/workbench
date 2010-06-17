@@ -1,12 +1,17 @@
 package org.ihtsdo.arena.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.util.EnumMap;
+import org.ihtsdo.arena.ArenaComponentSettings;
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
+import org.ihtsdo.arena.taxonomyview.TaxonomyViewSettings;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
@@ -24,11 +29,13 @@ public class ArenaEditor extends BasicGraphEditor
      * 
      */
     private static final long serialVersionUID = -7007225006753337933L;
+	private List<? extends ArenaComponentSettings> arenaList;
 
     /**
+     * @throws IOException 
      * 
      */
-    public ArenaEditor(ACE ace)
+    public ArenaEditor(ACE ace) throws IOException
     {
         super("mxGraph for JFC/Swing", new ArenaGraphComponent(new mxGraph()
         {
@@ -56,46 +63,47 @@ public class ArenaEditor extends BasicGraphEditor
             }
 
         });
+        
+        arenaList = (List<? extends ArenaComponentSettings>) ace.aceFrameConfig.getProperty(this.getClass().getCanonicalName());
+        if (arenaList == null) {
+            // Creates a single shapes palette
+            graphOutline.setVisible(true);
+            addPaletteTemplate(editorPalette, "tab 1", "view", 1);
+            addPaletteTemplate(editorPalette, "tab 2", "view", 2);
+            addPaletteTemplate(editorPalette, "tab 3", "view", 3);
+            addPaletteTemplate(editorPalette, "tab 4", "view", 4);
+            addPaletteTemplate(editorPalette, "taxonomy", "text_tree", 1, new TaxonomyViewSettings());
 
-        // Creates a single shapes palette
-        graphOutline.setVisible(true);
-        addPaletteTemplate(editorPalette, "tab 1", "view", 1);
-        addPaletteTemplate(editorPalette, "tab 2", "view", 2);
-        addPaletteTemplate(editorPalette, "tab 3", "view", 3);
-        addPaletteTemplate(editorPalette, "tab 4", "view", 4);
-        addPaletteTemplate(editorPalette, "taxonomy", "text_tree", 1, 
-        		new EnumMap().put(CELL_ATTRIBUTES.COMPONENT_KIND, COMPONENT_KIND.TAXONOMY));
+            getGraphComponent().getGraph().setCellsResizable(false);
+            getGraphComponent().setConnectable(false);
+            getGraphComponent().getGraphHandler().setCloneEnabled(false);
+            getGraphComponent().getGraphHandler().setImagePreview(false);
 
-        getGraphComponent().getGraph().setCellsResizable(false);
-        getGraphComponent().setConnectable(false);
-        getGraphComponent().getGraphHandler().setCloneEnabled(false);
-        getGraphComponent().getGraphHandler().setImagePreview(false);
-
-        // Prefers default JComponent event-handling before mxCellHandler handling
-        //getGraphComponent().getGraphHandler().setKeepOnTop(false);
-
-        mxGraph graph = getGraphComponent().getGraph();
-        Object parent = graph.getDefaultParent();
-        graph.getModel().beginUpdate();
-        try {
-            mxCell v1 = (mxCell) graph.insertVertex(parent, null, "Customers", 20, 20, 200, 280);
-            v1.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 200, 20));
-            v1.setValue(new EnumMap().put(CELL_ATTRIBUTES.LINKED_TAB, 1));
-            mxCell v2 = (mxCell) graph.insertVertex(parent, null, "Orders", 280, 20, 200, 280);
-            v2.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 200, 20));
-            v2.setValue(new EnumMap().put(CELL_ATTRIBUTES.LINKED_TAB, 2));
-        } finally {
-            graph.getModel().endUpdate();
+        } else {
+    		mxGraph graph = getGraphComponent().getGraph();
+            Object parent = graph.getDefaultParent();
+        	for (ArenaComponentSettings settings: arenaList) {
+        		mxRectangle bounds = settings.getBounds();
+                mxCell v1 = (mxCell) graph.insertVertex(parent, null, settings.getTitle(), 
+                		bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+                v1.getGeometry().setAlternateBounds(settings.getAlternateBounds());
+                v1.setValue(settings);
+        	}
         }
+
     }
 
     private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link) {
-    	addPaletteTemplate(palette,  label, imageName, link, new EnumMap().put(CELL_ATTRIBUTES.LINKED_TAB, link));
+    	addPaletteTemplate(palette,  label, imageName, link, new ConceptViewSettings(link));
     }
-    private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link, EnumMap map) {
-        mxCell tableTemplate = new mxCell(label, new mxGeometry(20, 20, 200, 200), null);
-        tableTemplate.setValue(map);
-        tableTemplate.getGeometry().setAlternateBounds(new mxRectangle(0, 0, 200, 20));
+    private void addPaletteTemplate(EditorPalette palette,  String label, String imageName, int link, ArenaComponentSettings settings) {
+    	
+    	mxGeometry geometry = new mxGeometry(20, 20, 300, 200);
+    	geometry.setAlternateBounds(new mxRectangle(0, 0, 300, 20));
+    	settings.setBounds(geometry);
+    	settings.setAlternateBounds(geometry.getAlternateBounds());
+        mxCell tableTemplate = new mxCell(label, geometry, null);
+        tableTemplate.setValue(settings);
         tableTemplate.setVertex(true);
         ImageIcon icon = new ImageIcon(ArenaEditor.class.getResource("/24x24/plain/" + imageName + ".png"));
         palette.addTemplate(label, icon, tableTemplate);

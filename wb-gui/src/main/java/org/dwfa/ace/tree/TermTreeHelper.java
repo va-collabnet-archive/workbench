@@ -78,7 +78,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         this.aceFrameConfig = aceFrameConfig;
     }
 
-    public JComponent getHierarchyPanel() throws TerminologyException, IOException {
+    public JScrollPane getHierarchyPanel() throws TerminologyException, IOException {
         if (tree != null) {
             for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
                 tree.removeTreeExpansionListener(tel);
