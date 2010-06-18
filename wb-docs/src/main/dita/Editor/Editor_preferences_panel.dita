@@ -1,717 +1,986 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 <topic id="topic6" xml:lang="en">
-    <title>Understanding the Preferences Panel</title>
-    <prolog>
-        <metadata>
-            <keywords><indexterm>Preferences Panel </indexterm></keywords>
-        </metadata>
-    </prolog>
-    <body>
-        <section>The Concept Work Area displays a concept view based on the concept descriptions you
-            select from the Hierarchy View and those you retrieve from a search. The Preferences
-            Panel provides multiple options for controlling the concept information and its
-            presentation.</section>
-        <section id="ag937216">
-            <title>Using the Preferences Panel</title>
-        </section>
-        <section>The Preferences Panel controls the relationships displayed in the hierarchy view.
-            Before you begin to construct or change concepts, you need to select the version of the
-            hierarchy you want to view and edit. This selection will also determine the hierarchy
-            views available to you. </section>
-        <section>To access Preferences, click on the Preferences Panel icon. A window similar to the
-            one shown in <xref href="#topic6/ag937234" type="fig" format="dita"/> will display. This
-            example shows a path with multiple versions.</section>
-        <fig id="ag937234">
-            <title>Preferences Panel</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_17.jpg"
-                placement="break"/>
-        </fig>
-        <section>The presented view will depend on which path was selected, as shown in the
-            available Path tab. To designate a path to use, you must use the “thermometer” slider to
-            select a version, as indicated by the arrows to the left of the available
-            choices.</section>
-        <fig id="ag937245">
-            <title>Preferences Panel - Path tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_18.jpg"
-                placement="break" width="434" height="398"/>
-        </fig>
-        <section>
-            <i>Edit on this path: You must select at least one editing path by checking this box.
-            </i>
-        </section>
-        <section>
-            <i>Use position for view: You must select at least one view position by checking this
-                box.</i>
-        </section>
-        <section>
-            <title>Colour highlighting</title><indexterm>colour<indexterm>paths in taxonomy</indexterm></indexterm>
-            <p>The Workbench IDE now supports colour highlighting of paths in the taxonomy view.
-                Concepts belonging to different editing paths can be visually differentiated using
-                this feature as shown in <xref href="#topic6/image_taxonomy_colour_bars"
-                    format="dita"/>.</p>
-            <fig id="image_taxonomy_colour_bars"><title>Colour highlighting of paths in the taxonomy
-                    view</title>
-                <image href="../images/Using_The_ACE_Editor_Images/taxonomy_colour_bars.jpg"/>
-            </fig>
-            <p> Assignment of colours to paths is undertaken by checking the <i>color path</i>
-                checkbox in the Path pane of the Preferences Panel, as illustrated in <xref
-                    href="#topic6/image_path_colour" format="dita"/>.</p>
-            <fig id="image_path_colour"><title>Choosing a colour to assign to a path</title>
-                <image href="../images/Using_The_ACE_Editor_Images/path_colour.jpg"/>
-            </fig>
-        </section>
-        <section id="ag938568">
-            <title>Using the Preferences Panel Tabs</title>
-        </section>
-        <section>In addition to the Path tab, the Preferences Panel includes these additional tabs
-            across the top of the panel.</section>
-        <ul>
-            <li>View</li>
-            <li>Edit</li>
-            <li>New Path</li>
-            <li>Refset</li>
-            <li>Component Panel</li>
-        </ul>
-        <section>The<i> Preferences View tab </i>displays the current settings and options for
-            descriptions, relationships, status and roots, as shown in <xref href="#topic6/ag946086"
-                type="fig" format="dita"/>.</section>
-        <fig id="ag946086">
-            <title>Preferences Panel - View Tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_19.jpg"
-                placement="break" width="385" height="224"/>
-        </fig>
-        <section><title>Descriptions</title>
-            <indexterm>preferences <indexterm>Descriptions</indexterm>
-            </indexterm></section>
-        <section><i>Description Types - </i>Specifies which taxonomy description types will be
-            standard for the current settings, such fully specified name or preferred
-            term.</section>
-        <section>
-            <i>Short label preference order - </i> Specifies how to display the concept name in
-            those areas of the screen that use short labels (e.g., the taxonomy pane), based on the
-            concept description type. The first concept description whose description type matches
-            one of the description types in the list (in descending order) will be the one displayed
-            for that concept. </section>
-        <section>
-            <i>Long label preference order - </i> Specifies how to display the concept name in those
-            areas of the screen that use long labels (e.g., the concept work area), based on the
-            concept description type (e.g., fully specified name, preferred term). The first concept
-            description whose description type matches one of the description types in the list (in
-            descending order) will be the one displayed for that concept. </section>
-        <section><i>Tree preference order - </i>Specifies how to display the concept name in the
-            taxonomy view pane, based on the concept description type (e.g., fully specified name,
-            preferred term). The first concept description whose description type matches one of the
-            description types in the list (in descending order) will be the one displayed for that
-            concept.</section>
-        <section>
-            <i>Table preference order - </i>
-        </section>
-        <section id="ag946203">Roots - Defines the highest level (root) concepts in the taxonomy.
-            All other concepts will be children or sub-children of these concepts.<indexterm
-                >preferences <indexterm>root concept</indexterm>
-            </indexterm></section>
-        <section id="ag946219"><title>Taxonomy</title>
-            <indexterm>preferences <indexterm>Taxonomy</indexterm>
-            </indexterm></section>
-        <section>
-            <i>Display toggles - </i> Checking one or more boxes will control how data is displayed
-            in the taxonomy view </section>
-        <section>
-            <i>Parent relationships - </i> Defines the relationships used to associate child
-            concepts with parent concepts. </section>
-        <section>
-            <i>Stated view characteristic types - </i>
-        </section>
-        <section>
-            <i>Inferred view characeristic types - </i>
-        </section>
-        <section id="ag946291"><i>Taxonomy Sort - </i> If the Sort taxonomy using refset is selected
-            on the Taxonomy tab, this sort defines the refsets that will order the taxonomy
-                display.<indexterm>preferences <indexterm>Taxonomy Sort</indexterm>
-            </indexterm></section>
-        <section id="ag946303"><i>Status - </i> Defines which concepts will be displayed in the
-            taxonomy view pane based on their value in the associated status field.<indexterm
-                >preferences <indexterm>Status</indexterm>
-            </indexterm></section>
-        <section id="ag946314"><i>Refset - </i> Specifies the refsets for which concepts in the
-            hierarchy display will show adjacent inclusion or exclusion symbols.<indexterm
-                >preferences <indexterm>Refset</indexterm>
-            </indexterm></section>
-        <section>The <i>Preferences Edit tab </i> displays the default settings for status,
-            description, relationship type, relationship characteristic and relationship
-            refinability. An example of default settings is shown in <xref href="#topic6/ag947067"
-                type="fig" format="dita"/>.</section>
-        <section><title>Edit Defaults</title><indexterm>preferences <indexterm>Edit
-                    Defaults</indexterm>
-            </indexterm></section>
-        <section>
-            <i>Default status - </i> Specifies the initial value of the status field when a new
-            concept is added. </section>
-        <section>
-            <i>Default image type - </i> Specifies the initial value of the status field in the
-            Image section of the work area when associating an image with a concept. </section>
-        <section>
-            <i>Default description type - </i> Specifies the initial value of the description that
-            will appear in the type field of the Descriptions section of the work area when a new
-            concept is added. </section>
-        <section>
-            <i>Default relationship type - </i> Specifies the initial value in the type field of the
-            Source relationships and Destination relationships sections of the work area when a new
-            concept is added. </section>
-        <section>
-            <i>Default relationship characteristic - </i> Specifies the initial value in the char
-            (characteristic) of the Source relationships and Destination relationships sections of
-            the work area when a new concept is added. </section>
-        <section>
-            <i>Default relationship refinability - </i> Specifies the initial value in the
-            refinability field of the Source relationships and Destination relationships sections of
-            the work area when a new concept is added. </section>
-        <section id="ag946985"><i>Relationship Types (values for popup menu) - </i> Defines the
-            values available for the relationship type of a concept. These values specify the
-            choices displayed in the refinability field popup selection boxes in the Source
-            relationships and Destination relationships sections of the work area.<indexterm
-                >preferences <indexterm>Relationship Types</indexterm>
-            </indexterm></section>
-        <section id="ag946997"><i>Relationship Refinability (values for popup menu) - </i> Defines
-            the values available for the refinability of a concept. These values specify the choices
-            displayed in the refinability field popup selection boxes in the Source relationships
-            and Destination relationships sections of the work area.<indexterm>preferences
-                    <indexterm>Relationship Refinability</indexterm>
-            </indexterm></section>
-        <section id="ag947016"><i>Relationship Characteristics - </i> Defines the values available
-            for the characteristics of a concept. These values specify the choices displayed in the
-            char (characteristic) field popup selection boxes in the Source relationships and
-            Destination relationships sections of the work area.<indexterm>preferences <indexterm
-                    >Relationship Characteristics</indexterm>
-            </indexterm></section>
-        <section id="ag947031"><i>Description Types - </i> Defines the values available for the
-            description type of a concept. These values specify the choices displayed in the type
-            field popup selection box in the Descriptions section of the work area. <indexterm
-                >preferences <indexterm>Description Types</indexterm>
-            </indexterm></section>
-        <section id="ag947043"><i>Image Types - </i> Defines the values available for a concept’s
-            image type. These values specify the choices displayed in the type field popup selection
-            box in the Images section of the work area. <indexterm>preferences <indexterm>Image
-                    Types</indexterm>
-            </indexterm></section>
-        <section id="ag947055"><i>Status Values - </i> Defines the values available for the status
-            value of a concept. These values specify the choices displayed in the status field popup
-            selection boxes in the Concept attributes, Refset, Descriptions, Source relationships,
-            Destination relationships, and Images sections of the work area.<indexterm>preferences
-                    <indexterm>Status Values</indexterm>
-            </indexterm></section>
-        <fig id="ag947067">
-            <title>Preferences Panel - Edit Tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_20.jpg"
-                placement="break"/>
-        </fig>
-        <section>You can add items to the defaults by copying and pasting from the Hierarchy View,
-            as shown in <xref href="#topic6/ag938644" type="fig" format="dita"/>. The added item(s)
-            will then display in the popup menu available in the Concept Work Area. </section>
-        <fig id="ag938644">
-            <title>Copying Preferences Panel item from Hierarchy View</title>
-            <image href="../images/Using_The_ACE_Editor_Images/preferences_via_copy.jpg"
-                placement="break"/>
-        </fig>
-        <section>The added item(s), as shown in <xref href="#topic6/ag938658" type="fig"
-                format="dita"/>, will then display in the popup menu in the Concept Work
-            Area.</section>
-        <fig id="ag938658">
-            <title>Preferences Panel with new item added</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_22new.jpg"
-                placement="break"/>
-        </fig>
-        <section>The <i>Preferences New Path tab </i>provides a way to create a new path (hierarchy
-            view) from the existing paths for Terminology Auxiliary and SNOMED CORE taxonomies, as
-            shown in <xref href="#topic6/ag938675" type="fig" format="dita"/>.</section>
-        <fig id="ag938675">
-            <title>Preferences Panel - New Path Tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/preferences_new_path.jpg"
-                placement="break"/>
-        </fig>
-        <section>To add a new path to the available tabs, as shown in <xref href="#topic6/ag938689"
-                type="fig" format="dita"/>, follow the instructions below.</section>
-        <fig id="ag938689">
-            <title>New Path fields in Preferences Panel</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_24.jpg"
-                placement="break"/>
-        </fig>
-        <ul>
-            <li>Click on the New Path tab. Two fields will display at the top of the Path tab area:
-                    <i>Description for new path </i>and <i>Parent for Path </i>(which will contain
-                the text “Empty” in red).</li>
-            <li>From the Hierarchy View, select the desired path.</li>
-            <li>Enter a description of the path in the <i>Description for new path </i>field.</li>
-            <li>Enter the correct parent path in the <i>Parent for Path </i>field OR click in the
-                “Use position as origin” box in the space below the tabs to define the current
-                position in the Hierarchy View as the parent path. </li>
-            <li>Click the Create button to add the new path to the available selections.</li>
-        </ul>
-        <section id="ag938738"><title>Preferences Panel - RefSet Tab</title><ph>
-                <indexterm>preferences <indexterm>RefSet Tab</indexterm>
-                </indexterm>
-            </ph>
-        </section>
-        <section>For information about reference set preference settings for the tabs shown in <xref
-                href="#topic6/ag947183" type="fig" format="dita"/>, see <xref
-                href="Editor_displaying_spec_refsets.dita#topic14" type="topic" format="dita"/>, and
-                <xref href="Editor_displaying_refset_members.dita#topic15" type="topic"
-                format="dita"/>.</section>
-        <section>The result of a specification refset is a member refset, i.e., the set of concepts
-            specified by the specification refset. IHTSDO IDE can be set to display which concepts
-            are members of a particular member refset. A diagonal paper clip icon next to a concept
-            means that the concept is a member of the specified refset. A horizontal paper clip icon
-            next to a concept indicates thar one or more of its children is a member of the refset.
-            To display these icons, you must drag the desired member refset name onto the refset
-            sub-tab.</section>
-        <fig id="ag947183">
-            <title>Preferences Panel - Refset Tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_25.jpg"
-                placement="break"/>
-        </fig>
-        <section id="ag938825"><title>Preferences Panel - Component Tab</title><ph>
-                <indexterm>preferences <indexterm>Component Tab</indexterm>
-                </indexterm>
-            </ph>
-        </section>
-        <section>The checkboxes on the Component panel tab determine which display toggle buttons
-            are shown or hidden. Hiding a button ensures that the corresponding portion of the work
-            area is either always displayed or always hidden (i.e., cannot be toggled on or
-            off).</section>
-        <fig id="ag939041">
-            <title>Preferences Panel - Component Tab</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_26.jpg"
-                placement="break"/>
-        </fig>
-        <section id="ag939025">
-            <title>Reviewing the Concept Work Area Tabs</title>
-        </section>
-        <section>In addition to the icons described in <xref
-                href="Editor_concept_area.dita#topic4/ag936964" type="section" format="dita"/>, this
-            portion of the IHTSDO Workbench IDE window includes five tabs. The first four tabs in
-            the concept viewing and editing area are user-configurable. By default, the first tab is
-            linked to the current selection of the hierarchy view. However, the first tab can be
-            “unlinked” by clicking on the Concept Linkage button.</section>
-        <section>In the example shown in <xref href="#topic6/ag938923" type="fig" format="dita"/>,
-            the Hierarchy tab contains the hierarchy view name and the Search tab displays “Search”
-            since a concept search has not been executed. </section>
-        <fig id="ag938923">
-            <title>Concept Work Area</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_27.jpg"
-                placement="break"/>
-        </fig>
-        <section><i>Hierarchy Tab</i>: Displays the selected concept’s descriptions and
-            relationships from the Hierarchy View.</section>
-        <section><i>Search Tab</i>: Displays the concept, if any, selected from a search.</section>
-        <section id="ag939128"><i>Empty and Empty2 Tabs</i>: These tabs are available for
-            constructing new concepts by copying a concept, as shown in <xref
-                href="#topic6/ag937461" type="fig" format="dita"/>, and then changing their
-            descriptions and relationships. Concepts can be copied by using the drag and drop
-            feature of the Transporter icon. The <i>Empty and Empty2 </i>tabs are not linked to the
-                hierarchy.<indexterm>Empty tabs </indexterm><indexterm>Transporter icon
-            </indexterm></section>
-        <fig id="ag937461">
-            <title>Concepts Copied to Empty and Empty2 Tabs</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_28.jpg"
-                placement="break"/>
-        </fig>
-        <section><i>List Tab</i>: The List tab provides a way to execute batch changes such as to
-            associate a group of children with a different parent. For more information about
-            functions available from the List Tab, see <xref href="Editor_list_view.dita#topic7"
-                type="topic" format="dita"/>.</section>
-        <section id="ag937478">
-            <title>Adding a Concept</title>
-        </section>
-        <section>Concepts can be added by modifying an existing concept in the hierarchy tab view or
-            copying a concept to one of the Empty tabs and making additions and changes from that
-            view.</section>
-        <section>To add a concept, click on the plus sign + in the Descriptions icon of the work
-            area, as shown in <xref href="#topic6/ag937496" type="fig" format="dita"/>.</section>
-        <fig id="ag937496">
-            <title>Adding a New Concept</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_29.jpg"
-                placement="break"/>
-        </fig>
-        <section>To create the new concept, double-click on the blank text field. The current focus
-            concept text will fill in. Change the existing text to reflect the new concept. For more
-            information about adding descriptions, <xref href="#topic6/ag937578" type="section"
-                format="dita"/></section>
-        <section id="ag937510">
-            <title>Modifying a Concept<ph>
-                    <indexterm>Modifying a Concept </indexterm>
-                </ph></title>
-        </section>
-        <section>To modify an existing concept, right-click on the concept description to be
-            modified. A popup menu will display, as shown in <xref href="#topic6/ag937524"
-                type="fig" format="dita"/>. </section>
-        <fig id="ag937524">
-            <title>Modifying a Concept</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_30.jpg"
-                placement="break"/>
-        </fig>
-        <section>Click on Change: [description]. A new blank line will appear below the line you
-            want to change. </section>
-        <section>Double-click in the text field of the new blank line and the existing concept
-            description will fill in. Place your cursor within the text field and modify the text. </section>
-        <section>For more information about changing concepts, <xref href="#topic6/ag937578"
-                type="section" format="dita"/></section>
-        <section id="ag937546">
-            <title>Changing Concept Attributes<ph>
-                    <indexterm>Concept Attributes <indexterm>changing</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>This section of the work area displays the existing concept and retired attributes
-            and indicates whether the concept has been fully defined.</section>
-        <section>To change or retire a concept attribute, hover the cursor over the existing line.
-            The Change or Retire menu displays. Click on one of the options. Note that the “status”
-            column will show the option you selected. A new line will display. Click on the new line
-            to reveal a True/False choice. Click on the appropriate choice. </section>
-        <section><i>Green Bar: </i>Note that new lines that have not been committed to the database
-            are identified by a green vertical bar at the left side of the line, as shown in <xref
-                href="#topic6/ag937572" type="fig" format="dita"/>. This visual identifier is used
-            throughout the IHTSDO Workbench Editor to denote uncommitted additions. The green bar
-            will remain in place until you press the “Commit” button.</section>
-        <fig id="ag937572">
-            <title>Adding a Concept Attribute</title>
-            <image href="../images/Using_The_ACE_Editor_Images/adding_concept_attribute.jpg"
-                placement="break"/>
-        </fig>
-        <section id="ag937578">
-            <title>Adding and Changing Descriptions</title><ph>
-                    <indexterm>concept descriptions <indexterm>adding and changing</indexterm>
-                    </indexterm>
-                </ph>
-        This section displays all of the descriptions that either are synonyms for the
-            selected focus concept or represent the preferred or fully specified
-            description.</section>
-        <section>To change or retire an existing description, hover the cursor over the existing
-            line. The Change or Retire menu displays. Click on one of the options. Note that the
-            “status” column will show the option you selected. In either option, a new line will
-            display, as shown in <xref href="#topic6/ag937596" type="fig" format="dita"/>.</section>
-        <fig id="ag937596">
-            <title>Changing a Description</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_32.jpg"
-                placement="break" width="445" height="87"/>
-        </fig>
-        <section>The focus concept is the first description listed in the section. To add a new
-            description, click on the green plus sign under the “Descriptions” heading. A new line
-            with the default text “New Description” will be added to the bottom of the list, with a
-            green vertical bar on the left side of the line to indicate the line has not yet been
-            committed to the database. The green bar will be displayed until you press Commit or
-            Cancel. <i>Note: This identifier is used throughout the IHTSDO Workbench Editor to
-                denote uncommitted additions. </i> Double-click on the text field in the new line
-            and replace the existing text with the description you want to add to the list, as shown
-            in <xref href="#topic6/ag937610" type="fig" format="dita"/>.</section>
-        <fig id="ag937610">
-            <title>Adding a Description</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_33.jpg"
-                placement="break" width="261" height="53"/>
-        </fig>
-        <section>The remaining fields are described below.</section>
-        <section>
-            <note><i>If you are editing on two paths (see Preferences Panel settings), clicking on
-                    the green plus sign will create two blank lines. </i></note>
-        </section>
-        <ul>
-            <li>Type: Type defaults to “synonym.” Click on the Type field to view a popup list of
-                other options that include fully specified, xhtml def(inition), entry term,
-                preferred and unspecified.</li>
-            <li>Case: The Case field denotes whether the concept, as a whole, is sufficiently
-                defined. The default is false. You or the user must determine whether the concept is
-                adequately defined. Click on the Case field to choose true or false.</li>
-            <li>Language (Lang): The default is “en” (English).</li>
-            <li>Status: The default is current. Click on the Change Status option in the drop-down
-                list to view and select a different status description from the popup list. The
-                choices that appear are set in the Preferences Panel. </li>
-            <li>Version and Path: These fields are displayed only when the “Display history records”
-                button is pressed. These informational fields are automatically updated by the
-                IHTSDO Workbench Editor.</li>
-        </ul>
-        <section id="ag937647">
-            <title>Adding and Changing Source Relationships<ph>
-                    <indexterm>source relationships <indexterm>adding and changing</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>This section displays all of the source relationships that are already defined for
-            the focus concept. Relationships link concepts to one another. That means “is a”
-            relationships link concepts in a parent-child hierarchy (e.g., duck is a bird; bird is a
-            animal). A concept can have more than one “is a” relationship to other concepts (e.g.,
-            bird is a animal, bird is a verterbrate.)</section>
-        <section>Attribute relationships form a class of similar relationships that relate two
-            concepts and establish the type of relationship between them. These types of
-            relationships are defined by the designer of the hierarchy or database. For example, the
-            attribute relationships in a pharmacology database could include “Has dose form” and
-            “Has active ingredient”.</section>
-        <section>A relationship exists between two concepts. That relationship may appear as either
-            a source relationship or a destination relationship, depending on which of the two
-            concepts’ details you are viewing. Relationships with concepts higher in a hierarchy
-            than the concept are source relationships. The IHTSDO Workbench Editor displays both
-            source and destination relationships for a concept.</section>
-        <section>To change or retire a source relationship, hover the cursor over the existing line.
-            The Change or Retire menu displays, as shown in <xref href="#topic6/ag970542" type="fig"
-                format="dita"/>. Click on an option. Note that the “status” column will show the
-            option you selected. </section>
-        <fig id="ag970542">
-            <title>Changing or Retiring a Source Relationship</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_34.jpg"
-                placement="break" width="419" height="221"/>
-        </fig>
-        <section>To change a description, select the “Change” option.</section>
-        <section>To add a source relationship, click on the green + symbol under the “Source
-            Relationships” description. A new line will be added to the list with the default
-            relationship type “is-a rel (terminology constant)”. Copy and paste a description from
-            the Hierarchy View, as shown in <xref href="#topic6/ag970577" type="fig" format="dita"
-            />. <i>Note</i>: Added line has been enlarged in screen shot for emphasis.</section>
-        <fig id="ag970577">
-            <title>Adding a Source Relationship</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_37.jpg"
-                placement="break" width="422" height="77"/>
-        </fig>
-        <section>Remaining fields in the Source Relationships section are described below.</section>
-        <ul>
-            <li><i>Destination</i>: The concept to which this concept is connected in the
-                terminology hierarchy.</li>
-            <li><i>Char</i>: Characteristic of the source relationship, as defined by options in the
-                popup menu (displayed when you double-click on the column). </li>
-            <li><i>Refinability</i>: Indicates whether the refinability of this relationship is
-                optional, mandatory or not refinable, as defined by options in the popup menu.</li>
-            <li><i>Group</i>: The SNOMED relationship group to which this relationship belongs.</li>
-            <li><i>Status</i>: Indicates the concept description, as defined by the popup menu, e.g,
-                current or inactive.</li>
-        </ul>
-        <section id="ag937756">
-            <title>Adding and Changing Destination Relationships<ph>
-                    <indexterm>destination relationships <indexterm>adding and changing</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>The Destination Relationships section displays all of the destination relationships
-            that are already defined for the focus concept and provides a way to change and add
-            destination relationships. </section>
-        <section>To change or retire a destination relationship, right-click on the desired line and
-            choose an option from the displayed popup menu, as shown in <xref
-                href="#topic6/ag937774" type="fig" format="dita"/>.</section>
-        <fig id="ag937774">
-            <title>Changing a Destination Relationship</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_38.jpg"
-                placement="break" width="408" height="171"/>
-        </fig>
-        <section>To change the content of a destination relationship, right-click on any of the
-            fields and select an option from the displayed popup menu.</section>
-        <section>To add a destination relationship, click on the green + symbol under the
-            “Destination Relationships” description. A new line will be added, as shown in <xref
-                href="#topic6/ag937792" type="fig" format="dita"/>. Copy and paste or type the new
-            destination relationship values.</section>
-        <fig id="ag937792">
-            <title>Adding a Destination Relationship</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_39.jpg"
-                placement="break" width="441" height="43"/>
-        </fig>
-        <section>Remaining fields in the Destination Relationships section include:</section>
-        <ul>
-            <li><i>Origin</i>: The source relationship of the description.</li>
-            <li><i>Type</i>: Type of relationship, as shown when you triple-click on the field to
-                display the popup menu.</li>
-            <li><i>Char</i>: Characteristics of the destination relationship, as defined by options
-                in the popup menu.</li>
-            <li><i>Refinability</i>: Indicates whether the refinability of this relationship is
-                optional, required or not refinable, as defined by options in the popup menu.</li>
-            <li><i>Status</i>: Indicates the destination description, as defined by the popup
-                menu.</li>
-        </ul>
-        <section id="ag937841">
-            <title>A Note About Taxonomy<ph>
-                    <indexterm>taxonomy </indexterm>
-                </ph></title>
-        </section>
-        <section>A relationship contains a taxonomy when a true “is-a” (source relationship)
-            statement is included in the view. If the view only displays mapping to other concepts,
-            the relationship is <i>not </i>a taxonomy.</section>
-        <section id="ag949029">
-            <title>Viewing Concept Lineage<ph>
-                    <indexterm>Concept Lineage </indexterm>
-                    <indexterm>lineage <indexterm>concept</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>The Lineage section of the Concept Work Area provides a visual aid to help identify
-            where the selected concept resides in the hierarchy. The selected concept is designated
-            with blue arrows to highlight where its multiple lineages, if any, exist, as shown in
-                <xref href="#topic6/ag949043" type="fig" format="dita"/>.</section>
-        <fig id="ag949043">
-            <title>Concept Lineage</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_40.jpg"
-                placement="break" width="446" height="228"/>
-        </fig>
-        <section>As described in the Hierarchy View discussion (<xref
-                href="Editor_hierarchy_view.dita#topic3/ag929147" type="section" format="dita"/>),
-            the slanted green arrows indicate additional parent lineages in higher positions in the
-            hierarchy.</section>
-        <section id="ag949057">
-            <title>Using Concept Lineage Graphs<ph>
-                    <indexterm>Concept Lineage Graphs </indexterm>
-                    <indexterm>graphs <indexterm>concept lineage</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>As noted in <xref href="Editor_concept_area.dita#topic4/ag937081" type="section"
-                format="dita"/>, you can view or hide access to a lineage graphing tool that
-            provides dimensional views of the current concept’s lineage. The default setting for the
-            icon is “off.” To turn the graphing option on, from the Preferences Panel, select
-            Component Panel and click in the box next to Lineage Graph.</section>
-        <section>This tool is especially helpful when working with complex concepts. Lineage graphs
-            can be manipulated according to a number of algorithms, allowing you to reorganize the
-            lineage elements to suit your needs. </section>
-        <section>
-            <note><i>You may want to hide the sections of the concept work area above the lineage
-                    graph section to provide space for a larger display of the graph.</i></note>
-        </section>
-        <section>To illustrate the features of the lineage graphing tool, use the search function to
-            search for ‘duck viral hepatitis.’ This concept will yield a complex graph that can be
-            reorganized by the lineage graph tools. The initially displayed graph will look like the
-            one shown in <xref href="#topic6/ag949090" type="fig" format="dita"/>. The focus concept
-            element is outlined in blue; the top SNOMED CT concept element is outlined in
-            red.</section>
-        <fig id="ag949090">
-            <title>Lineage Graph for Duck Viral Hepatitis</title>
-            <image href="../images/Using_The_ACE_Editor_Images/lineage_graph.jpg"
-                placement="break"/>
-        </fig>
-        <section id="ag949095">
-            <title>Lineage Graph Controls (Icons)<ph>
-                    <indexterm>graph controls </indexterm>
-                </ph></title>
-        </section>
-        <section>The icons on the left side of the lineage graph, as shown in <xref
-                href="#topic6/ag948613" type="fig" format="dita"/>, provide controls for viewing the
-            graph. The controls provide the following functions: </section>
-        <section><ph>
-                    <indexterm>hyperbolic view </indexterm><indexterm>lens view</indexterm>
-                </ph>Lens Views - Use this control to change the graph image to hyperbolic (a curved
-            representation) views that are useful for large, complex graphs, as shown in <xref
-                href="#topic6/ag948645" type="fig" format="dita"/>, or a hyperbolic layout, as shown
-            in <xref href="#topic6/ag948693" type="fig" format="dita"/> that distorts the image of
-            the elements. You can also magnify the view or layout from this menu. Click “No lens” to
-            return to the original view.</section>
-        <fig id="ag948613">
-            <title>Lineage Graph Controls</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_42.jpg"
-                placement="break"/>
-        </fig>
-        <fig id="ag948645">
-            <title>Lineage Graph - Hyperbolic View </title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_43.jpg"
-                placement="break"/>
-        </fig>
-        <fig id="ag948693">
-            <title>Lineage Graph - Hyperbolic Layout</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_44.jpg"
-                placement="break"/>
-        </fig>
-        <section id="ag948741"><i>Magnify View</i> - Click this icon to incrementally magnify, or
-            enlarge, the graph view. You can also use the scroll wheel on the mouse to magnify a
-            view. The cursor position determines where magnification begins.<indexterm>magnify view
-            </indexterm></section>
-        <section id="ag949163"><i>Shrink View</i> - Click this icon to incrementally shrink the
-            graph view. You can also use the scroll wheel on the mouse to shrink a view.<indexterm
-                >shrink view </indexterm></section>
-        <section id="ag948822"><i>Nodes View</i> - Click this to enable use of the mouse to select
-            nodes within the graph and move them around, as shown in <xref href="#topic6/ag948843"
-                type="fig" format="dita"/>. Use the mouse to draw a line around the nodes you want
-            to move. Click in the middle of one of the selected nodes and drag to move the node. To
-            extend the selected node beyond the original borders, Shift/Click in the middle of the
-            node. To deselect the node, click outside the selection borders.<indexterm>nodes view
-            </indexterm></section>
-        <fig id="ag948843">
-            <title>Lineage Graph - Node Moved</title>
-            <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_45.jpg"
-                placement="break"/>
-        </fig>
-        <section>Algorithm View - Click this icon to choose a specialized view based on the
-            algorithims listed in the menu. For more information, see <xref href="#topic6/ag949194"
-                type="section" format="dita"/>.</section>
-        <section id="ag948576">
-            <title>Using Lineage Graph Keyboard Controls<ph>
-                    <indexterm>keyboard controls <indexterm>lineage graph</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>In addition to the controls/icons discussed above, lineage graphs can also be
-            manipulated via several keyboard and mouse controls.</section>
-        <ul>
-            <li>Click/Drag - moves the graph within the graph window</li>
-            <li>Shift/Click - rotates the graph </li>
-            <li>Ctrl/Click/Drag - (or Clover/Click/Drag for Mac users) - when positioned in the
-                center of the frame, moves the graph from side to side, as a shear function</li>
-            <li>Mouse Hover - displays a tool tip that is the selected graph element’s label (e.g.,
-                V2) </li>
-            <li>Click a Link - changes the line to red to show where the line leads, i.e., to
-                illustrate relationships within the concept.</li>
-        </ul>
-        <section id="ag949194">
-            <title>Changing Lineage Graph Layouts with Algorithms <ph>
-                    <indexterm>graphs <indexterm>concept lineage layouts</indexterm>
-                    </indexterm>
-                </ph></title>
-        </section>
-        <section>As noted in <xref href="#topic6/ag949095" type="section" format="dita"/>, the
-            Algorithm View icon provides access to a number of graph views based on algorithms. The
-            algorithms, by definition, incorporate some randomness that can change how the layout
-            appears in different instances of the same algorithm. </section>
-        <section>Each algorithm has advantages and disadvantages. Some are more suited to small,
-            simple graphs; others work best with larger, more complex graphs. The available
-            algorithms are described below.</section>
-        <ul>
-            <li>
-                <i>DAG Layout - </i> is best suited to tree-like directed acrylic graphs. The layout
-                will have directed edges generally pointing upwards. Any vertices with no successors
-                are considered level zero, and tend toward the top of the layout. Any vertex has a
-                level one greater than the maximum level of all its successors. </li>
-            <li><i>ISOM Layout</i> - implements a self-organizing map layout algorithm, based on
-                Meyer’s self-organizing graph methods. </li>
-            <li><i>FR Layout</i> - implements the Fruchterman-Reingold algorithm for node layout.
-                This is one of the two most widely used layouts, and is based on the spring
-                algorithm, which introduces attraction forces between linked nodes and repulsion
-                forces between unlinked nodes. The FR layout uses a “temperature” system to lay out
-                the entire graph. During each iteration of the algorithm, the temperature is
-                reduced. When the minimum temperature is reached, the algorithm stops.</li>
-            <li><i>KK Layout</i> - implements the Kamada-Kawai algorithm for node layout, also a
-                widely used layout scheme. Each iteration of the KK Layout changes the position of
-                only a single node. </li>
-            <li><i>Spring Layout</i> - represents a visualization of a set of nodes. The Spring
-                Layout assigns X/Y locations to each node and moves the image forward one step at a
-                time. As a result, Spring Layout can take a considerable amount of time to
-                execute.</li>
-            <li><i>IHTSDO Workbench Graph Layout - </i>currently the same as the DAG Layout. Will be
-                enhanced in future releases.</li>
-        </ul>
-        <section id="ag949284"><title>Using the Conflicts View</title><ph>
-                <indexterm>conflicts </indexterm>
-            </ph>
-        </section>
-        <section>If you have selected more than one path, the Conflicts toggle displays (or hides) a
-            view of conflicts between the two paths, as shown in <xref href="#topic6/ag937911"
-                type="fig" format="dita"/>. </section>
-        <section><i>Resolution</i>: The resolved (agreeing) components of the conflicting versions
-            are listed in the upper left section of the Conflicts view.</section>
-        <section><i>Versions</i>: The conflicting versions are identified in the two lower sections
-            of the Conflicts view. <ph>
-                <indexterm>conflicts view </indexterm>
-            </ph></section>
-        <fig id="ag937911">
-            <title>Conflicts View </title>
-            <image href="../images/Using_The_ACE_Editor_Images/conflicts_view.jpg" placement="break" />
-        </fig>
-        <section><i>Differences</i>: The boxes with colored lettering and borders indicate the
-            conflict areas. To add conflicting concepts to the other version, click the “Add All”
-            and “Implement” buttons.</section>
-        <section><i>Long Form</i>: Click in this box to display more detailed definitions of each
-            attribute displayed in the Conflict view.</section>
-        <section><i>Status</i>: Click in this box to view the current status (current, etc.) of each
-            attribute displayed in the Conflict view. </section>
-    </body>
+  <title>Understanding the Preferences Panel</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Preferences Panel</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The Concept Work Area displays a concept view based on the
+    concept descriptions you select from the Hierarchy View and those you
+    retrieve from a search. The Preferences Panel provides multiple options
+    for controlling the concept information and its presentation.</section>
+
+    <section id="ag937216"><title>Using the Preferences
+    Panel</title></section>
+
+    <section>The Preferences Panel controls the relationships displayed in the
+    hierarchy view. Before you begin to construct or change concepts, you need
+    to select the version of the hierarchy you want to view and edit. This
+    selection will also determine the hierarchy views available to
+    you.</section>
+
+    <section>To access Preferences, click on the Preferences Panel icon. A
+    window similar to the one shown in <xref format="dita"
+    href="#topic6/ag937234" type="fig"/> will display. You will need to select
+    the path tab.</section>
+
+    <fig id="ag937234">
+      <title>Preferences Panel</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/preferences_pane.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>The presented view will depend on which path was selected, as
+    shown in the available Path tab. To designate a path to use, you must use
+    the “thermometer” slider to select a version, as indicated by the arrows
+    to the left of the available choices.</section>
+
+    <fig id="ag937245">
+      <title>Preferences Panel - Path tab</title>
+
+      <image height="398"
+             href="../images/Using_The_ACE_Editor_Images/preferences_path.jpg"
+             placement="break" width="434"/>
+    </fig>
+
+    <section><i>Edit on this path: You must select at least one editing path
+    by checking this box. </i></section>
+
+    <section><i>Use position for view: You must select at least one view
+    position by checking this box.</i></section>
+
+    <section><title>Colour
+    highlighting</title><indexterm>colour<indexterm>paths in
+    taxonomy</indexterm></indexterm> <p>The Workbench IDE now supports colour
+    highlighting of paths in the taxonomy view. Concepts belonging to
+    different editing paths can be visually differentiated using this feature
+    as shown in <xref format="dita"
+    href="#topic6/image_taxonomy_colour_bars"/>.</p> <fig
+        id="image_taxonomy_colour_bars">
+        <title>Colour highlighting of paths in the taxonomy view</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/taxonomy_colour_bars.jpg"/>
+      </fig> <p> Assignment of colours to paths is undertaken by checking the
+    <i>color path</i> checkbox in the Path pane of the Preferences Panel, as
+    illustrated in <xref format="dita" href="#topic6/image_path_colour"/>.</p>
+    <fig id="image_path_colour">
+        <title>Choosing a colour to assign to a path</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/path_colour.jpg"/>
+      </fig></section>
+
+    <section id="ag938568"><title>Using the Preferences Panel
+    Tabs</title></section>
+
+    <section>In addition to the Path tab, the Preferences Panel includes these
+    additional tabs across the top of the panel.</section>
+
+    <ul>
+      <li>View</li>
+
+      <li>Edit</li>
+
+      <li>Refset</li>
+
+      <li>Changeset</li>
+
+      <li>Chronicler</li>
+
+      <li>Classifier</li>
+    </ul>
+
+    <section>The<i> Preferences View tab </i>displays the current settings and
+    options for descriptions, relationships, status and roots, as shown in
+    <xref format="dita" href="#topic6/ag946086" type="fig"/>.</section>
+
+    <fig id="ag946086">
+      <title>Preferences Panel - View Tab</title>
+
+      <image height="224"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_19.jpg"
+             placement="break" width="385"/>
+    </fig>
+
+    <section><title>Descriptions</title> <indexterm>preferences
+    <indexterm>Descriptions</indexterm> </indexterm></section>
+
+    <section><i>Description Types - </i>Specifies which taxonomy description
+    types will be standard for the current settings, such fully specified name
+    or preferred term.</section>
+
+    <section><i>Short label preference order - </i> Specifies how to display
+    the concept name in those areas of the screen that use short labels (e.g.,
+    the taxonomy pane), based on the concept description type. The first
+    concept description whose description type matches one of the description
+    types in the list (in descending order) will be the one displayed for that
+    concept.</section>
+
+    <section><i>Long label preference order - </i> Specifies how to display
+    the concept name in those areas of the screen that use long labels (e.g.,
+    the concept work area), based on the concept description type (e.g., fully
+    specified name, preferred term). The first concept description whose
+    description type matches one of the description types in the list (in
+    descending order) will be the one displayed for that concept.</section>
+
+    <section><i>Tree preference order - </i>Specifies how to display the
+    concept name in the taxonomy view pane, based on the concept description
+    type (e.g., fully specified name, preferred term). The first concept
+    description whose description type matches one of the description types in
+    the list (in descending order) will be the one displayed for that
+    concept.</section>
+
+    <section><i>Table preference order - </i></section>
+
+    <section id="ag946203">Roots - Defines the highest level (root) concepts
+    in the taxonomy. All other concepts will be children or sub-children of
+    these concepts.<indexterm>preferences <indexterm>root concept</indexterm>
+    </indexterm></section>
+
+    <section id="ag946219"><title>Taxonomy</title> <indexterm>preferences
+    <indexterm>Taxonomy</indexterm> </indexterm></section>
+
+    <section><i>Display toggles - </i> Checking one or more boxes will control
+    how data is displayed in the taxonomy view</section>
+
+    <section><i>Parent relationships - </i> Defines the relationships used to
+    associate child concepts with parent concepts.</section>
+
+    <section><i>Stated view characteristic types - </i></section>
+
+    <section><i>Inferred view characeristic types - </i></section>
+
+    <section id="ag946291"><i>Taxonomy Sort - </i> If the Sort taxonomy using
+    refset is selected on the Taxonomy tab, this sort defines the refsets that
+    will order the taxonomy display.<indexterm>preferences <indexterm>Taxonomy
+    Sort</indexterm> </indexterm></section>
+
+    <section id="ag946303"><i>Status - </i> Defines which concepts will be
+    displayed in the taxonomy view pane based on their value in the associated
+    status field.<indexterm>preferences <indexterm>Status</indexterm>
+    </indexterm></section>
+
+    <section id="ag946314"><i>Refset - </i> Specifies the refsets for which
+    concepts in the hierarchy display will show adjacent inclusion or
+    exclusion symbols.<indexterm>preferences <indexterm>Refset</indexterm>
+    </indexterm></section>
+
+    <section>The <i>Preferences Edit tab </i> displays the default settings
+    for status, description, relationship type, relationship characteristic
+    and relationship refinability. An example of default settings is shown in
+    <xref format="dita" href="#topic6/ag947067" type="fig"/>.</section>
+
+    <section><title>Edit Defaults</title><indexterm>preferences
+    <indexterm>Edit Defaults</indexterm> </indexterm></section>
+
+    <section><i>Default status - </i> Specifies the initial value of the
+    status field when a new concept is added.</section>
+
+    <section><i>Default image type - </i> Specifies the initial value of the
+    status field in the Image section of the work area when associating an
+    image with a concept.</section>
+
+    <section><i>Default description type - </i> Specifies the initial value of
+    the description that will appear in the type field of the Descriptions
+    section of the work area when a new concept is added.</section>
+
+    <section><i>Default relationship type - </i> Specifies the initial value
+    in the type field of the Source relationships and Destination
+    relationships sections of the work area when a new concept is
+    added.</section>
+
+    <section><i>Default relationship characteristic - </i> Specifies the
+    initial value in the char (characteristic) of the Source relationships and
+    Destination relationships sections of the work area when a new concept is
+    added.</section>
+
+    <section><i>Default relationship refinability - </i> Specifies the initial
+    value in the refinability field of the Source relationships and
+    Destination relationships sections of the work area when a new concept is
+    added.</section>
+
+    <section id="ag946985"><i>Relationship Types (values for popup menu) -
+    </i> Defines the values available for the relationship type of a concept.
+    These values specify the choices displayed in the refinability field popup
+    selection boxes in the Source relationships and Destination relationships
+    sections of the work area.<indexterm>preferences <indexterm>Relationship
+    Types</indexterm> </indexterm></section>
+
+    <section id="ag946997"><i>Relationship Refinability (values for popup
+    menu) - </i> Defines the values available for the refinability of a
+    concept. These values specify the choices displayed in the refinability
+    field popup selection boxes in the Source relationships and Destination
+    relationships sections of the work area.<indexterm>preferences
+    <indexterm>Relationship Refinability</indexterm> </indexterm></section>
+
+    <section id="ag947016"><i>Relationship Characteristics - </i> Defines the
+    values available for the characteristics of a concept. These values
+    specify the choices displayed in the char (characteristic) field popup
+    selection boxes in the Source relationships and Destination relationships
+    sections of the work area.<indexterm>preferences <indexterm>Relationship
+    Characteristics</indexterm> </indexterm></section>
+
+    <section id="ag947031"><i>Description Types - </i> Defines the values
+    available for the description type of a concept. These values specify the
+    choices displayed in the type field popup selection box in the
+    Descriptions section of the work area. <indexterm>preferences
+    <indexterm>Description Types</indexterm> </indexterm></section>
+
+    <section id="ag947043"><i>Image Types - </i> Defines the values available
+    for a concept’s image type. These values specify the choices displayed in
+    the type field popup selection box in the Images section of the work area.
+    <indexterm>preferences <indexterm>Image Types</indexterm>
+    </indexterm></section>
+
+    <section id="ag947055"><i>Status Values - </i> Defines the values
+    available for the status value of a concept. These values specify the
+    choices displayed in the status field popup selection boxes in the Concept
+    attributes, Refset, Descriptions, Source relationships, Destination
+    relationships, and Images sections of the work area.<indexterm>preferences
+    <indexterm>Status Values</indexterm> </indexterm></section>
+
+    <fig id="ag947067">
+      <title>Preferences Panel - Edit Tab</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_20.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>You can add items to the defaults by copying and pasting from the
+    Hierarchy View, as shown in <xref format="dita" href="#topic6/ag938644"
+    type="fig"/>. The added item(s) will then display in the popup menu
+    available in the Concept Work Area.</section>
+
+    <fig id="ag938644">
+      <title>Copying Preferences Panel item from Hierarchy View</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/preferences_via_copy.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>The added item(s), as shown in <xref format="dita"
+    href="#topic6/ag938658" type="fig"/>, will then display in the popup menu
+    in the Concept Work Area.</section>
+
+    <fig id="ag938658">
+      <title>Preferences Panel with new item added</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_22new.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>The <i>Preferences Path tab </i>provides a way to create a new
+    path (hierarchy view) from the existing paths for Terminology Auxiliary
+    and SNOMED CORE taxonomies, as shown in <xref format="dita"
+    href="#topic6/ag938675" type="fig"/>.</section>
+
+    <fig id="ag938675">
+      <title>Preferences Panel - New Path Tab</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/preferences_path_create.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>To add a new path to the available tabs, as shown in <xref
+    format="dita" href="#topic6/ag938689" type="fig"/>, follow the
+    instructions below.</section>
+
+    <fig id="ag938689">
+      <title>New Path fields in Preferences Panel</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_24.jpg"
+             placement="break"/>
+    </fig>
+
+    <ul>
+      <li>Click on the Create tab. Two fields will display at the top of the
+      Path tab area: <i>Description for new path </i>and <i>Parent for Path
+      </i>(which will contain the text “Empty” in red).</li>
+
+      <li>From the Hierarchy View, select the desired path.</li>
+
+      <li>Enter a description of the path in the <i>Description for new path
+      </i>field.</li>
+
+      <li>Enter the correct parent path in the <i>Parent for Path </i>field OR
+      click in the “Use position as origin” box in the space below the tabs to
+      define the current position in the Hierarchy View as the parent
+      path.</li>
+
+      <li>Click the Create button to add the new path to the available
+      selections.</li>
+    </ul>
+
+    <section id="ag938738"><title>Preferences Panel - RefSet Tab</title><ph>
+    <indexterm>preferences <indexterm>RefSet Tab</indexterm> </indexterm>
+    </ph></section>
+
+    <section>For information about reference set preference settings for the
+    tabs shown in <xref format="dita" href="#topic6/ag947183" type="fig"/>,
+    see <xref format="dita" href="Editor_displaying_spec_refsets.dita#topic14"
+    type="topic"/>, and <xref format="dita"
+    href="Editor_displaying_refset_members.dita#topic15"
+    type="topic"/>.</section>
+
+    <section>The result of a specification refset is a member refset, i.e.,
+    the set of concepts specified by the specification refset. IHTSDO IDE can
+    be set to display which concepts are members of a particular member
+    refset. A diagonal paper clip icon next to a concept means that the
+    concept is a member of the specified refset. A horizontal paper clip icon
+    next to a concept indicates thar one or more of its children is a member
+    of the refset. To display these icons, you must drag the desired member
+    refset name onto the refset sub-tab.</section>
+
+    <fig id="ag947183">
+      <title>Preferences Panel - Refset Tab</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/preferences_refsets.jpg"
+             placement="break"/>
+    </fig>
+
+    <section id="ag938825"><title>Preferences Panel - Component
+    Tab</title><ph> <indexterm>preferences <indexterm>Component
+    Tab</indexterm> </indexterm> </ph></section>
+
+    <section>The checkboxes on the View -&gt; Component panel tab determine
+    which display toggle buttons are shown or hidden. Hiding a button ensures
+    that the corresponding portion of the work area is either always displayed
+    or always hidden (i.e., cannot be toggled on or off).</section>
+
+    <fig id="ag939041">
+      <title>Preferences Panel - Component Tab</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/preferences_component.jpg"
+             placement="break"/>
+    </fig>
+
+    <section><title>Preferences Panel - Changeset tab</title><p>The Changeset
+    tab<indexterm>changeset<indexterm>preferences</indexterm></indexterm>
+    <indexterm>preferences<indexterm>changeset</indexterm></indexterm>in the
+    preferences panel allows you to determine the effect various actions have
+    on changesets, as shown in <xref
+    href="#topic6/preferences_changeset"/>.<fig id="preferences_changeset">
+        <title>the changeset preferences panel</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/preferences_changeset.jpg"/>
+      </fig>The available changeset settings are:-<ul>
+        <li>no changeset</li>
+
+        <li>incremental changeset</li>
+
+        <li>mutable-only
+        changeset<indexterm>changeset<indexterm>mutable-only</indexterm></indexterm></li>
+
+        <li>comprehensive changeset</li>
+      </ul></p></section>
+
+    <section><title>Preferences Panel - Chronicler tab</title><p>The
+    chronicler tab
+    <indexterm>preferences<indexterm>chronicler</indexterm></indexterm><indexterm>chronicler</indexterm>provides
+    for setting the precedence and the basis upon which contradictions or
+    conflicts<indexterm>conflicts</indexterm> are
+    resolved.<indexterm>contradictions<indexterm>strategies</indexterm></indexterm><fig>
+        <title>Preferences panel - chronicler - precedence</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/preferences_chronicler_precedence.jpg"/>
+      </fig><fig>
+        <title>Preferences panel - chronicler - contradictions</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/preferences_chronicler_contradictions.jpg"/>
+      </fig>A number of strategies are available to set the action that should
+    be taken when identifying and resolving contadictions, as shown in <xref
+    href="#topic6/preferences_contradiction_strategies"/>.<fig
+        id="preferences_contradiction_strategies">
+        <title>Preferences panel - chronicler - contradiction
+        strategies</title>
+
+        <image href="../images/Using_The_ACE_Editor_Images/preferences_contradictions_popup.jpg"/>
+      </fig></p></section>
+
+    <section><title>Preferences Panel - Classifier tab</title><p>The
+    classifier is used to validate concept relationships according to SNOMED's
+    underlying Descriptions Logic. Use of the classifier is described in <xref
+    href="../Classifying/Classifying_intro.dita"/>. Preferences related to the
+    classifier can be set in the preferences panel by drag-and-droping
+    concepts from the taxonomy or search
+    panels.<indexterm>classifier<indexterm>preferences</indexterm></indexterm><fig>
+        <title/>
+
+        <image href="../images/Using_The_ACE_Editor_Images/preferences_classifier.jpg"/>
+      </fig></p></section>
+
+    <section id="ag939025"><title>Reviewing the Concept Work Area
+    Tabs</title></section>
+
+    <section>In addition to the icons described in <xref format="dita"
+    href="Editor_concept_area.dita#topic4/ag936964" type="section"/>, this
+    portion of the IHTSDO Workbench IDE window includes five tabs. The first
+    four tabs in the concept viewing and editing area are user-configurable.
+    By default, the first tab is linked to the current selection of the
+    hierarchy view. However, the first tab can be “unlinked” by clicking on
+    the Concept Linkage button.</section>
+
+    <section>In the example shown in <xref format="dita"
+    href="#topic6/ag938923" type="fig"/>, the Hierarchy tab contains the
+    hierarchy view name and the Search tab displays “Search” since a concept
+    search has not been executed.</section>
+
+    <fig id="ag938923">
+      <title>Concept Work Area</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_27.jpg"
+             placement="break"/>
+    </fig>
+
+    <section><i>Hierarchy Tab</i>: Displays the selected concept’s
+    descriptions and relationships from the Hierarchy View.</section>
+
+    <section><i>Search Tab</i>: Displays the concept, if any, selected from a
+    search.</section>
+
+    <section id="ag939128"><i>Empty and Empty2 Tabs</i>: These tabs are
+    available for constructing new concepts by copying a concept, as shown in
+    <xref format="dita" href="#topic6/ag937461" type="fig"/>, and then
+    changing their descriptions and relationships. Concepts can be copied by
+    using the drag and drop feature of the Transporter icon. The <i>Empty and
+    Empty2 </i>tabs are not linked to the hierarchy.<indexterm>Empty tabs
+    </indexterm><indexterm>Transporter icon </indexterm></section>
+
+    <fig id="ag937461">
+      <title>Concepts Copied to Empty and Empty2 Tabs</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_28.jpg"
+             placement="break"/>
+    </fig>
+
+    <section><i>List Tab</i>: The List tab provides a way to execute batch
+    changes such as to associate a group of children with a different parent.
+    For more information about functions available from the List Tab, see
+    <xref format="dita" href="Editor_list_view.dita#topic7"
+    type="topic"/>.</section>
+
+    <section id="ag937478"><title>Adding a Concept</title></section>
+
+    <section>Concepts can be added by modifying an existing concept in the
+    hierarchy tab view or copying a concept to one of the Empty tabs and
+    making additions and changes from that view.</section>
+
+    <section>To add a concept, click on the plus sign + in the Descriptions
+    icon of the work area, as shown in <xref format="dita"
+    href="#topic6/ag937496" type="fig"/>.</section>
+
+    <fig id="ag937496">
+      <title>Adding a New Concept</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_29.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>To create the new concept, double-click on the blank text field.
+    The current focus concept text will fill in. Change the existing text to
+    reflect the new concept. For more information about adding descriptions,
+    <xref format="dita" href="#topic6/ag937578" type="section"/></section>
+
+    <section id="ag937510"><title>Modifying a Concept<ph> <indexterm>Modifying
+    a Concept </indexterm> </ph></title></section>
+
+    <section>To modify an existing concept, right-click on the concept
+    description to be modified. A popup menu will display, as shown in <xref
+    format="dita" href="#topic6/ag937524" type="fig"/>.</section>
+
+    <fig id="ag937524">
+      <title>Modifying a Concept</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_30.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>Click on Change: [description]. A new blank line will appear
+    below the line you want to change.</section>
+
+    <section>Double-click in the text field of the new blank line and the
+    existing concept description will fill in. Place your cursor within the
+    text field and modify the text.</section>
+
+    <section>For more information about changing concepts, <xref format="dita"
+    href="#topic6/ag937578" type="section"/></section>
+
+    <section id="ag937546"><title>Changing Concept Attributes<ph>
+    <indexterm>Concept Attributes <indexterm>changing</indexterm> </indexterm>
+    </ph></title></section>
+
+    <section>This section of the work area displays the existing concept and
+    retired attributes and indicates whether the concept has been fully
+    defined.</section>
+
+    <section>To change or retire a concept attribute, hover the cursor over
+    the existing line. The Change or Retire menu displays. Click on one of the
+    options. Note that the “status” column will show the option you selected.
+    A new line will display. Click on the new line to reveal a True/False
+    choice. Click on the appropriate choice.</section>
+
+    <section><i>Green Bar: </i>Note that new lines that have not been
+    committed to the database are identified by a green vertical bar at the
+    left side of the line, as shown in <xref format="dita"
+    href="#topic6/ag937572" type="fig"/>. This visual identifier is used
+    throughout the IHTSDO Workbench Editor to denote uncommitted additions.
+    The green bar will remain in place until you press the “Commit”
+    button.</section>
+
+    <fig id="ag937572">
+      <title>Adding a Concept Attribute</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/adding_concept_attribute.jpg"
+             placement="break"/>
+    </fig>
+
+    <section id="ag937578"><title>Adding and Changing Descriptions</title><ph>
+    <indexterm>concept descriptions <indexterm>adding and changing</indexterm>
+    </indexterm> </ph> This section displays all of the descriptions that
+    either are synonyms for the selected focus concept or represent the
+    preferred or fully specified description.</section>
+
+    <section>To change or retire an existing description, hover the cursor
+    over the existing line. The Change or Retire menu displays. Click on one
+    of the options. Note that the “status” column will show the option you
+    selected. In either option, a new line will display, as shown in <xref
+    format="dita" href="#topic6/ag937596" type="fig"/>.</section>
+
+    <fig id="ag937596">
+      <title>Changing a Description</title>
+
+      <image height="87"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_32.jpg"
+             placement="break" width="445"/>
+    </fig>
+
+    <section>The focus concept is the first description listed in the section.
+    To add a new description, click on the green plus sign under the
+    “Descriptions” heading. A new line with the default text “New Description”
+    will be added to the bottom of the list, with a green vertical bar on the
+    left side of the line to indicate the line has not yet been committed to
+    the database. The green bar will be displayed until you press Commit or
+    Cancel. <i>Note: This identifier is used throughout the IHTSDO Workbench
+    Editor to denote uncommitted additions. </i> Double-click on the text
+    field in the new line and replace the existing text with the description
+    you want to add to the list, as shown in <xref format="dita"
+    href="#topic6/ag937610" type="fig"/>.</section>
+
+    <fig id="ag937610">
+      <title>Adding a Description</title>
+
+      <image height="53"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_33.jpg"
+             placement="break" width="261"/>
+    </fig>
+
+    <section>The remaining fields are described below.</section>
+
+    <section><note><i>If you are editing on two paths (see Preferences Panel
+    settings), clicking on the green plus sign will create two blank lines.
+    </i></note></section>
+
+    <ul>
+      <li>Type: Type defaults to “synonym.” Click on the Type field to view a
+      popup list of other options that include fully specified, xhtml
+      def(inition), entry term, preferred and unspecified.</li>
+
+      <li>Case: The Case field denotes whether the concept, as a whole, is
+      sufficiently defined. The default is false. You or the user must
+      determine whether the concept is adequately defined. Click on the Case
+      field to choose true or false.</li>
+
+      <li>Language (Lang): The default is “en” (English).</li>
+
+      <li>Status: The default is current. Click on the Change Status option in
+      the drop-down list to view and select a different status description
+      from the popup list. The choices that appear are set in the Preferences
+      Panel.</li>
+
+      <li>Version and Path: These fields are displayed only when the “Display
+      history records” button is pressed. These informational fields are
+      automatically updated by the IHTSDO Workbench Editor.</li>
+    </ul>
+
+    <section id="ag937647"><title>Adding and Changing Source Relationships<ph>
+    <indexterm>source relationships <indexterm>adding and changing</indexterm>
+    </indexterm> </ph></title></section>
+
+    <section>This section displays all of the source relationships that are
+    already defined for the focus concept. Relationships link concepts to one
+    another. That means “is a” relationships link concepts in a parent-child
+    hierarchy (e.g., duck is a bird; bird is a animal). A concept can have
+    more than one “is a” relationship to other concepts (e.g., bird is a
+    animal, bird is a verterbrate.)</section>
+
+    <section>Attribute relationships form a class of similar relationships
+    that relate two concepts and establish the type of relationship between
+    them. These types of relationships are defined by the designer of the
+    hierarchy or database. For example, the attribute relationships in a
+    pharmacology database could include “Has dose form” and “Has active
+    ingredient”.</section>
+
+    <section>A relationship exists between two concepts. That relationship may
+    appear as either a source relationship or a destination relationship,
+    depending on which of the two concepts’ details you are viewing.
+    Relationships with concepts higher in a hierarchy than the concept are
+    source relationships. The IHTSDO Workbench Editor displays both source and
+    destination relationships for a concept.</section>
+
+    <section>To change or retire a source relationship, hover the cursor over
+    the existing line. The Change or Retire menu displays, as shown in <xref
+    format="dita" href="#topic6/ag970542" type="fig"/>. Click on an option.
+    Note that the “status” column will show the option you selected.</section>
+
+    <fig id="ag970542">
+      <title>Changing or Retiring a Source Relationship</title>
+
+      <image height="221"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_34.jpg"
+             placement="break" width="419"/>
+    </fig>
+
+    <section>To change a description, select the “Change” option.</section>
+
+    <section>To add a source relationship, click on the green + symbol under
+    the “Source Relationships” description. A new line will be added to the
+    list with the default relationship type “is-a rel (terminology constant)”.
+    Copy and paste a description from the Hierarchy View, as shown in <xref
+    format="dita" href="#topic6/ag970577" type="fig"/>. <i>Note</i>: Added
+    line has been enlarged in screen shot for emphasis.</section>
+
+    <fig id="ag970577">
+      <title>Adding a Source Relationship</title>
+
+      <image height="77"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_37.jpg"
+             placement="break" width="422"/>
+    </fig>
+
+    <section>Remaining fields in the Source Relationships section are
+    described below.</section>
+
+    <ul>
+      <li><i>Destination</i>: The concept to which this concept is connected
+      in the terminology hierarchy.</li>
+
+      <li><i>Char</i>: Characteristic of the source relationship, as defined
+      by options in the popup menu (displayed when you double-click on the
+      column).</li>
+
+      <li><i>Refinability</i>: Indicates whether the refinability of this
+      relationship is optional, mandatory or not refinable, as defined by
+      options in the popup menu.</li>
+
+      <li><i>Group</i>: The SNOMED relationship group to which this
+      relationship belongs.</li>
+
+      <li><i>Status</i>: Indicates the concept description, as defined by the
+      popup menu, e.g, current or inactive.</li>
+    </ul>
+
+    <section id="ag937756"><title>Adding and Changing Destination
+    Relationships<ph> <indexterm>destination relationships <indexterm>adding
+    and changing</indexterm> </indexterm> </ph></title></section>
+
+    <section>The Destination Relationships section displays all of the
+    destination relationships that are already defined for the focus concept
+    and provides a way to change and add destination relationships.</section>
+
+    <section>To change or retire a destination relationship, right-click on
+    the desired line and choose an option from the displayed popup menu, as
+    shown in <xref format="dita" href="#topic6/ag937774"
+    type="fig"/>.</section>
+
+    <fig id="ag937774">
+      <title>Changing a Destination Relationship</title>
+
+      <image height="171"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_38.jpg"
+             placement="break" width="408"/>
+    </fig>
+
+    <section>To change the content of a destination relationship, right-click
+    on any of the fields and select an option from the displayed popup
+    menu.</section>
+
+    <section>To add a destination relationship, click on the green + symbol
+    under the “Destination Relationships” description. A new line will be
+    added, as shown in <xref format="dita" href="#topic6/ag937792"
+    type="fig"/>. Copy and paste or type the new destination relationship
+    values.</section>
+
+    <fig id="ag937792">
+      <title>Adding a Destination Relationship</title>
+
+      <image height="43"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_39.jpg"
+             placement="break" width="441"/>
+    </fig>
+
+    <section>Remaining fields in the Destination Relationships section
+    include:</section>
+
+    <ul>
+      <li><i>Origin</i>: The source relationship of the description.</li>
+
+      <li><i>Type</i>: Type of relationship, as shown when you triple-click on
+      the field to display the popup menu.</li>
+
+      <li><i>Char</i>: Characteristics of the destination relationship, as
+      defined by options in the popup menu.</li>
+
+      <li><i>Refinability</i>: Indicates whether the refinability of this
+      relationship is optional, required or not refinable, as defined by
+      options in the popup menu.</li>
+
+      <li><i>Status</i>: Indicates the destination description, as defined by
+      the popup menu.</li>
+    </ul>
+
+    <section id="ag937841"><title>A Note About Taxonomy<ph>
+    <indexterm>taxonomy </indexterm> </ph></title></section>
+
+    <section>A relationship contains a taxonomy when a true “is-a” (source
+    relationship) statement is included in the view. If the view only displays
+    mapping to other concepts, the relationship is <i>not </i>a
+    taxonomy.</section>
+
+    <section id="ag949029"><title>Viewing Concept Lineage<ph>
+    <indexterm>Concept Lineage </indexterm> <indexterm>lineage
+    <indexterm>concept</indexterm> </indexterm> </ph></title></section>
+
+    <section>The Lineage section of the Concept Work Area provides a visual
+    aid to help identify where the selected concept resides in the hierarchy.
+    The selected concept is designated with blue arrows to highlight where its
+    multiple lineages, if any, exist, as shown in <xref format="dita"
+    href="#topic6/ag949043" type="fig"/>.</section>
+
+    <fig id="ag949043">
+      <title>Concept Lineage</title>
+
+      <image height="228"
+             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_40.jpg"
+             placement="break" width="446"/>
+    </fig>
+
+    <section>As described in the Hierarchy View discussion (<xref
+    format="dita" href="Editor_hierarchy_view.dita#topic3/ag929147"
+    type="section"/>), the slanted green arrows indicate additional parent
+    lineages in higher positions in the hierarchy.</section>
+
+    <section id="ag949057"><title>Using Concept Lineage Graphs<ph>
+    <indexterm>Concept Lineage Graphs </indexterm> <indexterm>graphs
+    <indexterm>concept lineage</indexterm> </indexterm>
+    </ph></title></section>
+
+    <section>As noted in <xref format="dita"
+    href="Editor_concept_area.dita#topic4/ag937081" type="section"/>, you can
+    view or hide access to a lineage graphing tool that provides dimensional
+    views of the current concept’s lineage. The default setting for the icon
+    is “off.” To turn the graphing option on, from the Preferences Panel,
+    select Component Panel and click in the box next to Lineage
+    Graph.</section>
+
+    <section>This tool is especially helpful when working with complex
+    concepts. Lineage graphs can be manipulated according to a number of
+    algorithms, allowing you to reorganize the lineage elements to suit your
+    needs.</section>
+
+    <section><note><i>You may want to hide the sections of the concept work
+    area above the lineage graph section to provide space for a larger display
+    of the graph.</i></note></section>
+
+    <section>To illustrate the features of the lineage graphing tool, use the
+    search function to search for ‘duck viral hepatitis.’ This concept will
+    yield a complex graph that can be reorganized by the lineage graph tools.
+    The initially displayed graph will look like the one shown in <xref
+    format="dita" href="#topic6/ag949090" type="fig"/>. The focus concept
+    element is outlined in blue; the top SNOMED CT concept element is outlined
+    in red.</section>
+
+    <fig id="ag949090">
+      <title>Lineage Graph for Duck Viral Hepatitis</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/lineage_graph.jpg"
+             placement="break"/>
+    </fig>
+
+    <section id="ag949095"><title>Lineage Graph Controls (Icons)<ph>
+    <indexterm>graph controls </indexterm> </ph></title></section>
+
+    <section>The icons on the left side of the lineage graph, as shown in
+    <xref format="dita" href="#topic6/ag948613" type="fig"/>, provide controls
+    for viewing the graph. The controls provide the following
+    functions:</section>
+
+    <section><ph> <indexterm>hyperbolic view </indexterm><indexterm>lens
+    view</indexterm> </ph>Lens Views - Use this control to change the graph
+    image to hyperbolic (a curved representation) views that are useful for
+    large, complex graphs, as shown in <xref format="dita"
+    href="#topic6/ag948645" type="fig"/>, or a hyperbolic layout, as shown in
+    <xref format="dita" href="#topic6/ag948693" type="fig"/> that distorts the
+    image of the elements. You can also magnify the view or layout from this
+    menu. Click “No lens” to return to the original view.</section>
+
+    <fig id="ag948613">
+      <title>Lineage Graph Controls</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_42.jpg"
+             placement="break"/>
+    </fig>
+
+    <fig id="ag948645">
+      <title>Lineage Graph - Hyperbolic View</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_43.jpg"
+             placement="break"/>
+    </fig>
+
+    <fig id="ag948693">
+      <title>Lineage Graph - Hyperbolic Layout</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_44.jpg"
+             placement="break"/>
+    </fig>
+
+    <section id="ag948741"><i>Magnify View</i> - Click this icon to
+    incrementally magnify, or enlarge, the graph view. You can also use the
+    scroll wheel on the mouse to magnify a view. The cursor position
+    determines where magnification begins.<indexterm>magnify view
+    </indexterm></section>
+
+    <section id="ag949163"><i>Shrink View</i> - Click this icon to
+    incrementally shrink the graph view. You can also use the scroll wheel on
+    the mouse to shrink a view.<indexterm>shrink view </indexterm></section>
+
+    <section id="ag948822"><i>Nodes View</i> - Click this to enable use of the
+    mouse to select nodes within the graph and move them around, as shown in
+    <xref format="dita" href="#topic6/ag948843" type="fig"/>. Use the mouse to
+    draw a line around the nodes you want to move. Click in the middle of one
+    of the selected nodes and drag to move the node. To extend the selected
+    node beyond the original borders, Shift/Click in the middle of the node.
+    To deselect the node, click outside the selection borders.<indexterm>nodes
+    view </indexterm></section>
+
+    <fig id="ag948843">
+      <title>Lineage Graph - Node Moved</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_45.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>Algorithm View - Click this icon to choose a specialized view
+    based on the algorithims listed in the menu. For more information, see
+    <xref format="dita" href="#topic6/ag949194" type="section"/>.</section>
+
+    <section id="ag948576"><title>Using Lineage Graph Keyboard Controls<ph>
+    <indexterm>keyboard controls <indexterm>lineage graph</indexterm>
+    </indexterm> </ph></title></section>
+
+    <section>In addition to the controls/icons discussed above, lineage graphs
+    can also be manipulated via several keyboard and mouse controls.</section>
+
+    <ul>
+      <li>Click/Drag - moves the graph within the graph window</li>
+
+      <li>Shift/Click - rotates the graph</li>
+
+      <li>Ctrl/Click/Drag - (or Clover/Click/Drag for Mac users) - when
+      positioned in the center of the frame, moves the graph from side to
+      side, as a shear function</li>
+
+      <li>Mouse Hover - displays a tool tip that is the selected graph
+      element’s label (e.g., V2)</li>
+
+      <li>Click a Link - changes the line to red to show where the line leads,
+      i.e., to illustrate relationships within the concept.</li>
+    </ul>
+
+    <section id="ag949194"><title>Changing Lineage Graph Layouts with
+    Algorithms <ph> <indexterm>graphs <indexterm>concept lineage
+    layouts</indexterm> </indexterm> </ph></title></section>
+
+    <section>As noted in <xref format="dita" href="#topic6/ag949095"
+    type="section"/>, the Algorithm View icon provides access to a number of
+    graph views based on algorithms. The algorithms, by definition,
+    incorporate some randomness that can change how the layout appears in
+    different instances of the same algorithm.</section>
+
+    <section>Each algorithm has advantages and disadvantages. Some are more
+    suited to small, simple graphs; others work best with larger, more complex
+    graphs. The available algorithms are described below.</section>
+
+    <ul>
+      <li><i>DAG Layout - </i> is best suited to tree-like directed acrylic
+      graphs. The layout will have directed edges generally pointing upwards.
+      Any vertices with no successors are considered level zero, and tend
+      toward the top of the layout. Any vertex has a level one greater than
+      the maximum level of all its successors.</li>
+
+      <li><i>ISOM Layout</i> - implements a self-organizing map layout
+      algorithm, based on Meyer’s self-organizing graph methods.</li>
+
+      <li><i>FR Layout</i> - implements the Fruchterman-Reingold algorithm for
+      node layout. This is one of the two most widely used layouts, and is
+      based on the spring algorithm, which introduces attraction forces
+      between linked nodes and repulsion forces between unlinked nodes. The FR
+      layout uses a “temperature” system to lay out the entire graph. During
+      each iteration of the algorithm, the temperature is reduced. When the
+      minimum temperature is reached, the algorithm stops.</li>
+
+      <li><i>KK Layout</i> - implements the Kamada-Kawai algorithm for node
+      layout, also a widely used layout scheme. Each iteration of the KK
+      Layout changes the position of only a single node.</li>
+
+      <li><i>Spring Layout</i> - represents a visualization of a set of nodes.
+      The Spring Layout assigns X/Y locations to each node and moves the image
+      forward one step at a time. As a result, Spring Layout can take a
+      considerable amount of time to execute.</li>
+
+      <li><i>IHTSDO Workbench Graph Layout - </i>currently the same as the DAG
+      Layout. Will be enhanced in future releases.</li>
+    </ul>
+
+    <section id="ag949284"><title>Using the Conflicts View</title><ph>
+    <indexterm>conflicts </indexterm> </ph></section>
+
+    <section>If you have selected more than one path, the Conflicts toggle
+    displays (or hides) a view of conflicts between the two paths, as shown in
+    <xref format="dita" href="#topic6/ag937911" type="fig"/>.</section>
+
+    <section><i>Resolution</i>: The resolved (agreeing) components of the
+    conflicting versions are listed in the upper left section of the Conflicts
+    view.</section>
+
+    <section><i>Versions</i>: The conflicting versions are identified in the
+    two lower sections of the Conflicts view. <ph> <indexterm>conflicts view
+    </indexterm> </ph></section>
+
+    <fig id="ag937911">
+      <title>Conflicts View</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/conflicts_view.jpg"
+             placement="break"/>
+    </fig>
+
+    <section><i>Differences</i>: The boxes with colored lettering and borders
+    indicate the conflict areas. To add conflicting concepts to the other
+    version, click the “Add All” and “Implement” buttons.</section>
+
+    <section><i>Long Form</i>: Click in this box to display more detailed
+    definitions of each attribute displayed in the Conflict view.</section>
+
+    <section><i>Status</i>: Click in this box to view the current status
+    (current, etc.) of each attribute displayed in the Conflict
+    view.</section>
+  </body>
 </topic>

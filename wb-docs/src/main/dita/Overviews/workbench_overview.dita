@@ -7,8 +7,6 @@
 <topic id="overview_intro">
   <title>IHTSDO Workbench Guide: Documentation status</title>
 
-  <shortdesc>Purpose, Scope, Boundaries and Requirements</shortdesc>
-
   <body>
     <table>
       <title>Document Properties</title>
@@ -23,22 +21,26 @@
 
           <row>
             <entry><b>Project build version:</b></entry>
+
             <entry>MVN:project-version</entry>
           </row>
 
           <row>
             <entry><b>Subversion release:</b></entry>
+
             <entry>MVN:subversion-project-version</entry>
           </row>
 
           <row>
             <entry><b>Build Date:</b></entry>
+
             <entry>MVN:release-date</entry>
           </row>
 
           <row>
             <entry><b>Guidebook Version:</b></entry>
-            <entry>1.7a</entry>
+
+            <entry>1.8</entry>
           </row>
 
           <row>
@@ -175,6 +177,17 @@
             <entry>explanation of reference set expression clauses;
             explanation of paths, role permissions; classifier changes</entry>
           </row>
+
+          <row>
+            <entry>1.8</entry>
+
+            <entry>2010-06-13</entry>
+
+            <entry>Eric Browne</entry>
+
+            <entry>menu changes; difference report; revised search criteria;
+            revised preferences</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -237,9 +250,8 @@
 
       <p>Some chapters have been automatically generated from Workbench
       application source and binary components - particularly those chapters
-      documenting the Business Process Library and the Task Library.
-      Consequently, their content may vary considerably from release to
-      release.</p>
+      documenting the the Task Library and the Business Process Library.
+      Consequently, their content may vary from release to release.</p>
     </body>
   </topic>
 </topic>
