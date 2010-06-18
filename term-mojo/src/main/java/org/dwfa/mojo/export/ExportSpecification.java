@@ -1140,7 +1140,6 @@ public class ExportSpecification {
         } else {
             for (I_ThinExtByRefPart conceptParts : thinExtByRefVersioned.getVersions()) {
                 if(conceptParts.getPathId() == amPart.getPathId()
-                        && conceptParts.getStatusId() == amPart.getStatusId()
                         && conceptParts.getVersion() == amPart.getVersion()){
                     conceptExtension = (I_ThinExtByRefPartConcept) conceptParts;
                     break;
@@ -1201,7 +1200,6 @@ public class ExportSpecification {
         } else {
             for (I_ThinExtByRefPart stringParts : thinExtByRefVersioned.getVersions()) {
                 if(stringParts.getPathId() == amPart.getPathId()
-                        && stringParts.getStatusId() == amPart.getStatusId()
                         && stringParts.getVersion() == amPart.getVersion()){
                     conceptExtension = (I_ThinExtByRefPartString) stringParts;
                     break;
