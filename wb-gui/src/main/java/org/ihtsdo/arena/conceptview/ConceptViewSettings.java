@@ -143,7 +143,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	public List<AbstractButton> getSpecializedButtons() {
 		List<AbstractButton> buttons = new ArrayList<AbstractButton>();
 		buttons.add(getNavigatorButton());
-		buttons.add(getButton("/16x16/plain/element_preferences.png", "show component prefs"));
 		return buttons;
 	}
 	

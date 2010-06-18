@@ -1733,18 +1733,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
             snoRocketPanel);
         
-        JSplitPane arenaSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-        arenaSplit.setOneTouchExpandable(true);
         arena = new Arena(this);
-        arenaSplit.setTopComponent(arena);
-        ConceptPanel arenaConceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, this, 
-        		LINK_TYPE.ARENA_LINK, true,
-                Integer.MIN_VALUE);
-        arenaSplit.setBottomComponent(arenaConceptPanel);
-        arenaSplit.setDividerLocation(Integer.MAX_VALUE);
 
         conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
-        		arenaSplit);
+        		arena);
 
         /*
         */

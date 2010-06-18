@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.editor;
 
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.List;
 
