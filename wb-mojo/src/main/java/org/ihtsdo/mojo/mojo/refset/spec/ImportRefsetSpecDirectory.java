@@ -101,6 +101,8 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
 
             if (!writeChangesets) {
                 Terms.get().suspendChangeSetWriters();
+            } else {
+                Terms.get().resumeChangeSetWriters();
             }
             if (config == null) {
                 throw new MojoExecutionException(
