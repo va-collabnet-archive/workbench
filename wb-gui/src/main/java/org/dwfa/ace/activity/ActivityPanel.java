@@ -42,9 +42,15 @@ import org.dwfa.tapi.ComputationCanceled;
 
 public class ActivityPanel implements I_ShowActivity, AncestorListener {
     
-    ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
-    ConcurrentHashMap<ActionListener, ActionListener> listeners = new ConcurrentHashMap<ActionListener, ActionListener>();
-    ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = new ConcurrentHashMap<ActionListener, ActionListener>();
+	private ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl> panels = 
+    			new ConcurrentHashMap<ActivityPanelImpl, ActivityPanelImpl>();
+    private ConcurrentHashMap<ActionListener, ActionListener> listeners = 
+    			new ConcurrentHashMap<ActionListener, ActionListener>();
+    private ConcurrentHashMap<ActionListener, ActionListener> stopActionListeners = 
+    			new ConcurrentHashMap<ActionListener, ActionListener>();
+    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = 
+    			new CopyOnWriteArraySet<I_ShowActivity>();
+
     
     
     private class StopActionListenerPropigator implements ActionListener {
@@ -83,9 +89,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         JLabel progressInfoUpper = new JLabel();
 
         JLabel progressInfoLower = new JLabel();
-        
-        boolean showProgress = false;
-        
+                
         boolean stopped = false;
 
         
@@ -393,8 +397,6 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
     }
 
-    private CopyOnWriteArraySet<I_ShowActivity> showActivityListeners = new CopyOnWriteArraySet<I_ShowActivity>();
-
     public void addShowActivityListener(I_ShowActivity listener) {
         showActivityListeners.add(listener);
     }
@@ -508,4 +510,16 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         this.canceled = canceled;
     }
 
+    public void cancel() {
+    	this.canceled = true;
+        this.complete = true;
+        this.stopButtonVisible = false;
+        for (I_ShowActivity shower : showActivityListeners) {
+            try {
+				shower.complete();
+			} catch (ComputationCanceled e) {
+				// Nothing to do...
+			}
+        }
+    }
 }

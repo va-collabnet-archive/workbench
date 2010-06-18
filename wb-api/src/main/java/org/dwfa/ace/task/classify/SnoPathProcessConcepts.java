@@ -23,9 +23,6 @@ import org.dwfa.tapi.TerminologyException;
 public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
-    // Do not filter 'Is a' on classifier path
-    // The classifier itself is a "filter" what gets dropped.
-    private boolean doNotCareIfHasSnomedIsa;
 
     // STATISTICS COUNTERS
     private int countConSeen;
@@ -62,14 +59,14 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
 
     public SnoPathProcessConcepts(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos, I_ShowActivity gui,
-            boolean doNotCareIfHasIsa, PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
+            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
         this.logger = logger;
         this.snocons = snocons;
         this.snorels = snorels;
         this.fromPathPos = pathPos;
         this.roleTypeSet = roleSet;
         this.statusSet = statSet;
-        this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
+        //this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
         this.gui = gui;
         this.precedence = precedence;
         this.contradictionMgr = contradictionMgr;
@@ -128,9 +125,6 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
             return;
         }
 
-        // status, position, addUncommitted, returnConflictResolvedLatestState
-        // List<Version> attribs = concept.getConceptAttributeTuples(statusSet,
-        // fromPathPos, false, true);
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
                 statusSet, fromPathPos, 
                 precedence, contradictionMgr);
@@ -140,16 +134,12 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
                     roleTypeSet, fromPathPos, 
                     precedence, contradictionMgr);
 
-            // ComponentList<Relationship> rels = concept.getSourceRels();
-            boolean isaFound = false;
-            if (doNotCareIfHasSnomedIsa)
-                isaFound = true;
-            else
-                for (I_RelTuple rt : relTupList)
-                    if (rt.getTypeId() == isaNid)
-                        isaFound = true;
+			boolean isaFound = false;
+			for (I_RelTuple rt : relTupList)
+				if (rt.getTypeId() == isaNid)
+					isaFound = true;
 
-            if (isaFound || doNotCareIfHasSnomedIsa) {
+            if (isaFound) {
                 if (snocons != null)
                     snocons.add(new SnoCon(cNid, attribs.get(0).isDefined()));
                 countConAdded++;

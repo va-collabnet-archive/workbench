@@ -43,8 +43,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public void addRefreshActionListener(ActionListener l) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     public void complete() {
@@ -52,13 +51,11 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public JPanel getViewPanel(boolean showBorder) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void removeRefreshActionListener(ActionListener l) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     public void setIndeterminate(boolean newValue) {
@@ -70,8 +67,7 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public void setProgressInfoLower(String text) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     public void setProgressInfoUpper(String text) {
@@ -108,64 +104,53 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
     }
 
     public I_ShowActivity getSecondaryPanel() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setSecondaryPanel(I_ShowActivity panel) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     public void setStringPainted(boolean stringPainted) {
-        // TODO Auto-generated method stub
+        // Nothing to do
     }
 
     public JButton getStopButton() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setStopButton(JButton stopButton) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     public I_ConfigAceFrame getAceFrameConfig() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getProgressInfoLower() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getProgressInfoUpper() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public boolean isStringPainted() {
-        // TODO Auto-generated method stub
-        return false;
+         return false;
     }
 
     public void syncWith(I_ShowActivity another) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     @Override
     public void removeActivityFromViewer() {
-        // TODO Auto-generated method stub
-        
+        // Nothing to do
     }
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
-        
+        // Nothing to do
     }
 
     @Override
@@ -195,13 +180,16 @@ public class UpperInfoOnlyConsoleMonitor implements I_ShowActivity {
 
     @Override
     public boolean isCanceled() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isCompleteForComparison() {
-        // TODO Auto-generated method stub
         return false;
     }
+
+	@Override
+	public void cancel() {
+        // Nothing to do
+	}
 }

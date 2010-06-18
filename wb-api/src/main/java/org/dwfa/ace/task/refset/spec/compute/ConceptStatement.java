@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +47,20 @@ import org.ihtsdo.time.TimeUtil;
 public class ConceptStatement extends RefsetSpecStatement {
 
     I_GetConceptData queryConstraintConcept;
+	private Collection<I_ShowActivity> activities;
+	private StopActionListener stopListener = new StopActionListener();
+    
+    private class StopActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			for (I_ShowActivity a: activities) {
+				a.cancel();
+			}
+			
+		}
+    	
+    }
 
     /**
      * Constructor for refset spec statement.
@@ -68,36 +84,38 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
+    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, 
+    		I_RepresentIdSet parentPossibleConcepts, 
+    		Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException {
         throw new TerminologyException("Get possible descriptions in concept statement unsupported operation.");
     }
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+            I_RepresentIdSet parentPossibleConcepts, 
+    		Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in concept statement unsupported operation.");
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
+    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, 
+    		I_RepresentIdSet parentPossibleConcepts, 
+    		Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
-            "<html>Possible: <br>" + this.toHtmlFragment(), true);
-        activity.setIndeterminate(true);
+        I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
+        this.activities = activities;
         
         queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
         }
-        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case CONCEPT_IS:
             if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
                 possibleConcepts.setNotMember(queryConstraintConcept.getConceptId());
             } else {
@@ -105,10 +123,11 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_CHILD_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
+
             if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts.removeAll(results);
             } else {
                 I_RepresentIdSet results = queryConstraintConcept.getPossibleChildOfConcepts(configFrame);
                 possibleConcepts.or(results);
@@ -116,16 +135,19 @@ public class ConceptStatement extends RefsetSpecStatement {
             break;
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
              if (isNegated()) {
-                // possibleConcepts = termFactory.getConceptIdSet();
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts.removeAll(results);
             } else {
-                I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
+                I_RepresentIdSet results = 
+                	queryConstraintConcept.getPossibleKindOfConcepts(configFrame, activity);
                 possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
+            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activities.add(activity);
             Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
@@ -135,8 +157,6 @@ public class ConceptStatement extends RefsetSpecStatement {
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts = termFactory.getConceptIdSet();
-                // possibleConcepts.removeAll(refsetMemberSet);
             } else {
                 possibleConcepts.or(refsetMemberSet);
             }
@@ -145,7 +165,6 @@ public class ConceptStatement extends RefsetSpecStatement {
         case CONCEPT_STATUS_IS_CHILD_OF:
         case CONCEPT_STATUS_IS_DESCENDENT_OF:
         case CONCEPT_STATUS_IS_KIND_OF:
-            // possibleConcepts = termFactory.getConceptIdSet();
             possibleConcepts.or(parentPossibleConcepts);
             break;
         default:
@@ -153,14 +172,27 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
         
-        long endTime = System.currentTimeMillis();
-        long elapsed = endTime - startTime;
-        String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
-            "; Outgoing count: " + possibleConcepts.cardinality());
-        activity.complete();
+        if (activity != null) {
+            long endTime = System.currentTimeMillis();
+            long elapsed = endTime - startTime;
+            String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
+                "; Outgoing count: " + possibleConcepts.cardinality());
+            activity.complete();
+        }
         return possibleConcepts;
     }
+
+	private I_ShowActivity setupActivityPanel(I_ConfigAceFrame configFrame,
+			I_RepresentIdSet parentPossibleConcepts) {
+		I_ShowActivity activity;
+		activity = Terms.get().newActivityPanel(true, configFrame, 
+		        "<html>Possible: <br>" + this.toHtmlFragment(), true);
+		    activity.setIndeterminate(true);
+		    activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
+		    activity.addStopActionListener(stopListener);
+		return activity;
+	}
 
     @Override
     public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {

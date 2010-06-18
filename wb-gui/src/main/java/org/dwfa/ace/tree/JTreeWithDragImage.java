@@ -51,6 +51,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
@@ -164,7 +165,6 @@ public class JTreeWithDragImage extends JTree {
             lastPropagationId = Long.MIN_VALUE;
         }
 
-        @SuppressWarnings("unchecked")
         public void propertyChange(PropertyChangeEvent evt) {
             if (lastPropagationId == evt.getPropagationId()) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -181,18 +181,24 @@ public class JTreeWithDragImage extends JTree {
             }
             lastPropagationId = evt.getPropagationId();
 
-            TreePath selection = lastSelection;
-            if (selection == null) {
-                selection = nextToLastSelection;
-            }
-            logSelectionPaths(selection, "Initial Selection Paths:");
-            int horizValue = Integer.MAX_VALUE;
-            int vertValue = Integer.MAX_VALUE;
-            if (scroller != null) {
-                horizValue = scroller.getHorizontalScrollBar().getValue();
-                vertValue = scroller.getVerticalScrollBar().getValue();
-            }
-            restoreTreePositionAndSelection(selection, horizValue, vertValue);
+             SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+		            TreePath selection = lastSelection;
+		            if (selection == null) {
+		                selection = nextToLastSelection;
+		            }
+		            logSelectionPaths(selection, "Initial Selection Paths:");
+			           int horizValue = Integer.MAX_VALUE;
+			            int vertValue = Integer.MAX_VALUE;
+			            if (scroller != null) {
+			                horizValue = scroller.getHorizontalScrollBar().getValue();
+			                vertValue = scroller.getVerticalScrollBar().getValue();
+			            }
+		            restoreTreePositionAndSelection(selection, horizValue, vertValue);
+				}
+			});
 
         }
 
@@ -241,7 +247,7 @@ public class JTreeWithDragImage extends JTree {
         this(config, null);
     }
 
-    protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
+	protected JTreeWithDragImage(I_ConfigAceFrame config, TermTreeHelper helper) {
         super();
         this.config = config;
         this.helper = helper;
@@ -312,7 +318,10 @@ public class JTreeWithDragImage extends JTree {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) m.getRoot();
         Enumeration<DefaultMutableTreeNode> childEnum = root.children();
         while (childEnum.hasMoreElements()) {
-            m.nodeChanged(childEnum.nextElement());
+        	DefaultMutableTreeNode node = childEnum.nextElement();
+        	if (node != null) {
+                m.nodeChanged(node);
+        	}
         }
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Tree data changed");

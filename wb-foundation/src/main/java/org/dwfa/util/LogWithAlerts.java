@@ -33,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.app.DwfaEnv;
-import org.dwfa.bpa.util.OpenFrames;
 
 public class LogWithAlerts {
 
@@ -151,13 +150,18 @@ public class LogWithAlerts {
 
     private static void setupActiveFrame() {
         if (activeFrame == null) {
-            activeFrame = new JFrame();
-            activeFrame.setContentPane(new JLabel("Startup..."));
-            activeFrame.pack();
-            activeFrame.setVisible(true);
-            activeFrame.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width / 2) - 10,
-                (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - 10);
-            OpenFrames.addFrame(activeFrame);
+        	for (Frame f: Frame.getFrames()) {
+        		if (f.isActive()) {
+        			activeFrame = (JFrame) f;
+        		}
+        	}
+        	if (activeFrame == null) {
+                activeFrame = new JFrame();
+                activeFrame.setContentPane(new JLabel("Startup..."));
+                activeFrame.pack();
+                activeFrame.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width / 2) - 10,
+                        (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - 10);
+           	}
         }
     }
 

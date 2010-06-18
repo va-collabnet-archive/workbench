@@ -2,6 +2,7 @@ package org.ihtsdo.cs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,10 +15,12 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.svn.Svn;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 
@@ -59,6 +62,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
 	@Override
 	public void run() {
+		Svn.rwl.readLock().lock();
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
@@ -103,6 +107,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.complete();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} finally {
+			Svn.rwl.readLock().unlock();
 		}
 	}
 
@@ -149,6 +155,12 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         if (activity.isCompleteForComparison()) {
             timer.stop();
         }
+    }
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

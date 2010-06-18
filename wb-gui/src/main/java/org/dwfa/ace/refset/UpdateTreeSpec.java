@@ -226,7 +226,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
         Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(
             localRefsetSpecConcept.getNid());
         for (I_ExtendByRef ext : members) {
-
+        	
             int currentTupleCount = ext.getTuples(frameConfig.getAllowedStatus(),
                 frameConfig.getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
                 frameConfig.getConflictResolutionStrategy()).size();

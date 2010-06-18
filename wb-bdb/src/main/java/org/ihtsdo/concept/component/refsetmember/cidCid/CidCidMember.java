@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -15,7 +14,6 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
@@ -262,10 +260,14 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 				count = count + revisions.size();
 			}
 			ArrayList<Version> list = new ArrayList<Version>(count);
-			list.add(new Version());
+			if (getTime() != Long.MIN_VALUE) {
+				list.add(new Version());
+			}
 			if (revisions != null) {
 				for (int i = 0; i < revisions.size(); i++) {
-					list.add(new Version(i));
+					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+						list.add(new Version(i));
+					}
 				}
 			}
 			versions = list;

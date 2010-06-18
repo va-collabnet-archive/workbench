@@ -9,7 +9,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;

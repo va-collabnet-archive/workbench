@@ -140,6 +140,12 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	    }
 	    return getFromDisk(cNid) != null;
 	}
+	public boolean existsFast(int cNid) throws TerminologyException, IOException {
+	    if (pathMap.containsKey(cNid)) {
+	        return true;
+	    }
+	    return false;
+	}
 
 	public I_Path get(int nid) throws PathNotExistsException,
 			TerminologyException, IOException {
@@ -259,35 +265,41 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
 			for (RefsetMember extPart : pathConcept
 					.getConceptExtensions(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid())) {
-				assert extPart != null : "Null path origins for: " +
-						pathConcept.toLongString() + "\n\nin refset: \n\n" +
-						getRefsetPathOriginsConcept().toLongString();
-				CidIntMember conceptExtension = (CidIntMember) extPart;
-				if (conceptExtension.getC1Nid() == nid) {
-					AceLog.getAppLog().severe(
-							"Self-referencing origin in path: "
-									+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
+				if (extPart == null) {
+					AceLog.getAppLog().alertAndLogException(
+							new Exception("Null path origins for: " + 
+									pathConcept.toLongString() + 
+									"\n\nin refset: \n\n" +
+									getRefsetPathOriginsConcept().toLongString()));
 				} else {
-				    if (pathMap.containsKey(conceptExtension.getC1Nid())) {
-	                    result.add(new Position(conceptExtension.getIntValue(),
-	                        pathMap.get(conceptExtension.getC1Nid())));
-				    } else {
-			            if (depth > 40) {
-			                AceLog.getAppLog().alertAndLogException(new Exception(
-			                    "\n\n****************************************\nDepth limit exceeded. Path concept: \n" +
-			                    pathConcept.toLongString() + 
-                                "\n\n extensionPart: \n\n" + 
-                                extPart.toString() + 
-                                "\n\n origin refset: \n\n" + 
-                                Concept.get(extPart.getRefsetId()).toLongString() + 
-			                    "\n-------------------------------------------\n\n"));
-			            } else {
-	                        result.add(new Position(conceptExtension.getIntValue(),
-	                            new Path(conceptExtension.getC1Nid(),  
-	                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth + 1))));
-			            }
-				    }
+					CidIntMember conceptExtension = (CidIntMember) extPart;
+					if (conceptExtension.getC1Nid() == nid) {
+						AceLog.getAppLog().severe(
+								"Self-referencing origin in path: "
+										+ pathConcept.getDescriptions().iterator().next().getFirstTuple());
+					} else {
+					    if (pathMap.containsKey(conceptExtension.getC1Nid())) {
+		                    result.add(new Position(conceptExtension.getIntValue(),
+		                        pathMap.get(conceptExtension.getC1Nid())));
+					    } else {
+				            if (depth > 40) {
+				                AceLog.getAppLog().alertAndLogException(new Exception(
+				                    "\n\n****************************************\nDepth limit exceeded. Path concept: \n" +
+				                    pathConcept.toLongString() + 
+	                                "\n\n extensionPart: \n\n" + 
+	                                extPart.toString() + 
+	                                "\n\n origin refset: \n\n" + 
+	                                Concept.get(extPart.getRefsetId()).toLongString() + 
+				                    "\n-------------------------------------------\n\n"));
+				            } else {
+		                        result.add(new Position(conceptExtension.getIntValue(),
+		                            new Path(conceptExtension.getC1Nid(),  
+		                                getPathOriginsWithDepth(conceptExtension.getC1Nid(), depth + 1))));
+				            }
+					    }
+					}
 				}
+						
 			}
 			return result;
 		} catch (Exception e) {

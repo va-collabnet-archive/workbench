@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -24,6 +23,7 @@ import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.DescriptionBinder;
+import org.ihtsdo.concept.component.identifier.IdentifierVersion;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.image.ImageBinder;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -31,6 +31,7 @@ import org.ihtsdo.concept.component.refset.RefsetMemberBinder;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
@@ -83,7 +84,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
     
     public boolean hasUncommittedComponents() {
-        if (hasUncommittedVersion(attributes.get())) {
+        if (hasUncommittedVersion(attributes.get()) ||
+        		hasUncommittedId(attributes.get())) {
             return true;
         }
         if (hasUncommittedVersion(srcRels.get())) {
@@ -101,16 +103,32 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return false;
     }
 
+
     private boolean hasUncommittedVersion(ComponentList<? extends ConceptComponent<?, ?>> componentList) {
         if (componentList != null) {
             for (ConceptComponent<?, ?> cc: componentList) {
                 if (hasUncommittedVersion(cc)) {
                     return true;
                 }
+                if (hasUncommittedId(cc)) {
+                    return true;
+                }
             }
         }
         return false;
     }
+
+    private boolean hasUncommittedId(ConceptComponent<?, ?> cc) {
+        if (cc != null && cc.getAdditionalIdentifierParts() != null) {
+        	for (IdentifierVersion idv: cc.getAdditionalIdentifierParts()) {
+        		if (idv.getTime() == Long.MAX_VALUE) {
+                    return true;
+        		}
+        	}
+        }
+        return false;
+    }
+
 
     private boolean hasUncommittedVersion(ConceptComponent<?, ?> cc) {
         if (cc != null) {
@@ -133,6 +151,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             srcRels.compareAndSet(null, new AddSrcRelList(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
                 enclosingConcept)));
         }
+        handleCanceledComponents();
         return srcRels.get();
     }
 
@@ -141,6 +160,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             descriptions.compareAndSet(null, new AddDescriptionList(getList(new DescriptionBinder(),
                 OFFSETS.DESCRIPTIONS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return descriptions.get();
     }
 
@@ -224,13 +244,57 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             refsetMembers.compareAndSet(null, new AddMemberList(getList(new RefsetMemberBinder(),
                 OFFSETS.REFSET_MEMBERS, enclosingConcept)));
         }
+        handleCanceledComponents();
         return refsetMembers.get();
     }
+
+	private void handleCanceledComponents() {
+		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
+			if (refsetMembers != null && 
+					refsetMembers.get() != null && 
+					refsetMembers.get().size() > 0) {
+	        	removeCanceledFromList(refsetMembers.get());
+			}
+			if (descriptions != null && 
+					descriptions.get() != null && 
+					descriptions.get().size() > 0) {
+	        	removeCanceledFromList(descriptions.get());
+			}
+			if (images != null && 
+					images.get() != null && 
+					images.get().size() > 0) {
+	        	removeCanceledFromList(images.get());
+			}
+			if (srcRels != null && 
+					srcRels.get() != null && 
+					srcRels.get().size() > 0) {
+	        	removeCanceledFromList(srcRels.get());
+			}
+			lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
+        }
+	}
+
+	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
+		if (ccList != null) {
+			synchronized (ccList) {
+				List<Integer> toRemove = new ArrayList<Integer>();
+				for (int i = ccList.size() -1; i > -1; i--) {
+					if (ccList.get(i).getTime() == Long.MIN_VALUE) {
+							toRemove.add(i);
+					}
+				}
+				for (int i: toRemove) {
+					ccList.remove(i);
+				}
+			}
+		}
+	}
 
     public AddImageList getImages() throws IOException {
         if (images.get() == null) {
             images.compareAndSet(null, new AddImageList(getList(new ImageBinder(), OFFSETS.IMAGES, enclosingConcept)));
         }
+        handleCanceledComponents();
         return images.get();
     }
 
@@ -307,7 +371,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");
@@ -341,7 +405,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 }
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");

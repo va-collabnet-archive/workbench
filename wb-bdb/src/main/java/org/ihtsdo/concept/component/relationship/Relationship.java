@@ -469,10 +469,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 				count = count + revisions.size();
 			}
 			ArrayList<Version> list = new ArrayList<Version>(count);
-			list.add(new Version());
+			if (getTime() != Long.MIN_VALUE) {
+				list.add(new Version());
+			}
 			if (revisions != null) {
 				for (int i = 0; i < revisions.size(); i++) {
-					list.add(new Version(i));
+					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+						list.add(new Version(i));
+					}
 				}
 			}
 			versions = list;
@@ -698,5 +702,20 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
         return false;
     }
+
+
+	public boolean everWasType(int typeNid) {
+		if (this.typeNid == typeNid) {
+			return true;
+		}
+		if (revisions != null) {
+			for (RelationshipRevision rv: revisions) {
+				if (rv.getTypeId() == typeNid) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 }

@@ -28,6 +28,8 @@ public interface I_StoreLocalFixedTerminology {
 
     public Collection<I_ConceptualizeLocally> getRoots() throws IOException, TerminologyException;
 
+    public Collection<I_ConceptualizeLocally> getConcepts() throws IOException, TerminologyException;
+
     public I_ConceptualizeLocally getConcept(int conceptNid) throws IOException, TerminologyException;
 
     public I_DescribeConceptLocally getDescription(int descriptionNid, int conceptNid) throws IOException,

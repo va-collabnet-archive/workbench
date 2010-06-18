@@ -83,4 +83,6 @@ public interface I_ShowActivity extends ActionListener {
     public void update();
     
     public boolean isCanceled();
+
+	public void cancel();
 }

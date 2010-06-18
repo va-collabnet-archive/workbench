@@ -53,8 +53,12 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -164,27 +168,31 @@ public class InstructAndWaitDo extends AbstractTask {
                     return;
                 // Prompt for the description using the input term as the
                 // initial text
-                String newDescrString = (String) JOptionPane.showInputDialog(null, "Add description to:\n"
-                    + con.getInitialText(), "Enter description", JOptionPane.QUESTION_MESSAGE, null, null,
-                    InstructAndWaitDo.this.term);
+                String newDescrString =
+                        (String) JOptionPane.showInputDialog(null, "Add description to:\n" + con.getInitialText(),
+                            "Enter description", JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
                 if (newDescrString == null)
                     return;
                 // Here's the drill for adding a description
                 I_TermFactory termFactory = Terms.get();
-                I_GetConceptData synonym_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+                I_GetConceptData synonym_description_type =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
                 // See SearchReplaceTermsInList
                 Set<I_Path> paths = config.getEditingPathSet();
-                I_DescriptionVersioned newDescr = termFactory.newDescription(UUID.randomUUID(), con, language,
-                    newDescrString, synonym_description_type, config);
+                I_DescriptionVersioned newDescr =
+                        termFactory.newDescription(UUID.randomUUID(), con, language, newDescrString,
+                            synonym_description_type, config);
                 I_DescriptionPart newLastPart = newDescr.getLastTuple().getMutablePart();
                 for (I_Path path : paths) {
                     if (newLastPart == null) {
-                    	
-                        newLastPart = (I_DescriptionPart) newDescr.getLastTuple().getMutablePart().makeAnalog(newLastPart.getStatusId(), path.getConceptId(), Long.MAX_VALUE);
+
+                        newLastPart =
+                                (I_DescriptionPart) newDescr.getLastTuple().getMutablePart().makeAnalog(
+                                    newLastPart.getStatusId(), path.getConceptId(), Long.MAX_VALUE);
                     }
                     // printDescriptionPart(newLastPart);
                     // System.out.println(">>> language: " + language);
-     
+
                     termFactory.addUncommitted(con);
                     newLastPart = null;
                 }
@@ -196,9 +204,7 @@ public class InstructAndWaitDo extends AbstractTask {
 
     /*
      * Create a new concept
-     * 
      * @param newDescrString - the FSN and preferred term for the new concept
-     * 
      * @param semantic_tag - the semantic tag, may be null
      */
     protected I_GetConceptData createNewConcept(String newDescrString, String semantic_tag) throws Exception {
@@ -206,8 +212,10 @@ public class InstructAndWaitDo extends AbstractTask {
         if (semantic_tag == null)
             semantic_tag = "(?????)";
         I_TermFactory termFactory = Terms.get();
-        I_GetConceptData fully_specified_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-        I_GetConceptData preferred_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        I_GetConceptData fully_specified_description_type =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        I_GetConceptData preferred_description_type =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
         I_GetConceptData newConcept = Terms.get().newConcept(UUID.randomUUID(), false, config);
         // Install the FSN
         termFactory.newDescription(UUID.randomUUID(), newConcept, language, newDescrString + " " + semantic_tag,
@@ -221,22 +229,21 @@ public class InstructAndWaitDo extends AbstractTask {
     /*
      * Get the semantic tag from the concept's FSN <br> The semantic tag is the
      * substring starting at the last left paren
-     * 
      * @param con - the concept
-     * 
      * @return the semantic tag, null if none exists
      */
     private String getSemanticTag(I_GetConceptData con) throws Exception {
         I_TermFactory termFactory = Terms.get();
         I_GetConceptData current_status = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-        I_GetConceptData fully_specified_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+        I_GetConceptData fully_specified_description_type =
+                termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         Set<I_Position> positionSet = new HashSet<I_Position>();
         for (I_Path path : config.getEditingPathSet()) {
-        	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+            positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
         }
         PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
-        for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions, 
-            config.getPrecedence(), config.getConflictResolutionStrategy())) {
+        for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions, config.getPrecedence(),
+            config.getConflictResolutionStrategy())) {
             // Description is current
             if (desc.getStatusId() != current_status.getConceptId())
                 continue;
@@ -269,8 +276,10 @@ public class InstructAndWaitDo extends AbstractTask {
                 if (con == null)
                     return;
                 // Prompt for the name using the input term as initial text
-                String newDescrString = (String) JOptionPane.showInputDialog(null, "Clone:\n" + con.getInitialText(),
-                    "Enter concept name", JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
+                String newDescrString =
+                        (String) JOptionPane
+                            .showInputDialog(null, "Clone:\n" + con.getInitialText(), "Enter concept name",
+                                JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
                 if (newDescrString == null)
                     return;
                 // Create the new concept, using the semantic tag of the
@@ -280,16 +289,15 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_TermFactory termFactory = Terms.get();
                 Set<I_Position> positionSet = new HashSet<I_Position>();
                 for (I_Path path : config.getEditingPathSet()) {
-                	positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+                    positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
                 }
                 PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
-                for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, 
-                        config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                    termFactory.newRelationship(UUID.randomUUID(), newConcept,
-                        termFactory.getConcept(rel.getTypeId()), termFactory.getConcept(rel.getC2Id()),
-                        termFactory.getConcept(rel.getCharacteristicId()),
-                        termFactory.getConcept(rel.getRefinabilityId()), termFactory.getConcept(rel.getStatusId()),
-                        rel.getGroup(), config);
+                for (I_RelTuple rel : con.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions, config
+                    .getPrecedence(), config.getConflictResolutionStrategy())) {
+                    termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(rel.getTypeId()),
+                        termFactory.getConcept(rel.getC2Id()), termFactory.getConcept(rel.getCharacteristicId()),
+                        termFactory.getConcept(rel.getRefinabilityId()), termFactory.getConcept(rel.getStatusId()), rel
+                            .getGroup(), config);
                 }
                 I_HostConceptPlugins lcv = config.getListConceptViewer();
                 lcv.setTermComponent(newConcept);
@@ -315,9 +323,10 @@ public class InstructAndWaitDo extends AbstractTask {
                 if (con == null)
                     return;
                 // Prompt for name using input term as initial text
-                String newDescrString = (String) JOptionPane.showInputDialog(null, "Create a child of:\n"
-                    + con.getInitialText(), "Enter concept name", JOptionPane.QUESTION_MESSAGE, null, null,
-                    InstructAndWaitDo.this.term);
+                String newDescrString =
+                        (String) JOptionPane
+                            .showInputDialog(null, "Create a child of:\n" + con.getInitialText(), "Enter concept name",
+                                JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
                 if (newDescrString == null)
                     return;
                 // Create the new concept, using the semantic tag of the
@@ -326,9 +335,12 @@ public class InstructAndWaitDo extends AbstractTask {
                 // Now make the selected concept the parent of the new concept
                 I_TermFactory termFactory = Terms.get();
                 I_GetConceptData is_a_rel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-                I_GetConceptData defining_characteristic = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-                I_GetConceptData optional_refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-                I_GetConceptData current_status = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+                I_GetConceptData defining_characteristic =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+                I_GetConceptData optional_refinability =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+                I_GetConceptData current_status =
+                        termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
                 termFactory.newRelationship(UUID.randomUUID(), newConcept, is_a_rel, con, defining_characteristic,
                     optional_refinability, current_status, 0, config);
                 I_HostConceptPlugins lcv = config.getListConceptViewer();
@@ -350,8 +362,9 @@ public class InstructAndWaitDo extends AbstractTask {
         public void actionPerformed(ActionEvent e) {
             try {
                 // Prompt for name using input term as initial text
-                String newDescrString = (String) JOptionPane.showInputDialog(null, "Create a new concept",
-                    "Enter concept name", JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
+                String newDescrString =
+                        (String) JOptionPane.showInputDialog(null, "Create a new concept", "Enter concept name",
+                            JOptionPane.QUESTION_MESSAGE, null, null, InstructAndWaitDo.this.term);
                 if (newDescrString == null)
                     return;
                 // Create the new concept, but since it's not based on an
@@ -376,12 +389,27 @@ public class InstructAndWaitDo extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.ITEM_COMPLETE;
-            done = true;
-            synchronized (InstructAndWaitDo.this) {
-                InstructAndWaitDo.this.notifyAll();
+        	if (Terms.get().getUncommitted().size() > 0) {
+        		for (I_Transact c: Terms.get().getUncommitted()) {
+        			AceLog.getAppLog().warning("Uncommitted changes to: " 
+        					+ ((I_GetConceptData) c).toLongString());
+        			
+        		}
+        		HasUncommittedChanges.askToCommit();
+        	}
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                returnCondition = Condition.ITEM_COMPLETE;
+                done = true;
+                synchronized (InstructAndWaitDo.this) {
+                    InstructAndWaitDo.this.notifyAll();
+                }
             }
-
         }
 
     }

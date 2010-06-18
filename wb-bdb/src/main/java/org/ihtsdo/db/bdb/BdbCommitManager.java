@@ -48,6 +48,7 @@ import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.OpenFrames;
+import org.dwfa.svn.Svn;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
@@ -62,7 +63,6 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 
@@ -85,7 +85,7 @@ public class BdbCommitManager {
 		@Override
 		public void run() {
 			try {
-				while (c.isUnwritten()) {
+				while (c.isUnwritten() && ! c.isCanceled()) {
 					Bdb.getConceptDb().writeConcept(c);
 				}
 			} catch (Exception e) {
@@ -139,6 +139,11 @@ public class BdbCommitManager {
 	private static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
 
 	private static long lastCommit = Bdb.gVersion.incrementAndGet();
+	private static long lastCancel = Integer.MIN_VALUE;
+
+	public static long getLastCancel() {
+		return lastCancel;
+	}
 
 	public static void addUncommittedNoChecks(I_ExtendByRef extension) {
 		RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
@@ -161,6 +166,10 @@ public class BdbCommitManager {
     private static boolean writeChangeSets = true;
 	
 	static {
+		reset();
+	}
+
+	public static void reset() {
 		changeSetWriterService = Executors.newFixedThreadPool(1, new NamedThreadFactory(commitManagerThreadGroup,
 		"Change set writer"));
 		dbWriterService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), 
@@ -326,7 +335,9 @@ public class BdbCommitManager {
     private static boolean performCommit = false;
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-        try {
+    	lastCommit = Bdb.gVersion.incrementAndGet();
+		Svn.rwl.readLock().lock();
+    	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
@@ -462,6 +473,8 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        } finally {
+        	Svn.rwl.readLock().unlock();
         }
         fireCommit();
         updateFrames();
@@ -521,6 +534,7 @@ public class BdbCommitManager {
     }
 
     public static void cancel() {
+    	lastCancel = Bdb.gVersion.incrementAndGet();
     	synchronized (uncommittedCNids) {
     		synchronized (uncommittedCNidsNoChecks) {
     			try {
@@ -684,8 +698,7 @@ public class BdbCommitManager {
         } else {
             // have to forget "all" references to component...
             c.getRefsetMembers().remove(m);
-            NidPair toRemove = new NidPair(m.getRefsetId(), m.getMemberId());
-            c.getData().getMemberNids().remove(toRemove);
+            c.getData().getMemberNids().remove(m.getMemberId());
             m.setStatusAtPositionNid(-1);
         }
         c.modified();

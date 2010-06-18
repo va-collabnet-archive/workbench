@@ -26,11 +26,27 @@ public class IdentifierVersionString extends IdentifierVersion {
     }
 
     public IdentifierVersionString(IdentifierVersionString another, int statusNid, int pathNid, long time) {
-        super(statusNid, pathNid, time);
+        super(statusNid, pathNid, time, another);
         stringDenotation = (String) another.getDenotation();
     }
 
-    @Override
+    public IdentifierVersionString(int statusNid, int pathNid, long time, int authority, String stringDenotation) {
+        super(statusNid, pathNid, time, authority);
+        this.stringDenotation = stringDenotation;
+    }
+
+    
+    public IdentifierVersionString(int statusNid, 
+    		int pathNid, 
+    		long time, 
+    		String stringDenotation, 
+    		int authorityNid) {
+		super(statusNid, pathNid, time);
+		setAuthorityNid(authorityNid);
+		this.stringDenotation = stringDenotation;
+	}
+
+	@Override
     public IDENTIFIER_PART_TYPES getType() {
         return IDENTIFIER_PART_TYPES.STRING;
     }

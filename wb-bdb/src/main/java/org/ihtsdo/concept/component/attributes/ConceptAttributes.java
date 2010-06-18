@@ -227,10 +227,14 @@ public class ConceptAttributes
 				count = count + revisions.size();
 			}
 			list = new ArrayList<Version>(count);
-			list.add(new Version());
+			if (getTime() != Long.MIN_VALUE) {
+				list.add(new Version());
+			}
 			if (revisions != null) {
 				for (int i = 0; i < revisions.size(); i++) {
-					list.add(new Version(i));
+					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+						list.add(new Version(i));
+					}
 				}
 			}
 			versions = list;

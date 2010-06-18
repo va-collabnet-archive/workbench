@@ -145,4 +145,11 @@ public interface I_ExtendByRef extends I_AmTermComponent {
             throws TerminologyException, IOException;
 
 	public List<? extends I_ExtendByRefVersion> getTuples();
+	
+	/**
+	 * remove any uncommitted parts. 
+	 */
+	public void cancel();
+	
+	public boolean isUncommitted();
 }

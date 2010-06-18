@@ -32,15 +32,23 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
+import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -79,11 +87,26 @@ public class InstructAndWait extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            done = true;
-            synchronized (InstructAndWait.this) {
-                InstructAndWait.this.notifyAll();
+        	if (Terms.get().getUncommitted().size() > 0) {
+        		for (I_Transact c: Terms.get().getUncommitted()) {
+        			AceLog.getAppLog().warning("Uncommitted changes to: " 
+        					+ ((I_GetConceptData) c).toLongString());
+        			
+        		}
+        		HasUncommittedChanges.askToCommit();
+        	}
+            if (Terms.get().getUncommitted().size() > 0) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "There are uncommitted changes - please cancel or commit before continuing.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                done = true;
+                synchronized (InstructAndWait.this) {
+                    InstructAndWait.this.notifyAll();
+                }
             }
-
         }
 
     }
@@ -109,7 +132,8 @@ public class InstructAndWait extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         this.done = false;
-        I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+        I_ConfigAceFrame config =
+                (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
         boolean builderVisible = config.isBuilderToggleVisible();
         config.setBuilderToggleVisible(false);
         boolean subversionButtonVisible = config.isBuilderToggleVisible();
@@ -140,8 +164,9 @@ public class InstructAndWait extends AbstractTask {
                     c.gridx++;
                     workflowPanel.add(new JLabel("  "), c);
                     c.gridx++;
-                    stepButton = new JButton(new ImageIcon(
-                        InstructAndWait.class.getResource("/32x32/plain/media_step_forward.png")));
+                    stepButton =
+                            new JButton(new ImageIcon(InstructAndWait.class
+                                .getResource("/32x32/plain/media_step_forward.png")));
                     workflowPanel.add(stepButton, c);
                     stepButton.addActionListener(new StepActionListener());
                     c.gridx++;

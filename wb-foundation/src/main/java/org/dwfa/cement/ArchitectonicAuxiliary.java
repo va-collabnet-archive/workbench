@@ -811,7 +811,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                 new I_ConceptualizeUniversally[] { RELEASE }),
        
         ;
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         public String[] parents_S;
         public String[] descriptions_S;
@@ -846,7 +846,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             init(descriptionStrings, defString, parents);
         }
         private Concept(PrimordialId id, String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
-            this.conceptUids = id.getUids();
+            this.conceptUids = new ArrayList<UUID>(id.getUids());
             init(descriptionStrings, defString, parents);
         }
         private void init(String[] descriptionStrings, String defString, I_ConceptualizeUniversally[] parents) {
@@ -1016,6 +1016,11 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         public Collection<I_RelateConceptsUniversally> getSourceRels(Collection<I_ConceptualizeUniversally> types, I_StoreUniversalFixedTerminology termStore) {
             throw new UnsupportedOperationException();
         }
+
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
     }
 
     public void addToMemoryTermServer(MemoryTermServer server) throws Exception {

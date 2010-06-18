@@ -117,6 +117,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
         }
 
         I_ShowActivity computeRefsetActivityPanel = null;
+        HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         ProgressReport progressReportHtmlGenerator = null;
 
         try {
@@ -138,6 +139,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
             if (showActivityPanel) {
                 computeRefsetActivityPanel = termFactory.newActivityPanel(true, configFrame, 
                     "Computing Refset: " + refset.toString(), true);
+                activities.add(computeRefsetActivityPanel);
                 computeRefsetActivityPanel.setStringPainted(true);
                 computeRefsetActivityPanel.setValue(0);
                 computeRefsetActivityPanel.setIndeterminate(true);
@@ -255,7 +257,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
             // Compute the possible concepts to iterate over here...
             if (query.getTotalStatementCount() != 0) {
-                I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null);
+                I_RepresentIdSet possibleDescriptions = query.getPossibleDescriptions(configFrame, null, activities);
                 possibleDescriptions.or(termFactory.getIdSetFromIntCollection(currentRefsetMemberIds));
 
                 getLogger().info(
@@ -275,7 +277,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
                         boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
 
-                        if (query.execute(currentDescription, configFrame)) {
+                        if (query.execute(currentDescription, configFrame, activities)) {
                             if (!containsCurrentMember) {
                                 newMembers.add(currentDescription.getDescId());
                             }
@@ -299,6 +301,10 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                             getLogger().info("Retired members: " + retiredMembers.size());
                         }
                         if (cancelComputation) {
+                        	for (I_ShowActivity a: activities) {
+                        		a.cancel();
+                        		a.setProgressInfoLower("Cancelled.");
+                        	}
                             break;
                         }
                     }
@@ -321,6 +327,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                         computeRefsetActivityPanel.complete();
                         computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
                     }
+                	for (I_ShowActivity a: activities) {
+                		if (!a.isComplete()) {
+                    		a.cancel();
+                    		a.setProgressInfoLower("Cancelled.");
+                		}
+                	}
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
                         JOptionPane.ERROR_MESSAGE);
                     return Condition.ITEM_CANCELED;
@@ -337,6 +349,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, normalMemberConcept
                     .getConceptId(), false);
                 if (cancelComputation) {
+                	for (I_ShowActivity a: activities) {
+                		if (!a.isComplete()) {
+                    		a.cancel();
+                    		a.setProgressInfoLower("Cancelled.");
+                		}
+                	}
                     break;
                 }
             }
@@ -353,6 +371,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                 memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, normalMemberConcept
                     .getConceptId());
                 if (cancelComputation) {
+                	for (I_ShowActivity a: activities) {
+                		if (!a.isComplete()) {
+                    		a.cancel();
+                    		a.setProgressInfoLower("Cancelled.");
+                		}
+                	}
                     break;
                 }
             }
@@ -372,6 +396,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                         memberRefsetHelper.addDescriptionMarkedParents(new Integer[] { newMember });
                     }
                     if (cancelComputation) {
+                    	for (I_ShowActivity a: activities) {
+                    		if (!a.isComplete()) {
+                        		a.cancel();
+                        		a.setProgressInfoLower("Cancelled.");
+                    		}
+                    	}
                         break;
                     }
                 }
@@ -384,6 +414,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                         memberRefsetHelper.removeDescriptionMarkedParents(new Integer[] { retiredMember });
                     }
                     if (cancelComputation) {
+                    	for (I_ShowActivity a: activities) {
+                    		if (!a.isComplete()) {
+                        		a.cancel();
+                        		a.setProgressInfoLower("Cancelled.");
+                    		}
+                    	}
                         break;
                     }
                 }
@@ -430,6 +466,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
                     computeRefsetActivityPanel.setProgressInfoLower("User cancelled.");
                 }
 
+            	for (I_ShowActivity a: activities) {
+            		if (!a.isComplete()) {
+                		a.cancel();
+                		a.setProgressInfoLower("Cancelled.");
+            		}
+            	}
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "User cancelled. ", "",
                     JOptionPane.ERROR_MESSAGE);
                 return Condition.ITEM_CANCELED;
@@ -453,6 +495,12 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
             try {
                 termFactory.cancel();
+            	for (I_ShowActivity a: activities) {
+            		if (!a.isComplete()) {
+                		a.cancel();
+                		a.setProgressInfoLower("Cancelled.");
+            		}
+            	}
                 termFactory.getActiveAceFrameConfig().setCommitAbortButtonsVisible(true);
             } catch (IOException ioException) {
                 ioException.printStackTrace();

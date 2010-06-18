@@ -361,8 +361,22 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     public Set<Integer> getSelectedTuples() {
         Set<Integer> memberNids = new HashSet<Integer>(checkedRows.cardinality());
         for (int i = checkedRows.nextSetBit(0); i >= 0; i = checkedRows.nextSetBit(i + 1)) {
-            I_ExtendByRefVersion tuple = allTuples.get(i);
-            memberNids.add(tuple.getNid());
+            if (i < allTuples.size()) {
+                I_ExtendByRefVersion tuple = allTuples.get(i);
+                memberNids.add(tuple.getNid());
+            } else {
+            	//TODO verify this is correct behaviour -- Chrissy...
+            	/* Why did we previously get: 
+            	
+            	Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException: Index: 18, Size: 18
+            	at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+            	at java.util.ArrayList.get(ArrayList.java:322)
+            	at org.dwfa.ace.table.refset.ReflexiveRefsetTableModel.getSelectedTuples(ReflexiveRefsetTableModel.java:364)
+
+            	*/
+                AceLog.getAppLog().warning("Selected row > row collection: " + i + 
+                    " all tuples: " + allTuples);
+            }
         }
         return memberNids;
     }

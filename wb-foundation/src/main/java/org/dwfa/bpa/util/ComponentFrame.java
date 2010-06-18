@@ -67,7 +67,16 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         return 0;
     }
 
-    protected Configuration config;
+    private boolean sendToBackInsteadOfClose = false;
+    public boolean sendToBackInsteadOfClose() {
+		return sendToBackInsteadOfClose;
+	}
+
+	public void setSendToBackInsteadOfClose(boolean sendToBackInsteadOfClose) {
+		this.sendToBackInsteadOfClose = sendToBackInsteadOfClose;
+	}
+
+	protected Configuration config;
     private String[] args;
     private LifeCycle lc;
     protected File menuDir;

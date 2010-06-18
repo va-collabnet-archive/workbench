@@ -41,6 +41,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -52,7 +53,16 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes) throws IOException,
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
+			I_ShowActivity activity) throws IOException {
+		return bean.getPossibleKindOfConcepts(config, activity);
+	}
+
+	public boolean everHadSrcRelOfType(int typeNid) throws IOException {
+		return bean.everHadSrcRelOfType(typeNid);
+	}
+
+	public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes) throws IOException,
             TerminologyException {
         return bean.getDestRelOrigins(allowedTypes);
     }

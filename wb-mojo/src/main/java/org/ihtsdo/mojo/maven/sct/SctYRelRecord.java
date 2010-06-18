@@ -140,6 +140,6 @@ class SctYRelRecord implements Comparable<Object>, Serializable {
     public String toString() {
         UUID uuid = new UUID(relUuidMsb, relUuidLsb); // :yyy:
         return uuid + TAB_CHARACTER + relSnoId + TAB_CHARACTER + status + TAB_CHARACTER
-                + c1SnoId + TAB_CHARACTER + roleTypeIdx + TAB_CHARACTER + c2SnoId;
+                + c1SnoId + TAB_CHARACTER + roleTypeIdx + TAB_CHARACTER + c2SnoId + TAB_CHARACTER + group;
     }
 }

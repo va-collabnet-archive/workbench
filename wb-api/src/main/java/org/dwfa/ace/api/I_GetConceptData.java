@@ -37,6 +37,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException;
 
     public int getConceptId();
+    
+    public boolean everHadSrcRelOfType(int typeNid) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -398,6 +400,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
 
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException;
+
+	I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
+			I_ShowActivity activity) throws IOException;
 
 
 }

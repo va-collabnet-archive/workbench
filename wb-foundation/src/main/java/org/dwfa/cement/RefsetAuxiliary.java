@@ -463,7 +463,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 	    		LANGUAGE_REFSET_SV_SE(new String[] { "swedish sweden language refset", "swedish sweden language refset" }, 
 	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),;			
 
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -481,6 +481,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         public String[] getDescriptions_S() {
             return descriptions_S;
         }
+
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
 
         private Concept(String[] descriptions) {
             this(descriptions, new I_ConceptualizeUniversally[] {});
