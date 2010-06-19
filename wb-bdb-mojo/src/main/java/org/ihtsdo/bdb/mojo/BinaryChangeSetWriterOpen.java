@@ -31,7 +31,7 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 /**
  * Set up changeset read/writing in the database.
  * 
- * @extendsPlugin wb-mojo
+ * 
  * @goal bcs-open
  * 
  * @phase process-resources
