@@ -36,7 +36,29 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
     }
 
     public enum TOGGLES {
-        ID(UUID.fromString("f0e28620-7495-11de-8a39-0800200c9a66"), 1), ATTRIBUTES(UUID.fromString("f0e28621-7495-11de-8a39-0800200c9a66"), 1), AU_DIALECT(UUID.fromString("f0e28622-7495-11de-8a39-0800200c9a66"), 1), UK_DIALECT(UUID.fromString("f0e28623-7495-11de-8a39-0800200c9a66"), 1), USA_DIALECT(UUID.fromString("f0e28624-7495-11de-8a39-0800200c9a66"), 1), NZ_DIALECT(UUID.fromString("f0e28625-7495-11de-8a39-0800200c9a66"), 1), CA_DIALECT(UUID.fromString("f0e28626-7495-11de-8a39-0800200c9a66"), 1), DESCRIPTIONS(UUID.fromString("f0e28627-7495-11de-8a39-0800200c9a66"), 1), SOURCE_RELS(UUID.fromString("f0e28628-7495-11de-8a39-0800200c9a66"), 1), DEST_RELS(UUID.fromString("f0e28629-7495-11de-8a39-0800200c9a66"), 1), LINEAGE(UUID.fromString("f0e2862a-7495-11de-8a39-0800200c9a66"), 1), LINEAGE_GRAPH(UUID.fromString("f0e2862b-7495-11de-8a39-0800200c9a66"), 1), IMAGE(UUID.fromString("f0e2862c-7495-11de-8a39-0800200c9a66"), 1), CONFLICT(UUID.fromString("f0e2862d-7495-11de-8a39-0800200c9a66"), 1), STATED_INFERRED(UUID.fromString("f0e2862e-7495-11de-8a39-0800200c9a66"), 1), PREFERENCES(UUID.fromString("f0e28631-7495-11de-8a39-0800200c9a66"), 1), HISTORY(UUID.fromString("f0e28632-7495-11de-8a39-0800200c9a66"), 1), REFSETS(UUID.fromString("f0e28633-7495-11de-8a39-0800200c9a66"), 1);
+        ID(UUID.fromString("f0e28620-7495-11de-8a39-0800200c9a66"), 1), 
+        ATTRIBUTES(UUID.fromString("f0e28621-7495-11de-8a39-0800200c9a66"), 1), 
+        AU_DIALECT(UUID.fromString("f0e28622-7495-11de-8a39-0800200c9a66"), 1), 
+        UK_DIALECT(UUID.fromString("f0e28623-7495-11de-8a39-0800200c9a66"), 1), 
+        USA_DIALECT(UUID.fromString("f0e28624-7495-11de-8a39-0800200c9a66"), 1), 
+        NZ_DIALECT(UUID.fromString("f0e28625-7495-11de-8a39-0800200c9a66"), 1), 
+        CA_DIALECT(UUID.fromString("f0e28626-7495-11de-8a39-0800200c9a66"), 1), 
+        DESCRIPTIONS(UUID.fromString("f0e28627-7495-11de-8a39-0800200c9a66"), 1), 
+        SOURCE_RELS(UUID.fromString("f0e28628-7495-11de-8a39-0800200c9a66"), 1), 
+        DEST_RELS(UUID.fromString("f0e28629-7495-11de-8a39-0800200c9a66"), 1), 
+        LINEAGE(UUID.fromString("f0e2862a-7495-11de-8a39-0800200c9a66"), 1), 
+        LINEAGE_GRAPH(UUID.fromString("f0e2862b-7495-11de-8a39-0800200c9a66"), 1), 
+        IMAGE(UUID.fromString("f0e2862c-7495-11de-8a39-0800200c9a66"), 1), 
+        CONFLICT(UUID.fromString("f0e2862d-7495-11de-8a39-0800200c9a66"), 1), 
+        STATED_INFERRED(UUID.fromString("f0e2862e-7495-11de-8a39-0800200c9a66"), 1), 
+        PREFERENCES(UUID.fromString("f0e28631-7495-11de-8a39-0800200c9a66"), 1), 
+        HISTORY(UUID.fromString("f0e28632-7495-11de-8a39-0800200c9a66"), 1), 
+        REFSETS(UUID.fromString("f0e28633-7495-11de-8a39-0800200c9a66"), 1),
+        TREE_EDITOR(UUID.fromString("f0e28634-7495-11de-8a39-0800200c9a66"), 1),
+        SIMILARITY_PANEL(UUID.fromString("f0e28635-7495-11de-8a39-0800200c9a66"), 1),
+        FIRSTLANGVIEWER_PANEL(UUID.fromString("f0e28636-7495-11de-8a39-0800200c9a66"), 1),
+        SECONDLANGVIEWER_PANEL(UUID.fromString("f0e28637-7495-11de-8a39-0800200c9a66"), 1),
+        CONCEPT_DETAILS_PANEL(UUID.fromString("f0e28638-7495-11de-8a39-0800200c9a66"), 1);
 
         UUID pluginId;
         private int controlId;
