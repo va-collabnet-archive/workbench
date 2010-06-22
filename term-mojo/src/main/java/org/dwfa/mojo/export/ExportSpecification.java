@@ -202,7 +202,7 @@ public class ExportSpecification {
     private boolean fullExport = false;
 
     /** Generate/update a language reference set */
-    private boolean generateLangaugeRefset = false;
+    private boolean generateLangaugeRefset = true;
 
     /***/
     private PROJECT defaultProject;
@@ -567,6 +567,7 @@ public class ExportSpecification {
         getBaseConceptDto(relationshipDto, tuple, idParts, latest);
 
         if (latest) {
+            //TODO not implementing the concept history refsets yet
             setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
             setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
         }
@@ -670,9 +671,10 @@ public class ExportSpecification {
         for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
             I_ThinExtByRefVersioned currentLanguageExtensions = getRefsetExtensionVersioned(adrsNid,
                 currentDescription.getDescId());
-            if (currentLanguageExtensions != null) {
+            if (currentLanguageExtensions != null
+                    && isActive(currentLanguageExtensions.getLatestVersion().getStatusId())) {
                 //Is there a new Description for the ADRS (retired description)
-                if ((latestPreferredTerm == null || currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId())
+                if ((latestPreferredTerm != null && currentLanguageExtensions.getComponentId() != latestPreferredTerm.getDescId())
                     && !isDescriptionInList(latestSynonyms, currentLanguageExtensions.getComponentId())
                     && !isDescriptionInList(latestUnSpecifiedDescriptionTypes, currentLanguageExtensions.getComponentId())){
 
