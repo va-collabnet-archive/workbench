@@ -3,6 +3,7 @@ package org.dwfa.mojo.file;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.mojo.file.spec.ConcatFilesSpec;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,11 +31,14 @@ import java.io.IOException;
  */
 public class ConcatFilesMojo extends AbstractMojo {
 
+
+
+    // ****** SINGLE EXECUTION OF CONCATENATION ******
 	/**
 	 * Files to be concatenated
 	 *
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	File[] inputFiles;
 
@@ -43,9 +47,23 @@ public class ConcatFilesMojo extends AbstractMojo {
 	 * overwritten
 	 *
 	 * @parameter
-	 * @required
+	 * @optional
 	 */
 	File outputFile;
+    // ***********************************************
+
+
+    // ****** MULTI EXECUTION OF CONCATENATION *******
+    /**
+	 * The specification of files for concatenation
+	 *
+	 * @parameter
+	 * @optional
+	 */
+    ConcatFilesSpec[] concatSpecs;
+    // ***********************************************
+
+
 
 	/**
 	 * Indicates if the output file should use DOS line termination - defaults
@@ -64,9 +82,27 @@ public class ConcatFilesMojo extends AbstractMojo {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-        File tmpFile = new File(outputFile.getAbsolutePath() + TMP_TOKEN);
-        if (!outputFile.getParentFile().exists()) {
-            outputFile.getParentFile().mkdirs();
+        if (inputFiles == null && outputFile == null && concatSpecs == null) {
+            getLog().warn("No file concatenation criteria were defined for the 'Concat Files' mojo");
+            return;
+        }
+
+        if (inputFiles != null && outputFile != null) {
+            concatFiles(inputFiles, outputFile);
+        }
+
+        if (concatSpecs != null) {
+            for (ConcatFilesSpec spec : concatSpecs) {
+                concatFiles(spec.getInputFiles(), spec.getOutputFile());
+            }
+        }
+    }
+
+    private void concatFiles(File[] input, File output) throws MojoExecutionException, MojoFailureException {
+
+        File tmpFile = new File(output.getAbsolutePath() + TMP_TOKEN);
+        if (!output.getParentFile().exists()) {
+            output.getParentFile().mkdirs();
         }
 
         if (tmpFile.exists()) {
@@ -81,7 +117,7 @@ public class ConcatFilesMojo extends AbstractMojo {
                     "Mojo failed due to IO failure", e);
         }
 
-        for (File inputFile : inputFiles) {
+        for (File inputFile : input) {
             if (!inputFile.exists() || !inputFile.isFile() || !inputFile.canRead()) {
                 throw new MojoFailureException("The input file " + inputFile
                         + " must exist, be a file and be readable");
@@ -99,16 +135,16 @@ public class ConcatFilesMojo extends AbstractMojo {
             } catch (IOException e) {
                 throw new MojoExecutionException(
                         "Mojo failed due to IO failure, input file was "
-                                + inputFile + " output file was " + outputFile, e);
+                                + inputFile + " output file was " + output, e);
             }
         }
 
         try {
             writer.close();
-            if (outputFile.exists()) {
-                outputFile.delete();
+            if (output.exists()) {
+                output.delete();
             }
-            tmpFile.renameTo(outputFile);
+            tmpFile.renameTo(output);
         } catch (IOException e) {
             throw new MojoExecutionException(
                     "Mojo failed due to IO failure", e);
@@ -139,6 +175,14 @@ public class ConcatFilesMojo extends AbstractMojo {
 
     public void setOutputFile(File outputFile) {
         this.outputFile = outputFile;
+    }
+
+    public ConcatFilesSpec[] getConcatSpecs() {
+        return concatSpecs;
+    }
+
+    public void setConcatSpecs(ConcatFilesSpec[] concatSpecs) {
+        this.concatSpecs = concatSpecs;
     }
 
     public boolean isUseDosLineTermination() {

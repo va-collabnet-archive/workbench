@@ -2,9 +2,12 @@ package org.dwfa.mojo.file;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.mojo.file.spec.ConcatFilesSpec;
 import org.dwfa.mojo.file.util.FileUtil;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,8 +52,8 @@ public class ConcatFileMojoTest {
     /**
 	 * Setup test file object
 	 */
-	@BeforeClass
-	public static void setup() {
+	@Before
+	public void setup() {
 
 		if (!testDir.exists()) {
 			testDir.mkdirs();
@@ -113,8 +116,39 @@ public class ConcatFileMojoTest {
 		}
 	}
 
-	@AfterClass
-	public static void tearDown() {
+    @Test
+	public void testConcatSpec()
+			throws MojoExecutionException, MojoFailureException, IOException {
+
+		ConcatFilesSpec concatFilesSpec_1 = new ConcatFilesSpec();
+		concatFilesSpec_1.setInputFiles(new File[] {inputFile_1, inputFile_2});
+		concatFilesSpec_1.setOutputFile(outputFile);
+
+        ConcatFilesSpec concatFilesSpec_2 = new ConcatFilesSpec();
+		concatFilesSpec_2.setInputFiles(new File[] {inputFile_1, outputFile});
+		concatFilesSpec_2.setOutputFile(outputFile);
+
+        ConcatFilesMojo concatFilesMojo = new ConcatFilesMojo();
+		concatFilesMojo.setConcatSpecs(new ConcatFilesSpec[] {concatFilesSpec_1, concatFilesSpec_2});
+		concatFilesMojo.execute();
+
+		BufferedReader br = new BufferedReader(new FileReader(outputFile));
+		String readLine1 = br.readLine();
+		String readLine2 = br.readLine();
+        String readLine3 = br.readLine();
+        String readLine4 = br.readLine();
+        String readLine5 = br.readLine();
+        String readLine6 = br.readLine();
+        String readLine7 = br.readLine();
+
+		if (!((readLine1 + readLine2 + readLine3 + readLine4 + readLine5 + readLine6 + readLine7)
+				.equals(firstLine_1 + secondLine_1 + firstLine_1 + secondLine_1 + firstLine_2 + secondLine_2 + thirdLine_2))) {
+			Assert.fail("The text in the output file is incorrect");
+		}
+	}
+
+	@After
+	public void tearDown() {
         FileUtil.deleteDirectory(testDir);
 	}
 }
