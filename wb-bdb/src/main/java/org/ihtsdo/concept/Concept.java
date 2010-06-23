@@ -645,6 +645,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 			throws IOException, TerminologyException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
 		ConceptAttributes attr = getConceptAttributes();
+		//AceLog.getAppLog().info("concept = "+toLongString());
+		//AceLog.getAppLog().info("ConceptAttributes = "+attr.toString());
+		
 		if (attr != null) {
 			attr.addTuples(allowedStatus, positionSet, returnTuples,
 			    precedencePolicy, contradictionManager);
