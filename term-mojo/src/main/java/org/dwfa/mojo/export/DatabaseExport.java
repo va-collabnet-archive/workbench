@@ -33,7 +33,9 @@ import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
@@ -49,7 +51,6 @@ import org.dwfa.maven.transform.SctIdGenerator.NAMESPACE;
 import org.dwfa.maven.transform.SctIdGenerator.PROJECT;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
-import org.dwfa.mojo.Rf2ModuleDescriptor;
 import org.dwfa.mojo.export.file.AceOutputHandler;
 import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
@@ -106,11 +107,11 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private PositionDescriptor[] originsForExport;
 
     /**
-     * Positions mapped to release modules.
+     * The concept that groups all the maintained modules.
      *
      * @parameter
      */
-    private Rf2ModuleDescriptor[] moduleDescriptors;
+    private ConceptDescriptor maintainedModuleParent;
 
     /**
      * Included hierarchy
@@ -226,6 +227,9 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     private I_GetConceptData promotesToConcept;
 
+    /** The active concept. */
+    private I_GetConceptData currentConcept;
+
     /**
      * Tuple part to use for exporting new refset content namely the ADRS.
      */
@@ -248,6 +252,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         try {
             promotesToConcept = getTermFactory().getConcept(ConceptConstants.PROMOTES_TO.localize().getNid());
+            currentConcept = getTermFactory().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
@@ -260,7 +265,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
             workQueue = LocalVersionedTerminology.get().newProcessQueue(numberOfThreads);
 
-            Map<UUID, Map<UUID, Date>> releasePathDateMap = getReleasePathDateMap();
+            Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
 
             List<Position> positions = new ArrayList<Position>();
             setTestOriginPositions(releasePathDateMap, positions);
@@ -343,11 +348,21 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private void setTestOriginPositions(Map<UUID, Map<UUID, Date>> releasePathDateMap, List<Position> positions)
             throws Exception, TerminologyException, IOException, ParseException {
         if (originsForExport != null) {
+            I_GetConceptData matainedModuleParent = termFactory.getConcept(UUID.fromString(maintainedModuleParent.getUuid()));
+            I_IntSet allowedStatus = termFactory.newIntSet();
+            allowedStatus.add(currentConcept.getNid());
+
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+            I_IntSet currentStatus = config.getAllowedStatus();
+            config.setAllowedStatus(allowedStatus);
+
             Set<I_Position> positionOrigins = new HashSet<I_Position>();
             for (PositionDescriptor positionDescriptor : originsForExport) {
                 positionOrigins.addAll(
                     PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, getTermFactory()));
             }
+
+            config.setAllowedStatus(currentStatus);
 
             for (I_Position iPosition : positionOrigins) {
                 UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
@@ -359,16 +374,14 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                     position.setLastest(true);
                     positions.add(position);
 
-                    if (!releasePosition.getPath().getUuid().equals(pathUuid.toString())) {
-                        Map<UUID, Date> mappedModuleDate;
-                        if (releasePathDateMap.containsKey(pathUuid)) {
-                            mappedModuleDate = releasePathDateMap.get(pathUuid);
-                        } else {
-                            mappedModuleDate = new HashMap<UUID, Date>(1);
+                    if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus,null, null, false)) {
+                        if (!releasePathDateMap.containsKey(pathUuid)) {
+                            Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
                             releasePathDateMap.put(pathUuid, mappedModuleDate);
+
+                            mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
+                                AceDateFormat.getVersionHelperDateFormat().parse(releasePosition.getTimeString()));
                         }
-                        mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
-                            AceDateFormat.getVersionHelperDateFormat().parse(releasePosition.getTimeString()));
                     }
                 }
             }
@@ -405,38 +418,6 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     public void setTermFactory(I_TermFactory termFactory) {
         this.termFactory = termFactory;
-    }
-
-    /**
-     * Gets the list of mapped Paths to release Modules and time stamps.
-     *
-     * Allows mapping of a path to a release module and time.
-     *
-     * @return Map of UUID modules, Date time stamp maps.
-     *
-     * @throws ParseException
-     */
-    private Map<UUID, Map<UUID, Date>> getReleasePathDateMap() throws ParseException {
-        Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
-
-        if (moduleDescriptors != null) {
-            for (Rf2ModuleDescriptor rf2ModuleDescriptor : moduleDescriptors) {
-                Map<UUID, Date> mappedModuleDate;
-                UUID pathUuid = UUID.fromString(rf2ModuleDescriptor.getPath().getUuid());
-
-                if (releasePathDateMap.containsKey(pathUuid)) {
-                    mappedModuleDate = releasePathDateMap.get(pathUuid);
-                } else {
-                    mappedModuleDate = new HashMap<UUID, Date>(1);
-                    releasePathDateMap.put(pathUuid, mappedModuleDate);
-                }
-
-                mappedModuleDate.put(UUID.fromString(rf2ModuleDescriptor.getModule().getUuid()),
-                    AceDateFormat.getRf2DateFormat().parse(rf2ModuleDescriptor.getModuleTimeString()));
-            }
-        }
-
-        return releasePathDateMap;
     }
 
     /**
