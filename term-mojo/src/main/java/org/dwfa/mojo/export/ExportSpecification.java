@@ -310,6 +310,7 @@ public class ExportSpecification {
         //TODO this needs to be re factored...
         adrsNid = termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9")).getNid();
 
+        structuralRefsets.add(adrsNid);
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6f1e56b5-c127-4f0b-97fa-cb72c76ad58a")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("ef010cf1-cf06-4c8a-9684-a040e61b319d")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("f8834d2f-4e2d-4793-a9e0-5190391ad277")).getNid());
@@ -434,6 +435,21 @@ public class ExportSpecification {
             TerminologyException {
         matchingConceptTuples.addAll(
             position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, false)));
+        //Hack while attributes not loading in baseline correctly
+        if (matchingConceptTuples.isEmpty()) {
+            I_IdPart sctIdPart = null;
+            I_ConceptAttributeTuple exportableTuple = TupleVersionPart.getLatestPart(concept.getConceptAttributeTuples(false));
+
+            if(exportableTuple != null){
+                sctIdPart = getLatesIdtVersion(concept.getId().getVersions(), snomedIntId.getConceptId(), exportableTuple);
+            }
+
+            if (sctIdPart != null && position.isMatchingPart(sctIdPart)) {
+                exportableTuple.setPathId(sctIdPart.getPathId());
+                exportableTuple.setVersion(sctIdPart.getVersion());
+                matchingConceptTuples.add(exportableTuple);
+            }
+        }
 
         matchingDescriptionTuples.addAll(
             position.getMatchingTuples(concept.getDescriptionTuples(null, null, null, false)));
@@ -685,7 +701,7 @@ public class ExportSpecification {
                     retireLatestPart.setPathId(releasePart.getPathId());
                     retireLatestPart.setVersion(releasePart.getVersion());
 
-                    componentDto.getConceptExtensionDtos().addAll(
+                    componentDto.getDescriptionExtensionDtos().addAll(
                         extensionProcessor.processList(currentLanguageExtensions,
                             currentLanguageExtensions.getVersions(), TYPE.DESCRIPTION, true));
                 }
@@ -736,7 +752,7 @@ public class ExportSpecification {
             }
         }
 
-        componentDto.getConceptExtensionDtos().addAll(
+        componentDto.getDescriptionExtensionDtos().addAll(
             extensionProcessor.processList(adrsVersioned, adrsVersioned.getVersions(), TYPE.DESCRIPTION, true));
     }
 

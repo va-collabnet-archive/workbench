@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.util.TupleVersionPart;
@@ -77,5 +78,19 @@ public class Position {
         }
 
         return matchingTuples;
+    }
+
+    /**
+     * Tests if the part is on the path
+     * @param part I_AmPart
+     * @return boolean true if on the path and on or before the timepoint
+     */
+    public <T extends I_AmPart> boolean isMatchingPart(T part){
+        boolean isMatchingPart = false;
+        if (part.getPathId() == path.getConceptId() && part.getTime() <= timePoint.getTime()) {
+            isMatchingPart = true;
+        }
+
+        return isMatchingPart;
     }
 }
