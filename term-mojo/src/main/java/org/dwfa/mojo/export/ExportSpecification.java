@@ -435,21 +435,6 @@ public class ExportSpecification {
             TerminologyException {
         matchingConceptTuples.addAll(
             position.getMatchingTuples(concept.getConceptAttributeTuples(null, null, false, false)));
-        //Hack while attributes not loading in baseline correctly
-        if (matchingConceptTuples.isEmpty()) {
-            I_IdPart sctIdPart = null;
-            I_ConceptAttributeTuple exportableTuple = TupleVersionPart.getLatestPart(concept.getConceptAttributeTuples(false));
-
-            if(exportableTuple != null){
-                sctIdPart = getLatesIdtVersion(concept.getId().getVersions(), snomedIntId.getConceptId(), exportableTuple);
-            }
-
-            if (sctIdPart != null && position.isMatchingPart(sctIdPart)) {
-                exportableTuple.setPathId(sctIdPart.getPathId());
-                exportableTuple.setVersion(sctIdPart.getVersion());
-                matchingConceptTuples.add(exportableTuple);
-            }
-        }
 
         matchingDescriptionTuples.addAll(
             position.getMatchingTuples(concept.getDescriptionTuples(null, null, null, false)));

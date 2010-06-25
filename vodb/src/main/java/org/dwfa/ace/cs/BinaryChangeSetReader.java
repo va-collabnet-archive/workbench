@@ -33,6 +33,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.ACE;
+import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_AmVersioned;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_IdVersioned;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_Path;
@@ -546,8 +549,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             try {
                 ThinConVersioned oldVersioned = (ThinConVersioned) getVodb().getConceptAttributes(
                     thinAttributes.getConId());
-                if (oldVersioned != null) {
-                    oldVersioned.merge(thinAttributes);
+                if (oldVersioned != null && thinAttributes.merge(oldVersioned)) {
                     AceLog.getEditLog().fine(
                         "Merging attributes with existing (should have been null): \n" + thinAttributes + "\n\n"
                             + oldVersioned);
@@ -623,8 +625,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
             }
             try {
                 ThinImageVersioned oldVersioned = (ThinImageVersioned) getVodb().getImage(thinImage.getImageId());
-                if (oldVersioned != null) {
-                    oldVersioned.merge(thinImage);
+                if (oldVersioned != null && thinImage.merge(oldVersioned)) {
                     AceLog.getEditLog().fine(
                         "Merging image with existing (should have been null): \n" + thinImage + "\n\n" + oldVersioned);
                 }
@@ -671,17 +672,15 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
 
                 //If there is an existing relationship, add the new version if the details are different.
                 if (oldVersioned != null) {
-                    if (oldVersioned.merge(thinRel)) {
-                        getVodb().writeRel(thinRel);
+                    if (thinRel.merge(oldVersioned)) {
                         AceLog.getAppLog().info(
                             "Merging rel with existing (should have been null): \n" + thinRel + "\n\n" + oldVersioned);
                     } else {
                         AceLog.getAppLog().severe(
                             "Ignoring as existing relationship with the details \n" + thinRel + "\n\n" + oldVersioned);
                     }
-                } else {
-                    getVodb().writeRel(thinRel);
                 }
+                getVodb().writeRel(thinRel);
 
                 if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                     AceLog.getEditLog().fine("Importing rel: \n" + thinRel);
@@ -864,8 +863,7 @@ public class BinaryChangeSetReader implements I_ReadChangeSet {
         try {
             ThinDescVersioned oldDescVersioned = (ThinDescVersioned) getVodb().getDescription(thinDesc.getDescId(),
                 thinDesc.getConceptId());
-            if (oldDescVersioned != null) {
-                oldDescVersioned.merge(thinDesc);
+            if (oldDescVersioned != null && thinDesc.merge(oldDescVersioned)) {
                 AceLog.getEditLog().fine(
                     "Merging desc with existing (should have been null): \n" + thinDesc + "\n\n" + oldDescVersioned);
             }
