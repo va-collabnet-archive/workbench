@@ -24,14 +24,12 @@ import java.util.Set;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -50,9 +48,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @throws Exception
      */
-    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint, int refsetSpecNid) {
-        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid);
+    public RelationshipStatement(boolean useNotQualifier, I_GetConceptData queryToken,
+            I_AmTermComponent queryConstraint, int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
+        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
+        this.config = config;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;
@@ -65,7 +66,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
+    public boolean getStatementResult(I_AmTermComponent component) throws IOException, TerminologyException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;
         I_RelTuple relTuple = relVersioned.getLastTuple();
@@ -130,16 +131,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, 
-    		I_RepresentIdSet parentPossibleConcepts, 
-    		Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, configFrame, 
-            "<html>Possible: <br>" + this.toHtmlFragment(), true);
+    public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
+        I_ShowActivity activity =
+                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(), true);
         activities.add(activity);
         activity.setIndeterminate(true);
         long startTime = System.currentTimeMillis();
-        
+
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
             parentPossibleConcepts = termFactory.getConceptIdSet();
@@ -157,8 +156,6 @@ public class RelationshipStatement extends RefsetSpecStatement {
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
-                // possibleConcepts = termFactory.getConceptIdSet();
-                // possibleConcepts.removeAll(refsetMemberSet);
             } else {
                 possibleConcepts.or(refsetMemberSet);
             }
@@ -196,29 +193,25 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
-        
+
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
-            "; Outgoing count: " + possibleConcepts.cardinality());
+        activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+            + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         activity.complete();
         return possibleConcepts;
     }
 
     @Override
-    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, 
-    		I_RepresentIdSet parentPossibleConcepts, 
-			Collection<I_ShowActivity> activities)
-        throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible descriptions in rel statement unsupported operation.");
     }
 
     @Override
-    public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts, 
-			Collection<I_ShowActivity> activities) 
-    	throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in rel statement unsupported operation.");
     }
 
@@ -228,17 +221,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relRefinabilityIsDescendentOf(I_GetConceptData requiredRefinability, I_RelTuple relTuple)
             throws TerminologyException, IOException {
+
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     requiredRefinability.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relRefinabilityIs(child, relTuple)) {
@@ -257,17 +246,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relRefinabilityIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relRefinabilityIs(child, relTuple)) {
@@ -306,16 +289,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relCharIsDescendentOf(I_GetConceptData requiredCharType, I_RelTuple relTuple) throws IOException,
             TerminologyException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     requiredCharType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relCharIs(child, relTuple)) {
@@ -334,16 +312,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relCharIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relCharIs(child, relTuple)) {
@@ -399,16 +372,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relTypeIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relTypeIs(child, relTuple)) {
@@ -430,16 +398,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relTypeIsDescendentOf(I_GetConceptData requiredRelType, I_RelTuple relTuple) throws IOException,
             TerminologyException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     requiredRelType.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relTypeIs(child, relTuple)) {
@@ -463,16 +426,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relStatusIsDescendentOf(I_GetConceptData requiredStatus, I_RelTuple relTuple)
             throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     requiredStatus.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relStatusIs(child, relTuple)) {
@@ -491,16 +449,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relStatusIsChildOf(I_RelTuple relTuple) throws IOException, TerminologyException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Set<? extends I_GetConceptData> children =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relStatusIs(child, relTuple)) {
@@ -533,12 +486,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relIs(I_RelTuple relTuple) throws IOException, TerminologyException {
         I_RelTuple queryConstraintRel = (I_RelTuple) queryConstraint;
-        return relTuple.equals(queryConstraintRel); // TODO check
+        return relTuple.equals(queryConstraintRel);
     }
 
     private boolean relRestrictionIs(I_RelTuple relTuple) throws IOException, TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel restriction is"); // unimplemented
-        // TODO
+        throw new TerminologyException("Unimplemented query : rel restriction is"); // TODO unimplemented
     }
 
     private boolean relLogicalQuantifierIsDescendentOf(I_RelTuple relTuple) throws TerminologyException {
@@ -580,16 +532,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relDestinationIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relDestinationIs(child, relTuple)) {
@@ -611,16 +558,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relDestinationIsDescendentOf(I_GetConceptData requiredDestination, I_RelTuple relTuple)
             throws IOException, TerminologyException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> children =
                     requiredDestination.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (relDestinationIs(child, relTuple)) {

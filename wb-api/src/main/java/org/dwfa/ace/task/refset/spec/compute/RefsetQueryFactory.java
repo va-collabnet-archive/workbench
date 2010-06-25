@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -46,13 +45,11 @@ import org.dwfa.tapi.TerminologyException;
 public class RefsetQueryFactory {
 
     public static RefsetSpecQuery createQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-            I_GetConceptData refsetSpec, I_GetConceptData refset, RefsetComputeType refsetType) throws IOException,
-            TerminologyException, ParseException {
+            I_GetConceptData refsetSpec, I_GetConceptData refset, RefsetComputeType refsetType) throws Exception {
 
         // create tree object that corresponds to the database's refset spec
         Collection<? extends I_ExtendByRef> extensions =
-                Terms.get()
-                    .getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptId());
@@ -72,10 +69,9 @@ public class RefsetQueryFactory {
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid());
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid(), configFrame);
         query = processNode(root, query, refsetType, configFrame, termFactory, refsetSpec.getNid());
-                
-        
+
         return query;
 
     }
@@ -149,13 +145,11 @@ public class RefsetQueryFactory {
      * @param configFrame
      * @param termFactory
      * @return A query containing the updated node's information.
-     * @throws IOException
-     * @throws TerminologyException
-     * @throws ParseException
+     * @throws Exception
      */
     private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
-            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory, int refsetSpecNid) throws IOException,
-            TerminologyException, ParseException {
+            RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory, int refsetSpecNid)
+            throws Exception {
 
         if (query == null) {
             throw new TerminologyException("Invalid refset spec : null query item used.");
@@ -171,9 +165,9 @@ public class RefsetQueryFactory {
             I_ExtendByRef currExt = (I_ExtendByRef) childNode.getUserObject();
 
             List<I_ExtendByRefVersion> extensions =
-                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), 
-                        configFrame.getViewPositionSetReadOnly(), configFrame.getPrecedence(),
-                        configFrame.getConflictResolutionStrategy());
+                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), configFrame
+                        .getViewPositionSetReadOnly(), configFrame.getPrecedence(), configFrame
+                        .getConflictResolutionStrategy());
             if (extensions.size() > 0) {
                 I_ExtendByRefPart thinPart = extensions.get(0).getMutablePart();
 
@@ -188,15 +182,15 @@ public class RefsetQueryFactory {
                     if (termFactory.hasConcept(part.getC3id())) {
                         constraint = termFactory.getConcept(part.getC3id());
                     } else {
-                        constraint =
-                                termFactory.getDescription(part.getC3id());
+                        constraint = termFactory.getDescription(part.getC3id());
                     } // TODO add rel
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
                     case CONCEPT:
                         if (computeType.equals(RefsetComputeType.CONCEPT)) {
-                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
+                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -204,7 +198,8 @@ public class RefsetQueryFactory {
                         }
                     case DESCRIPTION:
                         if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
-                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
+                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -212,7 +207,8 @@ public class RefsetQueryFactory {
                         }
                     case RELATIONSHIP:
                         if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
-                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
+                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                refsetSpecNid);
                             break;
                         } else {
                             throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
@@ -238,7 +234,8 @@ public class RefsetQueryFactory {
                         throw new TerminologyException(
                             "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
                     case DESCRIPTION:
-                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint, refsetSpecNid);
+                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                            refsetSpecNid);
                         break;
                     default:
                         throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
@@ -331,13 +328,13 @@ public class RefsetQueryFactory {
             throws IOException {
         for (I_ExtendByRef ext : list) {
             if (ext.getRefsetId() == refsetNid) {
-            extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
-            if (fetchedComponents.contains(ext.getMemberId()) == false) {
-                fetchedComponents.add(ext.getMemberId());
-                    addExtensionsToMap(Terms.get()
-                        .getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap, fetchedComponents, refsetNid);
+                extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+                if (fetchedComponents.contains(ext.getMemberId()) == false) {
+                    fetchedComponents.add(ext.getMemberId());
+                    addExtensionsToMap(Terms.get().getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap,
+                        fetchedComponents, refsetNid);
+                }
             }
         }
     }
-}
 }
