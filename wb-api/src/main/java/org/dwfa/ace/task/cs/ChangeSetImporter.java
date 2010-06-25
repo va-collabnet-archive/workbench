@@ -55,6 +55,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     @SuppressWarnings("unchecked")
     public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets,
             String suffix, String prefix) throws TaskFailedException {
+    	logger.info("importAllChangeSets called rootDirStr = "+rootDirStr +" suffix = "+suffix+" prefix = "+prefix);
         try {
             long start = System.currentTimeMillis();
             I_TermFactory tf = Terms.get();
