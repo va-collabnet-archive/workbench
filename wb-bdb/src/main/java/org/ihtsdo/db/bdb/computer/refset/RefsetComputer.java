@@ -47,9 +47,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             for (ParallelConceptIterator pci : pcis) {
                 pci.getCurrentThread().interrupt();
             }
-            for (I_ShowActivity a: activities) {
-            	a.cancel();
-        		a.setProgressInfoLower("Cancelled.");
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
             }
         }
     }
@@ -86,8 +86,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         conceptCount = possibleIds.cardinality();
 
         activity =
-                Terms.get().newActivityPanel(true, frameConfig, 
-                		"Computing refset: " + refsetConcept.toString(), true);
+                Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
         activities.add(activity);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
@@ -147,8 +146,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                             .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                    executeComponent(descVersioned, cNid, 
-                    		descVersioned.getDescId(), frameConfig, activities);
+                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig, activities);
                 }
             } else if (specHelper.isConceptComputeType()) {
                 executeComponent(concept, cNid, cNid, frameConfig, activities);
@@ -156,14 +154,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         }
     }
 
-    private void executeComponent(I_AmTermComponent component, int conceptNid, 
-    		int componentNid, I_ConfigAceFrame config, 
-    		Collection<I_ShowActivity> activities)
-            throws Exception {
+    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid,
+            I_ConfigAceFrame config, Collection<I_ShowActivity> activities) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component, config, activities)) {
+            if (query.execute(component, activities)) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();
@@ -194,14 +190,14 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                         + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                         + retiredMembers.get());
                 } else {
-                	for (I_ShowActivity a: activities) {
-                		if (!a.isComplete()) {
-                    		if (!a.isComplete()) {
-                        		a.cancel();
-                        		a.setProgressInfoLower("Cancelled.");
-                    		}
-                		}
-                	}
+                    for (I_ShowActivity a : activities) {
+                        if (!a.isComplete()) {
+                            if (!a.isComplete()) {
+                                a.cancel();
+                                a.setProgressInfoLower("Cancelled.");
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -217,12 +213,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 + newMembers.get() + " Ret: " + retiredMembers.get());
         } else {
             activity.setProgressInfoLower("Cancelled.");
-        	for (I_ShowActivity a: activities) {
-        		if (!a.isComplete()) {
-            		a.cancel();
-            		a.setProgressInfoLower("Cancelled.");
-        		}
-        	}
+            for (I_ShowActivity a : activities) {
+                if (!a.isComplete()) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
+            }
         }
         activity.complete();
     }

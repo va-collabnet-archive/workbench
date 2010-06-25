@@ -1321,10 +1321,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         private I_ConfigAceFrame config;
         private I_RepresentIdSet matches;
 
-        public ConceptSearcher(CountDownLatch conceptLatch, 
-        		I_TrackContinuation tracker,
-                List<I_TestSearchResults> checkList, 
-                I_ConfigAceFrame config, I_RepresentIdSet matches) {
+        public ConceptSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker,
+                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) {
             super();
             this.conceptLatch = conceptLatch;
             this.tracker = tracker;
@@ -1336,9 +1334,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         @Override
         public void processConceptData(Concept concept) throws Exception {
 
-        	
             if (tracker.continueWork()) {
-            	boolean failed = false;
+                boolean failed = false;
                 for (I_TestSearchResults test : checkList) {
                     if (test.test(concept, config) == false) {
                         failed = true;
@@ -1346,7 +1343,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     }
                 }
                 if (!failed) {
-                	matches.setMember(concept.getNid());
+                    matches.setMember(concept.getNid());
                 }
 
                 conceptLatch.countDown();
@@ -1367,12 +1364,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
-    	ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
-    	try {
-			Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
-		} catch (Exception e) {
-			throw new IOException();
-		}
+        ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
+        try {
+            Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
+        } catch (Exception e) {
+            throw new IOException();
+        }
 
     }
 
@@ -1627,19 +1624,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
 
-    	HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+        HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         RefsetComputer computer;
         try {
             I_RepresentIdSet possibleIds;
             if (specHelper.isConceptComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
-                possibleIds = query.getPossibleConceptsInterruptable(frameConfig, null,
-                		activities);
+                possibleIds = query.getPossibleConceptsInterruptable(null, activities);
 
             } else if (specHelper.isDescriptionComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
-                possibleIds = query.getPossibleDescriptionsInterruptable(frameConfig, null,
-                		activities);
+                possibleIds = query.getPossibleDescriptionsInterruptable(null, activities);
             } else {
                 throw new Exception("Relationship compute type not supported.");
             }
@@ -1648,8 +1643,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             possibleIds.or(getIdSetFromIntCollection(currentMembersList));
             AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
-            computer = new RefsetComputer(refsetNid, query, 
-            		frameConfig, possibleIds, activities);
+            computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds, activities);
             if (possibleIds.cardinality() > 500) {
                 AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
                 Bdb.getConceptDb().iterateConceptDataInParallel(computer);
@@ -1682,29 +1676,29 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig
                 .getDbConfig().getChangeSetWriterThreading());
             if (!computer.continueWork()) {
-            	for (I_ShowActivity a: activities) {
-            		a.cancel();
-            		a.setProgressInfoLower("Cancelled.");
-            	}
+                for (I_ShowActivity a : activities) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
                 return Condition.ITEM_CANCELED;
             } else {
                 return Condition.ITEM_COMPLETE;
             }
         } catch (ComputationCanceled e) {
-        	for (I_ShowActivity a: activities) {
-        		a.cancel();
-        		a.setProgressInfoLower("Cancelled.");
-        	}
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
         } catch (InterruptedException e) {
-        	for (I_ShowActivity a: activities) {
-        		a.cancel();
-        		a.setProgressInfoLower("Cancelled.");
-        	}
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
         } catch (ExecutionException e) {
-        	for (I_ShowActivity a: activities) {
-        		a.cancel();
-        		a.setProgressInfoLower("Cancelled.");
-        	}
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
             if (getRootCause(e) instanceof TerminologyException) {
                 throw new TerminologyException(e.getMessage());
             } else if (getRootCause(e) instanceof IOException) {
@@ -1720,8 +1714,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         // Clean up any sub-activities...
-        
-        
+
         return Condition.ITEM_CANCELED;
     }
 
