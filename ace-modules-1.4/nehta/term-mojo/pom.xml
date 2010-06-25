@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- 
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ ! 
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+    <parent>
+        <groupId>au.gov.nehta</groupId>
+        <artifactId>ace-modules</artifactId>
+        <version>1.4</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>au.gov.nehta</groupId>
+    <artifactId>term-mojo</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>term mojo</name>
+    <scm>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4/term-mojo</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4/term-mojo</developerConnection>
+        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.4/term-mojo</url>
+    </scm>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <inceptionYear>2006</inceptionYear>
+    <description>This project provides a set of maven goals that are used to
+        transform terminology data in preparation for importing into standard file
+        formats used by the version-oriented database, and by other applications.</description>
+    <dependencies>
+        <dependency>
+            <groupId>au.gov.nehta</groupId>
+            <artifactId>dwfa-mojo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>au.gov.nehta</groupId>                                                                                     
+            <artifactId>vodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-project</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.dwfa</groupId>
+                <artifactId>pbl-mojo</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <cubitProject>cubitci</cubitProject>
+                    <siteRoot>ace-mojo</siteRoot>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>
