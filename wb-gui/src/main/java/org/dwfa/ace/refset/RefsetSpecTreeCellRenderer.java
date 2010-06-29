@@ -289,20 +289,26 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setTextToHtml(htmlParts);
     }
 
-    private void renderStructuralQueryClause(I_ExtendByRefVersion firstTuple, boolean indent) throws IOException, TerminologyException, ParseException {
-        List<String> htmlParts = new ArrayList<String>();
-        I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) firstTuple.getMutablePart();
-        if (indent) {
-            htmlParts.add("&nbsp;&nbsp;");
-        }
-        addPrefixImage(htmlParts, cccPart.getC1id());
-        htmlParts.add("&nbsp;&nbsp;");
-        addConceptDescription(htmlParts, cccPart.getC2id(), "#191970");
-        htmlParts.add("<font color='#191970'>:&nbsp;&nbsp;</font>");
-        addConceptDescription(htmlParts, cccPart.getC3id(), "black");
-        htmlParts.add("&nbsp;&nbsp;");
-        setTextToHtml(htmlParts);
-    }
+	private void renderStructuralQueryClause(I_ExtendByRefVersion firstTuple,
+			boolean indent) throws IOException, TerminologyException,
+			ParseException {
+		List<String> htmlParts = new ArrayList<String>();
+		I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) firstTuple
+				.getMutablePart();
+		if (indent) {
+			htmlParts.add("&nbsp;&nbsp;");
+		}
+		addPrefixImage(htmlParts, cccPart.getC1id());
+		htmlParts.add("&nbsp;&nbsp;");
+		addConceptDescription(htmlParts, cccPart.getC2id(), "#191970");
+		// This is for the "no arg" difference operators
+		if (cccPart.getC2id() != cccPart.getC3id()) {
+			htmlParts.add("<font color='#191970'>:&nbsp;&nbsp;</font>");
+			addConceptDescription(htmlParts, cccPart.getC3id(), "black");
+		}
+		htmlParts.add("&nbsp;&nbsp;");
+		setTextToHtml(htmlParts);
+	}
 
     private void renderBranchingClause(I_ExtendByRefVersion firstTuple) throws IOException, TerminologyException, ParseException {
         List<String> htmlParts = new ArrayList<String>();
