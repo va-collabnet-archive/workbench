@@ -36,6 +36,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -2371,21 +2372,25 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 	}
 
 	protected void parseDescriptions(String fName, SctXDesRecord[] a, int count) throws Exception {
-
+		// Refactored to user the bufferedReader readLine method to prevent errors for windows / linux end of line chars
 		long start = System.currentTimeMillis();
 
 		BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
 				"UTF-8"));
-		StreamTokenizer st = new StreamTokenizer(r);
-		st.resetSyntax();
-		st.wordChars('\u001F', '\u00FF');
-		st.whitespaceChars('\t', '\t');
-		st.eolIsSignificant(true);
+	
 		int descriptions = 0;
-
-		skipLineOne(st);
-		int tokenType = st.nextToken();
-		while ((tokenType != StreamTokenizer.TT_EOF) && (descriptions < count)) {
+//		skipLineOne(st);
+//		int tokenType = st.nextToken();
+//		while ((tokenType != StreamTokenizer.TT_EOF) && (descriptions < count)) {
+		r.readLine(); // Skip 1
+		String line = r.readLine();	
+		while ((line != null) && (descriptions < count)) {
+			StreamTokenizer st = new StreamTokenizer(new StringReader(line));
+			st.resetSyntax();
+			st.wordChars('\u001F', '\u00FF');
+			st.whitespaceChars('\t', '\t');
+			st.eolIsSignificant(true);
+			int tokenType = st.nextToken();
 			// DESCRIPTIONID
 			long descriptionId = Long.parseLong(st.sval);
 			// DESCRIPTIONSTATUS
@@ -2412,12 +2417,14 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 					typeInt, lang);
 			descriptions++;
 
-			// CR
-			tokenType = st.nextToken();
-			// LF
-			tokenType = st.nextToken();
-			// Beginning of loop
-			tokenType = st.nextToken();
+//			// CR
+//			tokenType = st.nextToken();
+//			// LF
+//			tokenType = st.nextToken();
+//			// Beginning of loop
+//			tokenType = st.nextToken();
+			
+			line = r.readLine();
 		}
 		Arrays.sort(a);
 
@@ -2429,6 +2436,7 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 	protected void parseRelationships(String fName, SctXRelRecord[] a, int count,
 			boolean hasSnomedId, boolean doCrossMap) throws Exception {
 
+		if (count >0) {
 		long start = System.currentTimeMillis();
 
 		BufferedReader r = new BufferedReader(new FileReader(fName));
@@ -2489,6 +2497,10 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 		getLog().info(
 				"Parse & sort time: " + relationships + " relationships, "
 				+ (System.currentTimeMillis() - start) + " milliseconds");
+		} else {
+			getLog().info(
+					"Parse & sort time: No rels, skipped");
+		}
 	}
 
 	private SctXRelRecord[] removeDuplRels(SctXRelRecord[] a) {
@@ -2812,10 +2824,9 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
 		// lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
 		// lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
 		// NOTE: removed (-1) if 0 check impact (Alo june 29 2010)
+		// Removed: if (lineCount > 0) lineCount--;
 		
-		if (lineCount > 0) lineCount--;
-		
-		return lineCount;
+		return lineCount - 1;
 	}
 
 	private String getFileRevDate(File f) throws MojoFailureException {
