@@ -151,7 +151,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component, config)) {
+            // TODO - EKM Is this right?
+            if (query.execute(component, config, null, query.getV1Is(), query.getV2Is())) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();
