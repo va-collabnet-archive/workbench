@@ -64,7 +64,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
     private static final int dataVersion = 4;
 
     private Boolean clauseIsTrue = true;
-    private transient Exception ex = null;
+    protected transient Exception ex = null;
     private transient Condition returnCondition = Condition.CONTINUE;
     protected I_DescriptionVersioned c3Description;
 
@@ -152,7 +152,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
         return returnCondition;
     }
 
-    private void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
+    protected void doRun(final I_EncodeBusinessProcess process, final I_Work worker) {
         try {
             // TODO pass in frame configuration
             I_ConfigAceFrame configFrame = Terms.get().getActiveAceFrameConfig();

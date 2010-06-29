@@ -30,6 +30,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -74,8 +75,7 @@ public class RefsetQueryFactory {
 
         RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid());
         query = processNode(root, query, refsetType, configFrame, termFactory, refsetSpec.getNid());
-                
-        
+              
         return query;
 
     }
@@ -156,7 +156,7 @@ public class RefsetQueryFactory {
     private static RefsetSpecQuery processNode(DefaultMutableTreeNode node, RefsetSpecQuery query,
             RefsetComputeType computeType, I_ConfigAceFrame configFrame, I_TermFactory termFactory, int refsetSpecNid) throws IOException,
             TerminologyException, ParseException {
-
+    	
         if (query == null) {
             throw new TerminologyException("Invalid refset spec : null query item used.");
         }
@@ -231,9 +231,39 @@ public class RefsetQueryFactory {
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
-                    case CONCEPT:
-                        throw new TerminologyException(
-                            "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
+					case CONCEPT: {
+						if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
+								.localize().getNid()
+								|| part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS
+										.localize().getNid()) {
+							String pos_str = part.getStringValue();
+							// System.out.println("1:" + pos_str);
+							pos_str = pos_str.substring(pos_str
+									.lastIndexOf("(") + 1, pos_str
+									.lastIndexOf(")"));
+							// System.out.println("2:" + pos_str);
+							String p_str = pos_str.substring(0, pos_str
+									.indexOf(" "));
+							String v_str = pos_str.substring(pos_str
+									.indexOf(" ") + 1);
+							// System.out.println("p:" + p_str);
+							// System.out.println("v:" + v_str);
+							I_Path path = Terms.get().getPath(
+									Integer.parseInt(p_str));
+							if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
+									.localize().getNid()) {
+								query.setV1Is(Terms.get().newPosition(path,
+										Integer.parseInt(v_str)));
+							} else {
+								query.setV2Is(Terms.get().newPosition(path,
+										Integer.parseInt(v_str)));
+							}
+						} else {
+							throw new TerminologyException(
+									"Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
+						}
+						break;
+					}
                     case RELATIONSHIP:
                         throw new TerminologyException(
                             "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
@@ -290,6 +320,7 @@ public class RefsetQueryFactory {
                 }
             }
         }
+
         return query;
     }
 

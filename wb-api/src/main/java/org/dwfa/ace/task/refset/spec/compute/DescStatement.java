@@ -33,12 +33,14 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -98,43 +100,54 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
-        if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
-            I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
-            I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
+	public boolean getStatementResult(I_AmTermComponent component,
+			I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1_is,
+			I_Position v2_is) throws IOException, TerminologyException {
+		if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+			I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
+			I_DescriptionTuple descriptionTuple = descriptionVersioned
+					.getLastTuple();
 
-            switch (tokenEnum) {
-            case DESC_IS:
-                return descriptionIs(descriptionTuple);
-            case DESC_IS_MEMBER_OF:
-                return descriptionIsMemberOf(descriptionTuple);
-            case DESC_STATUS_IS:
-                return descriptionStatusIs(descriptionTuple);
-            case DESC_STATUS_IS_CHILD_OF:
-                return descriptionStatusIsChildOf(descriptionTuple, config);
-            case DESC_STATUS_IS_KIND_OF:
-                return descriptionStatusIsKindOf(descriptionTuple, config);
-            case DESC_STATUS_IS_DESCENDENT_OF:
-                return descriptionStatusIsDescendentOf(descriptionTuple, config);
-            case DESC_TYPE_IS:
-                return descriptionTypeIs(descriptionTuple);
-            case DESC_TYPE_IS_CHILD_OF:
-                return descriptionTypeIsChildOf(descriptionTuple, config);
-            case DESC_TYPE_IS_KIND_OF:
-                return descriptionTypeIsKindOf(descriptionTuple, config);
-            case DESC_TYPE_IS_DESCENDENT_OF:
-                return descriptionTypeIsDescendentOf(descriptionTuple, config);
-            case DESC_REGEX_MATCH:
-                return descriptionRegexMatch(descriptionTuple);
-            case DESC_LUCENE_MATCH:
-                return descriptionLuceneMatch(descriptionTuple);
-            default:
-                throw new RuntimeException("Can't handle queryToken: " + queryToken);
-            }
-        } else {
-            return false;
-        }
-    }
+			switch (tokenEnum) {
+			case DESC_IS:
+				return descriptionIs(descriptionTuple);
+			case DESC_IS_MEMBER_OF:
+				return descriptionIsMemberOf(descriptionTuple);
+			case DESC_STATUS_IS:
+				return descriptionStatusIs(descriptionTuple);
+			case DESC_STATUS_IS_CHILD_OF:
+				return descriptionStatusIsChildOf(descriptionTuple, config);
+			case DESC_STATUS_IS_KIND_OF:
+				return descriptionStatusIsKindOf(descriptionTuple, config);
+			case DESC_STATUS_IS_DESCENDENT_OF:
+				return descriptionStatusIsDescendentOf(descriptionTuple, config);
+			case DESC_TYPE_IS:
+				return descriptionTypeIs(descriptionTuple);
+			case DESC_TYPE_IS_CHILD_OF:
+				return descriptionTypeIsChildOf(descriptionTuple, config);
+			case DESC_TYPE_IS_KIND_OF:
+				return descriptionTypeIsKindOf(descriptionTuple, config);
+			case DESC_TYPE_IS_DESCENDENT_OF:
+				return descriptionTypeIsDescendentOf(descriptionTuple, config);
+			case DESC_REGEX_MATCH:
+				return descriptionRegexMatch(descriptionTuple);
+			case DESC_LUCENE_MATCH:
+				return descriptionLuceneMatch(descriptionTuple);
+			case CHANGED_DESCRIPTION_CASE:
+			case CHANGED_DESCRIPTION_LANGUAGE:
+			case CHANGED_DESCRIPTION_STATUS:
+			case CHANGED_DESCRIPTION_TERM:
+			case CHANGED_DESCRIPTION_TYPE:
+				// TODO - EKM
+				return descriptionStatusIs(descriptionTuple);
+			default:
+				throw new RuntimeException("Can't handle queryToken: "
+						+ queryToken);
+			}
+		} else {
+			return false;
+		}
+	}
 
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
@@ -186,6 +199,14 @@ public class DescStatement extends RefsetSpecStatement {
         case DESC_TYPE_IS_KIND_OF:
         case DESC_TYPE_IS_DESCENDENT_OF:
         case DESC_REGEX_MATCH:
+            possibleConcepts.or(parentPossibleConcepts);
+            break;
+        case CHANGED_DESCRIPTION_CASE:
+        case CHANGED_DESCRIPTION_LANGUAGE:
+        case CHANGED_DESCRIPTION_STATUS:
+        case CHANGED_DESCRIPTION_TERM:
+        case CHANGED_DESCRIPTION_TYPE:
+        	// TODO - EKM
             possibleConcepts.or(parentPossibleConcepts);
             break;
         default:

@@ -45,7 +45,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/diff", type = BeanType.TASK_BEAN) })
-public class DiffV1IsRefsetSpec extends DiffVnIsRefsetSpec {
+public abstract class DiffVnIsRefsetSpec extends AbstractAddRefsetSpecTask {
 	/**
 	 * 
 	 */
@@ -67,9 +67,77 @@ public class DiffV1IsRefsetSpec extends DiffVnIsRefsetSpec {
 		}
 	}
 
-	protected int getStructuralQueryTokenId() throws IOException,
+	protected abstract int getStructuralQueryTokenId() throws IOException,
+			TerminologyException;
+
+	@Override
+	protected int getRefsetPartTypeId() throws IOException,
 			TerminologyException {
-		return RefsetAuxiliary.Concept.DIFFERENCE_V1_IS.localize().getNid();
+		return RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION
+				.localize().getNid();
+	}
+
+	@Override
+	protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf,
+			I_ConfigAceFrame configFrame) throws IOException,
+			TerminologyException {
+		RefsetPropertyMap refsetMap = new RefsetPropertyMap(
+				REFSET_TYPES.CID_CID_STR);
+		if (getClauseIsTrue()) {
+			refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
+		} else {
+			refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
+		}
+		refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
+		refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus()
+				.getNid());
+
+		refsetMap.put(REFSET_PROPERTY.STRING_VALUE, position.toString() + "("
+				+ position.getPath().getConceptId() + " "
+				+ position.getVersion() + ")");
+		return refsetMap;
+	}
+
+	I_Position position;
+
+	private class VersionDialog extends JDialog implements ActionListener {
+
+		PanelRefsetVersion p;
+
+		public VersionDialog() throws Exception {
+			super(new JFrame(), "Select versions", true);
+			I_ConfigAceFrame configFrame = Terms.get()
+					.getActiveAceFrameConfig();
+			p = new PanelRefsetVersion(configFrame);
+			p.setSelectedRefsetSpecLabel("");
+			this.getContentPane().add(p);
+			JPanel buttonPane = new JPanel();
+			JButton button = new JButton("OK");
+			buttonPane.add(button);
+			button.addActionListener(this);
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			this.pack();
+			this.setVisible(true);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			position = p.getPositionSet().iterator().next();
+			setVisible(false);
+			dispose();
+		}
+
+	}
+
+	@Override
+	protected void doRun(I_EncodeBusinessProcess process, I_Work worker) {
+		try {
+			new VersionDialog();
+		} catch (Exception e) {
+			ex = e;
+			e.printStackTrace();
+			return;
+		}
+		super.doRun(process, worker);
 	}
 
 }

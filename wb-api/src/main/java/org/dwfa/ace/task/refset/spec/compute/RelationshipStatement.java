@@ -25,6 +25,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
@@ -32,6 +33,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -65,69 +67,71 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
+	public boolean getStatementResult(I_AmTermComponent component,
+			I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1_is,
+			I_Position v2_is) throws IOException, TerminologyException {
 
-        I_RelVersioned relVersioned = (I_RelVersioned) component;
-        I_RelTuple relTuple = relVersioned.getLastTuple();
-        switch (tokenEnum) {
-        case REL_IS:
-            return relIs(relTuple);
-        case REL_RESTRICTION_IS:
-            return relRestrictionIs(relTuple);
-        case REL_IS_MEMBER_OF:
-            return relIsMemberOf(relTuple);
-        case REL_STATUS_IS:
-            return relStatusIs(relTuple);
-        case REL_STATUS_IS_KIND_OF:
-            return relStatusIsKindOf(relTuple);
-        case REL_STATUS_IS_CHILD_OF:
-            return relStatusIsChildOf(relTuple);
-        case REL_STATUS_IS_DESCENDENT_OF:
-            return relStatusIsDescendentOf(relTuple);
-        case REL_TYPE_IS:
-            return relTypeIs(relTuple);
-        case REL_TYPE_IS_KIND_OF:
-            return relTypeIsKindOf(relTuple);
-        case REL_TYPE_IS_CHILD_OF:
-            return relTypeIsChildOf(relTuple);
-        case REL_TYPE_IS_DESCENDENT_OF:
-            return relTypeIsDescendentOf(relTuple);
-        case REL_LOGICAL_QUANTIFIER_IS:
-            return relLogicalQuantifierIs(relTuple);
-        case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
-            return relLogicalQuantifierIsKindOf(relTuple);
-        case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
-            return relLogicalQuantifierIsChildOf(relTuple);
-        case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
-            return relLogicalQuantifierIsDescendentOf(relTuple);
-        case REL_CHARACTERISTIC_IS:
-            return relCharIs(relTuple);
-        case REL_CHARACTERISTIC_IS_KIND_OF:
-            return relCharIsKindOf(relTuple);
-        case REL_CHARACTERISTIC_IS_CHILD_OF:
-            return relCharIsChildOf(relTuple);
-        case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
-            return relCharIsDescendentOf(relTuple);
-        case REL_REFINABILITY_IS:
-            return relRefinabilityIs(relTuple);
-        case REL_REFINABILITY_IS_KIND_OF:
-            return relRefinabilityIsKindOf(relTuple);
-        case REL_REFINABILITY_IS_CHILD_OF:
-            return relRefinabilityIsChildOf(relTuple);
-        case REL_REFINABILITY_IS_DESCENDENT_OF:
-            return relRefinabilityIsDescendentOf(relTuple);
-        case REL_DESTINATION_IS:
-            return relDestinationIs(relTuple);
-        case REL_DESTINATION_IS_KIND_OF:
-            return relDestinationIsKindOf(relTuple);
-        case REL_DESTINATION_IS_CHILD_OF:
-            return relDestinationIsChildOf(relTuple);
-        case REL_DESTINATION_IS_DESCENDENT_OF:
-            return relDestinationIsDescendentOf(relTuple);
-        default:
-            throw new RuntimeException("Can't handle queryToken: " + queryToken);
-        }
-    }
+		I_RelVersioned relVersioned = (I_RelVersioned) component;
+		I_RelTuple relTuple = relVersioned.getLastTuple();
+		switch (tokenEnum) {
+		case REL_IS:
+			return relIs(relTuple);
+		case REL_RESTRICTION_IS:
+			return relRestrictionIs(relTuple);
+		case REL_IS_MEMBER_OF:
+			return relIsMemberOf(relTuple);
+		case REL_STATUS_IS:
+			return relStatusIs(relTuple);
+		case REL_STATUS_IS_KIND_OF:
+			return relStatusIsKindOf(relTuple);
+		case REL_STATUS_IS_CHILD_OF:
+			return relStatusIsChildOf(relTuple);
+		case REL_STATUS_IS_DESCENDENT_OF:
+			return relStatusIsDescendentOf(relTuple);
+		case REL_TYPE_IS:
+			return relTypeIs(relTuple);
+		case REL_TYPE_IS_KIND_OF:
+			return relTypeIsKindOf(relTuple);
+		case REL_TYPE_IS_CHILD_OF:
+			return relTypeIsChildOf(relTuple);
+		case REL_TYPE_IS_DESCENDENT_OF:
+			return relTypeIsDescendentOf(relTuple);
+		case REL_LOGICAL_QUANTIFIER_IS:
+			return relLogicalQuantifierIs(relTuple);
+		case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
+			return relLogicalQuantifierIsKindOf(relTuple);
+		case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
+			return relLogicalQuantifierIsChildOf(relTuple);
+		case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
+			return relLogicalQuantifierIsDescendentOf(relTuple);
+		case REL_CHARACTERISTIC_IS:
+			return relCharIs(relTuple);
+		case REL_CHARACTERISTIC_IS_KIND_OF:
+			return relCharIsKindOf(relTuple);
+		case REL_CHARACTERISTIC_IS_CHILD_OF:
+			return relCharIsChildOf(relTuple);
+		case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
+			return relCharIsDescendentOf(relTuple);
+		case REL_REFINABILITY_IS:
+			return relRefinabilityIs(relTuple);
+		case REL_REFINABILITY_IS_KIND_OF:
+			return relRefinabilityIsKindOf(relTuple);
+		case REL_REFINABILITY_IS_CHILD_OF:
+			return relRefinabilityIsChildOf(relTuple);
+		case REL_REFINABILITY_IS_DESCENDENT_OF:
+			return relRefinabilityIsDescendentOf(relTuple);
+		case REL_DESTINATION_IS:
+			return relDestinationIs(relTuple);
+		case REL_DESTINATION_IS_KIND_OF:
+			return relDestinationIsKindOf(relTuple);
+		case REL_DESTINATION_IS_CHILD_OF:
+			return relDestinationIsChildOf(relTuple);
+		case REL_DESTINATION_IS_DESCENDENT_OF:
+			return relDestinationIsDescendentOf(relTuple);
+		default:
+			throw new RuntimeException("Can't handle queryToken: " + queryToken);
+		}
+	}
 
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)

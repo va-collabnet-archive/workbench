@@ -275,7 +275,7 @@ public class ComputeDescRefsetFromSpecTask extends AbstractTask {
 
                         boolean containsCurrentMember = currentRefsetMemberIds.contains(currentDescription.getDescId());
 
-                        if (query.execute(currentDescription, configFrame)) {
+                        if (query.execute(currentDescription, configFrame, null, query.getV1Is(), query.getV2Is())) {
                             if (!containsCurrentMember) {
                                 newMembers.add(currentDescription.getDescId());
                             }

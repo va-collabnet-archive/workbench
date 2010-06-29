@@ -26,11 +26,13 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -197,20 +199,22 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return useNotQualifier;
     }
 
-    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
+	public boolean execute(I_AmTermComponent component,
+			I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1_is,
+			I_Position v2_is) throws IOException, TerminologyException {
 
-        boolean statementResult = getStatementResult(component, config);
+		boolean statementResult = getStatementResult(component, config, version, v1_is, v2_is);
 
-        if (useNotQualifier) {
-            // if the statement has a negation associated with it then we need
-            // to negate the results
-            return !statementResult;
-        } else {
-            return statementResult;
-        }
-    }
+		if (useNotQualifier) {
+			// if the statement has a negation associated with it then we need
+			// to negate the results
+			return !statementResult;
+		} else {
+			return statementResult;
+		}
+	}
 
-    public abstract boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException;
+    public abstract boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1Is, I_Position v2Is) throws IOException, TerminologyException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 

@@ -32,7 +32,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec/diff", type = BeanType.TASK_BEAN) })
-public class DiffV2IsRefsetSpec extends AddStructuralQueryToRefsetSpec {
+public class DiffV2IsRefsetSpec extends DiffVnIsRefsetSpec {
 	/**
 	 * 
 	 */
