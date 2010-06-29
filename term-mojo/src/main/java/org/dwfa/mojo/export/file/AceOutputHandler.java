@@ -356,11 +356,11 @@ public class AceOutputHandler extends SnomedFileFormatOutputHandler {
     /**
      * Gets the rf1 primitive flag for the ConceptDto
      *
-     * @param concept Concept
-     * @return String 1 or 0 1 is active
+     * @param conceptDto ConceptDto
+     * @return String 1 or 0 1 is primitive
      */
-    private String getPrimitiveFlag(Concept concept) {
-        return concept.isActive() ? "1" : "0";
+    private String getPrimitiveFlag(ConceptDto conceptDto) {
+        return conceptDto.isPrimative() ? "1" : "0";
     }
 
     /**
