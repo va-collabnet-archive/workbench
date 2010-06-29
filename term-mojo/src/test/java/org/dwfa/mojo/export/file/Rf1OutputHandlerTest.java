@@ -134,7 +134,7 @@ public class Rf1OutputHandlerTest {
         Assert.assertEquals(conceptDto.getCtv3Id(), rf1ConceptRow.getCtv3Id());
         Assert.assertEquals(conceptDto.getSnomedId(), rf1ConceptRow.getSnomedId());
         Assert.assertEquals(conceptDto.getFullySpecifiedName(), rf1ConceptRow.getFullySpecifiedName());
-        Assert.assertEquals((conceptDto.isPrimative()) ? "0" : "1", rf1ConceptRow.getIsPrimitive());
+        Assert.assertEquals((conceptDto.isPrimative()) ? "1" : "0", rf1ConceptRow.getIsPrimitive());
 
     }
 
