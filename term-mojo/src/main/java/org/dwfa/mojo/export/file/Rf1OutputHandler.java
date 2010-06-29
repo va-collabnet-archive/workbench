@@ -180,7 +180,7 @@ public class Rf1OutputHandler extends SnomedFileFormatOutputHandler {
      * @return String 1 or 0 1 is active
      */
     private String getPrimitiveFlag(ConceptDto concept) {
-        return concept.isPrimative() ? "0" : "1";
+        return concept.isPrimative() ? "1" : "0";
     }
 
     /**

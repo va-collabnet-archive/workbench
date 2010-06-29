@@ -911,7 +911,7 @@ public class ExportSpecification {
         }
         conceptDto.setFullySpecifiedName(fsn);
 
-        conceptDto.setPrimative(tuple.isDefined());
+        conceptDto.setPrimative(!tuple.isDefined());
         conceptDto.setDefinitionStatusUuid(getDefinitionStatusUuid(tuple.isDefined()));
         conceptDto.setType(TYPE.CONCEPT);
 
