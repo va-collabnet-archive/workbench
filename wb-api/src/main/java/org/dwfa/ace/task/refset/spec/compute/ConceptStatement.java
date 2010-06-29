@@ -484,30 +484,9 @@ public class ConceptStatement extends RefsetSpecStatement {
 		return conceptIsChildOf(c1, queryConstraintConcept, pos);
 	}
 
-	private boolean conceptIsChildOf(I_GetConceptData c1, I_GetConceptData c2,
-			I_Position pos) throws TerminologyException, IOException {
-		for (Integer child : getChildren(c2.getConceptId(), pos)) {
-			if (c1.getConceptId() == child.intValue())
-				return true;
-		}
-		return false;
-	}
-
 	private boolean conceptIsDescendantOf(I_GetConceptData c1, I_Position pos)
 			throws TerminologyException, IOException {
 		return conceptIsDescendantOf(c1, queryConstraintConcept, pos);
-	}
-
-	private boolean conceptIsDescendantOf(I_GetConceptData c1,
-			I_GetConceptData c2, I_Position pos) throws TerminologyException,
-			IOException {
-		for (Integer child : getChildren(c2.getConceptId(), pos)) {
-			if (c1.getConceptId() == child.intValue())
-				return true;
-			if (conceptIsDescendantOf(c1, Terms.get().getConcept(child), pos))
-				return true;
-		}
-		return false;
 	}
 
 	private boolean conceptIsKindOf(I_GetConceptData concept, I_Position pos)
@@ -669,15 +648,6 @@ public class ConceptStatement extends RefsetSpecStatement {
 		}
 	}
 
-	private I_Position getVersion(GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is) throws TerminologyException {
-		if (version == GROUPING_TYPE.V1)
-			return v1_is;
-		if (version == GROUPING_TYPE.V2)
-			return v2_is;
-		throw new TerminologyException("Version error:" + version);
-	}
-
 	private I_ConceptAttributePart getVersion(
 			I_GetConceptData conceptBeingTested, GROUPING_TYPE version,
 			I_Position v1_is, I_Position v2_is) throws TerminologyException {
@@ -734,32 +704,6 @@ public class ConceptStatement extends RefsetSpecStatement {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
-	}
-
-	private ArrayList<Integer> getChildren(int concept_id, I_Position pos)
-			throws TerminologyException, IOException {
-		ArrayList<Integer> ret = new ArrayList<Integer>();
-		I_TermFactory tf = Terms.get();
-		I_GetConceptData c = tf.getConcept(concept_id);
-		for (I_RelVersioned d : c.getDestRels()) {
-			I_RelPart dm = null;
-			for (I_RelPart dd : d.getMutableParts()) {
-				if (dd.getPathId() != pos.getPath().getConceptId())
-					continue;
-				if (!getIsAIds().contains(dd.getTypeId()))
-					continue;
-				// Find the greatest version <= the one of interest
-				if (dd.getVersion() <= pos.getVersion()
-						&& (dm == null || dm.getVersion() < dd.getVersion()))
-					dm = dd;
-			}
-			if (dm != null
-					&& dm.getStatusId() == tf.getConcept(
-							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-							.getConceptId())
-				ret.add(d.getC1Id());
-		}
-		return ret;
 	}
 
 }
