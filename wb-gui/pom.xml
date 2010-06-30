@@ -1,5 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- 
  !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  !
  !  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,95 +17,83 @@
  !  See the License for the specific language governing permissions and
  !  limitations under the License.
  -->
-
-   <parent>
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>wb-mmb</artifactId>
+    <version>impl-uktc-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>wb-gui</artifactId>
+  <packaging>jar</packaging>
+  <name>Workbench GUI</name>
+  <url>
+  https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html</url>
+  <inceptionYear>2005</inceptionYear>
+  <description>Workbench Editor GUI</description>
+  <licenses>
+    <license>
+      <name>Informatics, Inc. End User License Agreement</name>
+    </license>
+  </licenses>
+  <dependencies>
+    <dependency>
       <groupId>org.ihtsdo</groupId>
-      <artifactId>wb-mmb</artifactId>
-      <version>impl-uktc-1.0-SNAPSHOT</version> 
-    </parent> 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>wb-gui</artifactId>
-    <packaging>jar</packaging>
-    <name>Workbench GUI</name>
-    <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html </url>
-    <inceptionYear>2005</inceptionYear>
-    <description>Workbench Editor GUI </description>
-    <licenses>
-        <license>
-            <name>Informatics, Inc. End User License Agreement</name>
-        </license>
-    </licenses>
-   <!--   <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles>  -->  
-    <dependencies>
-        <dependency>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>wb-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jung</groupId>
-            <artifactId>jung</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.tmatesoft.svnkit</groupId>
-            <artifactId>svnkit</artifactId>
-            <version>${svnkit.version}</version>
-        </dependency>
-    </dependencies>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin </artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin </artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>org.dwfa.*</excludePackageNames>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <useReleaseProfile>false</useReleaseProfile>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+      <artifactId>wb-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jung</groupId>
+      <artifactId>jung</artifactId>
+      <version>1.7.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.tmatesoft.svnkit</groupId>
+      <artifactId>svnkit</artifactId>
+      <version>${svnkit.version}</version>
+    </dependency>
+  </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <excludePackageNames>org.dwfa.*</excludePackageNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <useReleaseProfile>false</useReleaseProfile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

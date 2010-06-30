@@ -1,5 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- 
  !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  !
  !  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,67 +17,53 @@
  !  See the License for the specific language governing permissions and
  !  limitations under the License.
  -->
-
-   <parent>
-      <groupId>org.ihtsdo</groupId>
-      <artifactId>wb-mmb</artifactId>
-      <version>impl-uktc-1.0-SNAPSHOT</version>
-  </parent> 
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>wb-mmb</artifactId>
+    <version>impl-uktc-1.0-SNAPSHOT</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>wb-foundation</artifactId>
   <packaging>jar</packaging>
   <name>DWFA foundation module</name>
-  <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html</url>
+  <url>
+  https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/foundation/site/index.html</url>
   <inceptionYear>2004</inceptionYear>
   <organization>
     <name>Informatics, Inc.</name>
     <url>http://www.informatics.com</url>
   </organization>
-  <!--    <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles>  -->
-  
-  
-	<dependencies>
-	        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-			<groupId>net.jini</groupId>
-			<artifactId>jsk-lib</artifactId>
-			<version>2.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.jini</groupId>
-			<artifactId>jsk-platform</artifactId>
-			<version>2.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.dwfa.jini</groupId>
-			<artifactId>mahalo</artifactId>
-			<scope>compile</scope>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dwfa.jini</groupId>
-			<artifactId>browser</artifactId>
-			<version>2.1</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.jini</groupId>
+      <artifactId>jsk-lib</artifactId>
+      <version>2.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.jini</groupId>
+      <artifactId>jsk-platform</artifactId>
+      <version>2.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dwfa.jini</groupId>
+      <artifactId>mahalo</artifactId>
+      <scope>compile</scope>
+      <version>2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dwfa.jini</groupId>
+      <artifactId>browser</artifactId>
+      <version>2.1</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

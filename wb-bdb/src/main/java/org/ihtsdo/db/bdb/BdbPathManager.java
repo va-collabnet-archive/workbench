@@ -35,6 +35,7 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.I_Manage;
@@ -140,7 +141,15 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	    }
 	    return getFromDisk(cNid) != null;
 	}
+	public boolean existsFast(int cNid) throws TerminologyException, IOException {
+	    if (pathMap.containsKey(cNid)) {
+	        return true;
+	    }
+	    return false;
+	}
 
+	
+	
 	public I_Path get(int nid) throws PathNotExistsException,
 			TerminologyException, IOException {
 		if (exists(nid)) {
@@ -151,8 +160,11 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		        return p;
 		    }
 		}
-        throw new PathNotExistsException("Path not found: "
-            + TerminologyHelper.conceptToString(nid) + " uuid: " + Bdb.getUuidsToNidMap().getUuidsForNid(nid));
+        AceLog.getAppLog().alertAndLogException(new PathNotExistsException("Path not found: "
+                + TerminologyHelper.conceptToString(nid) + " uuid: " + Bdb.getUuidsToNidMap().getUuidsForNid(nid))) ;
+        
+        pathMap.put(nid, pathMap.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid()));
+        return pathMap.get(nid);
 	}
 	
 	@SuppressWarnings("unchecked")

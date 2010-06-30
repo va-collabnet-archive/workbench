@@ -1030,7 +1030,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         for (I_Path p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
-                propMap.setProperties((I_ExtendByRefPart) member);
+                propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
                 I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
                 propMap.setProperties(revision);
@@ -1312,11 +1312,65 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.setup(homeFile.getAbsolutePath());
     }
 
+    private static class ConceptSearcher implements I_ProcessConceptData {
+
+        private CountDownLatch conceptLatch;
+        private I_TrackContinuation tracker;
+        private Semaphore checkSemaphore;
+        private List<I_TestSearchResults> checkList;
+        private I_ConfigAceFrame config;
+        private I_RepresentIdSet matches;
+
+        public ConceptSearcher(CountDownLatch conceptLatch, I_TrackContinuation tracker,
+                List<I_TestSearchResults> checkList, I_ConfigAceFrame config, I_RepresentIdSet matches) {
+            super();
+            this.conceptLatch = conceptLatch;
+            this.tracker = tracker;
+            this.checkList = checkList;
+            this.config = config;
+            this.matches = matches;
+        }
+
+        @Override
+        public void processConceptData(Concept concept) throws Exception {
+
+            if (tracker.continueWork()) {
+                boolean failed = false;
+                for (I_TestSearchResults test : checkList) {
+                    if (test.test(concept, config) == false) {
+                        failed = true;
+                        break;
+                    }
+                }
+                if (!failed) {
+                    matches.setMember(concept.getNid());
+                }
+
+                conceptLatch.countDown();
+            } else {
+                while (conceptLatch.getCount() > 0) {
+                    conceptLatch.countDown();
+                }
+            }
+        }
+
+        @Override
+        public boolean continueWork() {
+            return tracker.continueWork();
+        }
+    }
+
     @Override
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config) throws DatabaseException, IOException,
             org.apache.lucene.queryParser.ParseException {
-        throw new UnsupportedOperationException();
+        ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
+        try {
+            Bdb.getConceptDb().iterateConceptDataInParallel(searcher);
+        } catch (Exception e) {
+            throw new IOException();
+        }
+
     }
 
     @Override
@@ -1533,13 +1587,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException {
+        return pathManager.existsFast(pathConceptId);
+    }
+
+    @Override
     public Object getComponent(int nid) throws TerminologyException, IOException {
         return Bdb.getComponent(nid);
     }
 
     @Override
     public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig) throws Exception {
-        AceLog.getAppLog().info("Computing RefsetSpecQuery: " + query);
+        AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
         List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
         for (String warning : dangleWarnings) {
             AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
@@ -1565,14 +1624,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
 
+        HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
         RefsetComputer computer;
         try {
             I_RepresentIdSet possibleIds;
             if (specHelper.isConceptComputeType()) {
-                AceLog.getAppLog().info("Computing possible concepts for spec: " + query);
-                possibleIds = query.getPossibleConcepts(frameConfig, null);
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
+                possibleIds = query.getPossibleConceptsInterruptable(null, activities);
+
             } else if (specHelper.isDescriptionComputeType()) {
-                possibleIds = query.getPossibleDescriptions(frameConfig, null);
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
+                possibleIds = query.getPossibleDescriptionsInterruptable(null, activities);
             } else {
                 throw new Exception("Relationship compute type not supported.");
             }
@@ -1581,10 +1643,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             possibleIds.or(getIdSetFromIntCollection(currentMembersList));
             AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
 
-            computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds);
+            computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds, activities);
             if (possibleIds.cardinality() > 500) {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
                 Bdb.getConceptDb().iterateConceptDataInParallel(computer);
             } else {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
                 I_IterateIds possibleItr = possibleIds.iterator();
                 ConceptFetcher fetcher = new ConceptFetcher();
                 while (possibleItr.next()) {
@@ -1593,22 +1657,76 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 }
             }
 
+            if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
             computer.addUncommitted();
             if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
                 frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
                 frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
             }
-            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig.getDbConfig()
-                .getChangeSetWriterThreading());
+
             if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
+            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(), frameConfig
+                .getDbConfig().getChangeSetWriterThreading());
+            if (!computer.continueWork()) {
+                for (I_ShowActivity a : activities) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
                 return Condition.ITEM_CANCELED;
             } else {
                 return Condition.ITEM_COMPLETE;
             }
         } catch (ComputationCanceled e) {
-            // Nothing to do
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+        } catch (InterruptedException e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+        } catch (ExecutionException e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+            if (getRootCause(e) instanceof TerminologyException) {
+                throw new TerminologyException(e.getMessage());
+            } else if (getRootCause(e) instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else if (getRootCause(e) instanceof ComputationCanceled) {
+                // Nothing to do
+            } else if (getRootCause(e) instanceof InterruptedException) {
+                // Nothing to do
+            } else {
+
+                e.printStackTrace();
+                throw new TerminologyException(e);
+            }
         }
+        // Clean up any sub-activities...
+
         return Condition.ITEM_CANCELED;
+    }
+
+    private Throwable getRootCause(Exception e) {
+        Throwable prevCause = e;
+        Throwable rootCause = e.getCause();
+        while (rootCause != null) {
+            prevCause = rootCause;
+            rootCause = rootCause.getCause();
+        }
+
+        return prevCause;
     }
 
     private static class ConceptFetcher implements I_FetchConceptFromCursor {

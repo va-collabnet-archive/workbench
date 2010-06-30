@@ -37,7 +37,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -83,6 +87,14 @@ public class InstructAndWait extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
+        	if (Terms.get().getUncommitted().size() > 0) {
+        		for (I_Transact c: Terms.get().getUncommitted()) {
+        			AceLog.getAppLog().warning("Uncommitted changes to: " 
+        					+ ((I_GetConceptData) c).toLongString());
+        			
+        		}
+        		HasUncommittedChanges.askToCommit();
+        	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),

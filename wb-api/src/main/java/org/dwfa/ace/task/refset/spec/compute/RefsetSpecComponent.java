@@ -17,11 +17,13 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
@@ -29,11 +31,14 @@ import org.dwfa.tapi.TerminologyException;
 public abstract class RefsetSpecComponent {
     private int possibleConceptsCount;
     protected int refsetSpecNid;
-    
-    
+    protected I_HelpSpecRefset helper;
+    protected I_ConfigAceFrame config;
 
-    protected RefsetSpecComponent(int refsetSpecNid) {
+    protected RefsetSpecComponent(int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super();
+        this.config = config;
+        helper = Terms.get().getSpecRefsetHelper(this.config);
+
         this.refsetSpecNid = refsetSpecNid;
     }
 
@@ -51,22 +56,22 @@ public abstract class RefsetSpecComponent {
 
     protected Set<Integer> getCurrentStatusIds() {
         try {
-            I_HelpSpecRefset specHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            return specHelper.getCurrentStatusIds();
+            return helper.getCurrentStatusIds();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public abstract boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException;
+    public abstract boolean execute(I_AmTermComponent component, Collection<I_ShowActivity> activities)
+            throws IOException, TerminologyException;
 
-    public abstract I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame config,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
+    public abstract I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
 
-    public abstract I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
+    public abstract I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
 
-    public abstract I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame config,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException;
+    public abstract I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
 }

@@ -20,14 +20,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec
@@ -72,8 +72,12 @@ public class SetProcessNameFromProp extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            Object newName = process.readProperty(newNameProp);
-            process.setName(newName.toString());
+            Object newName = process.getProperty(newNameProp);
+            if (newName != null) {
+                process.setName(newName.toString());
+            } else {
+                process.setName("Null property for key: " + newNameProp);
+            }
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }

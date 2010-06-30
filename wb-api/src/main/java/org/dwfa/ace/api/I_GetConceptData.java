@@ -401,5 +401,8 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException;
 
+	I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
+			I_ShowActivity activity) throws IOException;
+
 
 }

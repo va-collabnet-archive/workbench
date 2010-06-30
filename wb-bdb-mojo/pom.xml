@@ -1,56 +1,71 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
-   <parent>
-      <groupId>org.ihtsdo</groupId>
-      <artifactId>wb-mmb</artifactId>
-      <version>impl-uktc-1.0-SNAPSHOT</version>
-  </parent> 
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>wb-mmb</artifactId>
+    <version>impl-uktc-1.0-SNAPSHOT</version>
+  </parent>
   <artifactId>wb-bdb-mojo</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Workbench Berkeley Database Mojo</name>
   <url>http://maven.apache.org</url>
-  <!--    <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles>  -->
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>2.0</version>
+      <type>jar</type>
+      <optional>false</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.ihtsdo</groupId>
+      <artifactId>wb-mojo</artifactId>
+      <version>${project.version}</version>
+      <type>maven-plugin</type>
+      <optional>false</optional>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      <type>jar</type>
       <scope>test</scope>
+      <optional>false</optional>
     </dependency>
     <dependency>
-    	<groupId>org.ihtsdo</groupId>
-    	<artifactId>wb-bdb</artifactId>
-    	<version>${project.version}</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
+      <groupId>org.ihtsdo</groupId>
+      <artifactId>wb-bdb</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+      <optional>false</optional>
     </dependency>
   </dependencies>
-       <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-         </plugins>
-       </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.ops4j</groupId>
+        <artifactId>maven-inherit-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>inherit</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

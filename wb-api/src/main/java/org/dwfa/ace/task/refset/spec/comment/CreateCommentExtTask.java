@@ -27,7 +27,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceConfiguration;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -118,6 +117,7 @@ public class CreateCommentExtTask extends AbstractTask {
                     }
                     if (commentsRefset != null && memberRefset != null) {
                         I_HelpSpecRefset specRefsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+                        specRefsetHelper.setAutocommitActive(true);
                         for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                             boolean added = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(),
                                 memberRefset.getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(

@@ -1,5 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- 
  !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
  !
  !  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,38 +17,26 @@
  !  See the License for the specific language governing permissions and
  !  limitations under the License.
  -->
-
-    <parent>
-        <groupId>org.ihtsdo</groupId>
-        <artifactId>wb-mmb</artifactId>
-        <version>impl-uktc-1.0-SNAPSHOT</version>
-    </parent> 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>wb-core</artifactId>
-    <packaging>jar</packaging>
-    <name>Core Distributed Workflow Architecture Components</name>
-    <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
-   <!--  <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles>   -->  
-    <dependencies>
-            <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- An alternative to:
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>wb-mmb</artifactId>
+    <version>impl-uktc-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>wb-core</artifactId>
+  <packaging>jar</packaging>
+  <name>Core Distributed Workflow Architecture Components</name>
+  <url>
+  https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- An alternative to:
                 <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
@@ -53,39 +44,39 @@
                 <scope>compile</scope>
                 </dependency>
                 secondary to licensing issues -->
-            <groupId>org.apache.geronimo.javamail</groupId>
-            <artifactId>geronimo-javamail_1.4_mail</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <!-- An alternative to:
+      <groupId>org.apache.geronimo.javamail</groupId>
+      <artifactId>geronimo-javamail_1.4_mail</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <!-- An alternative to:
                 <dependency>
                 <groupId>javax.activation</groupId>
                 <artifactId>activation</artifactId>
                 <version>1.1</version>
                 </dependency>
                 secondary to licensing issues -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.1_spec</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>wb-foundation</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-activation_1.1_spec</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ihtsdo</groupId>
+      <artifactId>wb-foundation</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

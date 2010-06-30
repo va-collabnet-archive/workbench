@@ -109,7 +109,7 @@ public class WizardPanel extends JPanel {
         dragLabel.setSize(10, dragLabelHeight);
         add(dragLabel);
         dragLabel.setLocation(0, 0);
-        setLocation(300, 20);
+        setLocation(200, 20);
 
         wfPanel.setOpaque(true);
         add(wfPanel);

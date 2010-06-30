@@ -1,9 +1,12 @@
 package org.ihtsdo.concept;
 
+import java.util.List;
+
+
 public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
 
     private I_ProcessConceptData processor;
-    
+
     public FetchConceptAdaptor(I_ProcessConceptData processor) {
         super();
         this.processor = processor;
@@ -17,6 +20,12 @@ public class FetchConceptAdaptor implements I_ProcessUnfetchedConceptData {
     @Override
     public boolean continueWork() {
         return processor.continueWork();
+    }
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

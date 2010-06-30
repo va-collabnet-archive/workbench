@@ -118,7 +118,7 @@ public class AceFrame extends ComponentFrame {
         JLayeredPane layers = getRootPane().getLayeredPane();
         WizardPanel wizPanel = new WizardPanel(getCdePanel());
         layers.add(wizPanel, JLayeredPane.MODAL_LAYER);
-        wizPanel.setLocation(350, 0);
+        wizPanel.setLocation(275, 0);
 
         setContentPane(getCdePanel());
 

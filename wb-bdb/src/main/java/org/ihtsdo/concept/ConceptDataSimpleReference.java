@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -251,20 +250,28 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
 	private void handleCanceledComponents() {
 		if (lastExtinctRemoval < BdbCommitManager.getLastCancel()) {
-			if (refsetMembers != null) {
+			if (refsetMembers != null && 
+					refsetMembers.get() != null && 
+					refsetMembers.get().size() > 0) {
 	        	removeCanceledFromList(refsetMembers.get());
 			}
-			if (descriptions != null) {
+			if (descriptions != null && 
+					descriptions.get() != null && 
+					descriptions.get().size() > 0) {
 	        	removeCanceledFromList(descriptions.get());
 			}
-			if (images != null) {
+			if (images != null && 
+					images.get() != null && 
+					images.get().size() > 0) {
 	        	removeCanceledFromList(images.get());
 			}
-			if (srcRels != null) {
+			if (srcRels != null && 
+					srcRels.get() != null && 
+					srcRels.get().size() > 0) {
 	        	removeCanceledFromList(srcRels.get());
 			}
+			lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
         }
-		lastExtinctRemoval = Bdb.gVersion.incrementAndGet();
 	}
 
 	private void removeCanceledFromList(List<? extends ConceptComponent<?,?>> ccList) {
@@ -276,7 +283,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 							toRemove.add(i);
 					}
 				}
-				for (Integer i: toRemove) {
+				for (int i: toRemove) {
 					ccList.remove(i);
 				}
 			}
@@ -364,7 +371,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");
@@ -398,7 +405,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 }
             } else {
                 members.remove(pair);
-                Terms.get().addUncommittedNoChecks(enclosingConcept);
+            	BdbCommitManager.writeImmediate(enclosingConcept);
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuffer buff = new StringBuffer();
                     buff.append("Unable to find extension. RefsetNid: ");

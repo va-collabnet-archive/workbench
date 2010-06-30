@@ -75,7 +75,6 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     /**
      * 
      */
-    @SuppressWarnings("unchecked")
     public QueueServer(String[] args, LifeCycle lc) throws Exception {
         super(args, lc);
         File file = new File(args[0]);

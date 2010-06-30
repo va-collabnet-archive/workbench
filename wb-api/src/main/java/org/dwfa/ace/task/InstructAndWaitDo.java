@@ -53,8 +53,11 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.db.HasUncommittedChanges;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -386,6 +389,14 @@ public class InstructAndWaitDo extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
+        	if (Terms.get().getUncommitted().size() > 0) {
+        		for (I_Transact c: Terms.get().getUncommitted()) {
+        			AceLog.getAppLog().warning("Uncommitted changes to: " 
+        					+ ((I_GetConceptData) c).toLongString());
+        			
+        		}
+        		HasUncommittedChanges.askToCommit();
+        	}
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),

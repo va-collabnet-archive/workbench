@@ -1,5 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!-- 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- 
  !  Copyright (c) 2010 International Health Terminology Standards Development Organisation
  !
  !  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,86 +17,72 @@
  !  See the License for the specific language governing permissions and
  !  limitations under the License.
  -->
-
-   <parent>
-        <groupId>org.ihtsdo</groupId>
-        <artifactId>wb-mmb</artifactId>
-        <version>impl-uktc-1.0-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-   <!--   <groupId>org.ihtsdo</groupId> -->
-    <artifactId>wb-api</artifactId>
-   <!--   <version>${workbench.version}</version> -->
-    <packaging>jar</packaging>
-    <name>Workbench API</name>
-    <url>https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
-    <!--  <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles> -->
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>wb-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-primitives</groupId>
-            <artifactId>commons-primitives</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.tmatesoft.svnkit</groupId>
-            <artifactId>svnkit-javahl</artifactId>
-            <version>${svnkit.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>au.csiro</groupId>
-        	<artifactId>snorocket</artifactId>
-        	<version>1.1.15-SNAPSHOT</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>wb-mmb</artifactId>
+    <version>impl-uktc-1.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>wb-api</artifactId>
+  <packaging>jar</packaging>
+  <name>Workbench API</name>
+  <url>
+  https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/ace-api/site/index.html</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+      <version>2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ihtsdo</groupId>
+      <artifactId>wb-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-primitives</groupId>
+      <artifactId>commons-primitives</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>2.9.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.tmatesoft.svnkit</groupId>
+      <artifactId>svnkit-javahl</artifactId>
+      <version>${svnkit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>au.csiro</groupId>
+      <artifactId>snorocket</artifactId>
+      <version>1.1.15-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

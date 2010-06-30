@@ -1,109 +1,113 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--  <parent>
-        <groupId>org.dwfa</groupId>
-        <artifactId>dwfa-pom</artifactId>
-        <version>3</version>
-    </parent> -->
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.ihtsdo</groupId>
-    <artifactId>wb-mmb</artifactId>
-    <version>impl-uktc-1.0-SNAPSHOT</version>
-    <name>Workbench modules multi-module build</name>
-    <packaging>pom</packaging>
-    <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
-                 dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
-    <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</developerConnection>
-        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</url>
-    </scm>
-    
-   <!--  <profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>!workbench.version</name>
-				</property>
-			</activation>
-			<properties>
-				<workbench.version>impl-uktc-1.0-SNAPSHOT</workbench.version>
-			</properties>
-		</profile>
-	</profiles>  -->
-    
-    
-    <properties>
-        <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <svnkit.version>1.3.3</svnkit.version>
-        <svnusername>${relusername}</svnusername>
-        <svnpassword>${relpassword}</svnpassword>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.dwfa</groupId>
-                    <artifactId>dwfa-mojo</artifactId>
-                    <version>${project.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0</version>
-                <configuration>
-                    <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/tags/</tagBase>
-                    <preparationGoals>clean validate</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <remoteTagging>true</remoteTagging>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
-    <modules>
-        <module>wb-foundation</module>
-        <module>wb-core</module>
-        <module>wb-api</module>
-        <module>wb-mojo</module>
-        <module>wb-gui</module>        
-        <module>wb-bdb</module>        
-        <module>wb-bdb-mojo</module>        
-    </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.ihtsdo</groupId>
+  <artifactId>wb-mmb</artifactId>
+  <version>impl-uktc-1.0-SNAPSHOT</version>
+  <name>Workbench modules multi-module build</name>
+  <packaging>pom</packaging>
+  <description>multi-module build for the Workbench modules
+  (dwfa-pom, foundation, dwfa-mojo, core, ace-api, vodb and
+  term-mojo)</description>
+  <scm>
+    <connection>
+    scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</connection>
+    <developerConnection>
+    scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</developerConnection>
+    <url>
+    https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb_impl_uktc</url>
+  </scm>
+  <properties>
+    <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
+    <project.build.sourceEncoding>
+    UTF-8</project.build.sourceEncoding>
+    <svnkit.version>1.3.3</svnkit.version>
+    <svnusername>${relusername}</svnusername>
+    <svnpassword>${relpassword}</svnpassword>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.dwfa</groupId>
+          <artifactId>dwfa-mojo</artifactId>
+          <version>${project.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <tagBase>
+          https://csfe.aceworkspace.net/svn/repos/workbench/tags/</tagBase>
+          <preparationGoals>clean validate</preparationGoals>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <remoteTagging>true</remoteTagging>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+  <modules>
+    <module>wb-foundation</module>
+    <module>wb-core</module>
+    <module>wb-api</module>
+    <module>wb-mojo</module>
+    <module>wb-gui</module>
+    <module>wb-bdb</module>
+    <module>wb-bdb-mojo</module>
+  </modules>
+  <!-- TODO: to be moved into a organisational parent POM -->
+  <distributionManagement>
+    <snapshotRepository>
+      <id>maestro_ihtsdo.wb-snapshots</id>
+      <name>IHTSDO Workbench Snapshots Repository</name>
+      <url>
+      http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>maestro_ihtsdo.wb-releases</id>
+      <name>IHTSDO Workbench Releases Repository</name>
+      <url>
+      http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
+    </repository>
+  </distributionManagement>
 </project>
