@@ -331,7 +331,8 @@ public class Svn implements I_HandleSubversion {
 							}
 
 						}
-					} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false) {
+					} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false &&
+					        !s.getPath().contains(".bp.write-pending") && !s.getPath().contains(".bp.take-pending")) {
 						int depth = Depth.infinity;
 						boolean force = false;
 						boolean noIgnores = false;
