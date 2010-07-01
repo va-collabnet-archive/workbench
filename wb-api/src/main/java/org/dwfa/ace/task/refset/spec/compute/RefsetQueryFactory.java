@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -249,7 +250,7 @@ public class RefsetQueryFactory {
 							// System.out.println("p:" + p_str);
 							// System.out.println("v:" + v_str);
 							I_Path path = Terms.get().getPath(
-									Integer.parseInt(p_str));
+									UUID.fromString(p_str));
 							if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
 									.localize().getNid()) {
 								query.setV1Is(Terms.get().newPosition(path,

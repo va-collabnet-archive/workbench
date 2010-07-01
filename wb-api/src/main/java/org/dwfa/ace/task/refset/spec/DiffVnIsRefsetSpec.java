@@ -93,7 +93,7 @@ public abstract class DiffVnIsRefsetSpec extends AbstractAddRefsetSpecTask {
 				.getNid());
 
 		refsetMap.put(REFSET_PROPERTY.STRING_VALUE, position.toString() + "("
-				+ position.getPath().getConceptId() + " "
+				+ position.getPath().getUniversal().getPathId().get(0) + " "
 				+ position.getVersion() + ")");
 		return refsetMap;
 	}

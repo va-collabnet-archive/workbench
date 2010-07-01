@@ -17,10 +17,12 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -95,58 +97,139 @@ public class RelationshipStatement extends RefsetSpecStatement {
 		}
 		switch (tokenEnum) {
 		case REL_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relIs(relTuple);
 		case REL_RESTRICTION_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relRestrictionIs(relTuple);
 		case REL_IS_MEMBER_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relIsMemberOf(relTuple);
 		case REL_STATUS_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relStatusIs(relTuple);
 		case REL_STATUS_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relStatusIsKindOf(relTuple);
 		case REL_STATUS_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relStatusIsChildOf(relTuple);
 		case REL_STATUS_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relStatusIsDescendentOf(relTuple);
 		case REL_TYPE_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relTypeIs(relTuple);
 		case REL_TYPE_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relTypeIsKindOf(relTuple);
 		case REL_TYPE_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relTypeIsChildOf(relTuple);
 		case REL_TYPE_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relTypeIsDescendentOf(relTuple);
 		case REL_LOGICAL_QUANTIFIER_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relLogicalQuantifierIs(relTuple);
 		case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relLogicalQuantifierIsKindOf(relTuple);
 		case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relLogicalQuantifierIsChildOf(relTuple);
 		case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relLogicalQuantifierIsDescendentOf(relTuple);
 		case REL_CHARACTERISTIC_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relCharIs(relTuple);
 		case REL_CHARACTERISTIC_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relCharIsKindOf(relTuple);
 		case REL_CHARACTERISTIC_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relCharIsChildOf(relTuple);
 		case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relCharIsDescendentOf(relTuple);
 		case REL_REFINABILITY_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relRefinabilityIs(relTuple);
 		case REL_REFINABILITY_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relRefinabilityIsKindOf(relTuple);
 		case REL_REFINABILITY_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relRefinabilityIsChildOf(relTuple);
 		case REL_REFINABILITY_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relRefinabilityIsDescendentOf(relTuple);
 		case REL_DESTINATION_IS:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relDestinationIs(relTuple);
 		case REL_DESTINATION_IS_KIND_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relDestinationIsKindOf(relTuple);
 		case REL_DESTINATION_IS_CHILD_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relDestinationIsChildOf(relTuple);
 		case REL_DESTINATION_IS_DESCENDENT_OF:
+			if (version != null)
+				throw new TerminologyException(tokenEnum
+						+ ": Unsupported operation for version scope.");
 			return relDestinationIsDescendentOf(relTuple);
 		case ADDED_RELATIONSHIP:
 			return addedRelationship(relVersioned, version, v1_is, v2_is);
@@ -763,21 +846,10 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
 	private I_RelPart getVersion(I_RelVersioned descriptionBeingTested,
 			I_Position vn_is) throws TerminologyException {
-		try {
-			I_RelPart an = null;
-			for (I_RelPart a : descriptionBeingTested.getMutableParts()) {
-				// Must be on the path
-				// Find the greatest version <= the one of interest
-				if (a.getPathId() == vn_is.getPath().getConceptId()
-						&& a.getVersion() <= vn_is.getVersion()
-						&& (an == null || an.getVersion() < a.getVersion()))
-					an = a;
-			}
-			return an;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
-		}
+		ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+				descriptionBeingTested.getMutableParts());
+		I_AmPart part = getVersion(parts, vn_is, false);
+		return (I_RelPart) part;
 	}
 
 	private boolean addedRelationship(I_RelVersioned relBeingTested,
@@ -793,21 +865,22 @@ public class RelationshipStatement extends RefsetSpecStatement {
 		}
 	}
 
-	private boolean changedRelationshipCharacteristic(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
-			throws TerminologyException, IOException {
+	private boolean changedRelationshipCharacteristic(
+			I_RelVersioned relBeingTested, GROUPING_TYPE version,
+			I_Position v1_is, I_Position v2_is) throws TerminologyException,
+			IOException {
 		try {
 			I_RelPart a1 = getVersion(relBeingTested, v1_is);
 			I_RelPart a2 = getVersion(relBeingTested, v2_is);
 			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getCharacteristicId() != a2
-					.getCharacteristicId());
+					&& a1.getVersion() != a2.getVersion() && a1
+					.getCharacteristicId() != a2.getCharacteristicId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
 	}
-	
+
 	private boolean changedRelationshipGroup(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
 			throws TerminologyException, IOException {
@@ -822,22 +895,23 @@ public class RelationshipStatement extends RefsetSpecStatement {
 			throw new TerminologyException(e.getMessage());
 		}
 	}
-	
-	private boolean changedRelationshipRefinability(I_RelVersioned relBeingTested,
-			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
-			throws TerminologyException, IOException {
+
+	private boolean changedRelationshipRefinability(
+			I_RelVersioned relBeingTested, GROUPING_TYPE version,
+			I_Position v1_is, I_Position v2_is) throws TerminologyException,
+			IOException {
 		try {
 			I_RelPart a1 = getVersion(relBeingTested, v1_is);
 			I_RelPart a2 = getVersion(relBeingTested, v2_is);
 			return (a1 != null && a2 != null
-					&& a1.getVersion() != a2.getVersion() && a1.getRefinabilityId() != a2
-					.getRefinabilityId());
+					&& a1.getVersion() != a2.getVersion() && a1
+					.getRefinabilityId() != a2.getRefinabilityId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
 	}
-	
+
 	private boolean changedRelationshipStatus(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
 			throws TerminologyException, IOException {
@@ -852,7 +926,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 			throw new TerminologyException(e.getMessage());
 		}
 	}
-	
+
 	private boolean changedRelationshipType(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
 			throws TerminologyException, IOException {

@@ -558,13 +558,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 			// will return false
 			return false;
 		case CONCEPT_CONTAINS_DESC:
-			return executeConceptContainsDesc(component, config, version);
+			return executeConceptContainsDesc(component, config, version, v1_is, v2_is);
 		case NOT_CONCEPT_CONTAINS_DESC:
-			return !executeConceptContainsDesc(component, config, version);
+			return !executeConceptContainsDesc(component, config, version, v1_is, v2_is);
 		case CONCEPT_CONTAINS_REL:
-			return executeConceptContainsRel(component, config, version);
+			return executeConceptContainsRel(component, config, version, v1_is, v2_is);
 		case NOT_CONCEPT_CONTAINS_REL:
-			return !executeConceptContainsRel(component, config, version);
+			return !executeConceptContainsRel(component, config, version, v1_is, v2_is);
 		case V1:
 		case V2:
 			if (statements.size() == 0 && subqueries.size() == 0) {
@@ -597,7 +597,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
 	}
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component, I_ConfigAceFrame config, GROUPING_TYPE version)
+    private boolean executeConceptContainsDesc(I_AmTermComponent component, I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
             throws TerminologyException, IOException, ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -619,7 +619,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(descVersioned, config, version, this.getV1Is(), this.getV2Is())) {
+                if (!statement.execute(descVersioned, config, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -633,7 +633,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(descVersioned, config, version, this.getV1Is(), this.getV2Is())) {
+                if (!subquery.execute(descVersioned, config, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -651,7 +651,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component, I_ConfigAceFrame config, GROUPING_TYPE version)
+    private boolean executeConceptContainsRel(I_AmTermComponent component, I_ConfigAceFrame config, GROUPING_TYPE version, I_Position v1_is, I_Position v2_is)
             throws TerminologyException, IOException, ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -670,7 +670,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(versionedTuple, config, version, this.getV1Is(), this.getV2Is())) {
+                if (!statement.execute(versionedTuple, config, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -684,7 +684,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(versionedTuple, config, version, this.getV1Is(), this.getV2Is())) {
+                if (!subquery.execute(versionedTuple, config, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;

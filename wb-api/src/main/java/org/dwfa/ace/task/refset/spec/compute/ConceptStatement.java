@@ -18,30 +18,26 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -621,29 +617,11 @@ public class ConceptStatement extends RefsetSpecStatement {
 			I_GetConceptData conceptBeingTested, I_Position vn_is)
 			throws TerminologyException {
 		try {
-			I_ConceptAttributePart an = null;
-			for (I_ConceptAttributePart a : conceptBeingTested
-					.getConceptAttributes().getMutableParts()) {
-				// if (conceptBeingTested.getInitialText().startsWith("XXX")) {
-				// System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-				// System.out.println("\t" + a.getPathId() + " "
-				// + v1_is.getPath().getConceptId() + " "
-				// + v2_is.getPath().getConceptId());
-				// System.out.println("\t" + a.getVersion() + " "
-				// + v1_is.getVersion() + " " + v2_is.getVersion());
-				// System.out.println("\t" + a.getTime() + " "
-				// + v1_is.getTime() + " " + v2_is.getTime());
-				// }
-				// Must be on the path
-				// Find the greatest version <= the one of interest
-				if (a.getPathId() == vn_is.getPath().getConceptId()
-						&& a.getVersion() <= vn_is.getVersion()
-						&& (an == null || an.getVersion() < a.getVersion()))
-					an = a;
-			}
-			return an;
+			ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+					conceptBeingTested.getConceptAttributes().getMutableParts());
+			I_AmPart part = getVersion(parts, vn_is, false);
+			return (I_ConceptAttributePart) part;
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
 	}

@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Hit;
 import org.apache.lucene.search.Hits;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -806,23 +808,26 @@ public class DescStatement extends RefsetSpecStatement {
 			I_DescriptionVersioned descriptionBeingTested, I_Position vn_is)
 			throws TerminologyException {
 		try {
-			I_DescriptionPart an = null;
-			for (I_DescriptionPart a : descriptionBeingTested.getMutableParts()) {
-				// Must be on the path
-				// Find the greatest version <= the one of interest
-				if (a.getPathId() == vn_is.getPath().getConceptId()
-						&& a.getVersion() <= vn_is.getVersion()
-						&& (an == null || an.getVersion() < a.getVersion()))
-					an = a;
-			}
-			return an;
+			ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
+					descriptionBeingTested.getMutableParts());
+			I_AmPart part = getVersion(parts, vn_is, false);
+			return (I_DescriptionPart) part;
+			// I_DescriptionPart an = null;
+			// for (I_DescriptionPart a :
+			// descriptionBeingTested.getMutableParts()) {
+			// // Must be on the path
+			// // Find the greatest version <= the one of interest
+			// if (a.getPathId() == vn_is.getPath().getConceptId()
+			// && a.getVersion() <= vn_is.getVersion()
+			// && (an == null || an.getVersion() < a.getVersion()))
+			// an = a;
+			// }
+			// return an;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TerminologyException(e.getMessage());
 		}
 	}
-
-	
 
 	private boolean descriptionIs(
 			I_DescriptionVersioned descriptionBeingTested, I_Position pos)
