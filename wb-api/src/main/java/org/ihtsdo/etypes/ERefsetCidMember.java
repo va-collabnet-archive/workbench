@@ -54,13 +54,17 @@ public class ERefsetCidMember extends ERefsetMember<ERefsetCidRevision> {
 
     public ERefsetCidMember(I_ExtendByRefVersion m, I_Identify id) throws TerminologyException, IOException {
         convert(id);
-        refsetUuid = nidToUuid(m.getRefsetId());
-        componentUuid = nidToUuid(m.getComponentId());
-        I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) m.getMutablePart();
-        c1Uuid = nidToUuid(part.getC1id());
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
-        time = part.getTime();
+        try {
+			refsetUuid = nidToUuid(m.getRefsetId());
+			componentUuid = nidToUuid(m.getComponentId());
+			I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) m.getMutablePart();
+			c1Uuid = nidToUuid(part.getC1id());
+			pathUuid = nidToUuid(part.getPathId());
+			statusUuid = nidToUuid(part.getStatusId());
+			time = part.getTime();
+		} catch (Exception e) {
+			throw new IOException("Exception converting: " + m + "\n with id: " + id, e);
+		}
 	}
 
 	@Override

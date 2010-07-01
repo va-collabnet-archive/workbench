@@ -88,28 +88,32 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
 
-        ec.setPrimordialUuid(c.getPrimUuid());
-        ec.setConceptAttributes(processConceptAttributes(c, changed));
-        ec.setDescriptions(processDescriptions(c, changed));
-        ec.setRelationships(processRelationships(c, changed));
-        ec.setImages(processImages(c, changed));
-        ec.setRefsetMembers(processRefsetMembers(c, changed));
+        try {
+			ec.setPrimordialUuid(c.getPrimUuid());
+			ec.setConceptAttributes(processConceptAttributes(c, changed));
+			ec.setDescriptions(processDescriptions(c, changed));
+			ec.setRelationships(processRelationships(c, changed));
+			ec.setImages(processImages(c, changed));
+			ec.setRefsetMembers(processRefsetMembers(c, changed));
 
-        if (processNidLists) {
-            ec.setDestRelUuidTypeUuids(processNidNidList(c.getData().getDestRelNidTypeNidList(), changed));
-            ec.setRefsetUuidMemberUuidForConcept(processNidNidList(c.getData().getRefsetNidMemberNidForConceptList(),
-                changed));
-            ec.setRefsetUuidMemberUuidForDescriptions(processNidNidList(c.getData()
-                .getRefsetNidMemberNidForDescriptionsList(), changed));
-            ec.setRefsetUuidMemberUuidForImages(processNidNidList(c.getData().getRefsetNidMemberNidForImagesList(), changed));
-            ec.setRefsetUuidMemberUuidForRefsetMembers(processNidNidList(c.getData()
-                .getRefsetNidMemberNidForRefsetMembersList(), changed));
-            ec.setRefsetUuidMemberUuidForRels(processNidNidList(c.getData().getRefsetNidMemberNidForRelsList(), changed));
-            return ec;
-        }
-        if (changed.get()) {
-            return ec;
-        }
+			if (processNidLists) {
+			    ec.setDestRelUuidTypeUuids(processNidNidList(c.getData().getDestRelNidTypeNidList(), changed));
+			    ec.setRefsetUuidMemberUuidForConcept(processNidNidList(c.getData().getRefsetNidMemberNidForConceptList(),
+			        changed));
+			    ec.setRefsetUuidMemberUuidForDescriptions(processNidNidList(c.getData()
+			        .getRefsetNidMemberNidForDescriptionsList(), changed));
+			    ec.setRefsetUuidMemberUuidForImages(processNidNidList(c.getData().getRefsetNidMemberNidForImagesList(), changed));
+			    ec.setRefsetUuidMemberUuidForRefsetMembers(processNidNidList(c.getData()
+			        .getRefsetNidMemberNidForRefsetMembersList(), changed));
+			    ec.setRefsetUuidMemberUuidForRels(processNidNidList(c.getData().getRefsetNidMemberNidForRelsList(), changed));
+			    return ec;
+			}
+			if (changed.get()) {
+			    return ec;
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(new IOException("getEConcept exception for " + c.toLongString(), e));
+		}
         return null;
     }
 

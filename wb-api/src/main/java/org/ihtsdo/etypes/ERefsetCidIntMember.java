@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -55,19 +55,23 @@ public class ERefsetCidIntMember extends ERefsetMember<ERefsetCidIntRevision> {
     }
 
     public ERefsetCidIntMember(I_ExtendByRefVersion m) throws TerminologyException, IOException {
-        if (I_Identify.class.isAssignableFrom(m.getClass())) {
-            convert((I_Identify) m);
-        } else {
-            convert(nidToIdentifier(m.getMemberId()));
-        }
-        refsetUuid = nidToUuid(m.getRefsetId());
-        componentUuid = nidToUuid(m.getComponentId());
-        I_ExtendByRefPartCidInt part = (I_ExtendByRefPartCidInt) m.getMutablePart();
-        c1Uuid = nidToUuid(part.getC1id());
-        intValue = part.getIntValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
-        time = part.getTime();
+        try {
+			if (I_Identify.class.isAssignableFrom(m.getClass())) {
+			    convert((I_Identify) m);
+			} else {
+			    convert(nidToIdentifier(m.getMemberId()));
+			}
+			refsetUuid = nidToUuid(m.getRefsetId());
+			componentUuid = nidToUuid(m.getComponentId());
+			I_ExtendByRefPartCidInt part = (I_ExtendByRefPartCidInt) m.getMutablePart();
+			c1Uuid = nidToUuid(part.getC1id());
+			intValue = part.getIntValue();
+			pathUuid = nidToUuid(part.getPathId());
+			statusUuid = nidToUuid(part.getStatusId());
+			time = part.getTime();
+		} catch (Exception e) {
+			throw new IOException("Exception converting: " + m, e);
+		}
 	}
 
 
