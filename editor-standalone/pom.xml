@@ -270,16 +270,24 @@
 										<taskdef name="install4j"
 											classname="com.install4j.Install4JTask"
 											classpath="/Applications/install4j 4/bin/ant.jar;/opt/install4j/bin/ant.jar"/>
-										<install4j
-											projectfile="src/main/install4j/ihtsdo_sa.install4j">
-											<variable name="project.version"
-												value="${project.version}"/>
-											<variable name="bundle.directory.rt.i4j"
-												value="${sa.bundle.directory.rt.i4j}"/>
-											<variable name="bundle.directory"
-												value="${sa.bundle.directory}"/>
-											<variable name="pom.short.name"
-												value="${sct.wb.ide.sa.bundle.shortname}"/>
+										<install4j projectfile="src/main/install4j/ihtsdo_sa.install4j">
+											<variable name="project.version" value="${project.version}"/>
+											<variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.file_description" value="IHTSDO Editor Trek"/>
+											<variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
+											<variable name="bundle.version" value=".01-ihtsdo-trek"/>
+											<variable name="bundle.publisher" value="IHTSDO"/>
+											<variable name="bundle.publisher.url" value="http://www.ihtsdo.org/members/uk00/"/>
+											<variable name="bundle.vm_args" value="config/start-wb-local.config"/>
+											<variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
+											<variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
+											<variable name="pom.short.name" value="ihtsdo editor trek sa"/>
+											<variable name="media.dir" value="${project.build.directory}/site"/>
+											<variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
+											<variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
+											<variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
+											<variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
 										</install4j>
 									</tasks>
 								</configuration>
