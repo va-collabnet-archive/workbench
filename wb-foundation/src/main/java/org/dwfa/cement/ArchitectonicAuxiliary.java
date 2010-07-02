@@ -835,132 +835,124 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             		new I_ConceptualizeUniversally[] { BUSINESS_PROCESS_CATEGORY }),
 	SEMTAGS_ROOT("semantic tags",
             new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-            
             SEMTAG_SNOMED_ROOT("SNOMED RT+CTV3",
             		new I_ConceptualizeUniversally[] { SEMTAGS_ROOT }),
-            		
     				SEMTAG_STAGING_SCALE("staging scale",
     						new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT }),
-    						
 					SEMTAG_ENVIRONMENT_LOCATION("environment / location",
 							new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT }),
-																					
 					SEMTAG_LINKAGE_CONCEPT("linkage concept",
 							new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT }),
-							
 							SEMTAG_LINK_ASSERTION("link assertion",
 									new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_LINKAGE_CONCEPT }),
-							
 					SEMTAG_SPECIAL_CONCEPT("special concept",
 							new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT }),	
-            				
 							SEMTAG_NAMESPACE_CONCEPT("namespace concept",
 									new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SPECIAL_CONCEPT }),
-									
 							SEMTAG_INACTIVE_CONCEPT("inactive concept",
 									new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SPECIAL_CONCEPT }),
-									
 									SEMTAG_SPECIMEN("specimen",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_SUBSTANCE("substance",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_TUMOR_STAGING("tumor staging",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT  }),
-													
 									SEMTAG_RECORD_ARTIFACT("record artifact",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-										
 									SEMTAG_SITUATION("situation",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_CONTEXT_DEPENDANT_CATEGORY("context-dependent category",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_BODY_STRUCTURE("body structure",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),	
-											
 											SEMTAG_CELL_STRUCTURE("cell structure",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_BODY_STRUCTURE }),
-											
 									SEMTAG_ASSESMENT_SCALE("assessment scale",
 						            		new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_INACTIVE_CONCEPT, SEMTAG_STAGING_SCALE }),
-				            		
 						    		SEMTAG_ATTRIBUTE("attribute",
 						    				new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_LINKAGE_CONCEPT, SEMTAG_INACTIVE_CONCEPT }),
-		    				
 									SEMTAG_ENVIRONMENT("environment",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_ENVIRONMENT_LOCATION, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_EVENT("event",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_FINDING("finding",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 											SEMTAG_DISORDER("disorder",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_FINDING, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_GEOGRAPHIC_LOCATION("geographic location",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_ENVIRONMENT_LOCATION, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_MORPHOLOGIC_ABNORMALITY("morphologic abnormality",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_BODY_STRUCTURE, SEMTAG_INACTIVE_CONCEPT }),
-									
 											SEMTAG_CELL("cell",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_BODY_STRUCTURE, SEMTAG_CELL_STRUCTURE, SEMTAG_INACTIVE_CONCEPT, SEMTAG_MORPHOLOGIC_ABNORMALITY }),
-											
 									SEMTAG_NAVIGATIONAL_CONCEPT("navigational concept",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SPECIAL_CONCEPT, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_OBSERVABLE_ENTITY("observable entity",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-									
 									SEMTAG_ORGANISM("organism",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_PHYSICAL_FORCE("physical force",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 									SEMTAG_PHYSICAL_OBJECT("physical object",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 											SEMTAG_PRODUCT("product",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT, SEMTAG_PHYSICAL_OBJECT }),
-													
 									SEMTAG_PROCEDURE("procedure",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-													
 											SEMTAG_REGIME_THERAPY("regime/therapy",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_PROCEDURE, SEMTAG_INACTIVE_CONCEPT }),
-													
 									SEMTAG_QUALIFIER_VALUE("qualifier value",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 											SEMTAG_ADMINISTRATIVE_CONCEPT("administrative concept",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_QUALIFIER_VALUE }),
-													
 									SEMTAG_SOCIAL_CONCEPT("social concept",
 											new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SNOMED_ROOT, SEMTAG_INACTIVE_CONCEPT }),
-											
 											SEMTAG_LIFE_STYLE("life style",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SOCIAL_CONCEPT, SEMTAG_INACTIVE_CONCEPT }),
-											
 											SEMTAG_RACIAL_GROUP("racial group",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SOCIAL_CONCEPT }),
-											
 											SEMTAG_ETHNIC_GROUP("ethnic group",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SOCIAL_CONCEPT }),
-											
 											SEMTAG_RELIGION_PHILOSOPHY("religion/philosophy",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SOCIAL_CONCEPT, SEMTAG_INACTIVE_CONCEPT }),
-													
 											SEMTAG_PERSON("person",
 													new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_SOCIAL_CONCEPT, SEMTAG_INACTIVE_CONCEPT }),
-
 													SEMTAG_OCCUPATION("occupation",
 															new I_ConceptualizeUniversally[] { SEMTAGS_ROOT, SEMTAG_PERSON, SEMTAG_INACTIVE_CONCEPT, SEMTAG_SOCIAL_CONCEPT }),
+		TRANSLATION_STATUS("translation status",
+				new I_ConceptualizeUniversally[] { STATUS }),	
+				TODO_STATUS("to-do status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),	
+						TRANSLATOR_TODO_STATUS("translator to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						TSP_REVIEWER_TODO_STATUS("TSP reviewer to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						TPO_REVIEWER_TODO_STATUS("TPO reviewer to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						SME_TODO_STATUS("SME to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						EDITORIAL_BOARD_TODO_STATUS("editorial board pending issue status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),
+				REJECTED_STATUS("rejected status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+						REJECTED_BY_TSP_STATUS("rejected by TSP reviewer status",
+								new I_ConceptualizeUniversally[] { REJECTED_STATUS }),
+						REJECTED_BY_TPO_STATUS("rejected by TPO reviewer status",
+								new I_ConceptualizeUniversally[] { REJECTED_STATUS }),
+						REJECTED_BY_EDITORIAL_BOARD_STATUS("rejected by editorial board status",
+								new I_ConceptualizeUniversally[] { REJECTED_STATUS }),
+				TRANSLATED_STATUS("translated status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				REVIEWED_BY_TSP_STATUS("reviewed by TSP reviewer status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				REFERRED_TO_SME_STATUS("referred to SME status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				SME_FEEDBACK_COMPLETE_STATUS("SME feedback complete status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				APPROVED_FOR_PUBLICATION_STATUS("approved for publication status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				ESCALATED_TO_EDITORIAL_BOARD_STATUS("escalated to editorial board status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 													
 
 						;
