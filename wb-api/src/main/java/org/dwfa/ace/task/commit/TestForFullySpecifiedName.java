@@ -36,6 +36,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -120,12 +121,13 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         String lang = part.getLang();
                         if (langs.get(lang) != null) {
                             for (I_DescriptionVersioned d : langs.get(lang)) {
-                                if (d.getDescId() != desc.getDescId()) {
-                                    alertList.add(new AlertToDataConstraintFailure(
-                                        (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                                  : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                        "<html>More than one FSN for " + lang, concept));
-                                }
+                            	// TODO: verify that are both active
+//                                if (d.getDescId() != desc.getDescId()) {
+//                                    alertList.add(new AlertToDataConstraintFailure(
+//                                        (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+//                                                  : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+//                                        "<html>More than one FSN for " + lang, concept));
+//                                }
                             }
                             langs.get(lang).add(desc);
                         } else {
@@ -178,5 +180,4 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                           : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>No FSN for en", concept));
         return alertList;
     }
-
 }
