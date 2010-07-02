@@ -55,7 +55,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.tapi.TerminologyException;
-import org.intsdo.util.swing.GuiUtil;
+import org.dwfa.util.swing.GuiUtil;
 
 public class LineagePlugin extends AbstractPlugin 
 	implements HierarchyListener {
