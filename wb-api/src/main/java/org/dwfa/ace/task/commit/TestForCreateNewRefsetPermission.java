@@ -38,9 +38,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/permissions", type = BeanType.TASK_BEAN)})
 public class TestForCreateNewRefsetPermission extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
