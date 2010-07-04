@@ -48,6 +48,12 @@
             <groupId>jung</groupId>
             <artifactId>jung</artifactId>
             <version>1.7.6</version>
+			<exclusions>
+				<exclusion>
+					<groupId>concurrent</groupId>
+					<artifactId>concurrent</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <!-- svnkit dependency -->

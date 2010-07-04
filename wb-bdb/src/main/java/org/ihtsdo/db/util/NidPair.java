@@ -3,19 +3,40 @@ package org.ihtsdo.db.util;
 import java.util.List;
 
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.db.bdb.Bdb;
 
-public class NidPair {
-	private int nid1;
-	private int nid2;
+public abstract class NidPair {
+	protected int nid1;
+	protected int nid2;
 	private int hash;
 	
-	public NidPair(long nids) {
+	protected NidPair(long nids) {
         super();
-        this.nid1 = (int) nids;
-        this.nid2 = (int) (nids >>> 32);
+ 	}
+	
+	public static NidPair getNidPair(long nids) {
+	       int nid1 = (int) nids;
+	       int nid2 = (int) (nids >>> 32);
+	       if (Bdb.getConceptNid(nid2) == nid2) {
+	    	   return getTypeNidRelNidPair(nid2, nid1);
+	       }
+		return getRefsetNidMemberNidPair(nid1, nid2);
+
+	}
+	public static NidPairForRel getTypeNidRelNidPair(int typeNid, int rNid) {
+		// the type (nid2) is a concept, the rNid is not. 
+		return new NidPairForRel(rNid, typeNid);
+	}
+
+	public static NidPairForRefset getRefsetNidMemberNidPair(int refsetNid, int memberNid) {
+		// the refset (nid1) is a concept, the memberNid is not. 
+		return new NidPairForRefset(refsetNid, memberNid);
 	}
 	
-	public NidPair(int nid1, int nid2) {
+	public abstract boolean isRelPair();
+	
+
+	protected NidPair(int nid1, int nid2) {
 		super();
 		this.nid1 = nid1;
 		this.nid2 = nid2;
@@ -53,11 +74,8 @@ public class NidPair {
 		list.add(nid2);
 	}
 
-	public int getNid1() {
-		return nid1;
+	public boolean isRefsetPair() {
+		return !isRelPair();
 	}
 
-	public int getNid2() {
-		return nid2;
-	}
 }

@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
@@ -35,7 +34,7 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
-import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -48,18 +47,8 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     private AtomicReference<AddDescriptionList> descriptions = new AtomicReference<AddDescriptionList>();
     private AtomicReference<AddImageList> images = new AtomicReference<AddImageList>();
     private AtomicReference<AddMemberList> refsetMembers = new AtomicReference<AddMemberList>();
-    private AtomicReference<SetModifiedWhenChangedList> destRelNidTypeNidList =
-            new AtomicReference<SetModifiedWhenChangedList>();
-    private AtomicReference<SetModifiedWhenChangedList> refsetNidMemberNidForConceptList =
-            new AtomicReference<SetModifiedWhenChangedList>();
-    private AtomicReference<SetModifiedWhenChangedList> refsetNidMemberNidForDescriptionsList =
-            new AtomicReference<SetModifiedWhenChangedList>();
-    private AtomicReference<SetModifiedWhenChangedList> refsetNidMemberNidForRelsList =
-            new AtomicReference<SetModifiedWhenChangedList>();
-    private AtomicReference<SetModifiedWhenChangedList> refsetNidMemberNidForImagesList =
-            new AtomicReference<SetModifiedWhenChangedList>();
-    private AtomicReference<SetModifiedWhenChangedList> refsetNidMemberNidForRefsetMembersList =
-            new AtomicReference<SetModifiedWhenChangedList>();
+    
+    
     private AtomicReference<CopyOnWriteArraySet<Integer>> descNids =
             new AtomicReference<CopyOnWriteArraySet<Integer>>();
     private AtomicReference<CopyOnWriteArraySet<Integer>> srcRelNids =
@@ -302,36 +291,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return nidData;
     }
 
-    protected SetModifiedWhenChangedList getArrayIntList(OFFSETS offset) throws IOException {
-        SetModifiedWhenChangedList roList = getReadOnlyArrayIntList(offset);
-        IntListPairsBinder binder = new IntListPairsBinder();
-        binder.setReadOnlyList(roList);
-        TupleInput readWriteInput = nidData.getMutableTupleInput();
-        if (readWriteInput.available() < OFFSETS.getHeaderSize()) {
-            return roList;
-        }
-        readWriteInput.mark(OFFSETS.getHeaderSize());
-        readWriteInput.skipFast(offset.offset);
-        int dataOffset = readWriteInput.readInt();
-        readWriteInput.reset();
-        readWriteInput.skipFast(dataOffset);
-        return new SetModifiedWhenChangedList(binder.entryToObject(readWriteInput));
-    }
-
-    protected SetModifiedWhenChangedList getReadOnlyArrayIntList(OFFSETS offset) throws IOException {
-        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-        if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
-            return new SetModifiedWhenChangedList();
-        }
-        readOnlyInput.mark(OFFSETS.getHeaderSize());
-        readOnlyInput.skipFast(offset.offset);
-        int dataOffset = readOnlyInput.readInt();
-        readOnlyInput.reset();
-        readOnlyInput.skipFast(dataOffset);
-        IntListPairsBinder binder = new IntListPairsBinder();
-        return new SetModifiedWhenChangedList(binder.entryToObject(readOnlyInput));
-    }
-
     protected CopyOnWriteArraySet<Integer> getReadOnlyIntSet(OFFSETS offset) throws IOException {
         TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
         if (readOnlyInput.available() < OFFSETS.getHeaderSize()) {
@@ -360,75 +319,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         return binder.entryToObject(mutableInput);
     }
 
-    protected List<RefsetMember<?, ?>> getRefsetMembers(SetModifiedWhenChangedList members) throws IOException {
-        List<RefsetMember<?, ?>> refsetMembers = new ArrayList<RefsetMember<?, ?>>();
-        for (NidPair pair : members) {
-            int refsetNid = pair.getNid1();
-            int memberNid = pair.getNid2();
-            Concept refsetConcept = Bdb.getConceptDb().getConcept(refsetNid);
-            RefsetMember<?, ?> member = refsetConcept.getRefsetMember(memberNid);
-            if (member != null) {
-                refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
-            } else {
-                members.remove(pair);
-            	BdbCommitManager.writeImmediate(enclosingConcept);
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    StringBuffer buff = new StringBuffer();
-                    buff.append("Unable to find extension. RefsetNid: ");
-                    buff.append(refsetNid);
-                    buff.append(" MemberNid: ");
-                    buff.append(memberNid);
-                    buff.append("\n\nReferenced from concept: ");
-                    buff.append(enclosingConcept.toLongString());
-                    buff.append("\n\nRefset concept: ");
-                    buff.append(refsetConcept.toLongString());
-                    AceLog.getAppLog().warning(buff.toString());
-                }
-            }
-        }
-        return refsetMembers;
-    }
-
-    protected List<RefsetMember<?, ?>> getRefsetMembers(SetModifiedWhenChangedList members, int componentId)
-            throws IOException {
-        List<RefsetMember<?, ?>> refsetMembers = new ArrayList<RefsetMember<?, ?>>();
-        for (NidPair pair : members) {
-            int refsetNid = pair.getNid1();
-            int memberNid = pair.getNid2();
-            Concept refsetConcept = Bdb.getConceptDb().getConcept(refsetNid);
-            RefsetMember<?, ?> member = refsetConcept.getRefsetMember(memberNid);
-            if (member != null) {
-                if (member.getComponentId() == componentId 
-                        && member.primordialSapNid >= 0 
-                        && member.getTime() != Long.MIN_VALUE) {
-                    refsetMembers.add(refsetConcept.getRefsetMember(memberNid));
-                }
-            } else {
-                members.remove(pair);
-            	BdbCommitManager.writeImmediate(enclosingConcept);
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    StringBuffer buff = new StringBuffer();
-                    buff.append("Unable to find extension. RefsetNid: ");
-                    buff.append(refsetNid);
-                    buff.append(" MemberNid: ");
-                    buff.append(memberNid);
-                    buff.append("\n\nReferenced from concept: ");
-                    buff.append(enclosingConcept.toLongString());
-                    buff.append("\n\nRefset concept: ");
-                    buff.append(refsetConcept.toLongString());
-                    AceLog.getAppLog().warning(buff.toString());
-                }
-            }
-        }
-        return refsetMembers;
-    }
-
-    @Override
-    public void setDestRelNidTypeNidList(List<NidPair> destRelNidTypeNidList) throws IOException {
-        this.destRelNidTypeNidList.set(new SetModifiedWhenChangedList(destRelNidTypeNidList));
-        enclosingConcept.modified();
-    }
-
     public void set(ConceptAttributes attr) throws IOException {
         if (attributes.get() != null) {
             throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
@@ -437,147 +327,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             throw new IOException("Attributes is already set. Please modify the exisiting attributes object.");
         }
         enclosingConcept.modified();
-    }
-
-    @Override
-    public void setRefsetNidMemberNidForConceptList(List<NidPair> refsetNidMemberNidForConceptList) throws IOException {
-        this.refsetNidMemberNidForConceptList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForConceptList));
-        enclosingConcept.modified();
-    }
-
-    @Override
-    public void setRefsetNidMemberNidForDescriptionsList(List<NidPair> refsetNidMemberNidForDescriptionsList)
-            throws IOException {
-        this.refsetNidMemberNidForDescriptionsList.set(new SetModifiedWhenChangedList(
-            refsetNidMemberNidForDescriptionsList));
-        enclosingConcept.modified();
-    }
-
-    @Override
-    public void setRefsetNidMemberNidForRelsList(List<NidPair> refsetNidMemberNidForRelsList) throws IOException {
-        this.refsetNidMemberNidForRelsList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForRelsList));
-        enclosingConcept.modified();
-    }
-
-    @Override
-    public void setRefsetNidMemberNidForImagesList(List<NidPair> refsetNidMemberNidForImagesList) throws IOException {
-        this.refsetNidMemberNidForImagesList.set(new SetModifiedWhenChangedList(refsetNidMemberNidForImagesList));
-        enclosingConcept.modified();
-    }
-
-    @Override
-    public void setRefsetNidMemberNidForRefsetMembersList(List<NidPair> refsetNidMemberNidForRefsetMembersList)
-            throws IOException {
-        this.refsetNidMemberNidForRefsetMembersList.set(new SetModifiedWhenChangedList(
-            refsetNidMemberNidForRefsetMembersList));
-        enclosingConcept.modified();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getDestRelNidTypeNidList() throws IOException {
-        if (destRelNidTypeNidList.get() == null) {
-            destRelNidTypeNidList.compareAndSet(null, getArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS));
-        }
-        return destRelNidTypeNidList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForConceptList() throws IOException {
-        if (refsetNidMemberNidForConceptList.get() == null) {
-            refsetNidMemberNidForConceptList.compareAndSet(null,
-                getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_CONCEPT));
-        }
-        return refsetNidMemberNidForConceptList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForDescriptionsList() throws IOException {
-        if (refsetNidMemberNidForDescriptionsList.get() == null) {
-            refsetNidMemberNidForDescriptionsList.compareAndSet(null,
-                getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_DESCRIPTIONS));
-        }
-        return refsetNidMemberNidForDescriptionsList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForRelsList() throws IOException {
-        if (refsetNidMemberNidForRelsList.get() == null) {
-            refsetNidMemberNidForRelsList.compareAndSet(null,
-                getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_RELATIONSHIPS));
-        }
-        return refsetNidMemberNidForRelsList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForImagesList() throws IOException {
-        if (refsetNidMemberNidForImagesList.get() == null) {
-            refsetNidMemberNidForImagesList
-                .compareAndSet(null, getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_IMAGES));
-        }
-        return refsetNidMemberNidForImagesList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForRefsetMembersList() throws IOException {
-        if (refsetNidMemberNidForRefsetMembersList.get() == null) {
-            refsetNidMemberNidForRefsetMembersList.compareAndSet(null,
-                getArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_REFSETMEMBERS));
-        }
-        return refsetNidMemberNidForRefsetMembersList.get();
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getDestRelNidTypeNidListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.DEST_REL_NID_TYPE_NIDS);
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForConceptListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_CONCEPT);
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForDescriptionsListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_DESCRIPTIONS);
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForRelsListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_RELATIONSHIPS);
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForRefsetMembersListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_REFSETMEMBERS);
-    }
-
-    @Override
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForImagesListReadOnly() throws IOException {
-        return getReadOnlyArrayIntList(OFFSETS.REFSETNID_MEMBERNID_FOR_IMAGES);
-    }
-
-    /**
-     * TODO add call for getRefsetMembersForComponent(int refset, int componentNid);
-     * 
-     * @throws IOException
-     */
-    @Override
-    public List<RefsetMember<?, ?>> getExtensionsForComponent(int componentNid) throws IOException {
-        if (componentNid == enclosingConcept.getConceptId()) {
-            SetModifiedWhenChangedList conceptMembers = getRefsetNidMemberNidForConceptList();
-            return getRefsetMembers(conceptMembers, componentNid);
-        } else if (getDescNids().contains(componentNid)) {
-            SetModifiedWhenChangedList descMembers = getRefsetNidMemberNidForDescriptionsList();
-            return getRefsetMembers(descMembers, componentNid);
-        } else if (getSrcRelNids().contains(componentNid)) {
-            SetModifiedWhenChangedList srcRelMembers = getRefsetNidMemberNidForRelsList();
-            return getRefsetMembers(srcRelMembers, componentNid);
-        } else if (getImageNids().contains(componentNid)) {
-            SetModifiedWhenChangedList imageMembers = getRefsetNidMemberNidForImagesList();
-            return getRefsetMembers(imageMembers, componentNid);
-        } // must be in one of the refset members by elimination
-        SetModifiedWhenChangedList refsetMembers = getRefsetNidMemberNidForRefsetMembersList();
-        return getRefsetMembers(refsetMembers, componentNid);
     }
 
     @Override
@@ -639,20 +388,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public CopyOnWriteArraySet<Integer> getMemberNidsReadOnly() throws IOException {
         return getReadOnlyIntSet(OFFSETS.MEMBER_NIDS);
-    }
-
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForImagesListRef() {
-        return refsetNidMemberNidForImagesList.get();
-    }
-
-    public SetModifiedWhenChangedList getRefsetNidMemberNidForRefsetMembersListRef() {
-        return refsetNidMemberNidForRefsetMembersList.get();
-    }
-
-    public void setRefsetNidMemberNidForRefsetMembersListRef(
-            SetModifiedWhenChangedList refsetNidMemberNidForRefsetMembersListRef) {
-        this.refsetNidMemberNidForRefsetMembersList.set(refsetNidMemberNidForRefsetMembersListRef);
-        enclosingConcept.modified();
     }
 
     @Override
@@ -773,11 +508,12 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     @Override
     public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
         boolean isLeaf = true;
-        if (destRelNidTypeNidList != null && destRelNidTypeNidList.get() != null) {
+        List<NidPairForRel> relPairs = Bdb.getDestRelPairs(enclosingConcept.getNid());
+        if (relPairs != null) {
             I_IntSet destRelTypes = aceConfig.getDestRelTypes();
-            for (NidPair pair: destRelNidTypeNidList.get()) {
-                int relNid = pair.getNid1();
-                int typeId = pair.getNid2();
+            for (NidPairForRel pair: relPairs) {
+                int relNid = pair.getRelNid();
+                int typeId = pair.getTypeNid();
                 if (destRelTypes.contains(typeId)) {
                     try {
                         Concept c = Bdb.getConceptForComponent(relNid);
@@ -832,36 +568,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
         }
         return isLeaf;
-    }
-
-    @Override
-    public boolean hasAttributeExtensions() throws IOException {
-        return getRefsetNidMemberNidForConceptList() == null || getRefsetNidMemberNidForConceptList().size() > 0;
-    }
-
-    @Override
-    public boolean hasDescriptionExtensions() throws IOException {
-        return getRefsetNidMemberNidForDescriptionsList() == null || getRefsetNidMemberNidForDescriptionsList().size() > 0;
-    }
-
-    @Override
-    public boolean hasExtensionExtensions() throws IOException{
-        return getRefsetNidMemberNidForRefsetMembersListRef() == null || getRefsetNidMemberNidForRefsetMembersListRef().size() > 0;
-    }
-
-    @Override
-    public boolean hasExtensionsForComponent(int nid) throws IOException {
-        return getExtensionsForComponent(nid).size() > 0;
-    }
-
-    @Override
-    public boolean hasMediaExtensions() throws IOException {
-        return getRefsetNidMemberNidForImagesListRef() == null || getRefsetNidMemberNidForImagesListRef().size() > 0;
-    }
-
-    @Override
-    public boolean hasRelExtensions() throws IOException {
-        return getRefsetNidMemberNidForRelsList() == null || getRefsetNidMemberNidForRelsList().size() > 0;
     }
 
 }

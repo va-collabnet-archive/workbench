@@ -448,9 +448,9 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             I_IntList refsets = getRefsetsToShowInTaxonomy();
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
                 I_GetConceptData rootConcept = Terms.get().getConcept(rootNid);
-                for (int memberNid : rootConcept.getConceptMemberNidsForRefset(new IntSet(refsets.getListArray()))) {
-                	I_ExtendByRef ext = Terms.get().getExtension(memberNid);
-                	if (ext != null) {
+                for (I_ExtendByRef ext: 
+                	Terms.get().getAllExtensionsForComponent(rootConcept.getNid())) {
+                	if (ext != null && refsets.contains(ext.getRefsetId())) {
                 		List<? extends I_ExtendByRefVersion> tuples =
                 			ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
                 					frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());

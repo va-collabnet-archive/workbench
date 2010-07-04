@@ -27,6 +27,8 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -298,6 +300,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		output.writeInt(referencedComponentNid);
 		writeMember(output);
 		output.writeShort(additionalVersionsToWrite.size());
+
+		NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(enclosingConceptNid, nid);
+		Bdb.addXrefPair(referencedComponentNid, npr);
+		
 		for (RefsetRevision<R, C> p: additionalVersionsToWrite) {
 			p.writePartToBdb(output);
 		}		
@@ -495,10 +501,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	}
     @Override
     public boolean hasExtensions() throws IOException {
-        if (getEnclosingConcept().hasExtensionExtensions()) {
-            return getEnclosingConcept().hasExtensionsForComponent(nid);
-        }
-        return false;
-    }
+         return getEnclosingConcept().hasExtensionsForComponent(nid);
+     }
 
 }

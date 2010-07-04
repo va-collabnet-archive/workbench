@@ -164,10 +164,14 @@ public class LuceneManager {
 
 
     private static  void addIdsToIndex(Document doc, I_Identify did) {
-		for (I_IdPart p : did.getMutableIdParts()) {
-			doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO, 
-					Field.Index.UN_TOKENIZED));
-		}
+    	if (did != null) {
+    		for (I_IdPart p : did.getMutableIdParts()) {
+    			doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO, 
+    					Field.Index.UN_TOKENIZED));
+    		}
+    	} else {
+    		AceLog.getAppLog().alertAndLogException(new Exception("Identifier is null"));
+    	}
 	}
 
 	public static Hits search(Query q) throws CorruptIndexException, IOException {

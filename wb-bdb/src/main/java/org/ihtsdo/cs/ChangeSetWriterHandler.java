@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Timer;
@@ -15,7 +16,6 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.svn.Svn;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
@@ -42,12 +42,16 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private ChangeSetWriterThreading changeSetWriterThreading;
     private ChangeSetPolicy changeSetPolicy;
     private Timer timer;
+	private Semaphore permit;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
-			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) {
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, 
+			ChangeSetWriterThreading changeSetWriterThreading, 
+			Semaphore permit) {
 		super();
 		assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
+		this.permit = permit;
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
 		this.commitTime = commitTime;
@@ -62,7 +66,6 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
 	@Override
 	public void run() {
-		Svn.rwl.readLock().lock();
 		try {
 	        conceptCount = Bdb.getConceptDb().getCount();
 
@@ -108,7 +111,9 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} finally {
-			Svn.rwl.readLock().unlock();
+			if (permit != null) {
+				permit.release();
+			}
 		}
 	}
 

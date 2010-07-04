@@ -46,8 +46,6 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 	
 	private Semaphore writePermit = new Semaphore(1);
 	
-	private  boolean processNidLists;
-	
 	private boolean timeStampEnabled = true;
 	
     public boolean isTimeStampEnabled() {
@@ -58,28 +56,26 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
         this.timeStampEnabled = timeStampEnabled;
     }
 
-    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy, 
-            boolean processNidLists, boolean timeStampEnabled) {
+    public EConceptChangeSetWriter(File changeSetFile, File tempFile, 
+    		ChangeSetPolicy policy, boolean timeStampEnabled) {
         super();
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
         this.policy = policy;
-        this.processNidLists = processNidLists;
         this.timeStampEnabled = timeStampEnabled;
     }
 
-    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy, boolean processNidLists) {
+    public EConceptChangeSetWriter(File changeSetFile, File tempFile, ChangeSetPolicy policy) {
         super();
         this.changeSetFile = changeSetFile;
         this.tempFile = tempFile;
         this.policy = policy;
-        this.processNidLists = processNidLists;
     }
 
 	@Override
 	public void open(I_IntSet commitSapNids) throws IOException {
 	    this.commitSapNids = commitSapNids;
-		computer = new EConceptChangeSetComputer(policy, (IntSet) commitSapNids, processNidLists);
+		computer = new EConceptChangeSetComputer(policy, (IntSet) commitSapNids);
         if (changeSetFile.exists() == false) {
             changeSetFile.getParentFile().mkdirs();
             changeSetFile.createNewFile();

@@ -95,7 +95,7 @@ public class GenerateIECFile extends AbstractMojo  {
             }
             ChangeSetPolicy changeSetPolicy = ChangeSetPolicy.valueOf(policy);
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile), 
-                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false, false);
+                new File(output, changeSetFile + ".tmp"), changeSetPolicy, false);
             ChangeSetWriterHandler.addWriter(writer);
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
                 TimeUtil.getFileDateFormat().parse(endDate).getTime());
@@ -103,7 +103,8 @@ public class GenerateIECFile extends AbstractMojo  {
             if (sapsToWrite.size() > 0) {
                 ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                     Bdb.getConceptDb().getConceptIdSet(), System.currentTimeMillis(),
-                    sapsToWrite, changeSetPolicy, ChangeSetWriterThreading.MULTI_THREAD);
+                    sapsToWrite, changeSetPolicy, 
+                    ChangeSetWriterThreading.MULTI_THREAD, null);
                 handler.run();
             }
         } catch (Exception e) {

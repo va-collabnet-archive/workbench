@@ -141,6 +141,7 @@ import org.ihtsdo.db.bdb.computer.refset.RefsetComputer;
 import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.SpecRefsetHelper;
 import org.ihtsdo.db.runner.WorkbenchRunner;
+import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
@@ -302,12 +303,38 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
-        int cNid = Bdb.getNidCNidMap().getCNid(nid);
-        if (cNid == Integer.MAX_VALUE) {
+    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        if (pairs == null || pairs.size() == 0) {
             return new ArrayList<I_ExtendByRef>(0);
         }
-        Concept c = Bdb.getConceptDb().getConcept(cNid);
-        return c.getExtensionsForComponent(nid);
+        List<I_ExtendByRef> returnValues = 
+        	new ArrayList<I_ExtendByRef>(pairs.size());
+        for (NidPairForRefset pair: pairs) {
+        	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+        	if (ext != null) {
+        		returnValues.add(ext);
+        	}
+        }
+        return returnValues;
+    }
+
+     public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
+    		 int nid) throws IOException {
+    	List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        if (pairs == null || pairs.size() == 0) {
+            return new ArrayList<I_ExtendByRef>(0);
+        }
+        List<I_ExtendByRef> returnValues = 
+        	new ArrayList<I_ExtendByRef>(pairs.size());
+        for (NidPairForRefset pair: pairs) {
+        	if (pair.getRefsetNid() == refsetNid) {
+            	I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+            	if (ext != null) {
+            		returnValues.add(ext);
+            	}
+        	}
+        }
+        return returnValues;
     }
 
     @Override

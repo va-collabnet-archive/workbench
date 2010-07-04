@@ -489,6 +489,9 @@ public interface I_TermFactory {
     List<? extends I_ExtendByRef> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
 
+    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
+   		 int nid) throws IOException;
+    
     String getStats() throws IOException;
 
     /**

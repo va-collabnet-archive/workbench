@@ -336,7 +336,8 @@ public class BdbCommitManager {
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
     	lastCommit = Bdb.gVersion.incrementAndGet();
-		Svn.rwl.readLock().lock();
+		Svn.rwl.acquireUninterruptibly();
+		boolean passedRelease = false;
     	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
@@ -360,7 +361,6 @@ public class BdbCommitManager {
                                             warningsAndErrors.addAll(test.test(extension, true));
                                         }
                                     }
-                                    
                                     for (AlertToDataConstraintFailure alert: warningsAndErrors) {
                                         if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                                             errorCount++;
@@ -439,8 +439,11 @@ public class BdbCommitManager {
                                 if (uncommittedCNidsNoChecks.cardinality() > 0) {
                                     ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                         uncommittedCNidsNoChecks, commitTime,
-                                        sapNidsFromCommit, changeSetPolicy, changeSetWriterThreading);
+                                        sapNidsFromCommit, changeSetPolicy, 
+                                        changeSetWriterThreading, 
+                                        Svn.rwl);
                                     changeSetWriterService.execute(handler);
+                                    passedRelease = true;
                                 }
                                 break;
                             case OFF:
@@ -474,7 +477,9 @@ public class BdbCommitManager {
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
-        	Svn.rwl.readLock().unlock();
+        	if (!passedRelease) {
+        		Svn.rwl.release();
+        	}
         }
         fireCommit();
         updateFrames();

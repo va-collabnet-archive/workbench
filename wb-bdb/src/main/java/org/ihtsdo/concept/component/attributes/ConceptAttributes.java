@@ -486,10 +486,7 @@ public class ConceptAttributes
 
     @Override
     public boolean hasExtensions() throws IOException {
-        if (getEnclosingConcept().hasAttributeExtensions()) {
-            return getEnclosingConcept().hasExtensionsForComponent(nid);
-        }
-        return false;
+        return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
 
 

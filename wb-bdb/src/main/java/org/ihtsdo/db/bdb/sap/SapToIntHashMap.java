@@ -1,8 +1,7 @@
 package org.ihtsdo.db.bdb.sap;
 
+import org.ihtsdo.cern.colt.list.IntArrayList;
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
-
-import cern.colt.list.IntArrayList;
 
 public class SapToIntHashMap {
 	

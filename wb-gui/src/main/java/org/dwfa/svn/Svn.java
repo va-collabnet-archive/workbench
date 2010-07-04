@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
@@ -77,11 +77,14 @@ public class Svn implements I_HandleSubversion {
 
 	private static SvnPrompter prompter = new SvnPrompter();
 
-	public static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+	public static final int SEMAPHORE_PERMITS = 10;
+	public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
 	public static SVNClientInterface getSvnClient() {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+			JOptionPane.showMessageDialog(null, 
+					"Skipping SVN task as not connected to SVN", 
+					"Not connected to SVN",
 					JOptionPane.INFORMATION_MESSAGE);
 			return null;
 		}
@@ -90,7 +93,8 @@ public class Svn implements I_HandleSubversion {
 			switch (impl) {
 			case NATIVE:
 				client = new SVNClient();
-				AceLog.getAppLog().info("Created native svn client: " + client.getVersion());
+				AceLog.getAppLog().info("Created native svn client: " + 
+						client.getVersion());
 				break;
 
 			case SVN_KIT:
@@ -101,7 +105,8 @@ public class Svn implements I_HandleSubversion {
 				client.password("");
 				client.username("");
 
-				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + client.getVersion());
+				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + 
+						client.getVersion());
 				break;
 
 			default:
@@ -180,7 +185,7 @@ public class Svn implements I_HandleSubversion {
 			workingCopy = workingCopy + "/";
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion status");
 		try {
@@ -212,7 +217,7 @@ public class Svn implements I_HandleSubversion {
 			SvnLog.info("finished status for working copy: " + workingCopy);
 			return status;
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -247,7 +252,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion cleanup");
 		try {
@@ -268,7 +273,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -290,7 +295,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion commit");
 		try {
@@ -381,7 +386,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished commit");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -415,7 +420,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion purge");
 		try {
@@ -459,7 +464,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -481,7 +486,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion revert");
 		try {
@@ -539,7 +544,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -571,7 +576,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion update");
 		try {
@@ -601,7 +606,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -623,7 +628,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion update database");
 		try {
@@ -653,7 +658,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished database update");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -675,7 +680,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion checkout");
 		try {
@@ -706,7 +711,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -927,7 +932,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion unlock");
 		try {
@@ -950,7 +955,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished unlock");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -982,7 +987,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion lock");
 		try {
@@ -1005,7 +1010,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished lock");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -1027,7 +1032,7 @@ public class Svn implements I_HandleSubversion {
 			return;
 		}
 		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion import");
 		try {
@@ -1060,7 +1065,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished import");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 

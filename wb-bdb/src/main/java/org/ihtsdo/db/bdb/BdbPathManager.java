@@ -33,6 +33,8 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -264,13 +266,12 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		return getPathOriginsWithDepth(nid, 0);
 	}
 
-    @SuppressWarnings("unchecked")
     private List<I_Position> getPathOriginsWithDepth(int nid, int depth) throws TerminologyException {
         try {
 			ArrayList<I_Position> result = new ArrayList<I_Position>();
 			Concept pathConcept = Bdb.getConceptDb().getConcept(nid);
-			for (RefsetMember extPart : pathConcept
-					.getConceptExtensions(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid())) {
+			for (I_ExtendByRef extPart : Terms.get().getRefsetExtensionsForComponent(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), 
+					pathConcept.getNid())) {
 				if (extPart == null) {
 					AceLog.getAppLog().alertAndLogException(
 							new Exception("Null path origins for: " + 
