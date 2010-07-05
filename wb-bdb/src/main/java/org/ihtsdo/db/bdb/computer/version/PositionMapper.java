@@ -423,12 +423,12 @@ public class PositionMapper {
 					}
 				}
 				completeLatch.countDown();
-				AceLog.getAppLog().info(
+				/*AceLog.getAppLog().info(
 						"Finished setup for new PositionMapper for: "
 								+ pathConcept.getNid() + ": " 
 								+ pathDesc + " time: "
 								+ TimeUtil.formatDate(destination.getTime()) + 
-								" thread: " + Thread.currentThread().getName());
+								" thread: " + Thread.currentThread().getName());*/
 			} catch (Throwable e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);
