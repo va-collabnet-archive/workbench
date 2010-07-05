@@ -56,366 +56,349 @@ import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
  */
 public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
 
-	/**
-	 * RF2 Descriptor - this is required if useRF2 is set to true. This
-	 * describes the module, namespace, content sub type and country information
-	 * required to export in RF2.
-	 * 
-	 * @parameter
-	 */
-	RF2Descriptor rf2Descriptor;
+    /**
+     * RF2 Descriptor - this is required if useRF2 is set to true. This
+     * describes the module, namespace, content sub type and country information
+     * required to export in RF2.
+     * 
+     * @parameter
+     */
+    RF2Descriptor rf2Descriptor;
 
-	/**
-	 * Specifies which refsets to include in the export.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	RefsetInclusionSpec[] refsetInclusionSpecs;
+    /**
+     * The namespace that this export uses. e.g. 1000036
+     * 
+     * @parameter
+     * @required
+     */
+    int namespace;
 
-	/**
-	 * Defines the directory to which the UUID based reference sets are exported
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	File uuidRefsetOutputDirectory;
+    /**
+     * The project that this export uses. e.g. 1000036
+     * 
+     * @parameter
+     * @required
+     */
+    int project;
 
-	/**
-	 * Defines the directory to which the SCTID based reference sets are
-	 * exported
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	File sctidRefsetOutputDirectory;
+    /**
+     * Specifies which refsets to include in the export.
+     * 
+     * @parameter
+     * @required
+     */
+    RefsetInclusionSpec[] refsetInclusionSpecs;
 
-	/**
-	 * Directory where the read/write SCTID maps are stored
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	File readWriteMapDirectory;
+    /**
+     * Defines the directory to which the UUID based reference sets are exported
+     * 
+     * @parameter
+     * @required
+     */
+    File uuidRefsetOutputDirectory;
 
-	/**
-	 * Release version used to embed in the refset file names - if not specified
-	 * then the "path version" reference set is used to determine the version
-	 * 
-	 * @parameter
-	 */
-	String releaseVersion;
+    /**
+     * Defines the directory to which the SCTID based reference sets are
+     * exported
+     * 
+     * @parameter
+     * @required
+     */
+    File sctidRefsetOutputDirectory;
 
-	private I_TermFactory tf = LocalVersionedTerminology.get();
+    /**
+     * Directory where the read/write SCTID maps are stored
+     * 
+     * @parameter
+     * @required
+     */
+    File readWriteMapDirectory;
 
-	private I_IntSet allowedStatuses;
+    /**
+     * Release version used to embed in the refset file names - if not specified
+     * then the "path version" reference set is used to determine the version
+     * 
+     * @parameter
+     */
+    String releaseVersion;
 
-	private Set<I_Position> positions;
+    private I_TermFactory tf = LocalVersionedTerminology.get();
 
-	private HashMap<String, BufferedWriter> writerMap = new HashMap<String, BufferedWriter>();
+    private I_IntSet allowedStatuses;
 
-	private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
+    private Set<I_Position> positions;
 
-	private ReferenceSetExport referenceSetExport = new ReferenceSetExport();
+    private HashMap<String, BufferedWriter> writerMap = new HashMap<String, BufferedWriter>();
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
 
-		if (!readWriteMapDirectory.exists()
-				|| !readWriteMapDirectory.isDirectory()
-				|| !readWriteMapDirectory.canRead()) {
-			throw new MojoExecutionException(
-					"Cannot proceed, readWriteMapDirectory must exist and be readable");
-		}
+    private ReferenceSetExport referenceSetExport = new ReferenceSetExport();
 
-		try {
-			allowedStatuses = null;
-			positions = null;
-			Set<I_Position> refsetPositions = new HashSet<I_Position>();
-			refsetPositions.addAll(LocalVersionedTerminology.get()
-					.getActiveAceFrameConfig().getViewPositionSetReadOnly());
-			referenceSetExport.setPositions(refsetPositions);
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
-			sctidRefsetOutputDirectory.mkdirs();
-			uuidRefsetOutputDirectory.mkdirs();
+        if (!readWriteMapDirectory.exists() || !readWriteMapDirectory.isDirectory() || !readWriteMapDirectory.canRead()) {
+            throw new MojoExecutionException("Cannot proceed, readWriteMapDirectory must exist and be readable");
+        }
 
-			MemberRefsetHandler.setFixedMapDirectory(readWriteMapDirectory);
-			MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
-			if (rf2Descriptor != null && rf2Descriptor.getModule() != null) {
-				MemberRefsetHandler.setModule(rf2Descriptor.getModule());
-			}
+        try {
+            allowedStatuses = null;
+            positions = null;
+            Set<I_Position> refsetPositions = new HashSet<I_Position>();
+            refsetPositions.addAll(LocalVersionedTerminology.get().getActiveAceFrameConfig()
+                .getViewPositionSetReadOnly());
+            referenceSetExport.setPositions(refsetPositions);
 
-			for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
-				processConcept(spec.refsetConcept.getVerifiedConcept());
-			}
+            sctidRefsetOutputDirectory.mkdirs();
+            uuidRefsetOutputDirectory.mkdirs();
 
-			for (BufferedWriter writer : writerMap.values()) {
-				writer.close();
-			}
+            MemberRefsetHandler.setFixedMapDirectory(readWriteMapDirectory);
+            MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
+            if (rf2Descriptor != null && rf2Descriptor.getModule() != null) {
+                MemberRefsetHandler.setModule(rf2Descriptor.getModule());
+            }
 
-			MemberRefsetHandler.cleanup();
+            for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
+                processConcept(spec.refsetConcept.getVerifiedConcept());
+            }
 
-		} catch (Exception e) {
-			throw new MojoExecutionException(
-					"exporting reference sets failed for specification ", e);
-		}
-	}
+            for (BufferedWriter writer : writerMap.values()) {
+                writer.close();
+            }
 
-	public void processConcept(I_GetConceptData concept) throws Exception {
-		if (testSpecification(concept)) {
-			// export the status refset for this concept
-			I_ConceptAttributePart latest = referenceSetExport
-					.getLatestAttributePart(concept);
-			if (latest == null) {
-				getLog()
-						.warn(
-								"Concept "
-										+ concept
-										+ " is exportable but has no parts valid for statuses "
-										+ allowedStatuses + " and positions "
-										+ positions);
-				return;
-			}
+            MemberRefsetHandler.cleanup();
 
-			exportRefsets(concept.getConceptId());
+        } catch (Exception e) {
+            throw new MojoExecutionException("exporting reference sets failed for specification ", e);
+        }
+    }
 
-			// export relationship refsets
-			for (I_RelVersioned rel : concept.getSourceRels()) {
-				processRelationship(rel);
-			}
+    public void processConcept(I_GetConceptData concept) throws Exception {
+        if (testSpecification(concept)) {
+            // export the status refset for this concept
+            I_ConceptAttributePart latest = referenceSetExport.getLatestAttributePart(concept);
+            if (latest == null) {
+                getLog().warn(
+                    "Concept " + concept + " is exportable but has no parts valid for statuses " + allowedStatuses
+                        + " and positions " + positions);
+                return;
+            }
 
-			// export description refsets
-			for (I_DescriptionVersioned desc : concept.getDescriptions()) {
-				processDescription(desc);
-			}
-		} else {
-			getLog().warn("Skipping : " + concept.getInitialText());
-		}
-	}
+            exportRefsets(concept.getConceptId());
 
-	private void processDescription(I_DescriptionVersioned versionedDesc)
-			throws Exception {
-		boolean exportableVersionFound = false;
-		I_DescriptionPart latest = null;
-		for (I_DescriptionPart part : versionedDesc.getMutableParts()) {
-			if (testSpecification(part.getTypeId())
-					&& allowedStatuses.contains(part.getStatusId())
-					&& referenceSetExport.checkPath(part.getPathId())) {
+            // export relationship refsets
+            for (I_RelVersioned rel : concept.getSourceRels()) {
+                processRelationship(rel);
+            }
 
-				exportableVersionFound = true;
-				if (latest == null || latest.getVersion() < part.getVersion()) {
-					latest = part;
-				}
+            // export description refsets
+            for (I_DescriptionVersioned desc : concept.getDescriptions()) {
+                processDescription(desc);
+            }
+        } else {
+            getLog().warn("Skipping : " + concept.getInitialText());
+        }
+    }
 
-			}
-		}
+    private void processDescription(I_DescriptionVersioned versionedDesc) throws Exception {
+        boolean exportableVersionFound = false;
+        I_DescriptionPart latest = null;
+        for (I_DescriptionPart part : versionedDesc.getMutableParts()) {
+            if (testSpecification(part.getTypeId()) && allowedStatuses.contains(part.getStatusId())
+                && referenceSetExport.checkPath(part.getPathId())) {
 
-		if (exportableVersionFound) {
-			// found a valid version of this relationship for export
-			// therefore export its extensions
-			int descId = versionedDesc.getDescId();
-			exportRefsets(descId);
-		}
-	}
+                exportableVersionFound = true;
+                if (latest == null || latest.getVersion() < part.getVersion()) {
+                    latest = part;
+                }
 
-	@SuppressWarnings("deprecation")
-	private void processRelationship(I_RelVersioned versionedRel)
-			throws Exception {
-		if (testSpecification(versionedRel.getC2Id())) {
-			boolean exportableVersionFound = false;
-			I_RelPart latest = null;
-			for (I_RelPart part : versionedRel.getMutableParts()) {
-				if (testSpecification(part.getCharacteristicId())
-						&& testSpecification(part.getPathId())
-						&& testSpecification(part.getRefinabilityId())
-						&& testSpecification(part.getTypeId())
-						&& allowedStatuses.contains(part.getStatusId())
-						&& referenceSetExport.checkPath(part.getPathId())) {
+            }
+        }
 
-					exportableVersionFound = true;
-					if (latest == null
-							|| latest.getVersion() < part.getVersion()) {
-						latest = part;
-					}
-				}
-			}
-			if (exportableVersionFound) {
-				// found a valid version of this relationship for export
-				// therefore export its extensions
-				int relId = versionedRel.getRelId();
-				exportRefsets(relId);
-			}
-		}
-	}
+        if (exportableVersionFound) {
+            // found a valid version of this relationship for export
+            // therefore export its extensions
+            int descId = versionedDesc.getDescId();
+            exportRefsets(descId);
+        }
+    }
 
-	/**
-	 * Exports the refset to file.
-	 * 
-	 * @param thinExtByRefTuple
-	 *            The concept extension to write to file.
-	 * 
-	 * @throws Exception
-	 *             on DB or file error.
-	 */
-	private void exportRefsets(int refsetId) throws TerminologyException,
-			Exception {
-		Collection<? extends I_ExtendByRef> extensions = tf
-				.getRefsetExtensionMembers(refsetId);
-		for (I_ExtendByRef thinExtByRefVersioned : extensions) {
-			for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned
-					.getTuples(allowedStatuses, new PositionSetReadOnly(
-							positions), null, null)) {
-				export(thinExtByRefTuple);
-			}
-		}
-	}
+    @SuppressWarnings("deprecation")
+    private void processRelationship(I_RelVersioned versionedRel) throws Exception {
+        if (testSpecification(versionedRel.getC2Id())) {
+            boolean exportableVersionFound = false;
+            I_RelPart latest = null;
+            for (I_RelPart part : versionedRel.getMutableParts()) {
+                if (testSpecification(part.getCharacteristicId()) && testSpecification(part.getPathId())
+                    && testSpecification(part.getRefinabilityId()) && testSpecification(part.getTypeId())
+                    && allowedStatuses.contains(part.getStatusId()) && referenceSetExport.checkPath(part.getPathId())) {
 
-	void export(I_ExtendByRefVersion thinExtByRefTuple) throws Exception {
-		export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple
-				.getMemberId(), thinExtByRefTuple.getRefsetId(),
-				thinExtByRefTuple.getComponentId());
-	}
+                    exportableVersionFound = true;
+                    if (latest == null || latest.getVersion() < part.getVersion()) {
+                        latest = part;
+                    }
+                }
+            }
+            if (exportableVersionFound) {
+                // found a valid version of this relationship for export
+                // therefore export its extensions
+                int relId = versionedRel.getRelId();
+                exportRefsets(relId);
+            }
+        }
+    }
 
-	/**
-	 * Exports the refset to file.
-	 * 
-	 * @param thinExtByRefPart
-	 *            The concept extension to write to file.
-	 * @param memberId
-	 *            the id for this refset member record.
-	 * @param refsetId
-	 *            the refset id
-	 * @param componentId
-	 *            the referenced component
-	 * @throws Exception
-	 *             on DB errors or file write errors.
-	 */
-	void export(I_ExtendByRefPart thinExtByRefPart, Integer memberId,
-			int refsetId, int componentId) throws Exception {
-		RefsetType refsetType = refsetTypeMap.get(refsetId);
-		if (refsetType == null) {
-			try {
-				refsetType = RefsetType.findByExtension(thinExtByRefPart);
-			} catch (EnumConstantNotPresentException e) {
-				getLog().warn(
-						"No handler for tuple " + thinExtByRefPart
-								+ " of type " + thinExtByRefPart.getClass(), e);
-				return;
-			}
-			refsetTypeMap.put(refsetId, refsetType);
-		}
+    /**
+     * Exports the refset to file.
+     * 
+     * @param thinExtByRefTuple
+     *            The concept extension to write to file.
+     * 
+     * @throws Exception
+     *             on DB or file error.
+     */
+    private void exportRefsets(int refsetId) throws TerminologyException, Exception {
+        Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetId);
+        for (I_ExtendByRef thinExtByRefVersioned : extensions) {
+            for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
+                new PositionSetReadOnly(positions), null, null)) {
+                export(thinExtByRefTuple);
+            }
+        }
+    }
 
-		BufferedWriter uuidRefsetWriter = writerMap.get(refsetId + "UUID");
-		BufferedWriter sctIdRefsetWriter = writerMap.get(refsetId + "SCTID");
-		if (sctIdRefsetWriter == null) {
-			// must not have written to this file yet
-			I_GetConceptData refsetConcept = tf.getConcept(refsetId);
-			String refsetName = referenceSetExport
-					.getPreferredTerm(refsetConcept);
+    void export(I_ExtendByRefVersion thinExtByRefTuple) throws Exception {
+        export(thinExtByRefTuple.getMutablePart(), thinExtByRefTuple.getMemberId(), thinExtByRefTuple.getRefsetId(),
+            thinExtByRefTuple.getComponentId());
+    }
 
-			refsetName = refsetName.replace("/", "-");
-			refsetName = refsetName.replace("'", "_");
+    /**
+     * Exports the refset to file.
+     * 
+     * @param thinExtByRefPart
+     *            The concept extension to write to file.
+     * @param memberId
+     *            the id for this refset member record.
+     * @param refsetId
+     *            the refset id
+     * @param componentId
+     *            the referenced component
+     * @throws Exception
+     *             on DB errors or file write errors.
+     */
+    void export(I_ExtendByRefPart thinExtByRefPart, Integer memberId, int refsetId, int componentId) throws Exception {
+        RefsetType refsetType = refsetTypeMap.get(refsetId);
+        if (refsetType == null) {
+            try {
+                refsetType = RefsetType.findByExtension(thinExtByRefPart);
+            } catch (EnumConstantNotPresentException e) {
+                getLog()
+                    .warn("No handler for tuple " + thinExtByRefPart + " of type " + thinExtByRefPart.getClass(), e);
+                return;
+            }
+            refsetTypeMap.put(refsetId, refsetType);
+        }
 
-			if (releaseVersion == null) {
-				releaseVersion = referenceSetExport
-						.getReleaseVersion(refsetConcept);
-			}
+        BufferedWriter uuidRefsetWriter = writerMap.get(refsetId + "UUID");
+        BufferedWriter sctIdRefsetWriter = writerMap.get(refsetId + "SCTID");
+        if (sctIdRefsetWriter == null) {
+            // must not have written to this file yet
+            I_GetConceptData refsetConcept = tf.getConcept(refsetId);
+            String refsetName = referenceSetExport.getPreferredTerm(refsetConcept);
 
-			/*
-			 * <FileType>_<ContentType>_<ContentSubType>_<Country|Namespace>_
-			 * <Date>.<ext> e.g. der2_SCTID.Activities of daily
-			 * living.concept.refset_National_UK1999999_20090131.txt
-			 */
-			String sctIdFilePrefix = "der2_SCTID.";
-			String uuidFilePrefix = "der2_UUID.";
+            refsetName = refsetName.replace("/", "-");
+            refsetName = refsetName.replace("'", "_");
 
-			String fileName = null;
-			File exportFile = getExportFile(tf.getConcept(refsetId));
-			if (exportFile != null) {
-				fileName = exportFile.getName();
-				sctIdFilePrefix = "";
-				uuidFilePrefix = "";
-			}
-			if (fileName == null) {
-				fileName = refsetName + refsetType.getFileExtension() + "_"
-						+ rf2Descriptor.getContentSubType() + "_"
-						+ rf2Descriptor.getCountryCode()
-						+ rf2Descriptor.getNamespace() + "_" + releaseVersion
-						+ ".txt";
-			}
-			uuidRefsetWriter = new BufferedWriter(new FileWriter(new File(
-					uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
-			sctIdRefsetWriter = new BufferedWriter(new FileWriter(new File(
-					sctidRefsetOutputDirectory, sctIdFilePrefix + fileName)));
+            if (releaseVersion == null) {
+                releaseVersion = referenceSetExport.getReleaseVersion(refsetConcept);
+            }
 
-			writerMap.put(refsetId + "UUID", uuidRefsetWriter);
-			writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
+            /*
+             * <FileType>_<ContentType>_<ContentSubType>_<Country|Namespace>_
+             * <Date>.<ext> e.g. der2_SCTID.Activities of daily
+             * living.concept.refset_National_UK1999999_20090131.txt
+             */
+            String sctIdFilePrefix = "der2_SCTID.";
+            String uuidFilePrefix = "der2_UUID.";
 
-			sctIdRefsetWriter.write(refsetType.getRefsetHandler()
-					.getRF2HeaderLine());
-			uuidRefsetWriter.write(refsetType.getRefsetHandler()
-					.getRF2HeaderLine());
-			uuidRefsetWriter.newLine();
-			sctIdRefsetWriter.newLine();
-		}
+            String fileName = null;
+            File exportFile = getExportFile(tf.getConcept(refsetId));
+            if (exportFile != null) {
+                fileName = exportFile.getName();
+                sctIdFilePrefix = "";
+                uuidFilePrefix = "";
+            }
+            if (fileName == null) {
+                fileName =
+                        refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
+                            + rf2Descriptor.getCountryCode() + namespace + "_" + releaseVersion + ".txt";
+            }
+            uuidRefsetWriter =
+                    new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
+            sctIdRefsetWriter =
+                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix + fileName)));
 
-		// note that we are assuming that the type of refset member will be the
-		// same as previous for this file type
-		// if not we'll get a class cast exception, as we probably should
+            writerMap.put(refsetId + "UUID", uuidRefsetWriter);
+            writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
 
-		sctIdRefsetWriter.write(refsetType.getRefsetHandler()
-				.formatRefsetLineRF2(tf, thinExtByRefPart, memberId, refsetId,
-						componentId, true));
-		uuidRefsetWriter.write(refsetType.getRefsetHandler()
-				.formatRefsetLineRF2(tf, thinExtByRefPart, memberId, refsetId,
-						componentId, false));
-		uuidRefsetWriter.newLine();
-		sctIdRefsetWriter.newLine();
-	}
+            sctIdRefsetWriter.write(refsetType.getRefsetHandler().getRF2HeaderLine());
+            uuidRefsetWriter.write(refsetType.getRefsetHandler().getRF2HeaderLine());
+            uuidRefsetWriter.newLine();
+            sctIdRefsetWriter.newLine();
+        }
 
-	/**
-	 * Does the concept match the <code>exportSpecifications</code>
-	 * 
-	 * @param concept
-	 *            I_GetConceptData
-	 * @return true if a matching concept.
-	 * @throws Exception
-	 *             DB error
-	 */
-	boolean testSpecification(I_GetConceptData concept) throws Exception {
-		for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
-			if (spec.test(concept)
-					&& referenceSetExport.getLatestAttributePart(concept) != null) {
-				return true;
-			}
-		}
+        // note that we are assuming that the type of refset member will be the
+        // same as previous for this file type
+        // if not we'll get a class cast exception, as we probably should
+        sctIdRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLineRF2(tf, thinExtByRefPart, memberId,
+            refsetId, componentId, true, namespace, project));
+        uuidRefsetWriter.write(refsetType.getRefsetHandler().formatRefsetLineRF2(tf, thinExtByRefPart, memberId,
+            refsetId, componentId, false, namespace, project));
+        uuidRefsetWriter.newLine();
+        sctIdRefsetWriter.newLine();
+    }
 
-		return false;
-	}
+    /**
+     * Does the concept match the <code>exportSpecifications</code>
+     * 
+     * @param concept
+     *            I_GetConceptData
+     * @return true if a matching concept.
+     * @throws Exception
+     *             DB error
+     */
+    boolean testSpecification(I_GetConceptData concept) throws Exception {
+        for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
+            if (spec.test(concept) && referenceSetExport.getLatestAttributePart(concept) != null) {
+                return true;
+            }
+        }
 
-	/**
-	 * Does the concept match the <code>exportSpecifications</code>
-	 * 
-	 * @param id
-	 *            concept it
-	 * @return true if a matching concept.
-	 * @throws TerminologyException
-	 *             DB error
-	 * @throws IOException
-	 *             DB error
-	 * @throws Exception
-	 *             DB error
-	 */
-	boolean testSpecification(int id) throws TerminologyException, IOException,
-			Exception {
-		return testSpecification(tf.getConcept(id));
-	}
+        return false;
+    }
 
-	File getExportFile(I_GetConceptData concept) throws Exception {
-		for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
-			if (spec.test(concept)) {
-				return spec.exportFile;
-			}
-		}
-		return null;
-	}
+    /**
+     * Does the concept match the <code>exportSpecifications</code>
+     * 
+     * @param id
+     *            concept it
+     * @return true if a matching concept.
+     * @throws TerminologyException
+     *             DB error
+     * @throws IOException
+     *             DB error
+     * @throws Exception
+     *             DB error
+     */
+    boolean testSpecification(int id) throws TerminologyException, IOException, Exception {
+        return testSpecification(tf.getConcept(id));
+    }
+
+    File getExportFile(I_GetConceptData concept) throws Exception {
+        for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
+            if (spec.test(concept)) {
+                return spec.exportFile;
+            }
+        }
+        return null;
+    }
 }

@@ -92,9 +92,10 @@ public abstract class MemberRefsetHandler {
      * @throws IOException
      * @throws TerminologyException
      */
-    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctId)
-            throws TerminologyException, IOException {
-        return formatRefsetLine(tf, tuple, tuple.getMemberId(), tuple.getRefsetId(), tuple.getComponentId(), sctId);
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctId, int namespace,
+            int project) throws TerminologyException, IOException {
+        return formatRefsetLine(tf, tuple, tuple.getMemberId(), tuple.getRefsetId(), tuple.getComponentId(), sctId,
+            namespace, project);
     }
 
     /**
@@ -111,14 +112,15 @@ public abstract class MemberRefsetHandler {
      * @throws IOException
      */
     public String formatRefsetLineRF2(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetNid,
-            int componentId, boolean sctId) throws TerminologyException, IOException {
-        String formattedLine = getRefsetAndReferencePart(tf, part, memberId, refsetNid, componentId, sctId);
+            int componentId, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
+        String formattedLine =
+                getRefsetAndReferencePart(tf, part, memberId, refsetNid, componentId, sctId, namespace, project);
 
         try {
             if (part instanceof I_ExtendByRefPartCid) {
                 I_ExtendByRefPartCid conceptPart = (I_ExtendByRefPartCid) part;
 
-                formattedLine += toId(tf, conceptPart.getC1id(), sctId);
+                formattedLine += toId(tf, conceptPart.getC1id(), sctId, namespace, project);
             } else if (part instanceof I_ExtendByRefPartStr) {
                 I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) part;
 
@@ -165,16 +167,16 @@ public abstract class MemberRefsetHandler {
      *             DB errors
      */
     private String getRefsetAndReferencePart(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetNid,
-            int componentId, boolean useSctId) throws TerminologyException, IOException {
+            int componentId, boolean useSctId, int namespace, int project) throws TerminologyException, IOException {
         StringBuffer formattedLine = new StringBuffer();
 
         Collection<UUID> statusUuids = tf.getUids(part.getStatusId());
-        String id = getMemberId(part, memberId, useSctId, componentId, refsetNid);
+        String id = getMemberId(part, memberId, useSctId, componentId, refsetNid, namespace, project);
         String effectiveDate = getDate(tf, part.getVersion());
         boolean active = isActiveStatus(statusUuids);
-        String moduleId = toId(tf, getModule().getConceptId(), useSctId);
-        String refsetId = toId(tf, refsetNid, useSctId);
-        String referencedComponentId = toId(tf, componentId, useSctId);
+        String moduleId = toId(tf, getModule().getConceptId(), useSctId, namespace, project);
+        String refsetId = toId(tf, refsetNid, useSctId, namespace, project);
+        String referencedComponentId = toId(tf, componentId, useSctId, namespace, project);
 
         formattedLine.append(id);
         formattedLine.append(FILE_DELIMITER);
@@ -217,7 +219,7 @@ public abstract class MemberRefsetHandler {
      * @throws IOException
      */
     public String formatRefsetAsSubset(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, String subsetId,
-            int componentNid, boolean sctId) throws TerminologyException, IOException {
+            int componentNid, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
 
         try {
 
@@ -232,7 +234,7 @@ public abstract class MemberRefsetHandler {
                     statusInt = 0;
                 }
 
-                String componentId = toId(tf, componentNid, sctId);
+                String componentId = toId(tf, componentNid, sctId, namespace, project);
 
                 return subsetId + FILE_DELIMITER + componentId + FILE_DELIMITER + statusInt;
             } else {
@@ -266,15 +268,17 @@ public abstract class MemberRefsetHandler {
     }
 
     public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart tuple, Integer memberId, int refsetId,
-            int componentId, boolean sctId) throws TerminologyException, IOException {
-        return getMemberId(tuple, memberId, sctId, componentId, refsetId) + FILE_DELIMITER
-            + toId(tf, tuple.getPathId(), sctId) + FILE_DELIMITER + getDate(tf, tuple.getVersion()) + FILE_DELIMITER
-            + toId(tf, tuple.getStatusId(), sctId) + FILE_DELIMITER + toId(tf, refsetId, sctId) + FILE_DELIMITER
-            + toId(tf, componentId, sctId);
+            int componentId, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
+        return getMemberId(tuple, memberId, sctId, componentId, refsetId, namespace, project) + FILE_DELIMITER
+            + toId(tf, tuple.getPathId(), sctId, namespace, project) + FILE_DELIMITER + getDate(tf, tuple.getVersion())
+            + FILE_DELIMITER + toId(tf, tuple.getStatusId(), sctId, namespace, project) + FILE_DELIMITER
+            + toId(tf, refsetId, sctId, namespace, project) + FILE_DELIMITER
+            + toId(tf, componentId, sctId, namespace, project);
     }
 
-    private String getMemberId(I_ExtendByRefPart tuple, Integer memberId, boolean sctId, int componentNid, int refsetNid)
-            throws UnsupportedEncodingException, TerminologyException, IOException {
+    private String getMemberId(I_ExtendByRefPart tuple, Integer memberId, boolean sctId, int componentNid,
+            int refsetNid, int namespace, int project) throws UnsupportedEncodingException, TerminologyException,
+            IOException {
         I_TermFactory tf = Terms.get();
         UUID uuid;
         if (memberId == null) {
@@ -306,7 +310,7 @@ public abstract class MemberRefsetHandler {
             // }
             // }
             // return String.valueOf(-1);
-            return Long.toString(getSctGenerator().getWithGeneration(uuid, TYPE.SUBSET));
+            return Long.toString(getSctGenerator(namespace, project).getWithGeneration(uuid, TYPE.SUBSET));
         } else {
             return uuid.toString();
         }
@@ -316,7 +320,8 @@ public abstract class MemberRefsetHandler {
         return dateFormat.format(tf.convertToThickVersion(version));
     }
 
-    public String toId(I_TermFactory tf, int componentId, boolean sctId) throws TerminologyException, IOException {
+    public String toId(I_TermFactory tf, int componentId, boolean sctId, int namespace, int project)
+            throws TerminologyException, IOException {
         if (sctId) {
             // TODO this assumes that the componentId is a concept! it might be
             // a description or relationship
@@ -326,15 +331,16 @@ public abstract class MemberRefsetHandler {
             if (snomedId != null) {
                 return snomedId; // TODO need to add to map?
             } else {
-                return Long.toString(getSctGenerator().getWithGeneration(tf.getUids(componentId).iterator().next(),
-                    TYPE.CONCEPT));
+                return Long.toString(getSctGenerator(namespace, project).getWithGeneration(
+                    tf.getUids(componentId).iterator().next(), TYPE.CONCEPT));
             }
         } else { // uuid
             return tf.getUids(componentId).iterator().next().toString();
         }
     }
 
-    public String generateNewSctId(int refsetId, int subsetVersion) throws TerminologyException, IOException {
+    public String generateNewSctId(int refsetId, int subsetVersion, int namespace, int project)
+            throws TerminologyException, IOException {
         UUID refsetUuid = Terms.get().getUids(refsetId).iterator().next();
 
         // generate a new UUID from refset ID + subset version
@@ -347,7 +353,7 @@ public abstract class MemberRefsetHandler {
         }
 
         // use this new UUID in the SCT generator
-        return Long.toString(getSctGenerator().getWithGeneration(versionedRefsetUuid, TYPE.CONCEPT));
+        return Long.toString(getSctGenerator(namespace, project).getWithGeneration(versionedRefsetUuid, TYPE.CONCEPT));
     }
 
     public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
@@ -359,7 +365,7 @@ public abstract class MemberRefsetHandler {
         List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
         I_IdPart latestPart = null;
         for (I_IdPart part : parts) {
-            if (latestPart == null || part.getVersion() >= latestPart.getVersion()) {
+            if (latestPart == null || part.getTime() >= latestPart.getTime()) {
                 if (part.getAuthorityNid() == snomedIntegerId) {
                     latestPart = part;
                 }
@@ -374,9 +380,9 @@ public abstract class MemberRefsetHandler {
 
     }
 
-    private static synchronized UuidSnomedMapHandler getSctGenerator() throws IOException {
+    private static synchronized UuidSnomedMapHandler getSctGenerator(int namespace, int project) throws IOException {
         if (sctGenerator == null) {
-            sctGenerator = new UuidSnomedMapHandler(fixedMapDirectory, readWriteMapDirectory);
+            sctGenerator = new UuidSnomedMapHandler(fixedMapDirectory, readWriteMapDirectory, namespace, project);
         }
         return sctGenerator;
     }
