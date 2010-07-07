@@ -1073,14 +1073,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @SuppressWarnings("unchecked")
     public final boolean addRevision(R r) {
+    	AceLog.getAppLog().info("addRevision called r = "+r.toString());
         boolean returnValue = false;
         Concept c = getEnclosingConcept();
+        
         if (revisions == null) {
+        	AceLog.getAppLog().info("revisions == null");
             revisions = new CopyOnWriteArrayList<R>();
             returnValue = revisions.add(r);
         } else if (revisions.size() == 0) {
+        	AceLog.getAppLog().info("revisions.size() == 0");
             returnValue = revisions.add(r);
         } else if (revisions.get(revisions.size() - 1) != r) {
+        	AceLog.getAppLog().info("revisions.get(revisions.size() - 1) != r");
             returnValue = revisions.add(r);
         }
         r.primordialComponent = (C) this;
