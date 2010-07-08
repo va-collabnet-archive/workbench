@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- Replace this parent with your organization's parent -->
   <parent>
-    <groupId>org.dwfa</groupId>
-		<artifactId>dwfa-pom</artifactId>
-		<version>3</version>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>ihtsdo-parent</artifactId>
+    <version>1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo.sample</groupId>
@@ -87,19 +87,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-			        <version>2.4.3</version>
-				</plugin>
-				<plugin>
           <groupId>org.ihtsdo</groupId>
           <artifactId>wb-bdb-mojo</artifactId>
           <version>${wb-toolkit.version}</version>
@@ -169,40 +156,4 @@
       </modules>
     </profile>
   </profiles>
-    <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.
-         These should be pushed into the parent POM -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            <!-- To be reviewed, currently daily is the default
-            <updatePolicy>never</updatePolicy>
-            -->
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            <!-- To be reviewed, currently daily is the default
-            <updatePolicy>never</updatePolicy>
-            -->
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </repository>
-    </repositories>
 </project>
