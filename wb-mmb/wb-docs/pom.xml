@@ -232,7 +232,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>${project.groupId}</groupId>
+				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-dita-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<executions>
