@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ !
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.dwfa</groupId>
-        <artifactId>dwfa-pom</artifactId>
-        <version>3</version>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>ihtsdo-wb-parent</artifactId>
+        <version>1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
     <version>2.6.0-SNAPSHOT</version>
-    <name>Workbench modules multi-module build</name>
+    <name>IHTSDO Workbench Toolkit</name>
     <packaging>pom</packaging>
-    <description>multi-module build for the Workbench modules (dwfa-pom, foundation, 
-                 dwfa-mojo, core, ace-api, vodb and term-mojo)</description>
+    <description>
+      The IHTSDO Workbench provides two software frameworks for terminology-focused applications: one for build-process
+      automation, and another for interactive development environments. These frameworks provide application skeletons
+      that can be customized by an application developer to meet unique needs of their end users.
+    </description>
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/trunk/wb-mmb</developerConnection>
@@ -33,59 +51,18 @@
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.dwfa</groupId>
-                    <artifactId>dwfa-mojo</artifactId>
-                    <version>${project.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>1.0-beta-1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+      <pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/tags/</tagBase>
-                    <preparationGoals>clean validate</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <remoteTagging>true</remoteTagging>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-release-plugin</artifactId>
+              <configuration>
+                <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/tags/</tagBase>
+              </configuration>
+          </plugin>
         </plugins>
+      </pluginManagement>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
     <modules>
         <module>wb-foundation</module>
         <module>wb-core</module>
@@ -97,53 +74,4 @@
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>
   </modules>
-    <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.
-         These should be pushed into the parent POM -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            <!-- To be reviewed, currently daily is the default
-            <updatePolicy>never</updatePolicy>
-            -->
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/all/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            <!-- To be reviewed, currently daily is the default
-            <updatePolicy>never</updatePolicy>
-            -->
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </repository>
-    </repositories>
-  <!-- TODO: to be moved into a organisational parent POM -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>maestro_ihtsdo.wb-snapshots</id>
-      <name>IHTSDO Workbench Snapshots Repository</name>
-      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>maestro_ihtsdo.wb-releases</id>
-      <name>IHTSDO Workbench Releases Repository</name>
-      <url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
-    </repository>
-  </distributionManagement>
 </project>
