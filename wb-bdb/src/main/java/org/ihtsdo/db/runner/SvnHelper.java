@@ -97,7 +97,7 @@ public class SvnHelper {
 
 					if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 						for (String svnSpec : svnCheckoutOnStart) {
-							activity.setProgressInfoLower("Checkout: " + svnSpec);
+							activity.setProgressInfoLower("Checkout: " + svnSpec.substring(0, svnSpec.indexOf('|')));
 							handleSvnCheckout(changeLocations, svnSpec);
 						}
 					}

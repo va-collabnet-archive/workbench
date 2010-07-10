@@ -83,7 +83,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
 
-        try {
 			ec.setPrimordialUuid(c.getPrimUuid());
 			ec.setConceptAttributes(processConceptAttributes(c, changed));
 			ec.setDescriptions(processDescriptions(c, changed));
