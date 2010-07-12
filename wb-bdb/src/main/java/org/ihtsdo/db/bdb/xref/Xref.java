@@ -263,18 +263,27 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
 				// copy readOnlyXref record over to mutable.
 				mutableXref.get().putIfAbsent(nid, currentPairs);
 			}
+			/*
+			 * public static void arraycopy(Object src,
+                             int srcPos,
+                             Object dest,
+                             int destPos,
+                             int length)
+			 */
 			while (true) {
 				int index = Arrays.binarySearch(currentPairs, pairAsLong);
 				if (index < 0) {
 					return; // it's removed already.
 				}
 				newPairs = new long[currentPairs.length - 1];
-				if (index > 0) {
+				if (index == 0) {
+					System.arraycopy(currentPairs, 1, newPairs, 0, currentPairs.length - 1);
+				} else {
 					System.arraycopy(currentPairs, 0, newPairs, 0, index - 1);
-				}
-				if (index < currentPairs.length) {
-					System.arraycopy(currentPairs, index, newPairs, index + 1,
-							currentPairs.length - index);
+					if (index < currentPairs.length) {
+						System.arraycopy(currentPairs, index + 1, newPairs, index,
+								currentPairs.length - index);
+					}
 				}
 				if (mutableXref.get().replace(nid, currentPairs, newPairs)) {
 					return;

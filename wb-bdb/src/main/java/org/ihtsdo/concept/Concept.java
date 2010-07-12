@@ -272,6 +272,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     private int nid;
     private I_ManageConceptData data;
 
+	private boolean removeInvalidXrefs = false;
+
     public boolean hasMediaExtensions() throws IOException {
     	if (data.getImageNids() == null || data.getImageNids().size() == 0) {
     		return false;
@@ -936,7 +938,7 @@ public class Concept implements I_Transact, I_GetConceptData {
             }
         }
 
-        if (invalidPairs.size() > 0) {
+        if (removeInvalidXrefs  && invalidPairs.size() > 0) {
             for (NidPair pair : invalidPairs) {
                Bdb.forgetXrefPair(nid, pair);
             }
