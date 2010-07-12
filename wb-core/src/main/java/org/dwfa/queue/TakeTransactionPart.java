@@ -40,7 +40,8 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
     private T processDesc;
     private SortedSet<T> processesInfoSortedSet;
     private Set<T> uncommittedTakes;
-    private File processFile;
+    private File originalProcessFile;
+    private File newProcessFile;
     private ActionListener listener;
     private ObjectServerCore server;
 
@@ -48,36 +49,37 @@ public class TakeTransactionPart<T extends I_DescribeObject> implements I_Transa
      * @param objDesc
      * @param processesInfoSortedSet2
      * @param uncommittedTakes2
-     * @param processFile
+     * @param originalProcessFile
      */
     public TakeTransactionPart(T objDesc, SortedSet<T> processesInfoSortedSet, Set<T> uncommittedTakes,
-            File processFile, ActionListener listener, ObjectServerCore server) {
+            File newProcessFile, File originalProcessFile, ActionListener listener, ObjectServerCore server) {
         super();
         this.processDesc = objDesc;
         this.processesInfoSortedSet = processesInfoSortedSet;
         this.uncommittedTakes = uncommittedTakes;
-        this.processFile = processFile;
+        this.originalProcessFile = originalProcessFile;
+        this.newProcessFile = newProcessFile;
         this.listener = listener;
         this.server = server;
     }
 
     /**
-     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager,
-     *      long, java.util.Date)
+     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager, long,
+     *      java.util.Date)
      */
     public void commit(TransactionManager mgr, long id, Date commitDate) {
-        processFile.delete();
+        originalProcessFile.delete();
+        newProcessFile.delete();
         this.uncommittedTakes.remove(processDesc);
     }
 
     /**
-     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager,
-     *      long)
+     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager, long)
      */
     public void abort(TransactionManager mgr, long id) {
         this.processesInfoSortedSet.add(processDesc);
         this.uncommittedTakes.remove(processDesc);
-        this.server.undoTake(processFile);
+        this.server.undoTake(newProcessFile);
         this.listener.actionPerformed(new ActionEvent(this, 0, "abort"));
     }
 
