@@ -129,6 +129,11 @@ public class DatabaseExportTest extends ConceptMockery {
         expect(termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9"))).andReturn(adrs);
         replay(adrs);
 
+        I_GetConceptData sctAuModule = createMock(I_GetConceptData.class);
+        expect(sctAuModule.getNid()).andReturn(234234234);
+        expect(termFactory.getConcept(UUID.fromString("bbd4b076-8637-46d4-8ce9-609909566999"))).andReturn(sctAuModule);
+        replay(sctAuModule);
+
         //set the default namespace
         setField(databaseExportClass, databaseExport, "defaultNamespace", NAMESPACE.NEHTA.getDigits());
 

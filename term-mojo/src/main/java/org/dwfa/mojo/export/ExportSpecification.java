@@ -218,6 +218,8 @@ public class ExportSpecification {
     private static final String EN_GB = "en-GB";
     private static final String EN_AU = "en-AU";
 
+    private I_GetConceptData adrsConceptParent;
+
     /**
      * Setup member variables/meta data
      *
@@ -310,7 +312,7 @@ public class ExportSpecification {
         //TODO this needs to be re factored...
         adrsNid = termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9")).getNid();
 
-        structuralRefsets.add(adrsNid);
+        //structuralRefsets.add(adrsNid);
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6f1e56b5-c127-4f0b-97fa-cb72c76ad58a")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("ef010cf1-cf06-4c8a-9684-a040e61b319d")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("f8834d2f-4e2d-4793-a9e0-5190391ad277")).getNid());
@@ -322,7 +324,6 @@ public class ExportSpecification {
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("622aa587-2e34-43b3-b3d4-53561aa3c7be")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6c441f26-ed8a-42ff-91b7-fcb27191f9f6")).getNid());
 
-
         setPositions(positions);
         setInclusions(inclusions);
         setExclusions(exclusions);
@@ -332,6 +333,8 @@ public class ExportSpecification {
 
         uuidSnomedDbMapHandler = UuidSnomedDbMapHandler.getInstance();
         uuidSnomedDbMapHandler.updateNextSequenceMap();
+
+        adrsConceptParent = termFactory.getConcept(UUID.fromString("bbd4b076-8637-46d4-8ce9-609909566999"));
 
         extensionProcessor = new ExtensionProcessor<I_ThinExtByRefPart>();
     }
@@ -395,7 +398,9 @@ public class ExportSpecification {
             }
 
             if (generateLangaugeRefset) {
+                if(adrsConceptParent.isParentOf(concept, false) || adrsConceptParent.equals(concept)){
                 updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
+                }
             }
 
             Set<I_RelTuple> latestRelationshipTuples = new HashSet<I_RelTuple>();
@@ -661,7 +666,7 @@ public class ExportSpecification {
         for (I_DescriptionTuple currentDescription : latestsConceptDescriptionTuples) {
             if (currentDescription.getStatusId() == activeConcept.getNid() || currentDescription.getStatusId() == currentConcept.getNid()) {
                 if (currentDescription.getTypeId() == preferredDescriptionType.getNid()) {
-                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true);
+                    latestPreferredTerm = getAdrsVersion(currentDescription, latestPreferredTerm, true, true);
                 } else if (currentDescription.getTypeId() == synonymDescriptionType.getNid()) {
                     latestSynonyms = getAdrsVersion(currentDescription, latestSynonyms, false);
                 } else if (currentDescription.getTypeId() == unspecifiedDescriptionType.getNid()) {
@@ -729,7 +734,7 @@ public class ExportSpecification {
                 I_ThinExtByRefPartConcept conceptExtension = new ThinExtByRefPartConcept();
 
                 conceptExtension.setC1id(desctriptionTypeNid);
-                conceptExtension.setPathId(releasePart.getPathId());
+                conceptExtension.setPathId(releasePart.getStatusId());
                 conceptExtension.setStatusId(releasePart.getStatusId());
                 conceptExtension.setVersion(releasePart.getVersion());
 
@@ -785,15 +790,14 @@ public class ExportSpecification {
         if(!adrsTuples.isEmpty()){
             adrsTuple = adrsTuples.get(0);
         }
-        selectedAdrsTuple = getAdrsVersion(currentTuple, adrsTuple, usAllowed);
+        selectedAdrsTuple = getAdrsVersion(currentTuple, adrsTuple, usAllowed, false);
 
         if (adrsTuple == null && selectedAdrsTuple != null) {
             adrsTuples.add(selectedAdrsTuple);
         } else if(selectedAdrsTuple != null && selectedAdrsTuple.getDescId() != currentTuple.getDescId()
-                && selectedAdrsTuple.getLang().equals(currentTuple.getLang())
-                && selectedAdrsTuple.getVersion() == currentTuple.getVersion()){
+                && selectedAdrsTuple.getLang().equals(currentTuple.getLang())){
             adrsTuples.add(currentTuple);
-        } else if(selectedAdrsTuple != null && selectedAdrsTuple.getDescId() != adrsTuple.getDescId()
+        } else if(selectedAdrsTuple != null
                 && (!selectedAdrsTuple.getLang().equals(adrsTuple.getLang())
                 || selectedAdrsTuple.getVersion() > adrsTuple.getVersion())) {
             adrsTuples.clear();
@@ -813,7 +817,7 @@ public class ExportSpecification {
      * @return I_DescriptionVersioned
      */
     private I_DescriptionTuple getAdrsVersion(I_DescriptionTuple currentTuple, I_DescriptionTuple adrsTuple,
-            boolean usAllowed) {
+            boolean usAllowed, boolean getLatest) {
         if (adrsTuple != null) {
             if (currentTuple.getLang().equals(EN_AU)) {
                 adrsTuple = currentTuple;
@@ -830,7 +834,7 @@ public class ExportSpecification {
                         || currentTuple.getLang().equals(EN_AU))) {
                 adrsTuple = currentTuple;
             } else if (adrsTuple.getLang().equals(currentTuple.getLang())
-                && currentTuple.getVersion() > adrsTuple.getVersion()) {
+                    && getLatest && currentTuple.getVersion() > adrsTuple.getVersion()) {
                 adrsTuple = currentTuple;
             }
         } else {
