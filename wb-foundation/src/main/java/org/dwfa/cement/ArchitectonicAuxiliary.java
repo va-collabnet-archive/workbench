@@ -89,7 +89,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
 
 
-
         USER_PERMISSION("user permission",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
               ADD_USER("add user permission",
@@ -771,6 +770,12 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     						new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     				VIEW_PROJECT_REPORTS_PERMISSION("view project reports permission",
     	    	    		new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
+    	    CONFIGURATION_MANAGER_ROLE("configuration role",
+    	    	    new I_ConceptualizeUniversally[] { USER_ROLE }),
+    	    	    MODIFY_EDITOR_MODE_PERMISSION("modify editor mode permission", 
+    	    	    		new I_ConceptualizeUniversally[] { CONFIGURATION_MANAGER_ROLE }),
+    	    	    
+
     		WORKSET_MANAGER_ROLE("workset manager role",
     	    		new I_ConceptualizeUniversally[] { USER_ROLE }),
     	    		WORKSET_CREATE_PERMISSION("workset create permission",
