@@ -30,6 +30,7 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -38,6 +39,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -64,6 +66,8 @@ import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
+
+import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class TransporterLabel extends JLabel implements I_ContainTermComponent, ActionListener {
 
@@ -121,8 +125,14 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
             }
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
-            dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
-                (I_GetConceptData) termComponent), dsl);
+            try {
+				dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+				    (I_GetConceptData) termComponent), dsl);
+			} catch (InvalidDnDOperationException e) {
+                AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [5]");
+                SunDragSourceContextPeer.setDragDropInProgress(false);
+			}
         }
     }
 

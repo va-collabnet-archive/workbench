@@ -54,6 +54,8 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
+import sun.awt.dnd.SunDragSourceContextPeer;
+
 /**
  * 
  * @author kec
@@ -118,7 +120,8 @@ public class ConceptLabel extends JEditorPane {
             try {
                 dge.startDrag(DragSource.DefaultCopyDrop, null, null, createTransferable(c), this);
             } catch (InvalidDnDOperationException e) {
-                System.out.println(e.toString());
+                e.printStackTrace();
+                SunDragSourceContextPeer.setDragDropInProgress(false);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

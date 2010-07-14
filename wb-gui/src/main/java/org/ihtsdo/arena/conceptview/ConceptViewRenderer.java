@@ -1,0 +1,247 @@
+package org.ihtsdo.arena.conceptview;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+
+import org.dwfa.ace.ACE;
+
+import com.mxgraph.model.mxCell;
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
+
+/**
+ * @author Administrator
+ * 
+ */
+public class ConceptViewRenderer extends JComponent
+{
+
+	private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
+
+		@Override
+		public void componentMoved(ComponentEvent e) {
+			settings.hideNavigator();
+		}
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+			settings.hideNavigator();
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent event) {
+			settings.hideNavigator();
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent event) {
+			settings.hideNavigator();
+		}
+
+		@Override
+		public void ancestorAdded(AncestorEvent event) {
+			settings.hideNavigator();
+		}
+		
+	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2106746763664760745L;
+
+ 
+    /**
+     * 
+     */
+    protected static ConceptViewRenderer dragSource = null;
+
+    /**
+     * 
+     */
+    protected static int sourceRow = 0;
+
+    /**
+     * 
+     */
+    protected mxCell cell;
+
+    /**
+     * 
+     */
+    protected mxGraphComponent graphContainer;
+
+    /**
+     * 
+     */
+    protected mxGraph graph;
+
+    /**
+     * 
+     */
+    public JComponent renderedComponent;
+
+	private ConceptViewSettings settings;
+
+
+	private ConceptViewTitle title;
+
+		
+    /**
+     * 
+     */
+    public ConceptViewRenderer(Object cellObj,
+            final mxGraphComponent graphContainer, ACE ace)
+    {
+        this.cell = (mxCell) cellObj;
+        this.graphContainer = graphContainer;
+        this.graph = graphContainer.getGraph();
+        this.settings = (ConceptViewSettings) this.cell.getValue();
+        this.settings.setup(ace, cell, graphContainer, graph, this);
+        this.settings.addHostListener(new HostListener());
+        setLayout(new BorderLayout());
+
+        title = new ConceptViewTitle(graph, cell, settings);
+
+        add(title, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = null;
+
+         if (graph.getModel().getChildCount(cell) == 0)  {
+             renderedComponent = settings.getComponent(ace.getAceFrameConfig());
+             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
+                 scrollPane = (JScrollPane) renderedComponent;
+             } else {
+                 scrollPane = new JScrollPane(renderedComponent);
+             }
+        }
+
+		if (scrollPane != null) {
+            add(scrollPane, BorderLayout.CENTER);
+            scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            scrollPane.getViewport().setBackground(Color.WHITE);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            setOpaque(true);
+			scrollPane.getVerticalScrollBar().addAdjustmentListener(
+					new AdjustmentListener() {
+
+						public void adjustmentValueChanged(AdjustmentEvent e) {
+							graphContainer.refresh();
+						}
+
+					});
+			scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
+		}
+
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = new Insets(0, 8, 0, 0);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+
+        gbc.gridx++;
+        footerPanel.add(new JLabel("global: "), gbc);
+
+        gbc.gridx++;
+        JButton globalCancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
+        globalCancelButton.setBorder(BorderFactory.createEmptyBorder());
+        footerPanel.add(globalCancelButton, gbc);
+        
+        gbc.gridx++;
+        JButton globalCommitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
+        globalCommitButton.setBorder(BorderFactory.createEmptyBorder());
+        footerPanel.add(globalCommitButton, gbc);
+        
+        gbc.weightx = 1;
+        JPanel fillerPanel = new JPanel();
+        fillerPanel.setBackground(footerPanel.getBackground());
+        
+        footerPanel.add(fillerPanel, gbc);
+        
+        gbc.weightx = 0;
+        gbc.gridx++;
+        footerPanel.add(new JLabel("concept: "), gbc);
+        
+        gbc.gridx++;
+        JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
+        cancelButton.setBorder(BorderFactory.createEmptyBorder());
+        footerPanel.add(cancelButton, gbc);
+        
+        gbc.gridx++;
+        JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
+        commitButton.setBorder(BorderFactory.createEmptyBorder());
+        footerPanel.add(commitButton, gbc);
+        
+        gbc.gridx++;
+        footerPanel.add(settings.getResizeLabel(), gbc);
+        footerPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.gray));
+        add(footerPanel, BorderLayout.SOUTH);
+
+
+        setMinimumSize(new Dimension(40, 20));
+        RendererComponentAdaptor rca = new RendererComponentAdaptor();
+        addAncestorListener(rca);
+        addComponentListener(rca);
+    }
+
+
+    private void updateLabel() {
+    	title.updateTitle();
+    }
+
+
+
+    /**
+     * 
+     */
+    public static ConceptViewRenderer getVertex(Component component)
+    {
+        while (component != null)
+        {
+            if (component instanceof ConceptViewRenderer)
+            {
+                return (ConceptViewRenderer) component;
+            }
+            component = component.getParent();
+        }
+
+        return null;
+    }
+
+    private class HostListener implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			updateLabel();
+		}
+    	
+    }
+ }

@@ -72,6 +72,8 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
+import sun.awt.dnd.SunDragSourceContextPeer;
+
 public class JTreeWithDragImage extends JTree {
 
     private class TermLabelDragSourceListener implements DragSourceListener {
@@ -126,7 +128,9 @@ public class JTreeWithDragImage extends JTree {
                     Point imageOffset = new Point(-10, -(dragImage.getHeight(JTreeWithDragImage.this) + 1));
                     dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(obj), dsl);
                 } catch (InvalidDnDOperationException e) {
-                    AceLog.getAppLog().info(e.toString());
+                    AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                    AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [4]");
+                    SunDragSourceContextPeer.setDragDropInProgress(false);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }

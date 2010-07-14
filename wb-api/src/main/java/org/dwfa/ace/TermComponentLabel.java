@@ -17,9 +17,11 @@
 package org.dwfa.ace;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -33,6 +35,7 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -43,6 +46,7 @@ import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -53,6 +57,8 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -65,6 +71,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+
+import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent, ClipboardOwner {
 
@@ -90,8 +98,19 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 	private I_AmTermComponent termComponent;
 
     private I_ConfigAceFrame config;
+    
+    private boolean lineWrapEnabled = false;
+    private int fixedWidth = 150;
 
-    private class TermLabelDragSourceListener implements DragSourceListener {
+    public boolean isLineWrapEnabled() {
+		return lineWrapEnabled;
+	}
+
+	public void setLineWrapEnabled(boolean lineWrapEnabled) {
+		this.lineWrapEnabled = lineWrapEnabled;
+	}
+
+	private class TermLabelDragSourceListener implements DragSourceListener {
 
         public void dragDropEnd(DragSourceDropEvent dsde) {
             // TODO Auto-generated method stub
@@ -256,8 +275,14 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         public void dragGestureRecognized(DragGestureEvent dge) {
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
-            dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
-                (I_GetConceptData) termComponent), dsl);
+            try {
+				dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+				    (I_GetConceptData) termComponent), dsl);
+			} catch (InvalidDnDOperationException e) {
+                AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [1]");
+                SunDragSourceContextPeer.setDragDropInProgress(false);
+			}
         }
     }
 
@@ -314,7 +339,6 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     public void focusGained(FocusEvent e) {
         setBorder(hasFocusBorder);
-
     }
 
     public void focusLost(FocusEvent e) {
@@ -332,7 +356,17 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     private boolean frozen = false;
 
-    /*
+	private Dimension wrapSize = new Dimension(fixedWidth, 16);
+
+    public int getFixedWidth() {
+		return fixedWidth;
+	}
+
+	public void setFixedWidth(int fixedWidth) {
+		this.fixedWidth = fixedWidth;
+	}
+
+	/*
      * (non-Javadoc)
      * 
      * @see
@@ -384,7 +418,85 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         }
     }
 
-    public void addTermChangeListener(PropertyChangeListener l) {
+	@Override
+	public void setText(String text) {
+        setBorder(noFocusBorder);
+		if (lineWrapEnabled) {
+			if (!BasicHTML.isHTMLString(text)) {
+				text = "<html>" + text;
+			}
+	    	super.setText(text);
+	        View v = BasicHTML.createHTMLView(this, getText());
+	        v.setSize(fixedWidth, 0);
+	        float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+	        if (prefYSpan > 16) {
+	        	wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
+	        	setSize(wrapSize);
+	        } else {
+	        	wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
+	        	setSize(wrapSize);
+	        }
+		} else {
+			super.setText(text);
+		}
+	}
+
+    @Override
+	public void setSize(Dimension d) {
+		if (lineWrapEnabled) {
+			super.setSize(wrapSize);
+		} else {
+			super.setSize(d);
+		}
+	}
+
+	@Override
+	public void setSize(int width, int height) {
+		if (lineWrapEnabled) {
+			super.setSize(wrapSize.width, wrapSize.height);
+		} else {
+			super.setSize(width, height);
+		}
+	}
+
+	
+	@Override
+	public void setBounds(int x, int y, int width, int height) {
+		if (lineWrapEnabled)
+			super.setBounds(x, y, wrapSize.width, wrapSize.height);
+	}
+
+	@Override
+	public void setBounds(Rectangle r) {
+		setBounds(r.x, r.y, r.width, r.height);
+	}
+
+	@Override
+	public Dimension getMaximumSize() {
+		if (lineWrapEnabled)
+			return wrapSize;
+		return super.getMaximumSize();
+	}
+
+	@Override
+	public Dimension getMinimumSize() {
+		if (lineWrapEnabled)
+			return wrapSize;
+		return super.getMinimumSize();
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		if (lineWrapEnabled)
+			return wrapSize;
+		return super.getPreferredSize();
+	}
+
+	
+	
+	
+
+	public void addTermChangeListener(PropertyChangeListener l) {
         addPropertyChangeListener("termComponent", l);
     }
 

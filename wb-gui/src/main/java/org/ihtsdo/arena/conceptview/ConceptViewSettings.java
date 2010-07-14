@@ -3,7 +3,6 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -23,7 +22,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -38,7 +36,6 @@ import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
-import org.ihtsdo.arena.editor.ArenaRenderer;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
 
@@ -48,15 +45,19 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private static final long serialVersionUID = 1L;
 
 	private static final int dataVersion = 1;
+	
+	public enum SIDE {RIGHT, LEFT};
 
 	// dataVersion = 1;
 	private Integer linkedTab = null;
 	
 	// transient
 	private ConceptView view;
-	private JComponent navigator;
+	private ConceptNavigator navigator;
 
 	private JTreeWithDragImage navigatorTree;
+
+	private JToggleButton navButton;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -142,13 +143,20 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	@Override
 	public List<AbstractButton> getSpecializedButtons() {
 		List<AbstractButton> buttons = new ArrayList<AbstractButton>();
-		buttons.add(getNavigatorButton());
+		navButton = getNavigatorButton();
+		buttons.add(navButton);
 		return buttons;
 	}
 	
-	protected AbstractButton getNavigatorButton() {
-		AbstractButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
-                ArenaRenderer.class.getResource("/16x16/plain/compass.png")))
+	public void hideNavigator() {
+		if (navButton.isSelected()) {
+			navButton.doClick();
+		}
+	}
+	
+	protected JToggleButton getNavigatorButton() {
+		JToggleButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/compass.png")))
         {
 
         	/**
@@ -163,10 +171,16 @@ public class ConceptViewSettings extends ArenaComponentSettings {
              	if (showNavigator) {
             		setNavigatorLocation();
             		getNavigator().setVisible(true);
+             		if (((JToggleButton) e.getSource()).isSelected() == false) {
+                		((JToggleButton) e.getSource()).setSelected(true);
+             		}
             	} else {
             		getNavigator().setVisible(false);
             		getNavigator().invalidate();
              		layers.remove(getNavigator());
+             		if (((JToggleButton) e.getSource()).isSelected()) {
+                		((JToggleButton) e.getSource()).setSelected(false);
+             		}
             	}
             }
 
@@ -180,21 +194,23 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	}
 
 	private void setNavigatorLocation() {
+		int space = 5;
    		JLayeredPane layers = renderer.getRootPane().getLayeredPane();
 		Point loc = SwingUtilities.convertPoint(renderer, new Point(0,0), layers);
-		if (layers.getWidth() > loc.x + renderer.getWidth() + getNavigator().getWidth()) {
-			loc.x = loc.x + renderer.getWidth();
-			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
+		if (layers.getWidth() > loc.x + renderer.getWidth() + getNavigator().getWidth() + space) {
+			loc.x = loc.x + renderer.getWidth() + space;
+			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+			getNavigator().setDropSide(SIDE.RIGHT);
 		} else {
-			loc.x = loc.x - getNavigator().getWidth();
-			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
+			loc.x = loc.x - getNavigator().getWidth() - space;
+			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+			getNavigator().setDropSide(SIDE.LEFT);
 		}
 		getNavigator().setBounds(loc.x, loc.y, getNavigator().getWidth(), renderer.getHeight());
 		layers.add(getNavigator(), JLayeredPane.PALETTE_LAYER);
 	}
 
-	
-	protected JComponent getNavigator() {
+	protected ConceptNavigator getNavigator() {
 		if (navigator == null) {
 			try {
 				TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(ace.getAceFrameConfig(),
@@ -202,11 +218,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				JScrollPane treeScroller = hierarchicalTreeHelper.getHierarchyPanel();
 				navigatorTree =  (JTreeWithDragImage) treeScroller.getViewport().getView();
 				navigatorTree.setFont(navigatorTree.getFont().deriveFont(getFontSize()));
-				navigator = new JPanel(new GridLayout(1,1));
-				navigator.add(treeScroller);
+				navigator = new ConceptNavigator(treeScroller, ace.getAceFrameConfig());
 				navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
 				navigator.setOpaque(true);
-				navigator.setBounds(0, 0, 450, 20);
+				navigator.setBounds(0, 0, 350, 20);
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
@@ -224,8 +239,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				}
 			}
 		}
-		
-
 		return navigator;
 	}
 

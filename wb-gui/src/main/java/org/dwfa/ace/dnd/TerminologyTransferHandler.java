@@ -71,6 +71,9 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
+import org.ihtsdo.arena.conceptview.ConceptViewTitle;
+import org.ihtsdo.arena.conceptview.FocusDrop;
+import org.ihtsdo.arena.conceptview.I_AcceptConcept;
 
 public class TerminologyTransferHandler extends TransferHandler {
 
@@ -266,6 +269,37 @@ public class TerminologyTransferHandler extends TransferHandler {
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("import: " + comp);
         }
+        if (I_AcceptConcept.class.isAssignableFrom(comp.getClass())) {
+        	try {
+        		I_AcceptConcept title = (I_AcceptConcept) comp;
+				if (t.isDataFlavorSupported(conceptBeanFlavor)) {
+				    Object obj = t.getTransferData(conceptBeanFlavor);
+				    if (obj == null) {
+				        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				            AceLog.getAppLog().fine("t has null obj " + t);
+				            AceLog.getAppLog().fine("t has null obj " + Arrays.asList(t.getTransferDataFlavors()));
+				        }
+				        return false;
+				    }
+				    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+				        AceLog.getAppLog().fine("Transfer data for conceptBeanFlavor is: " + obj);
+				    }
+				    if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
+				        ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
+				        title.setConcept(cbt.getCoreBean());
+		                return true;
+				    } else {
+				        title.setConcept((I_GetConceptData) obj);
+		                return true;
+				    }
+				}
+			} catch (UnsupportedFlavorException e) {
+                AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+            } catch (IOException e) {
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+            }
+        }
+
         if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
             I_ContainTermComponent ictc = (I_ContainTermComponent) comp;
             try {
@@ -469,6 +503,20 @@ public class TerminologyTransferHandler extends TransferHandler {
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
         if (AceLog.getAppLog().isLoggable(Level.FINE)) {
             AceLog.getAppLog().fine("Can import: " + comp.getClass().getCanonicalName());
+        }
+        if (ConceptViewTitle.class.isAssignableFrom(comp.getClass())) {
+            for (DataFlavor f : transferFlavors) {
+                if (f.equals(conceptBeanFlavor)) {
+                    return true;
+                }
+            }
+        }
+        if (FocusDrop.class.isAssignableFrom(comp.getClass())) {
+            for (DataFlavor f : transferFlavors) {
+                if (f.equals(conceptBeanFlavor)) {
+                    return true;
+                }
+            }
         }
         if (I_ContainTermComponent.class.isAssignableFrom(comp.getClass())) {
             for (DataFlavor f : transferFlavors) {

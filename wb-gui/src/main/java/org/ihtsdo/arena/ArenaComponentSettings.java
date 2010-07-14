@@ -41,7 +41,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.ihtsdo.arena.editor.ArenaRenderer;
+import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
@@ -80,7 +80,7 @@ public abstract class ArenaComponentSettings implements Serializable,
     protected JLabel resizeLabel;
     protected mxGraphComponent graphContainer;
     protected JComponent preferences;
-    protected ArenaRenderer renderer;
+    protected JComponent renderer;
 	private DefaultMutableTreeNode prefRoot;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
@@ -119,7 +119,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 	}
 
 	public void setup(ACE ace, mxCell cell, mxGraphComponent graphContainer, 
-			mxGraph graph, ArenaRenderer renderer) {
+			mxGraph graph, JComponent renderer) {
 		this.ace = ace;
 		this.cell = cell;
 		this.graphContainer = graphContainer;
@@ -243,7 +243,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 	
 	protected AbstractButton getButtonPreferencesButton() {
 		AbstractButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
-                ArenaRenderer.class.getResource("/16x16/plain/preferences.png")))
+                ConceptViewRenderer.class.getResource("/16x16/plain/preferences.png")))
         {
 
         	/**
@@ -277,7 +277,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 	
 	protected AbstractButton getButton(String iconLocStr, String toolTipStr) {
 		AbstractButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
-                ArenaRenderer.class.getResource(iconLocStr)))
+                ConceptViewRenderer.class.getResource(iconLocStr)))
         {
 
         	/**
@@ -301,8 +301,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 	
 	public JLabel getResizeLabel() {
 		if (resizeLabel == null) {
-	        resizeLabel = new JLabel(new ImageIcon(ArenaRenderer.class
-	                .getResource(ArenaComponentSettings.IMAGE_PATH + "resize.gif")));
+	        resizeLabel = new JLabel(new ImageIcon(ACE.class.getResource("/16x16/plain/resize.gif")));
 	        resizeLabel.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
 	        ResizeHandler resizeHandler = new ResizeHandler();
 	        resizeLabel.addMouseListener(resizeHandler);
@@ -328,7 +327,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 
 	private JButton getCollapseExpandButton() {
 		JButton button = new JButton(new AbstractAction("", new ImageIcon(
-                ArenaRenderer.class.getResource(IMAGE_PATH + "minimize.gif")))
+                ConceptViewRenderer.class.getResource(IMAGE_PATH + "minimize.gif")))
         {
 
         	/**
@@ -348,7 +347,7 @@ public abstract class ArenaComponentSettings implements Serializable,
                 graph.foldCells(collapsed, false, new Object[] { cell });
                 ((JButton) e.getSource())
                         .setIcon(new ImageIcon(
-                                ArenaRenderer.class
+                                ConceptViewRenderer.class
                                         .getResource(IMAGE_PATH
                                                 + ((graph.isCellCollapsed(cell)) ? "maximize.gif"
                                                         : "minimize.gif"))));

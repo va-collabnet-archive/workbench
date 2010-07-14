@@ -37,6 +37,7 @@ import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.KeyEvent;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -73,6 +74,8 @@ import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+
+import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class JTableWithDragImage extends JTable {
     /**
@@ -126,7 +129,9 @@ public class JTableWithDragImage extends JTable {
                         dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, t, dsl);
                     }
                 } catch (InvalidDnDOperationException e) {
-                    AceLog.getAppLog().info(e.toString());
+                    AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                    AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [3]");
+                    SunDragSourceContextPeer.setDragDropInProgress(false);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }

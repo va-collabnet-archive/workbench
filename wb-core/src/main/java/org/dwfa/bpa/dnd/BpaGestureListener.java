@@ -99,7 +99,7 @@ public class BpaGestureListener implements DragGestureListener {
                     ev.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, transferable, dragSource);
                 } catch (InvalidDnDOperationException e) {
                     logger.log(Level.WARNING, e.getMessage(), e);
-                    logger.log(Level.INFO, "Resetting SunDragSourceContextPeer");
+                    logger.log(Level.INFO, "Resetting SunDragSourceContextPeer [2]");
                     SunDragSourceContextPeer.setDragDropInProgress(false);
                 }
             } catch (UnsupportedFlavorException e) {
@@ -110,6 +110,7 @@ public class BpaGestureListener implements DragGestureListener {
 
         } catch (InvalidDnDOperationException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            SunDragSourceContextPeer.setDragDropInProgress(false);
         } catch (Exception ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
         }

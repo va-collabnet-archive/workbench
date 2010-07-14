@@ -1,8 +1,10 @@
 package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.TransferHandler;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -66,7 +71,8 @@ public class ConceptView extends JPanel {
 				GridBagConstraints gbc = new GridBagConstraints();
 				gbc.weightx = 1;
 				gbc.weighty = 0;
-				gbc.fill = GridBagConstraints.BOTH;
+				gbc.anchor = GridBagConstraints.NORTHWEST;
+				gbc.fill = GridBagConstraints.HORIZONTAL;
 				gbc.gridheight = 1;
 				gbc.gridwidth = 1;
 				gbc.gridx = 1;
@@ -77,9 +83,6 @@ public class ConceptView extends JPanel {
 					this.add(getDescComponent(desc), gbc);
 					gbc.gridy++;
 				}
-				
-
-				
 				
 				List<I_RelTuple> group = relGroups.get(0);
 				if (group != null) {
@@ -110,19 +113,20 @@ public class ConceptView extends JPanel {
 	public JComponent getRelGroupComponent(List<I_RelTuple> group) throws TerminologyException, IOException {
 		JPanel relPanel = new JPanel(new GridBagLayout());
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-		JLabel relLabel = new JLabel("   ");
+		JLabel relLabel = getJLabel("   ");
 		relLabel.setBackground(Color.GREEN);
 		relLabel.setOpaque(true);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
 		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridheight = group.size();
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		relPanel.add(relLabel, gbc);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx = 1;
 		gbc.weightx = 1;
 		gbc.gridheight = 1;
@@ -137,27 +141,92 @@ public class ConceptView extends JPanel {
 	public JComponent getDescComponent(I_DescriptionVersioned desc) throws TerminologyException, IOException {
 		JPanel descPanel = new JPanel(new GridBagLayout());
 		descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-		JLabel descLabel = new JLabel("   ");
+		JLabel descLabel = getJLabel("   ");
 		descLabel.setBackground(Color.ORANGE);
 		descLabel.setOpaque(true);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		descPanel.add(descLabel, gbc);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx++;
 		descPanel.add(getLabel(desc.getFirstTuple().getTypeId()), gbc);
 		gbc.gridx++;
 		descPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
 		gbc.weightx = 1;		
 		gbc.gridx++;
-		JLabel textLabel = new JLabel(desc.getFirstTuple().getText());
+		JLabel textLabel = new JLabel() {
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			
+			int fixedWidth = 150;
+			
+		    Dimension wrapSize = new Dimension();
+		    
+		    @Override
+			public void setSize(Dimension d) {
+				setSize(d.width, d.height);
+			}
+
+			@Override
+			public void setSize(int width, int height) {
+				super.setSize(fixedWidth, height);
+			}
+			
+			@Override
+			public void setBounds(int x, int y, int width, int height) {
+				super.setBounds(x, y, wrapSize.width, wrapSize.height);
+			}
+
+			@Override
+			public void setBounds(Rectangle r) {
+				setBounds(r.x, r.y, r.width, r.height);
+			}
+
+			@Override
+			public Dimension getMaximumSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public Dimension getPreferredSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public void setText(String text) {
+				if (!BasicHTML.isHTMLString(text)) {
+					text = "<html>" + text;
+				}
+            	super.setText(text);
+                View v = BasicHTML.createHTMLView(this, getText());
+                v.setSize(fixedWidth, 0);
+                float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+                if (prefYSpan > 16) {
+                	wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
+                	setSize(wrapSize);
+                } else {
+                	wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
+                	setSize(wrapSize);
+                }
+			}
+		};
+		
 		textLabel.setFont(textLabel.getFont().deriveFont(settings.getFontSize()));
+		textLabel.setText(desc.getFirstTuple().getText());
 		descPanel.add(textLabel, gbc);
 		return descPanel;
 	}
@@ -165,19 +234,20 @@ public class ConceptView extends JPanel {
 	public JComponent getRelTemplate() throws TerminologyException, IOException {
 		JPanel relPanel = new JPanel(new GridBagLayout());
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-		JLabel relLabel = new JLabel("   ");
+		JLabel relLabel = getJLabel(" T ");
 		relLabel.setBackground(Color.YELLOW);
 		relLabel.setOpaque(true);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		relPanel.add(relLabel, gbc);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx++;
 		relPanel.add(getLabel(ArchitectonicAuxiliary.Concept.RELATIONSHIP.localize().getNid()), gbc);
 		gbc.gridx++;
@@ -192,14 +262,14 @@ public class ConceptView extends JPanel {
 	public JComponent getRelComponent(I_RelTuple r) throws TerminologyException, IOException {
 		JPanel relPanel = new JPanel(new GridBagLayout());
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-		JLabel relLabel = new JLabel("   ");
+		JLabel relLabel = getJLabel("   ");
 		relLabel.setBackground(Color.BLUE);
 		relLabel.setOpaque(true);
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.WEST;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.weightx = 0;
 		gbc.weighty = 0;
-		gbc.fill = GridBagConstraints.BOTH;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
@@ -216,10 +286,19 @@ public class ConceptView extends JPanel {
 		return relPanel;
 	}
 
+	private JLabel getJLabel(String text) {
+		JLabel l = new JLabel(text);
+		l.setTransferHandler(new TransferHandler("text"));
+		l.setFont(l.getFont().deriveFont(settings.getFontSize()));
+		l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+		return l;
+	}
 
 	private TermComponentLabel getLabel(int nid)
 			throws TerminologyException, IOException {
 		TermComponentLabel termLabel = new TermComponentLabel();
+		termLabel.setLineWrapEnabled(true);
+		termLabel.setFixedWidth(100);
 		termLabel.setFont(termLabel.getFont().deriveFont(settings.getFontSize()));
 		termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 		termLabel.setTermComponent(Terms.get().getConcept(nid));

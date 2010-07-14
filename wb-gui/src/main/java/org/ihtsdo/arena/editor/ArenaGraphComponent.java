@@ -4,7 +4,12 @@ package org.ihtsdo.arena.editor;
 import java.awt.Component;
 
 import org.dwfa.ace.ACE;
+import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
+import org.ihtsdo.arena.taxonomyview.TaxonomyViewRenderer;
+import org.ihtsdo.arena.taxonomyview.TaxonomyViewSettings;
 
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
@@ -56,7 +61,12 @@ public class ArenaGraphComponent extends mxGraphComponent
      */
     public Component[] createComponents(mxCellState state) {
         if (getGraph().getModel().isVertex(state.getCell())) {
-            return new Component[] { new ArenaRenderer(state.getCell(), this, ace) };
+        	mxCell cell = (mxCell) state.getCell();
+        	if (ConceptViewSettings.class.isAssignableFrom(cell.getValue().getClass())) {
+                return new Component[] { new ConceptViewRenderer(state.getCell(), this, ace) };
+        	} else  if (TaxonomyViewSettings.class.isAssignableFrom(cell.getValue().getClass())) {
+                return new Component[] { new TaxonomyViewRenderer(state.getCell(), this, ace) };
+        	}
         }
         return null;
     }
