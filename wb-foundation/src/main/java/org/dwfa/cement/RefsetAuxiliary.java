@@ -450,7 +450,10 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 	    		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
 		ISSUE_REPOSITORY_METADATA_REFSET(new String[] { "Issue repository metadata refset", "Issue repository metadata refset" }, 
         		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
-		
+        		
+		DEFAULT_TRANSLATION_PROJECT_CONFIG(new String[] { "Default translation project config refset", "Default translation project config refset" }, 
+				new I_ConceptualizeUniversally[] {REFSET_AUXILIARY}),
+
         		
 		LANGUAGE_REFSET(new String[] { "language refset", "language refset" }, 
 	    		new I_ConceptualizeUniversally[] {REFSET_IDENTITY}),
@@ -461,7 +464,13 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 	    		LANGUAGE_REFSET_ES(new String[] { "spanish language refset", "spanish language refset" }, 
 	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
 	    		LANGUAGE_REFSET_SV_SE(new String[] { "swedish sweden language refset", "swedish sweden language refset" }, 
-	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),;			
+	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),			
+		        LANGUAGE_REFSET_DA(new String[] { "danish language refset", "danish language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),			
+		        LANGUAGE_REFSET_FR(new String[] { "french language refset", "french language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),		
+		        LANGUAGE_REFSET_FR_CA(new String[] { "french-canadian language refset", "french-canadian language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),;			
 
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
