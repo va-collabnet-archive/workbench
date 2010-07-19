@@ -13,9 +13,9 @@ public abstract class EIdentifier extends ERevision {
     public static final long serialVersionUID = 1;
     protected UUID authorityUuid;
 
-    public EIdentifier(DataInput in) throws IOException, ClassNotFoundException {
+    public EIdentifier(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EIdentifier() {
@@ -23,8 +23,8 @@ public abstract class EIdentifier extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         authorityUuid = new UUID(in.readLong(), in.readLong());
     }
 

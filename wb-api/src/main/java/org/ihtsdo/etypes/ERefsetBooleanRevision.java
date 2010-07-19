@@ -18,9 +18,9 @@ public class ERefsetBooleanRevision extends ERevision {
         super();
     }
 
-    public ERefsetBooleanRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetBooleanRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetBooleanRevision(I_ExtendByRefPartBoolean part) throws TerminologyException, IOException {
@@ -31,8 +31,8 @@ public class ERefsetBooleanRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         booleanValue = in.readBoolean();
     }
 

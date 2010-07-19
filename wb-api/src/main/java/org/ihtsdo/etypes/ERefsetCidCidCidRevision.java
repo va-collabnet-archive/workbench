@@ -17,9 +17,9 @@ public class ERefsetCidCidCidRevision extends ERevision {
     protected UUID c2Uuid;
     protected UUID c3Uuid;
 
-    public ERefsetCidCidCidRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetCidCidCidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetCidCidCidRevision(I_ExtendByRefPartCidCidCid part) throws TerminologyException,
@@ -37,8 +37,8 @@ public class ERefsetCidCidCidRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         c2Uuid = new UUID(in.readLong(), in.readLong());
         c3Uuid = new UUID(in.readLong(), in.readLong());

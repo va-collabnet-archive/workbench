@@ -19,9 +19,9 @@ public class EConceptAttributes extends EComponent<EConceptAttributesRevision> i
         super();
     }
 
-    public EConceptAttributes(DataInput in) throws IOException, ClassNotFoundException {
+    public EConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EConceptAttributes(I_ConceptAttributeVersioned conceptAttributes) throws TerminologyException, IOException {
@@ -41,14 +41,14 @@ public class EConceptAttributes extends EComponent<EConceptAttributesRevision> i
         }
     }
 
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         defined = in.readBoolean();
         int versionCount = in.readInt();
         if (versionCount > 0) {
             revisions = new ArrayList<EConceptAttributesRevision>(versionCount);
             for (int i = 0; i < versionCount; i++) {
-                revisions.add(new EConceptAttributesRevision(in));
+                revisions.add(new EConceptAttributesRevision(in, dataVersion));
             }
         }
     }

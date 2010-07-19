@@ -21,9 +21,9 @@ public class ERefsetIntMember extends ERefsetMember<ERefsetIntRevision> {
 
     protected List<ERefsetIntRevision> extraVersions;
 
-    public ERefsetIntMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetIntMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -69,14 +69,14 @@ public class ERefsetIntMember extends ERefsetMember<ERefsetIntRevision> {
 	}
 
 	@Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         intValue = in.readInt();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             extraVersions = new ArrayList<ERefsetIntRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                extraVersions.add(new ERefsetIntRevision(in));
+                extraVersions.add(new ERefsetIntRevision(in, dataVersion));
             }
         }
     }

@@ -11,12 +11,14 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 
 public class ERevision implements I_VersionExternally {
 
     public static final long serialVersionUID = 1;
+    private static final UUID userUuid = ArchitectonicAuxiliary.Concept.USER.getUids().iterator().next();
 
     protected static UUID nidToUuid(int nid) throws TerminologyException, IOException {
         return Terms.get().getId(nid).getUUIDs().iterator().next();
@@ -38,22 +40,28 @@ public class ERevision implements I_VersionExternally {
         return Terms.get().getAllExtensionsForComponent(nid);
     }
 
-    protected UUID pathUuid;
     protected UUID statusUuid;
-    protected long time = Long.MIN_VALUE;
+    protected UUID authorUuid = userUuid;
+    protected UUID pathUuid;
+	protected long time = Long.MIN_VALUE;
 
-    public ERevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERevision() {
         super();
     }
 
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         pathUuid = new UUID(in.readLong(), in.readLong());
         statusUuid = new UUID(in.readLong(), in.readLong());
+        if (dataVersion >= 3) {
+        	authorUuid = new UUID(in.readLong(), in.readLong());
+        } else {
+         	authorUuid = userUuid;
+        }
         time = in.readLong();
         assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE. Was it initialized?";
     }
@@ -62,8 +70,13 @@ public class ERevision implements I_VersionExternally {
         assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE. Was it initialized?";
         out.writeLong(pathUuid.getMostSignificantBits());
         out.writeLong(pathUuid.getLeastSignificantBits());
+        
         out.writeLong(statusUuid.getMostSignificantBits());
         out.writeLong(statusUuid.getLeastSignificantBits());
+        
+        out.writeLong(authorUuid.getMostSignificantBits());
+        out.writeLong(authorUuid.getLeastSignificantBits());
+        
         out.writeLong(time);
     }
 
@@ -111,10 +124,12 @@ public class ERevision implements I_VersionExternally {
      */
     public String toString() {
         StringBuffer buff = new StringBuffer();
-        buff.append(" pathUuid:");
-        buff.append(this.pathUuid);
         buff.append(" statusUuid:");
         buff.append(this.statusUuid);
+        buff.append(" authorUuid:");
+        buff.append(this.authorUuid);
+        buff.append(" pathUuid:");
+        buff.append(this.pathUuid);
         buff.append(" Time:");
         buff.append("(" + new Date(this.time) + " " + this.time + ")");
         return buff.toString();
@@ -165,5 +180,13 @@ public class ERevision implements I_VersionExternally {
         }
         return false;
     }
+
+    public UUID getAuthorUuid() {
+		return authorUuid;
+	}
+
+	public void setAuthorUuid(UUID authorUuid) {
+		this.authorUuid = authorUuid;
+	}
 
 }

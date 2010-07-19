@@ -18,9 +18,9 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
 
     protected long longValue;
 
-    public ERefsetLongMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetLongMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -51,14 +51,14 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         longValue = in.readLong();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<ERefsetLongRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERefsetLongRevision(in));
+                revisions.add(new ERefsetLongRevision(in, dataVersion));
             }
         }
     }

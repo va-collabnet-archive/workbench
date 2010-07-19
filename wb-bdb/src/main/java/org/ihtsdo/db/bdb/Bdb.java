@@ -216,18 +216,20 @@ public class Bdb {
 		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";
 		assert version.getPathUuid() != null: "Path is null; was it initialized?";
+		assert version.getAuthorUuid() != null: "Author is null; was it initialized?";
 		return statusAtPositionDb.getSapNid(
 				uuidToNid(version.getStatusUuid()), 
+				uuidToNid(version.getAuthorUuid()),
 				uuidToNid(version.getPathUuid()), 
 				version.getTime());
 	}
 
-	public static int getSapNid(int statusNid, int pathNid, long time) {
+	public static int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
 		assert time != 0: "Time is 0; was it initialized?";
 		assert time != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert statusNid != Integer.MIN_VALUE: "Status is Integer.MIN_VALUE; was it initialized?";
 		assert pathNid != Integer.MIN_VALUE: "Path is Integer.MIN_VALUE; was it initialized?";
-		return statusAtPositionDb.getSapNid(statusNid, pathNid, time);
+		return statusAtPositionDb.getSapNid(statusNid, authorNid, pathNid, time);
 	}
 
 	public static StatusAtPositionBdb getSapDb() {
@@ -533,4 +535,5 @@ public class Bdb {
     
         return statBuff.toString().replace("\n", "<br>");
     }
+
 }

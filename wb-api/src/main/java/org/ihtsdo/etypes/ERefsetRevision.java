@@ -12,9 +12,9 @@ public class ERefsetRevision extends ERevision {
 
     protected static final long serialVersionUID = 1;
 
-    public ERefsetRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetRevision(I_ExtendByRefPart part) throws TerminologyException, IOException {
@@ -28,8 +28,8 @@ public class ERefsetRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
     }
 
     @Override

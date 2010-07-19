@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
@@ -630,7 +631,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         if (getTime() == time && getPathId() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		RelationshipRevision newR = new RelationshipRevision(this, statusNid, pathNid, time, this);
+		RelationshipRevision newR = new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
 		addRevision(newR);
 		return newR;
 	}

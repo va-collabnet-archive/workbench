@@ -20,9 +20,9 @@ public class ERefsetMemberMember extends ERefsetMember<ERefsetRevision> {
         super();
     }
 
-    public ERefsetMemberMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetMemberMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetMemberMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -48,13 +48,13 @@ public class ERefsetMemberMember extends ERefsetMember<ERefsetRevision> {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<ERefsetRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERefsetRevision(in));
+                revisions.add(new ERefsetRevision(in, dataVersion));
             }
         }
     }

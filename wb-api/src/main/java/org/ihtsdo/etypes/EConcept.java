@@ -185,7 +185,7 @@ public class EConcept implements I_AmChangeSetObject {
 		}
     };
 
-    protected static final int dataVersion = 2;
+    protected static final int dataVersion = 3;
     protected EConceptAttributes conceptAttributes;
     protected List<EDescription> descriptions;
     protected List<ERelationship> relationships;
@@ -210,34 +210,34 @@ public class EConcept implements I_AmChangeSetObject {
             throw new IOException("Unsupported dataVersion: " + readDataVersion);
         }
         if (readDataVersion == 1) {
-            conceptAttributes = new EConceptAttributes(in);
+            conceptAttributes = new EConceptAttributes(in, readDataVersion);
             primordialUuid = conceptAttributes.primordialUuid;
         } else {
         	primordialUuid = new UUID(in.readLong(), in.readLong());
         	int attributeCount = in.readByte();
         	if (attributeCount == 1) {
-                conceptAttributes = new EConceptAttributes(in);
+                conceptAttributes = new EConceptAttributes(in, readDataVersion);
         	}
         }
         int descCount = in.readInt();
         if (descCount > 0) {
             descriptions = new ArrayList<EDescription>(descCount);
             for (int i = 0; i < descCount; i++) {
-                descriptions.add(new EDescription(in));
+                descriptions.add(new EDescription(in, readDataVersion));
             }
         }
         int relCount = in.readInt();
         if (relCount > 0) {
             relationships = new ArrayList<ERelationship>(relCount);
             for (int i = 0; i < relCount; i++) {
-                relationships.add(new ERelationship(in));
+                relationships.add(new ERelationship(in, readDataVersion));
             }
         }
         int imgCount = in.readInt();
         if (imgCount > 0) {
             images = new ArrayList<EImage>(imgCount);
             for (int i = 0; i < imgCount; i++) {
-                images.add(new EImage(in));
+                images.add(new EImage(in, readDataVersion));
             }
         }
         int refsetMemberCount = in.readInt();
@@ -247,40 +247,40 @@ public class EConcept implements I_AmChangeSetObject {
                 REFSET_TYPES type = REFSET_TYPES.readType(in);
                 switch (type) {
                 case CID:
-                    refsetMembers.add(new ERefsetCidMember(in));
+                    refsetMembers.add(new ERefsetCidMember(in, readDataVersion));
                     break;
                 case CID_CID:
-                    refsetMembers.add(new ERefsetCidCidMember(in));
+                    refsetMembers.add(new ERefsetCidCidMember(in, readDataVersion));
                     break;
                 case MEMBER:
-                    refsetMembers.add(new ERefsetMemberMember(in));
+                    refsetMembers.add(new ERefsetMemberMember(in, readDataVersion));
                     break;
                 case CID_CID_CID:
-                    refsetMembers.add(new ERefsetCidCidCidMember(in));
+                    refsetMembers.add(new ERefsetCidCidCidMember(in, readDataVersion));
                     break;
                 case CID_CID_STR:
-                    refsetMembers.add(new ERefsetCidCidStrMember(in));
+                    refsetMembers.add(new ERefsetCidCidStrMember(in, readDataVersion));
                     break;
                 case INT:
-                    refsetMembers.add(new ERefsetIntMember(in));
+                    refsetMembers.add(new ERefsetIntMember(in, readDataVersion));
                     break;
                 case STR:
-                    refsetMembers.add(new ERefsetStrMember(in));
+                    refsetMembers.add(new ERefsetStrMember(in, readDataVersion));
                     break;
                 case CID_INT:
-                    refsetMembers.add(new ERefsetCidIntMember(in));
+                    refsetMembers.add(new ERefsetCidIntMember(in, readDataVersion));
                     break;
                 case BOOLEAN:
-                    refsetMembers.add(new ERefsetBooleanMember(in));
+                    refsetMembers.add(new ERefsetBooleanMember(in, readDataVersion));
                     break;
                 case CID_FLOAT:
-                    refsetMembers.add(new ERefsetCidFloatMember(in));
+                    refsetMembers.add(new ERefsetCidFloatMember(in, readDataVersion));
                     break;
                 case CID_LONG:
-                    refsetMembers.add(new ERefsetCidLongMember(in));
+                    refsetMembers.add(new ERefsetCidLongMember(in, readDataVersion));
                     break;
                 case CID_STR:
-                    refsetMembers.add(new ERefsetCidStrMember(in));
+                    refsetMembers.add(new ERefsetCidStrMember(in, readDataVersion));
                     break;
                 default:
                     throw new UnsupportedOperationException("Can't handle refset type: " + type);

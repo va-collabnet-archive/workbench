@@ -156,4 +156,14 @@ public class MockTuple implements I_AmTuple {
 	     throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public int getAuthorNid() {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setAuthorNid(int authorNid) {
+	     throw new UnsupportedOperationException();
+	}
+
 }

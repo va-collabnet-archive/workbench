@@ -102,6 +102,16 @@ public class PartDateOrderSortComparatorTest {
     	     throw new UnsupportedOperationException();
     	}
 
+		@Override
+		public int getAuthorNid() {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setAuthorNid(int authorNid) {
+		     throw new UnsupportedOperationException();
+		}
+
     }
 
     private TestPart newestTestPart;

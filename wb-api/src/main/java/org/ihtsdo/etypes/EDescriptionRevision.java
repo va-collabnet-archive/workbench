@@ -20,9 +20,9 @@ public class EDescriptionRevision extends ERevision implements I_DescribeExterna
 
     protected UUID typeUuid;
 
-    public EDescriptionRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public EDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EDescriptionRevision(I_DescriptionPart part) throws TerminologyException, IOException {
@@ -40,8 +40,8 @@ public class EDescriptionRevision extends ERevision implements I_DescribeExterna
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         initialCaseSignificant = in.readBoolean();
         lang = in.readUTF();
         text = in.readUTF();

@@ -104,8 +104,14 @@ public class ConceptAttributes
 			    }
 				return rev.makeAnalog(statusNid, pathNid, time);
 			}
-			return new ConceptAttributesRevision(ConceptAttributes.this, 
-					statusNid, pathNid, time, ConceptAttributes.this);
+			try {
+				return new ConceptAttributesRevision(ConceptAttributes.this, 
+						statusNid, 
+						Terms.get().getAuthorNid(),
+						pathNid, time, ConceptAttributes.this);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} 
 		}
         @Override
         public ConceptAttributesRevision makeAnalog() {
@@ -414,7 +420,10 @@ public class ConceptAttributes
 	    if (getTime() == time && getPathId() == pathNid) {
 	        throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
 	    }
-		ConceptAttributesRevision newR = new ConceptAttributesRevision(this, statusNid, pathNid, time, this);
+		ConceptAttributesRevision newR;
+			newR = new ConceptAttributesRevision(this, statusNid, 
+					Terms.get().getAuthorNid(),
+					pathNid, time, this);
 		addRevision(newR);
 		return newR;
 	}

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -22,9 +22,9 @@ public class ERefsetCidLongMember extends ERefsetMember<ERefsetCidLongRevision> 
 
     protected List<ERefsetCidLongRevision> extraVersions;
 
-    public ERefsetCidLongMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetCidLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetCidLongMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -56,15 +56,15 @@ public class ERefsetCidLongMember extends ERefsetMember<ERefsetCidLongRevision> 
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         longValue = in.readLong();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             extraVersions = new ArrayList<ERefsetCidLongRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                extraVersions.add(new ERefsetCidLongRevision(in));
+                extraVersions.add(new ERefsetCidLongRevision(in, dataVersion));
             }
         }
     }

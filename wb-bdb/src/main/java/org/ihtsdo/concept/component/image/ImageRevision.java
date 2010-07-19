@@ -1,8 +1,12 @@
 package org.ihtsdo.concept.component.image;
 
+import java.io.IOException;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EImageRevision;
@@ -71,9 +75,12 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 }
 
 	protected ImageRevision(I_ImagePart another, int statusNid, 
+			int authorNid,
 			int pathNid, long time, 
 			Image primoridalMember) {
-		super(statusNid, pathNid, time, primoridalMember);
+		super(statusNid, 
+				authorNid, 
+				pathNid, time, primoridalMember);
 		this.textDescription = another.getTextDescription();
 		this.typeNid = another.getTypeId();
 	}
@@ -88,7 +95,9 @@ public class ImageRevision extends Revision<ImageRevision, Image>
             this.setStatusId(statusNid);
             return this;
         }
-		return new ImageRevision(this, statusNid, pathNid, time, this.primordialComponent);
+			return new ImageRevision(this, statusNid, 
+					Terms.get().getAuthorNid(), 
+					pathNid, time, this.primordialComponent);
 	}
 
 	@Override
@@ -101,7 +110,8 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	public ImageRevision(EImageRevision eiv, 
 			Image primoridalMember) {
 		super(Bdb.uuidToNid(eiv.getStatusUuid()), 
-			  Bdb.uuidToNid(eiv.getPathUuid()), 
+				  Bdb.uuidToNid(eiv.getAuthorUuid()), 
+				  Bdb.uuidToNid(eiv.getPathUuid()), 
 			  eiv.getTime(), primoridalMember);
 		this.textDescription = eiv.getTextDescription();
 		this.typeNid = Bdb.uuidToNid(eiv.getTypeUuid());

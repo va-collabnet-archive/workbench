@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.relationship;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
@@ -78,10 +79,10 @@ public class RelationshipRevision
 	        this.typeNid = primordialRel.getTypeNid();
 	    }
 
-	public RelationshipRevision(I_RelPart another, int statusNid,
+	public RelationshipRevision(I_RelPart another, int statusNid, int authorNid,
 			int pathNid, long time, 
 			Relationship primordialRel) {
-		super(statusNid, pathNid, time, primordialRel);
+		super(statusNid, authorNid, pathNid, time, primordialRel);
 		this.characteristicNid = another.getCharacteristicId();
 		this.group = another.getGroup();
 		this.refinabilityNid = another.getRefinabilityId();
@@ -100,6 +101,7 @@ public class RelationshipRevision
 	public RelationshipRevision(ERelationshipRevision erv, 
 			Relationship primordialRel) {
 		super(Bdb.uuidToNid(erv.getStatusUuid()), 
+				Bdb.uuidToNid(erv.getAuthorUuid()), 
 				Bdb.uuidToNid(erv.getPathUuid()), erv.getTime(), 
 				primordialRel);
 		this.characteristicNid = Bdb.uuidToNid(erv.getCharacteristicUuid());
@@ -173,7 +175,7 @@ public class RelationshipRevision
             this.setStatusId(statusNid);
             return this;
         }
-		return new RelationshipRevision(this, statusNid, pathNid, time,
+		return new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time,
 				primordialComponent);
 	}
 

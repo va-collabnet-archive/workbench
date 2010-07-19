@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
@@ -19,12 +21,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.drools.runtime.pipeline.JxlsTransformerProvider;
 import org.dwfa.ace.ACE;
 
 import com.mxgraph.model.mxCell;
@@ -107,6 +110,8 @@ public class ConceptViewRenderer extends JComponent
 
 	private ConceptViewTitle title;
 
+	private JPanel workflowPanel = new JPanel();
+
 		
     /**
      * 
@@ -167,18 +172,26 @@ public class ConceptViewRenderer extends JComponent
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
+                
         gbc.gridx++;
-        footerPanel.add(new JLabel("global: "), gbc);
+        JToggleButton workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
 
-        gbc.gridx++;
-        JButton globalCancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
-        globalCancelButton.setBorder(BorderFactory.createEmptyBorder());
-        footerPanel.add(globalCancelButton, gbc);
         
-        gbc.gridx++;
-        JButton globalCommitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
-        globalCommitButton.setBorder(BorderFactory.createEmptyBorder());
-        footerPanel.add(globalCommitButton, gbc);
+        workflowToggleButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (workflowPanel.isVisible()) {
+					workflowPanel.setVisible(false);
+				} else {
+					workflowPanel.setBackground(new Color(242, 172, 167, 128));
+					workflowPanel.setVisible(true);
+				}
+			}
+		});
+        
+        workflowToggleButton.setBorder(BorderFactory.createEmptyBorder());
+        footerPanel.add(workflowToggleButton, gbc);
         
         gbc.weightx = 1;
         JPanel fillerPanel = new JPanel();
@@ -187,9 +200,6 @@ public class ConceptViewRenderer extends JComponent
         footerPanel.add(fillerPanel, gbc);
         
         gbc.weightx = 0;
-        gbc.gridx++;
-        footerPanel.add(new JLabel("concept: "), gbc);
-        
         gbc.gridx++;
         JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
         cancelButton.setBorder(BorderFactory.createEmptyBorder());
@@ -205,7 +215,9 @@ public class ConceptViewRenderer extends JComponent
         footerPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.gray));
         add(footerPanel, BorderLayout.SOUTH);
 
-
+        //add(workflowPanel);
+        //workflowPanel.setVisible(false);
+        //workflowPanel.setBounds(0, 0, 100, 200);
         setMinimumSize(new Dimension(40, 20));
         RendererComponentAdaptor rca = new RendererComponentAdaptor();
         addAncestorListener(rca);

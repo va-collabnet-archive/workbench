@@ -255,6 +255,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		public void setTime(long value) {
 			part.setTime(value);
 		}
+
+		@Override
+		public int getAuthorNid() {
+			return part.getAuthorNid();
+		}
+
+		@Override
+		public void setAuthorNid(int authorNid) {
+			part.setAuthorNid(authorNid);
+		}
     }
 
     
@@ -263,7 +273,15 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         I_RelVersioned fixedPart;
         I_RelPart part;
 
-        public ArrayIntList getPartComponentNids() {
+        public int getAuthorNid() {
+			return part.getAuthorNid();
+		}
+
+		public void setAuthorNid(int authorNid) {
+			part.setAuthorNid(authorNid);
+		}
+
+		public ArrayIntList getPartComponentNids() {
             return part.getPartComponentNids();
         }
 

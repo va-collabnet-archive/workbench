@@ -21,9 +21,9 @@ public class ERefsetCidStrMember extends ERefsetMember<ERefsetCidStrRevision> {
     protected UUID c1Uuid;
     protected String strValue;
 
-    public ERefsetCidStrMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetCidStrMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -71,15 +71,15 @@ public class ERefsetCidStrMember extends ERefsetMember<ERefsetCidStrRevision> {
 	}
 
 	@Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         strValue = in.readUTF();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<ERefsetCidStrRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERefsetCidStrRevision(in));
+                revisions.add(new ERefsetCidStrRevision(in, dataVersion));
             }
         }
     }

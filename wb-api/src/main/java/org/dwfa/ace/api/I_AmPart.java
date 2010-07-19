@@ -46,5 +46,8 @@ public interface I_AmPart {
 	
 	
 	public void setStatusId(int statusId);
+	
+	public void setAuthorNid(int authorNid);
+	public int getAuthorNid();
 
 }

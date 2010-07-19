@@ -18,9 +18,9 @@ public class ERelationshipRevision extends ERevision {
     protected int group;
     protected UUID typeUuid;
 
-    public ERelationshipRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERelationshipRevision(I_RelPart part) throws TerminologyException, IOException {
@@ -38,8 +38,8 @@ public class ERelationshipRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         characteristicUuid = new UUID(in.readLong(), in.readLong());
         refinabilityUuid = new UUID(in.readLong(), in.readLong());
         group = in.readInt();

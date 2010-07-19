@@ -27,8 +27,8 @@ public class IdentifierVersionUuid extends IdentifierVersion {
         super();
     }
 
-    public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int pathNid, long time) {
-        super(statusNid, pathNid, time);
+    public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int authorNid, int pathNid, long time) {
+        super(statusNid, authorNid, pathNid, time);
         uNid = Bdb.getUuidsToNidMap().getUNid((UUID) another.getDenotation());
     }
 
@@ -86,7 +86,7 @@ public class IdentifierVersionUuid extends IdentifierVersion {
     }
 
     @Override
-    public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
-        return new IdentifierVersionUuid(this, statusNid, pathNid, time);
+    public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        return new IdentifierVersionUuid(this, statusNid, authorNid, pathNid, time);
     }
 }

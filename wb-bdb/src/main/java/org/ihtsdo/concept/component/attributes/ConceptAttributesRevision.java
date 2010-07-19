@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.attributes;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.I_ConceptualizeExternally;
@@ -19,24 +20,26 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     public ConceptAttributesRevision(I_ConceptualizeExternally another, ConceptAttributes primoridalMember) {
-        super(Bdb.uuidToNid(another.getStatusUuid()), Bdb.uuidToNid(another.getPathUuid()), another.getTime(),
+        super(Bdb.uuidToNid(another.getStatusUuid()), 
+        		Bdb.uuidToNid(another.getAuthorUuid()),
+        		Bdb.uuidToNid(another.getPathUuid()), another.getTime(),
             primoridalMember);
         this.defined = another.isDefined();
     }
 
-    public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, int pathNid, long time,
+    public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, int authorNid, int pathNid, long time,
             ConceptAttributes primoridalMember) {
-        super(statusNid, pathNid, time, primoridalMember);
+        super(statusNid, authorNid, pathNid, time, primoridalMember);
         this.defined = another.isDefined();
     }
 
     public ConceptAttributesRevision(I_ConceptAttributePart another, ConceptAttributes primoridalMember) {
-        super(another.getStatusId(), another.getPathId(), another.getTime(), primoridalMember);
+        super(another.getStatusId(), another.getAuthorNid(), another.getPathId(), another.getTime(), primoridalMember);
         this.defined = another.isDefined();
     }
 
-    public ConceptAttributesRevision(int statusNid, int pathNid, long time, ConceptAttributes primoridalMember) {
-        super(statusNid, pathNid, time, primoridalMember);
+    public ConceptAttributesRevision(int statusNid, int authorNid, int pathNid, long time, ConceptAttributes primoridalMember) {
+        super(statusNid, authorNid, pathNid, time, primoridalMember);
     }
 
     public ConceptAttributesRevision(TupleInput input, ConceptAttributes primoridalMember) {
@@ -50,7 +53,13 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
             this.setStatusId(statusNid);
             return this;
         }
-        return new ConceptAttributesRevision(this, statusNid, pathNid, time, this.primordialComponent);
+        try {
+			return new ConceptAttributesRevision(this, statusNid, 
+					Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId(),
+					pathNid, time, this.primordialComponent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} 
     }
 
     @Override
@@ -106,6 +115,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         }
         return false;
     }
+
 
 
 }

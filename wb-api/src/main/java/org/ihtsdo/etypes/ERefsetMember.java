@@ -21,14 +21,14 @@ public abstract class ERefsetMember<V extends ERevision> extends EComponent<V> {
         super();
     }
 
-    public ERefsetMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         refsetUuid = new UUID(in.readLong(), in.readLong());
         componentUuid = new UUID(in.readLong(), in.readLong());
     }

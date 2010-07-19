@@ -19,9 +19,9 @@ public class ERefsetStrMember extends ERefsetMember<ERefsetStrRevision> {
 
     protected String strValue;
 
-    public ERefsetStrMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetStrMember(I_ExtendByRef m) throws TerminologyException, IOException {
@@ -67,14 +67,14 @@ public class ERefsetStrMember extends ERefsetMember<ERefsetStrRevision> {
 	}
 
 	@Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         strValue = in.readUTF();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<ERefsetStrRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERefsetStrRevision(in));
+                revisions.add(new ERefsetStrRevision(in, dataVersion));
             }
         }
     }

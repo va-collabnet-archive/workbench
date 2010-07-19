@@ -46,7 +46,7 @@ public interface I_IdPart {
 	 * @param time
 	 * @return
 	 */
-	public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time);
+	public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time);
 
 	/**
 	 * 

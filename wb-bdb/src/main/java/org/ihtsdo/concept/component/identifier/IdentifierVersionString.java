@@ -25,8 +25,8 @@ public class IdentifierVersionString extends IdentifierVersion {
         super();
     }
 
-    public IdentifierVersionString(IdentifierVersionString another, int statusNid, int pathNid, long time) {
-        super(statusNid, pathNid, time);
+    public IdentifierVersionString(IdentifierVersionString another, int statusNid, int authorNid, int pathNid, long time) {
+        super(statusNid, authorNid, pathNid, time);
         stringDenotation = (String) another.getDenotation();
     }
 
@@ -77,7 +77,7 @@ public class IdentifierVersionString extends IdentifierVersion {
     }
 
     @Override
-    public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
-        return new IdentifierVersionString(this, statusNid, pathNid, time);
+    public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        return new IdentifierVersionString(this, statusNid, authorNid, pathNid, time);
     }
 }

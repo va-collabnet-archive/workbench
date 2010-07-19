@@ -24,9 +24,9 @@ public class EDescription extends EComponent<EDescriptionRevision> implements I_
 
     protected UUID typeUuid;
 
-    public EDescription(DataInput in) throws IOException, ClassNotFoundException {
+    public EDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EDescription(I_DescriptionVersioned desc) throws TerminologyException, IOException {
@@ -54,8 +54,8 @@ public class EDescription extends EComponent<EDescriptionRevision> implements I_
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         conceptUuid = new UUID(in.readLong(), in.readLong());
         initialCaseSignificant = in.readBoolean();
         lang = in.readUTF();
@@ -65,7 +65,7 @@ public class EDescription extends EComponent<EDescriptionRevision> implements I_
         if (versionLength > 0) {
             revisions = new ArrayList<EDescriptionRevision>(versionLength);
             for (int i = 0; i < versionLength; i++) {
-                revisions.add(new EDescriptionRevision(in));
+                revisions.add(new EDescriptionRevision(in, dataVersion));
             }
         }
     }

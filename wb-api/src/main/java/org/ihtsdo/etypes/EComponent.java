@@ -15,7 +15,7 @@ public abstract class EComponent<V extends ERevision> extends ERevision {
 
     public static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 3;
 
     public enum IDENTIFIER_PART_TYPES {
         LONG(1), STRING(2), UUID(3);
@@ -65,17 +65,17 @@ public abstract class EComponent<V extends ERevision> extends ERevision {
         super();
     }
 
-    public EComponent(DataInput in) throws IOException, ClassNotFoundException {
+    public EComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         int readDataVersion = in.readInt();
         if (readDataVersion != dataVersion) {
-            throw new IOException("Unsupported dataVersion: " + readDataVersion);
+            throw new IOException("Unsupported dataVersion: " + readDataVersion + " dataVersion: " + dataVersion);
         }
         primordialUuid = new UUID(in.readLong(), in.readLong());
         short idVersionCount = in.readShort();
@@ -84,13 +84,13 @@ public abstract class EComponent<V extends ERevision> extends ERevision {
             for (int i = 0; i < idVersionCount; i++) {
                 switch (IDENTIFIER_PART_TYPES.readType(in)) {
                 case LONG:
-                    additionalIds.add(new EIdentifierLong(in));
+                    additionalIds.add(new EIdentifierLong(in, dataVersion));
                     break;
                 case STRING:
-                    additionalIds.add(new EIdentifierString(in));
+                    additionalIds.add(new EIdentifierString(in, dataVersion));
                     break;
                 case UUID:
-                    additionalIds.add(new EIdentifierUuid(in));
+                    additionalIds.add(new EIdentifierUuid(in, dataVersion));
                     break;
                 default:
                     throw new UnsupportedOperationException();

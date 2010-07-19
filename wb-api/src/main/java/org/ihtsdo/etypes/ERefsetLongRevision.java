@@ -14,9 +14,9 @@ public class ERefsetLongRevision extends ERevision {
 
     protected long longValue;
 
-    public ERefsetLongRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetLongRevision(I_ExtendByRefPartLong part) throws TerminologyException, IOException {
@@ -31,8 +31,8 @@ public class ERefsetLongRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         longValue = in.readLong();
     }
 

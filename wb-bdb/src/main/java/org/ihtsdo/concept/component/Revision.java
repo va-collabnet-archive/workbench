@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.db.bdb.Bdb;
@@ -35,8 +36,8 @@ public abstract class Revision<V extends Revision<V, C>,
 		assert statusAtPositionNid != Integer.MAX_VALUE;
 	}
 
-	public Revision(int statusNid, int pathNid, long time, C primordialComponent) {
-		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
+	public Revision(int statusNid, int authorNid, int pathNid, long time, C primordialComponent) {
+		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
 		this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
 		assert primordialComponent != null;
@@ -139,8 +140,8 @@ public abstract class Revision<V extends Revision<V, C>,
 	 */
 	public abstract V makeAnalog(int statusNid, int pathNid, long time);
 
-	public void setStatusAtPosition(int statusNid, int pathNid, long time) {
-		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, pathNid, time);
+	public void setStatusAtPosition(int statusNid, int authorNid, int pathNid, long time) {
+		this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
 		modified();
 	}
 
@@ -151,7 +152,9 @@ public abstract class Revision<V extends Revision<V, C>,
 			throw new UnsupportedOperationException(
 					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
 		}
-		this.sapNid = Bdb.getSapNid(getStatusId(), pathId, Long.MAX_VALUE);
+			this.sapNid = Bdb.getSapNid(getStatusId(), 
+					Terms.get().getAuthorNid(),
+					pathId, Long.MAX_VALUE);
 	}
 
 	@Override
@@ -160,7 +163,13 @@ public abstract class Revision<V extends Revision<V, C>,
 			throw new UnsupportedOperationException(
 					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
 		}
-		this.sapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
+		try {
+			this.sapNid = Bdb.getSapNid(statusId, 
+					Terms.get().getAuthorNid(),
+					getPathId(), Long.MAX_VALUE);
+		} catch (Exception e) {
+			throw new RuntimeException();
+		} 
         modified();
 	}
 
@@ -173,6 +182,8 @@ public abstract class Revision<V extends Revision<V, C>,
         buf.append(sapNid);
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
+        buf.append(" author:");
+        ConceptComponent.addNidToBuffer(buf, getAuthorNid());
         buf.append(" path:");
         ConceptComponent.addNidToBuffer(buf, getPathId());
         buf.append(" tm: ");
@@ -229,9 +240,31 @@ public abstract class Revision<V extends Revision<V, C>,
 					"Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
 		}
 		if (time != getTime()) {
-			this.sapNid = Bdb.getSapNid(getStatusId(), getPathId(), time);
+			try {
+				this.sapNid = Bdb.getSapNid(getStatusId(), 
+						Terms.get().getAuthorNid(),
+						getPathId(), time);
+			} catch (Exception e) {
+				throw new RuntimeException();
+			} 
 	        modified();
 		}
+	}
+    @Override
+	public int getAuthorNid() {
+        return Bdb.getSapDb().getAuthorNid(sapNid);
+	}
+
+	@Override
+	public void setAuthorNid(int authorNid) {
+        if (getTime() != Long.MAX_VALUE) {
+            throw new UnsupportedOperationException(
+                "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+        }
+        if (authorNid != getPathId()) {
+            this.sapNid = Bdb.getSapNid(getStatusId(), authorNid, getPathId(), Long.MAX_VALUE);
+            modified();
+        }
 	}
 
 }

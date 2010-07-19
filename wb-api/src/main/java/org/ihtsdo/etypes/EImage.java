@@ -25,9 +25,9 @@ public class EImage extends EComponent<EImageRevision> {
 
     protected UUID typeUuid;
 
-    public EImage(DataInput in) throws IOException, ClassNotFoundException {
+    public EImage(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EImage(I_ImageVersioned imageVer) throws TerminologyException, IOException {
@@ -55,8 +55,8 @@ public class EImage extends EComponent<EImageRevision> {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         conceptUuid = new UUID(in.readLong(), in.readLong());
         format = in.readUTF();
         int imageSize = in.readInt();
@@ -68,7 +68,7 @@ public class EImage extends EComponent<EImageRevision> {
         if (versionLength > 0) {
             revisions = new ArrayList<EImageRevision>(versionLength);
             for (int i = 0; i < versionLength; i++) {
-                revisions.add(new EImageRevision(in));
+                revisions.add(new EImageRevision(in, dataVersion));
             }
         }
     }

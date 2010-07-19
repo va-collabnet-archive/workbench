@@ -13,9 +13,9 @@ public class EConceptAttributesRevision extends ERevision implements I_Conceptua
 
     protected boolean defined;
 
-    public EConceptAttributesRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public EConceptAttributesRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EConceptAttributesRevision(I_ConceptAttributePart part) throws TerminologyException, IOException {
@@ -30,8 +30,8 @@ public class EConceptAttributesRevision extends ERevision implements I_Conceptua
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         defined = in.readBoolean();
     }
 

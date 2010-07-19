@@ -40,13 +40,15 @@ public class ImageTest {
         eca1.primordialUuid = UUID.randomUUID();
         eca1.setStatusUuid(UUID.randomUUID());
         eca1.setPathUuid(UUID.randomUUID());
+        eca1.setAuthorUuid(UUID.randomUUID());
         eca1.setTime(System.currentTimeMillis());
         eca1.setDefined(true);
         
         EConceptAttributesRevision ecav = new EConceptAttributesRevision();
         ecav.setDefined(false);
-        ecav.setPathUuid(eca1.getPathUuid());
         ecav.setStatusUuid(eca1.getStatusUuid());
+        ecav.setAuthorUuid(eca1.getAuthorUuid());
+        ecav.setPathUuid(eca1.getPathUuid());
         ecav.setTime(eca1.getTime() + 10);
         eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
         eca1.revisions.add(ecav);
@@ -56,6 +58,7 @@ public class ImageTest {
         EConceptAttributes eca2 = new EConceptAttributes();
         eca2.primordialUuid = UUID.randomUUID();
         eca2.setStatusUuid(UUID.randomUUID());
+        eca2.setAuthorUuid(UUID.randomUUID());
         eca2.setPathUuid(UUID.randomUUID());
         eca2.setDefined(false);
         eca2.setTime(eca1.getTime());

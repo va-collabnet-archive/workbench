@@ -15,8 +15,8 @@ public class EIdentifierString extends EIdentifier {
 
     protected String denotation;
 
-    public EIdentifierString(DataInput in) throws IOException, ClassNotFoundException {
-        super(in);
+    public EIdentifierString(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super(in, dataVersion);
         denotation = in.readUTF();
     }
 

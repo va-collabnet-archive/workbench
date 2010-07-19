@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
@@ -28,8 +29,6 @@ import org.dwfa.tapi.impl.LocalFixedDesc;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
@@ -212,7 +211,11 @@ public class Description
 		if (eDesc.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<DescriptionRevision>();
 			for (EDescriptionRevision edv: eDesc.getRevisionList()) {
-				revisions.add(new DescriptionRevision(edv, this));
+				try {
+					revisions.add(new DescriptionRevision(edv, this));
+				} catch (TerminologyException e) {
+					throw new IOException(e);
+				}
 			}
 		}
 	}
@@ -515,7 +518,10 @@ public class Description
         if (getTime() == time && getPathId() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		DescriptionRevision newR = new DescriptionRevision(this, statusNid, pathNid, time, this);
+		DescriptionRevision newR;
+			newR = new DescriptionRevision(this, statusNid, 
+					Terms.get().getAuthorNid(),
+					pathNid, time, this);
 		addRevision(newR);
 		return newR;
 	}

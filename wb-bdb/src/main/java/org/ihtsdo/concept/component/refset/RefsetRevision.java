@@ -1,6 +1,10 @@
 package org.ihtsdo.concept.component.refset;
 
+import java.io.IOException;
+
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.ERevision;
@@ -15,7 +19,9 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 
 	public RefsetRevision(int statusNid, int pathNid, long time, 
 			C primordialComponent) {
-		super(statusNid, pathNid, time, primordialComponent);
+		super(statusNid, 				
+				Terms.get().getAuthorNid(), 
+				pathNid, time, primordialComponent);
 	}
 
 	public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
@@ -29,6 +35,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 	public RefsetRevision(ERevision eVersion,
 			C member) {
 		super(Bdb.uuidToNid(eVersion.getStatusUuid()), 
+				Bdb.uuidToNid(eVersion.getAuthorUuid()),
 				Bdb.uuidToNid(eVersion.getPathUuid()),
 				eVersion.getTime(),
 				member);

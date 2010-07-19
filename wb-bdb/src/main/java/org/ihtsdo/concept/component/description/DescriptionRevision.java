@@ -6,7 +6,9 @@ import java.nio.charset.Charset;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_MapNativeToNative;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceDescriptionPart;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
@@ -115,9 +117,9 @@ public class DescriptionRevision
 	}
 
 	protected DescriptionRevision(I_DescriptionPart another, 
-			int statusNid, int pathNid, long time, 
+			int statusNid, int authorNid, int pathNid, long time, 
 			Description primoridalMember) {
-		super(statusNid, pathNid, time, primoridalMember);
+		super(statusNid, authorNid, pathNid, time, primoridalMember);
 		this.text = another.getText();
 		this.typeNid = another.getTypeId();
 		this.lang = another.getLang();
@@ -140,8 +142,9 @@ public class DescriptionRevision
 	}
 
 	public DescriptionRevision(UniversalAceDescriptionPart umPart, 
-			Description primoridalMember) {
+			Description primoridalMember) throws TerminologyException, IOException {
 		super(Bdb.uuidsToNid(umPart.getStatusId()),
+				Terms.get().getAuthorNid(),
 				Bdb.uuidsToNid(umPart.getPathId()),
 				umPart.getTime(), primoridalMember);
 		text = umPart.getText();
@@ -151,8 +154,9 @@ public class DescriptionRevision
 	}
 
 	public DescriptionRevision(EDescriptionRevision edv, 
-			Description primoridalMember) {
+			Description primoridalMember) throws TerminologyException, IOException {
 		super(Bdb.uuidToNid(edv.getStatusUuid()),
+				Terms.get().getAuthorNid(),
 				Bdb.uuidToNid(edv.getPathUuid()),
 				edv.getTime(), primoridalMember);
 		initialCaseSignificant = edv.isInitialCaseSignificant();
@@ -243,8 +247,13 @@ public class DescriptionRevision
             this.setStatusId(statusNid);
             return this;
         }
-		return new DescriptionRevision(this, statusNid, 
-				pathNid, time, this.primordialComponent);
+		try {
+			return new DescriptionRevision(this, statusNid, 
+					Terms.get().getAuthorNid(),
+					pathNid, time, this.primordialComponent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

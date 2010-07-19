@@ -1,16 +1,13 @@
 package org.ihtsdo.db.bdb.sap;
 
-import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
-
-import cern.colt.list.IntArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SapToIntHashMap {
 	
-	private UuidToIntHashMap map;
+	private java.util.concurrent.ConcurrentHashMap<StatusAuthorPosition, Integer> map;
 
 	private static final int defaultCapacity = 277;
-	private static final double defaultMinLoadFactor = 0.2;
-	private static final double defaultMaxLoadFactor = 0.5;
 
 	/**
 	 * Constructs an empty map with default capacity and default load factors.
@@ -29,7 +26,7 @@ public class SapToIntHashMap {
 	 *             if the initial capacity is less than zero.
 	 */
 	public SapToIntHashMap(int initialCapacity) {
-		this(initialCapacity, defaultMinLoadFactor, defaultMaxLoadFactor);
+		setup(initialCapacity);
 	}
 
 	/**
@@ -50,37 +47,35 @@ public class SapToIntHashMap {
 	 */
 	public SapToIntHashMap(int initialCapacity, double minLoadFactor,
 			double maxLoadFactor) {
-		setup(initialCapacity, minLoadFactor, maxLoadFactor);
+		setup(initialCapacity);
 	}
 
-	private void setup(int initialCapacity, double minLoadFactor,
-			double maxLoadFactor) {
-		map = new UuidToIntHashMap(initialCapacity, minLoadFactor,
-				maxLoadFactor);
+	private void setup(int initialCapacity) {
+		map = new ConcurrentHashMap<StatusAuthorPosition, Integer>(initialCapacity);
 	}
 
-	public int get(long time, int statusNid, int pathNid) {
-		return map.get(TimeStatusPosition.timeStatusPositionToUuid(time, statusNid, pathNid));
+	public int get(int statusNid, int authorNid, int pathNid, long time) {
+		return map.get(new StatusAuthorPosition(statusNid, authorNid, pathNid, time));
 	}
 	
-	public int get(TimeStatusPosition tsp) {
-		return map.get(tsp.toUuid());
+	public int get(StatusAuthorPosition tsp) {
+		return map.get(tsp);
 	}
 	
-	public boolean put(long time, int statusNid, int pathNid, int statusAtPositionNid) {
-		return map.put(TimeStatusPosition.timeStatusPositionToUuid(time, statusNid, pathNid), 
+	public boolean put(int statusNid, int authorNid, int pathNid, long time, int statusAtPositionNid) {
+		return put(new StatusAuthorPosition(statusNid, authorNid, pathNid, time), 
 				statusAtPositionNid);
 	}
 	
-	public boolean put(TimeStatusPosition tsp, int statusAtPositionNid) {
-		return map.put(tsp.toUuid(), statusAtPositionNid);
+	public boolean put(StatusAuthorPosition tsp, int statusAtPositionNid) {
+		return map.put(tsp, statusAtPositionNid) == null;
 	}
 
-	public boolean containsKey(long time, int statusNid, int pathNid) {
-		return map.containsKey(TimeStatusPosition.timeStatusPositionToUuid(time, statusNid, pathNid));
+	public boolean containsKey(int statusNid, int authorNid, int pathNid, long time) {
+		return map.containsKey(new StatusAuthorPosition(statusNid, authorNid, pathNid, time));
 	}
 
-	public IntArrayList values() {
+	public Collection<Integer> values() {
 		return map.values();
 	}
 }

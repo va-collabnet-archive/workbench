@@ -20,8 +20,8 @@ public class IdentifierVersionLong extends IdentifierVersion {
         longDenotation = idv.getDenotation();
     }
 
-    public IdentifierVersionLong(IdentifierVersionLong another, int statusNid, int pathNid, long time) {
-        super(statusNid, pathNid, time);
+    public IdentifierVersionLong(IdentifierVersionLong another, int statusNid, int authorNid, int pathNid, long time) {
+        super(statusNid, authorNid, pathNid, time);
         longDenotation = (Long) another.getDenotation();
     }
 
@@ -76,7 +76,7 @@ public class IdentifierVersionLong extends IdentifierVersion {
     }
 
     @Override
-    public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
-        return new IdentifierVersionLong(this, statusNid, pathNid, time);
+    public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        return new IdentifierVersionLong(this, authorNid, statusNid, pathNid, time);
     }
 }

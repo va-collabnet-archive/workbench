@@ -640,5 +640,7 @@ public interface I_TermFactory {
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
 
+	public int getAuthorNid();
+
 
 }

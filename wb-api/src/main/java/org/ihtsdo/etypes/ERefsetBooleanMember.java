@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -19,9 +19,9 @@ public class ERefsetBooleanMember extends ERefsetMember<ERefsetBooleanRevision> 
 
     protected boolean booleanValue;
 
-    public ERefsetBooleanMember(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetBooleanMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetBooleanMember(I_ExtendByRefVersion m) throws TerminologyException, IOException {
@@ -67,14 +67,14 @@ public class ERefsetBooleanMember extends ERefsetMember<ERefsetBooleanRevision> 
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         booleanValue = in.readBoolean();
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<ERefsetBooleanRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERefsetBooleanRevision(in));
+                revisions.add(new ERefsetBooleanRevision(in, dataVersion));
             }
         }
     }

@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
@@ -495,7 +496,10 @@ public class Image
         if (getTime() == time && getPathId() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
-		ImageRevision newR = new ImageRevision(this, statusNid, pathNid, time, this);
+		ImageRevision newR;
+			newR = new ImageRevision(this, statusNid,
+					Terms.get().getAuthorNid(),
+					pathNid, time, this);
 		addRevision(newR);
 		return newR;
 	}

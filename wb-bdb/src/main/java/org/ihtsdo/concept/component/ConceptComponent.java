@@ -340,6 +340,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        public int getAuthorNid() {
+            if (index >= 0) {
+                return getMutablePart().getAuthorNid();
+            }
+            return Bdb.getSapDb().getAuthorNid(primordialSapNid);
+        }
+
+        @Override
         public long getTime() {
             if (index >= 0) {
                 return getMutablePart().getTime();
@@ -401,6 +409,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
         }
 
+        @Override
+        public void setAuthorNid(int authorNid) {
+            if (index >= 0) {
+                revisions.get(index).setStatusId(authorNid);
+            } else {
+                ConceptComponent.this.setStatusId(authorNid);
+            }
+        }
         public UUID getPrimUuid() {
             return Bdb.getUuidDb().getUuid(primordialUNid);
         }
@@ -514,14 +530,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
-        public I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
+        public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
 
             // if (index >= 0) {
             // return additionalIdentifierParts.get(index).makeIdAnalog(statusNid, pathNid, time);
             // }
             // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
 
-            return ConceptComponent.this.makeIdAnalog(statusNid, pathNid, time);
+            return ConceptComponent.this.makeIdAnalog(statusNid, authorNid, pathNid, time);
         }
 
         public I_IdPart makeIdAnalog() {
@@ -531,7 +547,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             // }
             // return new IdVersion(IdVersion.this, statusNid, pathNid, time, IdVersion.this);
 
-            return ConceptComponent.this.makeIdAnalog(getStatusId(), getPathId(), getTime());
+				return ConceptComponent.this.makeIdAnalog(getStatusId(), 
+						Terms.get().getAuthorNid(),
+						getPathId(), getTime());
         }
 
         @Override
@@ -644,6 +662,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (primordialSapNid >= 0) {
             buf.append(" status:");
             ConceptComponent.addNidToBuffer(buf, getStatusId());
+            buf.append(" author:");
+            ConceptComponent.addNidToBuffer(buf, getAuthorNid());
             buf.append(" path:");
             ConceptComponent.addNidToBuffer(buf, getPathId());
             buf.append(" tm: ");
@@ -1135,7 +1155,25 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return null;
     }
 
+ 
     @Override
+	public int getAuthorNid() {
+        return Bdb.getSapDb().getAuthorNid(primordialSapNid);
+	}
+
+	@Override
+	public void setAuthorNid(int authorNid) {
+        if (getTime() != Long.MAX_VALUE) {
+            throw new UnsupportedOperationException(
+                "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+        }
+        if (authorNid != getPathId()) {
+            this.primordialSapNid = Bdb.getSapNid(getStatusId(), authorNid, getPathId(), Long.MAX_VALUE);
+            modified();
+        }
+	}
+
+	@Override
     public final int getPathId() {
         return Bdb.getSapDb().getPathId(primordialSapNid);
     }
@@ -1162,8 +1200,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
         if (pathId != getPathId()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusId(), pathId, Long.MAX_VALUE);
-            modified();
+				this.primordialSapNid = Bdb.getSapNid(getStatusId(), 
+						Terms.get().getAuthorNid(),
+						pathId, Long.MAX_VALUE);
+				modified();
         }
     }
 
@@ -1174,24 +1214,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
         if (time != getTime()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusId(), getPathId(), time);
-            modified();
+				this.primordialSapNid = Bdb.getSapNid(getStatusId(), 
+						Terms.get().getAuthorNid(),
+						getPathId(), time);
         }
     }
-
-    @Override
-    public final void setStatusId(int statusId) {
+	public final void setStatusId(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
                 "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
         if (statusId != this.getStatusId()) {
-            this.primordialSapNid = Bdb.getSapNid(statusId, getPathId(), Long.MAX_VALUE);
-            modified();
+				this.primordialSapNid = Bdb.getSapNid(statusId, 
+						Terms.get().getAuthorNid(), 
+						getPathId(), Long.MAX_VALUE);
         }
-    }
-
-    // TODO elimiate "version" from the api since it has double meaning.
+	}
     @Override
     public final void setVersion(int version) {
         throw new UnsupportedOperationException("Use makeAnalog instead.");
@@ -1222,7 +1260,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Override
-    public final I_IdPart makeIdAnalog(int statusNid, int pathNid, long time) {
+    public final I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
         throw new UnsupportedOperationException();
     }
 

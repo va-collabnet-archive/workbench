@@ -205,11 +205,14 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 	@Override
 	public void sync() throws IOException {
 		w.lock();
-		AddToReadOnlyMap writer = new AddToReadOnlyMap();
-		mutableUuidsToNidMap.forEachPair(writer);
-		writer.close();
-		w.unlock();
-		super.sync();
+		try {
+			AddToReadOnlyMap writer = new AddToReadOnlyMap();
+			mutableUuidsToNidMap.forEachPair(writer);
+			writer.close();
+			super.sync();
+		} finally {
+			w.unlock();
+		}
 	}
 	
 
@@ -225,46 +228,49 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 	public boolean hasUuid(UUID uuid) {
         r.lock();
-        if (readOnlyUuidsToNidMap.containsKey(uuid)) {
-            r.unlock();
-            return true;
-        }
-        if (mutableUuidsToNidMap.containsKey(uuid)) {
-            r.unlock();
-            return true;
-        }
-        r.unlock();
-	    return false;
+		try {
+	        if (readOnlyUuidsToNidMap.containsKey(uuid)) {
+	            return true;
+	        }
+	        if (mutableUuidsToNidMap.containsKey(uuid)) {
+	            return true;
+	        }
+		    return false;
+		} finally {
+	        r.unlock();
+		}
 	}
 	public int uuidToNid(UUID uuid)  {
 		r.lock();
-		if (readOnlyUuidsToNidMap.containsKey(uuid)) {
-			int nid = readOnlyUuidsToNidMap.get(uuid);
+		try {
+			if (readOnlyUuidsToNidMap.containsKey(uuid)) {
+				int nid = readOnlyUuidsToNidMap.get(uuid);
+				return nid;
+			}
+			if (mutableUuidsToNidMap.containsKey(uuid)) {
+				int nid = mutableUuidsToNidMap.get(uuid);
+				return nid;
+			}
+		} finally {
 			r.unlock();
-			return nid;
 		}
-		if (mutableUuidsToNidMap.containsKey(uuid)) {
-			int nid = mutableUuidsToNidMap.get(uuid);
-			r.unlock();
-			return nid;
-		}
-		r.unlock();
 		// get lock here...
 		w.lock();
-		if (readOnlyUuidsToNidMap.containsKey(uuid)) {
-			int nid = readOnlyUuidsToNidMap.get(uuid);
+		try {
+			if (readOnlyUuidsToNidMap.containsKey(uuid)) {
+				int nid = readOnlyUuidsToNidMap.get(uuid);
+				return nid;
+			}
+			if (mutableUuidsToNidMap.containsKey(uuid)) {
+				int nid = mutableUuidsToNidMap.get(uuid);
+				return nid;
+			}
+			int newNid = sequence.getAndIncrement();
+			mutableUuidsToNidMap.put(uuid, newNid);
+			return newNid;
+		} finally {
 			w.unlock();
-			return nid;
 		}
-		if (mutableUuidsToNidMap.containsKey(uuid)) {
-			int nid = mutableUuidsToNidMap.get(uuid);
-			w.unlock();
-			return nid;
-		}
-		int newNid = sequence.getAndIncrement();
-		mutableUuidsToNidMap.put(uuid, newNid);
-		w.unlock();
-		return newNid;
 	}
 
 	public int uuidsToNid(UUID[] uuids) {
@@ -284,23 +290,25 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 			}
 		}
 		w.lock();
-		for (UUID uuid : uuids) {
-			if (mutableUuidsToNidMap.containsKey(uuid)) {
-				int nid = mutableUuidsToNidMap.get(uuid);
-				w.unlock();
-				return nid;
+		try {
+			for (UUID uuid : uuids) {
+				if (mutableUuidsToNidMap.containsKey(uuid)) {
+					int nid = mutableUuidsToNidMap.get(uuid);
+					return nid;
+				}
 			}
+			/*
+			assert Bdb.getUuidDb().searchForUuid(uuids.iterator().next()) 
+				== false: " Attempt to add duplicate uuid: " + uuids;
+				*/
+			int newNid = sequence.getAndIncrement();
+			for (UUID uuid : uuids) {
+				mutableUuidsToNidMap.put(uuid, newNid);
+			}
+			return newNid;
+		} finally {
+			w.unlock();
 		}
-		/*
-		assert Bdb.getUuidDb().searchForUuid(uuids.iterator().next()) 
-			== false: " Attempt to add duplicate uuid: " + uuids;
-			*/
-		int newNid = sequence.getAndIncrement();
-		for (UUID uuid : uuids) {
-			mutableUuidsToNidMap.put(uuid, newNid);
-		}
-		w.unlock();
-		return newNid;
 	}
 
 	@Override
@@ -324,8 +332,11 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
 	public void put(UUID denotation, int nid) {
 		w.lock();
-		mutableUuidsToNidMap.put(denotation, nid); 
-		w.unlock();
+		try {
+			mutableUuidsToNidMap.put(denotation, nid); 
+		} finally {
+			w.unlock();
+		}
 	}
 
 

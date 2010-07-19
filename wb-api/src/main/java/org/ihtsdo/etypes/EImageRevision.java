@@ -17,9 +17,9 @@ public class EImageRevision extends ERevision {
 
     protected UUID typeUuid;
 
-    public EImageRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public EImageRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public EImageRevision(I_ImagePart part) throws TerminologyException, IOException {
@@ -35,8 +35,8 @@ public class EImageRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         textDescription = in.readUTF();
         typeUuid = new UUID(in.readLong(), in.readLong());
     }

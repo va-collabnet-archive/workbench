@@ -663,7 +663,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public ConceptAttributes getConceptAttributes() throws IOException {
-		return data.getConceptAttributes();
+		if (data != null) {
+			return data.getConceptAttributes();
+		}
+		return null;
 	}
 
 	public ArrayList<ConceptAttributes> getConceptAttributesList()

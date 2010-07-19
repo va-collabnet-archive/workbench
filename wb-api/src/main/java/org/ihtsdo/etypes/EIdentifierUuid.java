@@ -18,8 +18,8 @@ public class EIdentifierUuid extends EIdentifier {
     protected static UUID primordialAuthority;
     protected UUID denotation;
 
-    public EIdentifierUuid(DataInput in) throws IOException, ClassNotFoundException {
-        super(in);
+    public EIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super(in, dataVersion);
         denotation = new UUID(in.readLong(), in.readLong());
     }
 

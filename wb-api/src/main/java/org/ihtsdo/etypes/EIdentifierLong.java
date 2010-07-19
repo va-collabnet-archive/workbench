@@ -15,8 +15,8 @@ public class EIdentifierLong extends EIdentifier {
 
     protected long denotation;
 
-    public EIdentifierLong(DataInput in) throws IOException, ClassNotFoundException {
-        super(in);
+    public EIdentifierLong(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super(in, dataVersion);
         denotation = in.readLong();
     }
 

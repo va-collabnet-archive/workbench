@@ -799,7 +799,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.primordialSapNid = Integer.MIN_VALUE;
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
-                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
+                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
+                		aceFrameConfig.getDbConfig().getUserConcept().getConceptId(), 
+                		p.getConceptId(), time);
             } else {
                 if (a.revisions == null) {
                     a.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
@@ -857,7 +859,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.primordialSapNid = Integer.MIN_VALUE;
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
-                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), p.getConceptId(), effectiveDate);
+                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), 
+                		aceFrameConfig.getDbConfig().getUserConcept().getConceptId(),
+                		p.getConceptId(), effectiveDate);
             } else {
                 if (d.revisions == null) {
                     d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
@@ -1029,7 +1033,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
         for (I_Path p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
-                member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), time);
+                member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
+                		config.getDbConfig().getUserConcept().getNid(),
+                		p.getConceptId(), time);
                 propMap.setProperties((I_ExtendByRefPart) member);
             } else {
                 I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
@@ -1143,7 +1149,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int statusNid = relStatus.getNid();
         for (I_Path p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
-                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), effectiveDate);
+                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
+                		aceFrameConfig.getDbConfig().getUserConcept().getNid(),
+                		p.getConceptId(), effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
@@ -1178,7 +1186,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, pathNid, effectiveDate);
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, 
+        		getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId(),
+        		pathNid, effectiveDate);
         c.getSourceRels().add(r);
         return r;
     }
@@ -1643,7 +1653,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         int statusNid = aceConfig.getDefaultStatus().getNid();
         for (I_Path p : aceConfig.getEditingPathSet()) {
             if (img.primordialSapNid == Integer.MIN_VALUE) {
-                img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, p.getConceptId(), Long.MAX_VALUE);
+                img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
+                		aceConfig.getDbConfig().getUserConcept().getNid(),
+                		p.getConceptId(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
                     img.revisions = new CopyOnWriteArrayList<ImageRevision>();
@@ -1705,5 +1717,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException {
         return Bdb.getConceptForComponent(componentNid);
     }
+
+    private int authorNid = Integer.MAX_VALUE;
+	@Override
+	public int getAuthorNid() {
+		if (authorNid == Integer.MAX_VALUE) {
+			try {
+				authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
+			} catch (IOException e) {
+				throw new RuntimeException();
+			}
+		}
+		return authorNid;
+	}
 
 }

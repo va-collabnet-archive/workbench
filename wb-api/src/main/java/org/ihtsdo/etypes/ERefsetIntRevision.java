@@ -14,9 +14,9 @@ public class ERefsetIntRevision extends ERevision {
 
     protected int intValue;
 
-    public ERefsetIntRevision(DataInput in) throws IOException, ClassNotFoundException {
+    public ERefsetIntRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERefsetIntRevision(I_ExtendByRefPartInt part) throws TerminologyException, IOException {
@@ -31,8 +31,8 @@ public class ERefsetIntRevision extends ERevision {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         intValue = in.readInt();
     }
 

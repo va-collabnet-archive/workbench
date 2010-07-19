@@ -22,9 +22,9 @@ public class ERelationship extends EComponent<ERelationshipRevision> {
     protected int relGroup;
     protected UUID typeUuid;
 
-    public ERelationship(DataInput in) throws IOException, ClassNotFoundException {
+    public ERelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
-        readExternal(in);
+        readExternal(in, dataVersion);
     }
 
     public ERelationship(I_RelVersioned rel) throws TerminologyException, IOException {
@@ -53,8 +53,8 @@ public class ERelationship extends EComponent<ERelationshipRevision> {
     }
 
     @Override
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         c2Uuid = new UUID(in.readLong(), in.readLong());
         characteristicUuid = new UUID(in.readLong(), in.readLong());
@@ -65,7 +65,7 @@ public class ERelationship extends EComponent<ERelationshipRevision> {
         if (versionSize > 0) {
             revisions = new ArrayList<ERelationshipRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                revisions.add(new ERelationshipRevision(in));
+                revisions.add(new ERelationshipRevision(in, dataVersion));
             }
         }
     }
