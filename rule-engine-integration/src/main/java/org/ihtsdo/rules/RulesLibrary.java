@@ -278,6 +278,56 @@ public class RulesLibrary {
 		}
 		return kbase;
 	}
+	
+	/**
+	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a byteArray, not a file.
+	 * 
+	 * @param kbId the kb id
+	 * @param url the url
+	 * @param recreate the recreate
+	 * 
+	 * @return the knowledge base
+	 * 
+	 * @throws Exception the exception
+	 */
+	public static KnowledgeBase getKnowledgeBase(int kbId, byte[] bytes, boolean recreate) throws Exception {
+		KnowledgeBase kbase= null;
+		File serializedKbFile = new File("rules/knowledge_packages-" + kbId + ".pkg");
+		if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
+			if (serializedKbFile.exists() && !recreate) {
+				try {
+					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+					// The input stream might contain an individual
+					// package or a collection.
+					@SuppressWarnings( "unchecked" )
+					Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+					in.close();
+					kbase = KnowledgeBaseFactory.newKnowledgeBase();
+					kbase.addKnowledgePackages(kpkgs);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			} else {
+				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
+				kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+				kbase = kagent.getKnowledgeBase();
+				try {
+					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+					out.writeObject( kbase.getKnowledgePackages() );
+					out.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return kbase;
+	}
 
 	/**
 	 * Gets the knowledge base.
