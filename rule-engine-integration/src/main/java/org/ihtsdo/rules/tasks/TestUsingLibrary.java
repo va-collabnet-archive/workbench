@@ -36,9 +36,9 @@ import org.ihtsdo.rules.RulesLibrary;
  * The Class TestUsingLibrary.
  */
 @BeanList(specs = {
-	 @Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN),
-     @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-     @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
+	 @Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN)
+    /*, @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+     @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)*/})
 		
 public class TestUsingLibrary extends AbstractConceptTest {
 
