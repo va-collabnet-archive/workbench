@@ -34,8 +34,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
-import org.ihtsdo.testmodel.Concept;
-import org.ihtsdo.testmodel.Description;
 
 /**
  * The Class DomainModelTestCheck.
@@ -84,12 +82,12 @@ public class TestObjectCheck extends TestCase {
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, true, resources);
 			System.out.println("Knowledge base updated");
 			UUID conceptUUID = UUID.randomUUID();
-			Concept concept = new Concept(conceptUUID, null, true, null, false);
-			Description description = new Description(UUID.randomUUID(), null, true, null, conceptUUID, null, null, 
-					"sample  description text with double space", false);
+//			Concept concept = new Concept(conceptUUID, null, true, null, false);
+//			Description description = new Description(UUID.randomUUID(), null, true, null, conceptUUID, null, null, 
+//					"sample  description text with double space", false);
 			List<Object> objects = new ArrayList<Object>();
-			objects.add(concept);
-			objects.add(description);
+//			objects.add(concept);
+//			objects.add(description);
 			ResultsCollectorWorkBench results = RulesLibrary.checkObjects(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
 			System.out.println("Done...");

@@ -19,7 +19,6 @@ package org.ihtsdo.rules.test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import junit.framework.TestCase;
 
@@ -28,13 +27,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.testmodel.Concept;
-import org.ihtsdo.testmodel.Description;
-import org.ihtsdo.testmodel.Relationship;
-import org.ihtsdo.testmodel.ResultsCollector;
-import org.ihtsdo.testmodel.TransitiveClosureHelperMock;
+import org.ihtsdo.tk.helper.ResultsCollector;
 
 /**
  * The Class DomainModelTestCheck.
@@ -82,22 +76,22 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 					"rules/change-set.xml", true);
 			System.out.println("Knowledge base updated");
 			
-			UUID conceptUUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
-			Concept concept = new Concept(conceptUUID, null, true, null, false);
-			Description description = new Description(UUID.randomUUID(), null, true, null, conceptUUID, null, null, 
-					"sample  description text with double ++space", false);
-			description.setTypeId(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next());
-			description.setConceptId(conceptUUID);
-			Relationship relationship = new Relationship();
-			relationship.setSourceId("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
-			relationship.setTypeId("f770e2d8-91e6-3c55-91be-f794ee835265");
-			relationship.setDestinationId("5032532f-6b58-31f9-84c1-4a365dde4449");
+//			UUID conceptUUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
+//			Concept concept = new Concept(conceptUUID, null, true, null, false);
+//			Description description = new Description(UUID.randomUUID(), null, true, null, conceptUUID, null, null, 
+//					"sample  description text with double ++space", false);
+//			description.setTypeId(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids().iterator().next());
+//			description.setConceptId(conceptUUID);
+//			Relationship relationship = new Relationship();
+//			relationship.setSourceId("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
+//			relationship.setTypeId("f770e2d8-91e6-3c55-91be-f794ee835265");
+//			relationship.setDestinationId("5032532f-6b58-31f9-84c1-4a365dde4449");
 			List<Object> objects = new ArrayList<Object>();
-			objects.add(concept);
-			objects.add(description);
-			description.setId(UUID.randomUUID());
-			objects.add(description);
-			objects.add(relationship);
+//			objects.add(concept);
+//			objects.add(description);
+//			description.setId(UUID.randomUUID());
+//			objects.add(description);
+//			objects.add(relationship);
 			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
 			System.out.println("Done...");

@@ -92,7 +92,8 @@ public class TestUsingLibrary extends AbstractConceptTest {
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG);
 			I_GetConceptData spanishLanguageRefset = null;
 			
-			spanishLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
+			spanishLanguageRefset = null; //TODO: migrate to core 
+						//Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
 			
 			return RulesLibrary.checkConcept(concept, RulesLibrary.CONCEPT_MODEL_PKG, spanishLanguageRefset, true).getAlertList();
 		} catch (Exception e) {
