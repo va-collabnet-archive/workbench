@@ -17,11 +17,10 @@
 package org.ihtsdo.rules.testmodel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.ihtsdo.testmodel.ResultsCollector;
+import org.ihtsdo.tk.helper.ResultsCollector;
 
 /**
  * The Class ResultsCollectorWorkBench.

@@ -21,7 +21,6 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +125,8 @@ public class TestListUsingLibrary extends AbstractTask {
 				I_GetConceptData conceptInList = model.getElementAt(i);
 				
 				I_GetConceptData spanishLanguageRefset = null;
-				spanishLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
+				spanishLanguageRefset = null; //TODO: migrate to core
+					//Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
 				
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
 						RulesLibrary.CONCEPT_MODEL_PKG, spanishLanguageRefset, false);

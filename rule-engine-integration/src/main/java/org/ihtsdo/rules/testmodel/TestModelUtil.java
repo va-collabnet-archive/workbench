@@ -43,18 +43,13 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.testmodel.Concept;
-import org.ihtsdo.testmodel.Description;
-import org.ihtsdo.testmodel.Identifier;
-import org.ihtsdo.testmodel.Relationship;
-import org.ihtsdo.testmodel.TerminologyComponent;
 
 /**
  * The Class TestModelUtil.
  */
 public class TestModelUtil {
 
-	public static List<TerminologyComponent> convertUncommittedToTestModel(I_GetConceptData concept, boolean convertConcept,
+	/*public static List<TerminologyComponent> convertUncommittedToTestModel(I_GetConceptData concept, boolean convertConcept,
 			boolean convertDescriptions, boolean convertRelationships, boolean convertIds) {
 		List<TerminologyComponent> convertedComponents = new ArrayList<TerminologyComponent>();
 		I_TermFactory tf = Terms.get();
@@ -174,7 +169,7 @@ public class TestModelUtil {
 
 	}
 
-	/**
+	*//**
 	 * Convert to test model.
 	 * 
 	 * @param concept the concept
@@ -184,7 +179,7 @@ public class TestModelUtil {
 	 * @param convertIds the convert ids
 	 * 
 	 * @return the list< terminology component>
-	 */
+	 *//*
 	public static List<TerminologyComponent> convertToTestModel(I_GetConceptData concept, boolean convertConcept,
 			boolean convertDescriptions, boolean convertRelationships, boolean convertIds) {
 		List<TerminologyComponent> convertedComponents = new ArrayList<TerminologyComponent>();
@@ -297,7 +292,7 @@ public class TestModelUtil {
 		return convertedComponents;
 	}
 
-	/**
+	*//**
 	 * Gets the workbench concept.
 	 * 
 	 * @param concept the concept
@@ -306,10 +301,10 @@ public class TestModelUtil {
 	 * 
 	 * @throws TerminologyException the terminology exception
 	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
+	 *//*
 	public static I_GetConceptData getWorkbenchConcept(Concept concept) throws TerminologyException, IOException {
 		return Terms.get().getConcept(new UUID[] {concept.getId()});
-	}
+	}*/
 
 
 	/**

@@ -31,12 +31,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.rules.testmodel.TestModelUtil;
-import org.ihtsdo.testmodel.Concept;
-import org.ihtsdo.testmodel.Description;
-import org.ihtsdo.testmodel.Relationship;
-import org.ihtsdo.testmodel.ResultsCollector;
-import org.ihtsdo.testmodel.TransitiveClosureHelperMock;
+import org.ihtsdo.tk.helper.ResultsCollector;
 
 /**
  * The Class DomainModelTestCheck.
@@ -94,8 +89,8 @@ public class DroolsUncommittedAgentKnowledgeBaseTest extends TestCase {
 					config);
 			tf.addUncommitted(concept);
 			List<Object> objects = new ArrayList<Object>();
-			objects.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
-			objects.add(new TransitiveClosureHelperMock());
+//			objects.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
+//			objects.add(new TransitiveClosureHelperMock());
 			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
 			System.out.println("Done...");

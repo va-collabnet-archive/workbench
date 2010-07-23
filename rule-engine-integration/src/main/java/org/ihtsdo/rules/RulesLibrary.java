@@ -55,9 +55,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
-import org.ihtsdo.rules.testmodel.TestModelUtil;
-import org.ihtsdo.testmodel.TerminologyComponent;
-import org.ihtsdo.testmodel.TransitiveClosureHelperMock;
 
 /**
  * The Class RulesLibrary.
@@ -118,16 +115,17 @@ public class RulesLibrary {
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
 		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
 
-		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
-		if (onlyUncommittedContent) {
-			termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
-		} else {
-			termComponents.addAll(TestModelUtil.convertToTestModel(concept, true, true, true, true));
-		}
-
-		for (TerminologyComponent termComponent : termComponents) {
-			ksession.insert(termComponent);
-		}
+		//TODO: convert to tk model
+//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
+//		if (onlyUncommittedContent) {
+//			termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
+//		} else {
+//			termComponents.addAll(TestModelUtil.convertToTestModel(concept, true, true, true, true));
+//		}
+//
+//		for (TerminologyComponent termComponent : termComponents) {
+//			ksession.insert(termComponent);
+//		}
 
 //		if (languageRefset != null) {
 //			termComponents = TestModelUtil.convertContextualizedDescriptionsToTestModel(concept, languageRefset);
@@ -186,7 +184,7 @@ public class RulesLibrary {
 
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
-		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperMock());
+		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
 
 		//ksession.insert(new TransitiveClosureHelperMock());
 
