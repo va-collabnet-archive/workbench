@@ -101,19 +101,19 @@ public class EConceptAttributesVersionTest {
 
     private EConceptAttributesRevision makeTestComponent1() {
         EConceptAttributesRevision testComponent = new EConceptAttributesRevision();
-        testComponent.defined = false;
-        testComponent.pathUuid = new UUID(4, 5);
-        testComponent.statusUuid = new UUID(8, 9);
-        testComponent.time = this.myTime;
+        testComponent.setDefined(false);
+        testComponent.setPathUuid(new UUID(4, 5));
+        testComponent.setStatusUuid(new UUID(8, 9));
+        testComponent.setTime(this.myTime);
         return testComponent;
     }
 
     private EConceptAttributesRevision makeTestComponent2() {
         EConceptAttributesRevision testComponent = new EConceptAttributesRevision();
-        testComponent.defined = true;
-        testComponent.pathUuid = new UUID(8, 7);
-        testComponent.statusUuid = new UUID(6, 5);
-        testComponent.time = this.myTime;
+        testComponent.setDefined(true);
+        testComponent.setPathUuid(new UUID(8, 7));
+        testComponent.setStatusUuid(new UUID(6, 5));
+        testComponent.setTime(this.myTime);
         return testComponent;
     }
 

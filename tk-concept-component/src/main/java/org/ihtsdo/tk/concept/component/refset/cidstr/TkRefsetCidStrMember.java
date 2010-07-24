@@ -14,8 +14,8 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected String strValue;
+    public UUID c1Uuid;
+    public String strValue;
 
     public TkRefsetCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

@@ -33,8 +33,8 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.EConceptAttributes;
-import org.ihtsdo.etypes.EConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -50,12 +50,12 @@ public class ConceptAttributes
 		super(enclosingConcept, input);
 	}
 
-	public ConceptAttributes(EConceptAttributes eAttr, Concept c) throws IOException {
+	public ConceptAttributes(TkConceptAttributes eAttr, Concept c) throws IOException {
 		super(eAttr, c);
 		defined = eAttr.isDefined();
 		if (eAttr.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
-			for (EConceptAttributesRevision ear: eAttr.getRevisionList()) {
+			for (TkConceptAttributesRevision ear: eAttr.getRevisionList()) {
 				revisions.add(new ConceptAttributesRevision(ear, this));
 			}
 		}

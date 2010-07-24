@@ -9,7 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.etypes.ERefsetStrRevision;
+import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -89,7 +89,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 		stringValue = input.readString();
 	}
 
-	public StrRevision(ERefsetStrRevision eVersion,
+	public StrRevision(TkRefsetStrRevision eVersion,
 			StrMember primoridalMember) {
 		super(eVersion, primoridalMember);
 		this.stringValue = eVersion.getStringValue();

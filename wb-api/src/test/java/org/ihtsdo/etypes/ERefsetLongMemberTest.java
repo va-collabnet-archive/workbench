@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,7 +138,7 @@ public class ERefsetLongMemberTest {
         member.statusUuid = new UUID(5386, 4497);
         member.time = this.myTime;
         member.primordialUuid = new UUID(320, 230);
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierLong ac = new EIdentifierLong();
         ac.authorityUuid = new UUID(4350, 5469);
         ac.denotation = 44;
@@ -144,7 +146,7 @@ public class ERefsetLongMemberTest {
         ac.statusUuid = new UUID(5386, 4497);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<ERefsetLongRevision>();
+        member.revisions = new ArrayList<TkRefsetLongRevision>();
         ERefsetLongRevision rsv = new ERefsetLongRevision();
         rsv.longValue = 99;
         rsv.pathUuid = new UUID(4350, 5469);
@@ -165,7 +167,7 @@ public class ERefsetLongMemberTest {
         member.statusUuid = new UUID(44, 44);
         member.time = this.myTime;
         member.primordialUuid = new UUID(55, 55);
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierLong ac = new EIdentifierLong();
         ac.authorityUuid = new UUID(66, 77);
         ac.denotation = 999;
@@ -173,7 +175,7 @@ public class ERefsetLongMemberTest {
         ac.statusUuid = new UUID(111, 111);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<ERefsetLongRevision>();
+        member.revisions = new ArrayList<TkRefsetLongRevision>();
         ERefsetLongRevision rsv = new ERefsetLongRevision();
         rsv.longValue = 333;
         rsv.pathUuid = new UUID(222, 222);

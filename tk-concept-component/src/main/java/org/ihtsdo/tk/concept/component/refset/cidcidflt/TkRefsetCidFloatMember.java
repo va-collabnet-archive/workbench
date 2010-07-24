@@ -14,8 +14,8 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected float floatValue;
+    public UUID c1Uuid;
+    public float floatValue;
 
     public TkRefsetCidFloatMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

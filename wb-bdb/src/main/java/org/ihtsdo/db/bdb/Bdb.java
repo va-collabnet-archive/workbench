@@ -35,10 +35,10 @@ import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
 import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
-import org.ihtsdo.etypes.ERevision;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.concept.component.TkRevision;
 
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
@@ -211,7 +211,7 @@ public class Bdb {
 	}
 
 	
-	public static int getSapNid(ERevision version) {
+	public static int getSapNid(TkRevision version) {
 		assert version.getTime() != 0: "Time is 0; was it initialized?";
 		assert version.getTime() != Long.MIN_VALUE: "Time is Long.MIN_VALUE; was it initialized?";
 		assert version.getStatusUuid() != null: "Status is null; was it initialized?";

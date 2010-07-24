@@ -7,12 +7,11 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.ihtsdo.tk.concept.component.TkRevision;
-import org.ihtsdo.tk.concept.component.TkComponent.IDENTIFIER_PART_TYPES;
 
 public abstract class TkIdentifier extends TkRevision {
 
     public static final long serialVersionUID = 1;
-    protected UUID authorityUuid;
+    public UUID authorityUuid;
 
     public TkIdentifier(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

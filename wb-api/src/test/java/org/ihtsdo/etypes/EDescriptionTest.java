@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,7 +118,7 @@ public class EDescriptionTest {
         desc.statusUuid = new UUID(8, 9);
         desc.time = this.myTime;
         desc.primordialUuid = new UUID(20, 30);
-        desc.revisions = new ArrayList<EDescriptionRevision>();
+        desc.revisions = new ArrayList<TkDescriptionRevision>();
 
         EDescriptionRevision edv = new EDescriptionRevision();
         edv.initialCaseSignificant = true;
@@ -142,7 +143,7 @@ public class EDescriptionTest {
         desc.statusUuid = new UUID(6, 2);
         desc.time = this.myTime;
         desc.primordialUuid = new UUID(2, 18);
-        desc.revisions = new ArrayList<EDescriptionRevision>();
+        desc.revisions = new ArrayList<TkDescriptionRevision>();
         EDescriptionRevision edv = new EDescriptionRevision();
         edv.initialCaseSignificant = true;
         edv.lang = "en-uk";

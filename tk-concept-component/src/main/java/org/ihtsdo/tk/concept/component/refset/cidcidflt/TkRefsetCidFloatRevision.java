@@ -11,8 +11,8 @@ public class TkRefsetCidFloatRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected float floatValue;
+    public UUID c1Uuid;
+    public float floatValue;
 
     public TkRefsetCidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

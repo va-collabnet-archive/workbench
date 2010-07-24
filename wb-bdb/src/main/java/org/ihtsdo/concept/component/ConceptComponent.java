@@ -39,12 +39,12 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
-import org.ihtsdo.etypes.EComponent;
-import org.ihtsdo.etypes.EIdentifier;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.concept.component.TkComponent;
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -740,7 +740,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     // TODO move the EComponent constructors to a helper class or factory
     // class...
     // So that the size of this class is kept limited ?
-    protected ConceptComponent(EComponent<?> eComponent, Concept enclosingConcept) throws IOException {
+    protected ConceptComponent(TkComponent<?> eComponent, Concept enclosingConcept) throws IOException {
         super();
         assert enclosingConcept != null;
         assert eComponent != null;
@@ -824,12 +824,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    public void convertId(List<EIdentifier> list) {
+    public void convertId(List<TkIdentifier> list) {
         if (list == null || list.size() == 0) {
             return;
         }
         additionalIdentifierVersions = new ArrayList<IdentifierVersion>(list.size());
-        for (EIdentifier idv : list) {
+        for (TkIdentifier idv : list) {
             Object denotation = idv.getDenotation();
             switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
             case LONG:

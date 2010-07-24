@@ -13,15 +13,15 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID conceptUuid;
+    public UUID conceptUuid;
 
-    protected String format;
+    public String format;
 
-    protected byte[] image;
+    public byte[] image;
 
-    protected String textDescription;
+    public String textDescription;
 
-    protected UUID typeUuid;
+    public UUID typeUuid;
 
     public TkMedia(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

@@ -12,7 +12,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERefsetCidStrRevision;
+import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -98,7 +98,7 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 		strValue = input.readString();
 	}
 
-	public CidStrRevision(ERefsetCidStrRevision eVersion,
+	public CidStrRevision(TkRefsetCidStrRevision eVersion,
 			CidStrMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());

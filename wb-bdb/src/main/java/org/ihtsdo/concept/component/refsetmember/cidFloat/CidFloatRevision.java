@@ -10,7 +10,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERefsetCidFloatRevision;
+import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -95,7 +95,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		floatValue = input.readFloat();
 	}
 
-	public CidFloatRevision(ERefsetCidFloatRevision eVersion,
+	public CidFloatRevision(TkRefsetCidFloatRevision eVersion,
 			CidFloatMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());

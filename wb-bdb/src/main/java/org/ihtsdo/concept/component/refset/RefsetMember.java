@@ -5,13 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Path;
@@ -20,12 +16,10 @@ import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
-import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
@@ -33,9 +27,9 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERefsetMember;
-import org.ihtsdo.etypes.ERevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.TkRevision;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -172,11 +166,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 			return (I_ExtendByRefPart) super.getMutablePart();
 		}
 
-		public ERefsetMember<?> getERefsetMember() throws TerminologyException, IOException {
+		public TkRefsetAbstractMember<?> getERefsetMember() throws TerminologyException, IOException {
 			throw new UnsupportedOperationException("subclass must override");
 		}
 
-		public ERevision getERefsetRevision() throws TerminologyException, IOException {
+		public TkRevision getERefsetRevision() throws TerminologyException, IOException {
 			throw new UnsupportedOperationException("subclass must override");
 		}
 
@@ -191,7 +185,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	public abstract R makeAnalog();
 
 
-    public RefsetMember(ERefsetMember<?> refsetMember, 
+    public RefsetMember(TkRefsetAbstractMember<?> refsetMember, 
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());

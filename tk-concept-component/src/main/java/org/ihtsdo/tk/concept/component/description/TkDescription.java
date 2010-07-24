@@ -13,15 +13,15 @@ import org.ihtsdo.tk.concept.component.TkComponent;
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
     public static final long serialVersionUID = 1;
 
-    protected UUID conceptUuid;
+    public UUID conceptUuid;
 
-    protected boolean initialCaseSignificant;
+    public boolean initialCaseSignificant;
 
-    protected String lang;
+    public String lang;
 
-    protected String text;
+    public String text;
 
-    protected UUID typeUuid;
+    public UUID typeUuid;
 
     public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

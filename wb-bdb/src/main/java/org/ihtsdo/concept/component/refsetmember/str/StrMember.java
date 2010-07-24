@@ -19,6 +19,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -96,12 +98,12 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 		super(enclosingConcept, input);
 	}
 
-	public StrMember(ERefsetStrMember refsetMember, Concept enclosingConcept) throws IOException {
+	public StrMember(TkRefsetStrMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		stringValue = refsetMember.getStrValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<StrRevision>();
-			for (ERefsetStrRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetStrRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new StrRevision(eVersion, this));
 			}
 		}

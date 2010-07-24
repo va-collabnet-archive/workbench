@@ -12,7 +12,7 @@ import org.ihtsdo.tk.concept.component.TkComponent;
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision> implements I_ConceptualizeExternally {
     public static final long serialVersionUID = 1;
 
-    protected boolean defined;
+    public boolean defined;
 
     public TkConceptAttributes() {
         super();

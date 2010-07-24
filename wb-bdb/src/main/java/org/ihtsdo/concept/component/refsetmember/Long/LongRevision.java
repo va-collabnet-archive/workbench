@@ -9,8 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
-import org.ihtsdo.etypes.ERefsetLongRevision;
+import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -84,7 +83,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		longValue = input.readLong();
 	}
 
-	public LongRevision(ERefsetLongRevision eVersion,
+	public LongRevision(TkRefsetLongRevision eVersion,
 			LongMember member) {
 		super(eVersion, member);
 		this.longValue = eVersion.getLongValue();

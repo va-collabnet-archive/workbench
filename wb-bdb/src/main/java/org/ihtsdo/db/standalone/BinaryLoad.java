@@ -26,9 +26,9 @@ import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.etypes.EDescription;
-import org.ihtsdo.etypes.EDescriptionRevision;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
 
 public class BinaryLoad {
 	public static void main(String[] args) {
@@ -63,12 +63,12 @@ public class BinaryLoad {
 		            			1737903371905020890L) {
 		            		System.out.println("Found it...");
 		            	}
-		            	for (EDescription d: eConcept.getDescriptions()) {
+		            	for (TkDescription d: eConcept.getDescriptions()) {
 		            		if (d.revisions != null) {
 		            			if (d.getText().startsWith("concept retired")) {
 		            				System.out.println("Found by desc: " + eConcept);
 		            			}
-			            		for (EDescriptionRevision dv: d.getRevisions()) {
+			            		for (TkDescriptionRevision dv: d.getRevisions()) {
 			            			if (dv.getText().startsWith("concept retired")) {
 			            				System.out.println("Found by desc: " + eConcept);
 			            			}

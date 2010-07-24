@@ -21,6 +21,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanMember;
+import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -104,13 +106,13 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 		super(enclosingConcept, input);
 	}
 
-	public BooleanMember(ERefsetBooleanMember refsetMember,
+	public BooleanMember(TkRefsetBooleanMember refsetMember,
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		booleanValue = refsetMember.getBooleanValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<BooleanRevision>();
-			for (ERefsetBooleanRevision eVersion : refsetMember
+			for (TkRefsetBooleanRevision eVersion : refsetMember
 					.getRevisionList()) {
 				revisions.add(new BooleanRevision(eVersion, this));
 			}

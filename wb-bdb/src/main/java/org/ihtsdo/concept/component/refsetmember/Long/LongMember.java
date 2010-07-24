@@ -9,11 +9,10 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.integer.IntRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERefsetLongMember;
-import org.ihtsdo.etypes.ERefsetLongRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongMember;
+import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -33,12 +32,12 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		super(enclosingConcept, input);
 	}
 
-	public LongMember(ERefsetLongMember refsetMember, Concept enclosingConcept) throws IOException {
+	public LongMember(TkRefsetLongMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		longValue =refsetMember.getLongValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<LongRevision>();
-			for (ERefsetLongRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetLongRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new LongRevision(eVersion, this));
 			}
 		}

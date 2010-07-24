@@ -13,7 +13,7 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
 
     public static final long serialVersionUID = 1;
 
-    protected long longValue;
+    public long longValue;
 
     public TkRefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

@@ -35,6 +35,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -112,7 +113,7 @@ public class ConceptAttributesVersionTest {
 		eca1.setPathUuid(p0Concept.getPrimUuid());
 		eca1.setTime(t0);
 		eca1.setDefined(true);
-        eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
+        eca1.revisions = new ArrayList<TkConceptAttributesRevision>(1);
 		
          t1 = t0 + 10000;
  		 addAttribute(t1, eca1, p0Concept.getPrimUuid());

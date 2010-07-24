@@ -7,7 +7,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -98,7 +98,7 @@ public class RelationshipRevision
 		this.typeNid = input.readInt();
 	}
 
-	public RelationshipRevision(ERelationshipRevision erv, 
+	public RelationshipRevision(TkRelationshipRevision erv, 
 			Relationship primordialRel) {
 		super(Bdb.uuidToNid(erv.getStatusUuid()), 
 				Bdb.uuidToNid(erv.getAuthorUuid()), 

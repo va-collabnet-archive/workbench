@@ -15,13 +15,14 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidLong.CidLongRevision;
 import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrMember;
+import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -115,13 +116,13 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
 		super(enclosingConcept, input);
 	}
 
-	public CidStrMember(ERefsetCidStrMember refsetMember, Concept enclosingConcept) throws IOException {
+	public CidStrMember(TkRefsetCidStrMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		strValue = refsetMember.getStrValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<CidStrRevision>();
-			for (ERefsetCidStrRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetCidStrRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidStrRevision(eVersion, this));
 			}
 		}

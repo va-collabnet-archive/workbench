@@ -11,9 +11,9 @@ public class TkMediaRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected String textDescription;
+    public String textDescription;
 
-    protected UUID typeUuid;
+    public UUID typeUuid;
 
     public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

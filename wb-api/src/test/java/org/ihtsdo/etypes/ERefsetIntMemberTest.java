@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -137,9 +139,8 @@ public class ERefsetIntMemberTest {
         member.time = this.myTime;
         member.primordialUuid = new UUID(320, 230);
         // Add additionalIdComponents
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierUuid ac = new EIdentifierUuid();
-        EIdentifierUuid.primordialAuthority = new UUID(564, 564);
         ac.authorityUuid = new UUID(4350, 5469);
         ac.denotation = new UUID(4350, 5469);
         ac.pathUuid = new UUID(4350, 5469);
@@ -147,7 +148,7 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.extraVersions = new ArrayList<ERefsetIntRevision>();
+        member.extraVersions = new ArrayList<TkRefsetIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
         rsv.intValue = 3; 
         rsv.pathUuid = new UUID(4350, 5469);
@@ -169,9 +170,8 @@ public class ERefsetIntMemberTest {
         member.time = this.myTime;
         member.primordialUuid = new UUID(55, 55);
         // Add additionalIdComponents
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierUuid ac = new EIdentifierUuid();
-        EIdentifierUuid.primordialAuthority = new UUID(66, 66);
         ac.authorityUuid = new UUID(77, 77);
         ac.denotation = new UUID(88, 88);
         ac.pathUuid = new UUID(99, 99);
@@ -179,7 +179,7 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.extraVersions = new ArrayList<ERefsetIntRevision>();
+        member.extraVersions = new ArrayList<TkRefsetIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
         rsv.intValue = 3; 
         rsv.pathUuid = new UUID(222, 222);

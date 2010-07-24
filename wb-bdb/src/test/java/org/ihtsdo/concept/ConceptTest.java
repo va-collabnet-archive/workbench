@@ -20,9 +20,17 @@ import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageRevision;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 import org.ihtsdo.etypes.ERefsetCidIntRevision;
-import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.concept.component.media.TkMedia;
+import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -61,7 +69,7 @@ public class ConceptTest {
         ecav.setPathUuid(eca1.getPathUuid());
         ecav.setStatusUuid(eca1.getStatusUuid());
         ecav.setTime(eca1.getTime() + 10);
-        eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
+        eca1.revisions = new ArrayList<TkConceptAttributesRevision>(1);
         eca1.revisions.add(ecav);
         
         testConcept.setConceptAttributes(eca1);
@@ -166,7 +174,7 @@ public class ConceptTest {
         testConcept.setConceptAttributes(ca);
 
         // Add a Description
-        List<EDescription> descriptionList = new ArrayList<EDescription>(1);
+        List<TkDescription> descriptionList = new ArrayList<TkDescription>(1);
         EDescription desc = new EDescription();
         desc.additionalIds = null;
         desc.primordialUuid = new UUID(20, 30);
@@ -178,7 +186,7 @@ public class ConceptTest {
         desc.setTypeUuid(new UUID(4, 7));
         desc.setText("hello world");
         desc.setTime(this.myTime);
-        desc.revisions = new ArrayList<EDescriptionRevision>(2);
+        desc.revisions = new ArrayList<TkDescriptionRevision>(2);
         // add an EDescriptionVersion version
         EDescriptionRevision edv = new EDescriptionRevision();
         edv.setInitialCaseSignificant(true);
@@ -235,7 +243,7 @@ public class ConceptTest {
 
         
         // Add Relationships
-        List<ERelationship> relList =  new ArrayList<ERelationship>(1);
+        List<TkRelationship> relList =  new ArrayList<TkRelationship>(1);
 
         ERelationship rel = new ERelationship();
         rel.additionalIds = null;
@@ -250,7 +258,7 @@ public class ConceptTest {
         rel.setStatusUuid(new UUID(86, 97));
         rel.setTime(this.myTime);
         rel.setTypeUuid(new UUID(44, 55));
-        rel.revisions = new ArrayList<ERelationshipRevision>(2);
+        rel.revisions = new ArrayList<TkRelationshipRevision>(2);
         // Add relationship versions
         ERelationshipRevision erv = new ERelationshipRevision();
         erv.setCharacteristicUuid(new UUID(861, 947));
@@ -292,7 +300,7 @@ public class ConceptTest {
         testConcept.setRelationships(relList);
 
         // Add Images
-        List<EImage> imageList = new ArrayList<EImage>(1);
+        List<TkMedia> imageList = new ArrayList<TkMedia>(1);
         EImage img = new EImage();
         img.setAdditionalIdComponents(null);
         img.setConceptUuid(new UUID(120, 130)); 
@@ -304,7 +312,7 @@ public class ConceptTest {
         img.setTextDescription("interesting image");
         img.setTime(this.myTime);
         img.setTypeUuid(new UUID(121, 132));
-        img.revisions = new ArrayList<EImageRevision>(2);
+        img.revisions = new ArrayList<TkMediaRevision>(2);
         // Image Versions
         EImageRevision iv = new EImageRevision();
         iv.setPathUuid(new UUID(24450, 5469));
@@ -325,7 +333,7 @@ public class ConceptTest {
         testConcept.setImages(imageList);
         
         // Add Refset Members  
-        List<ERefsetMember<?>> refsetList =  new ArrayList<ERefsetMember<?>>();
+        List<TkRefsetAbstractMember<?>> refsetList =  new ArrayList<TkRefsetAbstractMember<?>>();
 
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
         cidIntMember.additionalIds = null; 
@@ -338,7 +346,7 @@ public class ConceptTest {
         cidIntMember.setRefsetUuid(new UUID(14386, 65497));
         cidIntMember.setStatusUuid(new UUID(5386, 4497));
         cidIntMember.setTime(this.myTime);
-        cidIntMember.revisions = new ArrayList<ERefsetCidIntRevision>(2);
+        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
         rciv.setC1Uuid(new UUID(114386, 656497));
@@ -378,7 +386,7 @@ public class ConceptTest {
         testConcept.setConceptAttributes(ca);
 
         // Add a Description
-        List<EDescription> descriptionList = new ArrayList<EDescription>(1);
+        List<TkDescription> descriptionList = new ArrayList<TkDescription>(1);
         EDescription desc = new EDescription();
         desc.additionalIds = null;
         desc.primordialUuid = new UUID(21, 21);
@@ -390,7 +398,7 @@ public class ConceptTest {
         desc.setTypeUuid(new UUID(25, 25));
         desc.setText("good morning");
         desc.setTime(this.myTime);
-        desc.revisions = new ArrayList<EDescriptionRevision>(2);
+        desc.revisions = new ArrayList<TkDescriptionRevision>(2);
         // add an EDescriptionVersion version
         EDescriptionRevision edv = new EDescriptionRevision();
         edv.setInitialCaseSignificant(true);
@@ -415,7 +423,7 @@ public class ConceptTest {
         testConcept.setDescriptions(descriptionList);
 
         // Add Relationships
-        List<ERelationship> relList =  new ArrayList<ERelationship>(1);
+        List<TkRelationship> relList =  new ArrayList<TkRelationship>(1);
 
         ERelationship rel = new ERelationship();
         rel.additionalIds = null;
@@ -430,7 +438,7 @@ public class ConceptTest {
         rel.setStatusUuid(new UUID(57, 57));
         rel.setTime(this.myTime);
         rel.setTypeUuid(new UUID(58, 58));
-        rel.revisions = new ArrayList<ERelationshipRevision>(2);
+        rel.revisions = new ArrayList<TkRelationshipRevision>(2);
         // Add relationship versions
         ERelationshipRevision erv = new ERelationshipRevision();
         erv.setCharacteristicUuid(new UUID(59, 59));
@@ -455,7 +463,7 @@ public class ConceptTest {
         testConcept.setRelationships(relList);
 
         // Add Images
-        List<EImage> imageList = new ArrayList<EImage>(1);
+        List<TkMedia> imageList = new ArrayList<TkMedia>(1);
         EImage img = new EImage();
         img.setAdditionalIdComponents(null);
         img.setConceptUuid(new UUID(70, 70)); 
@@ -467,7 +475,7 @@ public class ConceptTest {
         img.setTextDescription("an amazing image!");
         img.setTime(this.myTime);
         img.setTypeUuid(new UUID(74, 74));
-        img.revisions = new ArrayList<EImageRevision>(2);
+        img.revisions = new ArrayList<TkMediaRevision>(2);
         // Image Versions
         EImageRevision iv = new EImageRevision();
         iv.setPathUuid(new UUID(75, 75));
@@ -488,7 +496,7 @@ public class ConceptTest {
         testConcept.setImages(imageList);
         
         // Add Refset Members  
-        List<ERefsetMember<?>> refsetList =  new ArrayList<ERefsetMember<?>>();
+        List<TkRefsetAbstractMember<?>> refsetList =  new ArrayList<TkRefsetAbstractMember<?>>();
 
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
         cidIntMember.additionalIds = null; 
@@ -501,7 +509,7 @@ public class ConceptTest {
         cidIntMember.setRefsetUuid(new UUID(94, 94));
         cidIntMember.setStatusUuid(new UUID(95, 95));
         cidIntMember.setTime(this.myTime);
-        cidIntMember.revisions = new ArrayList<ERefsetCidIntRevision>(2);
+        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
         rciv.setC1Uuid(new UUID(96, 96));

@@ -32,8 +32,8 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.EDescription;
-import org.ihtsdo.etypes.EDescriptionRevision;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -201,7 +201,7 @@ public class Description
 		super(enclosingConcept, input);
 	}
 	
-	public Description(EDescription eDesc, Concept enclosingConcept) throws IOException {
+	public Description(TkDescription eDesc, Concept enclosingConcept) throws IOException {
 		super(eDesc, enclosingConcept);
 		initialCaseSignificant = eDesc.isInitialCaseSignificant();
 		lang = eDesc.getLang();
@@ -210,7 +210,7 @@ public class Description
 		primordialSapNid = Bdb.getSapNid(eDesc);
 		if (eDesc.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<DescriptionRevision>();
-			for (EDescriptionRevision edv: eDesc.getRevisionList()) {
+			for (TkDescriptionRevision edv: eDesc.getRevisionList()) {
 				try {
 					revisions.add(new DescriptionRevision(edv, this));
 				} catch (TerminologyException e) {

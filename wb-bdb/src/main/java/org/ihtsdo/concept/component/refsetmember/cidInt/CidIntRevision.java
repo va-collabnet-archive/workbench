@@ -11,7 +11,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERefsetCidIntRevision;
+import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -99,7 +99,7 @@ public class CidIntRevision
 		intValue = input.readInt();
 	}
 
-	public CidIntRevision(ERefsetCidIntRevision eVersion,
+	public CidIntRevision(TkRefsetCidIntRevision eVersion,
 			CidIntMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());

@@ -24,22 +24,26 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.etypes.EComponent;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
-import org.ihtsdo.etypes.EConceptAttributesRevision;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
-import org.ihtsdo.etypes.EIdentifier;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageRevision;
-import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.etypes.ERevision;
+import org.ihtsdo.tk.concept.component.TkComponent;
+import org.ihtsdo.tk.concept.component.TkRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.concept.component.media.TkMedia;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
     private int minSapNid = Integer.MIN_VALUE;
@@ -92,7 +96,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ec.setConceptAttributes(processConceptAttributes(c, changed));
         ec.setDescriptions(processDescriptions(c, changed));
         ec.setRelationships(processRelationships(c, changed));
-        ec.setImages(processImages(c, changed));
+        ec.setImages(processMedia(c, changed));
         ec.setRefsetMembers(processRefsetMembers(c, changed));
 
         if (processNidLists) {
@@ -113,10 +117,10 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return null;
     }
 
-    private List<ERefsetMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed) throws IOException {
-        List<ERefsetMember<?>> eRefsetMembers = new ArrayList<ERefsetMember<?>>(c.getRefsetMembers().size());
+    private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkRefsetAbstractMember<?>> eRefsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
         for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
-            ERefsetMember<?> eMember = null;
+        	TkRefsetAbstractMember<?> eMember = null;
             for (RefsetMember<?, ?>.Version v : member.getTuples()) {
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
@@ -127,7 +131,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                                 eRefsetMembers.add(eMember);
                                 setupFirstVersion(eMember, v);
                             } else {
-                                ERevision eRevision = v.getERefsetRevision();
+                            	TkRevision eRevision = v.getERefsetRevision();
                                 setupRevision(eMember, v, eRevision);
                             }
                         } catch (TerminologyException e) {
@@ -173,8 +177,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return uuidUuidList;
     }
 
-    private List<EImage> processImages(Concept c, AtomicBoolean changed) throws IOException {
-        List<EImage> eImages = new ArrayList<EImage>();
+    private List<TkMedia> processMedia(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkMedia> eImages = new ArrayList<TkMedia>();
         for (Image img : c.getImages()) {
             EImage eImg = null;
             for (Image.Version v : img.getTuples()) {
@@ -203,10 +207,10 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return eImages;
     }
 
-    private List<ERelationship> processRelationships(Concept c, AtomicBoolean changed) throws IOException {
-        List<ERelationship> rels = new ArrayList<ERelationship>(c.getSourceRels().size());
+    private List<TkRelationship> processRelationships(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkRelationship> rels = new ArrayList<TkRelationship>(c.getSourceRels().size());
         for (Relationship r : c.getSourceRels()) {
-            ERelationship ecr = null;
+        	TkRelationship ecr = null;
             for (Relationship.Version v : r.getTuples()) {
                 if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
@@ -236,8 +240,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return rels;
     }
 
-    private List<EDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
-        List<EDescription> eDescriptions = new ArrayList<EDescription>(c.getDescriptions().size());
+    private List<TkDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkDescription> eDescriptions = new ArrayList<TkDescription>(c.getDescriptions().size());
         for (Description d : c.getDescriptions()) {
             EDescription ecd = null;
             for (Description.Version v : d.getTuples()) {
@@ -268,8 +272,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return eDescriptions;
     }
 
-    private EConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
-        EConceptAttributes eca = null;
+    private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
+    	TkConceptAttributes eca = null;
         for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
             if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                 changed.set(true);
@@ -279,7 +283,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                         eca.setDefined(v.isDefined());
                         setupFirstVersion(eca, v);
                     } else {
-                        EConceptAttributesRevision ecv = new EConceptAttributesRevision();
+                        TkConceptAttributesRevision ecv = new TkConceptAttributesRevision();
                         ecv.setDefined(v.isDefined());
                         setupRevision(eca, v, ecv);
                     }
@@ -290,7 +294,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     }
 
     @SuppressWarnings("unchecked")
-    private void setupRevision(EComponent ec, ConceptComponent.Version v, ERevision ev) throws IOException {
+    private void setupRevision(TkComponent ec, ConceptComponent.Version v, TkRevision ev) throws IOException {
         if (ec.revisions == null) {
             ec.revisions = new ArrayList();
         }
@@ -301,14 +305,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     }
 
     @SuppressWarnings("unchecked")
-    private void setupFirstVersion(EComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
+    private void setupFirstVersion(TkComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
         ec.primordialUuid = v.getPrimUuid();
         ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
         ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
         ec.setTime(v.getTime());
         if (v.getAdditionalIdentifierParts() != null) {
             for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
-                EIdentifier eIdv = null;
+                TkIdentifier eIdv = null;
                 if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                     if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
                         eIdv = new EIdentifierLong();

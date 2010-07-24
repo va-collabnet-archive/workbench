@@ -17,21 +17,21 @@ import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrMember;
 import org.ihtsdo.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
 import org.ihtsdo.concept.component.refsetmember.str.StrMember;
-import org.ihtsdo.etypes.ERefsetMember;
-import org.ihtsdo.etypes.ERefsetBooleanMember;
-import org.ihtsdo.etypes.ERefsetCidCidCidMember;
-import org.ihtsdo.etypes.ERefsetCidCidMember;
-import org.ihtsdo.etypes.ERefsetCidCidStrMember;
-import org.ihtsdo.etypes.ERefsetCidFloatMember;
-import org.ihtsdo.etypes.ERefsetCidIntMember;
-import org.ihtsdo.etypes.ERefsetCidLongMember;
-import org.ihtsdo.etypes.ERefsetCidMember;
-import org.ihtsdo.etypes.ERefsetCidStrMember;
-import org.ihtsdo.etypes.ERefsetIntMember;
-import org.ihtsdo.etypes.ERefsetLongMember;
-import org.ihtsdo.etypes.ERefsetMemberMember;
-import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanMember;
+import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongMember;
+import org.ihtsdo.tk.concept.component.refset.cid.TkRefsetCidMember;
+import org.ihtsdo.tk.concept.component.refset.cidcid.TkRefsetCidCidMember;
+import org.ihtsdo.tk.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
+import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatMember;
+import org.ihtsdo.tk.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
+import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntMember;
+import org.ihtsdo.tk.concept.component.refset.cidlong.TkRefsetCidLongMember;
+import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrMember;
+import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntMember;
+import org.ihtsdo.tk.concept.component.refset.member.TkRefsetMember;
+import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -83,35 +83,35 @@ public class RefsetMemberFactory  {
 		}
 	}
 	
-	public static RefsetMember<?,?> create(ERefsetMember<?> refsetMember, Concept enclosingConcept) throws IOException {
+	public static RefsetMember<?,?> create(TkRefsetAbstractMember<?> refsetMember, Concept enclosingConcept) throws IOException {
 		assert enclosingConcept != null;
 		switch (refsetMember.getType()) {
 		case BOOLEAN:
-			return new BooleanMember((ERefsetBooleanMember) refsetMember, enclosingConcept);
+			return new BooleanMember((TkRefsetBooleanMember) refsetMember, enclosingConcept);
 		case CID:
-			return new CidMember((ERefsetCidMember) refsetMember, enclosingConcept);
+			return new CidMember((TkRefsetCidMember) refsetMember, enclosingConcept);
 		case CID_CID:
-			return new CidCidMember((ERefsetCidCidMember) refsetMember, enclosingConcept);
+			return new CidCidMember((TkRefsetCidCidMember) refsetMember, enclosingConcept);
 		case CID_CID_CID:
-			return new CidCidCidMember((ERefsetCidCidCidMember) refsetMember, enclosingConcept);
+			return new CidCidCidMember((TkRefsetCidCidCidMember) refsetMember, enclosingConcept);
 		case CID_CID_STR:
-			return new CidCidStrMember((ERefsetCidCidStrMember) refsetMember, enclosingConcept);
+			return new CidCidStrMember((TkRefsetCidCidStrMember) refsetMember, enclosingConcept);
 		case CID_INT:
-			return new CidIntMember((ERefsetCidIntMember) refsetMember, enclosingConcept);
+			return new CidIntMember((TkRefsetCidIntMember) refsetMember, enclosingConcept);
 		case CID_STR:
-			return new CidStrMember((ERefsetCidStrMember) refsetMember, enclosingConcept);
+			return new CidStrMember((TkRefsetCidStrMember) refsetMember, enclosingConcept);
 		case INT:
-			return new IntMember((ERefsetIntMember) refsetMember, enclosingConcept);
+			return new IntMember((TkRefsetIntMember) refsetMember, enclosingConcept);
 		case CID_FLOAT:
-			return new CidFloatMember((ERefsetCidFloatMember) refsetMember, enclosingConcept);
+			return new CidFloatMember((TkRefsetCidFloatMember) refsetMember, enclosingConcept);
 		case MEMBER:
-			return new MembershipMember((ERefsetMemberMember) refsetMember, enclosingConcept);
+			return new MembershipMember((TkRefsetMember) refsetMember, enclosingConcept);
 		case STR:
-			return new StrMember((ERefsetStrMember) refsetMember, enclosingConcept);
+			return new StrMember((TkRefsetStrMember) refsetMember, enclosingConcept);
 		case CID_LONG:
-			return new CidLongMember((ERefsetCidLongMember) refsetMember, enclosingConcept);
+			return new CidLongMember((TkRefsetCidLongMember) refsetMember, enclosingConcept);
 		case LONG:
-			return new LongMember((ERefsetLongMember) refsetMember, enclosingConcept);
+			return new LongMember((TkRefsetLongMember) refsetMember, enclosingConcept);
 
 		default:
 			throw new UnsupportedOperationException(

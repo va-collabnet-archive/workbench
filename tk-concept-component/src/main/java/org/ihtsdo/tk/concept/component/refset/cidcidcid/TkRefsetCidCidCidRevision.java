@@ -11,9 +11,9 @@ public class TkRefsetCidCidCidRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected UUID c2Uuid;
-    protected UUID c3Uuid;
+    public UUID c1Uuid;
+    public UUID c2Uuid;
+    public UUID c3Uuid;
 
     public TkRefsetCidCidCidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

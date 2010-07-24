@@ -5,13 +5,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.ihtsdo.tk.concept.component.TkComponent.IDENTIFIER_PART_TYPES;
 
 public class TkIdentifierLong extends TkIdentifier {
 
     public static final long serialVersionUID = 1;
 
-    protected long denotation;
+    public long denotation;
 
     public TkIdentifierLong(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super(in, dataVersion);

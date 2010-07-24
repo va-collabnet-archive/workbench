@@ -107,12 +107,12 @@ public class EConceptAttributesTest {
     private EConceptAttributes makeTestComponent1() {
         EConceptAttributes testComponent = new EConceptAttributes();
         testComponent.primordialUuid = new UUID(2, 3);
-        testComponent.defined = false;
+        testComponent.setDefined(false);
         testComponent.revisions = null;
         testComponent.additionalIds = null;
-        testComponent.pathUuid = new UUID(4, 5);
-        testComponent.statusUuid = new UUID(8, 9);
-        testComponent.time = this.myTime;
+        testComponent.setPathUuid(new UUID(4, 5));
+        testComponent.setStatusUuid(new UUID(8, 9));
+        testComponent.setTime(this.myTime);
         
         return testComponent;
     }
@@ -120,12 +120,12 @@ public class EConceptAttributesTest {
     private EConceptAttributes makeTestComponent2() {
         EConceptAttributes testComponent = new EConceptAttributes();
         testComponent.primordialUuid = new UUID(4, 7);
-        testComponent.defined = true;
+        testComponent.setDefined(true);
         testComponent.revisions = null;
         testComponent.additionalIds = null;
-        testComponent.pathUuid = new UUID(2, 1);
-        testComponent.statusUuid = new UUID(5, 8);
-        testComponent.time = this.myTime;
+        testComponent.setPathUuid(new UUID(2, 1));
+        testComponent.setStatusUuid(new UUID(5, 8));
+        testComponent.setTime(this.myTime);
         
         return testComponent;
     }

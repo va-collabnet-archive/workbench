@@ -130,7 +130,6 @@ public class EIdentifierVersionUuidTest {
 
         EIdentifierUuid iv = new EIdentifierUuid();
         iv.denotation = new UUID(2323, 3434);
-        EIdentifierUuid.primordialAuthority = new UUID(4334, 2332);
         iv.authorityUuid = new UUID(3333, 4444);
         iv.pathUuid = new UUID(24450, 5469);
         iv.statusUuid = new UUID(8668, 9757);
@@ -143,7 +142,6 @@ public class EIdentifierVersionUuidTest {
         
         EIdentifierUuid iv = new EIdentifierUuid();
         iv.denotation = new UUID(4321, 1234);
-        EIdentifierUuid.primordialAuthority = new UUID(1221, 2112);
         iv.authorityUuid = new UUID(2222, 1111);
         iv.pathUuid = new UUID(34450, 3469);
         iv.statusUuid = new UUID(4668, 4757);

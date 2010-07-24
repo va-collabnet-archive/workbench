@@ -14,10 +14,10 @@ public class TkRefsetCidLongMember extends TkRefsetAbstractMember<TkRefsetCidLon
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected long longValue;
+    public UUID c1Uuid;
+    public long longValue;
 
-    protected List<TkRefsetCidLongRevision> extraVersions;
+    public List<TkRefsetCidLongRevision> extraVersions;
 
     public TkRefsetCidLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

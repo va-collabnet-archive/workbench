@@ -32,8 +32,8 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.EImage;
-import org.ihtsdo.etypes.EImageRevision;
+import org.ihtsdo.tk.concept.component.media.TkMedia;
+import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -171,16 +171,16 @@ public class Image
 		super(enclosingConcept, input);
 	}
 
-	public Image(EImage eImage, Concept enclosingConcept) throws IOException {
-		super(eImage, enclosingConcept);
-		image = eImage.getImage();
-		format = eImage.getFormat();
-		textDescription = eImage.getTextDescription();
-		typeNid = Bdb.uuidToNid(eImage.getTypeUuid());
-		primordialSapNid = Bdb.getSapNid(eImage);
-		if (eImage.getRevisionList() != null) {
+	public Image(TkMedia eMedia, Concept enclosingConcept) throws IOException {
+		super(eMedia, enclosingConcept);
+		image = eMedia.getImage();
+		format = eMedia.getFormat();
+		textDescription = eMedia.getTextDescription();
+		typeNid = Bdb.uuidToNid(eMedia.getTypeUuid());
+		primordialSapNid = Bdb.getSapNid(eMedia);
+		if (eMedia.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<ImageRevision>();
-			for (EImageRevision eiv: eImage.getRevisionList()) {
+			for (TkMediaRevision eiv: eMedia.getRevisionList()) {
 				revisions.add(new ImageRevision(eiv, this));
 			}
 		}

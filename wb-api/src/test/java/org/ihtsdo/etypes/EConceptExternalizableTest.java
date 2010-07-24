@@ -10,6 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.concept.component.media.TkMedia;
+import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +25,8 @@ import org.junit.Test;
 public class EConceptExternalizableTest {
 
     private EConcept testConcept; 
-    private long myTime = Long.MIN_VALUE;
+    @SuppressWarnings("unused")
+	private long myTime = Long.MIN_VALUE;
     
     @Before
     public void setUp() throws Exception {
@@ -63,7 +72,7 @@ public class EConceptExternalizableTest {
         testConcept.conceptAttributes.time = System.currentTimeMillis(); 
         
         // Add a Description 
-        testConcept.descriptions = new ArrayList<EDescription>(1);
+        testConcept.descriptions = new ArrayList<TkDescription>(1);
         EDescription desc = new EDescription();
         desc.conceptUuid  = new UUID(11, 12);
         desc.initialCaseSignificant = false;
@@ -75,7 +84,7 @@ public class EConceptExternalizableTest {
         desc.authorUuid = UUID.randomUUID();
         desc.time = System.currentTimeMillis(); 
         desc.primordialUuid = new UUID(20, 30);
-        desc.revisions = new ArrayList<EDescriptionRevision>();
+        desc.revisions = new ArrayList<TkDescriptionRevision>();
         // add a EDescriptionVersion
         EDescriptionRevision edv = new EDescriptionRevision();
         edv.initialCaseSignificant = true;
@@ -104,7 +113,7 @@ public class EConceptExternalizableTest {
         
         
         // Add Relationships  
-        testConcept.relationships = new ArrayList<ERelationship>(1);
+        testConcept.relationships = new ArrayList<TkRelationship>(1);
         ERelationship rel = new ERelationship();
         rel.c1Uuid = new UUID(40, 50);
         rel.c2Uuid = new UUID(41, 52);
@@ -118,7 +127,7 @@ public class EConceptExternalizableTest {
         rel.time = System.currentTimeMillis(); 
         rel.primordialUuid = new UUID(20, 30);
         testConcept.relationships.add(rel);
-        rel.revisions = new ArrayList<ERelationshipRevision>();
+        rel.revisions = new ArrayList<TkRelationshipRevision>();
         // Add relationship versions 
         ERelationshipRevision erv = new ERelationshipRevision();
         erv.characteristicUuid  = new UUID(861, 947);
@@ -143,7 +152,7 @@ public class EConceptExternalizableTest {
         
         
         // Add Images  
-        testConcept.images = new ArrayList<EImage>(1);
+        testConcept.images = new ArrayList<TkMedia>(1);
         EImage img = new EImage();
         img.conceptUuid = new UUID(120, 130);
         img.format = "jpg";
@@ -156,7 +165,7 @@ public class EConceptExternalizableTest {
         img.time = System.currentTimeMillis(); 
         img.primordialUuid = new UUID(206, 305);
         testConcept.images.add(img);
-        img.revisions = new ArrayList<EImageRevision>();
+        img.revisions = new ArrayList<TkMediaRevision>();
         // Image Versions 
         EImageRevision iv = new EImageRevision();
         iv.textDescription = "interesting image e";
@@ -178,7 +187,7 @@ public class EConceptExternalizableTest {
         
         
         // Add Refset Members  
-        testConcept.refsetMembers = new ArrayList<ERefsetMember<?>>();
+        testConcept.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>();
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
         cidIntMember.c1Uuid = new UUID(4386, 5497);
         cidIntMember.intValue = 33;
@@ -190,7 +199,7 @@ public class EConceptExternalizableTest {
         cidIntMember.time = System.currentTimeMillis(); 
         cidIntMember.primordialUuid = new UUID(320, 230);
         testConcept.refsetMembers.add(cidIntMember);
-        cidIntMember.revisions = new ArrayList<ERefsetCidIntRevision>();
+        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>();
         // Add extra Refset Members Versions 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
         rciv.c1Uuid = new UUID(114386, 656497);

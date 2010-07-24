@@ -11,10 +11,10 @@ public class TkRelationshipRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID characteristicUuid;
-    protected UUID refinabilityUuid;
-    protected int group;
-    protected UUID typeUuid;
+    public UUID characteristicUuid;
+    public UUID refinabilityUuid;
+    public int group;
+    public UUID typeUuid;
 
     public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

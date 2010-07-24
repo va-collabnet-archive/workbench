@@ -10,7 +10,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERefsetCidCidStrRevision;
+import org.ihtsdo.tk.concept.component.refset.cidcidstr.TkRefsetCidCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -104,7 +104,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
 		strValue = input.readString();
 	}
 
-	public CidCidStrRevision(ERefsetCidCidStrRevision eVersion,
+	public CidCidStrRevision(TkRefsetCidCidStrRevision eVersion,
 			CidCidStrMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());

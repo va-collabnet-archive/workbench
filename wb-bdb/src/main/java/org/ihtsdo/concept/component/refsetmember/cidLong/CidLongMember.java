@@ -9,12 +9,11 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERefsetCidLongMember;
-import org.ihtsdo.etypes.ERefsetCidLongRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.cidlong.TkRefsetCidLongMember;
+import org.ihtsdo.tk.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -36,13 +35,13 @@ public class CidLongMember
 		super(enclosingConcept, input);
 	}
 
-	public CidLongMember(ERefsetCidLongMember refsetMember, Concept enclosingConcept) throws IOException {
+	public CidLongMember(TkRefsetCidLongMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		longValue = refsetMember.getLongValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<CidLongRevision>();
-			for (ERefsetCidLongRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetCidLongRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidLongRevision(eVersion, this));
 			}
 		}

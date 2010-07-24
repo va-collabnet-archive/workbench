@@ -13,12 +13,12 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected UUID c2Uuid;
-    protected UUID characteristicUuid;
-    protected UUID refinabilityUuid;
-    protected int relGroup;
-    protected UUID typeUuid;
+    public UUID c1Uuid;
+    public UUID c2Uuid;
+    public UUID characteristicUuid;
+    public UUID refinabilityUuid;
+    public int relGroup;
+    public UUID typeUuid;
 
     public TkRelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

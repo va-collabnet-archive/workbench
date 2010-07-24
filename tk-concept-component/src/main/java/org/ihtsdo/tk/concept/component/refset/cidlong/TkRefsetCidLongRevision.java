@@ -11,8 +11,8 @@ public class TkRefsetCidLongRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected UUID c1Uuid;
-    protected long longValue;
+    public UUID c1Uuid;
+    public long longValue;
 
     public TkRefsetCidLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

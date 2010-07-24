@@ -8,7 +8,7 @@ import org.ihtsdo.tk.concept.component.TkRevision;
 
 public class TkRefsetRevision extends TkRevision {
 
-    protected static final long serialVersionUID = 1;
+    public static final long serialVersionUID = 1;
 
     public TkRefsetRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

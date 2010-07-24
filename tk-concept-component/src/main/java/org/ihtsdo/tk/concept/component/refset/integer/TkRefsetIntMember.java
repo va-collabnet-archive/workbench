@@ -13,9 +13,9 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
 
     public static final long serialVersionUID = 1;
 
-    protected int intValue;
+    public int intValue;
 
-    protected List<TkRefsetIntRevision> extraVersions;
+    public List<TkRefsetIntRevision> extraVersions;
 
     public TkRefsetIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

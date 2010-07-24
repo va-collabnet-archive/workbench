@@ -19,6 +19,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
+import org.ihtsdo.tk.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -130,7 +132,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		super(enclosingConcept, input);
 	}
 
-	public CidCidCidMember(ERefsetCidCidCidMember refsetMember, 
+	public CidCidCidMember(TkRefsetCidCidCidMember refsetMember, 
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
@@ -138,7 +140,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 		c3Nid = Bdb.uuidToNid(refsetMember.getC3Uuid());
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<CidCidCidRevision>();
-			for (ERefsetCidCidCidRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetCidCidCidRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidCidCidRevision(eVersion, this));
 			}
 		}

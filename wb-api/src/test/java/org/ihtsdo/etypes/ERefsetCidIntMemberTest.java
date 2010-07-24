@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,7 +137,7 @@ public class ERefsetCidIntMemberTest {
         cidIntMember.statusUuid = new UUID(5386, 4497);
         cidIntMember.time = this.myTime;
         cidIntMember.primordialUuid = new UUID(320, 230);
-        cidIntMember.revisions = new ArrayList<ERefsetCidIntRevision>();
+        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>();
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
         rciv.c1Uuid = new UUID(114386, 656497);
         rciv.intValue = 99;
@@ -158,7 +159,7 @@ public class ERefsetCidIntMemberTest {
         cidIntMember.statusUuid = new UUID(555, 4497);
         cidIntMember.time = this.myTime;
         cidIntMember.primordialUuid = new UUID(666, 230);
-        cidIntMember.revisions = new ArrayList<ERefsetCidIntRevision>();
+        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>();
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
         rciv.c1Uuid = new UUID(777, 656497);
         rciv.intValue = 16;

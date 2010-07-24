@@ -10,9 +10,9 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERefsetCidFloatMember;
-import org.ihtsdo.etypes.ERefsetCidFloatRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatMember;
+import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -33,13 +33,13 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		super(enclosingConcept, input);
 	}
 
-	public CidFloatMember(ERefsetCidFloatMember refsetMember, Concept enclosingConcept) throws IOException {
+	public CidFloatMember(TkRefsetCidFloatMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		floatValue = refsetMember.getFloatValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<CidFloatRevision>();
-			for (ERefsetCidFloatRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetCidFloatRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidFloatRevision(eVersion, this));
 			}
 		}

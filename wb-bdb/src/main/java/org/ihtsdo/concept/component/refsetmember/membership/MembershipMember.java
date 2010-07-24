@@ -9,11 +9,10 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.Long.LongRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERefsetMemberMember;
-import org.ihtsdo.etypes.ERefsetRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.member.TkRefsetMember;
+import org.ihtsdo.tk.concept.component.refset.member.TkRefsetRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -31,11 +30,11 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 		super(enclosingConcept, input);
 	}
 
-	public MembershipMember(ERefsetMemberMember refsetMember, Concept enclosingConcept) throws IOException {
+	public MembershipMember(TkRefsetMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<MembershipRevision>();
-			for (ERefsetRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new MembershipRevision(eVersion, this));
 			}
 		}

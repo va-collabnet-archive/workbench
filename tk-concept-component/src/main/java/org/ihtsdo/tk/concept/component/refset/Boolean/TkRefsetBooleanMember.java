@@ -13,7 +13,7 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
 
     public static final long serialVersionUID = 1;
 
-    protected boolean booleanValue;
+    public boolean booleanValue;
 
     public TkRefsetBooleanMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

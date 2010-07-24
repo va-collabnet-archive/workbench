@@ -29,8 +29,8 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.etypes.ERelationship;
-import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -214,7 +214,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 	
 
-	public Relationship(ERelationship eRel, Concept enclosingConcept) throws IOException {
+	public Relationship(TkRelationship eRel, Concept enclosingConcept) throws IOException {
 		super(eRel, enclosingConcept);
 		c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
 		setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
@@ -224,7 +224,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		primordialSapNid = Bdb.getSapNid(eRel);
 		if (eRel.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<RelationshipRevision>();
-			for (ERelationshipRevision erv: eRel.getRevisionList()) {
+			for (TkRelationshipRevision erv: eRel.getRevisionList()) {
 				revisions.add(new RelationshipRevision(erv, this));
 			}
 		}

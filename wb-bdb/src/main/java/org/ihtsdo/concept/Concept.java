@@ -63,12 +63,13 @@ import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.etypes.EConceptAttributes;
-import org.ihtsdo.etypes.EDescription;
-import org.ihtsdo.etypes.EImage;
-import org.ihtsdo.etypes.ERefsetMember;
-import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.concept.TkConcept;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.media.TkMedia;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 
 import cern.colt.map.OpenLongObjectHashMap;
 
@@ -107,7 +108,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	
 	private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
 			throws IOException {
-		EConceptAttributes eAttr = eConcept.getConceptAttributes();
+		TkConceptAttributes eAttr = eConcept.getConceptAttributes();
 		if (eAttr != null) {
 			if (c.getConceptAttributes() == null) {
 				setAttributesFromEConcept(c, eAttr);
@@ -122,7 +123,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				setDescriptionsFromEConcept(eConcept, c);
 			} else {
 				Set<Integer> currentDNids = c.data.getDescNids();
-				for (EDescription ed: eConcept.getDescriptions()) {
+				for (TkDescription ed: eConcept.getDescriptions()) {
 					int dNid = Bdb.uuidToNid(ed.primordialUuid);
 					Description d = c.getDescription(dNid);
 					if (currentDNids.contains(dNid) && d != null) {
@@ -142,7 +143,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				setRelationshipsFromEConcept(eConcept, c);
 			} else {
 				Set<Integer> currentSrcRelNids = c.data.getSrcRelNids();
-				for (ERelationship er: eConcept.getRelationships()) {
+				for (TkRelationship er: eConcept.getRelationships()) {
 					int rNid = Bdb.uuidToNid(er.primordialUuid);
 					Relationship r = c.getSourceRel(rNid);
 					if (currentSrcRelNids.contains(rNid) && r != null) {
@@ -159,7 +160,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				setImagesFromEConcept(eConcept, c);
 			} else {
 				Set<Integer> currentImageNids = c.data.getImageNids();
-				for (EImage eImg: eConcept.getImages()) {
+				for (TkMedia eImg: eConcept.getImages()) {
 					int iNid = Bdb.uuidToNid(eImg.primordialUuid);
 					Image img = c.getImage(iNid);
 					if (currentImageNids.contains(iNid) && img != null) {
@@ -176,7 +177,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				setRefsetMembersFromEConcept(eConcept, c);
 			} else {
 				Set<Integer> currentMemberNids = c.data.getMemberNids();
-				for (ERefsetMember<?> er: eConcept.getRefsetMembers()) {
+				for (TkRefsetAbstractMember<?> er: eConcept.getRefsetMembers()) {
 					int rNid = Bdb.uuidToNid(er.primordialUuid);
 					RefsetMember<?, ?> r = c.getRefsetMember(rNid);
 					if (currentMemberNids.contains(rNid) && r != null) {
@@ -358,7 +359,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private static void setRefsetMembersFromEConcept(EConcept eConcept,
 			Concept c) throws IOException {
-		for (ERefsetMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
+		for (TkRefsetAbstractMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
 			RefsetMember<?, ?> refsetMember = RefsetMemberFactory.create(
 					eRefsetMember, c);
 			c.data.add(refsetMember);
@@ -367,7 +368,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private static void setImagesFromEConcept(EConcept eConcept, Concept c)
 			throws IOException {
-		for (EImage eImage : eConcept.getImages()) {
+		for (TkMedia eImage : eConcept.getImages()) {
 			Image img = new Image(eImage, c);
 			c.data.add(img);
 		}
@@ -375,22 +376,22 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private static void setRelationshipsFromEConcept(EConcept eConcept,
 			Concept c) throws IOException {
-		for (ERelationship eRel : eConcept.getRelationships()) {
+		for (TkRelationship eRel : eConcept.getRelationships()) {
 			Relationship rel = new Relationship(eRel, c);
 			c.data.add(rel);
 		}
 	}
 
-	private static void setDescriptionsFromEConcept(EConcept eConcept, Concept c)
+	private static void setDescriptionsFromEConcept(TkConcept eConcept, Concept c)
 			throws IOException {
-		for (EDescription eDesc : eConcept.getDescriptions()) {
+		for (TkDescription eDesc : eConcept.getDescriptions()) {
 			Description desc = new Description(eDesc, c);
 			c.data.add(desc);
 		}
 	}
 
 	private static void setAttributesFromEConcept(Concept c,
-			EConceptAttributes eAttr) throws IOException {
+			TkConceptAttributes eAttr) throws IOException {
 		assert eAttr != null;
 		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
 		c.data.set(attr);

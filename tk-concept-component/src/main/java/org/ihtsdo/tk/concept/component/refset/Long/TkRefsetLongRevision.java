@@ -10,7 +10,7 @@ public class TkRefsetLongRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected long longValue;
+    public long longValue;
 
     public TkRefsetLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

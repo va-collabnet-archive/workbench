@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,7 +136,7 @@ public class ERefsetBooleanMemberTest {
         member.refsetUuid = new UUID(14386, 65497);
         member.statusUuid = new UUID(5386, 4497);
         member.time = this.myTime;
-        member.revisions = new ArrayList<ERefsetBooleanRevision>();
+        member.revisions = new ArrayList<TkRefsetBooleanRevision>();
         ERefsetBooleanRevision rsv = new ERefsetBooleanRevision();
         rsv.booleanValue = true;
         rsv.pathUuid = new UUID(4350, 5469);
@@ -155,7 +156,7 @@ public class ERefsetBooleanMemberTest {
         member.refsetUuid = new UUID(330, 331);
         member.statusUuid = new UUID(332, 333);
         member.time = this.myTime;
-        member.revisions = new ArrayList<ERefsetBooleanRevision>();
+        member.revisions = new ArrayList<TkRefsetBooleanRevision>();
         ERefsetBooleanRevision rsv = new ERefsetBooleanRevision();
         rsv.booleanValue = true;
         rsv.pathUuid = new UUID(334, 335);

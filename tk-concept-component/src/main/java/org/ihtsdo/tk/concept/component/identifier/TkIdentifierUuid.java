@@ -6,15 +6,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-import org.ihtsdo.tk.concept.component.TkComponent.IDENTIFIER_PART_TYPES;
 
 
 public class TkIdentifierUuid extends TkIdentifier {
 
     public static final long serialVersionUID = 1;
 
-    protected static UUID generatedUuid = UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66");
-    protected UUID denotation;
+    public static UUID generatedUuid = UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66");
+    public UUID denotation;
 
     public TkIdentifierUuid(UUID denotation) {
 		super();

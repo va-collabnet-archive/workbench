@@ -16,6 +16,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class ImageTest {
         ecav.setAuthorUuid(eca1.getAuthorUuid());
         ecav.setPathUuid(eca1.getPathUuid());
         ecav.setTime(eca1.getTime() + 10);
-        eca1.revisions = new ArrayList<EConceptAttributesRevision>(1);
+        eca1.revisions = new ArrayList<TkConceptAttributesRevision>(1);
         eca1.revisions.add(ecav);
         
         testConcept.setConceptAttributes(eca1);

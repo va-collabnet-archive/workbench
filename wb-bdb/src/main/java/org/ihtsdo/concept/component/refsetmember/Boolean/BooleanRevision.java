@@ -9,7 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.etypes.ERefsetBooleanRevision;
+import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -85,7 +85,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
         booleanValue = input.readBoolean();
 	}
 
-	public BooleanRevision(ERefsetBooleanRevision eVersion,
+	public BooleanRevision(TkRefsetBooleanRevision eVersion,
 			BooleanMember booleanMember) {
 		super(eVersion, booleanMember);
 		this.booleanValue = eVersion.isBooleanValue();

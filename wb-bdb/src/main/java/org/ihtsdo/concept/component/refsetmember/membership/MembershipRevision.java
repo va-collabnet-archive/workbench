@@ -7,7 +7,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.etypes.ERefsetRevision;
+import org.ihtsdo.tk.concept.component.refset.member.TkRefsetRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -74,7 +74,7 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
          return new MembershipRevision(getStatusId(), getPathId(), getTime(), this);
     }
 
-	public MembershipRevision(ERefsetRevision eVersion,
+	public MembershipRevision(TkRefsetRevision eVersion,
 			MembershipMember member) {
 		super(eVersion, member);
 	}

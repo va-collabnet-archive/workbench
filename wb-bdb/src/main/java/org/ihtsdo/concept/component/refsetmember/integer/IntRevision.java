@@ -9,8 +9,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
-import org.ihtsdo.etypes.ERefsetIntRevision;
+import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -88,7 +87,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 		intValue = input.readInt();
 	}
 
-	public IntRevision(ERefsetIntRevision eVersion,
+	public IntRevision(TkRefsetIntRevision eVersion,
 			IntMember member) {
 		super(eVersion, member);
 		this.intValue = eVersion.getIntValue();

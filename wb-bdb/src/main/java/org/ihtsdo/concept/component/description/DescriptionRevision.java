@@ -12,7 +12,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.EDescriptionRevision;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -153,7 +153,7 @@ public class DescriptionRevision
 		typeNid = Bdb.uuidsToNid(umPart.getTypeId());
 	}
 
-	public DescriptionRevision(EDescriptionRevision edv, 
+	public DescriptionRevision(TkDescriptionRevision edv, 
 			Description primoridalMember) throws TerminologyException, IOException {
 		super(Bdb.uuidToNid(edv.getStatusUuid()),
 				Terms.get().getAuthorNid(),

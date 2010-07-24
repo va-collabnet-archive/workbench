@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -138,9 +140,8 @@ public class ERefsetCidStrMemberTest {
         member.time = this.myTime;
         member.primordialUuid = new UUID(320, 230);
         // Add additionalIdComponents 
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierUuid ac = new EIdentifierUuid();
-        EIdentifierUuid.primordialAuthority = new UUID(564, 564);
         ac.authorityUuid = new UUID(4350, 5469);
         ac.denotation = new UUID(4350, 5469);
         ac.pathUuid = new UUID(4350, 5469);
@@ -148,7 +149,7 @@ public class ERefsetCidStrMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions 
-        member.revisions = new ArrayList<ERefsetCidStrRevision>();
+        member.revisions = new ArrayList<TkRefsetCidStrRevision>();
         ERefsetCidStrRevision rsv = new ERefsetCidStrRevision();
         rsv.c1Uuid = new UUID(4350, 5469);
         rsv.strValue = "VALUE 1"; 
@@ -172,9 +173,8 @@ public class ERefsetCidStrMemberTest {
         member.time = this.myTime;
         member.primordialUuid = new UUID(666, 230);
         // Add additionalIdComponents 
-        member.additionalIds = new ArrayList<EIdentifier>();
+        member.additionalIds = new ArrayList<TkIdentifier>();
         EIdentifierUuid ac = new EIdentifierUuid();
-        EIdentifierUuid.primordialAuthority = new UUID(777, 564);
         ac.authorityUuid = new UUID(888, 5469);
         ac.denotation = new UUID(999, 5469);
         ac.pathUuid = new UUID(1111, 5469);
@@ -182,7 +182,7 @@ public class ERefsetCidStrMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions 
-        member.revisions = new ArrayList<ERefsetCidStrRevision>();
+        member.revisions = new ArrayList<TkRefsetCidStrRevision>();
         ERefsetCidStrRevision rsv = new ERefsetCidStrRevision();
         rsv.c1Uuid = new UUID(3333, 5469);
         rsv.strValue = "VALUE 2"; 

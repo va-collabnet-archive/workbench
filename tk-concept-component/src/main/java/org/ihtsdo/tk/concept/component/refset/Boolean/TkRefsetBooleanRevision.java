@@ -10,7 +10,7 @@ public class TkRefsetBooleanRevision extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    protected boolean booleanValue;
+    public boolean booleanValue;
 
     public TkRefsetBooleanRevision() {
         super();

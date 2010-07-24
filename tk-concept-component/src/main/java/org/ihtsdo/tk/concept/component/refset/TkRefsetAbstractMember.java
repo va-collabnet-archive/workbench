@@ -12,8 +12,8 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
 
     public static final long serialVersionUID = 1;
 
-    protected UUID refsetUuid;
-    protected UUID componentUuid;
+    public UUID refsetUuid;
+    public UUID componentUuid;
 
     public TkRefsetAbstractMember() {
         super();

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -137,7 +138,7 @@ public class EImageTest {
         img.statusUuid = new UUID(868, 977);
         img.time = this.myTime; 
         img.primordialUuid = new UUID(206, 305);
-        img.revisions = new ArrayList<EImageRevision>();
+        img.revisions = new ArrayList<TkMediaRevision>();
         EImageRevision iv = new EImageRevision();
         iv.textDescription = "interesting image e";
         iv.typeUuid = new UUID(1231, 1532);
@@ -160,7 +161,7 @@ public class EImageTest {
         img.statusUuid = new UUID(118, 119);
         img.time = this.myTime; 
         img.primordialUuid = new UUID(120, 121);
-        img.revisions = new ArrayList<EImageRevision>();
+        img.revisions = new ArrayList<TkMediaRevision>();
         EImageRevision iv = new EImageRevision();
         iv.textDescription = "interesting image e";
         iv.typeUuid = new UUID(122, 123);

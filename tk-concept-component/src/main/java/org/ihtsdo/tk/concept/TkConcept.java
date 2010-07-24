@@ -30,19 +30,19 @@ import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 public class TkConcept {
     public static final long serialVersionUID = 1;
 
-    protected static final int dataVersion = 3;
-    protected TkConceptAttributes conceptAttributes;
-    protected List<TkDescription> descriptions;
-    protected List<TkRelationship> relationships;
-    protected List<TkMedia> images;
-    protected List<TkRefsetAbstractMember<?>> refsetMembers;
-    protected List<UUID> destRelUuidTypeUuids;
-    protected List<UUID> refsetUuidMemberUuidForConcept;
-    protected List<UUID> refsetUuidMemberUuidForDescriptions;
-    protected List<UUID> refsetUuidMemberUuidForRels;
-    protected List<UUID> refsetUuidMemberUuidForImages;
-    protected List<UUID> refsetUuidMemberUuidForRefsetMembers;
-    protected UUID primordialUuid;
+    public static final int dataVersion = 3;
+    public TkConceptAttributes conceptAttributes;
+    public List<TkDescription> descriptions;
+    public List<TkRelationship> relationships;
+    public List<TkMedia> images;
+    public List<TkRefsetAbstractMember<?>> refsetMembers;
+    public List<UUID> destRelUuidTypeUuids;
+    public List<UUID> refsetUuidMemberUuidForConcept;
+    public List<UUID> refsetUuidMemberUuidForDescriptions;
+    public List<UUID> refsetUuidMemberUuidForRels;
+    public List<UUID> refsetUuidMemberUuidForImages;
+    public List<UUID> refsetUuidMemberUuidForRefsetMembers;
+    public UUID primordialUuid;
     
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();

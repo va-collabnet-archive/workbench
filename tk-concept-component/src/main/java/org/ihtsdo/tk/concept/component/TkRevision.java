@@ -12,11 +12,15 @@ import org.ihtsdo.tk.I_VersionExternally;
 public class TkRevision implements I_VersionExternally {
 
     public static final long serialVersionUID = 1;
+    
+    public static UUID nidToUuid(int nid) {
+    	throw new UnsupportedOperationException();
+    }
 
-    protected UUID statusUuid;
-    protected UUID authorUuid;
-    protected UUID pathUuid;
-	protected long time = Long.MIN_VALUE;
+    public UUID statusUuid;
+    public UUID authorUuid;
+    public UUID pathUuid;
+    public long time = Long.MIN_VALUE;
 
     public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -139,8 +143,12 @@ public class TkRevision implements I_VersionExternally {
             if (!this.statusUuid.equals(another.statusUuid)) {
                 return false;
             }
-            if (!this.authorUuid.equals(another.authorUuid)) {
-                return false;
+            if (this.authorUuid != null && another.authorUuid != null) {
+                if (!this.authorUuid.equals(another.authorUuid)) {
+                    return false;
+                }
+            } else if (!(this.authorUuid == null && another.authorUuid == null)) {
+            	return false;
             }
             if (!this.pathUuid.equals(another.pathUuid)) {
                 return false;

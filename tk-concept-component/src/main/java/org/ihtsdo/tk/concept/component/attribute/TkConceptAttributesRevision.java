@@ -10,7 +10,7 @@ import org.ihtsdo.tk.concept.component.TkRevision;
 public class TkConceptAttributesRevision extends TkRevision implements I_ConceptualizeExternally {
     public static final long serialVersionUID = 1;
 
-    protected boolean defined;
+    public boolean defined;
 
     public TkConceptAttributesRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();

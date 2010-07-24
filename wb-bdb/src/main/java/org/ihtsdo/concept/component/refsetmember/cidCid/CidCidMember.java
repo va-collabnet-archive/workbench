@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -15,12 +14,13 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.cidcid.TkRefsetCidCidMember;
+import org.ihtsdo.tk.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -112,13 +112,13 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 				input);
 	}
 
-	public CidCidMember(ERefsetCidCidMember refsetMember, Concept enclosingConcept) throws IOException {
+	public CidCidMember(TkRefsetCidCidMember refsetMember, Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
 		c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<CidCidRevision>();
-			for (ERefsetCidCidRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetCidCidRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new CidCidRevision(eVersion, this));
 			}
 		}

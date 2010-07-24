@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -139,7 +140,7 @@ public class ERelationshipTest {
         rel.statusUuid = new UUID(86, 97);
         rel.time = this.myTime;
         rel.primordialUuid = new UUID(20, 30);
-        rel.revisions = new ArrayList<ERelationshipRevision>();
+        rel.revisions = new ArrayList<TkRelationshipRevision>();
         ERelationshipRevision erv = new ERelationshipRevision();
         erv.characteristicUuid  = new UUID(861, 947);
         erv.refinabilityUuid  = new UUID(586, 937);
@@ -165,7 +166,7 @@ public class ERelationshipTest {
         rel.statusUuid = new UUID(72, 73);
         rel.time = this.myTime;
         rel.primordialUuid = new UUID(74, 75);
-        rel.revisions = new ArrayList<ERelationshipRevision>();
+        rel.revisions = new ArrayList<TkRelationshipRevision>();
         ERelationshipRevision erv = new ERelationshipRevision();
         erv.characteristicUuid  = new UUID(860, 861);
         erv.refinabilityUuid  = new UUID(862, 863);

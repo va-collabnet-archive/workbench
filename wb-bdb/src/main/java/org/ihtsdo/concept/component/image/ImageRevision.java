@@ -1,15 +1,12 @@
 package org.ihtsdo.concept.component.image;
 
-import java.io.IOException;
-
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.EImageRevision;
+import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -107,7 +104,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	}
 
 
-	public ImageRevision(EImageRevision eiv, 
+	public ImageRevision(TkMediaRevision eiv, 
 			Image primoridalMember) {
 		super(Bdb.uuidToNid(eiv.getStatusUuid()), 
 				  Bdb.uuidToNid(eiv.getAuthorUuid()), 

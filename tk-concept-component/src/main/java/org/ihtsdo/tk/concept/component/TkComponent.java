@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.concept.component.identifier.TkIdentifierString;
@@ -18,44 +19,6 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     public static final long serialVersionUID = 1;
 
     private static final int dataVersion = 3;
-
-    public enum IDENTIFIER_PART_TYPES {
-        LONG(1), STRING(2), UUID(3);
-
-        private int externalPartTypeToken;
-
-        IDENTIFIER_PART_TYPES(int externalPartTypeToken) {
-            this.externalPartTypeToken = externalPartTypeToken;
-        }
-
-        public void writeType(DataOutput output) throws IOException {
-            output.writeByte(externalPartTypeToken);
-        }
-
-        public static IDENTIFIER_PART_TYPES getType(Class<?> c) {
-            if (Long.class.isAssignableFrom(c)) {
-                return LONG;
-            } else if (String.class.isAssignableFrom(c)) {
-                return STRING;
-            } else if (UUID.class.isAssignableFrom(c)) {
-                return UUID;
-            }
-            throw new UnsupportedOperationException();
-        }
-
-        public static IDENTIFIER_PART_TYPES readType(DataInput input) throws IOException {
-            byte typeByte = input.readByte();
-            switch (typeByte) {
-            case 1:
-                return LONG;
-            case 2:
-                return STRING;
-            case 3:
-                return UUID;
-            }
-            throw new UnsupportedOperationException("Can't find byte: " + typeByte);
-        }
-    };
 
     public UUID primordialUuid;
 

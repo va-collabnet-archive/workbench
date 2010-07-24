@@ -15,12 +15,13 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrRevision;
 import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntMember;
+import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -93,13 +94,13 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 		super(enclosingConcept, input);
 	}
 
-	public IntMember(ERefsetIntMember refsetMember, 
+	public IntMember(TkRefsetIntMember refsetMember, 
 			Concept enclosingConcept) throws IOException {
 		super(refsetMember, enclosingConcept);
 		intValue =refsetMember.getIntValue();
 		if (refsetMember.getRevisionList() != null) {
 			revisions = new CopyOnWriteArrayList<IntRevision>();
-			for (ERefsetIntRevision eVersion: refsetMember.getRevisionList()) {
+			for (TkRefsetIntRevision eVersion: refsetMember.getRevisionList()) {
 				revisions.add(new IntRevision(eVersion, this));
 			}
 		}

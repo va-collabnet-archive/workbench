@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -137,7 +138,7 @@ public class ERefsetCidFloatMemberTest {
         member.refsetUuid = new UUID(14386, 65497);
         member.statusUuid = new UUID(5386, 4497);
         member.time = this.myTime;
-        member.revisions = new ArrayList<ERefsetCidFloatRevision>();
+        member.revisions = new ArrayList<TkRefsetCidFloatRevision>();
         ERefsetCidFloatRevision rsv = new ERefsetCidFloatRevision();
         rsv.c1Uuid = new UUID(4444, 4444);
         rsv.floatValue = 2;
@@ -160,7 +161,7 @@ public class ERefsetCidFloatMemberTest {
         member.refsetUuid = new UUID(4321, 7777);
         member.statusUuid = new UUID(4321, 8888);
         member.time = this.myTime;
-        member.revisions = new ArrayList<ERefsetCidFloatRevision>();
+        member.revisions = new ArrayList<TkRefsetCidFloatRevision>();
         ERefsetCidFloatRevision rsv = new ERefsetCidFloatRevision();
         rsv.c1Uuid = new UUID(555, 777);
         rsv.floatValue = 2;

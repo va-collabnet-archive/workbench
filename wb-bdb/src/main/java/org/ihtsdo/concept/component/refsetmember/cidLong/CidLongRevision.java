@@ -11,7 +11,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERefsetCidLongRevision;
+import org.ihtsdo.tk.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -97,7 +97,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 		longValue = input.readLong();
 	}
 
-	public CidLongRevision(ERefsetCidLongRevision eVersion,
+	public CidLongRevision(TkRefsetCidLongRevision eVersion,
 			CidLongMember member) {
 		super(eVersion, member);
 		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());

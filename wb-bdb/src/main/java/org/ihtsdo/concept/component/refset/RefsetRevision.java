@@ -1,13 +1,10 @@
 package org.ihtsdo.concept.component.refset;
 
-import java.io.IOException;
-
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.ERevision;
+import org.ihtsdo.tk.concept.component.TkRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -32,7 +29,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 		super(input, primordialComponent);
 	}
 
-	public RefsetRevision(ERevision eVersion,
+	public RefsetRevision(TkRevision eVersion,
 			C member) {
 		super(Bdb.uuidToNid(eVersion.getStatusUuid()), 
 				Bdb.uuidToNid(eVersion.getAuthorUuid()),
