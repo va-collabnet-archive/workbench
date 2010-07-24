@@ -5,6 +5,8 @@
       <unpack>false</unpack>
       <scope>runtime</scope>
       <includes>
+        <include>org.ihtsdo:rules-engine-integration</include>
+        <include>org.ihtsdo:tk-concept-component</include>
         <include>org.ihtsdo:wb-icons</include>
         <include>org.ihtsdo:wb-foundation</include>
         <include>org.ihtsdo:wb-core</include>
