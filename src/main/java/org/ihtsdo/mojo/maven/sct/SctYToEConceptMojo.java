@@ -59,16 +59,21 @@ import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
 import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
-import org.ihtsdo.etypes.EIdentifier;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetIntMember;
-import org.ihtsdo.etypes.ERefsetMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 
 /**
  * <b>DESCRIPTION: </b><br>
@@ -1875,7 +1880,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         getLog().info("*** SctSiToEConcept STEP #4 COMPLETED - MATCH IDs ***\r\n");
     }
 
-    private EIdentifier createEIdentifier(SctYIdRecord id) {
+    private TkIdentifier createEIdentifier(SctYIdRecord id) {
         // :!!!:NYI: add Long, String, type detection.
         // This version is just for string identifiers.
         EIdentifierString eId = new EIdentifierString();
@@ -2946,7 +2951,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         ca.primordialUuid = theConUUID;
         ca.setDefined(cRec0.isprimitive == 0 ? true : false);
 
-        ArrayList<EIdentifier> tmpAdditionalIds = new ArrayList<EIdentifier>();
+        ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<TkIdentifier>();
 
         // SNOMED ID, if present
         if (cRec0.conSnoId < Long.MAX_VALUE) {
@@ -2993,7 +2998,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         ca.setTime(yRevDateArray[cRec0.yRevision]); // long
 
         int max = conList.size();
-        List<EConceptAttributesRevision> caRevisions = new ArrayList<EConceptAttributesRevision>();
+        List<TkConceptAttributesRevision> caRevisions = new ArrayList<TkConceptAttributesRevision>();
         for (int i = 1; i < max; i++) {
             EConceptAttributesRevision rev = new EConceptAttributesRevision();
             SctYConRecord cRec = conList.get(i);
@@ -3026,19 +3031,19 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         // ADD DESCRIPTIONS
         if (desList != null) {
             Collections.sort(desList);
-            List<EDescription> eDesList = new ArrayList<EDescription>();
+            List<TkDescription> eDesList = new ArrayList<TkDescription>();
             // long theDesId = Long.MIN_VALUE;
             long theDesMsb = Long.MIN_VALUE;
             long theDesLsb = Long.MIN_VALUE;
             EDescription des = null;
-            List<EDescriptionRevision> revisions = new ArrayList<EDescriptionRevision>();
+            List<TkDescriptionRevision> revisions = new ArrayList<TkDescriptionRevision>();
             for (SctYDesRecord dRec : desList) {
                 if (dRec.desUuidMsb != theDesMsb || dRec.desUuidLsb != theDesLsb) {
                     // CLOSE OUT OLD RELATIONSHIP
                     if (des != null) {
                         if (revisions.size() > 0) {
                             des.revisions = revisions;
-                            revisions = new ArrayList<EDescriptionRevision>();
+                            revisions = new ArrayList<TkDescriptionRevision>();
                         }
                         eDesList.add(des);
                     }
@@ -3046,7 +3051,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     // CREATE NEW DESCRIPTION
                     des = new EDescription();
 
-                    ArrayList<EIdentifier> tmpDesAdditionalIds = new ArrayList<EIdentifier>();
+                    ArrayList<TkIdentifier> tmpDesAdditionalIds = new ArrayList<TkIdentifier>();
                     if (dRec.desSnoId < Long.MAX_VALUE) {
                         EIdentifierLong did = new EIdentifierLong();
                         did.setAuthorityUuid(uuidSourceSnomedInteger);
@@ -3098,18 +3103,18 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
         // ADD RELATIONSHIPS
         if (relList != null) {
             Collections.sort(relList);
-            List<ERelationship> eRelList = new ArrayList<ERelationship>();
+            List<TkRelationship> eRelList = new ArrayList<TkRelationship>();
             long theRelMsb = Long.MIN_VALUE;
             long theRelLsb = Long.MIN_VALUE;
             ERelationship rel = null;
-            List<ERelationshipRevision> revisions = new ArrayList<ERelationshipRevision>();
+            List<TkRelationshipRevision> revisions = new ArrayList<TkRelationshipRevision>();
             for (SctYRelRecord rRec : relList) {
                 if (rRec.relUuidMsb != theRelMsb || rRec.relUuidLsb != theRelLsb) {
                     // CLOSE OUT OLD RELATIONSHIP
                     if (rel != null) {
                         if (revisions.size() > 0) {
                             rel.revisions = revisions;
-                            revisions = new ArrayList<ERelationshipRevision>();
+                            revisions = new ArrayList<TkRelationshipRevision>();
                         }
                         eRelList.add(rel);
                     }
@@ -3117,7 +3122,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                     // CREATE NEW RELATIONSHIP
                     rel = new ERelationship();
 
-                    ArrayList<EIdentifier> tmpRelAdditionalIds = new ArrayList<EIdentifier>();
+                    ArrayList<TkIdentifier> tmpRelAdditionalIds = new ArrayList<TkIdentifier>();
                     if (rRec.relSnoId < Long.MAX_VALUE) {
                         EIdentifierLong rid = new EIdentifierLong();
                         rid.setAuthorityUuid(uuidSourceSnomedInteger);
@@ -3229,7 +3234,7 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
 
         // ADD REFSET MEMBER VALUES
         if (rsByRsList != null && rsByRsList.size() > 0) {
-            List<ERefsetMember<?>> listErm = new ArrayList<ERefsetMember<?>>();
+            List<TkRefsetAbstractMember<?>> listErm = new ArrayList<TkRefsetAbstractMember<?>>();
 
             for (SctYRefSetRecord r : rsByRsList) {
 
