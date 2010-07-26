@@ -56,7 +56,7 @@ public class CementLoadTest {
 					new FileOutputStream(eConceptsFile));
 			eConceptDOS = new DataOutputStream(eConceptsBos);
 			for (I_ConceptualizeLocally localConcept: mts.getConcepts()) {
-				EConcept eC = new EConcept(localConcept.universalize());
+				EConcept eC = new EConcept(localConcept, mts);
 				eC.writeExternal(eConceptDOS);
 			}
 			eConceptDOS.close();

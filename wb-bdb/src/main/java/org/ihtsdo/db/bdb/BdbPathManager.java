@@ -137,7 +137,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	public boolean exists(int cNid) throws TerminologyException, IOException {
+	public boolean exists(int cNid) throws IOException {
 	    if (pathMap.containsKey(cNid)) {
 	        return true;
 	    }
@@ -152,8 +152,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 
 	
 	
-	public I_Path get(int nid) throws PathNotExistsException,
-			TerminologyException, IOException {
+	public I_Path get(int nid) throws IOException, TerminologyException {
 		if (exists(nid)) {
 			return pathMap.get(nid);
 		} else {

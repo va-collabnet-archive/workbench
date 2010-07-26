@@ -36,7 +36,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.I_ConceptualizeUniversally;
+import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.I_RelateConceptsLocally;
+import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
 
 public class EConcept implements I_AmChangeSetObject {
@@ -507,17 +510,51 @@ public class EConcept implements I_AmChangeSetObject {
     	}
 	}
 
-    public EConcept(I_ConceptualizeUniversally uConcept) throws IOException, TerminologyException {
+    public EConcept(I_ConceptualizeLocally cNoHx, 
+    		I_StoreLocalFixedTerminology mts) throws IOException, TerminologyException {
     	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
        	UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
        	long time = System.currentTimeMillis();
         conceptAttributes = new EConceptAttributes();
         conceptAttributes.defined = false;
-    	conceptAttributes.setStatusUuid(currentUuid);
-    	conceptAttributes.primordialUuid = uConcept.getPrimoridalUid();
+    	conceptAttributes.primordialUuid = cNoHx.getUids().iterator().next();
+    	conceptAttributes.statusUuid = currentUuid;
     	conceptAttributes.setPathUuid(pathUuid);
     	conceptAttributes.setTime(time);
-    	//TODO implement other types...
+    	
+        descriptions = new ArrayList<EDescription>(cNoHx.getDescriptions().size());
+    	for (I_DescribeConceptLocally descNoHx: cNoHx.getDescriptions()) {
+    		EDescription desc  = new EDescription();
+    		desc.primordialUuid = descNoHx.getUids().iterator().next();
+    		desc.statusUuid = currentUuid;
+    		desc.setPathUuid(pathUuid);
+    		desc.setTime(time);
+
+        	desc.conceptUuid = conceptAttributes.primordialUuid;
+        	desc.initialCaseSignificant = descNoHx.isInitialCapSig();
+        	desc.lang = descNoHx.getLangCode();
+        	desc.text = descNoHx.getText();
+        	desc.typeUuid = descNoHx.getDescType().getUids().iterator().next();
+        	descriptions.add(desc);
+    	}
+    	
+    	relationships = new ArrayList<ERelationship>(cNoHx.getSourceRels().size());
+    	for (I_RelateConceptsLocally relNoHx: cNoHx.getSourceRels()) {
+    		ERelationship rel  = new ERelationship();
+    		rel.primordialUuid = relNoHx.getUids().iterator().next();
+    		rel.statusUuid = currentUuid;
+    		rel.setPathUuid(pathUuid);
+    		rel.setTime(time);
+    		
+    		rel.c1Uuid = conceptAttributes.primordialUuid;
+    		rel.c2Uuid = relNoHx.getC2().getUids().iterator().next();
+    		rel.characteristicUuid = relNoHx.getCharacteristic().getUids().iterator().next();
+    		rel.refinabilityUuid = relNoHx.getRefinability().getUids().iterator().next();
+    		rel.relGroup = relNoHx.getRelGrp();
+    		rel.typeUuid = relNoHx.getRelType().getUids().iterator().next();
+    		relationships.add(rel);
+    		
+    	}
 	}
 
 	/**
