@@ -861,6 +861,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	            new I_ConceptualizeUniversally[] { RELEASE }),
         SNOMED_LANGUAGE_FR_CA_PATH("french-canadian language path",
 	            new I_ConceptualizeUniversally[] { RELEASE }),
+        SNOMED_LANGUAGE_VIEW_ALL_PATH("all languages path",
+	            new I_ConceptualizeUniversally[] { RELEASE }),
+	      
     FILE_LINK_CATEGORY("file link category",
             new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
       BUSINESS_PROCESS_CATEGORY("business process",

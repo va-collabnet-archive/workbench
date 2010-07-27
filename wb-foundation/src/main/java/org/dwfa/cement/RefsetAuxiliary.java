@@ -470,6 +470,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		        LANGUAGE_REFSET_FR(new String[] { "french language refset", "french language refset" }, 
 		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),		
 		        LANGUAGE_REFSET_FR_CA(new String[] { "french-canadian language refset", "french-canadian language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
+        		LANGUAGE_REFSET_ALL(new String[] { "french-canadian language refset", "french-canadian language refset" }, 
 		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),;			
 
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
