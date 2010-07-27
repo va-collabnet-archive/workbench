@@ -74,7 +74,6 @@ import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.lookup.JoinManager;
 import net.jini.lookup.entry.Name;
 
-import org.apache.commons.io.FileUtils;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -231,12 +230,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         String newName =
                 currentName.substring(0, currentName.lastIndexOf(getFileSuffix())).concat(getFileSuffixTakePending());
         File newFile = new File(file.getParentFile(), newName);
-        try {
-            FileUtils.copyFile(file, newFile); // copy the original .bp to the .bp.take-pending. Do not delete the .bp.
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        file.renameTo(newFile);
         return newFile;
     }
 
