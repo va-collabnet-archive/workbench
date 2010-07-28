@@ -120,6 +120,10 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
     public int getStatusId() {
         return sapBdb.getStatusId(statusAtPositionNid);
     }
+    
+    public int getAuthorId() {
+    	return sapBdb.getAuthorNid(statusAtPositionNid);
+    }
 
     @Override
     public long getTime() {

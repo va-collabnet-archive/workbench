@@ -300,6 +300,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         }
         ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
         ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
+        ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
         ev.setTime(v.getTime());
         ec.revisions.add(ev);
     }
@@ -309,6 +310,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ec.primordialUuid = v.getPrimUuid();
         ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
         ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
+        ec.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
         ec.setTime(v.getTime());
         if (v.getAdditionalIdentifierParts() != null) {
             for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
@@ -325,6 +327,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
                     eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathId()));
                     eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusId()));
+                    eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorId()));
                     eIdv.setTime(idv.getTime());
                 }
             }
