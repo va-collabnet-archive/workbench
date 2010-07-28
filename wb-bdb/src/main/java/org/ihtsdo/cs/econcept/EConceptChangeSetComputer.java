@@ -300,7 +300,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         }
         ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
         ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
-        ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
+        ev.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
         ev.setTime(v.getTime());
         ec.revisions.add(ev);
     }
