@@ -292,7 +292,12 @@ public class RulesLibrary {
 	 */
 	public static KnowledgeBase getKnowledgeBase(int kbId, byte[] bytes, boolean recreate) throws Exception {
 		KnowledgeBase kbase= null;
-		File serializedKbFile = new File("rules/knowledge_packages-" + kbId + ".pkg");
+		File rulesDirectory = new File("rules");
+		if (!rulesDirectory.exists())
+		  {
+		    rulesDirectory.mkdir();
+		  }
+		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + kbId + ".pkg");
 		if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
 			if (serializedKbFile.exists() && !recreate) {
 				try {
