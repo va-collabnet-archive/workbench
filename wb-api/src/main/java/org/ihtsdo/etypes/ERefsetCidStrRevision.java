@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
@@ -16,10 +17,10 @@ public class ERefsetCidStrRevision extends TkRefsetCidStrRevision {
     }
 
     public ERefsetCidStrRevision(I_ExtendByRefPartCidString part) throws TerminologyException, IOException {
-        c1Uuid = nidToUuid(part.getC1id());
+        c1Uuid = Terms.get().nidToUuid(part.getC1id());
         strValue = part.getStringValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

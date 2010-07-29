@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_ImagePart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
 
@@ -17,9 +18,9 @@ public class EImageRevision extends TkMediaRevision {
 
     public EImageRevision(I_ImagePart part) throws TerminologyException, IOException {
         textDescription = part.getTextDescription();
-        typeUuid = nidToUuid(part.getTypeId());
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        typeUuid = Terms.get().nidToUuid(part.getTypeId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

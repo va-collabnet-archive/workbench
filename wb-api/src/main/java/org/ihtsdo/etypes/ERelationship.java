@@ -28,14 +28,14 @@ public class ERelationship extends TkRelationship {
         }
         int partCount = rel.getMutableParts().size();
         I_RelPart part = rel.getMutableParts().get(0);
-        c1Uuid = nidToUuid(rel.getC1Id());
-        c2Uuid = nidToUuid(rel.getC2Id());
-        characteristicUuid = nidToUuid(part.getCharacteristicId());
-        refinabilityUuid = nidToUuid(part.getRefinabilityId());
+        c1Uuid = Terms.get().nidToUuid(rel.getC1Id());
+        c2Uuid = Terms.get().nidToUuid(rel.getC2Id());
+        characteristicUuid = Terms.get().nidToUuid(part.getCharacteristicId());
+        refinabilityUuid = Terms.get().nidToUuid(part.getRefinabilityId());
         relGroup = part.getGroup();
-        typeUuid = nidToUuid(part.getTypeId());
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        typeUuid = Terms.get().nidToUuid(part.getTypeId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRelationshipRevision>(partCount - 1);

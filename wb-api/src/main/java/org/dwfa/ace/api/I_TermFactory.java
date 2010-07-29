@@ -566,6 +566,8 @@ public interface I_TermFactory {
     public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
+    
+    public UUID nidToUuid(int nid) throws IOException;
 
     public I_ImageVersioned getImage(UUID fromString) throws IOException;
 

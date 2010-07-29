@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
 
@@ -17,8 +18,8 @@ public class ERefsetIntRevision extends TkRefsetIntRevision {
 
     public ERefsetIntRevision(I_ExtendByRefPartInt part) throws TerminologyException, IOException {
         intValue = part.getIntValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

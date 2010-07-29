@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.concept.component.identifier.TkIdentifierLong;
@@ -21,9 +22,9 @@ public class EIdentifierLong extends TkIdentifierLong {
     public EIdentifierLong(I_IdPart idp) throws TerminologyException, IOException {
         super();
         denotation = (Long) idp.getDenotation();
-        authorityUuid = nidToUuid(idp.getAuthorityNid());
-        pathUuid = nidToUuid(idp.getPathId());
-        statusUuid = nidToUuid(idp.getStatusId());
+        authorityUuid = Terms.get().nidToUuid(idp.getAuthorityNid());
+        pathUuid = Terms.get().nidToUuid(idp.getPathId());
+        statusUuid = Terms.get().nidToUuid(idp.getStatusId());
         time = idp.getTime();
     }
 

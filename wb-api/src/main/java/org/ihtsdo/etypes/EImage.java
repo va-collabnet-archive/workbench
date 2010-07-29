@@ -23,13 +23,13 @@ public class EImage extends TkMedia {
         EConcept.convertId(Terms.get().getId(imageVer.getNid()), this);
         int partCount = imageVer.getMutableParts().size();
         I_ImagePart part = imageVer.getMutableParts().get(0);
-        conceptUuid = nidToUuid(imageVer.getConceptId());
+        conceptUuid = Terms.get().nidToUuid(imageVer.getConceptId());
         format = imageVer.getFormat();
         image = imageVer.getImage();
         textDescription = part.getTextDescription();
-        typeUuid = nidToUuid(part.getTypeId());
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        typeUuid = Terms.get().nidToUuid(part.getTypeId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkMediaRevision>(partCount - 1);

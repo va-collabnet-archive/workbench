@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 
@@ -17,10 +18,10 @@ public class ERefsetCidFloatRevision extends TkRefsetCidFloatRevision {
 
     public ERefsetCidFloatRevision(I_ExtendByRefPartCidFloat part) throws TerminologyException, IOException {
         super();
-        c1Uuid = nidToUuid(part.getUnitsOfMeasureId());
+        c1Uuid = Terms.get().nidToUuid(part.getUnitsOfMeasureId());
         floatValue = (float) part.getMeasurementValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

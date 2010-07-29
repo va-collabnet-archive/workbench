@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
@@ -21,8 +22,8 @@ public class ERefsetBooleanRevision extends TkRefsetBooleanRevision {
 
     public ERefsetBooleanRevision(I_ExtendByRefPartBoolean part) throws TerminologyException, IOException {
         booleanValue = part.getBooleanValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 }

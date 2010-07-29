@@ -23,13 +23,13 @@ public class EDescription extends TkDescription {
         EConcept.convertId(Terms.get().getId(desc.getNid()), this);
         int partCount = desc.getMutableParts().size();
         I_DescriptionPart part = desc.getMutableParts().get(0);
-        conceptUuid = nidToUuid(desc.getConceptId());
+        conceptUuid = Terms.get().nidToUuid(desc.getConceptId());
         initialCaseSignificant = part.isInitialCaseSignificant();
         lang = part.getLang();
         text = part.getText();
-        typeUuid = nidToUuid(part.getTypeId());
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        typeUuid = Terms.get().nidToUuid(part.getTypeId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkDescriptionRevision>(partCount - 1);

@@ -50,10 +50,6 @@ import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     public static final long serialVersionUID = 1;
     
-    protected static UUID nidToUuid(int nid) throws TerminologyException, IOException {
-        return Terms.get().getId(nid).getUUIDs().iterator().next();
-    }
-    
     protected static Collection<? extends I_ExtendByRef> getRefsetMembers(int nid) throws TerminologyException, IOException {
         return Terms.get().getRefsetExtensionMembers(nid);
     }
@@ -349,9 +345,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         		assert m.getComponentId() == c.getNid() : 
         			"getRefsetMembersForComponent query error: componentId: " + m.getComponentId() + 
         			" conceptId: " + c.getNid();
-                UUID refsetUuid = nidToUuid(m.getRefsetId());
+                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForConcept.add(refsetUuid);
-                UUID memberUuid = nidToUuid(m.getNid());
+                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
                 refsetUuidMemberUuidForConcept.add(memberUuid);
             }
         }
@@ -370,9 +366,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         		new ArrayList<UUID>(descriptionMembers.size() * 2);
         	for (I_ExtendByRef m : descriptionMembers) {
         		System.out.println("Found description extension: " + m + " for component: " + this);
-                UUID refsetUuid = nidToUuid(m.getRefsetId());
+                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForDescriptions.add(refsetUuid);
-                UUID memberUuid = nidToUuid(m.getNid());
+                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
                 refsetUuidMemberUuidForDescriptions.add(memberUuid);
             }
         }
@@ -390,9 +386,9 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         	refsetUuidMemberUuidForRels = new ArrayList<UUID>(relMembers.size() * 2);
         	for (I_ExtendByRef m : relMembers) {
         		System.out.println("Found rel extension: " + m + " for component: " + this);
-                UUID refsetUuid = nidToUuid(m.getRefsetId());
+                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForRels.add(refsetUuid);
-                UUID memberUuid = nidToUuid(m.getNid());
+                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
                 refsetUuidMemberUuidForRels.add(memberUuid);
             }
         }
@@ -411,19 +407,19 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         	refsetUuidMemberUuidForImages = new ArrayList<UUID>(relMembers.size() * 2);
         	for (I_ExtendByRef m : imageMembers) {
         		System.out.println("Found image extension: " + m + " for component: " + this);
-        		UUID refsetUuid = nidToUuid(m.getRefsetId());
+        		UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
                 refsetUuidMemberUuidForImages.add(refsetUuid);
-                UUID memberUuid = nidToUuid(m.getNid());
+                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
                 refsetUuidMemberUuidForImages.add(memberUuid);
             }
         }
         
         destRelUuidTypeUuids = new ArrayList<UUID>();
         for (I_RelVersioned r: c.getDestRels()) {
-            UUID relUuid = nidToUuid(r.getNid());
+            UUID relUuid = Terms.get().nidToUuid(r.getNid());
             HashSet<UUID> typesAdded = new HashSet<UUID>();
             for (I_RelPart p: r.getMutableParts()) {
-                UUID typeUuid = nidToUuid(p.getTypeId());
+                UUID typeUuid = Terms.get().nidToUuid(p.getTypeId());
                 if (!typesAdded.contains(typeUuid)) {
                     destRelUuidTypeUuids.add(relUuid);            	
                     destRelUuidTypeUuids.add(typeUuid);

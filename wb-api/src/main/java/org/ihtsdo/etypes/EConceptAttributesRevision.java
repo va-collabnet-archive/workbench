@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
 
@@ -16,8 +17,8 @@ public class EConceptAttributesRevision extends TkConceptAttributesRevision {
 
     public EConceptAttributesRevision(I_ConceptAttributePart part) throws TerminologyException, IOException {
         defined = part.isDefined();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

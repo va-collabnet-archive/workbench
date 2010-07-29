@@ -31,12 +31,12 @@ public class ERefsetMemberMember extends TkRefsetMember {
             EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
         }
         int partCount = m.getMutableParts().size();
-        refsetUuid = nidToUuid(m.getRefsetId());
-        componentUuid = nidToUuid(m.getComponentId());
+        refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
+        componentUuid = Terms.get().nidToUuid(m.getComponentId());
 
         I_ExtendByRefPart part = (I_ExtendByRefPart) m.getMutableParts().get(0);
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRefsetRevision>(partCount - 1);

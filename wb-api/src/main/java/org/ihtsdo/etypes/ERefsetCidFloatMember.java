@@ -27,14 +27,14 @@ public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
             EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
         }
         int partCount = m.getMutableParts().size();
-        refsetUuid = nidToUuid(m.getRefsetId());
-        componentUuid = nidToUuid(m.getComponentId());
+        refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
+        componentUuid = Terms.get().nidToUuid(m.getComponentId());
 
         I_ExtendByRefPartCidFloat part = (I_ExtendByRefPartCidFloat) m.getMutableParts().get(0);
-        c1Uuid = nidToUuid(part.getUnitsOfMeasureId());
+        c1Uuid = Terms.get().nidToUuid(part.getUnitsOfMeasureId());
         floatValue = (float) part.getMeasurementValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRefsetCidFloatRevision>(partCount - 1);

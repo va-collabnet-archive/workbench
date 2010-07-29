@@ -28,8 +28,8 @@ public class EConceptAttributes extends TkConceptAttributes {
         int partCount = conceptAttributes.getMutableParts().size();
         I_ConceptAttributePart part = conceptAttributes.getMutableParts().get(0);
         defined = part.isDefined();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkConceptAttributesRevision>(partCount - 1);

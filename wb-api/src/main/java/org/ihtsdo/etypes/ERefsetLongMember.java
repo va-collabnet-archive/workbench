@@ -27,13 +27,13 @@ public class ERefsetLongMember extends TkRefsetLongMember {
             EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
         }
         int partCount = m.getMutableParts().size();
-        refsetUuid = nidToUuid(m.getRefsetId());
-        componentUuid = nidToUuid(m.getComponentId());
+        refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
+        componentUuid = Terms.get().nidToUuid(m.getComponentId());
 
         I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutableParts().get(0);
         longValue = part.getLongValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);

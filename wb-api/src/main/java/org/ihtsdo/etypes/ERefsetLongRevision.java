@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
 
@@ -17,8 +18,8 @@ public class ERefsetLongRevision extends TkRefsetLongRevision {
 
     public ERefsetLongRevision(I_ExtendByRefPartLong part) throws TerminologyException, IOException {
         longValue = part.getLongValue();
-        pathUuid = nidToUuid(part.getPathId());
-        statusUuid = nidToUuid(part.getStatusId());
+        pathUuid = Terms.get().nidToUuid(part.getPathId());
+        statusUuid = Terms.get().nidToUuid(part.getStatusId());
         time = part.getTime();
     }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.component.TkComponent;
 import org.ihtsdo.tk.concept.component.identifier.TkIdentifierUuid;
@@ -19,9 +20,9 @@ public class EIdentifierUuid extends TkIdentifierUuid {
 
     public EIdentifierUuid(I_IdPart idp) throws TerminologyException, IOException {
         denotation = (UUID) idp.getDenotation();
-        authorityUuid = nidToUuid(idp.getAuthorityNid());
-        pathUuid = nidToUuid(idp.getPathId());
-        statusUuid = nidToUuid(idp.getStatusId());
+        authorityUuid = Terms.get().nidToUuid(idp.getAuthorityNid());
+        pathUuid = Terms.get().nidToUuid(idp.getPathId());
+        statusUuid = Terms.get().nidToUuid(idp.getStatusId());
         time = idp.getTime();
     }
 
