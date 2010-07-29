@@ -1275,6 +1275,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         return null;
     }
+    
+    public UUID nidToUuid(int nid) throws IOException {
+    	return Bdb.getConceptForComponent(nid).getComponent(nid).getPrimUuid();
+    }
 
     @Override
     public I_ImageVersioned getImage(UUID uuid) throws IOException {
