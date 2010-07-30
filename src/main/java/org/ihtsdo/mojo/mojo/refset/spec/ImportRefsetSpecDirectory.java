@@ -22,9 +22,11 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.file.TupleFileUtil;
+import org.dwfa.ace.task.refset.spec.compute.ComputeRefsetFromSpecTask;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 
@@ -39,87 +41,142 @@ import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 
 public class ImportRefsetSpecDirectory extends AbstractMojo {
 
-	/**
-	 * The input refset spec directory.
-	 * 
-	 * @parameter default-value=
-	 *            "${project.build.directory}/generated-resources/refsetspec/"
-	 */
-	File inputDir;
+    /**
+     * The input refset spec directory.
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/refsetspec/"
+     */
+    File inputDir;
 
-	/**
-	 * The output refset report directory.
-	 * 
-	 * @parameter default-value=
-	 *            "${project.build.directory}/generated-resources/refsetspec/reports"
-	 */
-	File outputDir;
+    /**
+     * The output refset report directory.
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/refsetspec/reports"
+     */
+    File outputDir;
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File targetDirectory;
+    /**
+     * Location of the build directory.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File targetDirectory;
 
-	/**
-	 * Optional edit path (this will override refset spec file path data).
-	 * 
-	 * @parameter
-	 */
-	private ConceptDescriptor editPathDescriptor = null;
+    /**
+     * Optional edit path (this will override refset spec file path data).
+     * 
+     * @parameter
+     */
+    private ConceptDescriptor editPathDescriptor = null;
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			if (MojoUtil.alreadyRun(getLog(), this.getClass()
-					.getCanonicalName()
-					+ inputDir.getCanonicalPath(), this.getClass(),
-					targetDirectory)) {
-				return;
-			}
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
+    /**
+     * Set to true to also compute the refset
+     * 
+     * @parameter default-value = false
+     */
+    private boolean computeP;
 
-		try {
-			TupleFileUtil tupleImporter = new TupleFileUtil();
-			if (!inputDir.isDirectory()) {
-				throw new Exception("Directory has not been configured : "
-						+ inputDir.getPath());
-			}
-			outputDir.mkdirs();
-			getLog().info("Importing refset specs from " + inputDir.getPath());
-			for (File inputFile : inputDir.listFiles()) {
-				if (inputFile.getName().endsWith(".txt")) {
-					String reportFileName = inputFile.getName().replace(".txt",
-							".log");
-					if (inputFile.getName().equals(reportFileName)) {
-						reportFileName = inputFile.getName() + ".log";
-					}
-					File outputFile = new File(outputDir, reportFileName);
+    /**
+     * Set to true generate changesets
+     * 
+     * @parameter default-value = true
+     */
+    private boolean writeChangesets = true;
 
-					UUID uuid = null;
-					if (editPathDescriptor != null) {
-						uuid = editPathDescriptor.getVerifiedConcept()
-								.getUids().iterator().next();
-					}
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + inputDir.getCanonicalPath(), this
+                .getClass(), targetDirectory)) {
+                return;
+            }
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
 
-					getLog().info(
-							"Beginning import of refset spec :"
-									+ inputFile.getPath());
-					tupleImporter.importFile(inputFile, outputFile, Terms.get()
-							.getActiveAceFrameConfig(), null);
-					getLog().info(
-							"Finished importing refset spec from "
-									+ inputFile.getPath());
-				}
-			}
+        try {
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-			LocalVersionedTerminology.get().commit();
+            if (!writeChangesets) {
+                Terms.get().suspendChangeSetWriters();
+            } else {
+                Terms.get().resumeChangeSetWriters();
+            }
+            if (config == null) {
+                throw new MojoExecutionException(
+                    "You must set up the configuration prior to this call. Please see: vodb-set-default-config and vodb-set-view-paths goals. ");
+            }
 
-		} catch (Exception e) {
-			throw new MojoExecutionException(e.getLocalizedMessage(), e);
-		}
-	}
+            TupleFileUtil tupleImporter = new TupleFileUtil();
+            if (!inputDir.isDirectory()) {
+                throw new Exception("Directory has not been configured : " + inputDir.getPath());
+            }
+            outputDir.mkdirs();
+            getLog().info("Importing refset specs from " + inputDir.getPath());
+            boolean checkCreationTestsEnabled = Terms.get().isCheckCreationDataEnabled();
+            boolean checkCommitTestsEnabled = Terms.get().isCheckCommitDataEnabled();
+
+            for (File inputFile : inputDir.listFiles()) {
+                if (inputFile.getName().endsWith(".txt")) {
+                    String reportFileName = inputFile.getName().replace(".txt", ".log");
+                    if (inputFile.getName().equals(reportFileName)) {
+                        reportFileName = inputFile.getName() + ".log";
+                    }
+                    File outputFile = new File(outputDir, reportFileName);
+
+                    UUID pathUuid = null;
+                    if (editPathDescriptor != null) {
+                        pathUuid = editPathDescriptor.getVerifiedConcept().getUids().iterator().next();
+                    }
+
+                    if (pathUuid != null) {
+                        config.setProperty("override", true);
+                        config.setProperty("pathUuid", pathUuid);
+                        config.getEditingPathSet().add(Terms.get().getPath(pathUuid));
+                    } else {
+                        config.setProperty("override", false);
+                    }
+
+                    getLog().info("Beginning import of refset spec :" + inputFile.getPath());
+                    I_GetConceptData refsetSpec =
+                            tupleImporter.importFile(inputFile, outputFile, config, Terms.get().newActivityPanel(false,
+                                config, "Importing refset spec...", true));
+
+                    if (refsetSpec != null) {
+                        getLog().info("Refset is: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+                    } else {
+                        getLog().info("Refset is: " + refsetSpec);
+                    }
+
+                    getLog().info("Finished importing refset spec from " + inputFile.getPath());
+
+                    if (computeP) {
+                        Terms.get().commit();
+                        getLog().info("Computing refset spec " + inputFile.getPath());
+                        boolean showActivityPanel = false;
+                        ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
+                        task.computeRefset(config, refsetSpec, showActivityPanel);
+                        getLog().info("Finished computing refset spec " + inputFile.getPath());
+                        Terms.get().commit();
+                    }
+                }
+            }
+
+            Terms.get().commit();
+
+            Terms.get().setCheckCommitDataEnabled(checkCommitTestsEnabled);
+            Terms.get().setCheckCreationDataEnabled(checkCreationTestsEnabled);
+
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
+        } catch (Exception e) {
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
+            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+        }
+    }
 }

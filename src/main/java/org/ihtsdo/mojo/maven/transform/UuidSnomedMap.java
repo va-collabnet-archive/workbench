@@ -52,11 +52,19 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     private PROJECT project = null;
     private NAMESPACE namespace = null;
+    private int namespaceId;
+    private int projectId;
 
     private UuidSnomedMap(PROJECT project, NAMESPACE namespace) {
         super();
         this.project = project;
         this.namespace = namespace;
+    }
+
+    private UuidSnomedMap(int projectId, int namespaceId) {
+        super();
+        this.projectId = projectId;
+        this.namespaceId = namespaceId;
     }
 
     private UuidSnomedMap() {
@@ -65,7 +73,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#addFixedMap(java.util.Map)
      */
@@ -75,7 +82,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#getSnomedUuidListMap()
      */
     public Map<Long, List<UUID>> getSnomedUuidListMap() {
@@ -94,7 +100,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#clear()
      */
     public void clear() {
@@ -103,7 +108,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#containsKey(java.lang.Object)
      */
@@ -113,13 +117,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
-     * 
-     * 
-     * 
-     * 
-     * 
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#containsValue(java.lang.Object
      * )
      */
@@ -129,7 +127,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#entrySet()
      */
     public Set<Entry<UUID, Long>> entrySet() {
@@ -142,7 +139,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#get(java.lang.Object)
      */
     public Long get(Object key) {
@@ -158,7 +154,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#getWithGeneration(java.util
      * .UUID, org.ihtsdo.mojo.maven.transform.SctIdGenerator.TYPE)
@@ -167,7 +162,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         Long returnValue = get(key);
         if (returnValue == null) {
             modified = true;
-            returnValue = Long.parseLong(SctIdGenerator.generate(++maxSequence, project, namespace, type));
+            returnValue = Long.parseLong(SctIdGenerator.generate(++maxSequence, projectId, namespaceId, type));
             if (returnValue > MAX_SCT_ID) {
                 throw new RuntimeException("SCT ID exceeds max allowed (" + MAX_SCT_ID + "): " + returnValue);
             }
@@ -185,7 +180,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#isEmpty()
      */
     public boolean isEmpty() {
@@ -194,7 +188,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#keySet()
      */
     public Set<UUID> keySet() {
@@ -209,22 +202,22 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#put(java.util.UUID,
      * java.lang.Long)
      */
     public Long put(UUID key, Long sctId) {
-        try {
-            maxSequence = Math.max(maxSequence, getSequence(sctId));
-        } catch (StringIndexOutOfBoundsException e) {
-            System.out.println("Inserted sctid which is not NEHTA owned: " + sctId);
-        }
+        /*
+         * try {
+         * maxSequence = Math.max(maxSequence, getSequence(sctId)); TODO
+         * } catch (StringIndexOutOfBoundsException e) {
+         * System.out.println("Inserted sctid which is not NEHTA owned: " + sctId);
+         * }
+         */
         return uuidSnomedMap.put(key, sctId);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#putAll(java.util.Map)
      */
     public void putAll(Map<? extends UUID, ? extends Long> map) {
@@ -236,7 +229,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#remove(java.lang.Object)
      */
     public Long remove(Object key) {
@@ -245,7 +237,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#size()
      */
     public int size() {
@@ -254,7 +245,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#values()
      */
     public Collection<Long> values() {
@@ -263,7 +253,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#getMaxSequence()
      */
     public long getMaxSequence() {
@@ -272,7 +261,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#write(java.io.File)
      */
     public void write(File f) throws IOException {
@@ -327,6 +315,13 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return map;
     }
 
+    public static UuidSnomedMap read(File f, int namespaceId, int projectId) throws IOException {
+        UuidSnomedMap map = new UuidSnomedMap(projectId, namespaceId);
+        readData(f, map);
+        System.out.println(" maxSequence on read: " + map.maxSequence);
+        return map;
+    }
+
     private static void readData(File f, UuidSnomedMap map) throws FileNotFoundException, IOException {
         System.out.println("Reading map file: " + f.getAbsolutePath());
         BufferedReader br = new BufferedReader(new FileReader(f));
@@ -359,7 +354,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#putEffectiveDate(java.lang
      * .Long, java.lang.String, boolean)
@@ -371,7 +365,6 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.mojo.maven.transform.I_MapUuidsToSnomed#getEffectiveDate(java.lang
      * .Long)

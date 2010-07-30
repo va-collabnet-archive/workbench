@@ -24,62 +24,57 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-public class ConceptConceptConceptRefsetHandler extends
-		ConceptConceptRefsetHandler {
+public class ConceptConceptConceptRefsetHandler extends ConceptConceptRefsetHandler {
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion part,
-			boolean sctid) throws TerminologyException, IOException {
-		return formatRefsetLine(tf, part, part.getMemberId(), part
-				.getRefsetId(), part.getComponentId(), sctid);
-	}
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion part, boolean sctid, int namespace,
+            int project) throws TerminologyException, IOException {
+        return formatRefsetLine(tf, part, part.getMemberId(), part.getRefsetId(), part.getComponentId(), sctid,
+            namespace, project);
+    }
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part,
-			Integer memberId, int refsetId, int componentId, boolean sctId)
-			throws TerminologyException, IOException {
-		I_ExtendByRefPartCidCidCid conceptPart = (I_ExtendByRefPartCidCidCid) part;
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
+            int componentId, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
+        I_ExtendByRefPartCidCidCid conceptPart = (I_ExtendByRefPartCidCidCid) part;
 
-		return super.formatRefsetLine(tf, part, memberId, refsetId,
-				componentId, sctId)
-				+ MemberRefsetHandler.FILE_DELIMITER
-				+ toId(tf, conceptPart.getC1id(), sctId);
-	}
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, namespace, project)
+            + MemberRefsetHandler.FILE_DELIMITER + toId(tf, conceptPart.getC1id(), sctId, namespace, project);
+    }
 
-	@Override
-	public String getHeaderLine() {
-		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER
-				+ "CONCEPT_CONCEPT_CONCEPT_VALUE_ID";
-	}
+    @Override
+    public String getHeaderLine() {
+        return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "CONCEPT_CONCEPT_CONCEPT_VALUE_ID";
+    }
 
-	// @Override
-	// protected I_ExtendByRefPart processLine(String line) {
-	// I_ExtendByRefPartCid part;
-	// try {
-	//
-	// I_ExtendByRef versioned = getExtensionVersioned(line,
-	// RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION);
-	//
-	// part = getTermFactory().newConceptConceptConceptExtensionPart();
-	// setGenericExtensionPartFields(part);
-	//
-	// String conceptValue = getNextCurrentRowToken();
-	// part.setConceptId(getNid(UUID.fromString(conceptValue)));
-	//
-	// versioned.addVersion(part);
-	//
-	// if (isTransactional()) {
-	// getTermFactory().addUncommitted(versioned);
-	// } else {
-	// getTermFactory().getDirectInterface().writeExt(versioned);
-	// }
-	//
-	// } catch (Exception e) {
-	// throw new RuntimeException("Error occred processing file " + sourceFile,
-	// e);
-	// }
-	//
-	// return part;
-	// }
+    // @Override
+    // protected I_ExtendByRefPart processLine(String line) {
+    // I_ExtendByRefPartCid part;
+    // try {
+    //
+    // I_ExtendByRef versioned = getExtensionVersioned(line,
+    // RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION);
+    //
+    // part = getTermFactory().newConceptConceptConceptExtensionPart();
+    // setGenericExtensionPartFields(part);
+    //
+    // String conceptValue = getNextCurrentRowToken();
+    // part.setConceptId(getNid(UUID.fromString(conceptValue)));
+    //
+    // versioned.addVersion(part);
+    //
+    // if (isTransactional()) {
+    // getTermFactory().addUncommitted(versioned);
+    // } else {
+    // getTermFactory().getDirectInterface().writeExt(versioned);
+    // }
+    //
+    // } catch (Exception e) {
+    // throw new RuntimeException("Error occred processing file " + sourceFile,
+    // e);
+    // }
+    //
+    // return part;
+    // }
 
 }

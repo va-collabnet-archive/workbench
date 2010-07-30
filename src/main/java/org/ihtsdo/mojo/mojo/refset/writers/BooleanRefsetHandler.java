@@ -26,20 +26,20 @@ import org.dwfa.tapi.TerminologyException;
 
 public class BooleanRefsetHandler extends MemberRefsetHandler {
     @Override
-    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctid)
-            throws TerminologyException, IOException {
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctid, int namespace,
+            int project) throws TerminologyException, IOException {
         I_ExtendByRefPartBoolean booleanPart = (I_ExtendByRefPartBoolean) tuple.getMutablePart();
 
-        return super.formatRefsetLine(tf, tuple, sctid) + MemberRefsetHandler.FILE_DELIMITER
+        return super.formatRefsetLine(tf, tuple, sctid, namespace, project) + MemberRefsetHandler.FILE_DELIMITER
             + (booleanPart.getBooleanValue() ? 1 : 0); // 1 for true, 0 for false
     }
 
     @Override
     public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
-            int componentId, boolean sctId) throws TerminologyException, IOException {
+            int componentId, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
         I_ExtendByRefPartBoolean booleanPart = (I_ExtendByRefPartBoolean) part;
 
-        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId)
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, namespace, project)
             + MemberRefsetHandler.FILE_DELIMITER + (booleanPart.getBooleanValue() ? 1 : 0); // 1
         // for
         // true,
@@ -53,34 +53,34 @@ public class BooleanRefsetHandler extends MemberRefsetHandler {
         return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "BOOLEAN_VALUE";
     }
 
-//    @Override
-//    protected I_ExtendByRefPart processLine(String line) {
-//        I_ExtendByRefPartBoolean part;
-//        try {
-//
-//            I_ExtendByRef versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION);
-//
-//            part = getTermFactory().newBooleanExtensionPart();
-//            setGenericExtensionPartFields(part);
-//
-//            String value = getNextCurrentRowToken();
-//            assert value.equals("0") || value.equals("1");
-//
-//            part.setBooleanValue(value.equals("1") ? true : false);
-//
-//            versioned.addVersion(part);
-//
-//            if (isTransactional()) {
-//                getTermFactory().addUncommitted(versioned);
-//            } else {
-//                getTermFactory().getDirectInterface().writeExt(versioned);
-//            }
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error occred processing file " + sourceFile, e);
-//        }
-//
-//        return part;
-//    }
+    // @Override
+    // protected I_ExtendByRefPart processLine(String line) {
+    // I_ExtendByRefPartBoolean part;
+    // try {
+    //
+    // I_ExtendByRef versioned = getExtensionVersioned(line, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION);
+    //
+    // part = getTermFactory().newBooleanExtensionPart();
+    // setGenericExtensionPartFields(part);
+    //
+    // String value = getNextCurrentRowToken();
+    // assert value.equals("0") || value.equals("1");
+    //
+    // part.setBooleanValue(value.equals("1") ? true : false);
+    //
+    // versioned.addVersion(part);
+    //
+    // if (isTransactional()) {
+    // getTermFactory().addUncommitted(versioned);
+    // } else {
+    // getTermFactory().getDirectInterface().writeExt(versioned);
+    // }
+    //
+    // } catch (Exception e) {
+    // throw new RuntimeException("Error occred processing file " + sourceFile, e);
+    // }
+    //
+    // return part;
+    // }
 
 }

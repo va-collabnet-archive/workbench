@@ -26,11 +26,13 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.util.id.Type5UuidFactory;
 
 
 public class ConceptDescriptor {
 
-    private String uuid;
+	private String pathFsDesc;
+	private String uuid;
     private String description;
 
     public ConceptDescriptor() {
@@ -58,6 +60,10 @@ public class ConceptDescriptor {
 
     public I_GetConceptData getVerifiedConcept() throws Exception {
 
+    	if (uuid == null && pathFsDesc != null) {
+    		uuid = Type5UuidFactory.get(
+    				Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc).toString();
+    	}
         if (uuid == null) {
             throw new Exception("UUID parameter must be specified.");
         } else if (description == null) {
@@ -103,4 +109,14 @@ public class ConceptDescriptor {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    public String getPathFsDesc() {
+		return pathFsDesc;
+	}
+
+	public void setPathFsDesc(String pathFsDesc) {
+		this.pathFsDesc = pathFsDesc;
+	}
+
+
 }
