@@ -13,8 +13,6 @@ import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 
-import com.termmed.drools_test.Concept;
-
 public class Test_drools_interfaces extends TestCase {
 	
 	public void test1() {
