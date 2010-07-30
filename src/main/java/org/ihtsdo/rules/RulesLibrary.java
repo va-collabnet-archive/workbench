@@ -116,23 +116,23 @@ public class RulesLibrary {
 		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
 
 		//TODO: convert to tk model
-//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
-//		if (onlyUncommittedContent) {
-//			termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
-//		} else {
-//			termComponents.addAll(TestModelUtil.convertToTestModel(concept, true, true, true, true));
-//		}
-//
-//		for (TerminologyComponent termComponent : termComponents) {
-//			ksession.insert(termComponent);
-//		}
+		//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
+		//		if (onlyUncommittedContent) {
+		//			termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
+		//		} else {
+		//			termComponents.addAll(TestModelUtil.convertToTestModel(concept, true, true, true, true));
+		//		}
+		//
+		//		for (TerminologyComponent termComponent : termComponents) {
+		//			ksession.insert(termComponent);
+		//		}
 
-//		if (languageRefset != null) {
-//			termComponents = TestModelUtil.convertContextualizedDescriptionsToTestModel(concept, languageRefset);
-//			for (TerminologyComponent termComponent : termComponents) {
-//				ksession.insert(termComponent);
-//			}
-//		}
+		//		if (languageRefset != null) {
+		//			termComponents = TestModelUtil.convertContextualizedDescriptionsToTestModel(concept, languageRefset);
+		//			for (TerminologyComponent termComponent : termComponents) {
+		//				ksession.insert(termComponent);
+		//			}
+		//		}
 
 		ksession.fireAllRules();
 
@@ -278,7 +278,7 @@ public class RulesLibrary {
 		}
 		return kbase;
 	}
-	
+
 	/**
 	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a byteArray, not a file.
 	 * 
@@ -294,9 +294,9 @@ public class RulesLibrary {
 		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
 		if (!rulesDirectory.exists())
-		  {
-		    rulesDirectory.mkdir();
-		  }
+		{
+			rulesDirectory.mkdir();
+		}
 		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + kbId + ".pkg");
 		if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
 			if (serializedKbFile.exists() && !recreate) {
@@ -332,6 +332,18 @@ public class RulesLibrary {
 			}
 		}
 		return kbase;
+	}
+
+	public static boolean validateDeploymentPackage(byte[] bytes) {
+		KnowledgeBase kbase= null;
+		try {
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
+			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			kbase = kagent.getKnowledgeBase();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return (kbase != null);
 	}
 
 	/**
