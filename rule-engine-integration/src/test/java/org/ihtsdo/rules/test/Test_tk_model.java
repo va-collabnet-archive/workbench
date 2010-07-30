@@ -1,4 +1,4 @@
-package com.termmed.drools_test;
+package org.ihtsdo.rules.test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class Test_tk_model extends TestCase {
 		
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
-		kbuilder.add(ResourceFactory.newFileResource("src/test/java/com/termmed/drools_test/test-tk-model-rules.drl"), 
+		kbuilder.add(ResourceFactory.newFileResource("src/test/java/org/ihtsdo/rules/test/test-tk-model-rules.drl"), 
 				ResourceType.DRL);
 		kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();

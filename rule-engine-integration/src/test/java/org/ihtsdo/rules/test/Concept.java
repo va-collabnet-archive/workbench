@@ -1,4 +1,7 @@
-package com.termmed.drools_test;
+package org.ihtsdo.rules.test;
+
+import com.termmed.drools_test.I_Concept;
+import com.termmed.drools_test.I_IsLastVersion;
 
 public class Concept implements I_Concept, I_IsLastVersion {
 	
