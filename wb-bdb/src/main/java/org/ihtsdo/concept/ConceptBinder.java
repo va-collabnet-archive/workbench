@@ -71,32 +71,17 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			byte[] refsetOutput = getRefsetBytes(conceptData, primordial,
 					OFFSETS.REFSET_MEMBERS, conceptData.getRefsetMembersIfChanged(),
 					new RefsetMemberBinder());
-			IntListPairsBinder pairsBinder = new IntListPairsBinder();
 			
-			byte[] destRelOutput = pairsBinder.getBytes(
-					conceptData.getDestRelNidTypeNidListReadOnly(),
-					conceptData.getDestRelNidTypeNidList());
 			
-			byte[] refsetNidMemberNidForConceptOutput = pairsBinder.getBytes(
-					conceptData.getRefsetNidMemberNidForConceptListReadOnly(),
-					conceptData.getRefsetNidMemberNidForConceptList());
-
-			byte[] refsetNidMemberNidForDescOutput = pairsBinder.getBytes(
-					conceptData.getRefsetNidMemberNidForDescriptionsListReadOnly(),
-					conceptData.getRefsetNidMemberNidForDescriptionsList());
-
-			byte[] refsetNidMemberNidForRelsOutput = pairsBinder.getBytes(
-					conceptData.getRefsetNidMemberNidForRelsListReadOnly(),
-					conceptData.getRefsetNidMemberNidForRelsList());
+			// KEC: start vestigial 
+			byte[] destRelOutput = zeroOutputArray;
+			byte[] refsetNidMemberNidForConceptOutput = zeroOutputArray;
+			byte[] refsetNidMemberNidForDescOutput = zeroOutputArray;
+			byte[] refsetNidMemberNidForRelsOutput = zeroOutputArray;
+			byte[] refsetNidMemberNidForImagesOutput = zeroOutputArray;
+			byte[] refsetNidMemberNidForRefsetMembersOutput = zeroOutputArray;
+			// end vestigial 
 			
-			byte[] refsetNidMemberNidForImagesOutput = pairsBinder.getBytes(
-					conceptData.getRefsetNidMemberNidForImagesListReadOnly(),
-					conceptData.getRefsetNidMemberNidForImagesList());
-
-			byte[] refsetNidMemberNidForRefsetMembersOutput = pairsBinder.getBytes(
-					conceptData.getRefsetNidMemberNidForRefsetMembersListReadOnly(),
-					conceptData.getRefsetNidMemberNidForRefsetMembersList());
-
 			byte[] descNidOutput = getNidSetBytes(conceptData, primordial,
 					conceptData.getDescNidsReadOnly(),
 					conceptData.getDescNids());
@@ -126,26 +111,26 @@ public class ConceptBinder extends TupleBinding<Concept> {
 			finalOutput.writeInt(nextDataLocation); // REFSET_MEMBERS
 			nextDataLocation = nextDataLocation + refsetOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // DEST_REL_NID_TYPE_NIDS
+			finalOutput.writeInt(nextDataLocation); // DEST_REL_NID_TYPE_NIDS - vestigial
 			nextDataLocation = nextDataLocation + destRelOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_CONCEPT
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_CONCEPT - vestigial
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForConceptOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_DESCRIPTIONS - vestigial
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForDescOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_RELATIONSHIPS - vestigial
 			nextDataLocation = nextDataLocation
 				+ refsetNidMemberNidForRelsOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_IMAGES
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_IMAGES - vestigial
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForImagesOutput.length;
 			
-			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_REFSETMEMBERS
+			finalOutput.writeInt(nextDataLocation); // REFSETNID_MEMBERNID_FOR_REFSETMEMBERS - vestigial
 			nextDataLocation = nextDataLocation
 					+ refsetNidMemberNidForRefsetMembersOutput.length;
 			

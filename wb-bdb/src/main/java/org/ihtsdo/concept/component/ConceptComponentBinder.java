@@ -99,7 +99,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 	                        }
 						} else {
                             AceLog.getAppLog().warning("\n########## Suppressing concept component:\n     " + conceptComponent +
-                            "\n##########");
+						        "\n##########" );
 						}
 					} else {
 					    conceptComponent.merge(factory.create(enclosingConcept, input));

@@ -30,7 +30,16 @@ public class IdentifierVersionString extends IdentifierVersion {
         stringDenotation = (String) another.getDenotation();
     }
 
-    @Override
+	public IdentifierVersionString(int statusNid, int authorNid, int pathNid, long time) {
+        super(statusNid, authorNid, pathNid, time);
+	}
+	public IdentifierVersionString(int statusNid, int authorNid, int pathNid, long time, String denotation, int authorityNid) {
+        super(statusNid, authorNid, pathNid, time);
+        stringDenotation = denotation;
+        this.setAuthorityNid(authorityNid);
+	}
+
+	@Override
     public IDENTIFIER_PART_TYPES getType() {
         return IDENTIFIER_PART_TYPES.STRING;
     }

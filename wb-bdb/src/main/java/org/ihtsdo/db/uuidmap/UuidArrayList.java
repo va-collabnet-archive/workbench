@@ -132,7 +132,7 @@ public class UuidArrayList extends AbstractUuidList {
 	 *         elements in the receiver are less than the specified key. Note
 	 *         that this guarantees that the return value will be &gt;= 0 if and
 	 *         only if the key is found.
-	 * @see cern.colt.Sorting
+	 * @see org.ihtsdo.cern.colt.Sorting
 	 * @see java.util.Arrays
 	 */
 	public int binarySearchFromTo(long[] key, int from, int to) {
@@ -207,7 +207,7 @@ public class UuidArrayList extends AbstractUuidList {
 	 *            the desired minimum capacity.
 	 */
 	public void ensureCapacity(int minCapacity) {
-		elements = cern.colt.Arrays.ensureCapacity(elements, minCapacity);
+		elements = org.ihtsdo.cern.colt.Arrays.ensureCapacity(elements, minCapacity);
 	}
 
 	/**
@@ -438,7 +438,7 @@ public class UuidArrayList extends AbstractUuidList {
 
 		double N = (double) other.size();
 		double M = (double) mySize;
-		if ((N + M) * cern.jet.math.Arithmetic.log2(N) < M * N) {
+		if ((N + M) * org.ihtsdo.cern.jet.math.Arithmetic.log2(N) < M * N) {
 			// it is faster to sort other before searching in it
 			UuidArrayList sortedList = (UuidArrayList) other.clone();
 			sortedList.quickSort();
@@ -543,7 +543,7 @@ public class UuidArrayList extends AbstractUuidList {
 
 		double N = (double) other.size();
 		double M = (double) mySize;
-		if ((N + M) * cern.jet.math.Arithmetic.log2(N) < M * N) {
+		if ((N + M) * org.ihtsdo.cern.jet.math.Arithmetic.log2(N) < M * N) {
 			// it is faster to sort other before searching in it
 			UuidArrayList sortedList = (UuidArrayList) other.clone();
 			sortedList.quickSort();
@@ -660,8 +660,8 @@ public class UuidArrayList extends AbstractUuidList {
 			return;
 		checkRangeFromTo(from, to, size);
 
-		cern.jet.random.Uniform gen = new cern.jet.random.Uniform(
-				new cern.jet.random.engine.DRand(new java.util.Date()));
+		org.ihtsdo.cern.jet.random.Uniform gen = new org.ihtsdo.cern.jet.random.Uniform(
+				new org.ihtsdo.cern.jet.random.engine.DRand(new java.util.Date()));
 		long tmpElement;
 		long[] theElements = elements;
 		int random;
@@ -710,7 +710,7 @@ public class UuidArrayList extends AbstractUuidList {
 	 * operation to minimize the storage of the receiver.
 	 */
 	public void trimToSize() {
-		elements = cern.colt.Arrays.trimToCapacity(elements, size() * 2 + 1);
+		elements = org.ihtsdo.cern.colt.Arrays.trimToCapacity(elements, size() * 2 + 1);
 	}
 
 	@Override

@@ -807,7 +807,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 Concept c = getEnclosingConcept();
                 clearVersions();
                 c.modified();
-                BdbCommitManager.addUncommittedNoChecks(c);
+            	BdbCommitManager.writeImmediate(c);
                 return larger;
             }
             return dup2;
@@ -1425,24 +1425,72 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionString v = new IdentifierVersionString();
+        IdentifierVersionString v = new IdentifierVersionString(statusNid, Terms.get().getAuthorNid(), pathNid, time);
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(stringId);
+        return addIdVersion(v);
+    }
+    public boolean addStringId(String stringId, int authorityNid, int statusNid, int authorNid, int pathNid, long time) {
+        IdentifierVersionString v = new IdentifierVersionString(statusNid, authorNid, pathNid, time);
         v.setAuthorityNid(authorityNid);
         v.setDenotation(stringId);
         return addIdVersion(v);
     }
 
+    public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int authorNid, int pathNid, long time) {
+        IdentifierVersionUuid v = new IdentifierVersionUuid(statusNid, authorNid, pathNid, time);
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(uuidId);
+        return addIdVersion(v);
+    }
+
     public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionUuid v = new IdentifierVersionUuid();
+        IdentifierVersionUuid v = new IdentifierVersionUuid(statusNid, Terms.get().getAuthorNid(), pathNid, time);
         v.setAuthorityNid(authorityNid);
         v.setDenotation(uuidId);
         return addIdVersion(v);
     }
 
     public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
-        IdentifierVersionLong v = new IdentifierVersionLong();
+        IdentifierVersionLong v = new IdentifierVersionLong(statusNid, Terms.get().getAuthorNid(), pathNid, time);
+        v.setAuthorityNid(authorityNid);
+        v.setDenotation(longId);
+        return addIdVersion(v);
+    }
+    public boolean addLongId(Long longId, int authorityNid, int statusNid, int authorNid, int pathNid, long time) {
+        IdentifierVersionLong v = new IdentifierVersionLong(statusNid, authorNid, pathNid, time);
         v.setAuthorityNid(authorityNid);
         v.setDenotation(longId);
         return addIdVersion(v);
     }
     
+    public void cancel() {
+        if (additionalIdentifierVersions != null) {
+        	List<IdentifierVersion> toRemove = new ArrayList<IdentifierVersion>();
+            for (IdentifierVersion idv : additionalIdentifierVersions) {
+                if (idv.getTime() == Long.MAX_VALUE) {
+                	toRemove.add(idv);
+                }
+            }
+            if (toRemove.size() > 0) {
+            	for (IdentifierVersion idv: toRemove) {
+                	additionalIdentifierVersions.remove(idv);
+            	}
+            }
+        }
+        if (revisions != null) {
+        	List<R> toRemove = new ArrayList<R>();
+            for (R r : revisions) {
+                if (r.getTime() == Long.MAX_VALUE) {
+                	toRemove.add(r);
+                }
+            }
+            if (toRemove.size() > 0) {
+            	for (R r: toRemove) {
+            		revisions.remove(r);
+            	}
+            }
+            clearVersions();
+        }
+    }
 }

@@ -2,7 +2,9 @@ package org.ihtsdo.cs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Timer;
@@ -18,6 +20,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 
@@ -39,12 +42,16 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private ChangeSetWriterThreading changeSetWriterThreading;
     private ChangeSetPolicy changeSetPolicy;
     private Timer timer;
+	private Semaphore permit;
 
 	public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
-			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) {
+			long commitTime, IntSet sapNidsFromCommit, ChangeSetPolicy changeSetPolicy, 
+			ChangeSetWriterThreading changeSetWriterThreading, 
+			Semaphore permit) {
 		super();
 		assert commitTime != Long.MAX_VALUE;
 		assert commitTime != Long.MIN_VALUE;
+		this.permit = permit;
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
 		this.commitTime = commitTime;
@@ -103,6 +110,10 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.complete();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} finally {
+			if (permit != null) {
+				permit.release();
+			}
 		}
 	}
 
@@ -149,6 +160,12 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         if (activity.isCompleteForComparison()) {
             timer.stop();
         }
+    }
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

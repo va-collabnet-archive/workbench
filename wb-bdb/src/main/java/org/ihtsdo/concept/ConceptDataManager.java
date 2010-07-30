@@ -22,6 +22,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
@@ -243,6 +244,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	protected long lastChange = Long.MIN_VALUE;
 	protected long lastWrite = Long.MIN_VALUE;
+	protected long lastExtinctRemoval = Long.MIN_VALUE;
 
 	public void modified() {
 		lastChange = Bdb.gVersion.incrementAndGet();
@@ -277,8 +279,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 	public List<Relationship> getDestRels() throws IOException {
 
 		List<Relationship> destRels = new ArrayList<Relationship>();
-		for (NidPair pair: getDestRelNidTypeNidList()) {
-			int relNid = pair.getNid1();
+		for (NidPairForRel pair: Bdb.getDestRelPairs(enclosingConcept.getNid())) {
+			int relNid = pair.getRelNid();
 			int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
 			Concept c = Bdb.getConceptForComponent(conceptNid);
 			if (c != null) {
@@ -321,18 +323,15 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         assert rel != null : "rel is null: " + this;
 		assert rel.nid != 0 : "relNid is 0: " + this;
 		assert rel.getTypeId() != 0 : "relTypeNid is 0: " + this;
-		Concept dest = Concept.get(rel.getC2Id());
 		assert Bdb.getConceptForComponent(rel.nid) != null : "No concept for component: "
-				+ rel.nid
-				+ "\nsourceConcept: "
-				+ this.enclosingConcept.toLongString()
-				+ "\ndestConcept: "
-				+ dest.toLongString();
-		List<NidPair> relNidTypeNidList = (List<NidPair>) dest.getData()
-				.getDestRelNidTypeNidList();
-		NidPair pair = new NidPair(rel.nid, rel.getTypeId());
-		relNidTypeNidList.add(pair);
-		BdbCommitManager.addUncommittedNoChecks(dest);
+			+ rel.nid
+			+ "\nsourceConcept: "
+			+ this.enclosingConcept.toLongString()
+			+ "\ndestConcept: "
+			+ Concept.get(rel.getC2Id()).toLongString();
+		Bdb.addXrefPair(rel.getC2Id(), 
+				NidPair.getTypeNidRelNidPair(rel.getTypeNid(), 
+						rel.getNid()));
 		getSrcRelNids().add(rel.nid);
 		modified();
 	}
@@ -381,19 +380,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 				+ this;
 		getMemberNids().add(refsetMember.nid);
 		addToMemberMap(refsetMember);
-		Concept dest = ConceptDataManager.this.enclosingConcept;
-		if (!hasComponent(refsetMember.getComponentId())) {
-			dest = Bdb.getConceptForComponent(refsetMember.getComponentId());
-		}
-		if (dest != null) {
-			dest.getData().addRefsetNidMemberNidForComponent(
-					refsetMember.enclosingConceptNid, refsetMember.nid,
-					refsetMember.getComponentId());
-			if (dest.getNid() != this.enclosingConcept.getNid()) {
-	            BdbCommitManager.addUncommittedNoChecks(dest);
-			}
-		}
 		modified();
+		Bdb.addXrefPair(refsetMember.getReferencedComponentNid(), 
+				NidPair.getRefsetNidMemberNidPair(
+				refsetMember.getRefsetId(), 
+				refsetMember.getNid()));
 	}
 
 	protected abstract void addToMemberMap(RefsetMember<?, ?> refsetMember);
@@ -439,35 +430,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 	@Override
 	public TupleInput getReadWriteTupleInput() throws IOException {
 		return nidData.getMutableTupleInput();
-	}
-
-	@Override
-	public void addRefsetNidMemberNidForComponent(int refsetNid, int memberNid,
-			int componentNid) throws IOException {
-		List<NidPair> list = null;
-		if (componentNid == enclosingConcept.getNid()) {
-			list = (List<NidPair>) getRefsetNidMemberNidForConceptList();
-		} else if (getDescNids().contains(componentNid)) {
-			list = (List<NidPair>) getRefsetNidMemberNidForDescriptionsList();
-		} else if (getSrcRelNids().contains(componentNid)) {
-			list = (List<NidPair>) getRefsetNidMemberNidForRelsList();
-		} else if (getImageNids().contains(componentNid)) {
-			list = (List<NidPair>) getRefsetNidMemberNidForImagesList();
-		} else if (getMemberNids().contains(componentNid)) {
-			list = (List<NidPair>) getRefsetNidMemberNidForRefsetMembersList();
-		} else {
-			AceLog.getAppLog().warning(
-					"Cannot find component nid: " + componentNid
-							+ " in concept: " + enclosingConcept);
-		}
-		if (list != null) {
-			ArrayList<Integer> toAdd = new ArrayList<Integer>();
-			toAdd.add(refsetNid);
-			toAdd.add(memberNid);
-			NidPair refsetNidMemberNidPair = new NidPair(refsetNid, memberNid);
-			list.add(refsetNidMemberNidPair);
-		}
-		modified();
 	}
 
 	void processNewDesc(Description e) throws IOException {

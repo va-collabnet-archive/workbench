@@ -56,6 +56,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
         c1Uuid = Terms.get().nidToUuid(part.getC1id());
         pathUuid = Terms.get().nidToUuid(part.getPathId());
         statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        authorUuid = Terms.get().nidToUuid(part.getAuthorNid());
         time = part.getTime();
 	}
 

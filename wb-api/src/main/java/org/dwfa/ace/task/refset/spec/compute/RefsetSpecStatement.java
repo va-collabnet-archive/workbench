@@ -18,6 +18,7 @@ package org.dwfa.ace.task.refset.spec.compute;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -26,11 +27,11 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -131,21 +132,29 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected I_TermFactory termFactory;
 
+    protected I_IntSet allowedTypes;
+    protected I_IntSet currentStatuses;
+
     /**
      * Constructor for refset spec statement.
      * 
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @throws Exception
+     * @throws IOException
+     * @throws TerminologyException
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken,
-            I_AmTermComponent constraint, int refsetSpecNid) {
-        super(refsetSpecNid);
-
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, I_AmTermComponent constraint,
+            int refsetSpecNid, I_ConfigAceFrame config) throws TerminologyException, IOException, Exception {
+        super(refsetSpecNid, config);
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
         this.queryConstraint = constraint;
         termFactory = Terms.get();
+        this.allowedTypes = getIsAIds();
+        this.currentStatuses = helper.getCurrentStatusIntSet();
+
     }
 
     /**
@@ -154,9 +163,16 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The string value for regex or lucene search.
+     * @throws Exception
+     * @throws IOException
+     * @throws TerminologyException
      */
-    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, String constraint, int refsetSpecNid) {
-        super(refsetSpecNid);
+    public RefsetSpecStatement(boolean useNotQualifier, I_GetConceptData groupingToken, String constraint,
+            int refsetSpecNid, I_ConfigAceFrame config) throws TerminologyException, IOException, Exception {
+        super(refsetSpecNid, config);
+        this.config = config;
+        this.allowedTypes = getIsAIds();
+        this.currentStatuses = helper.getCurrentStatusIntSet();
         this.useNotQualifier = useNotQualifier;
         this.queryToken = groupingToken;
         this.queryConstraint = constraint;
@@ -168,7 +184,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
      * the Terminology Auxiliary Is-a only. Others use the Snomed Is-a as well.
      */
     public I_IntSet getIsAIds() throws TerminologyException, IOException {
-        I_IntSet ids = termFactory.getActiveAceFrameConfig().getDestRelTypes();
+        I_IntSet ids = config.getDestRelTypes();
         return ids;
     }
 
@@ -176,9 +192,10 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return useNotQualifier;
     }
 
-    public boolean execute(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException {
+    public boolean execute(I_AmTermComponent component, Collection<I_ShowActivity> activities) throws IOException,
+            TerminologyException {
 
-        boolean statementResult = getStatementResult(component, config);
+        boolean statementResult = getStatementResult(component);
 
         if (useNotQualifier) {
             // if the statement has a negation associated with it then we need
@@ -189,7 +206,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
-    public abstract boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws IOException, TerminologyException;
+    public abstract boolean getStatementResult(I_AmTermComponent componen) throws IOException, TerminologyException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 
@@ -233,18 +250,12 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             if (isComponentStatus((I_GetConceptData) queryConstraint, tuples)) {
                 return true;
             }
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childStatuses =
                     ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {
@@ -310,7 +321,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     public String toHtmlFragment() {
         return toString();
     }
-    
+
     public String toString() {
         StringBuffer buff = new StringBuffer();
         buff.append(!useNotQualifier);

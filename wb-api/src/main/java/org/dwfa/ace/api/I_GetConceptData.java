@@ -385,12 +385,6 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public List<I_Identify> getUncommittedIdVersioned();
     
     public String toLongString();
-    
-    public List<Integer> getConceptMemberNidsForRefset(I_IntSet refsetNids) throws IOException;
-    public List<Integer> getDescriptionMemberNidsForRefset(I_IntSet refsetNids) throws IOException;
-    public List<Integer> getSrcRelMemberNidsForRefset(I_IntSet refsetNids) throws IOException;
-    public List<Integer> getImageMemberNidsForRefset(I_IntSet refsetNids) throws IOException;
-    public List<Integer> getRefsetMemberNidsForRefset(I_IntSet refsetNids) throws IOException;
 
 	public boolean isCanceled() throws IOException;
 
@@ -400,6 +394,9 @@ public interface I_GetConceptData extends I_AmTermComponent {
 	public Set<? extends I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException;
 
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException;
+
+	I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
+			I_ShowActivity activity) throws IOException;
 
 
 }

@@ -9,13 +9,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.cern.colt.function.DoubleProcedure;
+import org.ihtsdo.cern.colt.list.ByteArrayList;
+import org.ihtsdo.cern.colt.list.IntArrayList;
+import org.ihtsdo.cern.colt.map.PrimeFinder;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
-
-import cern.colt.function.DoubleProcedure;
-import cern.colt.list.ByteArrayList;
-import cern.colt.list.IntArrayList;
-import cern.colt.map.PrimeFinder;
 
 public class IntUuidProxyToNidMap extends AbstractUuidToIntHashMap {
 	

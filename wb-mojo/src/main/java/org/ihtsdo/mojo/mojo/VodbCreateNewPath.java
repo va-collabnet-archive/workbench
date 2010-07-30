@@ -189,7 +189,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
             throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
-    	getLog().error("VodbCreateNewPath entering createNewPathConcept");
+    	getLog().info("VodbCreateNewPath entering createNewPathConcept");
     	
         List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
 
@@ -205,7 +205,7 @@ public class VodbCreateNewPath extends AbstractMojo {
         
         I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
         		descTypeConcept, activeConfig);
-        getLog().error("VodbCreateNewPath.createNewPathConcept should be adding a desc of "+pathFsDesc);
+        getLog().info("VodbCreateNewPath.createNewPathConcept should be adding a desc of "+pathFsDesc);
         newTuples.addAll(idv.getTuples());
 
         UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
@@ -232,17 +232,17 @@ public class VodbCreateNewPath extends AbstractMojo {
         // need to do an immediate commit so that new concept will be available
         // to path when read from changeset
         
-        getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
+        getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
         //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
         for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
-        	getLog().error("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
+        	getLog().info("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
         	for (I_DescriptionPart desl : desc.getMutableParts()) {
-        		getLog().error("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());
+        		getLog().info("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());
         	}
         	
         }
         
-        
+        tf.addUncommitted(pathConcept);
         tf.commit();
         return pathConcept;
     }

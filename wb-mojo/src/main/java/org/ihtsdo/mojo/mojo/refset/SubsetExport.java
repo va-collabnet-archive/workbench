@@ -89,6 +89,22 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     File subsetInputDirectory;
 
     /**
+     * Defines the namespace to use in the ID generation.
+     * 
+     * @parameter
+     * @required
+     */
+    int namespace;
+
+    /**
+     * Defines the project code to use in the ID generation.
+     * 
+     * @parameter
+     * @required
+     */
+    int project;
+
+    /**
      * Directory where the read/write SCTID maps are stored
      * 
      * @parameter
@@ -221,7 +237,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
                     Long memberId =
                             Long.parseLong(refsetType.getRefsetHandler().toId(tf, thinExtByRefTuple.getComponentId(),
-                                true));
+                                true, namespace, project));
                     if (treeMap.containsKey(memberId)) {
                         getLog().warn(
                             "Refset " + tf.getConcept(refsetId).getInitialText()
@@ -371,7 +387,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         }
 
         subsetMemberFileWriter.write(refsetType.getRefsetHandler().formatRefsetAsSubset(tf, thinExtByRefPart, memberId,
-            subsetId, componentId, true));
+            subsetId, componentId, true, namespace, project));
         subsetMemberFileWriter.newLine();
     }
 
@@ -424,7 +440,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 } else {
                     int subsetVersion = storedSubsetVersion + 1;
                     long subsetId =
-                            Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, subsetVersion));
+                            Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, subsetVersion,
+                                namespace, project));
                     setSubsetId(subsetId);
                     updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, subsetVersion);
                     return "" + subsetVersion;
@@ -435,7 +452,8 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 // ID. Generate the member file for use in the next release.
                 try {
 
-                    long subsetId = Long.parseLong(refsetType.getRefsetHandler().toId(tf, refsetId, true));
+                    long subsetId =
+                            Long.parseLong(refsetType.getRefsetHandler().toId(tf, refsetId, true, namespace, project));
 
                     setSubsetId(subsetId);
                     updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, currentSpec.subsetVersion);

@@ -457,7 +457,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         		RULES_REPOSITORY_METADATA_REFSET(new String[] { "Rules repository metadata refset", "Rules repository metadata refset" }, 
         				new I_ConceptualizeUniversally[] {REFSET_AUXILIARY}),;		
 
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -475,6 +475,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         public String[] getDescriptions_S() {
             return descriptions_S;
         }
+
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
 
         private Concept(String[] descriptions) {
             this(descriptions, new I_ConceptualizeUniversally[] {});

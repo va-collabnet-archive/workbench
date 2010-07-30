@@ -14,8 +14,8 @@ import com.sleepycat.je.DatabaseException;
  * 
  */
 public abstract class ComponentBdb {
-	protected Database readOnly;
-	protected Database mutable;
+	protected Database readOnly = null;
+	protected Database mutable = null;
 
 	public ComponentBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
 			throws IOException {
@@ -35,7 +35,9 @@ public abstract class ComponentBdb {
 	public void close() {
 		try {
 			sync();
-			readOnly.close();
+			if (readOnly != null) {
+				readOnly.close();
+			}
 			mutable.close();
 		} catch (IllegalStateException ex) {
 			if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -49,7 +51,7 @@ public abstract class ComponentBdb {
 	}
 
 	public void sync() throws IOException {
-		if (readOnly.getConfig().getReadOnly() == false) {
+		if (readOnly != null && readOnly.getConfig().getReadOnly() == false) {
 			readOnly.sync();
 		}
 		mutable.sync();

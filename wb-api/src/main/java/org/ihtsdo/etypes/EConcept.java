@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +38,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeLocally;
+import org.dwfa.tapi.I_DescribeConceptLocally;
+import org.dwfa.tapi.I_RelateConceptsLocally;
+import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.concept.TkConcept;
 import org.ihtsdo.tk.concept.component.TkComponent;
@@ -295,6 +300,53 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     	}
 	}
 
+    public EConcept(I_ConceptualizeLocally cNoHx, 
+    		I_StoreLocalFixedTerminology mts) throws IOException, TerminologyException {
+    	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+       	UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+       	long time = System.currentTimeMillis();
+        conceptAttributes = new EConceptAttributes();
+        conceptAttributes.defined = false;
+    	conceptAttributes.primordialUuid = cNoHx.getUids().iterator().next();
+    	conceptAttributes.statusUuid = currentUuid;
+    	conceptAttributes.setPathUuid(pathUuid);
+    	conceptAttributes.setTime(time);
+    	
+        descriptions = new ArrayList<TkDescription>(cNoHx.getDescriptions().size());
+    	for (I_DescribeConceptLocally descNoHx: cNoHx.getDescriptions()) {
+    		EDescription desc  = new EDescription();
+    		desc.primordialUuid = descNoHx.getUids().iterator().next();
+    		desc.statusUuid = currentUuid;
+    		desc.setPathUuid(pathUuid);
+    		desc.setTime(time);
+
+        	desc.conceptUuid = conceptAttributes.primordialUuid;
+        	desc.initialCaseSignificant = descNoHx.isInitialCapSig();
+        	desc.lang = descNoHx.getLangCode();
+        	desc.text = descNoHx.getText();
+        	desc.typeUuid = descNoHx.getDescType().getUids().iterator().next();
+        	descriptions.add(desc);
+    	}
+    	
+    	relationships = new ArrayList<TkRelationship>(cNoHx.getSourceRels().size());
+    	for (I_RelateConceptsLocally relNoHx: cNoHx.getSourceRels()) {
+    		ERelationship rel  = new ERelationship();
+    		rel.primordialUuid = relNoHx.getUids().iterator().next();
+    		rel.statusUuid = currentUuid;
+    		rel.setPathUuid(pathUuid);
+    		rel.setTime(time);
+    		
+    		rel.c1Uuid = conceptAttributes.primordialUuid;
+    		rel.c2Uuid = relNoHx.getC2().getUids().iterator().next();
+    		rel.characteristicUuid = relNoHx.getCharacteristic().getUids().iterator().next();
+    		rel.refinabilityUuid = relNoHx.getRefinability().getUids().iterator().next();
+    		rel.relGroup = relNoHx.getRelGrp();
+    		rel.typeUuid = relNoHx.getRelType().getUids().iterator().next();
+    		relationships.add(rel);
+    		
+    	}
+	}
+
 	/**
 	 * @TODO remove componentRefsetMap added to get around bug in current database implementation!
 	 * @param c
@@ -428,4 +480,223 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
             }
         }
     }
+    
+	public List<TkMedia> getImages() {
+        return images;
+    }
+
+    public void setImages(List<TkMedia> images) {
+        this.images = images;
+    }
+
+    public void setConceptAttributes(EConceptAttributes conceptAttributes) {
+        this.conceptAttributes = conceptAttributes;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer buff = new StringBuffer();
+
+        buff.append(this.getClass().getSimpleName() + ": ");
+        buff.append("\n   primordial UUID: ");
+        buff.append(this.primordialUuid);
+        buff.append("\n   ConceptAttributes: \n\t");
+        buff.append(this.conceptAttributes);
+        buff.append("\n   Descriptions: \n\t");
+        buff.append(this.descriptions);
+        buff.append("\n   Relationships: \n\t");
+        buff.append(this.relationships);
+        buff.append("\n   RefsetMembers: \n\t");
+        buff.append(this.refsetMembers);
+        buff.append("\n   Images: \n\t");
+        buff.append(this.images);
+        buff.append("\n   destRelUuidTypeUuids: \n\t");
+        buff.append(this.destRelUuidTypeUuids);
+        buff.append("\n   refsetUuidMemberUuidForConcept: \n\t");
+        buff.append(this.refsetUuidMemberUuidForConcept);
+        buff.append("\n   refsetUuidMemberUuidForDescriptions: \n\t");
+        buff.append(this.refsetUuidMemberUuidForDescriptions);
+        buff.append("\n   refsetUuidMemberUuidForRels: \n\t");
+        buff.append(this.refsetUuidMemberUuidForRels);
+        buff.append("\n   refsetUuidMemberUuidForImages: \n\t");
+        buff.append(this.refsetUuidMemberUuidForImages);
+        return buff.toString();
+    }
+
+	public List<UUID> getDestRelUuidTypeUuids() {
+		return destRelUuidTypeUuids;
+	}
+
+	public void setDestRelUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
+		this.destRelUuidTypeUuids = destRelOriginUuidTypeUuids;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForConcept() {
+		return refsetUuidMemberUuidForConcept;
+	}
+
+	public void setRefsetUuidMemberUuidForConcept(
+			List<UUID> refsetUuidMemberUuidForConcept) {
+		this.refsetUuidMemberUuidForConcept = refsetUuidMemberUuidForConcept;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForDescriptions() {
+		return refsetUuidMemberUuidForDescriptions;
+	}
+
+	public void setRefsetUuidMemberUuidForDescriptions(
+			List<UUID> refsetUuidMemberUuidForDescriptions) {
+		this.refsetUuidMemberUuidForDescriptions = refsetUuidMemberUuidForDescriptions;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForRels() {
+		return refsetUuidMemberUuidForRels;
+	}
+
+	public void setRefsetUuidMemberUuidForRels(
+			List<UUID> refsetUuidMemberUuidForRels) {
+		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
+	}
+	
+    /**
+     * Returns a hash code for this <code>EConcept</code>.
+     * 
+     * @return a hash code value for this <tt>EConcept</tt>.
+     */
+    public int hashCode() {
+        return this.conceptAttributes.primordialUuid.hashCode();
+    }
+
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EConcept</tt> object, and contains the same values, field by field, 
+     * as this <tt>EConcept</tt>.
+     * 
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; 
+     *         <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (EConcept.class.isAssignableFrom(obj.getClass())) {
+            EConcept another = (EConcept) obj;
+            
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare ConceptAttributes
+            if (this.conceptAttributes == null) {
+                if (this.conceptAttributes != another.conceptAttributes)
+                    return false;
+            } else if (!this.conceptAttributes.equals(another.conceptAttributes)) {
+                return false;
+            }
+            // Compare Descriptions
+            if (this.descriptions == null) {
+                if (another.descriptions == null) { // Equal!
+                } else if (another.descriptions.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.descriptions.equals(another.descriptions)) {
+                return false;
+            }
+            // Compare Relationships
+            if (this.relationships == null) {
+                if (another.relationships == null) { // Equal!
+                } else if (another.relationships.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.relationships.equals(another.relationships)) {
+                return false;
+            }
+            // Compare Images
+            if (this.images == null) {
+                if (another.images == null) { // Equal!
+                } else if (another.images.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.images.equals(another.images)) {
+                return false;
+            }
+            // Compare Refset Members
+            if (this.refsetMembers == null) {
+                if (another.refsetMembers == null) { // Equal!
+                } else if (another.refsetMembers.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetMembers.equals(another.refsetMembers)) {
+                return false;
+            }
+            // Compare destRelUuidTypeUuids
+            if (this.destRelUuidTypeUuids == null) {
+                if (another.destRelUuidTypeUuids == null) { // Equal!
+                } else if (another.destRelUuidTypeUuids.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.destRelUuidTypeUuids.equals(another.destRelUuidTypeUuids)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForConcept
+            if (this.refsetUuidMemberUuidForConcept == null) {
+                if (another.refsetUuidMemberUuidForConcept == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForConcept.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForConcept.equals(another.refsetUuidMemberUuidForConcept)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForDescriptions
+            if (this.refsetUuidMemberUuidForDescriptions == null) {
+                if (another.refsetUuidMemberUuidForDescriptions == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForDescriptions.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForDescriptions.equals(another.refsetUuidMemberUuidForDescriptions)) {
+                return false;
+            }
+            // Compare refsetUuidMemberUuidForRels
+            if (this.refsetUuidMemberUuidForRels == null) {
+                if (another.refsetUuidMemberUuidForRels == null) { // Equal!
+                } else if (another.refsetUuidMemberUuidForRels.size() == 0) { // Equal!
+                } else
+                    return false;
+            } else if (!this.refsetUuidMemberUuidForRels.equals(another.refsetUuidMemberUuidForRels)) {
+                return false;
+            }
+
+            // If none of the previous comparisons fail, the objects must be equal
+            return true;
+        }
+        return false;
+    }
+
+	public List<UUID> getRefsetUuidMemberUuidForImages() {
+		return refsetUuidMemberUuidForImages;
+	}
+
+	public void setRefsetUuidMemberUuidForImages(
+			List<UUID> refsetUuidMemberUuidForImages) {
+		this.refsetUuidMemberUuidForImages = refsetUuidMemberUuidForImages;
+	}
+
+	public List<UUID> getRefsetUuidMemberUuidForRefsetMembers() {
+		return refsetUuidMemberUuidForRefsetMembers;
+	}
+
+	public void setRefsetUuidMemberUuidForRefsetMembers(
+			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
+		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
+	}
+
+	public UUID getPrimordialUuid() {
+		return primordialUuid;
+	}
+
+	public void setPrimordialUuid(UUID primordialUuid) {
+		this.primordialUuid = primordialUuid;
+	}
 }

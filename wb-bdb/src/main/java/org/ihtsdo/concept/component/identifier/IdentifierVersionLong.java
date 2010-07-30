@@ -29,7 +29,12 @@ public class IdentifierVersionLong extends IdentifierVersion {
         super();
     }
 
-    @Override
+    public IdentifierVersionLong(int statusNid, int authorNid, int pathNid,
+			long time) {
+        super(statusNid, authorNid, pathNid, time);
+	}
+
+	@Override
     public IDENTIFIER_PART_TYPES getType() {
         return IDENTIFIER_PART_TYPES.LONG;
     }

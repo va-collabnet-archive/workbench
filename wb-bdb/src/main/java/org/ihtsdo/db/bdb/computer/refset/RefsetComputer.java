@@ -6,6 +6,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,12 +26,34 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_FetchConceptFromCursor;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
+import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.time.TimeUtil;
 
 public class RefsetComputer implements I_ProcessUnfetchedConceptData {
+    public class StopActionListener implements ActionListener {
+
+        RefsetComputer computer;
+
+        public StopActionListener(RefsetComputer computer) {
+            this.computer = computer;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            canceled = true;
+            List<ParallelConceptIterator> pcis = computer.getParallelConceptIterators();
+            for (ParallelConceptIterator pci : pcis) {
+                pci.getCurrentThread().interrupt();
+            }
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+        }
+    }
+
     private int refsetNid;
     private RefsetSpecQuery query;
     private Collection<? extends I_ExtendByRef> allRefsetMembers;
@@ -45,6 +68,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private boolean canceled = false;
     private boolean informed = false;
     private I_ShowActivity activity;
+    private Collection<I_ShowActivity> activities;
     private long startTime = System.currentTimeMillis();
     private int conceptCount;
     private I_RepresentIdSet possibleCNids;
@@ -52,23 +76,22 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     private RefsetSpec specHelper;
 
     public RefsetComputer(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig,
-            I_RepresentIdSet possibleIds) throws Exception {
+            I_RepresentIdSet possibleIds, HashSet<I_ShowActivity> activities) throws Exception {
         super();
+        this.activities = activities;
         this.possibleCNids = possibleIds;
         this.frameConfig = frameConfig;
         this.refsetNid = refsetNid;
         this.refsetConcept = Bdb.getConcept(refsetNid);
         conceptCount = possibleIds.cardinality();
 
-        activity = Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
+        activity =
+                Terms.get().newActivityPanel(true, frameConfig, "Computing refset: " + refsetConcept.toString(), true);
+        activities.add(activity);
         activity.setIndeterminate(true);
         activity.setProgressInfoUpper("Computing refset: " + refsetConcept.toString());
         activity.setProgressInfoLower("Setting up the computer...");
-        activity.addRefreshActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                canceled = true;
-            }
-        });
+        activity.addStopActionListener(new StopActionListener(this));
         ActivityViewer.addActivity(activity);
 
         this.query = query;
@@ -123,20 +146,20 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                             .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                 for (I_DescriptionTuple tuple : descriptionTuples) {
                     I_DescriptionVersioned descVersioned = tuple.getDescVersioned();
-                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig);
+                    executeComponent(descVersioned, cNid, descVersioned.getDescId(), frameConfig, activities);
                 }
             } else if (specHelper.isConceptComputeType()) {
-                executeComponent(concept, cNid, cNid, frameConfig);
+                executeComponent(concept, cNid, cNid, frameConfig, activities);
             }
         }
     }
 
-    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid, I_ConfigAceFrame config)
-            throws Exception {
+    private void executeComponent(I_AmTermComponent component, int conceptNid, int componentNid,
+            I_ConfigAceFrame config, Collection<I_ShowActivity> activities) throws Exception {
         if (possibleCNids.isMember(conceptNid)) {
             boolean containsCurrentMember = currentRefsetMemberIds.isMember(componentNid);
 
-            if (query.execute(component, config)) {
+            if (query.execute(component, activities)) {
                 members.incrementAndGet();
                 if (!containsCurrentMember) {
                     newMembers.incrementAndGet();
@@ -166,6 +189,15 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                     activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr
                         + ";  Members: " + members.get() + " New: " + newMembers.get() + " Ret: "
                         + retiredMembers.get());
+                } else {
+                    for (I_ShowActivity a : activities) {
+                        if (!a.isComplete()) {
+                            if (!a.isComplete()) {
+                                a.cancel();
+                                a.setProgressInfoLower("Cancelled.");
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -181,6 +213,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
                 + newMembers.get() + " Ret: " + retiredMembers.get());
         } else {
             activity.setProgressInfoLower("Cancelled.");
+            for (I_ShowActivity a : activities) {
+                if (!a.isComplete()) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
+            }
         }
         activity.complete();
     }
@@ -192,5 +230,16 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     @Override
     public boolean continueWork() {
         return !canceled;
+    }
+
+    List<ParallelConceptIterator> pcis;
+
+    @Override
+    public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
+        this.pcis = pcis;
+    }
+
+    public List<ParallelConceptIterator> getParallelConceptIterators() {
+        return pcis;
     }
 }

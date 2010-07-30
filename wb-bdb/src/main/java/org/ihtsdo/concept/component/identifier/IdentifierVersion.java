@@ -36,6 +36,7 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time, IdentifierVersion idVersion) {
         this(statusNid, authorNid, pathNid, time);
+        this.authorityNid = idVersion.authorityNid;
     }
 
     protected IdentifierVersion(TupleInput input) {

@@ -489,6 +489,9 @@ public interface I_TermFactory {
     List<? extends I_ExtendByRef> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
 
+    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
+   		 int nid) throws IOException;
+    
     String getStats() throws IOException;
 
     /**
@@ -566,6 +569,7 @@ public interface I_TermFactory {
     public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
+ 
     
     public UUID nidToUuid(int nid) throws IOException;
 
@@ -578,6 +582,7 @@ public interface I_TermFactory {
             throws IOException, ParseException;
 
     public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
+    public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException;
 
     /**
      * Close the database. Called on quit.

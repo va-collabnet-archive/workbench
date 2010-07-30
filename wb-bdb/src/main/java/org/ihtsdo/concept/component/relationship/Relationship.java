@@ -29,6 +29,8 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
 
@@ -361,7 +363,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		output.writeInt(getRefinabilityNid());
 		output.writeInt(getTypeNid());
 		output.writeShort(partsToWrite.size());
+		
+		NidPairForRel npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
+		Bdb.addXrefPair(c2Nid, npr);
+		
 		for (RelationshipRevision p : partsToWrite) {
+			if (p.getTypeId() != typeNid) {
+				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
+				Bdb.addXrefPair(c2Nid, npr);
+			}
 			p.writePartToBdb(output);
 		}
 	}
@@ -470,10 +480,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 				count = count + revisions.size();
 			}
 			ArrayList<Version> list = new ArrayList<Version>(count);
-			list.add(new Version());
+			if (getTime() != Long.MIN_VALUE) {
+				list.add(new Version());
+			}
 			if (revisions != null) {
 				for (int i = 0; i < revisions.size(); i++) {
-					list.add(new Version(i));
+					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+						list.add(new Version(i));
+					}
 				}
 			}
 			versions = list;
@@ -694,10 +708,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public boolean hasExtensions() throws IOException {
-        if (getEnclosingConcept().hasRelExtensions()) {
-            return getEnclosingConcept().hasExtensionsForComponent(nid);
-        }
-        return false;
+         return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
 
 

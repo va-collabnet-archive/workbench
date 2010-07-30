@@ -310,10 +310,14 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 				count = count + revisions.size();
 			}
 			ArrayList<Version> list = new ArrayList<Version>(count);
-			list.add(new Version());
+			if (getTime() != Long.MIN_VALUE) {
+				list.add(new Version());
+			}
 			if (revisions != null) {
 				for (int i = 0; i < revisions.size(); i++) {
-					list.add(new Version(i));
+					if (revisions.get(i).getTime() != Long.MIN_VALUE) {
+						list.add(new Version(i));
+					}
 				}
 			}
 			versions = list;

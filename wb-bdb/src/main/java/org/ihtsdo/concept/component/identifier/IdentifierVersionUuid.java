@@ -32,7 +32,12 @@ public class IdentifierVersionUuid extends IdentifierVersion {
         uNid = Bdb.getUuidsToNidMap().getUNid((UUID) another.getDenotation());
     }
 
-    @Override
+    public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid,
+			long time) {
+        super(statusNid, authorNid, pathNid, time);
+	}
+
+	@Override
     public IDENTIFIER_PART_TYPES getType() {
         return IDENTIFIER_PART_TYPES.UUID;
     }

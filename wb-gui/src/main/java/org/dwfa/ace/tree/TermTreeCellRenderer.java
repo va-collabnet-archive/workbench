@@ -200,7 +200,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                         }
 
                         if (showPathInfoInTaxonomy) {
-                            if (Terms.get().pathExists(cb.getConceptId())) {
+                            if (Terms.get().pathExistsFast(cb.getConceptId())) {
                                 addChildrenToolTipText(cb);
                                 I_Position latestInheritedViewPosition = null;
 

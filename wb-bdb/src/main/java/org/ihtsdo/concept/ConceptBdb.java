@@ -36,8 +36,8 @@ public class ConceptBdb extends ComponentBdb {
 
     private static ThreadGroup conDbThreadGroup = new ThreadGroup("concept db threads");
 
-    private static ExecutorService iteratorService = Executors.newCachedThreadPool(new NamedThreadFactory(
-        conDbThreadGroup, "parallel iterator service"));
+    private static ExecutorService iteratorService =
+            Executors.newCachedThreadPool(new NamedThreadFactory(conDbThreadGroup, "parallel iterator service"));
 
     private int processors = Runtime.getRuntime().availableProcessors();
 
@@ -107,7 +107,6 @@ public class ConceptBdb extends ComponentBdb {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.db.bdb.concept.I_ProcessAllConceptData#iterateConceptData(
      * org.ihtsdo.db.bdb.concept.ConceptData)
@@ -130,11 +129,14 @@ public class ConceptBdb extends ComponentBdb {
 
     private void iterateConceptData(I_ProcessUnfetchedConceptData processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
+    	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
         IdentifierSet ids = (IdentifierSet) getReadOnlyConceptIdSet();
         int cardinality = ids.cardinality();
         int idsPerParallelConceptIterator = cardinality / executors;
+    	//AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
         I_IterateIds idsItr = ids.iterator();
         List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
+        List<ParallelConceptIterator> pcis = new ArrayList<ParallelConceptIterator>();
         int sum = 0;
         while (idsItr.next()) {
             int first = idsItr.nid();
@@ -149,9 +151,17 @@ public class ConceptBdb extends ComponentBdb {
             }
             sum = sum + count;
             ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
+//        	AceLog.getAppLog().info("Iterate in parallel. first: " + first + 
+//        			" last: " + last +
+//        			" count: " + count);
             Future<Boolean> f = iteratorService.submit(pci);
+
             futures.add(f);
+            pcis.add(pci);
         }
+
+        processor.setParallelConceptIterators(pcis);
+
         for (Future<Boolean> f : futures) {
             f.get();
         }

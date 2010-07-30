@@ -260,15 +260,9 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent arg0) {
-            List<I_ExtendByRefPart> partsToRemove = new ArrayList<I_ExtendByRefPart>();
-            for (I_ExtendByRefPart part : specPart.getMutableParts()) {
-                if (part.getVersion() == Integer.MAX_VALUE) {
-                    partsToRemove.add(part);
-                }
-            }
-            specPart.getMutableParts().removeAll(partsToRemove);
+            specPart.cancel();
             try {
-                if (specPart.getMutableParts().size() == 0) {
+                if (specPart.isUncommitted()) {
                     Terms.get().forget(specPart);
                 }
                 Terms.get().addUncommitted(Terms.get().getConcept(specPart.getRefsetId()));

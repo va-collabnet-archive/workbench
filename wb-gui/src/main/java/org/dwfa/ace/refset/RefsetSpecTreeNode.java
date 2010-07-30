@@ -71,7 +71,8 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                 try {
                     I_DescriptionTuple thisConstraintDesc =
                             thisConstraint.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
-                    if (thisConstraintDesc.getText() == null) {
+
+                    if (thisConstraintDesc == null || thisConstraintDesc.getText() == null) {
                         constraintDesc = thisConstraint.toString();
                     } else {
                         constraintDesc = thisConstraintDesc.getText().toLowerCase();
@@ -83,10 +84,10 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                 I_DescriptionVersioned thisConstraint = (I_DescriptionVersioned) component;
                 try {
                     List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
-                    thisConstraint.addTuples(aceConfig.getAllowedStatus(), 
-                                null, aceConfig.getViewPositionSetReadOnly(), matchingTuples, 
-                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
-                            
+                    thisConstraint.addTuples(aceConfig.getAllowedStatus(), null,
+                        aceConfig.getViewPositionSetReadOnly(), matchingTuples, aceConfig.getPrecedence(), aceConfig
+                            .getConflictResolutionStrategy());
+
                     if (matchingTuples.size() == 0) {
                         constraintDesc = thisConstraint.toString();
                     } else {
@@ -103,7 +104,8 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public String getClauseDesc() throws TerminologyException, IOException {
         if (clauseDesc == null) {
-        	I_GetConceptData thisClause = Terms.get().getConcept(((I_ExtendByRefPartCidCid) getExtension().getMutablePart()).getC2id());
+            I_GetConceptData thisClause =
+                    Terms.get().getConcept(((I_ExtendByRefPartCidCid) getExtension().getMutablePart()).getC2id());
             try {
                 I_DescriptionTuple thisClauseDesc =
                         thisClause.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -124,7 +126,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
 
     public String getTruthDesc() throws TerminologyException, IOException {
         if (truthDesc == null) {
-        	I_GetConceptData thisTruth = Terms.get().getConcept(truthId);
+            I_GetConceptData thisTruth = Terms.get().getConcept(truthId);
             I_DescriptionTuple thisTruthDesc;
             try {
                 thisTruthDesc = thisTruth.getDescTuple(aceConfig.getTreeDescPreferenceList(), aceConfig);
@@ -140,15 +142,17 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     public I_ExtendByRefVersion getExtension() {
         try {
             if (extension == null) {
-                List<I_ExtendByRefVersion> tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(
-                    aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), 
-                    aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                List<I_ExtendByRefVersion> tupleList =
+                        (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(aceConfig
+                            .getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(), aceConfig.getPrecedence(),
+                            aceConfig.getConflictResolutionStrategy());
                 if (tupleList.size() > 0) {
                     extension = tupleList.get(tupleList.size() - 1);
                 } else {
-                    tupleList = (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(null, 
-                        aceConfig.getViewPositionSetReadOnly(),
-                        aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                    tupleList =
+                            (List<I_ExtendByRefVersion>) ((I_ExtendByRef) this.userObject).getTuples(null, aceConfig
+                                .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
+                                .getConflictResolutionStrategy());
                     if (tupleList.size() > 0) {
                         extension = tupleList.get(tupleList.size() - 1);
                     }
@@ -183,74 +187,74 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                     return -1;
                 }
                 try {
-					switch (EConcept.REFSET_TYPES.nidToType(thisExt.getCore().getTypeId())) {
-					case CID_CID:
+                    switch (EConcept.REFSET_TYPES.nidToType(thisExt.getCore().getTypeId())) {
+                    case CID_CID:
 
-					    switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
-					    case CID_CID:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return compareClause(o);
-					    case CID_CID_CID:
-					        return 1;
-					    case CID_CID_STR:
-					        return 1;
-					    default:
-					        break;
-					    }
+                        switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
+                        case CID_CID:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return compareClause(o);
+                        case CID_CID_CID:
+                            return 1;
+                        case CID_CID_STR:
+                            return 1;
+                        default:
+                            break;
+                        }
 
-					    break;
+                        break;
 
-					case CID_CID_CID:
-					    switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
-					    case CID_CID:
-					        return -1;
-					    case CID_CID_CID:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        comparison = compareClause(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return this.getConstraintDesc().compareTo(o.getClauseDesc());
-					    case CID_CID_STR:
-					        return -1;
-					    default:
-					        break;
-					    }
+                    case CID_CID_CID:
+                        switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
+                        case CID_CID:
+                            return -1;
+                        case CID_CID_CID:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            comparison = compareClause(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return this.getConstraintDesc().compareTo(o.getClauseDesc());
+                        case CID_CID_STR:
+                            return -1;
+                        default:
+                            break;
+                        }
 
-					    break;
-					case CID_CID_STR:
-					    switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
-					    case CID_CID:
-					        return -1;
-					    case CID_CID_CID:
-					        return 1;
-					    case CID_CID_STR:
-					        int comparison = compareTruth(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        comparison = compareClause(o);
-					        if (comparison != 0) {
-					            return comparison;
-					        }
-					        return compareString(thisExt, otherExt);
-					    default:
-					        break;
-					    }
+                        break;
+                    case CID_CID_STR:
+                        switch (EConcept.REFSET_TYPES.nidToType(otherExt.getCore().getTypeId())) {
+                        case CID_CID:
+                            return -1;
+                        case CID_CID_CID:
+                            return 1;
+                        case CID_CID_STR:
+                            int comparison = compareTruth(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            comparison = compareClause(o);
+                            if (comparison != 0) {
+                                return comparison;
+                            }
+                            return compareString(thisExt, otherExt);
+                        default:
+                            break;
+                        }
 
-					    break;
-					default:
-					    break;
-					}
-				} catch (TerminologyException e) {
-					throw new RuntimeException(e);
-				}
+                        break;
+                    default:
+                        break;
+                    }
+                } catch (TerminologyException e) {
+                    throw new RuntimeException(e);
+                }
 
             }
             return this.userObject.toString().compareTo(o.userObject.toString());
@@ -264,7 +268,6 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
         String otherExtStr = ((I_ExtendByRefPartCidCidString) otherExt.getMutablePart()).getStringValue();
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
-
 
     private int compareClause(RefsetSpecTreeNode o) throws IOException, TerminologyException {
         return getClauseDesc().compareTo(o.getClauseDesc());
@@ -312,10 +315,11 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     }
 
     private String htmlRendering;
+
     public String getHtmlRendering() {
         return htmlRendering;
     }
-    
+
     public void setHtmlRendering(String htmlRendering) {
         this.htmlRendering = htmlRendering;
     }

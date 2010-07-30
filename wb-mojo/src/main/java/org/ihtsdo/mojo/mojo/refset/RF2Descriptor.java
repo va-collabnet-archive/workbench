@@ -26,13 +26,6 @@ public class RF2Descriptor {
     ConceptDescriptor module;
 
     /**
-     * The namespace that this export uses. e.g. 1000036
-     */
-    String namespace;
-
-    String project;
-
-    /**
      * The content sub type - this is National, Local or Core.
      */
     String contentSubType;
@@ -48,22 +41,6 @@ public class RF2Descriptor {
 
     public void setModule(ConceptDescriptor module) {
         this.module = module;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getProject() {
-        return project;
-    }
-
-    public void setProject(String project) {
-        this.project = project;
     }
 
     public String getContentSubType() {

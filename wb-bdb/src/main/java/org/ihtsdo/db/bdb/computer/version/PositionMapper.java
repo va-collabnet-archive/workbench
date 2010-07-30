@@ -28,7 +28,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
 
-import cern.colt.bitvector.BitMatrix;
+import org.ihtsdo.cern.colt.bitvector.BitMatrix;
 
 /**
  * Assumptions: 1. Each path can participate as an origin only once 2. The

@@ -3,6 +3,7 @@ package org.ihtsdo.db.bdb;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,10 @@ import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.id.UuidBdb;
 import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
+import org.ihtsdo.db.bdb.xref.Xref;
+import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
@@ -61,6 +66,8 @@ public class Bdb {
 	private static StatusAtPositionBdb statusAtPositionDb;
 	private static ConceptBdb conceptDb;
 	private static PropertiesBdb propDb;
+	public static Xref xref;
+
 	private static ThreadGroup dbdThreadGroup  = 
 		new ThreadGroup("db threads");
 
@@ -124,6 +131,8 @@ public class Bdb {
 	public static void setup(String dbRoot, ActivityPanel activity) {
 		try {
 			closed = false;
+			BdbCommitManager.reset();
+			NidDataFromBdb.resetExecutorPool();
 			for (@SuppressWarnings("unused") OFFSETS o: OFFSETS.values()) {
 				// ensure all OFFSETS are initialized prior to multi-threading. 
 			}
@@ -148,7 +157,7 @@ public class Bdb {
 			statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
 			inform(activity, "loading concept database...");
 			conceptDb = new ConceptBdb(readOnly, mutable);
-			inform(activity, "loaded concept database...");
+			inform(activity, "settig up term factory...");
 			
 			String versionString = getProperty(G_VERSION);
 			if (versionString != null) {
@@ -162,11 +171,12 @@ public class Bdb {
 	            Terms.set(tf);
 			}
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
+			inform(activity, "loading cross references...");
+			xref = new Xref(readOnly, mutable);
+			inform(activity, "Loading paths...");
 			pathManager = BdbPathManager.get();
 			tf.setPathManager(pathManager);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (TerminologyException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -180,17 +190,13 @@ public class Bdb {
 		
 	}
 
-	public static Database setupDatabase(boolean readOnly, String dbName, Bdb bdb) throws IOException {
+	public static Database setupDatabase(boolean readOnly, String dbName, Bdb bdb) throws IOException, DatabaseException {
 		DatabaseConfig dbConfig = new DatabaseConfig();
 		dbConfig.setReadOnly(readOnly);
 		dbConfig.setAllowCreate(!readOnly);
 		dbConfig.setDeferredWrite(!readOnly);
-		try {
-			return bdb.bdbEnv.openDatabase(null,
+		return bdb.bdbEnv.openDatabase(null,
 					dbName, dbConfig);
-		} catch (DatabaseException e) {
-			throw new IOException(e);
-		}
 	}
 
 	protected Environment bdbEnv;
@@ -280,7 +286,7 @@ public class Bdb {
 			try {
 	            activity.setIndeterminate(false);
 	            activity.setValue(0);
-	            activity.setMaximum(8);
+	            activity.setMaximum(9);
 				setProperty(G_VERSION, Long.toString(gVersion.incrementAndGet()));
                 activity.setProgressInfoLower("Writing uuidDb... ");
 				uuidDb.sync();
@@ -296,17 +302,20 @@ public class Bdb {
                 activity.setProgressInfoLower("Writing conceptDb... ");
 				conceptDb.sync();
                 activity.setValue(5);
+                activity.setProgressInfoLower("Writing xref... ");
+				xref.sync();
+                activity.setValue(6);
                 activity.setProgressInfoLower("Writing propDb... ");
 				propDb.sync();
                 activity.setProgressInfoLower("Writing mutable environment... ");
-                activity.setValue(6);
+                activity.setValue(7);
 				mutable.bdbEnv.sync();
                 activity.setProgressInfoLower("Writing readonly environment... ");
-                activity.setValue(7);
+                activity.setValue(8);
 				if (readOnly.bdbEnv.getConfig().getReadOnly() == false) {
 					readOnly.bdbEnv.sync();
 				}
-                activity.setValue(8);
+                activity.setValue(9);
                 long endTime = System.currentTimeMillis();
 
                 long elapsed = endTime - startTime;
@@ -382,6 +391,7 @@ public class Bdb {
 				statusAtPositionDb.close();
 				conceptDb.close();
 				propDb.close();
+				xref.close();
 				mutable.bdbEnv.sync();
 				mutable.bdbEnv.close();
                 activity.setProgressInfoLower("10/10: Shutdown complete");
@@ -535,5 +545,21 @@ public class Bdb {
     
         return statBuff.toString().replace("\n", "<br>");
     }
+
+    
+	public static void addXrefPair(int nid, NidPair pair) {
+		xref.addPair(nid, pair);
+	}
+	public static void forgetXrefPair(int nid, NidPair pair) {
+		xref.forgetPair(nid, pair);
+	}
+
+	public static List<NidPairForRel> getDestRelPairs(int cNid) {
+		return xref.getDestRelPairs(cNid);
+	}
+
+	public static  List<NidPairForRefset> getRefsetPairs(int nid) {
+		return xref.getRefsetPairs(nid);
+	}
 
 }

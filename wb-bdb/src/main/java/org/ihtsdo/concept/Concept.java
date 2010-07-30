@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +29,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -45,7 +45,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
-import org.ihtsdo.concept.ConceptDataManager.SetModifiedWhenChangedList;
 import org.ihtsdo.concept.component.ComponentList;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
@@ -55,12 +54,15 @@ import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.util.NidPair;
+import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
@@ -70,8 +72,6 @@ import org.ihtsdo.tk.concept.component.description.TkDescription;
 import org.ihtsdo.tk.concept.component.media.TkMedia;
 import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
-
-import cern.colt.map.OpenLongObjectHashMap;
 
 public class Concept implements I_Transact, I_GetConceptData {
 
@@ -188,175 +188,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 				}
 			}
 		}
-
-		if (eConcept.getDestRelUuidTypeUuids() != null && 
-				eConcept.getDestRelUuidTypeUuids().size() != 0) {
-			if (c.getData().getDestRelNidTypeNidList() == null || 
-					c.getData().getDestRelNidTypeNidList().size() == 0) {
-				setDestRelNidTypeNidFromEConcept(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getDestRelUuidTypeUuids(),
-						c.getData().getDestRelNidTypeNidList());
-				c.data.setDestRelNidTypeNidList(nidList);
-			}		
-		}
-		if (eConcept.getRefsetUuidMemberUuidForConcept() != null && 
-				eConcept.getRefsetUuidMemberUuidForConcept().size() != 0) {
-			if (c.getData().getRefsetNidMemberNidForConceptList() == null || 
-					c.getData().getRefsetNidMemberNidForConceptList().size() == 0) {
-				setRefsetNidMemberNidForConceptFromEConcept(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getRefsetUuidMemberUuidForConcept(),
-						c.getData().getRefsetNidMemberNidForConceptList());
-				c.data.setRefsetNidMemberNidForConceptList(nidList);
-			}		
-		}
-		if (eConcept.getRefsetUuidMemberUuidForDescriptions() != null && 
-				eConcept.getRefsetUuidMemberUuidForDescriptions().size() != 0) {
-			if (c.getData().getRefsetNidMemberNidForDescriptionsList() == null || 
-					c.getData().getRefsetNidMemberNidForDescriptionsList().size() == 0) {
-				setRefsetNidMemberNidForDescriptions(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getRefsetUuidMemberUuidForDescriptions(),
-						c.getData().getRefsetNidMemberNidForDescriptionsList());
-				c.data.setRefsetNidMemberNidForDescriptionsList(nidList);
-			}		
-		}
-		if (eConcept.getRefsetUuidMemberUuidForRels() != null && 
-				eConcept.getRefsetUuidMemberUuidForRels().size() != 0) {
-			if (c.getData().getRefsetNidMemberNidForRelsList() == null || 
-					c.getData().getRefsetNidMemberNidForRelsList().size() == 0) {
-				getRefsetNidMemberNidForRels(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getRefsetUuidMemberUuidForRels(),
-						c.getData().getRefsetNidMemberNidForRelsList());
-				c.data.setRefsetNidMemberNidForRelsList(nidList);
-			}		
-		}
-
-		if (eConcept.getRefsetUuidMemberUuidForImages() != null && 
-				eConcept.getRefsetUuidMemberUuidForImages().size() != 0) {
-			if (c.getData().getRefsetNidMemberNidForImagesList() == null || 
-					c.getData().getRefsetNidMemberNidForImagesList().size() == 0) {
-				getRefsetNidMemberNidForImages(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getRefsetUuidMemberUuidForImages(),
-						c.getData().getRefsetNidMemberNidForImagesList());
-				c.data.setRefsetNidMemberNidForImagesList(nidList);
-			}		
-		}
-
-		if (eConcept.getRefsetUuidMemberUuidForRefsetMembers() != null && 
-				eConcept.getRefsetUuidMemberUuidForRefsetMembers().size() != 0) {
-			if (c.getData().getRefsetNidMemberNidForRefsetMembersList() == null || 
-					c.getData().getRefsetNidMemberNidForRefsetMembersList().size() == 0) {
-				getRefsetNidMemberNidForRefsetMembers(eConcept, c);
-			} else {
-				ArrayList<NidPair> nidList = mergeNidLists(c, 
-						eConcept.getRefsetUuidMemberUuidForRefsetMembers(),
-						c.getData().getRefsetNidMemberNidForRefsetMembersList());
-				c.data.setRefsetNidMemberNidForRefsetMembersList(nidList);
-			}		
-		}
 		return c;
 	}
-
-	@SuppressWarnings("unchecked")
-    private static ArrayList<NidPair> mergeNidLists(Concept c,
-			List<UUID> uuidPairList, List<NidPair> nidPairList)
-			throws IOException {
-	    int maxSize = (uuidPairList.size() / 2) + nidPairList.size();
-	    OpenLongObjectHashMap pairMap = new OpenLongObjectHashMap(maxSize); 
-	    for (NidPair pair: nidPairList) {
-	        pairMap.put(pair.asLong(), pair);
-	    }
-
-		Iterator<UUID> uuidIterator = uuidPairList.iterator();
-		while (uuidIterator.hasNext()) {
-		    NidPair pair = new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                Bdb.uuidToNid(uuidIterator.next()));
-		    pairMap.put(pair.asLong(), pair);
-		}
-		return pairMap.values().toList();
-	}
-
-	private static void getRefsetNidMemberNidForRefsetMembers(
-			EConcept eConcept, Concept c) throws IOException {
-		ArrayList<NidPair> refsetNidMemberNidForRefsetMembersList = new ArrayList<NidPair>(
-				eConcept.getRefsetUuidMemberUuidForRefsetMembers().size());
-        Iterator<UUID> uuidIterator = eConcept.getRefsetUuidMemberUuidForRefsetMembers().iterator();
-        while (uuidIterator.hasNext()) {
-            refsetNidMemberNidForRefsetMembersList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setRefsetNidMemberNidForRefsetMembersList(refsetNidMemberNidForRefsetMembersList);
-	}
-
-	private static void getRefsetNidMemberNidForImages(EConcept eConcept,
-			Concept c) throws IOException {
-		ArrayList<NidPair> refsetNidMemberNidForImagesList = new ArrayList<NidPair>(
-				eConcept.getRefsetUuidMemberUuidForImages().size());
-        Iterator<UUID> uuidIterator = eConcept.getRefsetUuidMemberUuidForImages().iterator();
-        while (uuidIterator.hasNext()) {
-            refsetNidMemberNidForImagesList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setRefsetNidMemberNidForImagesList(refsetNidMemberNidForImagesList);
-	}
-
-	private static void getRefsetNidMemberNidForRels(EConcept eConcept,
-			Concept c) throws IOException {
-		ArrayList<NidPair> refsetNidMemberNidForRelsList = new ArrayList<NidPair>(
-				eConcept.getRefsetUuidMemberUuidForRels().size());
-        Iterator<UUID> uuidIterator = eConcept.getRefsetUuidMemberUuidForImages().iterator();
-        while (uuidIterator.hasNext()) {
-            refsetNidMemberNidForRelsList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setRefsetNidMemberNidForRelsList(refsetNidMemberNidForRelsList);
-	}
-
-	private static void setRefsetNidMemberNidForDescriptions(EConcept eConcept,
-			Concept c) throws IOException {
-		ArrayList<NidPair> refsetNidMemberNidForDescriptionsList = new ArrayList<NidPair>(
-				eConcept.getRefsetUuidMemberUuidForDescriptions().size());
-        Iterator<UUID> uuidIterator = eConcept.getRefsetUuidMemberUuidForDescriptions().iterator();
-        while (uuidIterator.hasNext()) {
-            refsetNidMemberNidForDescriptionsList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setRefsetNidMemberNidForDescriptionsList(refsetNidMemberNidForDescriptionsList);
-	}
-
-	private static void setRefsetNidMemberNidForConceptFromEConcept(
-			EConcept eConcept, Concept c) throws IOException {
-		ArrayList<NidPair> refsetNidMemberNidForConceptList = new ArrayList<NidPair>(
-				eConcept.getRefsetUuidMemberUuidForConcept().size());
-        Iterator<UUID> uuidIterator = eConcept.getRefsetUuidMemberUuidForConcept().iterator();
-        while (uuidIterator.hasNext()) {
-            refsetNidMemberNidForConceptList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setRefsetNidMemberNidForConceptList(refsetNidMemberNidForConceptList);
-	}
-
-	private static void setDestRelNidTypeNidFromEConcept(EConcept eConcept,
-			Concept c) throws IOException {
-		ArrayList<NidPair> destRelOriginNidTypeNidList = new ArrayList<NidPair>(
-				eConcept.getDestRelUuidTypeUuids().size());
-        Iterator<UUID> uuidIterator = eConcept.getDestRelUuidTypeUuids().iterator();
-        while (uuidIterator.hasNext()) {
-            destRelOriginNidTypeNidList.add(new NidPair(Bdb.uuidToNid(uuidIterator.next()), 
-                    Bdb.uuidToNid(uuidIterator.next())));
-        }
-		c.data.setDestRelNidTypeNidList(destRelOriginNidTypeNidList);
-	}
-
+	
 	private static void setRefsetMembersFromEConcept(EConcept eConcept,
 			Concept c) throws IOException {
 		for (TkRefsetAbstractMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
@@ -365,7 +199,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.data.add(refsetMember);
 		}
 	}
-
+	
 	private static void setImagesFromEConcept(EConcept eConcept, Concept c)
 			throws IOException {
 		for (TkMedia eImage : eConcept.getImages()) {
@@ -373,7 +207,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.data.add(img);
 		}
 	}
-
+	
 	private static void setRelationshipsFromEConcept(EConcept eConcept,
 			Concept c) throws IOException {
 		for (TkRelationship eRel : eConcept.getRelationships()) {
@@ -381,7 +215,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.data.add(rel);
 		}
 	}
-
+	
 	private static void setDescriptionsFromEConcept(TkConcept eConcept, Concept c)
 			throws IOException {
 		for (TkDescription eDesc : eConcept.getDescriptions()) {
@@ -389,21 +223,19 @@ public class Concept implements I_Transact, I_GetConceptData {
 			c.data.add(desc);
 		}
 	}
-
+	
 	private static void setAttributesFromEConcept(Concept c,
 			TkConceptAttributes eAttr) throws IOException {
 		assert eAttr != null;
 		ConceptAttributes attr = new ConceptAttributes(eAttr, c);
 		c.data.set(attr);
 	}
-
-
-	private static Concept populateFromEConcept(EConcept eConcept, Concept c)
-			throws IOException {
+	
+	private static Concept populateFromEConcept(EConcept eConcept, Concept c) throws IOException {
 		if (eConcept.getConceptAttributes() != null) {
 			setAttributesFromEConcept(c, eConcept.getConceptAttributes());
-		}
-		
+		}			
+
 		if (eConcept.getDescriptions() != null) {
 			setDescriptionsFromEConcept(eConcept, c);
 		}
@@ -419,34 +251,10 @@ public class Concept implements I_Transact, I_GetConceptData {
 		if (eConcept.getRefsetMembers() != null) {
 			setRefsetMembersFromEConcept(eConcept, c);
 		}
-
-		if (eConcept.getDestRelUuidTypeUuids() != null) {
-			setDestRelNidTypeNidFromEConcept(eConcept, c);
-		}
-		
-		if (eConcept.getRefsetUuidMemberUuidForConcept() != null) {
-			setRefsetNidMemberNidForConceptFromEConcept(eConcept, c);
-		}
-		
-		if (eConcept.getRefsetUuidMemberUuidForDescriptions() != null) {
-			setRefsetNidMemberNidForDescriptions(eConcept, c);
-		}
-		
-		if (eConcept.getRefsetUuidMemberUuidForRels() != null) {
-			getRefsetNidMemberNidForRels(eConcept, c);
-		}
-
-		if (eConcept.getRefsetUuidMemberUuidForImages() != null) {
-			getRefsetNidMemberNidForImages(eConcept, c);
-		}
-
-		if (eConcept.getRefsetUuidMemberUuidForRefsetMembers() != null) {
-			getRefsetNidMemberNidForRefsetMembers(eConcept, c);
-		}
 		
 		return c;
 	}
-
+	
 	public static Concept get(int nid) throws IOException {
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
 		Concept c = conceptsCRHM.get(nid);
@@ -464,8 +272,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public static Concept getIfInMap(int nid) {
 	    return conceptsCRHM.get(nid);
 	}
-
-	public static Concept get(int nid, byte[] roBytes, byte[] mutableBytes)
+	
+		public static Concept get(int nid, byte[] roBytes, byte[] mutableBytes)
 			throws IOException {
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
 		Concept c = conceptsCRHM.get(nid);
@@ -481,35 +289,13 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	private int nid;
 	private I_ManageConceptData data;
-	public boolean hasMediaExtensions() throws IOException {
-        return data.hasMediaExtensions();
-    }
-
-    public boolean hasExtensionsForComponent(int nid) throws IOException {
-        return data.hasExtensionsForComponent(nid);
-    }
-
-    public boolean hasAttributeExtensions()  throws IOException {
-        return data.hasAttributeExtensions();
-    }
-
-    public boolean hasDescriptionExtensions() throws IOException {
-        return data.hasDescriptionExtensions();
-    }
-
-    public boolean hasExtensionExtensions() throws IOException {
-        return data.hasExtensionExtensions();
-    }
-
-    public boolean hasRelExtensions() throws IOException {
-        return data.hasRelExtensions();
-    }
-
-    private static int fsDescNid = Integer.MIN_VALUE;
-	private static int fsXmlDescNid = Integer.MIN_VALUE;
-
-	private Concept(int nid) throws IOException {
-		super();
+	   
+	
+	private static int fsDescNid = Integer.MIN_VALUE;
+    private static int fsXmlDescNid = Integer.MIN_VALUE;
+    
+   	private Concept(int nid) throws IOException {		
+   		super();
 		assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
 		this.nid = nid;
 		switch (refType) {
@@ -530,7 +316,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 							+ " $$$$$$$$$$$$$$");
 		}
 	}
-
+	
 	/**
 	 * For use in testing/test cases only.
 	 * 
@@ -546,8 +332,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		data = new ConceptDataSimpleReference(this, roBytes, mutableBytes);
 		if (Bdb.watchList.containsKey(nid)) {
 			AceLog.getAppLog().info(
-					"############  Constructing concept: " + nid
-							+ " ############");
+					"############  Constructing concept: " + nid + " ############");
 		}
 	}
 	
@@ -814,16 +599,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 	            config.getPrecedence(), config.getConflictResolutionStrategy());
 	}
 
-	public Set<Concept> getDestRelOrigins(I_IntSet allowedTypes)
-			throws IOException, TerminologyException {
-
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
-		return getDestRelOrigins(config.getAllowedStatus(), allowedTypes,
-				config.getViewPositionSetReadOnly(),
-	            config.getPrecedence(), config.getConflictResolutionStrategy());
-	}
-
 	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, 
         PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException, TerminologyException {
@@ -959,65 +734,6 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return first.getText();
 	}
 
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-        I_IntSet isATypes = config.getDestRelTypes();
-        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-        possibleKindOfConcepts.setMember(getNid());
-        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
-            int relNid = pair.getNid1();
-            int typeNid = pair.getNid2();
-            if (isATypes.contains(typeNid)) {
-                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
-                Concept origin = Bdb.getConceptForComponent(relNid);
-                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
-            }
-        }
-        return possibleKindOfConcepts;
-    }
-
-    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
-        I_IntSet isATypes = config.getDestRelTypes();
-        I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-        for (NidPair pair : this.getData().getDestRelNidTypeNidList()) {
-            int relNid = pair.getNid1();
-            int typeNid = pair.getNid2();
-            if (isATypes.contains(typeNid)) {
-                possibleChildOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
-            }
-        }
-        return possibleChildOfConcepts;
-    }
-
-	private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, I_IntSet isATypes)
-			throws IOException {
-        possibleKindOfConcepts.setMember(getNid());
-        for (NidPair pair: this.getData().getDestRelNidTypeNidList()) {
-            int relNid = pair.getNid1();
-            int typeNid = pair.getNid2();
-			if (isATypes.contains(typeNid)) {
-				int destNid = Bdb.getNidCNidMap().getCNid(relNid);
-				if (!possibleKindOfConcepts.isMember(destNid)) {
-					possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(relNid));
-					Concept origin = Bdb.getConceptForComponent(relNid);
-					origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
-				}
-			}
-		}
-	}
-
-	public Set<Integer> getPossibleDestRelsOfTypes(I_IntSet relTypes)
-			throws IOException {
-		Set<Integer> possibleRelNids = new HashSet<Integer>();
-        for (NidPair pair: this.getData().getDestRelNidTypeNidList()) {
-            int relNid = pair.getNid1();
-            int typeNid = pair.getNid2();
-			if (relTypes.contains(typeNid)) {
-				possibleRelNids.add(relNid);
-			}
-		}
-		return possibleRelNids;
-	}
-
 	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, 
         PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException, TerminologyException {
@@ -1098,328 +814,201 @@ public class Concept implements I_Transact, I_GetConceptData {
 	    return data.isLeafByDestRels(aceConfig);
 	}
 
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
-			throws IOException, TerminologyException {
-		boolean promotedAnything = false;
+    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+            PRECEDENCE precedence) throws IOException, TerminologyException {
+        boolean promotedAnything = false;
 
-		if (getConceptAttributes().promote(viewPosition, pomotionPaths,
-				allowedStatus, precedence)) {
-			promotedAnything = true;
-		}
-
-		for (I_DescriptionVersioned dv : getDescriptions()) {
-			if (dv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
-				promotedAnything = true;
-			}
-		}
-
-		for (I_RelVersioned rv : getSourceRels()) {
-			if (rv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
-				promotedAnything = true;
-			}
-		}
-
-		for (I_ImageVersioned img : getImages()) {
-			if (img.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
-				promotedAnything = true;
-			}
-		}
-		return promotedAnything;
-	}
-
-	public Relationship getRelationship(int relNid) throws IOException {
-		for (Relationship r : getNativeSourceRels()) {
-			if (r.getNid() == relNid) {
-				return r;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, PositionSetReadOnly positions, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
-		Set<Concept> returnValues = new HashSet<Concept>();
-		for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes,
-				positions, precedencePolicy, contradictionManager)) {
-			returnValues.add(Bdb.getConceptDb().getConcept(rel.getC1Id()));
-		}
-		return returnValues;
-	}
-
-	@Override
-	public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, PositionSetReadOnly positions, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
-			throws IOException {
-		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-        SetModifiedWhenChangedList relNidTypeNidlist = data.getDestRelNidTypeNidList();
-        List<NidPair> invalidPairs = new ArrayList<NidPair>();
-        for (NidPair pair: relNidTypeNidlist) {
-        	int relNid = pair.getNid1();
-        	int typeNid = pair.getNid2();
-        	if (allowedTypes == null || allowedTypes.contains(typeNid)) {
-        		Concept relSource = Bdb.getConceptForComponent(relNid);
-        		if (relSource != null) {
-                    Relationship r = relSource.getRelationship(relNid);
-                    if (r != null) {
-                        r.addTuples(allowedStatus, allowedTypes, positions,
-                                returnRels, precedencePolicy, contradictionManager);
-                    } else {
-                        invalidPairs.add(new NidPair(relNid, typeNid));
-                    }
-        		} else {
-                    invalidPairs.add(new NidPair(relNid, typeNid));
-        		}
-        	}
+        if (getConceptAttributes().promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+            promotedAnything = true;
         }
-        
-        if (invalidPairs.size() > 0) {
-        	synchronized (relNidTypeNidlist) {
-        		for (NidPair pair: invalidPairs) {
-        			if (relNidTypeNidlist.forget(pair)) {
-        				Terms.get().addUncommittedNoChecks(this);
-        			}
-        		}
-        	}
+
+        for (I_DescriptionVersioned dv : getDescriptions()) {
+            if (dv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+                promotedAnything = true;
+            }
+        }
+
+        for (I_RelVersioned rv : getSourceRels()) {
+            if (rv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+                promotedAnything = true;
+            }
+        }
+
+        for (I_ImageVersioned img : getImages()) {
+            if (img.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+                promotedAnything = true;
+            }
+        }
+        return promotedAnything;
+    }
+
+    public Relationship getRelationship(int relNid) throws IOException {
+        for (Relationship r : getNativeSourceRels()) {
+            if (r.getNid() == relNid) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException {
+        List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
+        for (I_ImageVersioned img : getImages()) {
+            img.addTuples(allowedStatus, allowedTypes, positions, returnTuples, precedencePolicy, contradictionManager);
+        }
+        return returnTuples;
+    }
+
+    @Override
+    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException, TerminologyException {
+        Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
+        for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
+            contradictionManager)) {
+            returnValues.add(Concept.get(rel.getC2Id()));
+        }
+        return returnValues;
+    }
+
+    @Override
+    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException, TerminologyException {
+        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+        for (I_RelVersioned rel : getSourceRels()) {
+            rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy, contradictionManager);
         }
         return returnRels;
-	}
+    }
 
-	@Override
-	public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, PositionSetReadOnly positions, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
-			throws IOException {
-		List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
-		for (I_ImageVersioned img : getImages()) {
-			img.addTuples(allowedStatus, allowedTypes, positions, returnTuples,
-			    precedencePolicy, contradictionManager);
-		}
-		return returnTuples;
-	}
+    @Override
+    public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException, TerminologyException {
+        for (I_Position p : positions) {
+            KindOfSpec kindOfSpec =
+                    new KindOfSpec(p, allowedStatus, allowedTypes, getNid(), precedencePolicy, contradictionManager);
+            if (KindOfComputer.isKindOf((Concept) child, kindOfSpec)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus,
-			I_IntSet allowedTypes, PositionSetReadOnly positions, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException {
-		Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
-		for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes,
-				positions, precedencePolicy, contradictionManager)) {
-			returnValues.add(Concept.get(rel.getC2Id()));
-		}
-		return returnValues;
-	}
+    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException {
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(), config
+            .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+    }
 
-	@Override
-	public List<? extends I_RelTuple> getSourceRelTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException,
-			TerminologyException {
-		List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-		for (I_RelVersioned rel : getSourceRels()) {
-			rel.addTuples(allowedStatus, allowedTypes, positions, returnRels,
-			    precedencePolicy, contradictionManager);
-		}
-		return returnRels;
-	}
+    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
+        if (child == this) {
+            return true;
+        }
+        return isParentOf(child);
+    }
 
-	@Override
-	public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus,
-			I_IntSet allowedTypes, PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException {
-		for (I_Position p : positions) {
-			KindOfSpec kindOfSpec = new KindOfSpec(p, allowedStatus,
-					allowedTypes, getNid(), precedencePolicy, contradictionManager);
-			if (KindOfComputer.isKindOf((Concept) child, kindOfSpec)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException, TerminologyException {
+        if (child == this) {
+            return true;
+        }
+        return isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy, contradictionManager);
+    }
 
-	public boolean isParentOf(I_GetConceptData child)
-			throws IOException, TerminologyException {
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		return isParentOf(child, config.getAllowedStatus(), config
-				.getDestRelTypes(), config.getViewPositionSetReadOnly(), 
-				config.getPrecedence(), config.getConflictResolutionStrategy());
-	}
+    @Override
+    public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
+        for (I_IdVersion part : getIdentifier().getIdVersions()) {
+            if (part.getAuthorityNid() == authorityNid) {
+                return part.getDenotation();
+            }
+        }
+        return null;
+    }
 
-	public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
-		if (child == this) {
-			return true;
-		}
-		return isParentOf(child);
-	}
+    @Override
+    public I_Identify getIdentifier() throws IOException {
+        return getConceptAttributes();
+    }
 
-	@Override
-	public boolean isParentOfOrEqualTo(I_GetConceptData child,
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
-			throws IOException, TerminologyException {
-		if (child == this) {
-			return true;
-		}
-		return isParentOf(child, allowedStatus, allowedTypes, positions, 
-		        precedencePolicy, contradictionManager);
-	}
+    public I_ManageConceptData getData() {
+        return data;
+    }
 
-	@Override
-	public Object getDenotation(int authorityNid) throws IOException,
-			TerminologyException {
-		for (I_IdVersion part : getIdentifier().getIdVersions()) {
-			if (part.getAuthorityNid() == authorityNid) {
-				return part.getDenotation();
-			}
-		}
-		return null;
-	}
+    public Collection<Integer> getAllNids() throws IOException {
+        return data.getAllNids();
+    }
 
-	@Override
-	public I_Identify getIdentifier() throws IOException {
-		return getConceptAttributes();
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        try {
+            if (!isCanceled()) {
+                return getInitialText();
+            }
+            return "canceled concept";
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+            return ex.toString();
+        }
+    }
 
-	public I_ManageConceptData getData() {
-		return data;
-	}
+    /**
+     * Returns a longer - more complete - string representation of the object.
+     * 
+     * @return
+     */
+    public String toLongString() {
+        StringBuffer buff = new StringBuffer();
+        try {
+            buff.append("\nConcept: \"");
+            buff.append(getInitialText());
+            buff.append("\" nid: ");
+            buff.append(nid);
+            buff.append("\n  data version: ");
+            buff.append(getDataVersion());
+            buff.append("\n write version: ");
+            buff.append(getWriteVersion());
+            buff.append("\n uncommitted: ");
+            buff.append(isUncommitted());
+            buff.append("\n unwritten: ");
+            buff.append(isUnwritten());
+            buff.append("\n attributes: ");
+            buff.append(getConceptAttributes());
+            buff.append("\n descriptions: ");
+            formatCollection(buff, getDescriptions());
+            buff.append("\n srcRels: ");
+            formatCollection(buff, getSourceRels());
+            buff.append("\n images: ");
+            formatCollection(buff, getImages());
+            buff.append("\n refset members: ");
+            formatCollection(buff, getExtensions());
+            buff.append("\n desc nids: ");
+            buff.append(data.getDescNids());
+            buff.append("\n src rel nids: ");
+            buff.append(data.getSrcRelNids());
+            buff.append("\n member nids: ");
+            buff.append(data.getMemberNids());
+            buff.append("\n image nids: ");
+            buff.append(data.getImageNids());
+            buff.append("\n");
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return buff.toString();
+    }
 
-	public Collection<Integer> getAllNids() throws IOException {
-		return data.getAllNids();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		try {
-			if (!isCanceled()) {
-				return getInitialText();
-			}
-			return "canceled concept";
-		} catch (Exception ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-			return ex.toString();
-		}
-	}
-
-	/**
-	 * Returns a longer - more complete - string representation of the object.
-	 * 
-	 * @return
-	 */
-	public String toLongString() {
-		StringBuffer buff = new StringBuffer();
-		try {
-			buff.append("\nConcept: \"");
-			buff.append(getInitialText());
-			buff.append("\" nid: ");
-			buff.append(nid);
-			buff.append("\n  data version: ");
-			buff.append(getDataVersion());
-			buff.append("\n write version: ");
-			buff.append(getWriteVersion());
-			buff.append("\n uncommitted: ");
-			buff.append(isUncommitted());
-			buff.append("\n unwritten: ");
-			buff.append(isUnwritten());
-			buff.append("\n attributes: ");
-			buff.append(getConceptAttributes());
-			buff.append("\n descriptions: ");
-			formatCollection(buff, getDescriptions());
-			buff.append("\n srcRels: ");
-			formatCollection(buff, getSourceRels());
-			buff.append("\n images: ");
-			formatCollection(buff, getImages());
-			buff.append("\n refset members: ");
-			formatCollection(buff, getExtensions());
-			buff.append("\n destRel/type: ");
-			doubleNidFormatter(buff, data.getDestRelNidTypeNidList());
-			buff.append("\n refset/member for concept: ");
-			refsetMemberNidFormatter(buff, data
-					.getRefsetNidMemberNidForConceptList());
-			buff.append("\n refset/member for desc: ");
-			refsetMemberNidFormatter(buff, data
-					.getRefsetNidMemberNidForDescriptionsList());
-			buff.append("\n refset/member for rels: ");
-			refsetMemberNidFormatter(buff, data
-					.getRefsetNidMemberNidForRelsList());
-			buff.append("\n refset/member for image: ");
-			refsetMemberNidFormatter(buff, data
-					.getRefsetNidMemberNidForImagesList());
-			buff.append("\n refset/member for members: ");
-			refsetMemberNidFormatter(buff, data
-					.getRefsetNidMemberNidForRefsetMembersList());
-			buff.append("\n desc nids: ");
-			buff.append(data.getDescNids());
-			buff.append("\n src rel nids: ");
-			buff.append(data.getSrcRelNids());
-			buff.append("\n member nids: ");
-			buff.append(data.getMemberNids());
-			buff.append("\n image nids: ");
-			buff.append(data.getImageNids());
-			buff.append("\n");
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return buff.toString();
-	}
-
-	private long getWriteVersion() {
-		return data.getLastWrite();
-	}
-
-	private void refsetMemberNidFormatter(StringBuffer buff,
-			List<? extends NidPair> refsetNidMemberNidList) throws IOException {
-		if (refsetNidMemberNidList.size() == 0) {
-			buff.append("[]");
-		} else {
-			buff.append("[\n");
-			for (NidPair pair: refsetNidMemberNidList) {
-				int refsetNid = pair.getNid1();
-				int memberNid = pair.getNid2();
-				Concept refsetConcept = Bdb.getConceptForComponent(refsetNid);
-				buff.append("     ");
-				buff.append(refsetNid);
-				buff.append(": ");
-				buff.append(refsetConcept);
-				buff.append(" ");
-				buff.append(memberNid);
-				buff.append("\n");
-			}
-			buff.append("]");
-		}
-	}
-
-	private void doubleNidFormatter(StringBuffer buff,
-			List<? extends NidPair> doubleNidList) throws IOException {
-		if (doubleNidList.size() == 0) {
-			buff.append("[]");
-		} else {
-			buff.append("[\n");
-			for (NidPair pair: doubleNidList) {
-				Concept relConcept = Bdb.getConceptForComponent(pair.getNid1());
-				Concept typeConcept = Bdb.getConceptForComponent(pair.getNid2());
-				buff.append("     ");
-				buff.append(pair.getNid1());
-				buff.append(": ");
-				buff.append(relConcept);
-				buff.append(" ");
-				buff.append(pair.getNid2());
-				buff.append(": ");
-				buff.append(typeConcept);
-				buff.append("\n");
-			}
-			buff.append("]");
-		}
-	}
+    private long getWriteVersion() {
+        return data.getLastWrite();
+    }
 
 	private void formatCollection(StringBuffer buff, Collection<?> list) {
 		if (list != null && list.size() > 0) {
@@ -1435,47 +1024,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 	}
 
-	public List<RefsetMember<?, ?>> getConceptExtensions() throws IOException {
-		List<RefsetMember<?, ?>> returnValues = new ArrayList<RefsetMember<?, ?>>();
-		for (NidPair pair: data.getRefsetNidMemberNidForConceptList()) {
-			int refsetNid = pair.getNid1();
-			int memberNid = pair.getNid2();
-			Concept c = Bdb.getConceptDb().getConcept(refsetNid);
-			RefsetMember<?, ?> member = c.getRefsetMember(memberNid);
-			returnValues.add(member);
-		}
-		return returnValues;
-	}
-
-	public List<RefsetMember<?, ?>> getConceptExtensions(int specifiedRefsetNid)
-			throws IOException {
-		List<RefsetMember<?, ?>> returnValues = new ArrayList<RefsetMember<?, ?>>();
-        for (NidPair pair: data.getRefsetNidMemberNidForConceptList()) {
-            int refsetNid = pair.getNid1();
-            int memberNid = pair.getNid2();
-			if (specifiedRefsetNid == refsetNid) {
-				Concept c = Concept.get(refsetNid);
-				RefsetMember<?, ?> member = c.getRefsetMember(memberNid);
-				assert member != null: "\n\nMissing concept refset exetension " + 
-				    memberNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(memberNid) +
-				    " in concept: \n-------------------------\n\n" + 
-				    this.toLongString() + 
-				    "\n\nIn refset\n\n**********************************\n\n" +
-				    Concept.get(refsetNid).toLongString() +
-				    "\n-------------------------\n\n";
-				returnValues.add(member);
-			}
-		}
-		return returnValues;
-	}
-
 	public ConceptComponent<?, ?> getComponent(int nid) throws IOException {
 		return data.getComponent(nid);
-	}
-
-	public List<RefsetMember<?, ?>> getExtensionsForComponent(int nid)
-			throws IOException {
-		return data.getExtensionsForComponent(nid);
 	}
 
 	public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
@@ -1532,8 +1082,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				return d;
 			}
 		}
-		throw new IOException("No description: " + nid + " found in\n"
-				+ toLongString());
+		throw new IOException("No description: " + nid + " found in\n" + toLongString());
 	}
 
 	public void modified() {
@@ -1544,72 +1093,30 @@ public class Concept implements I_Transact, I_GetConceptData {
 		data.setLastWrite(version);
 	}
 	
-    public List<Integer> getConceptMemberNidsForRefset(I_IntSet refsetNidToMatch) 
-    		throws IOException {
-    	return processMemberNidsForRefset(refsetNidToMatch,
-    			data.getRefsetNidMemberNidForConceptList());
-    }
-
-	private List<Integer> processMemberNidsForRefset(I_IntSet refsetNids,
-			List<? extends NidPair> refsetNidMemberNidList) {
-    	List<Integer> memberNids = new ArrayList<Integer>();
-    	for (NidPair pair: refsetNidMemberNidList) {
-    		int refsetNid = pair.getNid1();
-    		int memberNid = pair.getNid2();
-    		if (refsetNids.contains(refsetNid)) {
-    			memberNids.add(memberNid);
-    		}
-    	}
-    	return memberNids;
-	}
-    public List<Integer> getDescriptionMemberNidsForRefset(I_IntSet refsetNids) 
-    		throws IOException {
-    	return processMemberNidsForRefset(refsetNids,
-    			data.getRefsetNidMemberNidForDescriptionsList());
-    }
-    public List<Integer> getSrcRelMemberNidsForRefset(I_IntSet refsetNids) 
-    		throws IOException {
-    	return processMemberNidsForRefset(refsetNids,
-    			data.getRefsetNidMemberNidForRelsList());
-    }
-    public List<Integer> getImageMemberNidsForRefset(I_IntSet refsetNids) 
-    		throws IOException {
-    	return processMemberNidsForRefset(refsetNids,
-    			data.getRefsetNidMemberNidForImagesList());
-    }
-    public List<Integer> getRefsetMemberNidsForRefset(I_IntSet refsetNids) 
-    		throws IOException {
-    	return processMemberNidsForRefset(refsetNids,
-    			data.getRefsetNidMemberNidForRefsetMembersList());
-    }
-
+ 
 	public ComponentList<RefsetMember<?, ?>> getRefsetMembers()
 			throws IOException {
 		return data.getRefsetMembers();
 	}
 
 	public boolean isCanceled() throws IOException {
-		if (getConceptAttributes() == null || 
-				getConceptAttributes().getTime() == Long.MIN_VALUE) {
+		if (getConceptAttributes() == null || getConceptAttributes().getTime() == Long.MIN_VALUE) {
 			return true;
 		}
 		return false;
 	}
 	
-	public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config)
-	      throws IOException {
+	public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException {
 	    return ConflictHelper.getCommonDescTuples(this, config);
 	  }
 
-	  public final Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config)
-	      throws IOException, TerminologyException {
+	  public final Set<I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException {
 	    return ConflictHelper.getCommonRelTuples(this, config);
 	  }
 
-	  public final Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(
-	      I_ConfigAceFrame config) throws IOException, TerminologyException {
-	    return ConflictHelper.getCommonConceptAttributeTuples(this,
-	        config);
+	  public final Set<I_ConceptAttributeTuple> getCommonConceptAttributeTuples(I_ConfigAceFrame config) 
+	  		  throws IOException, TerminologyException {
+	    return ConflictHelper.getCommonConceptAttributeTuples(this, config);
 	  }
 
 	@Override
@@ -1622,4 +1129,195 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		return false;
 	}
+	    
+    public void updateXrefs() throws IOException {
+    	for (Relationship r: getSourceRels()) {
+    		NidPairForRel npr = NidPair.getTypeNidRelNidPair(r.getTypeNid(), 
+    				r.getNid());
+    		Bdb.addXrefPair(r.getC2Id(), npr);
+    		if (r.revisions != null) {
+        		for (RelationshipRevision p : r.revisions) {
+        			if (p.getTypeId() != r.getTypeNid()) {
+        				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
+        				Bdb.addXrefPair(r.getC2Id(), npr);
+        			}
+        		}
+    		}
+    	}
+    	
+    	for (RefsetMember<?, ?> m: getRefsetMembers()) {
+    		NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(m.getRefsetId(), 
+    				m.getNid());
+    		Bdb.addXrefPair(m.referencedComponentNid, npr);
+    	}
+    }
+    
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+            if (isATypes.contains(pair.getTypeNid())) {
+                possibleChildOfConcepts.setMember(
+                		Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
+            }
+        }
+        return possibleChildOfConcepts;
+    }
+
+
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
+    		I_IntSet isATypes, I_ShowActivity activity)
+            throws IOException {
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+        	if (activity.isCanceled()) {
+        		return;
+        	}
+            if (isATypes.contains(pair.getTypeNid())) {
+                int destNid = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
+                if (!possibleKindOfConcepts.isMember(destNid)) {
+                    possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
+                    Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
+                    origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes, activity);
+                }
+            }
+        }
+    }
+
+    private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
+    		I_IntSet isATypes)
+            throws IOException {
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+            if (isATypes.contains(pair.getTypeNid())) {
+                int destNid = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
+                if (!possibleKindOfConcepts.isMember(destNid)) {
+                    possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
+                    Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
+                    origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
+                }
+            }
+        }
+    }
+
+    public Set<Integer> getPossibleDestRelsOfTypes(I_IntSet relTypes) throws IOException {
+        Set<Integer> possibleRelNids = new HashSet<Integer>();
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+            if (relTypes.contains(pair.getTypeNid())) {
+                possibleRelNids.add(pair.getRelNid());
+            }
+        }
+        return possibleRelNids;
+    }
+
+    public Set<Concept> getDestRelOrigins(I_IntSet allowedTypes) throws IOException, TerminologyException {
+
+        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
+        return getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), config
+            .getPrecedence(), config.getConflictResolutionStrategy());
+    }
+    
+
+    @Override
+    public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
+            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
+        Set<Concept> returnValues = new HashSet<Concept>();
+        for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
+            contradictionManager)) {
+            returnValues.add(Bdb.getConceptDb().getConcept(rel.getC1Id()));
+        }
+        return returnValues;
+    }
+
+	private boolean removeInvalidXrefs = false;
+
+
+    @Override
+    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
+            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            throws IOException {
+        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+        List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+            int relNid = pair.getRelNid();
+            int typeNid = pair.getTypeNid();
+            if (allowedTypes == null || allowedTypes.contains(typeNid)) {
+                Concept relSource = Bdb.getConceptForComponent(relNid);
+                if (relSource != null) {
+                    Relationship r = relSource.getRelationship(relNid);
+                    if (r != null) {
+                        r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
+                            contradictionManager);
+                    } else {
+                        invalidPairs.add(pair);
+                    }
+                } else {
+                    invalidPairs.add(pair);
+                }
+            }
+        }
+
+        if (removeInvalidXrefs  && invalidPairs.size() > 0) {
+            for (NidPair pair : invalidPairs) {
+               Bdb.forgetXrefPair(nid, pair);
+            }
+        }
+        return returnRels;
+    }
+
+    @Override
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
+    		I_ShowActivity activity) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+        	if (activity.isCanceled()) {
+        		return possibleKindOfConcepts;
+        	}
+            if (isATypes.contains(pair.getTypeNid())) {
+                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
+                Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, 
+                		isATypes, activity);
+            }
+        }
+        return possibleKindOfConcepts;
+    }
+
+    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
+        I_IntSet isATypes = config.getDestRelTypes();
+        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        possibleKindOfConcepts.setMember(getNid());
+        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+            if (isATypes.contains(pair.getTypeNid())) {
+                possibleKindOfConcepts.setMember(Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
+                Concept origin = Bdb.getConceptForComponent(pair.getRelNid());
+                origin.addPossibleKindOfConcepts(possibleKindOfConcepts, isATypes);
+            }
+        }
+        return possibleKindOfConcepts;
+    }
+
+    public boolean hasExtensionsForComponent(int nid) throws IOException {
+		List<NidPairForRefset> refsetPairs = Bdb.getRefsetPairs(nid);
+		if (refsetPairs != null && refsetPairs.size() > 0) {
+			return true;
+		}
+		return false;
+    }
+
+    public boolean hasMediaExtensions() throws IOException {
+    	if (data.getImageNids() == null || data.getImageNids().size() == 0) {
+    		return false;
+    	}
+    	for (int imageNid: data.getImageNids()) {
+    		if (hasExtensionsForComponent(imageNid)) {
+    			return true;
+    		}
+    	}
+        return false;
+    }
+
 }

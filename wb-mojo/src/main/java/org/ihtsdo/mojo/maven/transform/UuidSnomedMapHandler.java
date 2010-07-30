@@ -64,10 +64,44 @@ public class UuidSnomedMapHandler {
                         "RW mapping file not found. There must be one--and only one--file of format [namespace]-[project]-"
                             + type + "-sct-map-rw.txt in the directory " + idSourceDir.getAbsolutePath());
                 }
+
                 fileMap.put(type, rwMapFileArray[0]);
                 String[] nameParts = fileMap.get(type).getName().split("-");
                 NAMESPACE namespace = NAMESPACE.valueOf(nameParts[0]);
                 PROJECT project = PROJECT.valueOf(nameParts[1]);
+                mapMap.put(type, UuidSnomedMap.read(fileMap.get(type), namespace, project));
+            }
+            for (File fixedMapFile : idSourceDir.listFiles(new SctMapFilter())) {
+                UuidSnomedFixedMap fixedMap = UuidSnomedFixedMap.read(fixedMapFile);
+                for (TYPE type : TYPE.values()) {
+                    mapMap.get(type).addFixedMap(fixedMap);
+                }
+            }
+            if (idGeneratedDir.listFiles() != null) {
+                for (File fixedMapFile : idGeneratedDir.listFiles(new SctMapFilter())) {
+                    UuidSnomedFixedMap fixedMap = UuidSnomedFixedMap.read(fixedMapFile);
+                    for (TYPE type : TYPE.values()) {
+                        mapMap.get(type).addFixedMap(fixedMap);
+                    }
+                }
+            }
+        }
+    }
+
+    public UuidSnomedMapHandler(File idGeneratedDir, File sourceDirectory, int namespace, int project)
+            throws IOException {
+        if (mapMap == null) {
+            mapMap = new HashMap<TYPE, UuidSnomedMap>();
+            fileMap = new HashMap<TYPE, File>();
+            File idSourceDir = new File(sourceDirectory.getParentFile(), "sct-uuid-maps");
+            for (final TYPE type : TYPE.values()) {
+                File[] rwMapFileArray = idSourceDir.listFiles(new SctMapRwFilter(type));
+                if (rwMapFileArray == null || rwMapFileArray.length != 1) {
+                    throw new IOException(
+                        "RW mapping file not found. There must be one--and only one--file of format [namespace]-[project]-"
+                            + type + "-sct-map-rw.txt in the directory " + idSourceDir.getAbsolutePath());
+                }
+                fileMap.put(type, rwMapFileArray[0]);
                 mapMap.put(type, UuidSnomedMap.read(fileMap.get(type), namespace, project));
             }
             for (File fixedMapFile : idSourceDir.listFiles(new SctMapFilter())) {

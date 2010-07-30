@@ -87,7 +87,8 @@ import com.sun.jini.start.LifeCycle;
 
 public abstract class ObjectServerCore<T extends I_DescribeObject> implements ActionListener {
 
-    private static Set<ObjectServerCore<I_DescribeObject>> openServers = new HashSet<ObjectServerCore<I_DescribeObject>>();
+    private static Set<ObjectServerCore<I_DescribeObject>> openServers =
+            new HashSet<ObjectServerCore<I_DescribeObject>>();
 
     public static void refreshServers() {
         for (ObjectServerCore<I_DescribeObject> server : openServers) {
@@ -194,8 +195,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
      */
     public File undoTake(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixTakePending())).concat(
-            getFileSuffix());
+        String newName =
+                currentName.substring(0, currentName.lastIndexOf(getFileSuffixTakePending())).concat(getFileSuffix());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         return newFile;
@@ -208,8 +209,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
      */
     public File finishWrite(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending())).concat(
-            getFileSuffix());
+        String newName =
+                currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending())).concat(getFileSuffix());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         try {
@@ -226,8 +227,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
      */
     public File startTake(File file) {
         String currentName = file.getName();
-        String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffix())).concat(
-            getFileSuffixTakePending());
+        String newName =
+                currentName.substring(0, currentName.lastIndexOf(getFileSuffix())).concat(getFileSuffixTakePending());
         File newFile = new File(file.getParentFile(), newName);
         file.renameTo(newFile);
         return newFile;
@@ -242,21 +243,24 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                 + Arrays.asList(args) + "\n\n******************\n");
         this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
-        oisGetter = (I_GetObjectInputStream) this.config.getEntry(this.getClass().getName(), "objectGetter",
-            I_GetObjectInputStream.class);
-        Boolean readInsteadOfTakeBool = (Boolean) this.config.getEntry(this.getClass().getName(), "readInsteadOfTake",
-            Boolean.class, new Boolean(false));
+        oisGetter =
+                (I_GetObjectInputStream) this.config.getEntry(this.getClass().getName(), "objectGetter",
+                    I_GetObjectInputStream.class);
+        Boolean readInsteadOfTakeBool =
+                (Boolean) this.config.getEntry(this.getClass().getName(), "readInsteadOfTake", Boolean.class,
+                    new Boolean(false));
         this.readInsteadOfTake = readInsteadOfTakeBool.booleanValue();
-        this.nodeInboxAddress = (String) this.config.getEntry(this.getClass().getName(), "nodeInboxAddress",
-            String.class);
-        this.directory = (File) this.config.getEntry(this.getClass().getName(), "directory", File.class, new File(
-            args[0]).getParentFile());
+        this.nodeInboxAddress =
+                (String) this.config.getEntry(this.getClass().getName(), "nodeInboxAddress", String.class);
+        this.directory =
+                (File) this.config.getEntry(this.getClass().getName(), "directory", File.class, new File(args[0])
+                    .getParentFile());
         this.directory.mkdirs();
         this.logDir = new File(this.directory, ".llog");
         this.logDir.mkdirs();
 
-        this.nativeComparator = (Comparator<T>) this.config.getEntry(this.getClass().getName(), "nativeComparator",
-            Comparator.class);
+        this.nativeComparator =
+                (Comparator<T>) this.config.getEntry(this.getClass().getName(), "nativeComparator", Comparator.class);
         initFromDirectory();
         this.init();
     }
@@ -286,20 +290,20 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     protected void init() throws Exception {
         if (JiniManager.isLocalOnly()) {
             List<Entry> entryList = new ArrayList<Entry>();
-            Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
-                new Entry[] {});
+            Entry[] entries =
+                    (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class, new Entry[] {});
             entryList.addAll(Arrays.asList(entries));
 
             Entry[] moreEntries = getFixedServiceEntries();
             entryList.addAll(Arrays.asList(moreEntries));
 
-            ServiceItem serviceItem = new ServiceItem(this.getServiceID(), this,
-                (Entry[]) entryList.toArray(new Entry[entryList.size()]));
+            ServiceItem serviceItem =
+                    new ServiceItem(this.getServiceID(), this, (Entry[]) entryList.toArray(new Entry[entryList.size()]));
             LookupJiniAndLocal.addToLocalServices(serviceItem);
 
         } else {
-            LoginContext loginContext = (LoginContext) config.getEntry(this.getClass().getName(), "loginContext",
-                LoginContext.class, null);
+            LoginContext loginContext =
+                    (LoginContext) config.getEntry(this.getClass().getName(), "loginContext", LoginContext.class, null);
             if (loginContext == null) {
                 getLogger().info(
                     "initAsSubject: " + this.getClass().getName() + " " + this.getServiceID()
@@ -395,8 +399,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
 
                 } else if (files[i].getName().endsWith(getFileSuffixWritePending())) {
                     String currentName = files[i].getName();
-                    String newName = currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending()))
-                        .concat(getFileSuffix());
+                    String newName =
+                            currentName.substring(0, currentName.lastIndexOf(getFileSuffixWritePending())).concat(
+                                getFileSuffix());
                     files[i].renameTo(new File(files[i].getParentFile(), newName));
 
                 }
@@ -436,8 +441,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
      * @throws IOException
      * @throws ClassNotFoundException
      * @throws NoMatchingEntryException
-     * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid,
-     *      net.jini.core.transaction.Transaction)
+     * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid, net.jini.core.transaction.Transaction)
      */
     public Object read(UUID objectID, Transaction t) throws IOException, ClassNotFoundException,
             NoMatchingEntryException {
@@ -477,8 +481,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     /**
      * @throws IOException
      * @throws ClassNotFoundException
-     * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid,
-     *      net.jini.core.transaction.Transaction)
+     * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid, net.jini.core.transaction.Transaction)
      */
     public Object take(EntryID entryID, Transaction t) throws TransactionException, IOException,
             ClassNotFoundException, NoMatchingEntryException {
@@ -523,8 +526,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         if (t == null) {
             write(object, entryID);
         } else {
-            File objectFile = new File(this.directory, object.getObjectID() + "." + entryID
-                + getFileSuffixWritePending());
+            File objectFile =
+                    new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffixWritePending());
             FileOutputStream fos = new FileOutputStream(objectFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -557,8 +560,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
 
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#writeThenTake(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     *      net.jini.core.transaction.Transaction,
-     *      net.jini.core.transaction.Transaction)
+     *      net.jini.core.transaction.Transaction, net.jini.core.transaction.Transaction)
      */
     public EntryID writeThenTake(T object, Transaction writeTran, Transaction takeTran) throws RemoteException,
             IOException, TransactionException {
@@ -630,8 +632,7 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     /**
      * @throws IOException
      * @throws ClassNotFoundException
-     * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid,
-     *      net.jini.core.transaction.Transaction)
+     * @see org.dwfa.bpa.process.I_QueueProcesses#take(net.jini.id.Uuid, net.jini.core.transaction.Transaction)
      */
     public Object take(UUID objectID, Transaction t) throws TransactionException, IOException, ClassNotFoundException,
             NoMatchingEntryException {
@@ -737,8 +738,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         if (st == null) {
             return;
         }
-        TakeTransactionPart part = new TakeTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes,
-            processFile, this, this);
+        TakeTransactionPart part =
+                new TakeTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes, processFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addTakeToTransaction");
@@ -752,8 +753,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         if (st == null) {
             return;
         }
-        HideTransactionPart part = new HideTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes,
-            processFile, this, this);
+        HideTransactionPart part =
+                new HideTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes, processFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addHideTransactionPart");
@@ -767,8 +768,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         if (writeTransaction == null) {
             return;
         }
-        WriteThenTakeTransactionPart part = new WriteThenTakeTransactionPart<T>(objectDesc, objectInfoSortedSet,
-            processFile, takeTran, this);
+        WriteThenTakeTransactionPart part =
+                new WriteThenTakeTransactionPart<T>(objectDesc, objectInfoSortedSet, processFile, takeTran, this);
         TransactionParticipantAggregator.addTransactionPart(writeTransaction, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addWriteThenTakeToTransaction");
@@ -845,20 +846,21 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         /* Get the discovery manager, for discovering lookup services */
         DiscoveryManagement discoveryManager;
         try {
-            discoveryManager = (DiscoveryManagement) config.getEntry(this.getClass().getName(), "discoveryManager",
-                DiscoveryManagement.class);
+            discoveryManager =
+                    (DiscoveryManagement) config.getEntry(this.getClass().getName(), "discoveryManager",
+                        DiscoveryManagement.class);
         } catch (NoSuchEntryException e) {
             getLogger().warning("No entry for discoveryManager in config file. " + e.toString());
             String[] groups = (String[]) config.getEntry(this.getClass().getName(), "groups", String[].class);
             discoveryManager = new LookupDiscovery(groups, config);
         }
 
-        Entry[] entries = (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class,
-            new Entry[] {});
+        Entry[] entries =
+                (Entry[]) this.config.getEntry(this.getClass().getName(), "entries", Entry[].class, new Entry[] {});
 
         /* Get the join manager, for joining lookup services */
-        joinManager = new JoinManager(smartProxy, entries, getServiceID(), discoveryManager, null /* leaseMgr */,
-            config);
+        joinManager =
+                new JoinManager(smartProxy, entries, getServiceID(), discoveryManager, null /* leaseMgr */, config);
 
         Entry[] moreEntries = getFixedServiceEntries();
         joinManager.addAttributes(moreEntries);
@@ -884,8 +886,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
 
         }
 
-        ServiceItem serviceItem = new ServiceItem(this.getServiceID(), smartProxy,
-            (Entry[]) entryList.toArray(new Entry[entryList.size()]));
+        ServiceItem serviceItem =
+                new ServiceItem(this.getServiceID(), smartProxy, (Entry[]) entryList
+                    .toArray(new Entry[entryList.size()]));
         LookupJiniAndLocal.addToLocalServices(serviceItem);
         /*
          * }

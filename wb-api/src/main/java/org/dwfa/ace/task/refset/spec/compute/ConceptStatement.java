@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,12 +28,10 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 
@@ -45,6 +45,18 @@ import org.ihtsdo.time.TimeUtil;
 public class ConceptStatement extends RefsetSpecStatement {
 
     I_GetConceptData queryConstraintConcept;
+    private Collection<I_ShowActivity> activities;
+    private StopActionListener stopListener = new StopActionListener();
+
+    private class StopActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+            }
+        }
+    }
 
     /**
      * Constructor for refset spec statement.
@@ -52,9 +64,12 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @throws Exception
      */
-    public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint, int refsetSpecNid) {
-        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid);
+    public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint,
+            int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
+        super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
+
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptId() == token.nid) {
                 tokenEnum = token;
@@ -68,23 +83,24 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public I_RepresentIdSet getPossibleDescriptions(I_ConfigAceFrame config, I_RepresentIdSet parentPossibleConcepts)
-            throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible descriptions in concept statement unsupported operation.");
     }
 
     @Override
-    public I_RepresentIdSet getPossibleRelationships(I_ConfigAceFrame configFrame,
-            I_RepresentIdSet parentPossibleConcepts) throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         throw new TerminologyException("Get possible relationships in concept statement unsupported operation.");
     }
 
     @Override
-    public I_RepresentIdSet getPossibleConcepts(I_ConfigAceFrame configFrame, I_RepresentIdSet parentPossibleConcepts)
-            throws TerminologyException, IOException {
+    public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
+            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
         I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
-        
+        this.activities = activities;
+
         queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
@@ -101,27 +117,30 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
             break;
         case CONCEPT_IS_CHILD_OF:
-            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activity = setupActivityPanel(parentPossibleConcepts);
+            activities.add(activity);
 
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
             } else {
-                I_RepresentIdSet results = queryConstraintConcept.getPossibleChildOfConcepts(configFrame);
+                I_RepresentIdSet results = queryConstraintConcept.getPossibleChildOfConcepts(config);
                 possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_DESCENDENT_OF:
         case CONCEPT_IS_KIND_OF:
-            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
-             if (isNegated()) {
+            activity = setupActivityPanel(parentPossibleConcepts);
+            activities.add(activity);
+            if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
             } else {
-                I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(configFrame);
+                I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(config, activity);
                 possibleConcepts.or(results);
             }
             break;
         case CONCEPT_IS_MEMBER_OF:
-            activity = setupActivityPanel(configFrame, parentPossibleConcepts);
+            activity = setupActivityPanel(parentPossibleConcepts);
+            activities.add(activity);
             Collection<? extends I_ExtendByRef> refsetExtensions =
                     termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
@@ -145,37 +164,36 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
-        
+
         if (activity != null) {
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: " + parentPossibleConcepts.cardinality() + 
-                "; Outgoing count: " + possibleConcepts.cardinality());
+            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+                + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
             activity.complete();
         }
         return possibleConcepts;
     }
 
-	private I_ShowActivity setupActivityPanel(I_ConfigAceFrame configFrame,
-			I_RepresentIdSet parentPossibleConcepts) {
-		I_ShowActivity activity;
-		activity = Terms.get().newActivityPanel(true, configFrame, 
-		        "<html>Possible: <br>" + this.toHtmlFragment(), true);
-		    activity.setIndeterminate(true);
-		    activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
-		return activity;
-	}
+    private I_ShowActivity setupActivityPanel(I_RepresentIdSet parentPossibleConcepts) {
+        I_ShowActivity activity;
+        activity = Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(), true);
+        activity.setIndeterminate(true);
+        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
+        activity.addStopActionListener(stopListener);
+        return activity;
+    }
 
     @Override
-    public boolean getStatementResult(I_AmTermComponent component, I_ConfigAceFrame config) throws TerminologyException, IOException {
+    public boolean getStatementResult(I_AmTermComponent component) throws TerminologyException, IOException {
         I_GetConceptData concept = (I_GetConceptData) component;
 
         switch (tokenEnum) {
         case CONCEPT_IS:
             return conceptIs(concept);
         case CONCEPT_IS_CHILD_OF:
-            return conceptIsChildOf(concept, config);
+            return conceptIsChildOf(concept);
         case CONCEPT_IS_DESCENDENT_OF:
             return conceptIsDescendantOf(concept);
         case CONCEPT_IS_KIND_OF:
@@ -204,16 +222,13 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      * @throws IOException
      */
-    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested, I_ConfigAceFrame config) throws TerminologyException, IOException {
+    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws TerminologyException, IOException {
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
                 if (conceptBeingTested.equals(child)) {
@@ -260,7 +275,9 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraintConcept.isParentOf(conceptBeingTested);
+        return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses, allowedTypes, termFactory
+            .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+            .getConflictResolutionStrategy());
     }
 
     /**
@@ -274,7 +291,9 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested);
+        return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, currentStatuses, allowedTypes,
+            termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                .getConflictResolutionStrategy());
     }
 
     /**
@@ -301,13 +320,10 @@ public class ConceptStatement extends RefsetSpecStatement {
      */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
             throws IOException, TerminologyException {
-        // TODO replace with passed in config...
-        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         List<? extends I_ConceptAttributeTuple> tuples =
                 conceptBeingTested.getConceptAttributeTuples(null, termFactory.getActiveAceFrameConfig()
-                    .getViewPositionSetReadOnly(), 
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
+                    .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
         // get latest tuple
         I_ConceptAttributeTuple latestTuple = null;
@@ -358,17 +374,12 @@ public class ConceptStatement extends RefsetSpecStatement {
             IOException {
 
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-           // get list of all children of input concept
+            // get list of all children of input concept
             Set<? extends I_GetConceptData> childStatuses =
                     queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
+                        .getConflictResolutionStrategy());
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {
@@ -413,16 +424,10 @@ public class ConceptStatement extends RefsetSpecStatement {
             throws TerminologyException, IOException {
 
         try {
-            I_IntSet allowedTypes = getIsAIds();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
-            // TODO replace with passed in config...
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             Set<? extends I_GetConceptData> childStatuses =
                     status.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig()
-                        .getViewPositionSetReadOnly(), 
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
+                        .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
                 if (conceptStatusIs(conceptBeingTested, childStatus)) {

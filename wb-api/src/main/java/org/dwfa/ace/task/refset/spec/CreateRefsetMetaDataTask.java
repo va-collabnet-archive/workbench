@@ -358,6 +358,12 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             termFactory.getActiveAceFrameConfig().setBuilderToggleVisible(true);
             termFactory.getActiveAceFrameConfig().setInboxToggleVisible(true);
 
+            termFactory.addUncommittedNoChecks(memberRefset);
+            termFactory.addUncommittedNoChecks(refsetSpec);
+            termFactory.addUncommittedNoChecks(markedParent);
+            termFactory.addUncommittedNoChecks(promotionRefset);
+            termFactory.addUncommittedNoChecks(commentsRefset);
+
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -378,8 +384,6 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
             UUID conceptUuid = UUID.randomUUID();
 
             I_GetConceptData newConcept = termFactory.newConcept(conceptUuid, isDefined, aceConfig, status.getNid());
-
-            termFactory.addUncommittedNoChecks(newConcept);
             return newConcept;
         } catch (Exception e) {
             e.printStackTrace();
@@ -395,8 +399,11 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
 
         if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize()
             .getNid()) {
-            String paddedDescription = "\"" + description + "\"";
-            Hits hits = termFactory.doLuceneSearch(paddedDescription);
+            String filteredDescription = description;
+            // remove all non-alphanumeric characters and replace with a space - this is to stop these characters
+            // causing issues with the lucene search
+            filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
+            Hits hits = termFactory.doLuceneSearch(filteredDescription);
             for (int i = 0; i < hits.length(); i++) {
                 Document doc = hits.doc(i);
                 int cnid = Integer.parseInt(doc.get("cnid"));
