@@ -452,10 +452,16 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         		new I_ConceptualizeUniversally[] {ISSUE_MANAGER_ROOT}),
         		
         // Rules repository metadata
-        RULES_REPOSITORY(new String[] { "Rules repository", "Rules repository" }, 
-        		new I_ConceptualizeUniversally[] {REFSET_AUXILIARY}),
-        		RULES_REPOSITORY_METADATA_REFSET(new String[] { "Rules repository metadata refset", "Rules repository metadata refset" }, 
-        				new I_ConceptualizeUniversally[] {REFSET_AUXILIARY}),;		
+		RULES_AUXILIARY(new String[] {"rules auxiliary concept", "rules auxiliary concept" }, REFSET_AUXILIARY),
+		RULES_DEPLOYMENT_PKG(new String[] {"rules deployment package", "rules deployment package" }, RULES_AUXILIARY),
+		RULES_DEPLOYMENT_PKG_METADATA_REFSET(new String[] { "rules deployment package metadata refset", 
+				"rules deployment package metadata refset" }, RULES_AUXILIARY),
+        RULES_CONTEXT(new String[] { "rules context", "rules context" },  RULES_AUXILIARY),
+        RULES_CONTEXT_METADATA_REFSET(new String[] { "rules context metadata refset", 
+		"rules context metadata refset" }, RULES_AUXILIARY),
+        REALTIME_QA_CONTEXT(new String[] { "realtime qa context", "realtime qa context" },  RULES_CONTEXT),		
+        BATCH_QA_CONTEXT(new String[] { "batch qa context", "batch qa context" },  RULES_CONTEXT),
+        TEMPLATE_CONTEXT(new String[] { "template context", "template context" },  RULES_CONTEXT),;		
 
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
