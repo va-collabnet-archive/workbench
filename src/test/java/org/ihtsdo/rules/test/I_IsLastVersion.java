@@ -1,4 +1,4 @@
-package com.termmed.drools_test;
+package org.ihtsdo.rules.test;
 
 public interface I_IsLastVersion {
 	

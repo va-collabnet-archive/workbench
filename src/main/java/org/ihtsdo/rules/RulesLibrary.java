@@ -52,8 +52,13 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.rules.context.RulesContextHelper;
+import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
+import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
 /**
@@ -65,6 +70,70 @@ public class RulesLibrary {
 	public static int CONCEPT_MODEL_PKG = 0;
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 
+	public static KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
+		RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
+
+		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+		for (RulesDeploymentPackageReference deploymentPackage : rulesPackageHelper.getAllRulesDeploymentPackages()) {
+			if (deploymentPackage.isOnLine()) {
+				KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase();
+				loopKBase = filterForContext(loopKBase, context, config);
+				kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+			}
+		}
+
+		return kbase;
+	}
+
+	public static KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
+		RulesContextHelper contextHelper = new RulesContextHelper(config);
+		I_GetConceptData excludeClause = Terms.get().getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
+		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
+			for (Rule rule : kpackg.getRules()) {
+				boolean excluded = false;
+				String ruleUid = rule.getMetaAttribute("UID");
+				if (ruleUid != null) {
+					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
+					if (role != null && role.getConceptId() == excludeClause.getConceptId()) {
+						excluded = true;
+					}
+				}
+				if (excluded) {
+					kbase.removeRule(kpackg.getName(), rule.getName());
+				}
+			}
+		}
+		return kbase;
+	}
+	
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
+			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
+	throws Exception {
+		KnowledgeBase kbase = getKnowledgeBaseForContext(context, config);
+
+		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
+		ksession.setGlobal("transitiveClosureHelper", new TransitiveClosureHelperWorkbench());
+		
+		EConcept testConcept = new EConcept(concept);
+		ksession.insert(testConcept);
+
+		ksession.fireAllRules();
+
+		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+
+		for (int errorCode : results.getErrorCodes().keySet() ) {
+			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+					results.getErrorCodes().get(errorCode), 
+					concept));
+		}
+
+		ksession.dispose();
+
+		return results;
+	}
+
 	/**
 	 * Check concept.
 	 * 
@@ -74,11 +143,13 @@ public class RulesLibrary {
 	 * @return the array list< alert to data constraint failure>
 	 * @throws Exception 
 	 */
+	@Deprecated
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean onlyUncommittedContent
 	) throws Exception {
 		return checkConcept(concept, kbId, null, onlyUncommittedContent);
 	}
 
+	@Deprecated
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, 
 			I_GetConceptData languageRefset, boolean onlyUncommittedContent) 
 	throws Exception {
@@ -240,6 +311,7 @@ public class RulesLibrary {
 	 * 
 	 * @throws Exception the exception
 	 */
+	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, String url, boolean recreate) throws Exception {
 		KnowledgeBase kbase= null;
 		File serializedKbFile = new File("rules/knowledge_packages-" + kbId + ".pkg");
@@ -290,45 +362,43 @@ public class RulesLibrary {
 	 * 
 	 * @throws Exception the exception
 	 */
-	public static KnowledgeBase getKnowledgeBase(int kbId, byte[] bytes, boolean recreate) throws Exception {
+	public static KnowledgeBase getKnowledgeBase(UUID referenceUuid, byte[] bytes, boolean recreate) throws Exception {
 		KnowledgeBase kbase= null;
 		File rulesDirectory = new File("rules");
 		if (!rulesDirectory.exists())
 		{
 			rulesDirectory.mkdir();
 		}
-		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + kbId + ".pkg");
-		if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
-			if (serializedKbFile.exists() && !recreate) {
-				try {
-					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-					// The input stream might contain an individual
-					// package or a collection.
-					@SuppressWarnings( "unchecked" )
-					Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
-					in.close();
-					kbase = KnowledgeBaseFactory.newKnowledgeBase();
-					kbase.addKnowledgePackages(kpkgs);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-			} else {
-				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
-				kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
-				kbase = kagent.getKnowledgeBase();
-				try {
-					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					out.writeObject( kbase.getKnowledgePackages() );
-					out.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+		if (serializedKbFile.exists() && !recreate) {
+			try {
+				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+				// The input stream might contain an individual
+				// package or a collection.
+				@SuppressWarnings( "unchecked" )
+				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+				in.close();
+				kbase = KnowledgeBaseFactory.newKnowledgeBase();
+				kbase.addKnowledgePackages(kpkgs);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		} else {
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
+			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			kbase = kagent.getKnowledgeBase();
+			try {
+				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+				out.writeObject( kbase.getKnowledgePackages() );
+				out.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		return kbase;
@@ -354,10 +424,12 @@ public class RulesLibrary {
 	 * @return the knowledge base
 	 * @throws Exception 
 	 */
+	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId) throws Exception {
 		return getKnowledgeBase(kbId, false, null);
 	}
 
+	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, HashMap<Resource, ResourceType> resources) throws Exception {
 		return getKnowledgeBase(kbId, false, resources);
 	}
@@ -371,6 +443,7 @@ public class RulesLibrary {
 	 * @return the knowledge base
 	 * @throws Exception 
 	 */
+	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, boolean recreate, 
 			HashMap<Resource, ResourceType> resources) throws Exception {
 		KnowledgeBase kbase= null;
