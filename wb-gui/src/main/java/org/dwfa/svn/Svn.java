@@ -368,7 +368,17 @@ public class Svn implements I_HandleSubversion {
 					Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
 					SvnLog.info("Adding: " + s.getPath());
 					newFiles++;
-				} else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
+				} else if (s.isIgnored() == false && new File(s.getPath()).exists()
+                        && s.getPath().contains(".llog") == false && !s.getPath().contains(".bp.write-pending")
+                        && !s.getPath().contains(".bp.take-pending")) {
+                        int depth = Depth.infinity;
+                        boolean force = false;
+                        boolean noIgnores = false;
+                        boolean addParents = true;
+                        Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
+                        SvnLog.info("Adding: " + s.getPath());
+                        newFiles++;
+                    } else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
 					// prevent tree conflict. 
 					SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
 					revert(s);

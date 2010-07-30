@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -38,8 +40,8 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -122,7 +124,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      */
     String releaseVersion;
 
-    private I_TermFactory tf = LocalVersionedTerminology.get();
+    private I_TermFactory tf = Terms.get();
 
     private I_IntSet allowedStatuses;
 
@@ -144,8 +146,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             allowedStatuses = null;
             positions = null;
             Set<I_Position> refsetPositions = new HashSet<I_Position>();
-            refsetPositions.addAll(LocalVersionedTerminology.get().getActiveAceFrameConfig()
-                .getViewPositionSetReadOnly());
+            refsetPositions.addAll(Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly());
             referenceSetExport.setPositions(refsetPositions);
 
             sctidRefsetOutputDirectory.mkdirs();
@@ -222,7 +223,6 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void processRelationship(I_RelVersioned versionedRel) throws Exception {
         if (testSpecification(versionedRel.getC2Id())) {
             boolean exportableVersionFound = false;
@@ -258,11 +258,41 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      */
     private void exportRefsets(int refsetId) throws TerminologyException, Exception {
         Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetId);
+        TreeMap<Long, I_ExtendByRefVersion> sortedExtensions = new TreeMap<Long, I_ExtendByRefVersion>();
+
         for (I_ExtendByRef thinExtByRefVersioned : extensions) {
             for (I_ExtendByRefVersion thinExtByRefTuple : thinExtByRefVersioned.getTuples(allowedStatuses,
                 new PositionSetReadOnly(positions), null, null)) {
-                export(thinExtByRefTuple);
+                RefsetType refsetType = refsetTypeMap.get(refsetId);
+                if (refsetType == null) {
+                    try {
+                        refsetType = RefsetType.findByExtension(thinExtByRefTuple.getMutablePart());
+                    } catch (EnumConstantNotPresentException e) {
+                        getLog().warn(
+                            "No handler for tuple " + thinExtByRefTuple.getMutablePart() + " of type "
+                                + thinExtByRefTuple.getMutablePart().getClass(), e);
+                        return;
+                    }
+                    refsetTypeMap.put(refsetId, refsetType);
+                }
+                Long memberId =
+                        Long.parseLong(refsetType.getRefsetHandler().toId(tf, thinExtByRefTuple.getComponentId(), true,
+                            namespace, project));
+                if (sortedExtensions.containsKey(memberId)) {
+                    getLog().warn(
+                        "Refset " + tf.getConcept(refsetId).getInitialText()
+                            + " export has multiple entries with same member ID : " + thinExtByRefTuple + " "
+                            + memberId);
+                }
+                sortedExtensions.put(memberId, thinExtByRefTuple);
             }
+        }
+
+        Iterator<Long> iterator = sortedExtensions.keySet().iterator();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            I_ExtendByRefVersion ext = sortedExtensions.get(key);
+            export(ext);
         }
     }
 
