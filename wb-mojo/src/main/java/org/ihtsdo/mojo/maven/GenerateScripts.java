@@ -295,7 +295,6 @@ public class GenerateScripts extends AbstractMojo {
                 fw.write("java");
             }
             fw.write(lineContinuance());
-            writeLine(fw, "-Djava.ext.dirs=lib-ext ");
 
             // write debug options
             if (debug) {

@@ -28,7 +28,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
 
-import cern.colt.bitvector.BitMatrix;
+import org.ihtsdo.cern.colt.bitvector.BitMatrix;
 
 /**
  * Assumptions: 1. Each path can participate as an origin only once 2. The
@@ -423,12 +423,12 @@ public class PositionMapper {
 					}
 				}
 				completeLatch.countDown();
-				/*AceLog.getAppLog().info(
+				AceLog.getAppLog().info(
 						"Finished setup for new PositionMapper for: "
 								+ pathConcept.getNid() + ": " 
 								+ pathDesc + " time: "
 								+ TimeUtil.formatDate(destination.getTime()) + 
-								" thread: " + Thread.currentThread().getName());*/
+								" thread: " + Thread.currentThread().getName());
 			} catch (Throwable e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);

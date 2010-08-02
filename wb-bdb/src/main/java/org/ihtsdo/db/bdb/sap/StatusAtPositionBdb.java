@@ -20,12 +20,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.cern.colt.list.IntArrayList;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-
-import cern.colt.list.IntArrayList;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleBinding;

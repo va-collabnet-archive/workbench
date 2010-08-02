@@ -25,64 +25,57 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
 public class StringRefsetHandler extends MemberRefsetHandler {
-	
-	@Override
-	public String formatRefsetLine(I_TermFactory tf,
-			I_ExtendByRefVersion tuple, boolean sctid)
-			throws TerminologyException, IOException {
-		I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) tuple
-				.getMutablePart();
 
-		return super.formatRefsetLine(tf, tuple, sctid)
-				+ MemberRefsetHandler.FILE_DELIMITER
-				+ stringPart.getStringValue();
-	}
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefVersion tuple, boolean sctid, int namespace,
+            int project) throws TerminologyException, IOException {
+        I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) tuple.getMutablePart();
 
-	@Override
-	public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part,
-			Integer memberId, int refsetId, int componentId, boolean sctId)
-			throws TerminologyException, IOException {
-		I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) part;
+        return super.formatRefsetLine(tf, tuple, sctid, namespace, project) + MemberRefsetHandler.FILE_DELIMITER
+            + stringPart.getStringValue();
+    }
 
-		return super.formatRefsetLine(tf, part, memberId, refsetId,
-				componentId, sctId)
-				+ MemberRefsetHandler.FILE_DELIMITER
-				+ stringPart.getStringValue();
-	}
+    @Override
+    public String formatRefsetLine(I_TermFactory tf, I_ExtendByRefPart part, Integer memberId, int refsetId,
+            int componentId, boolean sctId, int namespace, int project) throws TerminologyException, IOException {
+        I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) part;
 
-	@Override
-	public String getHeaderLine() {
-		return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER
-				+ "STRING_VALUE";
-	}
+        return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, namespace, project)
+            + MemberRefsetHandler.FILE_DELIMITER + stringPart.getStringValue();
+    }
 
-	// @Override
-	// protected I_ExtendByRefPart processLine(String line) {
-	// I_ExtendByRefPartString part;
-	// try {
-	//
-	// I_ExtendByRef versioned = getExtensionVersioned(line,
-	// RefsetAuxiliary.Concept.STRING_EXTENSION);
-	//
-	// part = getTermFactory().newStringExtensionPart();
-	// setGenericExtensionPartFields(part);
-	//
-	// part.setStringValue(getNextCurrentRowToken());
-	//
-	// versioned.addVersion(part);
-	//
-	// if (isTransactional()) {
-	// getTermFactory().addUncommitted(versioned);
-	// } else {
-	// getTermFactory().getDirectInterface().writeExt(versioned);
-	// }
-	//
-	// } catch (Exception e) {
-	// throw new RuntimeException("Error occred processing file " + sourceFile,
-	// e);
-	// }
-	//
-	// return part;
-	// }
+    @Override
+    public String getHeaderLine() {
+        return super.getHeaderLine() + MemberRefsetHandler.FILE_DELIMITER + "STRING_VALUE";
+    }
+
+    // @Override
+    // protected I_ExtendByRefPart processLine(String line) {
+    // I_ExtendByRefPartString part;
+    // try {
+    //
+    // I_ExtendByRef versioned = getExtensionVersioned(line,
+    // RefsetAuxiliary.Concept.STRING_EXTENSION);
+    //
+    // part = getTermFactory().newStringExtensionPart();
+    // setGenericExtensionPartFields(part);
+    //
+    // part.setStringValue(getNextCurrentRowToken());
+    //
+    // versioned.addVersion(part);
+    //
+    // if (isTransactional()) {
+    // getTermFactory().addUncommitted(versioned);
+    // } else {
+    // getTermFactory().getDirectInterface().writeExt(versioned);
+    // }
+    //
+    // } catch (Exception e) {
+    // throw new RuntimeException("Error occred processing file " + sourceFile,
+    // e);
+    // }
+    //
+    // return part;
+    // }
 
 }

@@ -24,8 +24,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
-//TODO : Add the SAPNID ID
-//TODO : Rearrange the ID parts to place an ID into a specific container with versions	
+
 	private static final Logger log = Logger.getLogger(I_Handle_XML.class
 			.getName());
 

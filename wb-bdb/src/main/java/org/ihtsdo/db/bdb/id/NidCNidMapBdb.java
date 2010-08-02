@@ -9,10 +9,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
-
-import cern.colt.map.OpenIntIntHashMap;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleInput;

@@ -2,7 +2,7 @@ package org.ihtsdo.db.uuidmap;
 
 import java.util.Comparator;
 
-import cern.colt.list.AbstractList;
+import org.ihtsdo.cern.colt.list.AbstractList;
 
 public abstract class AbstractUuidList extends AbstractList {
 	/**
@@ -456,7 +456,7 @@ public abstract class AbstractUuidList extends AbstractList {
 		checkRangeFromTo(from, to, mySize);
 
 		long[] myElements = elements();
-		cern.colt.Sorting.mergeSort(myElements, from, to + 1);
+		org.ihtsdo.cern.colt.Sorting.mergeSort(myElements, from, to + 1);
 		elements(myElements);
 		setSizeRaw(mySize);
 	}
@@ -901,8 +901,8 @@ public abstract class AbstractUuidList extends AbstractList {
 	public void shuffleFromTo(int from, int to) {
 		checkRangeFromTo(from, to, size());
 
-		cern.jet.random.Uniform gen = new cern.jet.random.Uniform(
-				new cern.jet.random.engine.DRand(new java.util.Date()));
+		org.ihtsdo.cern.jet.random.Uniform gen = new org.ihtsdo.cern.jet.random.Uniform(
+				new org.ihtsdo.cern.jet.random.engine.DRand(new java.util.Date()));
 		for (int i = from; i < to; i++) {
 			int random = gen.nextIntFromTo(i, to);
 
@@ -942,6 +942,6 @@ public abstract class AbstractUuidList extends AbstractList {
 	 * representation of each element.
 	 */
 	public String toString() {
-		return cern.colt.Arrays.toString(partFromTo(0, size() - 1).elements());
+		return org.ihtsdo.cern.colt.Arrays.toString(partFromTo(0, size() - 1).elements());
 	}
 }

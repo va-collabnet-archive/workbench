@@ -89,7 +89,7 @@ public class SvnHelper {
 			if (connectToSubversion) {
 				long startTime = System.currentTimeMillis();
 				I_ShowActivity activity = Svn.setupActivityPanel("Subversion startup operation");
-				Svn.rwl.writeLock().lock();
+				Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
 				try {
 					if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
 						handleSvnProfileCheckout(aceProperties);
@@ -97,7 +97,7 @@ public class SvnHelper {
 
 					if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 						for (String svnSpec : svnCheckoutOnStart) {
-							activity.setProgressInfoLower("Checkout: " + svnSpec);
+							activity.setProgressInfoLower("Checkout: " + svnSpec.substring(0, svnSpec.indexOf('|')));
 							handleSvnCheckout(changeLocations, svnSpec);
 						}
 					}
@@ -110,7 +110,7 @@ public class SvnHelper {
 					}
 
 				} finally {
-					Svn.rwl.writeLock().unlock();
+					Svn.rwl.release(Svn.SEMAPHORE_PERMITS);
 					try {
 						long elapsedTime = System.currentTimeMillis() - startTime;
 						String elapsed = "Elapsed time: " + 
@@ -153,7 +153,7 @@ public class SvnHelper {
 			if (connectToSubversion) {
 				long startTime = System.currentTimeMillis();
 				I_ShowActivity activity = Svn.setupActivityPanel("Subversion startup operation");
-				Svn.rwl.writeLock().lock();
+				Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
 				try {
 					if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
 						handleSvnProfileCheckout(wbProperties);
@@ -173,7 +173,7 @@ public class SvnHelper {
 						}
 					}
 				} finally {
-					Svn.rwl.writeLock().unlock();
+					Svn.rwl.release(Svn.SEMAPHORE_PERMITS);
 					try {
 						long elapsedTime = System.currentTimeMillis() - startTime;
 						String elapsed = "Elapsed time: " + 

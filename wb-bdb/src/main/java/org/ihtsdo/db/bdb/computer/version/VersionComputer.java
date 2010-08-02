@@ -138,13 +138,6 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                                 AceLog.getAppLog().warning(
                                     RELATIVE_POSITION.EQUAL + " should never happen. Data is malformed. Part:\n" + part
                                         + " \n  Part to test: \n" + prevPartToTest);
-                                try {
-                                	throw new Exception("Equal!!!");
-
-                                }
-                                catch(Exception Ex) {
-                                	Ex.printStackTrace();
-                                }
                                 partsForPosition.remove(part);
                                 partsForPosition.remove(prevPartToTest);
                                 Version dup = part.removeDuplicates(part, prevPartToTest);

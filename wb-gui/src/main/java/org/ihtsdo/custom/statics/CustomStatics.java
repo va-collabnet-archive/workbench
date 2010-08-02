@@ -20,8 +20,7 @@ public class CustomStatics {
 	/** Used to get all the handlers associated with the conceptService **/
 	public static String CUSTOM_UI_CONCEPTSERVICENAME = "conceptServiceName";
 	
-	
-	
+		
 
 
 }

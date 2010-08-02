@@ -587,10 +587,7 @@ public class Description
 
     @Override
     public boolean hasExtensions() throws IOException {
-        if (getEnclosingConcept().hasDescriptionExtensions()) {
-            return getEnclosingConcept().hasExtensionsForComponent(nid);
-        }
-        return false;
+        return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
 
 }

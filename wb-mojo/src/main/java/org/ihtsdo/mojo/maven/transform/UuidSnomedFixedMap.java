@@ -33,9 +33,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.ihtsdo.mojo.maven.transform.SctIdGenerator.NAMESPACE;
-import org.ihtsdo.mojo.maven.transform.SctIdGenerator.PROJECT;
-
 public class UuidSnomedFixedMap implements Map<UUID, Long> {
 
     private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
@@ -154,7 +151,15 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
         return map;
     }
 
-    public static UuidSnomedFixedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
+    /*
+     * public static UuidSnomedFixedMap read(File f, NAMESPACE namespace, PROJECT project) throws IOException {
+     * UuidSnomedFixedMap map = new UuidSnomedFixedMap();
+     * readData(f, map);
+     * return map;
+     * }
+     */
+
+    public static UuidSnomedFixedMap read(File f, int namespace, int project) throws IOException {
         UuidSnomedFixedMap map = new UuidSnomedFixedMap();
         readData(f, map);
         return map;

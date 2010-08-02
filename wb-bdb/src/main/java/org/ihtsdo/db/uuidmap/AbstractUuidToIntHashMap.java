@@ -2,8 +2,8 @@ package org.ihtsdo.db.uuidmap;
 
 import java.util.UUID;
 
-import cern.colt.list.IntArrayList;
-import cern.colt.map.AbstractMap;
+import org.ihtsdo.cern.colt.list.IntArrayList;
+import org.ihtsdo.cern.colt.map.AbstractMap;
 
 public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 	/**
@@ -248,27 +248,27 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 		 * keys(keyList); values(valueList);
 		 * 
 		 * final double[] k = keyList.elements(); final int[] v =
-		 * valueList.elements(); cern.colt.Swapper swapper = new
-		 * cern.colt.Swapper() { public void swap(int a, int b) { int t1; double
+		 * valueList.elements(); org.ihtsdo.Swapper swapper = new
+		 * org.ihtsdo.Swapper() { public void swap(int a, int b) { int t1; double
 		 * t2; t1 = v[a]; v[a] = v[b]; v[b] = t1; t2 = k[a]; k[a] = k[b]; k[b] =
 		 * t2; } };
 		 * 
-		 * cern.colt.function.IntComparator comp = new
-		 * cern.colt.function.IntComparator() { public int compare(int a, int b)
+		 * org.ihtsdo.function.IntComparator comp = new
+		 * org.ihtsdo.function.IntComparator() { public int compare(int a, int b)
 		 * { return k[a]<k[b] ? -1 : k[a]==k[b] ? 0 : 1; } };
-		 * cern.colt.MultiSorting.sort(0,keyList.size(),comp,swapper);
+		 * org.ihtsdo.MultiSorting.sort(0,keyList.size(),comp,swapper);
 		 */
 
 		// this variant may be quicker
-		// cern.colt.map.OpenDoubleIntHashMap.hashCollisions = 0;
-		// System.out.println("collisions="+cern.colt.map.OpenDoubleIntHashMap.hashCollisions);
+		// org.ihtsdo.map.OpenDoubleIntHashMap.hashCollisions = 0;
+		// System.out.println("collisions="+org.ihtsdo.map.OpenDoubleIntHashMap.hashCollisions);
 		keys(keyList);
 		keyList.sort();
 		valueList.setSize(keyList.size());
 		for (int i = keyList.size(); --i >= 0;) {
 			valueList.setQuick(i, get(keyList.getQuick(i)));
 		}
-		// System.out.println("collisions="+cern.colt.map.OpenDoubleIntHashMap.hashCollisions);
+		// System.out.println("collisions="+org.ihtsdo.map.OpenDoubleIntHashMap.hashCollisions);
 
 	}
 
@@ -295,7 +295,7 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 
 		final long[] k = keyList.elements();
 		final int[] v = valueList.elements();
-		cern.colt.Swapper swapper = new cern.colt.Swapper() {
+		org.ihtsdo.cern.colt.Swapper swapper = new org.ihtsdo.cern.colt.Swapper() {
 			public void swap(int a, int b) {
 				int t1;
 				long[] t2 = new long[2];
@@ -315,7 +315,7 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 			}
 		};
 
-		cern.colt.function.IntComparator comp = new cern.colt.function.IntComparator() {
+		org.ihtsdo.cern.colt.function.IntComparator comp = new org.ihtsdo.cern.colt.function.IntComparator() {
 			public int compare(int a, int b) {
 				int aMsb = a * 2;
 				int aLsb = aMsb + 1;
@@ -326,9 +326,9 @@ public abstract class AbstractUuidToIntHashMap extends AbstractMap {
 			}
 		};
 
-		// cern.colt.map.OpenDoubleIntHashMap.hashCollisions = 0;
-		cern.colt.GenericSorting.quickSort(0, keyList.size(), comp, swapper);
-		// System.out.println("collisions="+cern.colt.map.OpenDoubleIntHashMap.hashCollisions);
+		// org.ihtsdo.map.OpenDoubleIntHashMap.hashCollisions = 0;
+		org.ihtsdo.cern.colt.GenericSorting.quickSort(0, keyList.size(), comp, swapper);
+		// System.out.println("collisions="+org.ihtsdo.map.OpenDoubleIntHashMap.hashCollisions);
 	}
 
 	/**

@@ -3,11 +3,9 @@ package org.ihtsdo.cs.econcept;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.Concept;
@@ -23,7 +21,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.etypes.EComponent;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -46,16 +43,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private int maxSapNid = Integer.MAX_VALUE;
     private IntSet commitSapNids;
     private ChangeSetPolicy policy;
-    private boolean processNidLists = true;
 
     public String toString() {
         return "EConceptChangeSetComputer: minSapNid: " + minSapNid + " maxSapNid: " + maxSapNid + " policy: " + policy;
     }
 
-    public EConceptChangeSetComputer(ChangeSetPolicy policy, IntSet commitSapNids, boolean processNidLists) {
+    public EConceptChangeSetComputer(ChangeSetPolicy policy, IntSet commitSapNids) {
         super();
         this.policy = policy;
-        this.processNidLists = processNidLists;
         switch (policy) {
         case COMPREHENSIVE:
             maxSapNid = commitSapNids.getMax();
@@ -88,25 +83,12 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
 
-        ec.setPrimordialUuid(c.getPrimUuid());
-        ec.setConceptAttributes(processConceptAttributes(c, changed));
-        ec.setDescriptions(processDescriptions(c, changed));
-        ec.setRelationships(processRelationships(c, changed));
-        ec.setImages(processImages(c, changed));
-        ec.setRefsetMembers(processRefsetMembers(c, changed));
-
-        if (processNidLists) {
-            ec.setDestRelUuidTypeUuids(processNidNidList(c.getData().getDestRelNidTypeNidList(), changed));
-            ec.setRefsetUuidMemberUuidForConcept(processNidNidList(c.getData().getRefsetNidMemberNidForConceptList(),
-                changed));
-            ec.setRefsetUuidMemberUuidForDescriptions(processNidNidList(c.getData()
-                .getRefsetNidMemberNidForDescriptionsList(), changed));
-            ec.setRefsetUuidMemberUuidForImages(processNidNidList(c.getData().getRefsetNidMemberNidForImagesList(), changed));
-            ec.setRefsetUuidMemberUuidForRefsetMembers(processNidNidList(c.getData()
-                .getRefsetNidMemberNidForRefsetMembersList(), changed));
-            ec.setRefsetUuidMemberUuidForRels(processNidNidList(c.getData().getRefsetNidMemberNidForRelsList(), changed));
-            return ec;
-        }
+			ec.setPrimordialUuid(c.getPrimUuid());
+			ec.setConceptAttributes(processConceptAttributes(c, changed));
+			ec.setDescriptions(processDescriptions(c, changed));
+			ec.setRelationships(processRelationships(c, changed));
+			ec.setImages(processImages(c, changed));
+			ec.setRefsetMembers(processRefsetMembers(c, changed));
         if (changed.get()) {
             return ec;
         }
@@ -139,40 +121,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         }
         return eRefsetMembers;
     }
-
-    private List<UUID> processNidNidList(List<? extends NidPair> nidNidList, AtomicBoolean changed) throws IOException {
-        List<UUID> uuidUuidList = new ArrayList<UUID>(nidNidList.size() * 2);
-        for (NidPair pair : nidNidList) {
-            int nid1 = pair.getNid1();
-            int nid2 = pair.getNid2();
-            Concept c1 = Bdb.getConceptForComponent(nid1);
-            Concept c2 = Bdb.getConceptForComponent(nid2);
-            if (c1 == null || c1.isCanceled() || c2 == null || c2.isCanceled()) {
-                // nothing to do...
-            } else {
-                UUID uuid1 = Bdb.getPrimUuidForComponent(nid1);
-                UUID uuid2 = Bdb.getPrimUuidForComponent(nid2);
-                if (uuid1 != null && uuid2 != null) {
-                    uuidUuidList.add(uuid1);
-                    uuidUuidList.add(uuid2);
-                } else {
-                    if (uuid1 == null) {
-                        AceLog.getAppLog().warning(
-                            "---------------------------------------------" + "null primordial uuid for nid1: " + nid1
-                                + " nid2: " + nid2 + " concept1: " + c1.toLongString() + " concept2: "
-                                + c2.toLongString());
-                    } else {
-                        AceLog.getAppLog().warning(
-                            "---------------------------------------------" + "null primordial uuid for nid2: " + nid2
-                                + " nid1: " + nid1 + " concept1: " + c1.toLongString() + " concept2: "
-                                + c2.toLongString());
-                    }
-                }
-            }
-        }
-        return uuidUuidList;
-    }
-
+    
     private List<EImage> processImages(Concept c, AtomicBoolean changed) throws IOException {
         List<EImage> eImages = new ArrayList<EImage>();
         for (Image img : c.getImages()) {
@@ -271,25 +220,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private EConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
         EConceptAttributes eca = null;
         for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
-        	/*AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v ="+v.toString());
-        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v.getSapNid() ="+v.getSapNid());
-        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes minSapNid ="+minSapNid);
-        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes maxSapNid ="+maxSapNid);
-        	AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes v.getTime() ="+v.getTime());*/
-        	
-        	
             if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
                 changed.set(true);
-                //AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes changed.set(true)");
                 if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
-                	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes commitSapNids == null || commitSapNids.contains(v.getSapNid())");
                     if (eca == null) {
-                    	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca == null");
                         eca = new EConceptAttributes();
                         eca.setDefined(v.isDefined());
                         setupFirstVersion(eca, v);
                     } else {
-                    	//AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca != null");
                         EConceptAttributesRevision ecv = new EConceptAttributesRevision();
                         ecv.setDefined(v.isDefined());
                         setupRevision(eca, v, ecv);
@@ -297,10 +235,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                 }
             }
         }
-       /* if(eca != null) {
-        AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca = "+eca.toString());
-        }
-        else{AceLog.getAppLog().info("EConceptChangeSetComputer processConceptAttributes eca = null");}*/
         return eca;
     }
 

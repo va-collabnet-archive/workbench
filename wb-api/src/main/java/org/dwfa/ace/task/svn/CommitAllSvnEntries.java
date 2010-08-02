@@ -54,8 +54,6 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
 
     protected void doSvnTask(I_ConfigAceFrame config, SubversionData svd, String taskKey) throws TaskFailedException {
         try {
-        	System.out.println("doSvnTask SubversionData user = " +svd.getUsername()+" password = "+svd.getPassword() +" url = "+svd.getRepositoryUrlStr());
-        	
             SPECIAL_SVN_ENTRIES entry = SPECIAL_SVN_ENTRIES.valueOf(taskKey);
             BundleType bundleType = config.getBundleType();
             switch (entry) {
@@ -63,11 +61,9 @@ public class CommitAllSvnEntries extends AbstractAllSvnEntriesTask {
                 switch (bundleType) {
                 case STAND_ALONE:
                     // nothing to do...
-                	System.out.println("doSvnTask STAND_ALONE");
                     break;
 
                 case CHANGE_SET_UPDATE:
-                	System.out.println("doSvnTask CHANGE_SET_UPDATE");
                     config.svnCommit(svd);
                     break;
                 default:

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dwfa.ace.log.AceLog;
@@ -120,27 +118,9 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 
 	@Override
 	public void objectToEntry(Collection<C> conceptComponentList, TupleOutput output) {
-		//AceLog.getAppLog().info("ConceptComponentBinder objectToEntry called");
-		//AceLog.getAppLog().info("ConceptComponentBinder objectToEntry maxReadOnlyStatusAtPositionId = "+maxReadOnlyStatusAtPositionId);		
 		List<C> componentListToWrite = new ArrayList<C>(conceptComponentList.size());
-		//AceLog.getAppLog().info("ConceptComponentBinder objectToEntry conceptComponentList.size() = "+conceptComponentList.size());
 		for (C conceptComponent: conceptComponentList) {
 			componentsEncountered.incrementAndGet();
-			/*AceLog.getAppLog().info("ConceptComponentBinder objectToEntry conceptComponent = "+conceptComponent);
-			AceLog.getAppLog().info("ConceptComponentBinder objectToEntry conceptComponent.primordialSapNid"+conceptComponent.primordialSapNid);
-			AceLog.getAppLog().info("conceptComponent.getIdVersions().size() "+conceptComponent.getIdVersions().size());*/
-			int idSapNid = Integer.MIN_VALUE;
-			Set<Integer> ids = conceptComponent.getIdSapNids();
-			//AceLog.getAppLog().info("conceptComponent ids size = "+ids.size());
-			for (Iterator<Integer> it1 = ids.iterator(); it1.hasNext();) {
-				int id = it1.next();
-				if(id > conceptComponent.primordialSapNid)
-				{
-					idSapNid = id;
-				}
-				//AceLog.getAppLog().info("conceptComponent idSapNid = "+id);
-			}
-			
 			if (conceptComponent.primordialSapNid > maxReadOnlyStatusAtPositionId &&
 					conceptComponent.getTime() != Long.MIN_VALUE) {
 				componentListToWrite.add(conceptComponent);
@@ -156,19 +136,10 @@ public class ConceptComponentBinder<V extends Revision<V, C>,
 					}
 				}
 			}
-			
-			if(componentListToWrite.size() == 0 && idSapNid > maxReadOnlyStatusAtPositionId &&
-					conceptComponent.getTime() != Long.MIN_VALUE) {
-				//AceLog.getAppLog().info("Should be updating the ID!!! idSapNid = "+idSapNid +" maxReadOnlyStatusAtPositionId = "+maxReadOnlyStatusAtPositionId);
-				componentListToWrite.add(conceptComponent);
-			}
-			
 		}
 		output.writeInt(componentListToWrite.size()); // List size
-		//AceLog.getAppLog().info("ConceptComponentBinder objectToEntry componentListToWrite.size() = "+componentListToWrite.size());
 		for (C conceptComponent: componentListToWrite) {
 			componentsWritten.incrementAndGet();
-			//AceLog.getAppLog().info("ConceptComponentBinder objectToEntry writeComponentToBdb");
 			conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
 		}
 	}
