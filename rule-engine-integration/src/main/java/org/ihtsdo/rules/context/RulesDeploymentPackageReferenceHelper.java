@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -180,12 +181,12 @@ public class RulesDeploymentPackageReferenceHelper {
 					}
 				}
 			}
-			
+
 			termFactory.addUncommittedNoChecks(rulesPackageConcept);
 			termFactory.addUncommittedNoChecks(rulesPackageRefset);
 
 			termFactory.commit();
-			
+
 			rulesPackageNewVersion = getRulesDeploymentPackageReference(rulesPackageConcept);
 			return rulesPackageNewVersion;
 
@@ -236,10 +237,10 @@ public class RulesDeploymentPackageReferenceHelper {
 		I_TermFactory termFactory = Terms.get();
 
 		try {
-//			I_IntSet localDescTypes = null;
-//			if (config.getDescTypes().getSetValues().length > 0) {
-//				localDescTypes = config.getDescTypes();
-//			}
+			//			I_IntSet localDescTypes = null;
+			//			if (config.getDescTypes().getSetValues().length > 0) {
+			//				localDescTypes = config.getDescTypes();
+			//			}
 			List<? extends I_DescriptionTuple> descTuples = concept.getDescriptionTuples(
 					config.getAllowedStatus(), 
 					config.getDescTypes(), config.getViewPositionSetReadOnly(),
@@ -266,7 +267,7 @@ public class RulesDeploymentPackageReferenceHelper {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		int lastVersion = Integer.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -288,5 +289,46 @@ public class RulesDeploymentPackageReferenceHelper {
 		}
 
 		return lastPart;
+	}
+
+	public void retireRulesDeploymentPackageReference(RulesDeploymentPackageReference rulesPackage) {
+		I_TermFactory termFactory = Terms.get();
+		I_GetConceptData conceptToRetireUpdatedFromDB = null;
+		try {
+			conceptToRetireUpdatedFromDB = termFactory.getConcept(rulesPackage.getUuids());
+			I_ConceptAttributePart lastAttributePart = getLastestAttributePart(conceptToRetireUpdatedFromDB);
+			for (I_Path editPath : config.getEditingPathSet()) {
+				I_ConceptAttributePart newAttributeVersion = 
+					(I_ConceptAttributePart) lastAttributePart.makeAnalog(
+							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+							editPath.getConceptId(), 
+							Long.MAX_VALUE);
+				conceptToRetireUpdatedFromDB.getConceptAttributes().addVersion(newAttributeVersion);
+			}
+			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
+			termFactory.commit();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
+		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
+		I_ConceptAttributePart latestAttributePart = null;
+		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
+			if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {
+				latestAttributePart = attributePart;
+			}
+		}
+
+		if (latestAttributePart == null) {
+			throw new IOException("No parts on this viewpositionset.");
+		}
+
+		return latestAttributePart;
 	}
 }
