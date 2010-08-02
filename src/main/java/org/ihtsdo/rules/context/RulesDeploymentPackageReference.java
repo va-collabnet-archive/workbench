@@ -69,9 +69,10 @@ public class RulesDeploymentPackageReference {
 		return name;
 	}
 
-	public KnowledgeBase getKnowledgeBase() throws Exception {
+	public KnowledgeBase updateKnowledgeBase() throws Exception {
 		return getKnowledgeBase(true);
 	}
+	
 	public KnowledgeBase getKnowledgeBase(boolean recreate) throws Exception {
 		return RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 				getChangeSetXmlBytes(), recreate);
@@ -79,7 +80,7 @@ public class RulesDeploymentPackageReference {
 	
 	public Collection<Rule> getRules() throws Exception {
 		Collection<Rule> rules = new ArrayList<Rule>();
-		KnowledgeBase kbase = getKnowledgeBase();
+		KnowledgeBase kbase = getKnowledgeBase(false);
 		if (kbase != null) {
 			for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
 				//System.out.println("** pkg: " + kpackg.getName());
@@ -91,8 +92,8 @@ public class RulesDeploymentPackageReference {
 		return rules;
 	}
 	
-	public boolean isOnLine() {
-		return RulesLibrary.validateDeploymentPackage(getChangeSetXmlBytes());
+	public boolean validate() {
+		return RulesLibrary.validateDeploymentPackage(uuids.iterator().next(), getChangeSetXmlBytes());
 	}
 
 }

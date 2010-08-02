@@ -76,8 +76,8 @@ public class RulesLibrary {
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 		for (RulesDeploymentPackageReference deploymentPackage : rulesPackageHelper.getAllRulesDeploymentPackages()) {
-			if (deploymentPackage.isOnLine()) {
-				KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase();
+			if (deploymentPackage.validate()) {
+				KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(false);
 				loopKBase = filterForContext(loopKBase, context, config);
 				kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
 			}
@@ -404,7 +404,17 @@ public class RulesLibrary {
 		return kbase;
 	}
 
-	public static boolean validateDeploymentPackage(byte[] bytes) {
+	public static boolean validateDeploymentPackage(UUID referenceUuid, byte[] bytes) {
+		KnowledgeBase kbase= null;
+		try {
+			kbase = getKnowledgeBase(referenceUuid, bytes, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return (kbase != null);
+	}
+	
+	public static boolean isPackageOnLine(byte[] bytes) {
 		KnowledgeBase kbase= null;
 		try {
 			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );

@@ -112,7 +112,7 @@ public class RulesContextHelper {
 			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			refsetHelper.setAutocommitActive(true);
 			
-			if (currentRole == null) {
+			if (currentRole == null && newRole != null) {
 				//new member in context refset
 				RefsetPropertyMap propertyMap = new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ruleUid);
 				propertyMap.put(REFSET_PROPERTY.CID_ONE, newRole.getConceptId());
@@ -121,7 +121,7 @@ public class RulesContextHelper {
 				tf.addUncommittedNoChecks(contextRefset);
 				tf.addUncommittedNoChecks(context);
 				tf.commit();
-			} else {
+			} else if (currentRole != null && newRole != null){
 				if (currentRole.getConceptId() != newRole.getConceptId()) {
 					// update existing role
 					for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
@@ -156,6 +156,37 @@ public class RulesContextHelper {
 					}
 				} else {
 					// same role, do nothing
+				}
+			} else if (currentRole != null && newRole == null) {
+				// retire latest version of role
+				for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
+					if (extension.getRefsetId() == contextRefset.getConceptId()) {
+						List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
+						for (I_ExtendByRefPart part : extension.getMutableParts()) {
+							I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
+							if (strPart.getStringValue().equals(ruleUid)) {
+								ruleParts.add(strPart);
+							}
+						}
+						if (!ruleParts.isEmpty()) {
+							I_ExtendByRefPartCidString lastPart = ruleParts.iterator().next();
+							for (I_ExtendByRefPartCidString loopPart : ruleParts) {
+								if (loopPart.getVersion() >= lastPart.getVersion()) {
+									lastPart = loopPart;
+								}
+							}
+							for (I_Path editPath : config.getEditingPathSet()) {
+								I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
+								lastPart.makeAnalog(
+										ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+										editPath.getConceptId(),
+										Long.MAX_VALUE);
+								extension.addVersion(newPart);
+								tf.addUncommittedNoChecks(extension);
+							}
+							tf.commit();
+						}
+					}
 				}
 			}
 		} catch (Exception e) {

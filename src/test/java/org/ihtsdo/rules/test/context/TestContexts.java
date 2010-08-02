@@ -98,7 +98,7 @@ public class TestContexts extends TestCase {
 		assertEquals(1, packages.size());
 
 		RulesDeploymentPackageReference package1 = packages.iterator().next();
-		assertTrue(package1.isOnLine());
+		assertTrue(package1.validate());
 		Collection<Rule> rules = package1.getRules();
 		assertEquals(4, rules.size());
 
