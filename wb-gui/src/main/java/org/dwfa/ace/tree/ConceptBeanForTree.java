@@ -348,31 +348,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.toLongString();
 	}
 
-	public List<Integer> getConceptMemberNidsForRefset(I_IntSet refsetNids)
-			throws IOException {
-		return bean.getConceptMemberNidsForRefset(refsetNids);
-	}
-
-	public List<Integer> getDescriptionMemberNidsForRefset(I_IntSet refsetNids)
-			throws IOException {
-		return bean.getDescriptionMemberNidsForRefset(refsetNids);
-	}
-
-	public List<Integer> getImageMemberNidsForRefset(I_IntSet refsetNids)
-			throws IOException {
-		return bean.getImageMemberNidsForRefset(refsetNids);
-	}
-
-	public List<Integer> getRefsetMemberNidsForRefset(I_IntSet refsetNids)
-			throws IOException {
-		return bean.getRefsetMemberNidsForRefset(refsetNids);
-	}
-
-	public List<Integer> getSrcRelMemberNidsForRefset(I_IntSet refsetNids)
-			throws IOException {
-		return bean.getSrcRelMemberNidsForRefset(refsetNids);
-	}
-
 	public boolean isCanceled() throws IOException {
 		return bean.isCanceled();
 	}

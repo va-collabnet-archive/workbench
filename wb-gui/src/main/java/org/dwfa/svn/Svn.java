@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
@@ -77,11 +77,14 @@ public class Svn implements I_HandleSubversion {
 
 	private static SvnPrompter prompter = new SvnPrompter();
 
-	public static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+	public static final int SEMAPHORE_PERMITS = 10;
+	public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
 	public static SVNClientInterface getSvnClient() {
 		if (!isConnectedToSvn()) {
-			JOptionPane.showMessageDialog(null, "Skipping SVN task as not connected to SVN", "Not connected to SVN",
+			JOptionPane.showMessageDialog(null, 
+					"Skipping SVN task as not connected to SVN", 
+					"Not connected to SVN",
 					JOptionPane.INFORMATION_MESSAGE);
 			return null;
 		}
@@ -90,7 +93,8 @@ public class Svn implements I_HandleSubversion {
 			switch (impl) {
 			case NATIVE:
 				client = new SVNClient();
-				AceLog.getAppLog().info("Created native svn client: " + client.getVersion());
+				AceLog.getAppLog().info("Created native svn client: " + 
+						client.getVersion());
 				break;
 
 			case SVN_KIT:
@@ -101,7 +105,8 @@ public class Svn implements I_HandleSubversion {
 				client.password("");
 				client.username("");
 
-				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + client.getVersion());
+				AceLog.getAppLog().info("Created Svnkit pure java svn client: " + 
+						client.getVersion());
 				break;
 
 			default:
@@ -179,40 +184,15 @@ public class Svn implements I_HandleSubversion {
 		if (workingCopy.endsWith("/") == false) {
 			workingCopy = workingCopy + "/";
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [status]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion status");
 		try {
-
-			SvnLog.info("starting status for working copy: " + workingCopy + ", absolute file:"
-					+ new File(workingCopy).getAbsoluteFile());
-			try {
-				int depth = Depth.unknown;
-				boolean getAll = false;
-				boolean noIgnore = false;
-				boolean ignoreExternals = false;
-				String[] changelists = null;
-				HandleStatus statusHandler = new HandleStatus();
-				Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, onServer, getAll, noIgnore, ignoreExternals,
-						changelists, statusHandler);
-				for (Status s : statusHandler.getStatusList()) {
-					SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " "
-							+ s.getPath());
-				}
-				status = statusHandler.statusList.toArray(new Status[statusHandler.statusList.size()]);
-			} catch (ClientException e) {
-				if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
-					SvnLog.alertAndLog(e);
-					SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
-							+ e.getLocalizedMessage());
-					throw new TaskFailedException(e);
-				}
-			}
-			SvnLog.info("finished status for working copy: " + workingCopy);
-			return status;
+			return statusNoLocks(svd, onServer, status, workingCopy);
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -223,6 +203,36 @@ public class Svn implements I_HandleSubversion {
 				throw new TaskFailedException(e);
 			}
 		}
+	}
+
+	private static Status[] statusNoLocks(SubversionData svd, boolean onServer,
+			Status[] status, String workingCopy) throws TaskFailedException {
+		SvnLog.info("starting status for working copy: " + workingCopy + ", absolute file:"
+				+ new File(workingCopy).getAbsoluteFile());
+		try {
+			int depth = Depth.unknown;
+			boolean getAll = false;
+			boolean noIgnore = false;
+			boolean ignoreExternals = false;
+			String[] changelists = null;
+			HandleStatus statusHandler = new HandleStatus();
+			Svn.getSvnClient().status(svd.getWorkingCopyStr(), depth, onServer, getAll, noIgnore, ignoreExternals,
+					changelists, statusHandler);
+			for (Status s : statusHandler.getStatusList()) {
+				SvnLog.info("Managed: " + s.isManaged() + " status: " + s.getTextStatusDescription() + " "
+						+ s.getPath());
+			}
+			status = statusHandler.statusList.toArray(new Status[statusHandler.statusList.size()]);
+		} catch (ClientException e) {
+			if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+				SvnLog.alertAndLog(e);
+				SvnLog.info("finished status for working copy: " + workingCopy + "with exception: "
+						+ e.getLocalizedMessage());
+				throw new TaskFailedException(e);
+			}
+		}
+		SvnLog.info("finished status for working copy: " + workingCopy);
+		return status;
 	}
 
 	public static I_ShowActivity setupActivityPanel(String message)
@@ -246,8 +256,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [cleanup]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion cleanup");
 		try {
@@ -268,7 +279,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -289,99 +300,15 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [commit]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion commit");
 		try {
-
-			SvnLog.info("Starting Commit");
-			Svn.getSvnClient().setPrompt(authenticator);
-			try {
-
-				Status[] status = status(svd, authenticator, interactive, true);
-
-				int newFiles = 0;
-				int deletedFiles = 0;
-				int modifiedFiles = 0;
-				for (Status s : status) {
-					if (s.isManaged()) {
-						if (s.getTextStatus() == StatusKind.missing) {
-							boolean force = true;
-							boolean keepLocal = false;
-							Map<String, String> revpropTable = new HashMap<String, String>();
-							Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force, keepLocal, revpropTable);
-							SvnLog.info("Removing: " + s.getPath());
-							deletedFiles++;
-						} else if (s.isModified()) {
-							if (s.getRepositoryTextStatus() == StatusKind.modified) {
-								// Conflict exists. 
-								StringBuffer msg = new StringBuffer();
-								msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
-								msg.append(s.getPath());
-								msg.append("<br><br>Accept recommendation to revert to version on server?");
-								boolean resolve = authenticator.askYesNo("Warning: local mods and server mods", msg.toString(), true);
-								if (resolve) {
-									revert(s);
-								} else {
-									throw new TaskFailedException("Conflict between local copy and server: " + s.getPath());
-								}
-							} else {
-								modifiedFiles++;
-							}
-
-						}
-					} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false) {
-						int depth = Depth.infinity;
-						boolean force = false;
-						boolean noIgnores = false;
-						boolean addParents = true;
-						Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
-						SvnLog.info("Adding: " + s.getPath());
-						newFiles++;
-					} else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
-						// prevent tree conflict. 
-						SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
-						revert(s);
-					} else {
-						SvnLog.info("Not adding: " + s.getPath());
-					}
-				}
-
-				if (newFiles + deletedFiles + modifiedFiles > 0) {
-					String commitMessage = "new: " + newFiles + " deleted: " + deletedFiles + " modified: " + modifiedFiles;
-					SvnLog.info(commitMessage);
-					if (interactive && SvnPrompter.class.isAssignableFrom(authenticator.getClass())) {
-						SvnLog.info("getting commit message...");
-						SvnPrompter p = (SvnPrompter) authenticator;
-						commitMessage = p.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", commitMessage, true);
-					}
-					if (interactive) {
-						SvnLog.info("authenticating");
-						handleAuthentication(authenticator);
-					}
-					int depth = Depth.unknown;
-					boolean noUnlock = true;
-					boolean keepChangelist = false;
-					String[] changelists = null;
-					Map<String, String> revpropTable = new HashMap<String, String>();
-					SvnLog.info("start commit: " + svd.getWorkingCopyStr());
-					Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, depth, noUnlock,
-							keepChangelist, changelists, revpropTable);
-					SvnLog.info("finish commit");
-				}
-
-			} catch (ClientException e) {
-				if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
-					SvnLog.alertAndLog(e);
-					SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
-							+ e.getLocalizedMessage());
-					throw new TaskFailedException(e);
-				}
-			}
-			SvnLog.info("finished commit");
+			commitNoLocks(svd, authenticator, interactive);
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -393,6 +320,95 @@ public class Svn implements I_HandleSubversion {
 			}
 
 		}
+	}
+
+	private static void commitNoLocks(SubversionData svd,
+			PromptUserPassword3 authenticator, boolean interactive)
+			throws TaskFailedException {
+		SvnLog.info("Starting Commit");
+		Svn.getSvnClient().setPrompt(authenticator);
+		try {
+			Status[] status = statusNoLocks(svd, true,
+					new Status[0], svd.getWorkingCopyStr());
+			int newFiles = 0;
+			int deletedFiles = 0;
+			int modifiedFiles = 0;
+			for (Status s : status) {
+				if (s.isManaged()) {
+					if (s.getTextStatus() == StatusKind.missing) {
+						boolean force = true;
+						boolean keepLocal = false;
+						Map<String, String> revpropTable = new HashMap<String, String>();
+						Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force, keepLocal, revpropTable);
+						SvnLog.info("Removing: " + s.getPath());
+						deletedFiles++;
+					} else if (s.isModified()) {
+						if (s.getRepositoryTextStatus() == StatusKind.modified) {
+							// Conflict exists. 
+							StringBuffer msg = new StringBuffer();
+							msg.append("<html>File has been modified locally and on server: <br><br>&nbsp;>&nbsp;>&nbsp;>&nbsp;");
+							msg.append(s.getPath());
+							msg.append("<br><br>Accept recommendation to revert to version on server?");
+							boolean resolve = authenticator.askYesNo("Warning: local mods and server mods", msg.toString(), true);
+							if (resolve) {
+								revert(s);
+							} else {
+								throw new TaskFailedException("Conflict between local copy and server: " + s.getPath());
+							}
+						} else {
+							modifiedFiles++;
+						}
+
+					}
+				} else if (s.isIgnored() == false && new File(s.getPath()).exists() && s.getPath().contains(".llog") == false) {
+					int depth = Depth.infinity;
+					boolean force = false;
+					boolean noIgnores = false;
+					boolean addParents = true;
+					Svn.getSvnClient().add(s.getPath(), depth, force, noIgnores, addParents);
+					SvnLog.info("Adding: " + s.getPath());
+					newFiles++;
+				} else if (s.isDeleted() && s.getRepositoryTextStatus() == StatusKind.deleted) {
+					// prevent tree conflict. 
+					SvnLog.info("Preventing dual deletion tree conflict by reverting local copy: " + s.getPath());
+					revert(s);
+				} else {
+					SvnLog.info("Not adding: " + s.getPath());
+				}
+			}
+
+			if (newFiles + deletedFiles + modifiedFiles > 0) {
+				String commitMessage = "new: " + newFiles + " deleted: " + deletedFiles + " modified: " + modifiedFiles;
+				SvnLog.info(commitMessage);
+				if (interactive && SvnPrompter.class.isAssignableFrom(authenticator.getClass())) {
+					SvnLog.info("getting commit message...");
+					SvnPrompter p = (SvnPrompter) authenticator;
+					commitMessage = p.askQuestion(svd.getRepositoryUrlStr(), "commit message: ", commitMessage, true);
+				}
+				if (interactive) {
+					SvnLog.info("authenticating");
+					handleAuthentication(authenticator);
+				}
+				int depth = Depth.unknown;
+				boolean noUnlock = true;
+				boolean keepChangelist = false;
+				String[] changelists = null;
+				Map<String, String> revpropTable = new HashMap<String, String>();
+				SvnLog.info("start commit: " + svd.getWorkingCopyStr());
+				Svn.getSvnClient().commit(new String[] { svd.getWorkingCopyStr() }, commitMessage, depth, noUnlock,
+						keepChangelist, changelists, revpropTable);
+				SvnLog.info("finish commit");
+			}
+
+		} catch (ClientException e) {
+			if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+				SvnLog.alertAndLog(e);
+				SvnLog.info("finished commit for working copy: " + svd.getWorkingCopyStr() + "with exception: "
+						+ e.getLocalizedMessage());
+				throw new TaskFailedException(e);
+			}
+		}
+		SvnLog.info("finished commit");
 	}
 
 	private static class HandleStatus implements StatusCallback {
@@ -414,8 +430,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [purge]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion purge");
 		try {
@@ -459,7 +476,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -480,8 +497,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [revert]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion revert");
 		try {
@@ -539,7 +557,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -570,8 +588,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [update]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion update");
 		try {
@@ -601,7 +620,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -622,8 +641,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [update-database]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion update database");
 		try {
@@ -653,7 +673,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished database update");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -674,8 +694,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [checkout]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion checkout");
 		try {
@@ -706,7 +727,7 @@ public class Svn implements I_HandleSubversion {
 			ObjectServerCore.refreshServers();
 			SvnLog.info("refreshed Object Servers");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -926,8 +947,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [unlock]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion unlock");
 		try {
@@ -950,7 +972,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished unlock");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -981,8 +1003,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [lock]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion lock");
 		try {
@@ -990,7 +1013,6 @@ public class Svn implements I_HandleSubversion {
 			SvnLog.info("Starting lock");
 			Svn.getSvnClient().setPrompt(authenticator);
 			try {
-
 				if (interactive) {
 					handleAuthentication(authenticator);
 				}
@@ -1005,7 +1027,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished lock");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 
@@ -1026,8 +1048,9 @@ public class Svn implements I_HandleSubversion {
 					JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		SvnLog.info("Acquiring svn write lock");
-		rwl.writeLock().lock();
+		SvnLog.info("Acquiring svn write lock [import]");
+		rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
+		SvnLog.info("Acquired");
 		long startTime = System.currentTimeMillis();
 		I_ShowActivity activity = setupActivityPanel("Subversion import");
 		try {
@@ -1060,7 +1083,7 @@ public class Svn implements I_HandleSubversion {
 			}
 			SvnLog.info("finished import");
 		} finally {
-			rwl.writeLock().unlock();
+			rwl.release(SEMAPHORE_PERMITS);
 			try {
 				long elapsedTime = System.currentTimeMillis() - startTime;
 				String elapsed = "Elapsed time: " + 

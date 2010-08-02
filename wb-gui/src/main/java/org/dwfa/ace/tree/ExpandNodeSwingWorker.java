@@ -370,7 +370,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + TimeUtil.getElapsedTimeString(elapsedTime));
         } else if (logTimingInfo) {
-           logger.fine("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + TimeUtil.getElapsedTimeString(elapsedTime));
+            logger.info("ExpandNodeSwingWorker " + workerId + " for " + node + " finished in " + TimeUtil.getElapsedTimeString(elapsedTime));
         }
         tree.workerFinished(this);
         workers.remove(node.getUserObject());

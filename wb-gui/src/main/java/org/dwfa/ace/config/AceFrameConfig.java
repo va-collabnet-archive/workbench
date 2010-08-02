@@ -567,12 +567,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             destRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
             allowedStatus = IntSet.readIntSetIgnoreMapErrors(in);
             descTypes = IntSet.readIntSetIgnoreMapErrors(in);
-            try {
             viewPositions = Position.readPositionSet(in);
-            }catch(IOException ie) {
-            	AceLog.getAppLog().severe("Saved Concept Not found", ie);
-            	viewPositions = Collections.synchronizedSet(new HashSet<I_Position>());
-            }
             bounds = (Rectangle) in.readObject();
             if (objDataVersion >= 3) {
                 editingPathSet = Path.readPathSet(in);
