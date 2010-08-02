@@ -44,13 +44,19 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.5</version>
+      <version>4.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jung</groupId>
       <artifactId>jung</artifactId>
       <version>1.7.6</version>
+      <exclusions>
+			<exclusion>
+					<groupId>concurrent</groupId>
+					<artifactId>concurrent</artifactId>
+				</exclusion>
+			</exclusions>
     </dependency>
     <dependency>
       <groupId>org.tmatesoft.svnkit</groupId>
