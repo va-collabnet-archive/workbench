@@ -36,7 +36,7 @@ public class RulesContextHelper {
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
 	}
-	
+
 	public I_GetConceptData createContext(String name) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -106,13 +106,15 @@ public class RulesContextHelper {
 	public void setRoleInContext(String ruleUid, I_GetConceptData context, I_GetConceptData newRole) {
 		try {
 			I_GetConceptData currentRole = getRoleInContext(ruleUid, context);
+			I_ExtendByRefPartCidString currentRolePart = getLastStringPartForRule(ruleUid, context);
 			I_TermFactory tf = Terms.get();
+			I_GetConceptData currentStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			I_GetConceptData contextRefset = tf.getConcept(
 					RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			refsetHelper.setAutocommitActive(true);
-			
-			if (currentRole == null && newRole != null) {
+
+			if (currentRolePart == null && newRole != null) {
 				//new member in context refset
 				RefsetPropertyMap propertyMap = new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ruleUid);
 				propertyMap.put(REFSET_PROPERTY.CID_ONE, newRole.getConceptId());
@@ -121,11 +123,11 @@ public class RulesContextHelper {
 				tf.addUncommittedNoChecks(contextRefset);
 				tf.addUncommittedNoChecks(context);
 				tf.commit();
-			} else if (currentRole != null && newRole != null){
-				if (currentRole.getConceptId() != newRole.getConceptId()) {
+			} else if (currentRolePart != null && newRole != null){
+				if (currentRolePart.getC1id() != newRole.getConceptId() || currentRolePart.getStatusId() != currentStatus.getConceptId()) {
 					// update existing role
 					for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
-						if (extension.getRefsetId() == contextRefset.getConceptId()) {
+						if (extension.getComponentId() == context.getConceptId()) {
 							List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 							for (I_ExtendByRefPart part : extension.getMutableParts()) {
 								I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -150,6 +152,7 @@ public class RulesContextHelper {
 									extension.addVersion(newPart);
 									tf.addUncommittedNoChecks(extension);
 								}
+								tf.addUncommittedNoChecks(contextRefset);
 								tf.commit();
 							}
 						}
@@ -160,7 +163,7 @@ public class RulesContextHelper {
 			} else if (currentRole != null && newRole == null) {
 				// retire latest version of role
 				for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
-					if (extension.getRefsetId() == contextRefset.getConceptId()) {
+					if (extension.getComponentId() == context.getConceptId()) {
 						List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 						for (I_ExtendByRefPart part : extension.getMutableParts()) {
 							I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -184,6 +187,7 @@ public class RulesContextHelper {
 								extension.addVersion(newPart);
 								tf.addUncommittedNoChecks(extension);
 							}
+							tf.addUncommittedNoChecks(contextRefset);
 							tf.commit();
 						}
 					}
@@ -194,15 +198,17 @@ public class RulesContextHelper {
 		}
 	}
 
-	public I_GetConceptData getRoleInContext(String ruleUid, I_GetConceptData context) {
+	public I_ExtendByRefPartCidString getLastStringPartForRule(String ruleUid, I_GetConceptData context) {
 		try {
+			I_ExtendByRefPartCidString lastPart = null;
 			I_TermFactory tf = Terms.get();
 			I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
+			I_GetConceptData currentStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			//I_GetConceptData includeClause = tf.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
 			//I_GetConceptData excludeClause = tf.getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
 			I_GetConceptData role = null;
 			for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(agendaMetadataRefset.getConceptId())) {
-				if (extension.getRefsetId() == agendaMetadataRefset.getConceptId()) {
+				if (extension.getComponentId() == context.getConceptId()) {
 					List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 					for (I_ExtendByRefPart part : extension.getMutableParts()) {
 						I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -211,14 +217,33 @@ public class RulesContextHelper {
 						}
 					}
 					if (!ruleParts.isEmpty()) {
-						I_ExtendByRefPartCidString lastPart = ruleParts.iterator().next();
+						lastPart = ruleParts.iterator().next();
 						for (I_ExtendByRefPartCidString loopPart : ruleParts) {
 							if (loopPart.getVersion() >= lastPart.getVersion()) {
 								lastPart = loopPart;
 							}
 						}
-						role = tf.getConcept(lastPart.getC1id());
 					}
+				}
+			}
+			return lastPart;
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public I_GetConceptData getRoleInContext(String ruleUid, I_GetConceptData context) {
+		try {
+			I_TermFactory tf = Terms.get();
+			I_GetConceptData role = null;
+			I_GetConceptData currentStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			I_ExtendByRefPartCidString lastPart = getLastStringPartForRule(ruleUid, context);
+			if (lastPart != null) {
+				if (lastPart.getStatusId() == currentStatus.getConceptId()) {
+					role = tf.getConcept(lastPart.getC1id());
 				}
 			}
 			return role;

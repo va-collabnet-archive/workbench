@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,7 +90,10 @@ public class TestContexts extends TestCase {
 		assertEquals(0, rulesPackageHelper.getAllRulesDeploymentPackages().size());
 		List<I_GetConceptData> contexts = contextHelper.getAllContexts();
 		assertEquals(3, contexts.size());
-		I_GetConceptData context = contexts.iterator().next();
+		Iterator<I_GetConceptData> contextsIterator = contexts.iterator();
+		I_GetConceptData context1 = contextsIterator.next();
+		I_GetConceptData context2 = contextsIterator.next();
+		I_GetConceptData context3 = contextsIterator.next();
 
 		rulesPackageHelper.createNewRulesDeploymentPackage("Package reference one", 
 		"http://127.0.0.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/org.ihtsdo/TESTING");
@@ -104,51 +108,124 @@ public class TestContexts extends TestCase {
 
 		for (Rule loopRule : rules) {
 			String ruleUid = loopRule.getMetaAttribute("UID");
-			assertNull(contextHelper.getRoleInContext(ruleUid, context));
+			assertNull(contextHelper.getRoleInContext(ruleUid, context1));
 		}
+		
+		System.out.println("Checking contexts...");
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2, includeClause);
+		
+		assertEquals(includeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2, null);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2, includeClause);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2, excludeClause);
+		
+		assertEquals(includeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(excludeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2, null);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2, includeClause);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3, includeClause);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3, null);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3, includeClause);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3, excludeClause);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(excludeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3, null);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3, includeClause);
+		
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
+		
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2, excludeClause);
+		contextHelper.setRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3, excludeClause);
+		
+		assertEquals(excludeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
+		assertEquals(excludeClause, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
+		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
 
 		for (Rule loopRule : rules) {
 			String ruleUid = loopRule.getMetaAttribute("UID");
 			if (ruleUid.equals("f7bd3b50-9c1e-11df-981c-0800200c9a66")) {
 				assertTrue(true);
-				contextHelper.setRoleInContext(ruleUid, context, includeClause);
+				contextHelper.setRoleInContext(ruleUid, context1, includeClause);
 			}
 			if (ruleUid.equals("7feea960-9c23-11df-981c-0800200c9a66")) {
 				assertTrue(true);
-				contextHelper.setRoleInContext(ruleUid, context, excludeClause);
+				contextHelper.setRoleInContext(ruleUid, context1, excludeClause);
 			}
 		}
 		
 		for (Rule loopRule : rules) {
 			String ruleUid = loopRule.getMetaAttribute("UID");
 			if (ruleUid.equals("f7bd3b50-9c1e-11df-981c-0800200c9a66")) {
-				assertEquals(includeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context).getConceptId());
+				assertEquals(includeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context1).getConceptId());
 			} else {
 				if (ruleUid.equals("7feea960-9c23-11df-981c-0800200c9a66")) {
-					assertEquals(excludeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context).getConceptId());
+					assertEquals(excludeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context1).getConceptId());
 				} else {
-					assertNull(contextHelper.getRoleInContext(ruleUid, context));
+					assertNull(contextHelper.getRoleInContext(ruleUid, context1));
 				}
 			}
 		}
 		
-		ResultsCollectorWorkBench results = RulesLibrary.checkConcept(testConcept, context, false, config);
+		ResultsCollectorWorkBench results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(1,results.getErrorCodes().size());
 		
-		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context, includeClause);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, includeClause);
 		assertEquals(includeClause.getConceptId(), 
-				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context).getConceptId());
+				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptId());
 
-		results = RulesLibrary.checkConcept(testConcept, context, false, config);
+		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(2,results.getErrorCodes().size());
 		
-		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context, excludeClause);
+		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, excludeClause);
 		assertEquals(excludeClause.getConceptId(), 
-				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context).getConceptId());
+				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptId());
 		
-		results = RulesLibrary.checkConcept(testConcept, context, false, config);
+		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(1,results.getErrorCodes().size());
-
+		
 		System.out.println("End!");
 
 	}
