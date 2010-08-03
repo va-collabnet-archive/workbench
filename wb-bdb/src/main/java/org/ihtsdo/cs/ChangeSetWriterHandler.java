@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.Timer;
 
+import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
@@ -54,6 +55,21 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 		this.permit = permit;
 		this.cNidsToWrite = cNidsToWrite;
 		changedCount = cNidsToWrite.cardinality();
+		
+		if(changedCount > 0) {
+			try {
+            I_IterateIds uncommittedCNidItr2 = this.cNidsToWrite.iterator();
+            while (uncommittedCNidItr2.next()) {
+            	Concept concept = Concept.get(uncommittedCNidItr2.nid());
+                AceLog.getAppLog().info("ChangeSetWriterHandler contructor changed concept = "+concept.toLongString());
+            }
+			}catch(Exception e) {
+				AceLog.getAppLog().severe("ChangeSetWriterHandler contructor", e);
+			}
+        }
+		
+		
+		
 		this.commitTime = commitTime;
 		this.commitTimeStr = TimeUtil.formatDate(commitTime) + 
 		    "; gVer: " + Bdb.gVersion.incrementAndGet() + 
