@@ -243,6 +243,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             LANGUAGE_ENUMERATION_ORIGIN_REL(new String[] { "language enumeration origin rel", "language enumeration origin rel" }, REFSET_RELATIONSHIP),
             LANGUAGE_SPEC_PREF_ORDER_REL(new String[] { "language spec pref order rel", "language spec pref order rel" }, REFSET_RELATIONSHIP),
             ATTRIBUTE_VALUE_REFSET_REL(new String[] { "attribute value refset rel", "attribute value refset rel" }, REFSET_RELATIONSHIP),
+            WORKFLOW(new String[] {"Workflow Refsets", "Workflow Refsets" }, REFSET_RELATIONSHIP), 
+            WORKFLOW_HISTORY(new String[] {"history workflow refset", "history workflow refset" }, WORKFLOW), 
+            EDITOR_CATEGORY(new String[] {"editor category workflow refset", "editor category workflow refset" }, WORKFLOW), 
+            SEMANTIC_AREA_HIERARCHY(new String[] {"semantic area hierarchy workflow refset", "semantic area hierarchy workflow refset" }, WORKFLOW), 
+            STATE_TRANSITION(new String[] {"state transition workflow refset", "state transition workflow refset" }, WORKFLOW), 
             
 
         SUPPORTING_REFSETS(new String[] { "supporting refsets", "supporting refsets" }, REFSET_AUXILIARY),
