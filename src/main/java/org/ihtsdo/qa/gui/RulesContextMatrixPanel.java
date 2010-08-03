@@ -4,6 +4,7 @@
 
 package org.ihtsdo.qa.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -27,7 +29,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.ihtsdo.rules.TextAreaRenderer;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
@@ -135,10 +136,13 @@ public class RulesContextMatrixPanel extends JPanel {
 				}
 			}
 			table1.setModel(tableModel);
+			table1.setGridColor(Color.BLACK);
+			table1.setShowGrid(true);
 			TableColumnModel cmodel = table1.getColumnModel(); 
-			TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
-			cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
-			cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 
+			TextAreaRendererForDeploymentPackages textAreaRenderer = new TextAreaRendererForDeploymentPackages();
+			for (int i=0 ; i< cmodel.getColumnCount() ; i++) {
+				cmodel.getColumn(i).setCellRenderer(textAreaRenderer);
+			}
 			// refresh table
 			table1.revalidate();
 			table1.repaint();

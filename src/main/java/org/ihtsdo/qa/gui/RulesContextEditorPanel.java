@@ -37,7 +37,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.rules.TextAreaRenderer;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
@@ -97,7 +96,9 @@ public class RulesContextEditorPanel extends JPanel {
 						//System.out.println("** rule: " + rule.getName());
 						String ruleUid = rule.getMetaAttribute("UID");
 						String description = rule.getMetaAttribute("DESCRIPTION");
+						if (description == null) description = "";
 						String ditaUid = rule.getMetaAttribute("DITA_UID");
+						if (ditaUid == null) ditaUid = "";
 
 						List<Object> row = new ArrayList<Object>();
 						row.add(rule.getName());
@@ -128,7 +129,9 @@ public class RulesContextEditorPanel extends JPanel {
 					row.add("");
 					tableModel.addData(row);
 				}
-				TableColumnModel cmodel = table1.getColumnModel(); 
+				TableColumnModel cmodel = table1.getColumnModel();
+				table1.setGridColor(Color.BLACK);
+				table1.setShowGrid(true);
 				TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
 				cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
 				cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 

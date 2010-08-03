@@ -20,7 +20,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.rules.TextAreaRenderer;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 

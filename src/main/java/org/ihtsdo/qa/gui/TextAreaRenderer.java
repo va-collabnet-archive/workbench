@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.rules;
+package org.ihtsdo.qa.gui;
 
 /** 
  * @(#)TextAreaRenderer.java 
  */ 
  
+import java.awt.Color;
 import java.awt.Component;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,11 +40,11 @@ import javax.swing.table.TableColumnModel;
 public class TextAreaRenderer extends JTextArea implements TableCellRenderer { 
     
     /** The renderer. */
-    private final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer(); 
+    protected final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer(); 
  
     // Column heights are placed in this Map 
     /** The tablecell sizes. */
-    private final Map<JTable, Map<Object, Map<Object, Integer>>> tablecellSizes = new HashMap<JTable, Map<Object, Map<Object, Integer>>>(); 
+    protected final Map<JTable, Map<Object, Map<Object, Integer>>> tablecellSizes = new HashMap<JTable, Map<Object, Map<Object, Integer>>>(); 
  
     /**
      * Instantiates a new text area renderer.
@@ -60,9 +61,9 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
                                                    boolean hasFocus, int row, int column) { 
         // set the Font, Color, etc. 
         renderer.getTableCellRendererComponent(table, value, 
-                isSelected, hasFocus, row, column); 
+                isSelected, hasFocus, row, column);
+        setBackground(renderer.getBackground());
         setForeground(renderer.getForeground()); 
-        setBackground(renderer.getBackground()); 
         setBorder(renderer.getBorder()); 
         setFont(renderer.getFont()); 
         setText(renderer.getText()); 
@@ -86,7 +87,7 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
      * @param column the column
      * @param height the height
      */ 
-    private void addSize(JTable table, int row, int column, int height) { 
+    protected void addSize(JTable table, int row, int column, int height) { 
         Map<Object, Map<Object, Integer>> rowsMap = tablecellSizes.get(table); 
         if (rowsMap == null) { 
             tablecellSizes.put(table, rowsMap = new HashMap<Object, Map<Object, Integer>>()); 
@@ -106,7 +107,7 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
      * 
      * @return the int
      */ 
-    private int findTotalMaximumRowSize(JTable table, int row) { 
+    protected int findTotalMaximumRowSize(JTable table, int row) { 
         int maximum_height = 0; 
         Enumeration<TableColumn> columns = table.getColumnModel().getColumns(); 
         while (columns.hasMoreElements()) { 
@@ -129,7 +130,7 @@ public class TextAreaRenderer extends JTextArea implements TableCellRenderer {
      * 
      * @return the int
      */ 
-    private int findMaximumRowSize(JTable table, int row) { 
+    protected int findMaximumRowSize(JTable table, int row) { 
         Map<Object, Map<Object, Integer>> rows = tablecellSizes.get(table); 
         if (rows == null) return 0; 
         Map<Object, Integer> rowheights = rows.get(row); 
