@@ -100,6 +100,7 @@
         <module>wb-docs</module>
         <module>tk-concept-component</module>
         <module>rule-engine-integration</module>
+        <module>wb-wf</module>
     </modules>
     <!-- Reconfigure the central repository definitions, which will be directed by settings.xml to IHTSDO.
          These should be pushed into the parent POM -->
