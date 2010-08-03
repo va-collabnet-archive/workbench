@@ -342,10 +342,11 @@ public class BdbCommitManager {
 		AceLog.getAppLog().info("BDBCommitManager commit called");
     	try {
             synchronized (uncommittedCNids) {
+            	AceLog.getAppLog().info("BDBCommitManager commit called1");
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
                     performCommit = true;
-                    
+                    AceLog.getAppLog().info("BDBCommitManager commit called2");
                     //DEBUG
                     I_IterateIds uncommittedCNidItr1 = uncommittedCNids.iterator();
                     while (uncommittedCNidItr1.next()) {
