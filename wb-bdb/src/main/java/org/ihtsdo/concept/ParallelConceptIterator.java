@@ -75,12 +75,20 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     }
 
     private Concept fetchThree() throws IOException {
+    	AceLog.getAppLog().info("fetchThree");
         Concept c = Concept.getIfInMap(currentCNid);
         if (c != null) {
+        	AceLog.getAppLog().info("fetchThree found c");
+        	AceLog.getAppLog().info("C1 = "+c.toLongString());
             return c;
         }
+        AceLog.getAppLog().info("fetchThree using mutableCursor");
         mutableCursor.getCurrent(aKey, mutableFoundData, LockMode.READ_UNCOMMITTED);
-        return Concept.get(currentCNid, new byte[0], mutableFoundData.getData());
+        c = Concept.get(currentCNid, new byte[0], mutableFoundData.getData());
+        
+        AceLog.getAppLog().info("fetchThree found c using mutableCursor");
+    	AceLog.getAppLog().info("C2 = "+c.toLongString());
+    	return c;
     }
 
     private Concept fetchTwo() throws IOException {
@@ -130,7 +138,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                 if (roKey == mutableKey) {
                     fetchKind = FETCH.ONE;
                     currentCNid = roKey; 
-                    AceLog.getAppLog().info("ParallelConceptIterator call() 1 currentCNid = "+currentCNid);
+                    //AceLog.getAppLog().info("ParallelConceptIterator call() 1 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (roKey < last) {
@@ -143,7 +151,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                 } else if (roKey < mutableKey) {
                     fetchKind = FETCH.TWO;
                     currentCNid = roKey;
-                    AceLog.getAppLog().info("ParallelConceptIterator call() 2 currentCNid = "+currentCNid);
+                    //AceLog.getAppLog().info("ParallelConceptIterator call() 2 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (roKey < last) {
@@ -154,7 +162,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                 } else {
                     fetchKind = FETCH.THREE;
                     currentCNid = mutableKey;
-                    AceLog.getAppLog().info("ParallelConceptIterator call() 3 currentCNid = "+currentCNid);
+                    //AceLog.getAppLog().info("ParallelConceptIterator call() 3 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (mutableKey < last) {
