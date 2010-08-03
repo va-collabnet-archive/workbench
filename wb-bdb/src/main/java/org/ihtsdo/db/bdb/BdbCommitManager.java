@@ -345,6 +345,14 @@ public class BdbCommitManager {
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
                     performCommit = true;
+                    
+                    //DEBUG
+                    I_IterateIds uncommittedCNidItr1 = uncommittedCNids.iterator();
+                    while (uncommittedCNidItr1.next()) {
+                    	Concept concept = Concept.get(uncommittedCNidItr1.nid());
+                        AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
+                    }
+                    
                     int errorCount = 0;
                     int warningCount = 0;
                     if (performCreationTests) {
