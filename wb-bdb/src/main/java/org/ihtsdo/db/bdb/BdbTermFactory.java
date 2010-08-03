@@ -1179,7 +1179,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         c.getSourceRels().add(r);
-        AceLog.getAppLog().info("BDBTF newRelationship r ="+r );
+       // AceLog.getAppLog().info("BDBTF newRelationship r ="+r );
         AceLog.getAppLog().info("BDBTF newRelationship c ="+c.toLongString() );
         return r;
     }
