@@ -342,11 +342,10 @@ public class BdbCommitManager {
 		AceLog.getAppLog().info("BDBCommitManager commit called");
     	try {
             synchronized (uncommittedCNids) {
-            	AceLog.getAppLog().info("BDBCommitManager commit called1");
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
                     performCommit = true;
-                    AceLog.getAppLog().info("BDBCommitManager commit called2");
+                    AceLog.getAppLog().info("BDBCommitManager commit called2 uncommittedCNids size =" +uncommittedCNids.size());
                     //DEBUG
                     I_IterateIds uncommittedCNidItr1 = uncommittedCNids.iterator();
                     while (uncommittedCNidItr1.next()) {
@@ -429,6 +428,16 @@ public class BdbCommitManager {
                                     performCommit = false;
                                 }
                             }
+                        }
+                    }
+                    AceLog.getAppLog().info("BDBCommitManager commit performCommit = "+performCommit);
+                    AceLog.getAppLog().info("BDBCommitManager commit uncommittedCNidsNoChecks = "+uncommittedCNidsNoChecks.cardinality());
+                    
+                    if(uncommittedCNidsNoChecks.cardinality() > 0) {
+                        I_IterateIds uncommittedCNidItr2 = uncommittedCNidsNoChecks.iterator();
+                        while (uncommittedCNidItr2.next()) {
+                        	Concept concept = Concept.get(uncommittedCNidItr2.nid());
+                            AceLog.getAppLog().info("BDBCommitManager commit uncommitted concept = "+concept.toLongString());
                         }
                     }
                     
