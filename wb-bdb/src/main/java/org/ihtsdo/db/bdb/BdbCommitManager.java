@@ -351,6 +351,9 @@ public class BdbCommitManager {
                         while (uncommittedCNidItr.next()) {
                             List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                             Concept concept = Concept.get(uncommittedCNidItr.nid());
+                            
+                            AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
+                            
                             dataCheckMap.put(concept, warningsAndErrors);
                             for (I_TestDataConstraints test : commitTests) {
                                 try {
