@@ -107,7 +107,7 @@ public class RulesContextEditorPanel extends JPanel {
 						if (ruleUid != null) {
 							I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, selectedContext);
 							if (role == null) {
-								row.add("Not included");
+								row.add("Included by default");
 								row.add("");
 							} else {
 								row.add(role);
@@ -205,7 +205,11 @@ public class RulesContextEditorPanel extends JPanel {
          * rather than a check box.
          */
         public Class getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
+        	if (getValueAt(0, c) != null) {
+        		return getValueAt(0, c).getClass();
+        	} else {
+        		return null;
+        	}
         }
 
         /*
@@ -254,7 +258,7 @@ public class RulesContextEditorPanel extends JPanel {
 			I_GetConceptData excludeClause = tf.getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
 			// Set up the editor for the sport cells.
 			JComboBox comboBox = new JComboBox();
-			comboBox.addItem("Not included");
+			comboBox.addItem("Included by default");
 			comboBox.addItem(includeClause);
 			comboBox.addItem(excludeClause);
 			conceptColumn.setCellEditor(new DefaultCellEditor(comboBox));
@@ -282,6 +286,10 @@ public class RulesContextEditorPanel extends JPanel {
 
 	private void button2ActionPerformed(ActionEvent e) {
 		try {
+			
+			comboBox1.removeItemListener(comboBox1.getItemListeners()[0]);
+			comboBox2.removeItemListener(comboBox2.getItemListeners()[0]);
+			
 			comboBox2.removeAllItems();
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
 				comboBox2.addItem(context);
@@ -290,6 +298,19 @@ public class RulesContextEditorPanel extends JPanel {
 			for (RulesDeploymentPackageReference repo : rulesRepoHelper.getAllRulesDeploymentPackages()) {
 				comboBox1.addItem(repo);
 			}
+			
+			comboBox2.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					comboBox2ItemStateChanged(e);
+				}
+			});
+
+			comboBox1.addItemListener(new ItemListener() {
+				public void itemStateChanged(ItemEvent e) {
+					comboBox1ItemStateChanged(e);
+				}
+			});
+			
 			updateTable1();
 		} catch (Exception e1) {
 			e1.printStackTrace();

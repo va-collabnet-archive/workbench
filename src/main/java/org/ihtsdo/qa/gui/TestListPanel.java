@@ -81,9 +81,15 @@ public class TestListPanel extends JPanel {
 	}
 
 	private void testConcepts() {
-		for (int row = 0 ; row < table1Model.getRowCount() ; row++) {
-			table1Model.removeRow(row);
-		}
+		String[] columnNames = {"Concept",
+		"Alerts"};
+		String[][] data = null;
+		table1Model = new DefaultTableModel(data, columnNames) {
+			private static final long serialVersionUID = 1L;
+			public boolean isCellEditable(int x, int y) {
+				return false;
+			}
+		};
 		for (int i = 0; i < list1Model.getSize(); i++) {
 			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();

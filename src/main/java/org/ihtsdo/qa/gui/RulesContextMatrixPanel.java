@@ -107,7 +107,7 @@ public class RulesContextMatrixPanel extends JPanel {
 							for (I_GetConceptData context : contexts) {
 								//System.out.println("** context: " + context.toString());
 								//Look for agenda
-								String columnValue = "Not included";
+								String columnValue = "Included by default";
 								I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
 								if (role != null) {
 									columnValue = role.toString();
