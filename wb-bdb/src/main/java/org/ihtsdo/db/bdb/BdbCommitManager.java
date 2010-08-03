@@ -338,6 +338,8 @@ public class BdbCommitManager {
     	lastCommit = Bdb.gVersion.incrementAndGet();
 		Svn.rwl.acquireUninterruptibly();
 		boolean passedRelease = false;
+		
+		AceLog.getAppLog().info("BDBCommitManager commit called");
     	try {
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
