@@ -103,9 +103,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             activity.setProgressInfoLower("Iterating over concepts...");
             switch (changeSetWriterThreading) {
             case MULTI_THREAD:
+            	AceLog.getAppLog().info("MULTI_THREAD");
                 Bdb.getConceptDb().iterateConceptDataInParallel(this);
                 break;
             case SINGLE_THREAD:
+            	AceLog.getAppLog().info("SINGLE_THREAD");
                 Bdb.getConceptDb().iterateConceptDataInSequence(this);
                break;
             default:

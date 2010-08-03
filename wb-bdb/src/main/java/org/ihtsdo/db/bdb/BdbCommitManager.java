@@ -460,12 +460,15 @@ public class BdbCommitManager {
                             case MUTABLE_ONLY:
                                 uncommittedCNidsNoChecks.or(uncommittedCNids);
                                 if (uncommittedCNidsNoChecks.cardinality() > 0) {
+                                	AceLog.getAppLog().info("ChangeSetWriterHandler about to get the CS Handler");
                                     ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                                         uncommittedCNidsNoChecks, commitTime,
                                         sapNidsFromCommit, changeSetPolicy, 
                                         changeSetWriterThreading, 
                                         Svn.rwl);
+                                    AceLog.getAppLog().info("About to call changeSetWriterService.execute(handler)");
                                     changeSetWriterService.execute(handler);
+                                    AceLog.getAppLog().info("changeSetWriterService.execute(handler) called");
                                     passedRelease = true;
                                 }
                                 break;
