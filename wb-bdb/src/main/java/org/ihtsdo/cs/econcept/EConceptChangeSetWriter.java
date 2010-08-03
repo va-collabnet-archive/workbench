@@ -138,6 +138,9 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
 		assert time != Long.MAX_VALUE;
 		assert time != Long.MIN_VALUE;
 		Concept c = (Concept) igcd;
+		
+		 AceLog.getAppLog().info("EConceptChangeSetWriter writeChanges concept = "+c.toLongString());
+		
 		if (c.isCanceled()) {
 	        AceLog.getAppLog().info("Writing canceled concept suppressed: " + 
 	        		c.toLongString());
