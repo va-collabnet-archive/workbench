@@ -38,6 +38,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.qa.gui.TextAreaRenderer;
 
 /**
  * The Class RulesResultsPanel.
