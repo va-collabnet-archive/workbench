@@ -129,7 +129,8 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
             while ((roKey <= last || mutableKey <= last) && processor.continueWork()) {
                 if (roKey == mutableKey) {
                     fetchKind = FETCH.ONE;
-                    currentCNid = roKey;
+                    currentCNid = roKey; 
+                    AceLog.getAppLog().info("ParallelConceptIterator call() 1 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (roKey < last) {
@@ -142,6 +143,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                 } else if (roKey < mutableKey) {
                     fetchKind = FETCH.TWO;
                     currentCNid = roKey;
+                    AceLog.getAppLog().info("ParallelConceptIterator call() 2 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (roKey < last) {
@@ -152,6 +154,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
                 } else {
                     fetchKind = FETCH.THREE;
                     currentCNid = mutableKey;
+                    AceLog.getAppLog().info("ParallelConceptIterator call() 3 currentCNid = "+currentCNid);
                     processor.processUnfetchedConceptData(currentCNid, this);
                     processedCount++;
                     if (mutableKey < last) {
@@ -170,7 +173,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
             AceLog.getAppLog().info(
                     "Parallel concept iterator finished.\n" + " First: " + first + " last: " + last + " roKey: "
                         + roKey + " mutableKey: " + mutableKey + " processedCount: " + processedCount
-                        + " countToProcess: " + countToProcess);
+                        + " countToProcess: " + countToProcess +" fetchKind = "+fetchKind);
             return true;
         } finally {
             roCursor.close();
