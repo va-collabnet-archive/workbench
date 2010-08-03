@@ -88,7 +88,7 @@ public class WorkflowAuxiliary implements I_AddToMemoryTermServer {
         EDIT_USE_CASE(new String[] { "Edit Use Case" }, new I_ConceptualizeUniversally[] { USE_CASE }, new int[] { 10 }), 
         ;
 
-        private Collection<UUID> conceptUids = new ArrayList<UUID>();
+        private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
         private Boolean primitive = true;
 
@@ -205,6 +205,11 @@ public class WorkflowAuxiliary implements I_AddToMemoryTermServer {
         public I_ConceptualizeLocally localize() throws IOException, TerminologyException {
             return LocalFixedConcept.get(getUids(), primitive);
         }
+
+		@Override
+		public UUID getPrimoridalUid() throws IOException, TerminologyException {
+			return conceptUids.get(0);
+		}
     }
 
     //private static HashMap<I_ManifestUniversally, HashMap<I_ConceptualizeUniversally, I_ExtendUniversally>> extensions = new HashMap<I_ManifestUniversally, HashMap<I_ConceptualizeUniversally, I_ExtendUniversally>>();
