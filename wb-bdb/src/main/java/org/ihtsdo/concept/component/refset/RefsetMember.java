@@ -364,8 +364,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 				enclosingConceptNid = refsetNid;
 				Concept newRefsetConcept = Concept.get(refsetNid);
 				newRefsetConcept.getExtensions().add(this);
-				Concept extendedConcept = Concept.get(this.referencedComponentNid);
-				Bdb.getNidCNidMap().setCidForNid(refsetNid, getNid());
+				Bdb.getNidCNidMap().resetCidForNid(refsetNid, getNid());
 				Terms.get().addUncommitted(newRefsetConcept);
 			}
 		} else {

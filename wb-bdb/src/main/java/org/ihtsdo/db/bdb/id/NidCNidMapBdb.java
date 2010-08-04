@@ -218,7 +218,29 @@ public class NidCNidMapBdb extends ComponentBdb {
 		}
 	}
 
-	   
+	public void resetCidForNid(int cNid, int nid) throws IOException {
+        assert cNid != Integer.MAX_VALUE;
+        int mapIndex = (nid  - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
+        assert mapIndex >= 0: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex;
+        int indexInMap = (nid  - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
+        assert indexInMap < NID_CNID_MAP_SIZE: "cNid: " + cNid + " nid: " + nid + " mapIndex: " + mapIndex
+            + " indexInMap: " + indexInMap;
+        
+		ensureCapacity(nid);
+		if (nidCNidMaps.get() != null && nidCNidMaps.get()[mapIndex] != null) {
+	        if (nidCNidMaps.get()[mapIndex][indexInMap] != cNid) {
+	            nidCNidMaps.get()[mapIndex][indexInMap] = cNid;
+	            mapChanged[mapIndex] = true;
+	        }
+		} else {
+		    if (nidCNidMaps.get() == null) {
+	            throw new IOException("Null nidCidMap: ");
+		    }
+            throw new IOException("nidCidMap[" + mapIndex + "] " + 
+                "is null. cNid: " + cNid + " nid: " + nid);
+		}
+	}
+   
     private void ensureCapacity(int nextId) throws IOException {
         int nidCidMapCount = ((nextId - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE) + 1;
         if (nidCidMapCount > nidCNidMaps.get().length) {
