@@ -70,6 +70,9 @@ public class ConceptBdb extends ComponentBdb {
     }
 
     public void writeConcept(Concept concept) throws IOException {
+    	
+    	AceLog.getAppLog().info("writeConcept concept = "+concept.toLongString());
+    	
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---!!! Writing to conceptBdb: " + concept.toLongString() + "\n---!!! ");
         }
