@@ -19,7 +19,7 @@
 		-->
 			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>database</artifactId>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -29,7 +29,7 @@
 			-->
 			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>profiles</artifactId>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -66,12 +66,12 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-ide-admin-bp</artifactId>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-ide-user-bp</artifactId>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -236,6 +236,12 @@
 						</goals>
 						<configuration>
 							<targetSubDir>generated-resources/</targetSubDir>
+              <runtimeArtifacts>
+                <runtimeArtifact>${project.groupId}:profiles</runtimeArtifact>
+                <runtimeArtifact>${project.groupId}:database</runtimeArtifact>
+                <runtimeArtifact>org.ihtsdo:wb-ide-admin-bp</runtimeArtifact>
+                <runtimeArtifact>org.ihtsdo:wb-ide-user-bp</runtimeArtifact>
+              </runtimeArtifacts>
 						</configuration>
 					</execution>
 				</executions>
@@ -250,7 +256,6 @@
 					<groupId>${project.groupId}</groupId>
 					<artifactId>documentation</artifactId>
 					<type>zip</type>
-					<scope>runtime-directory</scope>
 				</dependency>
 			</dependencies>
 		</profile>

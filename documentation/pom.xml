@@ -28,18 +28,17 @@
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-docs</artifactId>
 			<type>zip</type>
-			<scope>runtime-directory</scope>
 			<version>${wb-toolkit.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-ide-admin-bp</artifactId>
-			<scope>runtime-directory</scope>
+			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-ide-user-bp</artifactId>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 		</dependency>
 	</dependencies>
 	<build>

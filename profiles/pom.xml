@@ -6,35 +6,28 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>profiles</artifactId>
+  <packaging>pom</packaging>
   <name>Workbench Bundle Profiles</name>
   <description>wb-bundle profiles</description>
   <build>
     <plugins>
       <plugin>
-      	<groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-profiles</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/profiles</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>src/main/profiles</directory>
-                  <includes>
-                    <include>**/*.ace</include>
-                    <include>**/*.bp</include>
-                    <include>**/*.xls</include>
-                  </includes>
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+              <execution>
+                  <id>attach-profiles</id>
+                  <configuration>
+                      <descriptors>
+                          <descriptor>src/main/assembly/profiles.xml</descriptor>
+                      </descriptors>
+                  </configuration>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
+                  <phase>package</phase>
+              </execution>
+          </executions>
       </plugin>
     </plugins>
   </build>

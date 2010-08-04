@@ -1,0 +1,18 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/profiles</directory>
+      <outputDirectory>/profiles</outputDirectory>
+      <includes>
+        <include>**/*.ace</include>
+        <include>**/*.bp</include>
+        <include>**/*.xls</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
+

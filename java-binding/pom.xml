@@ -16,7 +16,7 @@
 			<groupId>org.ihtsdo.sample</groupId>
 			<artifactId>database</artifactId>
 			<version>${project.version}</version>
-			<scope>runtime-directory</scope>
+      <type>zip</type>
 		</dependency>
 	</dependencies>
 	<build>
@@ -65,6 +65,9 @@
 						</goals>
 						<configuration>
 							<targetSubDir>generated-resources/</targetSubDir>
+              <runtimeArtifacts>
+                <runtimeArtifact>${project.groupId}:database</runtimeArtifact>
+              </runtimeArtifacts>
 						</configuration>
 					</execution>
 					<execution>
