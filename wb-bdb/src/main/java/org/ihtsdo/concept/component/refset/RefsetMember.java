@@ -357,14 +357,26 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 
 	@Override
-	public void setRefsetId(int refsetId) {
-		throw new UnsupportedOperationException();
+	public void setRefsetId(int refsetNid) throws IOException {
+		if (getTime() == Long.MAX_VALUE) {
+			if (enclosingConceptNid != refsetNid) {
+				Terms.get().forget(this);
+				enclosingConceptNid = refsetNid;
+				Concept newRefsetConcept = Concept.get(refsetNid);
+				newRefsetConcept.getExtensions().add(this);
+				Terms.get().addUncommitted(newRefsetConcept);
+			}
+		} else {
+			throw new UnsupportedOperationException("Cannot change refset unless member is uncommitted...");
+		}
 	}
 
 
 	@Override
 	public void setTypeId(int typeId) {
-		throw new UnsupportedOperationException();
+		if (typeId != getTypeId()) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 

@@ -58,7 +58,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
 
     public void addVersion(I_ExtendByRefPart part);
 
-    public void setRefsetId(int refsetId);
+    public void setRefsetId(int refsetId) throws IOException;
 
     public void setTypeId(int typeId);
 
