@@ -88,6 +88,17 @@ public class BdbCommitManager {
 		public void run() {
 			try {
 				while (c.isUnwritten() && ! c.isCanceled()) {
+			    	try {
+			    		throw new Exception("Write Concept Debug");
+			    	}
+			    	catch(Exception e) {
+			    		//System.out.println(e);
+			    		StringWriter sw = new StringWriter();
+			    		e.printStackTrace(new PrintWriter(sw));
+			    		String stacktrace = sw.toString();
+			    		AceLog.getAppLog().info("ConceptWriter run Stack = "+stacktrace);
+			    		System.out.println(e);
+			    	}
 					Bdb.getConceptDb().writeConcept(c);
 				}
 			} catch (Exception e) {
