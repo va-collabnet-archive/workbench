@@ -107,12 +107,14 @@ public class WriteConfigFile extends AbstractMojo {
         }
         List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
         for (Artifact a : artifacts) {
-            if (a.getScope().equals("provided")) {
+            if (a.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                 getLog().info("Not adding provided: " + a);
             } else if (a.getGroupId().endsWith("runtime-directory") || a.getScope().equals("runtime-directory")) {
-                getLog().info("Not adding runtime-directory: " + a);
+                getLog().error("(DEPRECATED - please change artifact to ZIP): Not adding runtime-directory: " + a);
+            } else if (!a.getArtifactHandler().isAddedToClasspath()) {
+                getLog().info("Not adding non-classpath: " + a);
             } else {
-                if (a.getScope().equals("system")) {
+                if (a.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                     getLog().info("System dependency: " + a);
                 }
                 dependencyWithoutProvided.add(a);
