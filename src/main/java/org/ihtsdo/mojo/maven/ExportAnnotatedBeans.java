@@ -169,12 +169,14 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
         if (MojoUtil.allowedGoal(getLog(), session.getGoals(), allowedGoals)) {
             List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
             for (Artifact a : artifacts) {
-                if (a.getScope().equals("provided")) {
+                if (a.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                     getLog().info("Not adding provided: " + a);
                 } else if (a.getGroupId().endsWith("runtime-directory") || a.getScope().equals("runtime-directory")) {
-                    getLog().info("Not adding runtime-directory: " + a);
+                    getLog().error("(DEPRECATED - please change artifact to ZIP): Not adding runtime-directory: " + a);
+                } else if (!a.getArtifactHandler().isAddedToClasspath()) {
+                    getLog().info("Not adding non-classpath: " + a);
                 } else {
-                    if (a.getScope().equals("system")) {
+                    if (a.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                         getLog().info("System dependency: " + a);
                     }
                     if (a.getFile().length() > 10000000) {
@@ -194,16 +196,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                 URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
                 Class beanListClass = libLoader.loadClass(BeanList.class.getName());
 
-                for (Artifact artifact : artifacts) {
-                    if (artifact.getScope().equals("provided")) {
-                        continue;
-                    }
-
-                    if (artifact.getScope().equals("runtime-directory")) {
-                        continue;
-                    }
-
-                    if (artifact.getScope().equals("system")) {
+                for (Artifact artifact : dependencyWithoutProvided) {
+                    if (artifact.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                         continue;
                     }
 
