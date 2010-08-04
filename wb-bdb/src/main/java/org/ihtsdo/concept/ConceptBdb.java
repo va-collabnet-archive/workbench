@@ -73,6 +73,14 @@ public class ConceptBdb extends ComponentBdb {
     	
     	AceLog.getAppLog().info("writeConcept concept = "+concept.toLongString());
     	
+    	try {
+    		throw new Exception("Write Concept Debug");
+    	}
+    	catch(Exception e) {
+    		System.out.println(e);
+    	}
+    	
+    	
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---!!! Writing to conceptBdb: " + concept.toLongString() + "\n---!!! ");
         }
