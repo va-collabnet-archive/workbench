@@ -50,7 +50,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.ComponentFrame;
-import org.intsdo.util.swing.GuiUtil;
+import org.ihtsdo.util.swing.GuiUtil;
 
 /**
  * TODO get this viewer to work more directly with the java 6 Swing worker.  
