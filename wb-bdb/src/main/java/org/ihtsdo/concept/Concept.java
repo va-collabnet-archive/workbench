@@ -31,6 +31,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -1058,7 +1059,18 @@ public class Concept implements I_Transact, I_GetConceptData {
         return data.isLeafByDestRels(aceConfig);
     }
 
-    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+    
+    @Override
+	public boolean promote(I_TestComponent test, I_Position viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+			PRECEDENCE precedence) throws IOException, TerminologyException {
+		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
+			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+		}
+		return false;
+	}
+
+	public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
             PRECEDENCE precedence) throws IOException, TerminologyException {
         boolean promotedAnything = false;
 

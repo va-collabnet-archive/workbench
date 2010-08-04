@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -53,7 +54,14 @@ import org.dwfa.tapi.TerminologyException;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
+    public boolean promote(I_TestComponent test, I_Position viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+			PRECEDENCE precedence) throws IOException, TerminologyException {
+		return bean.promote(test, viewPosition, pomotionPaths, allowedStatus,
+				precedence);
+	}
+
+	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
 			I_ShowActivity activity) throws IOException {
 		return bean.getPossibleKindOfConcepts(config, activity);
 	}
