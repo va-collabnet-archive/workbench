@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -929,6 +931,17 @@ public class BdbCommitManager {
 	}
 
 	public static void writeImmediate(Concept concept) {
+    	try {
+    		throw new Exception("BDBCM writeImmediate Debug");
+    	}
+    	catch(Exception e) {
+    		//System.out.println(e);
+    		StringWriter sw = new StringWriter();
+    		e.printStackTrace(new PrintWriter(sw));
+    		String stacktrace = sw.toString();
+    		AceLog.getAppLog().info("BDBCM writeImmediate Debug Stack = "+stacktrace);
+    		System.out.println(e);
+    	}
 		new ConceptWriter(concept).run();
 	}
 

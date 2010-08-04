@@ -84,6 +84,7 @@ public class ConceptBdb extends ComponentBdb {
     		e.printStackTrace(new PrintWriter(sw));
     		String stacktrace = sw.toString();
     		AceLog.getAppLog().info("writeConcept Stack = "+stacktrace);
+    		System.out.println(e);
     	}
     	
     	
