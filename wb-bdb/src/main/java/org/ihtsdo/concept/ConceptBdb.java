@@ -1,6 +1,8 @@
 package org.ihtsdo.concept;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -77,7 +79,11 @@ public class ConceptBdb extends ComponentBdb {
     		throw new Exception("Write Concept Debug");
     	}
     	catch(Exception e) {
-    		System.out.println(e);
+    		//System.out.println(e);
+    		StringWriter sw = new StringWriter();
+    		e.printStackTrace(new PrintWriter(sw));
+    		String stacktrace = sw.toString();
+    		AceLog.getAppLog().info("writeConcept Stack = "+stacktrace);
     	}
     	
     	
