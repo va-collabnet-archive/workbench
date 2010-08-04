@@ -134,9 +134,9 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         gbc.gridx++;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
-        content.add(cancelButton, gbc);
-        gbc.gridx++;
         content.add(loginButton, gbc);
+        gbc.gridx++;
+        content.add(cancelButton, gbc);
         if (JComponent.class.isAssignableFrom(content.getClass())) {
             JComponent jc = (JComponent) content;
             jc.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));

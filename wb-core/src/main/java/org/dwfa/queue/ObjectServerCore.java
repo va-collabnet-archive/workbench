@@ -74,7 +74,6 @@ import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.lookup.JoinManager;
 import net.jini.lookup.entry.Name;
 
-import org.apache.commons.io.FileUtils;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeObject;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -498,9 +497,9 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                 throw new NoMatchingEntryException("Found " + files.length + " matching files for entryID: " + entryID);
             }
 
-            File processFile = files[0];
-            processFile = startTake(processFile);
-            FileInputStream fis = new FileInputStream(processFile);
+            File originalProcessFile = files[0];
+            File newProcessFile = startTake(originalProcessFile);
+            FileInputStream fis = new FileInputStream(newProcessFile);
             BufferedInputStream bis = new BufferedInputStream(fis);
             ObjectInputStream ois = oisGetter.getObjectInputStream(bis);
             Object obj = ois.readObject();
@@ -509,8 +508,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
 
             this.uncommittedTakes.add(objDesc);
             this.objectInfoSortedSet.remove(objDesc);
-            addTakeToTransaction(objDesc, this.objectInfoSortedSet, this.uncommittedTakes, processFile,
-                (ServerTransaction) t, this);
+            addTakeToTransaction(objDesc, this.objectInfoSortedSet, this.uncommittedTakes, newProcessFile,
+                originalProcessFile, (ServerTransaction) t, this);
             return obj;
         } catch (FileNotFoundException ex) {
             throw new NoMatchingEntryException(ex.toString());
@@ -566,19 +565,21 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     public EntryID writeThenTake(T object, Transaction writeTran, Transaction takeTran) throws RemoteException,
             IOException, TransactionException {
         EntryID entryID = newEntryID();
-        File processFile = new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffixTakePending());
-        FileOutputStream fos = new FileOutputStream(processFile);
+        File originalProcessFile = new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffix());
+        File newProcessFile =
+                new File(this.directory, object.getObjectID() + "." + entryID + getFileSuffixTakePending());
+        FileOutputStream fos = new FileOutputStream(newProcessFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(object);
         oos.close();
-        writeLogEntry(processFile);
+        writeLogEntry(newProcessFile);
         T objectDesc = getObjectDescription(object, entryID);
-        this.addWriteThenTakeToTransaction(objectDesc, this.objectInfoSortedSet, processFile,
+        this.addWriteThenTakeToTransaction(objectDesc, this.objectInfoSortedSet, newProcessFile,
             (ServerTransaction) writeTran, takeTran);
         this.uncommittedTakes.add(objectDesc);
-        this.addTakeToTransaction(objectDesc, this.objectInfoSortedSet, this.uncommittedTakes, processFile,
-            (ServerTransaction) takeTran, this);
+        this.addTakeToTransaction(objectDesc, this.objectInfoSortedSet, this.uncommittedTakes, newProcessFile,
+            originalProcessFile, (ServerTransaction) takeTran, this);
         return entryID;
     }
 
@@ -653,11 +654,11 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                         + objectID);
                 }
 
-                File objectFile = files[0];
+                File originalObjectFile = files[0];
 
-                EntryID entryID = getEntryID(objectFile);
-                objectFile = startTake(objectFile);
-                FileInputStream fis = new FileInputStream(objectFile);
+                EntryID entryID = getEntryID(originalObjectFile);
+                File newObjectFile = startTake(originalObjectFile);
+                FileInputStream fis = new FileInputStream(newObjectFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 ObjectInputStream ois = oisGetter.getObjectInputStream(bis);
                 Object obj = ois.readObject();
@@ -665,8 +666,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                 T desc = this.getObjectDescription(obj, entryID);
                 this.uncommittedTakes.add(desc);
                 this.objectInfoSortedSet.remove(desc);
-                this.addTakeToTransaction(desc, this.objectInfoSortedSet, this.uncommittedTakes, objectFile,
-                    (ServerTransaction) t, this);
+                this.addTakeToTransaction(desc, this.objectInfoSortedSet, this.uncommittedTakes, newObjectFile,
+                    originalObjectFile, (ServerTransaction) t, this);
                 return obj;
             }
         } catch (FileNotFoundException ex) {
@@ -733,14 +734,15 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         }
     }
 
-    private void addTakeToTransaction(T objDesc, SortedSet<T> name, Set<T> name2, File processFile,
-            ServerTransaction st, ObjectServerCore core) throws TransactionException, UnknownTransactionException,
-            CannotJoinException, CrashCountException, RemoteException {
+    private void addTakeToTransaction(T objDesc, SortedSet<T> name, Set<T> name2, File newProcessFile,
+            File originalProcessFile, ServerTransaction st, ObjectServerCore core) throws TransactionException,
+            UnknownTransactionException, CannotJoinException, CrashCountException, RemoteException {
         if (st == null) {
             return;
         }
         TakeTransactionPart part =
-                new TakeTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes, processFile, this, this);
+                new TakeTransactionPart<T>(objDesc, objectInfoSortedSet, uncommittedTakes, newProcessFile,
+                    originalProcessFile, this, this);
         TransactionParticipantAggregator.addTransactionPart(st, part);
         if (getLogger().isLoggable(Level.FINE)) {
             getLogger().fine("addTakeToTransaction");

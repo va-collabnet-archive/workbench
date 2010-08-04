@@ -336,12 +336,31 @@ public class Svn implements I_HandleSubversion {
 			for (Status s : status) {
 				if (s.isManaged()) {
 					if (s.getTextStatus() == StatusKind.missing) {
-						boolean force = true;
-						boolean keepLocal = false;
-						Map<String, String> revpropTable = new HashMap<String, String>();
-						Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force, keepLocal, revpropTable);
-						SvnLog.info("Removing: " + s.getPath());
-						deletedFiles++;
+                            boolean delete = true;
+                            if (s.getPath().endsWith(".bp")) {
+                                String pathNameNoExtension = s.getPath().substring(0, s.getPath().lastIndexOf(".bp"));
+                                File directory = new File(s.getPath());
+                                for (String fileStr : directory.list()) {
+                                    File file = new File(fileStr);
+                                    if (file.getPath().contains(pathNameNoExtension + ".bp.write-pending")
+                                        || file.getPath().contains(pathNameNoExtension + ".bp.take-pending")) {
+                                        // don't delete the .bp as we need to keep a copy while the bp is executing
+                                        delete = false;
+                                    }
+                                }
+                            }
+
+                            if (delete) {
+                                boolean force = true;
+                                boolean keepLocal = false;
+                                Map<String, String> revpropTable = new HashMap<String, String>();
+                                Svn.getSvnClient().remove(new String[] { s.getPath() }, "pr01", force, keepLocal,
+                                    revpropTable);
+                                SvnLog.info("Removing: " + s.getPath());
+                                deletedFiles++;
+                            } else {
+                                SvnLog.info("Skipping remove of: " + s.getPath() + " due to take/write-pending");
+                            }
 					} else if (s.isModified()) {
 						if (s.getRepositoryTextStatus() == StatusKind.modified) {
 							// Conflict exists. 

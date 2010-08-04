@@ -58,7 +58,7 @@ public class RefsetPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
+                if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     for (I_Path p : config.getEditingPathSet()) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
                         I_ExtendByRefPart newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(),
@@ -72,7 +72,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     model.fireTableDataChanged();
                     model.propertyChange(null);
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -112,7 +112,7 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
-                    if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
                         newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(), currentPart.getPathId(), Long.MAX_VALUE);
                     } else {
@@ -148,7 +148,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -170,7 +170,7 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
-                    if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
                         newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
                     } else {
@@ -190,7 +190,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         throw new Exception("Don't know how to handle: " + field);
                     }
                     model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
-                    if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                         selectedObject.getTuple().addVersion(newPart);
                     }
                 }
@@ -198,7 +198,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -221,7 +221,7 @@ public class RefsetPopupListener extends MouseAdapter {
             try {
                 for (I_Path p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
-                    if (selectedObject.getTuple().getMutablePart().getVersion() != Long.MAX_VALUE) {
+                    if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
                         newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(), currentPart.getPathId(), Long.MAX_VALUE);
                     } else {
@@ -253,7 +253,7 @@ public class RefsetPopupListener extends MouseAdapter {
                 model.allTuples = null;
                 model.fireTableDataChanged();
                 model.propertyChange(null);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -341,9 +341,7 @@ public class RefsetPopupListener extends MouseAdapter {
 
                 }
             }
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
+        } catch (Throwable e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }
