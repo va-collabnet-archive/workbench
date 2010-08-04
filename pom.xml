@@ -60,7 +60,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagBase>https://csfe.aceworkspace.net/svn/repos/workbench/tags/</tagBase>
-                    <preparationGoals>clean validate</preparationGoals>
+                    <preparationGoals>clean install</preparationGoals>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <remoteTagging>true</remoteTagging>
                 </configuration>
