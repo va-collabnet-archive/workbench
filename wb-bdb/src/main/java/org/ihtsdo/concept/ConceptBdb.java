@@ -73,7 +73,7 @@ public class ConceptBdb extends ComponentBdb {
 
     public void writeConcept(Concept concept) throws IOException {
     	
-    	AceLog.getAppLog().info("writeConcept concept = "+concept.toLongString());
+    	/*AceLog.getAppLog().info("writeConcept concept = "+concept.toLongString());
     	
     	try {
     		throw new Exception("Write Concept Debug");
@@ -85,7 +85,7 @@ public class ConceptBdb extends ComponentBdb {
     		String stacktrace = sw.toString();
     		AceLog.getAppLog().info("writeConcept Stack = "+stacktrace);
     		System.out.println(e);
-    	}
+    	}*/
     	
     	
         if (Bdb.watchList.containsKey(concept.getNid())) {

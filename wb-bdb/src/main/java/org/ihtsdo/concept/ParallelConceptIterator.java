@@ -77,17 +77,17 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     private Concept fetchThree() throws IOException {
     	AceLog.getAppLog().info("fetchThree");
         Concept c = Concept.getIfInMap(currentCNid);
-        if (c != null) {
+        /*if (c != null) {
         	AceLog.getAppLog().info("fetchThree found c");
         	AceLog.getAppLog().info("C1 = "+c.toLongString());
             return c;
         }
-        AceLog.getAppLog().info("fetchThree using mutableCursor");
+        AceLog.getAppLog().info("fetchThree using mutableCursor");*/
         mutableCursor.getCurrent(aKey, mutableFoundData, LockMode.READ_UNCOMMITTED);
         c = Concept.get(currentCNid, new byte[0], mutableFoundData.getData());
         
-        AceLog.getAppLog().info("fetchThree found c using mutableCursor");
-    	AceLog.getAppLog().info("C2 = "+c.toLongString());
+        /*AceLog.getAppLog().info("fetchThree found c using mutableCursor");
+    	AceLog.getAppLog().info("C2 = "+c.toLongString());*/
     	return c;
     }
 

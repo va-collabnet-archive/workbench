@@ -358,12 +358,11 @@ public class BdbCommitManager {
                 synchronized (uncommittedCNidsNoChecks) {
                     flushUncommitted();
                     performCommit = true;
-                    AceLog.getAppLog().info("BDBCommitManager commit called2 uncommittedCNids size =" +uncommittedCNids.size());
                     //DEBUG
                     I_IterateIds uncommittedCNidItr1 = uncommittedCNids.iterator();
                     while (uncommittedCNidItr1.next()) {
                     	Concept concept = Concept.get(uncommittedCNidItr1.nid());
-                        AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
+                        //AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
                     }
                     
                     int errorCount = 0;
@@ -375,7 +374,7 @@ public class BdbCommitManager {
                             List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
                             Concept concept = Concept.get(uncommittedCNidItr.nid());
                             
-                            AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
+                            //AceLog.getAppLog().info("BDBCommitManager commit concept = "+concept.toLongString());
                             
                             dataCheckMap.put(concept, warningsAndErrors);
                             for (I_TestDataConstraints test : commitTests) {
@@ -443,7 +442,7 @@ public class BdbCommitManager {
                             }
                         }
                     }
-                    AceLog.getAppLog().info("BDBCommitManager commit performCommit = "+performCommit);
+                    /*AceLog.getAppLog().info("BDBCommitManager commit performCommit = "+performCommit);
                     AceLog.getAppLog().info("BDBCommitManager commit uncommittedCNidsNoChecks = "+uncommittedCNidsNoChecks.cardinality());
                     
                     if(uncommittedCNidsNoChecks.cardinality() > 0) {
@@ -452,7 +451,7 @@ public class BdbCommitManager {
                         	Concept concept = Concept.get(uncommittedCNidItr2.nid());
                             AceLog.getAppLog().info("BDBCommitManager commit uncommitted concept = "+concept.toLongString());
                         }
-                    }
+                    }*/
                     
                     if (performCommit) {
                         KindOfComputer.reset();

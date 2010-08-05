@@ -61,7 +61,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             I_IterateIds uncommittedCNidItr2 = this.cNidsToWrite.iterator();
             while (uncommittedCNidItr2.next()) {
             	Concept concept = Concept.get(uncommittedCNidItr2.nid());
-                AceLog.getAppLog().info("ChangeSetWriterHandler contructor changed concept = "+concept.toLongString());
+               // AceLog.getAppLog().info("ChangeSetWriterHandler contructor changed concept = "+concept.toLongString());
             }
 			}catch(Exception e) {
 				AceLog.getAppLog().severe("ChangeSetWriterHandler contructor", e);
