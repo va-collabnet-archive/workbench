@@ -1034,7 +1034,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             if (active) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        if (active) {
+                        if (active && row > -1 && row < allTuples.size()) {
                             I_ExtendByRefVersion tuple = allTuples.get(row);
                             Terms.get().addUncommitted(tuple.getCore());
                         }

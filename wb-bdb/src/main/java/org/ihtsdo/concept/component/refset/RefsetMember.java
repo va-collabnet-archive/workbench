@@ -360,8 +360,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	public void setRefsetId(int refsetNid) throws IOException {
 		if (getTime() == Long.MAX_VALUE) {
 			if (enclosingConceptNid != refsetNid) {
+				int nid = primordialSapNid;
 				Terms.get().forget(this);
 				enclosingConceptNid = refsetNid;
+				primordialSapNid = nid;
 				Concept newRefsetConcept = Concept.get(refsetNid);
 				newRefsetConcept.getExtensions().add(this);
 				Bdb.getNidCNidMap().resetCidForNid(refsetNid, getNid());
