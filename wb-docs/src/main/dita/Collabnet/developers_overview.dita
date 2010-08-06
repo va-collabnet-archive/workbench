@@ -1,31 +1,36 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Topic//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="collabnet_development" xml:lang="en-US">
+  <title>Using the IHTSDO Workspace on Collabnet</title>
 
- <title>Using the IHTSDO Workspace on Collabnet</title>
- <body>
-    <section>An overview of the IHTSDO Workspace can be seen in<xref href="#topic1/ay1069819"
-    type="fig" format="dita"/></section>
-  <fig id="ay1069819">
-   <title>The Developer's Environment</title>
-   <image href="../images/Using_Collabnet_Images/usingcollabnet_img_2.jpg" placement="break"
-    width="468" height="273"/>
-  </fig>
-  <section id="ay1050005">Most of the Maven projects described in <xref
-    href="../Maven_Plugins/plugins_intro.dita#topic1" type="topic" format="dita"/> have a corresponding “project” on
-   the IHTSDO Workbench Collabnet workspace at http://<i>project</i>.aceworkspace.net. Access to
-   each project is controlled on a per project basis. Every user must be registered and can be
-   assigned to 1 or more roles. A key role relevant to developers is the <i>developer</i> role.
-   Projects can be nested, but each subproject must have a globally unique name within the
-   Aceworkspace namespace. <indexterm>roles </indexterm></section>
-  <section>Initial versions of the IHTSDO Workspace were based on the Collabnet Subversion product.
-   In September 2008, Aceworkspace migrated to the more poweful Collabnet Sourceforge product.
-   Further details of the func­tionality provided by Collabnet may be found at <xref
-    href="http://www.collabnet.net" scope="external" format="html">
-    <ph>http://www.collabnet.net.</ph>
-   </xref></section>
+  <body>
+    <section>An overview of the IHTSDO Workspace can be seen in <xref
+    format="dita" href="#collabnet_development/ay1069819"
+    type="fig"/></section>
 
- </body>
+    <fig id="ay1069819">
+      <title>The Developer's Environment</title>
+
+      <image href="../images/Using_Collabnet_Images/collabnet_overview.jpg"
+             placement="inline"/>
+    </fig>
+
+    <section id="ay1050005">Most of the Maven projects described in <xref
+    format="dita" href="../Maven_Plugins/plugins_intro.dita#topic1"
+    type="topic"/> have a corresponding “project” on the IHTSDO Workbench
+    Collabnet workspace at http://cfse.aceworkspace.net. Access to each
+    project is controlled on a per project basis. Every user must be
+    registered and can be assigned to 1 or more roles. A key role relevant to
+    developers is the <i>developer</i> role. Projects can be nested, but each
+    subproject must have a globally unique name within the Aceworkspace
+    namespace. <indexterm>roles </indexterm></section>
+
+    <section>Initial versions of the IHTSDO Workspace were based on the
+    Collabnet Subversion product. In September 2008, Aceworkspace migrated to
+    the more powerful Collabnet Sourceforge product. Further details of the
+    functionality provided by Collabnet may be found at <xref format="html"
+    href="http://www.collabnet.net" scope="external">
+    <ph>http://www.collabnet.net.</ph> </xref></section>
+  </body>
 </topic>
-

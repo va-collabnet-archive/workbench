@@ -3,7 +3,7 @@
   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 
 
-<topic id="topic1" xml:lang="en">
+<topic id="topic1" xml:lang="en-us">
 <title>Standard Task Library </title>
  <prolog>
   <author>Eric Browne</author>

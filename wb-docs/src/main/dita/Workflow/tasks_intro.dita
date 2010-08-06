@@ -3,7 +3,7 @@
   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 
 
-<topic id="topic1" xml:lang="en">
+<topic id="topic1" xml:lang="en-us">
  <title>Creating new tasks</title>
  <body>
   <section>The IHTSDO Workbench Editor's functionality can be extended through building business

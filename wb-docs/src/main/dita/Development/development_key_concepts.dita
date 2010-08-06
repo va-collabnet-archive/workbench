@@ -1,72 +1,107 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 <topic id="topic3" xml:lang="en">
- <title>Key Concepts</title>
- <body>
-  <section><b>bundle</b><indexterm>bundle</indexterm>: a collection of artefacts associated or
-   “bundled” together for a single purpose – distribution and installation on customers' desktops.
-   Bundle can also be used as a verb.</section>
-  <section><b>package</b><indexterm>package</indexterm>: a collection of associated artefacts
-   “packaged” into a single <i>jar</i><fn id="at1057199"><b>J</b>ava <b>ar</b>chive – a single
-    archive file format from Sun Microsystem's Java initiative. Similar to a <i>zip</i> or other
-    archiving technology. Jar files contain a <i>MANIFEST</i> section of metadata about the archive.
-    </fn><xref href="#topic3/at1057199" scope="local" type="fn" format="dita"/><i>
-   </i>file for version management purposes.</section>
-  <section id="at1003629"><b>module</b>: [Maven concept]<indexterm>Maven concept<indexterm
-     >module</indexterm></indexterm></section>
-  <section id="at1003644"><b>project</b>: [Maven concept] is the smallest unit of software that is
-   built and packaged as a single artefact, with its own build instructions, using Maven. The build
-   rules for the project are represented in the project's POM, and contain all of the project's
-   goals and dependencies.<indexterm>Maven concept<indexterm>project</indexterm></indexterm>
-  </section>
-  <section id="at1003663"><b>POM</b>: [Maven Concept] Maven's Project Object Model file – an XML
-   formatted file containing a project's definition in terms of goals, dependencies and build
-    rules.<indexterm>POM </indexterm><indexterm>Maven concept<indexterm>POM
-   </indexterm></indexterm></section>
-  <section id="at1003683"><b>dependency</b>: [Maven concept]<indexterm>Maven concept<indexterm
-     >dependency </indexterm></indexterm></section>
-  <section id="at1003698"><b>goal</b>: [Maven concept]<indexterm>goal </indexterm><indexterm>Maven
-    concept </indexterm><indexterm>goal</indexterm></section>
-  <section id="at1003714"><b>repository</b>: [concept used by both Maven and Subversion]. A
-   persistent store for holding various sorts of artefacts in a contolled fashion. It supports
-   multiple users, version management, web access. A subversion repository on Collabnet<fn
-    id="at1057225">
-    <xref href="http://www.collab.net" scope="external" format="html">
-     <ph>http://www.collab.net</ph>
-    </xref>
-   </fn><xref href="#topic3/at1057225" scope="local" type="fn" format="dita"/> may be used for
-   storing source code for developers of IHTSDO Workbench IDE components and Maven plugins. A
-   Subversion repository may also be also used by terminology modellers for storing terminology
-   changesets and change history from their IHTSDO Workbench profiles. Maven repositories are used
-   to hold built components (jar files) that are used for constructing executable IHTSDO Workbench
-   IDE bundles, replete with SNOMED and/or other terminology sets within a single
-    database.<indexterm>repository </indexterm><indexterm>Maven concept<indexterm
-     >repository</indexterm></indexterm><indexterm>Subversion </indexterm><indexterm>version
-   </indexterm></section>
-  <section id="at1003734"><b>deploy</b>: [Maven concept] The action of transferring a project's
-   built artefacts from a developer's local Maven repository into a remote master
-    repository.<indexterm>deploy </indexterm><indexterm>Maven concept<indexterm>deploy
+  <title>Key Concepts</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>development</indexterm>
+
+        <indexterm>concepts and definitions</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><b>bundle</b><indexterm>bundle</indexterm>: a collection of
+    artefacts associated or “bundled” together for a single purpose –
+    distribution and installation on customers' desktops. Bundle can also be
+    used as a verb.</section>
+
+    <section><b>package</b><indexterm>package</indexterm>: a collection of
+    associated artefacts “packaged” into a single <i>jar</i><fn
+    id="at1057199"><b>J</b>ava <b>ar</b>chive – a single archive file format
+    from Sun Microsystem's Java initiative. Similar to a <i>zip</i> or other
+    archiving technology. Jar files contain a <i>MANIFEST</i> section of
+    metadata about the archive. </fn><xref format="dita"
+    href="#topic3/at1057199" scope="local" type="fn"/><i> </i>file for version
+    management purposes.</section>
+
+    <section id="at1003629"><b>module</b>: [Maven concept]<indexterm>Maven
+    concept<indexterm>module</indexterm></indexterm></section>
+
+    <section id="at1003644"><b>project</b>: [Maven concept] is the smallest
+    unit of software that is built and packaged as a single artefact, with its
+    own build instructions, using Maven. The build rules for the project are
+    represented in the project's POM, and contain all of the project's goals
+    and dependencies.<indexterm>Maven
+    concept<indexterm>project</indexterm></indexterm></section>
+
+    <section id="at1003663"><b>POM</b>: [Maven Concept] Maven's Project Object
+    Model file – an XML formatted file containing a project's definition in
+    terms of goals, dependencies and build rules.<indexterm>POM
+    </indexterm><indexterm>Maven concept<indexterm>POM
     </indexterm></indexterm></section>
-  <section id="at1003751"><b>install</b>: [Maven concept] A project goal which, when executed,
-   places a built project artefact into the user's local maven repository.
-    Maven checks all project dependencies and, if required, will automatically download or build
-    relevant components of the project.<indexterm>install </indexterm><indexterm>Maven
-    concept <indexterm>deploy</indexterm></indexterm></section>
-  <section id="at1003772"><b>Snapshot</b>: [Maven concept] Unlike stable releases, which are deemed
-   immutable and stay in one or more Maven repositories until no longer supported, <ph
-    >snapshots</ph> can change daily, or even hourly to reflect developer's changes.<indexterm
-    >Snapshot </indexterm><indexterm>Maven </indexterm><indexterm>Maven </indexterm></section>
-  <section id="at1003793"><b>Continuous Integration</b>: When a team of developers is working on a
-   project, the contributions of each member can conflict with those of the others on the team. By
-   frequently integrating and testing individuals' changes into a single system, the risk of
-   divergent or conflicting change is minimised. Organisations can use the IHTSDO Workbench
-    Continuum<fn id="at1057262">
-    <xref href="http://continuum.apache.org/" scope="external" format="html">
-     <ph>http://continuum.apache.org</ph>
-    </xref>
-   </fn><xref href="#topic3/at1057262" scope="local" type="fn" format="dita"/> server to drive Maven
-   builds after source code changes have been committed to the IHTSDO workspace.<indexterm
-    >Continuous Integration </indexterm></section>
- </body>
+
+    <section id="at1003683"><b>dependency</b>: [Maven concept]<indexterm>Maven
+    concept<indexterm>dependency </indexterm></indexterm></section>
+
+    <section id="at1003698"><b>goal</b>: [Maven concept]<indexterm>goal
+    </indexterm><indexterm>Maven concept
+    </indexterm><indexterm>goal</indexterm></section>
+
+    <section id="at1003714"><b>repository</b>: [concept used by both Maven and
+    Subversion]. A persistent store for holding various sorts of artefacts in
+    a contolled fashion. It supports multiple users, version management, web
+    access. A subversion repository on Collabnet<fn id="at1057225"> <xref
+    format="html" href="http://www.collab.net" scope="external">
+    <ph>http://www.collab.net</ph> </xref> </fn><xref format="dita"
+    href="#topic3/at1057225" scope="local" type="fn"/> may be used for storing
+    source code for developers of IHTSDO Workbench IDE components and Maven
+    plugins. A Subversion repository may also be also used by terminology
+    modellers for storing terminology changesets and change history from their
+    IHTSDO Workbench profiles. Maven repositories are used to hold built
+    components (jar files) that are used for constructing executable IHTSDO
+    Workbench IDE bundles, replete with SNOMED and/or other terminology sets
+    within a single database.<indexterm>repository
+    </indexterm><indexterm>Maven
+    concept<indexterm>repository</indexterm></indexterm><indexterm>Subversion
+    </indexterm><indexterm>version </indexterm></section>
+
+    <section id="at1003734"><b>deploy</b>: [Maven concept] The action of
+    transferring a project's built artefacts from a developer's local Maven
+    repository into a remote master repository.<indexterm>deploy
+    </indexterm><indexterm>Maven concept<indexterm>deploy
+    </indexterm></indexterm></section>
+
+    <section id="at1003751"><b>install</b>: [Maven concept] A project goal
+    which, when executed, places a built project artefact into the user's
+    local maven repository. Maven checks all project dependencies and, if
+    required, will automatically download or build relevant components of the
+    project.<indexterm>install </indexterm><indexterm>Maven concept
+    <indexterm>deploy</indexterm></indexterm></section>
+
+    <section id="at1003772"><b>Snapshot</b>: [Maven concept] Unlike stable
+    releases, which are deemed immutable and stay in one or more Maven
+    repositories until no longer supported, <ph>snapshots</ph> can change
+    daily, or even hourly to reflect developer's changes.<indexterm>Snapshot
+    </indexterm><indexterm>Maven </indexterm><indexterm>Maven
+    </indexterm></section>
+
+    <section id="at1003793"><b>Continuous Integration</b>: When a team of
+    developers is working on a project, the contributions of each member can
+    conflict with those of the others on the team. By frequently integrating
+    and testing individuals' changes into a single system, the risk of
+    divergent or conflicting change is minimised. Organisations can use the
+    IHTSDO Workbench's Apache Continuum server to facilitate this.<fn
+    id="at1057262"> <xref format="html" href="http://continuum.apache.org/"
+    scope="external"> <ph>http://continuum.apache.org</ph> </xref> </fn><xref
+    format="dita" href="#topic3/at1057262" scope="local" type="fn"/> server to
+    drive Maven builds after source code changes have been committed to the
+    IHTSDO workspace.<indexterm>Continuous Integration </indexterm></section>
+  </body>
 </topic>

@@ -3,6 +3,9 @@
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/bookmap.dtd">
 <bookmap id="book_workbench_guide">
   <booktitle>
+    <booklibrary><image
+    href="../images/IHTSDO_logohead_full.png"/></booklibrary>
+
     <mainbooktitle>Workbench component: SnoRocket</mainbooktitle>
   </booktitle>
 

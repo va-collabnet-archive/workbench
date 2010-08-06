@@ -1,16 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 <topic id="topic6" xml:lang="en">
- <title>The Terminology Validator Role</title>
- <body>
-  <section>The role of the validator is to analyse the potential updates and changes devised by the
-   terminology modeller(s) and resolve any conflicts that have arisen as part of the Quality
-   Assurance framework. terminology development is undertaken using a dual independent modelling
-   approach, whereby each target concept is modelled in SNOMED by two modellers working
-   independently. The change sets produced by the two modellers are then compared and presented to
-   the validator role. At the time of writing, tool support for this process is still being
-   developed.</section>
- </body>
+  <title>The Terminology Validator Role</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>role<indexterm>reviewer</indexterm><indexterm>validator</indexterm></indexterm>
+
+        <indexterm>validator</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The role of the validator is to analyse the potential updates and
+    changes devised by the terminology modeller(s) and resolve any conflicts
+    that have arisen as part of the Quality Assurance framework. terminology
+    development is undertaken using a dual independent modelling approach,
+    whereby each target concept is modelled in SNOMED by two modellers working
+    independently. The change sets produced by the two modellers are then
+    compared and presented to the validator role. At the time of writing, tool
+    support for this process is still being developed.</section>
+  </body>
 </topic>

@@ -5,6 +5,16 @@
   <topic id="IDE_terminologist" xml:lang="en">
     <title>Terminologist IDE</title>
 
+    <prolog>
+      <author/>
+
+      <metadata>
+        <keywords>
+          <indexterm>terminologist<indexterm>IDE</indexterm></indexterm>
+        </keywords>
+      </metadata>
+    </prolog>
+
     <body>
       <section>The Clinical Terminologist’s IDE can be integrated into the
       CollabNet platform in an equivalent way that software developer’s IDEs
@@ -41,7 +51,7 @@
 
       <section/>
 
-      <section id="ac999683">Australia’s National Center for Classification in
+      <section id="ac999683">Australia’s National Centre for Classification in
       Health (NCCH) has taken the Clinical Terminologist’s IDE and have been
       using it to develop mappings between classification systems and SNOMED,
       and have also been creating SNOMED and classification system extensions
@@ -49,7 +59,7 @@
 
       <section>An example of how NCCH is using the IHTSDO Workbench IDE is
       shown in <xref format="dita" href="#IDE_terminologist/ac999719"
-      type="fig"/>. In this Figure, note that theEmergency Department (ED)
+      type="fig"/>. In this Figure, note that the Emergency Department (ED)
       concept “Blunt injury – heel” shows two relationships of type “map to
       extension.” In this example, the original ED term and meaning needed to
       be preserved, but there was no existing SNOMED CT concept that exactly

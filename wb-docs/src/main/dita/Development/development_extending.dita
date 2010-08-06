@@ -1,24 +1,38 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 <topic id="topic2" xml:lang="en">
- <title>Extending the IHTSDO Workbench IDE programatically</title>
- <body>
-  <section>
-   The IHTSDO Toolkit is
-    based on a predominantly open source infrastructure and built for maximum configuration and
-    customisation by users, to suit their needs and to enable collaborative development of
-    terminologies. Other features of this tooling environment are that it can be adapted, extended,
-    enhanced, and that features and functionality available to users can be re-used, and
-    re-purposed, without having to rely upon vendor capacity, service level agreements, or business
-    development priorities and interests.
-  </section>
-  <section id="at1003567">Although software developers may have their own preferred development
-   methodologies and environments, the approach covered here has evolved and been refined to
-   optimise productivity and distributed development across different operating systems. The key
-   technologies employed are Java; JINI; Eclipse; Maven; Subversion; a versioned object database
-   built on Berkeley DB; install4j; and the IHTSDO Workspace and Maven internet repositories.
-    <indexterm>JINI </indexterm><indexterm>install4j </indexterm></section>
- </body>
+  <title>Extending the IHTSDO Workbench IDE programatically</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>development</indexterm>
+
+        <indexterm>extending</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The IHTSDO Toolkit is based on a predominantly open source
+    infrastructure and built for maximum configuration and customisation by
+    users, to suit their needs and to enable collaborative development of
+    terminologies. Other features of this tooling environment are that it can
+    be adapted, extended, enhanced, and that features and functionality
+    available to users can be re-used, and re-purposed, without having to rely
+    upon vendor capacity, service level agreements, or business development
+    priorities and interests.</section>
+
+    <section id="at1003567">Although software developers may have their own
+    preferred development methodologies and environments, the approach covered
+    here has evolved and been refined to optimise productivity and distributed
+    development across different operating systems. The key technologies
+    employed are Java; JINI; Eclipse; Maven; Subversion; a versioned object
+    database built on Berkeley DB; install4j; and the IHTSDO Workspace and
+    Maven internet repositories. <indexterm>JINI
+    </indexterm><indexterm>install4j </indexterm></section>
+  </body>
 </topic>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="Development" xml:lang="en" title="Development">
+<map id="Development" xml:lang="en-us" title="Development">
  <title>Development</title>
  <topicref href="development_intro.dita#topic1" type="topic"
   navtitle="The IHTSDO Workbench Development Environment">

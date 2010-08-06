@@ -40,7 +40,7 @@
           <row>
             <entry><b>Guidebook Version:</b></entry>
 
-            <entry>1.8</entry>
+            <entry>1.9</entry>
           </row>
 
           <row>
@@ -187,6 +187,16 @@
 
             <entry>menu changes; difference report; revised search criteria;
             revised preferences</entry>
+          </row>
+
+          <row>
+            <entry>1.9</entry>
+
+            <entry>2010-08-12</entry>
+
+            <entry>Eric Browne</entry>
+
+            <entry>classifier example; new arena workarea; </entry>
           </row>
         </tbody>
       </tgroup>

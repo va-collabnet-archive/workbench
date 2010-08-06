@@ -1,21 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Topic//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic1" xml:lang="en">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic1" xml:lang="en-us">
+  <title>Using the IHTSDO Workspace on Collabnet</title>
 
- <title>Using the IHTSDO Workspace on Collabnet</title>
- <body>
-  <section id="ay1069817">Collabnet is a web-based repository and framework for collaborative
-   project development. Informatics Inc. have established ( and manage ) a workspace for e-health
-   projects that use the IHTSDO Workbench IDE and the distributed workflow environment enabled by
-   the IDE. Development Organisations may chose to create and manage a project group within the
-   IHTSDO Workspace, that gives its software developers access to a central source code repository
-   (based on subversion). It also gives both the devel­opers and terminology modellers access to
-   wiki-style project workspaces where project information can be managed, including issue
-   management under various life-cycle phases. The key features and advantages of using Collabnet,
-   both for IHTSDO Workbench terminology development and for extending the IHTSDO Tookit components
-   themselves, are dicussed in <xref href="../Workspace/workspace_intro.dita#topic1" type="topic" format="dita"
-    /><indexterm>subversion </indexterm></section>
-   </body>
+  <body>
+    <section id="ay1069817">Collabnet is a web-based repository and framework
+    for collaborative project development. Informatics Inc. have established (
+    and manage ) a workspace for e-health projects that use the IHTSDO
+    Workbench IDE and the distributed workflow environment enabled by the IDE.
+    Development Organisations may chose to create and manage a project group
+    within the IHTSDO Workspace, that gives its software developers access to
+    a central source code repository (based on subversion). It also gives both
+    the devel­opers and terminology modellers access to wiki-style project
+    workspaces where project information can be managed, including issue
+    management under various life-cycle phases. The key features and
+    advantages of using Collabnet, both for IHTSDO Workbench terminology
+    development and for extending the IHTSDO Toolkit components themselves,
+    are discussed in <xref format="dita"
+    href="../Workspace/workspace_intro.dita#topic1"
+    type="topic"/><indexterm>subversion </indexterm></section>
+  </body>
 </topic>
-

@@ -3,7 +3,7 @@
   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 
 
-<topic id="topic1" xml:lang="en">
+<topic id="topic1" xml:lang="en-us">
  <title>Building an application bundle</title>
  <body>
   <section>An IHTSDO Workbench IDE application bundle is a package of components ready for

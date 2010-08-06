@@ -25,7 +25,7 @@
         file.</p></stepxmp>
 
         <stepresult>The running time for the Classifier can vary substantially
-        from machine to machine. The following graphs were measured run on 2.8
+        from machine to machine. The following graphs were measured on 2.8
         GHz, single Pentium 4, 32-bit Windows XP system with 2.5GB of RAM and
         show the memory usage and CPU usage of time respectively. This
         particular run includes UK Extensions in addition to SNOMED.<fig>

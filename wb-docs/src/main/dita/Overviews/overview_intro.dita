@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="intro" xml:lang="en">
+<topic id="intro" xml:lang="en-us">
   <title>Overview of the IHTSDO Toolkit</title>
 
   <shortdesc>The IHTSDO Workbench Toolkit constitutes a powerful and flexible

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="UsingQueueViewer" xml:lang="en" title="Queue Viewer">
+<map id="UsingQueueViewer" xml:lang="en-us" title="Queue Viewer">
 
  <title>Using the Queue Viewer</title>
  <topicref href="queues_intro.dita#topic1" type="topic" navtitle="Using the Queue Viewer">

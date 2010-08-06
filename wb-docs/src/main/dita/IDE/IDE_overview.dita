@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="IDE_overview" xml:lang="en">
+<topic id="IDE_overview" xml:lang="en-us">
   <title>IHTSDO Workbench and Integrated Development Environments</title>
+
+  <prolog>
+    <author/>
+
+    <metadata>
+      <keywords>
+        <indexterm><indexterm>integration environment</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
 
   <body>
     <section>The IHTSDO Workbench provides proven support for IDE Integration.

@@ -3,7 +3,7 @@
   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 
 
-<topic id="topic1" xml:lang="en">
+<topic id="topic1" xml:lang="en-us">
 <title>Data Import</title>
  <prolog><metadata><keywords><indexterm>Import of termsets</indexterm></keywords></metadata></prolog>
  <body><p>Different user requirements will determine what versions of what terminologies 

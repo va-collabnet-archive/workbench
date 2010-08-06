@@ -2,7 +2,7 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 
-  <topic id="topic1" xml:lang="en">
+  <topic id="topic1" xml:lang="en-us">
     <title>Getting Started with the IHTSDO Workbench IDE</title>
     <body>
       <section>The IHTSDO Workbench IDE and Viewer are quality assurance tools designed to help

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"   "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="BuildingBundle" xml:lang="en" title="Application Bundles">
+<map id="BuildingBundle" xml:lang="en-us" title="Application Bundles">
 
  <title>Application bundles</title>
  <topicref href="bundle_intro.dita#topic1" type="topic" navtitle="Building an application bundle">

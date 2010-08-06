@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="edit_paths" xml:lang="en">
+<topic id="edit_paths" xml:lang="en-us">
   <title>Understanding and using Paths</title>
 
   <prolog>
+    <author>Eric Browne</author>
+
+    <copyright>
+      <copyryear year="2010"/>
+
+      <copyrholder>International Standards Development Organisation (IHTSDO)
+      </copyrholder>
+    </copyright>
+
     <metadata>
       <keywords>
         <indexterm>paths</indexterm>
@@ -65,33 +74,32 @@
     <section><title>Other Paths</title><p>Classifier Path - see <xref
     href="../Classifying/Classifying_intro.dita#topic1"/></p></section>
 
-    <section id="editors_paths"><title>Editors' workflow and
-    paths</title><p>When a new user needs to be configured into a
-    collaborative authoring/editing environment, a number of paths need to be
-    established, usually by a systems administrator, as part of the adding new
-    user process ( see <xref
+    <section><title>Editors' workflow and paths</title><p>When a new user
+    needs to be configured into a collaborative authoring/editing environment,
+    a number of paths need to be established, usually by a systems
+    administrator, as part of the adding new user process ( see <xref
     href="../Admin/Admin_new_user_creation.dita#new_user_creation"/>). The
     following "butterfly"<indexterm>workflow<indexterm>editor's
     paths</indexterm></indexterm> <indexterm>butterfly
     diagram</indexterm>diagram, <xref href="#edit_paths/butterfly_diagram"/>,
     illustrates the paths that might be required to support two independent
     authors editing a terminology and synching and merging their changes into
-    a new version for ultimate release. <fig id="butterfly_diagram">
+    a new version for ultimate release.</p> <fig id="butterfly_diagram">
         <title>"Butterfly" diagram of authors' edits and paths</title>
 
         <image href="../images/Refsets_Images/butterfly4-7-10B-1.jpg"/>
-      </fig></p><p>The working paths of the two authors are <i>Author 1
-    dev,</i> <i>Author 2 dev</i>, <i>Author 1 promote</i>, <i>Author 2
-    promote</i>. The "dev" paths are the respective development paths of each
-    author, kept private to each author. The "promote" paths are the
-    respective paths used to promote the work of each author for sharing. All
-    the underlined paths may need to be established over and above the initial
-    existing paths shipped with the Workbench bundle. The <i>developer
-    template path</i> and the <i>promotion template path</i> are used as the
-    basis for cloning to produce each authors' development and promotion path
-    respectively. The names chosen for these paths are for illustrative
-    purposes only. Change sets produced by each author are labelled, for
-    example, ca1-<i>n</i> for author 1 and are timestamped e.g. <i>@t14</i> to
-    illustrate the sequence of edits by each author.</p></section>
+      </fig> <p>The working paths of the two authors are <i>Author 1 dev,</i>
+    <i>Author 2 dev</i>, <i>Author 1 promote</i>, <i>Author 2 promote</i>. The
+    "dev" paths are the respective development paths of each author, kept
+    private to each author. The "promote" paths are the respective paths used
+    to promote the work of each author for sharing. All the underlined paths
+    may need to be established over and above the initial existing paths
+    shipped with the Workbench bundle. The <i>developer template path</i> and
+    the <i>promotion template path</i> are used as the basis for cloning to
+    produce each authors' development and promotion path respectively. The
+    names chosen for these paths are for illustrative purposes only. Change
+    sets produced by each author are labelled, for example, ca1-<i>n</i> for
+    author 1 and are timestamped e.g. <i>@t14</i> to illustrate the sequence
+    of edits by each author.</p></section>
   </body>
 </topic>

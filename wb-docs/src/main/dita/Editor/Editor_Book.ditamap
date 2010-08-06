@@ -3,6 +3,9 @@
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/bookmap.dtd">
 <bookmap id="book_workbench_guide" xml:lang="en_US">
   <booktitle>
+    <booklibrary><image
+    href="../images/IHTSDO_logohead_full.png"/></booklibrary>
+
     <mainbooktitle>Workbench component: Editor</mainbooktitle>
   </booktitle>
 
@@ -29,11 +32,11 @@
 
     <bookrights>
       <copyrfirst>
-        <year>2009</year>
+        <year>2010</year>
       </copyrfirst>
 
       <!--copyrlast>
-                <year>2009</year>
+                <year>2010</year>
             </copyrlast-->
 
       <bookowner>

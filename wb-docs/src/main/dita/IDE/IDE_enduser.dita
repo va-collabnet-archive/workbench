@@ -5,11 +5,24 @@
   <topic id="IDE_enduser" xml:lang="en">
     <title>End-User IDE</title>
 
+    <prolog>
+      <author/>
+
+      <metadata>
+        <keywords>
+          <indexterm>viewer</indexterm>
+
+          <indexterm>IDE<indexterm>specialised end-user
+          bundles</indexterm></indexterm>
+        </keywords>
+      </metadata>
+    </prolog>
+
     <body>
       <section id="ac1000242">The IHTSDO Workbench IDE can also be configured
       for wide distribution to end-users. For example, the Australian
       Medicine’s Terminology (AMT) v1.4 (and later) viewer is available in a
-      downloadable form from a secure NEHTA website. The data bundled with the
+      downloadable from from a secure NEHTA website. The data bundled with the
       viewer contains SNOMED CT identifiers and therefore requires interested
       stakeholders to have licensed SNOMED CT through NEHTA prior to obtaining
       it for review.<indexterm>SNOMED </indexterm><indexterm>NEHTA

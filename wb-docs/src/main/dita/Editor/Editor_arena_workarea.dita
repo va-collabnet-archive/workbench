@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="arena">
+  <title>The Arena work area</title>
+
+  <prolog>
+    <author/>
+
+    <metadata>
+      <keywords>
+        <indexterm>Arena</indexterm>
+
+        <indexterm>concept<indexterm>editing</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p>In August 2010, the Workbench IDE was enhanced to provide a more
+    efficient work area for concept and refset creation and editing.</p>
+
+    <p>The Arena provides a flexible work area that can be arranged and
+    re-arranged to suit each user's editing workflow tasks and available
+    screen real estate. When toggled on, the Arena takes over the component
+    panel in the right half of the editor and provides a "blank paper"
+    paradigm whereby users can drag and drop concept panes onto the worksheet
+    as they wish, and can pan and zoom the worksheet to best effect their
+    editing tasks. The arena view is toggled from a tab at the top of the
+    right hand component view panel, as shown in <xref
+    href="#arena/arena_overview"/></p>
+
+    <fig id="arena_overview">
+      <title>The Editor's concept editing 'Arena'.</title>
+
+      <image href="../images/arena_images/arena_overview.jpg"/>
+    </fig>
+
+    <p>The arena has three separate subpanels. The right hand side is the work
+    area, where concepts can be dragged from the top of the left hand side.
+    The bottom of the left hand side has a zoom and pan miniview of the work
+    area. Multiple concepts can be viewed simultaneously in the work area.
+    Each concept can have an auxilliary preferences pane and/or a personal
+    taxonomy navigator as shown in <xref href="#arena/arena_layout"/></p>
+
+    <fig id="arena_layout">
+      <title>layout of the Arena</title>
+
+      <image href="../images/arena_images/arena_parts.jpg"/>
+    </fig>
+  </body>
+</topic>

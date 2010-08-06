@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="UsingCollabnet" xml:lang="en" title="Using Collabnet">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="UsingCollabnet" title="Using Collabnet" xml:lang="en-us">
+  <title>Using the Collabnet Workspace</title>
 
- <title>Using the Collabnet Workspace</title>
- <topicref href="collabnet_intro.dita#topic1" type="topic"  navtitle="Using the IHTSDO Workspace on Collabnet">
-  <topicref href="developers_overview.dita#topic1" type="topic"   navtitle="Developer's Overview of Collabnet"> </topicref>
- </topicref>
+  <topicref href="collabnet_intro.dita"
+            navtitle="Using the IHTSDO Workspace on Collabnet" type="topic">
+    <topicref href="developers_overview.dita"
+              navtitle="Developer's Overview of Collabnet" type="topic"/>
+  </topicref>
 </map>

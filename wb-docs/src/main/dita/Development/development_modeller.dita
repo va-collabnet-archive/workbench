@@ -1,27 +1,47 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
 <topic id="topic5" xml:lang="en">
- <title>The Terminology Modeller's Environment</title>
- <body>
-  <section id="at1003939">Terminology modellers need access to various versions of a given
-   terminology. They need tools that support the importation of termsets, the automatic correlation
-   of a given term in their termset of interest to SNOMED or other target terminology. They need the
-   ability to edit the descriptions associated with a given concept, the relationships to other
-   concepts, the ability to deprecate terms, and a host of other functions that the IHTSDO Workbench
-   editor is capable, or might be capable of providing. A simplified view of the modeller's
-   environment is illustrated in Figure 172, “IHTSDO Workbench Terminology Modeller’s Environment”,
-   below. It is important to note that the environment is distributed in both time and space, with
-   modeller's having the ability to work offline and to synchronise their changes with those of
-   others through a master repository that holds changesets. Each modeller's changeset is
-   timestamped and identified as belonging to that modeller. This allows for changes to be uploaded
-   in chunks appropriate to the work practices of them modeller, and for changes to be rolled back
-   if required. It also supports the important principle of dual independent modelling which helps
-   to improve the quality of a terminology.<indexterm>version </indexterm></section>
-  <fig id="at1004088">
-   <title>IHTSDO Workbench Terminology Modeller’s Environment</title>
-   <image href="../images/Developement_Images/development_img_5.jpg" placement="break" width="459"
-    height="322"/>
-  </fig>
- </body>
+  <title>The Terminology Modeller's Environment</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>authoring</indexterm>
+
+        <indexterm>environment</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section id="at1003939">Terminology modellers need access to various
+    versions of a given terminology. They need tools that support the
+    importation of termsets, the automatic correlation of a given term in
+    their termset of interest to SNOMED or other target terminology. They need
+    the ability to edit the descriptions associated with a given concept, the
+    relationships to other concepts, the ability to deprecate terms, and a
+    host of other functions that the IHTSDO Workbench editor is capable, or
+    might be capable of providing. A simplified view of the modeller's
+    environment is illustrated in Figure 172, “IHTSDO Workbench Terminology
+    Modeller’s Environment”, below. It is important to note that the
+    environment is distributed in both time and space, with modeller's having
+    the ability to work offline and to synchronise their changes with those of
+    others through a master repository that holds changesets. Each modeller's
+    changeset is timestamped and identified as belonging to that modeller.
+    This allows for changes to be uploaded in chunks appropriate to the work
+    practices of them modeller, and for changes to be rolled back if required.
+    It also supports the important principle of dual independent modelling
+    which helps to improve the quality of a terminology.<indexterm>version
+    </indexterm></section>
+
+    <fig id="at1004088">
+      <title>IHTSDO Workbench Terminology Modeller’s Environment</title>
+
+      <image href="../images/Developement_Images/development_img_5.jpg"
+             placement="break"/>
+    </fig>
+  </body>
 </topic>
