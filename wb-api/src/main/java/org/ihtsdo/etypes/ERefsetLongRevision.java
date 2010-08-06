@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
 public class ERefsetLongRevision extends TkRefsetLongRevision {
 

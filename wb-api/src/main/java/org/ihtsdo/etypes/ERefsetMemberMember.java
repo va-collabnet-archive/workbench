@@ -9,8 +9,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
+import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 
 public class ERefsetMemberMember extends TkRefsetMember {
 

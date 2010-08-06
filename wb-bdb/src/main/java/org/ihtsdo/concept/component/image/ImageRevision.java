@@ -6,7 +6,7 @@ import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
+import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

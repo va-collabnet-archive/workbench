@@ -32,15 +32,15 @@ import org.ihtsdo.etypes.EImage;
 import org.ihtsdo.etypes.EImageRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.tk.concept.component.TkComponent;
-import org.ihtsdo.tk.concept.component.TkRevision;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.concept.component.media.TkMedia;
-import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
     private int minSapNid = Integer.MIN_VALUE;

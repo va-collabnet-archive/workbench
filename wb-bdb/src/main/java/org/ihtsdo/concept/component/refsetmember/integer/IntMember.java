@@ -20,8 +20,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
+import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

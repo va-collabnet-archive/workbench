@@ -16,7 +16,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
 public class ERefsetStrRevision extends TkRefsetStrRevision {
 

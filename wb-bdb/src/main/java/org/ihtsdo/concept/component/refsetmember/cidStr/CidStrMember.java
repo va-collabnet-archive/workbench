@@ -21,8 +21,8 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

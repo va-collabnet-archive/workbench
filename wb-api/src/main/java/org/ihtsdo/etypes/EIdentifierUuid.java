@@ -7,8 +7,8 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.TkComponent;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifierUuid;
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 public class EIdentifierUuid extends TkIdentifierUuid {
 

@@ -8,8 +8,8 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 public class EDescription extends TkDescription {
     public static final long serialVersionUID = 1;

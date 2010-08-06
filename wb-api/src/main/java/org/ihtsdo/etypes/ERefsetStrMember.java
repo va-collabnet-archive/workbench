@@ -10,8 +10,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 
 public class ERefsetStrMember extends TkRefsetStrMember {
 

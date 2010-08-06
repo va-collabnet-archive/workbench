@@ -43,7 +43,7 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
-import org.ihtsdo.tk.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;

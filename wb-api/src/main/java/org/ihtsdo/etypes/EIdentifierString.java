@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifierString;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 
 public class EIdentifierString extends TkIdentifierString {
 

@@ -31,8 +31,8 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

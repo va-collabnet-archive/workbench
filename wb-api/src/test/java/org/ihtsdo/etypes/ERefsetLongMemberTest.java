@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.concept.component.refset.Long.TkRefsetLongRevision;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

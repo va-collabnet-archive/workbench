@@ -8,8 +8,8 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 
 public class EConceptAttributes extends TkConceptAttributes {
     public static final long serialVersionUID = 1;

@@ -19,8 +19,9 @@ package org.dwfa.ace.api;
 import java.io.IOException;
 
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ComponentBI;
 
-public interface I_AmTermComponent {
+public interface I_AmTermComponent extends ComponentBI {
 
     /**
      * @return The terminology component's identifier

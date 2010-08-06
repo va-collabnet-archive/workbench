@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 
 public class EConceptAttributesRevision extends TkConceptAttributesRevision {
     public static final long serialVersionUID = 1;

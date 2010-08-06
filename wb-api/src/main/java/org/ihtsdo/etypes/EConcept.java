@@ -40,14 +40,14 @@ import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.TkConcept;
-import org.ihtsdo.tk.concept.component.TkComponent;
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.identifier.IDENTIFIER_PART_TYPES;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.concept.component.media.TkMedia;
-import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     public static final long serialVersionUID = 1;

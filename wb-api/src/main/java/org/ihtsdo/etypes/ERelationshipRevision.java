@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 public class ERelationshipRevision extends TkRelationshipRevision {
 

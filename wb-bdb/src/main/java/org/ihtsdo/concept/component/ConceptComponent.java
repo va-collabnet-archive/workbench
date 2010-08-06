@@ -44,8 +44,8 @@ import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.time.TimeUtil;
-import org.ihtsdo.tk.concept.component.TkComponent;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

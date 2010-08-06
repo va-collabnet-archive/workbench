@@ -10,8 +10,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
+import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 
 public class ERefsetIntMember extends TkRefsetIntMember {
 

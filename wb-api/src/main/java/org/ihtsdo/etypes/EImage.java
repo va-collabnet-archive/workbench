@@ -8,8 +8,8 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.media.TkMedia;
-import org.ihtsdo.tk.concept.component.media.TkMediaRevision;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
 public class EImage extends TkMedia {
 

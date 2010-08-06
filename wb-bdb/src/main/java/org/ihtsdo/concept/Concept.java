@@ -67,12 +67,12 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
-import org.ihtsdo.tk.concept.TkConcept;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributes;
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.media.TkMedia;
-import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class Concept implements I_Transact, I_GetConceptData {
 

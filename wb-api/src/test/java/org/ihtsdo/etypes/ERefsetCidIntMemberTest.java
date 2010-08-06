@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

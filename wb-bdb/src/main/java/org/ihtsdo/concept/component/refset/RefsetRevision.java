@@ -4,7 +4,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

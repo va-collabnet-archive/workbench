@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

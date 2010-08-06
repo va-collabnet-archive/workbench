@@ -9,8 +9,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcidflt.TkRefsetCidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 
 public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
 

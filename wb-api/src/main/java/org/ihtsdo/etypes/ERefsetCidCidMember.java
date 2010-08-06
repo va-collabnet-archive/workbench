@@ -10,8 +10,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.concept.component.refset.cidcid.TkRefsetCidCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 
 public class ERefsetCidCidMember extends TkRefsetCidCidMember {
 
