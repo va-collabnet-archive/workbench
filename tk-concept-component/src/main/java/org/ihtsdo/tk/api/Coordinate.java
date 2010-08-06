@@ -8,7 +8,7 @@ public class Coordinate {
 	private NidSetBI   isaTypeNids;
 	
 	public Coordinate(Precedence precedence, PositionBI position,
-			NidSetBI allowedStatusNids, NidSetBI   isaTypeNids) {
+			NidSetBI allowedStatusNids, NidSetBI isaTypeNids) {
 		super();
 		this.precedence = precedence;
 		this.position = position;
