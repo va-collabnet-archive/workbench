@@ -1,0 +1,117 @@
+#created on: Jul 31, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import org.ihtsdo.concept.Concept;
+import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.PRECEDENCE;
+import org.dwfa.ace.api.I_ManageContradiction;
+import org.dwfa.ace.api.I_IntSet;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.concept.component.image.Image;
+
+#declare any global variables here.
+global PathSetReadOnly editPaths;
+global PositionSetReadOnly viewPositions;
+global PRECEDENCE precedence; 
+global I_ManageContradiction contradictionMgr;
+global I_IntSet allowedStatus;
+global I_IntSet allowedDescTypes;
+global I_IntSet allowedSrcRelTypes;
+global I_IntSet allowedMediaTypes;
+ 
+rule "Insert specified versions of attributes, descriptions, relationships, and media."
+	
+	when
+		$c : Concept();
+	then 
+   		for (ConceptAttributes.Version $a : $c.getConceptAttrVersions(allowedStatus, 
+   				  				  				viewPositions, 
+   				  				  				precedence, 
+   				  				  				contradictionMgr)) {
+   		    insert($a);
+		} 	
+		
+   		for (Description.Version $d : $c.getDescriptionVersions(allowedStatus, 
+   												allowedDescTypes,
+   				  				  				viewPositions, 
+   				  				  				precedence, 
+   				  				  				contradictionMgr)) {
+   		    insert($d);
+		} 	
+		
+		for (Relationship.Version $r : $c.getSrcRelVersions(allowedStatus, 
+   												allowedSrcRelTypes,
+   				  				  				viewPositions, 
+   				  				  				precedence, 
+   				  				  				contradictionMgr)) {
+   		    insert($r);
+		} 		
+			
+		for (Image.Version $m : $c.getMediaVersions(allowedStatus, 
+   												allowedMediaTypes,
+   				  				  				viewPositions, 
+   				  				  				precedence, 
+   				  				  				contradictionMgr)) {
+   		    insert($m);
+		} 		
+end
+
+rule "Process ConceptAttributes.Version"
+	
+	when
+		$av : ConceptAttributes.Version();
+	then 
+   		System.out.println("ConceptAttributes.Version found: " + $av.toString());
+		   		
+end
+
+rule "Process Description.Version"
+	
+	when
+		$dv : Description.Version();
+	then 
+   		System.out.println("Description.Version found: " + $dv.toString());
+		   		
+end
+
+rule "Process FSN"
+	
+	when
+		$dv : Description.Version();
+	then 
+   		System.out.println("Description.Version found: " + $dv.toString());
+		   		
+end
+
+rule "Process duplicate text in Description.Version"
+	
+	when
+		$dv : Description.Version($text1: text);
+		$dv2 : Description.Version(this != $dv, $text2: text);
+		eval($text1 != $text2);
+	then 
+   		System.out.println("Duplicate text for: " + $dv.getDescId() + 
+   					" & " + $dv2.getDescId() + " text: " + $dv.getText());
+end
+
+rule "Process Relationship.Version"
+	
+	when
+		$rv : Relationship.Version();
+	then 
+   		System.out.println("Relationship.Version found: " + $rv.toString());
+		   		
+end
+
+rule "Process Image.Version"
+	
+	when
+		$mv : Image.Version();
+	then 
+   		System.out.println("Image.Version found: " + $mv.toString());
+		   		
+end

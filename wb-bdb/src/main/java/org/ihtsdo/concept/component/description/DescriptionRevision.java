@@ -21,6 +21,7 @@ public class DescriptionRevision
 	extends Revision<DescriptionRevision, Description> 
 	implements I_DescriptionPart {
 	
+	@SuppressWarnings("unused")
 	private static Charset utf8 = Charset.forName("UTF-8");
 	
 	private String text;

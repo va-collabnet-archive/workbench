@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+
 public interface I_DescriptionTuple extends I_AmTypedTuple {
 
     public boolean isInitialCaseSignificant();

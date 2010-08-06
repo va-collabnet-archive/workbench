@@ -1854,7 +1854,7 @@ public class VersionDiff extends AbstractMojo {
 				getLog().info("Position: " + position);
 				getLog().info("Version: " + position.getVersion());
 				I_GetConceptData position_con = tf.getConcept(position
-						.getPath().getConceptId());
+						.getPath().getConceptNid());
 				getLog().info("         " + position_con.getInitialText());
 				getLog().info("         " + position_con.getUids().get(0));
 			}

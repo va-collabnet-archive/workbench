@@ -30,18 +30,12 @@ import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
 public class TkConcept {
     public static final long serialVersionUID = 1;
 
-    public static final int dataVersion = 3;
+    public static final int dataVersion = 4;
     public TkConceptAttributes conceptAttributes;
     public List<TkDescription> descriptions;
     public List<TkRelationship> relationships;
-    public List<TkMedia> images;
+    public List<TkMedia> media;
     public List<TkRefsetAbstractMember<?>> refsetMembers;
-    public List<UUID> destRelUuidTypeUuids;
-    public List<UUID> refsetUuidMemberUuidForConcept;
-    public List<UUID> refsetUuidMemberUuidForDescriptions;
-    public List<UUID> refsetUuidMemberUuidForRels;
-    public List<UUID> refsetUuidMemberUuidForImages;
-    public List<UUID> refsetUuidMemberUuidForRefsetMembers;
     public UUID primordialUuid;
     
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
@@ -80,9 +74,9 @@ public class TkConcept {
         }
         int imgCount = in.readInt();
         if (imgCount > 0) {
-            images = new ArrayList<TkMedia>(imgCount);
+            media = new ArrayList<TkMedia>(imgCount);
             for (int i = 0; i < imgCount; i++) {
-                images.add(new TkMedia(in, readDataVersion));
+                media.add(new TkMedia(in, readDataVersion));
             }
         }
         int refsetMemberCount = in.readInt();
@@ -132,53 +126,13 @@ public class TkConcept {
                 }
             }
         }
-        int destRelNidTypeNidsCount = in.readInt();
-        if (destRelNidTypeNidsCount > 0) {
-        	destRelUuidTypeUuids = new ArrayList<UUID>(
-        			destRelNidTypeNidsCount);
-        	for (int i = 0; i < destRelNidTypeNidsCount; i++) {
-        		destRelUuidTypeUuids.add(new UUID(in.readLong(), in.readLong()));
-        	}
-        }
-        int refsetUuidMemberUuidForConceptCount = in.readInt();
-        if (refsetUuidMemberUuidForConceptCount > 0) {
-        	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForConceptCount);
-        	for (int i = 0; i < refsetUuidMemberUuidForConceptCount; i++) {
-        		refsetUuidMemberUuidForConcept.add(new UUID(in.readLong(), in.readLong()));
-        	}
-        }
-        int refsetUuidMemberUuidForDescsCount = in.readInt();
-        if (refsetUuidMemberUuidForDescsCount > 0) {
-        	refsetUuidMemberUuidForDescriptions = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForDescsCount);
-        	for (int i = 0; i < refsetUuidMemberUuidForDescsCount; i++) {
-        		refsetUuidMemberUuidForDescriptions.add(new UUID(in.readLong(), in.readLong()));
-        	}
-        }
-        int refsetUuidMemberUuidForRelsCount = in.readInt();
-        if (refsetUuidMemberUuidForRelsCount > 0) {
-        	refsetUuidMemberUuidForRels = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForRelsCount);
-        	for (int i = 0; i < refsetUuidMemberUuidForRelsCount; i++) {
-        		refsetUuidMemberUuidForRels.add(new UUID(in.readLong(), in.readLong()));
-        	}
-        }
-        int refsetUuidMemberUuidForImagesCount = in.readInt();
-        if (refsetUuidMemberUuidForImagesCount > 0) {
-        	refsetUuidMemberUuidForImages = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForImagesCount);
-        	for (int i = 0; i < refsetUuidMemberUuidForImagesCount; i++) {
-        		refsetUuidMemberUuidForImages.add(new UUID(in.readLong(), in.readLong()));
-        	}
-        }
-        int refsetUuidMemberUuidForRefsetMembersCount = in.readInt();
-        if (refsetUuidMemberUuidForRefsetMembersCount > 0) {
-        	refsetUuidMemberUuidForRefsetMembers = new ArrayList<UUID>(
-        			refsetUuidMemberUuidForRefsetMembersCount);
-        	for (int i = 0; i < refsetUuidMemberUuidForRefsetMembersCount; i++) {
-        		refsetUuidMemberUuidForRefsetMembers.add(new UUID(in.readLong(), in.readLong()));
-        	}
+        if (readDataVersion < 4) {
+            in.readInt(); //destRelNidTypeNidsCount
+            in.readInt(); //refsetUuidMemberUuidForConceptCount
+            in.readInt(); //refsetUuidMemberUuidForDescsCount
+            in.readInt(); //refsetUuidMemberUuidForRelsCount
+            in.readInt(); //refsetUuidMemberUuidForImagesCount
+            in.readInt(); //refsetUuidMemberUuidForRefsetMembersCount
         }
     }
 
@@ -211,11 +165,11 @@ public class TkConcept {
                 r.writeExternal(out);
             }
         }
-        if (images == null) {
+        if (media == null) {
             out.writeInt(0);
         } else {
-            out.writeInt(images.size());
-            for (TkMedia img : images) {
+            out.writeInt(media.size());
+            for (TkMedia img : media) {
                 img.writeExternal(out);
             }
         }
@@ -226,72 +180,6 @@ public class TkConcept {
             for (TkRefsetAbstractMember<?> r : refsetMembers) {
                 r.getType().writeType(out);
                 r.writeExternal(out);
-            }
-        }
-        if (destRelUuidTypeUuids == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(destRelUuidTypeUuids.size());
-            assert destRelUuidTypeUuids.size() % 2 == 0: 
-            	"Illegal size: " + destRelUuidTypeUuids.size();
-            for (UUID uuid : destRelUuidTypeUuids) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-            }
-        }
-        if (refsetUuidMemberUuidForConcept == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(refsetUuidMemberUuidForConcept.size());
-            assert refsetUuidMemberUuidForConcept.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForConcept.size();
-            for (UUID uuid : refsetUuidMemberUuidForConcept) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-            }
-        }
-        if (refsetUuidMemberUuidForDescriptions == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(refsetUuidMemberUuidForDescriptions.size());
-            assert refsetUuidMemberUuidForDescriptions.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForDescriptions.size();
-            for (UUID uuid : refsetUuidMemberUuidForDescriptions) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-            }
-        }
-        if (refsetUuidMemberUuidForRels == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(refsetUuidMemberUuidForRels.size());
-            assert refsetUuidMemberUuidForRels.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForRels.size();
-            for (UUID uuid : refsetUuidMemberUuidForRels) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-            }
-        }
-        if (refsetUuidMemberUuidForImages == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(refsetUuidMemberUuidForImages.size());
-            assert refsetUuidMemberUuidForImages.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForImages.size();
-            for (UUID uuid : refsetUuidMemberUuidForImages) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-            }
-        }
-        if (refsetUuidMemberUuidForRefsetMembers == null) {
-            out.writeInt(0);
-        } else {
-            out.writeInt(refsetUuidMemberUuidForRefsetMembers.size());
-            assert refsetUuidMemberUuidForRefsetMembers.size() % 2 == 0: 
-            	"Illegal size: " + refsetUuidMemberUuidForRefsetMembers.size();
-            for (UUID uuid : refsetUuidMemberUuidForRefsetMembers) {
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
             }
         }
     }
@@ -329,11 +217,11 @@ public class TkConcept {
     }
 
     public List<TkMedia> getImages() {
-        return images;
+        return media;
     }
 
     public void setImages(List<TkMedia> images) {
-        this.images = images;
+        this.media = images;
     }
 
     public void setConceptAttributes(TkConceptAttributes conceptAttributes) {
@@ -357,55 +245,11 @@ public class TkConcept {
         buff.append(this.relationships);
         buff.append("\n   RefsetMembers: \n\t");
         buff.append(this.refsetMembers);
-        buff.append("\n   Images: \n\t");
-        buff.append(this.images);
-        buff.append("\n   destRelUuidTypeUuids: \n\t");
-        buff.append(this.destRelUuidTypeUuids);
-        buff.append("\n   refsetUuidMemberUuidForConcept: \n\t");
-        buff.append(this.refsetUuidMemberUuidForConcept);
-        buff.append("\n   refsetUuidMemberUuidForDescriptions: \n\t");
-        buff.append(this.refsetUuidMemberUuidForDescriptions);
-        buff.append("\n   refsetUuidMemberUuidForRels: \n\t");
-        buff.append(this.refsetUuidMemberUuidForRels);
-        buff.append("\n   refsetUuidMemberUuidForImages: \n\t");
-        buff.append(this.refsetUuidMemberUuidForImages);
+        buff.append("\n   Media: \n\t");
+        buff.append(this.media);
         return buff.toString();
     }
 
-	public List<UUID> getDestRelUuidTypeUuids() {
-		return destRelUuidTypeUuids;
-	}
-
-	public void setDestRelUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
-		this.destRelUuidTypeUuids = destRelOriginUuidTypeUuids;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForConcept() {
-		return refsetUuidMemberUuidForConcept;
-	}
-
-	public void setRefsetUuidMemberUuidForConcept(
-			List<UUID> refsetUuidMemberUuidForConcept) {
-		this.refsetUuidMemberUuidForConcept = refsetUuidMemberUuidForConcept;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForDescriptions() {
-		return refsetUuidMemberUuidForDescriptions;
-	}
-
-	public void setRefsetUuidMemberUuidForDescriptions(
-			List<UUID> refsetUuidMemberUuidForDescriptions) {
-		this.refsetUuidMemberUuidForDescriptions = refsetUuidMemberUuidForDescriptions;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForRels() {
-		return refsetUuidMemberUuidForRels;
-	}
-
-	public void setRefsetUuidMemberUuidForRels(
-			List<UUID> refsetUuidMemberUuidForRels) {
-		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
-	}
 	
     /**
      * Returns a hash code for this <code>EConcept</code>.
@@ -461,12 +305,12 @@ public class TkConcept {
                 return false;
             }
             // Compare Images
-            if (this.images == null) {
-                if (another.images == null) { // Equal!
-                } else if (another.images.size() == 0) { // Equal!
+            if (this.media == null) {
+                if (another.media == null) { // Equal!
+                } else if (another.media.size() == 0) { // Equal!
                 } else
                     return false;
-            } else if (!this.images.equals(another.images)) {
+            } else if (!this.media.equals(another.media)) {
                 return false;
             }
             // Compare Refset Members
@@ -478,66 +322,11 @@ public class TkConcept {
             } else if (!this.refsetMembers.equals(another.refsetMembers)) {
                 return false;
             }
-            // Compare destRelUuidTypeUuids
-            if (this.destRelUuidTypeUuids == null) {
-                if (another.destRelUuidTypeUuids == null) { // Equal!
-                } else if (another.destRelUuidTypeUuids.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.destRelUuidTypeUuids.equals(another.destRelUuidTypeUuids)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForConcept
-            if (this.refsetUuidMemberUuidForConcept == null) {
-                if (another.refsetUuidMemberUuidForConcept == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForConcept.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForConcept.equals(another.refsetUuidMemberUuidForConcept)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForDescriptions
-            if (this.refsetUuidMemberUuidForDescriptions == null) {
-                if (another.refsetUuidMemberUuidForDescriptions == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForDescriptions.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForDescriptions.equals(another.refsetUuidMemberUuidForDescriptions)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForRels
-            if (this.refsetUuidMemberUuidForRels == null) {
-                if (another.refsetUuidMemberUuidForRels == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForRels.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForRels.equals(another.refsetUuidMemberUuidForRels)) {
-                return false;
-            }
-
             // If none of the previous comparisons fail, the objects must be equal
             return true;
         }
         return false;
     }
-
-	public List<UUID> getRefsetUuidMemberUuidForImages() {
-		return refsetUuidMemberUuidForImages;
-	}
-
-	public void setRefsetUuidMemberUuidForImages(
-			List<UUID> refsetUuidMemberUuidForImages) {
-		this.refsetUuidMemberUuidForImages = refsetUuidMemberUuidForImages;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForRefsetMembers() {
-		return refsetUuidMemberUuidForRefsetMembers;
-	}
-
-	public void setRefsetUuidMemberUuidForRefsetMembers(
-			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
-		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
-	}
 
 	public UUID getPrimordialUuid() {
 		return primordialUuid;

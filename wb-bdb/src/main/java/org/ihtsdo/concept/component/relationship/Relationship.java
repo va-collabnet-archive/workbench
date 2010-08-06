@@ -128,15 +128,23 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int getTypeId() {
+	public int getTypeNid() {
 		if (index >= 0) {
+			assert revisions.get(index).getTypeId() != Integer.MAX_VALUE: Relationship.this;
 			return revisions.get(index).getTypeId();
 		} else {
-			return Relationship.this.getTypeNid();
+			assert Relationship.this.typeNid != Integer.MAX_VALUE: Relationship.this;
+			return Relationship.this.typeNid;
 		}
 	}
-
+	@Override
+	public int getTypeId() {
+		return getTypeNid();
+	}
+	
+	public Concept getType() throws IOException {
+		return Bdb.getConcept(getTypeNid());
+	}
 	@Override
 	public void setTypeId(int type) {
 		if (index >= 0) {
@@ -197,6 +205,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		throw new UnsupportedOperationException("Use makeAnalog instead");
 	}
 
+	public int getC1Nid() {
+		return getEnclosingConcept().getNid();
+	}
+
+	public int getC2Nid() {
+		return c2Nid;
+	}
 	}
 	
 	private static VersionComputer<Relationship.Version> computer = 
@@ -399,12 +414,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		throw new UnsupportedOperationException();
 	}
 
-	private void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Version> matchingTuples, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
-		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples,
-				getTuples(), precedencePolicy, contradictionManager);
-	}
-
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
         List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
         computer.addSpecifiedVersions(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), specifiedVersions,
@@ -426,6 +435,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 						  boolean returnConflictResolvedLatestState)
 			throws TerminologyException, IOException {
 		throw new UnsupportedOperationException("Use a method that specified the config");
+	}
+
+	public Collection<Relationship.Version> getVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
+				returnTuples, getVersions(), precedence, contradictionMgr);
+		return returnTuples;
 	}
 
 	public boolean addVersion(I_RelPart part) {
@@ -539,7 +557,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
-        int viewPathId = viewPosition.getPath().getConceptId();
+        int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.
         	getSpecifiedVersions(allowedStatus, 
         			viewPosition, 
@@ -725,5 +743,4 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 		return false;
 	}
-
 }

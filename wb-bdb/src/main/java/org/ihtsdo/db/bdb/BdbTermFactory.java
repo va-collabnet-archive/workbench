@@ -1108,7 +1108,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_Path newPath(Collection<I_Position> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
+    public I_Path newPath(Collection<? extends I_Position> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException {
         assert pathConcept != null && pathConcept.getConceptId() != 0;
         ArrayList<I_Position> originList = new ArrayList<I_Position>();

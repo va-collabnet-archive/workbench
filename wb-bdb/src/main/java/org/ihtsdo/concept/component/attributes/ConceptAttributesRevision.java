@@ -5,7 +5,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.I_ConceptualizeExternally;
+import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

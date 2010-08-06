@@ -1,26 +1,45 @@
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.Precedence;
+
+/**
+ * Left as a transitional compatibility class. Eventually we need 
+ * to migrate to org.ihtsdo.tk.api.Precedence in all api calls.  
+ * @author kec
+ *
+ */
 public enum PRECEDENCE {
     
-    TIME("time precedence","<html>If two versions are both on a route to the destination, the version with the later time has higher precedence."),
-    PATH("path precedence","<html>If two versions are both on route to the destination, but one version is on a path that is closer to the destination, " +
-        "the version on the closer path has higher precedence.<br><br>If two versions are on the same path, the version with the later time has higher precedence.");
+    TIME(Precedence.TIME),
+    PATH(Precedence.PATH);
     
-    private String label;
-    private String description;
+    private Precedence tkp;
     
-    private PRECEDENCE(String label, String description) {
-        this.label = label;
-        this.description = description;
+    private PRECEDENCE(Precedence tkp) {
+    	this.tkp = tkp;
     }
 
     public String getDescription() {
-        return description;
+        return tkp.getDescription();
     }
 
     @Override
     public String toString() {
-        return label;
+        return tkp.toString();
+    }
+    
+    public Precedence getTkPrecedence() {
+    	return tkp;
     }
 
+    public static PRECEDENCE get(Precedence p) {
+    	switch (p) {
+		case PATH:
+			return PATH;
+		case TIME:
+			return TIME;
+		default:
+			throw new RuntimeException("can't handle " + p);
+		}
+    }
 }

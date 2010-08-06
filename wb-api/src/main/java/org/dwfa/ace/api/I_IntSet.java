@@ -19,23 +19,13 @@ package org.dwfa.ace.api;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-public interface I_IntSet extends ListDataListener {
+import org.ihtsdo.tk.api.NidSetBI;
 
-    public boolean contains(int key);
+public interface I_IntSet extends ListDataListener, NidSetBI {
 
-    public int[] getSetValues();
+    public I_IntSet addAll(int[] nids);
 
-    public void add(int key);
-
-    public void remove(int key);
-
-    public I_IntSet addAll(int[] keys);
-
-    public void removeAll(int[] keys);
-
-    public void clear();
-
-    public void contentsChanged(ListDataEvent e);
+	public void contentsChanged(ListDataEvent e);
 
     public void intervalAdded(ListDataEvent e);
 
@@ -44,11 +34,5 @@ public interface I_IntSet extends ListDataListener {
     public boolean addListDataListener(ListDataListener o);
 
     public boolean removeListDataListener(ListDataListener o);
-
-	public int size();
-
-	int getMax();
-
-	int getMin();
 
 }

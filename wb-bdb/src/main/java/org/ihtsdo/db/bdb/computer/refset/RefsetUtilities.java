@@ -422,7 +422,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 	/**
 	 * Adds a particular concept to the member set.
 	 * 
-	 * @param conceptId
+	 * @param conceptNid
 	 *            the concept id of the concept we wish to add to the member
 	 *            set.
 	 * @param includeTypeConceptId

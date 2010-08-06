@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.I_DescribeExternally;
+import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 import org.ihtsdo.tk.concept.component.TkComponent;
 
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {

@@ -160,7 +160,7 @@ public class GetRefsetVersionPanelDataTask extends AbstractTask {
 
                         for (I_Position position : positionSet) {
                             try {
-                                I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptId());
+                                I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptNid());
 
                                 universalPositions.add(new UniversalAcePosition(
                                     termFactory.getUids(pathConcept.getConceptId()),

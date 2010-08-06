@@ -47,11 +47,4 @@
 			<version>2.9.1</version>
 		</dependency>
 	</dependencies>
-	<build>
-		<resources>
-			<resource>
-				<directory>./TextFiles</directory>
-			</resource>
-		</resources>
-     </build>
 </project>

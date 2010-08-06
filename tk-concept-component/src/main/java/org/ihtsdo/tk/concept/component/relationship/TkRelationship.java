@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.tk.api.ext.I_RelateExternally;
 import org.ihtsdo.tk.concept.component.TkComponent;
 
-public class TkRelationship extends TkComponent<TkRelationshipRevision> {
+public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
 
     public static final long serialVersionUID = 1;
 
@@ -71,6 +72,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         }
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC1Uuid()
+	 */
     public UUID getC1Uuid() {
         return c1Uuid;
     }
@@ -79,6 +83,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         this.c1Uuid = c1Uuid;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC2Uuid()
+	 */
     public UUID getC2Uuid() {
         return c2Uuid;
     }
@@ -87,6 +94,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         this.c2Uuid = c2Uuid;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getCharacteristicUuid()
+	 */
     public UUID getCharacteristicUuid() {
         return characteristicUuid;
     }
@@ -95,6 +105,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         this.characteristicUuid = characteristicUuid;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRefinabilityUuid()
+	 */
     public UUID getRefinabilityUuid() {
         return refinabilityUuid;
     }
@@ -103,6 +116,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         this.refinabilityUuid = refinabilityUuid;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelGroup()
+	 */
     public int getRelGroup() {
         return relGroup;
     }
@@ -115,6 +131,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> {
         return revisions;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getTypeUuid()
+	 */
     public UUID getTypeUuid() {
         return typeUuid;
     }

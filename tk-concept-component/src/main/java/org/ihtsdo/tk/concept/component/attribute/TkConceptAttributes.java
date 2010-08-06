@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ihtsdo.tk.I_ConceptualizeExternally;
+import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.concept.component.TkComponent;
 
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision> implements I_ConceptualizeExternally {

@@ -46,13 +46,13 @@ public class Path implements I_Path {
 	 */
     private static final long serialVersionUID = 1L;
 
-    int conceptId;
+    int conceptNid;
 
     Set<I_Position> origins;
 
     public Path(int conceptId, List<I_Position> origins) {
         super();
-        this.conceptId = conceptId;
+        this.conceptNid = conceptId;
         if (origins != null) {
             this.origins = new HashSet<I_Position>(origins);
         } else {
@@ -61,7 +61,7 @@ public class Path implements I_Path {
     }
 
     public boolean equals(I_Path another) {
-        return (conceptId == another.getConceptId());
+        return (conceptNid == another.getConceptId());
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Path implements I_Path {
 
     @Override
     public int hashCode() {
-        return conceptId;
+        return conceptNid;
     }
 
     /*
@@ -86,7 +86,10 @@ public class Path implements I_Path {
      * @see org.dwfa.vodb.types.I_Path#getConceptId()
      */
     public int getConceptId() {
-        return conceptId;
+        return conceptNid;
+    }
+    public int getConceptNid() {
+        return conceptNid;
     }
 
     /*
@@ -123,7 +126,7 @@ public class Path implements I_Path {
         Set<I_Position> normalisedOrigins = new HashSet<I_Position>(inheritedOrigins);
         for (I_Position a : inheritedOrigins) {
             for (I_Position b : inheritedOrigins) {
-                if ((a.getPath().getConceptId() == b.getPath().getConceptId()) && (a.getVersion() < b.getVersion())) {
+                if ((a.getPath().getConceptNid()) == b.getPath().getConceptNid() && (a.getVersion() < b.getVersion())) {
                     normalisedOrigins.remove(a);
                 }
             }
@@ -137,7 +140,7 @@ public class Path implements I_Path {
      * @see org.dwfa.vodb.types.I_Path#getMatchingPath(int)
      */
     public I_Path getMatchingPath(int pathId) {
-        if (conceptId == pathId) {
+        if (conceptNid == pathId) {
             return this;
         }
         for (I_Position origin : origins) {
@@ -177,7 +180,7 @@ public class Path implements I_Path {
      * )
      */
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-        conceptId = jarToDbNativeMap.get(conceptId);
+        conceptNid = jarToDbNativeMap.get(conceptNid);
         for (I_Position origin : origins) {
             origin.getPath().convertIds(jarToDbNativeMap);
         }
@@ -187,9 +190,9 @@ public class Path implements I_Path {
              List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
             for (I_Position position : origins) {
                 universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
-                    position.getPath().getConceptId()), Terms.get().convertToThickVersion(position.getVersion())));
+                    position.getPath().getConceptNid()), Terms.get().convertToThickVersion(position.getVersion())));
             }
-            return new UniversalAcePath(Terms.get().nativeToUuid(conceptId), universalOrigins);
+            return new UniversalAcePath(Terms.get().nativeToUuid(conceptNid), universalOrigins);
     }
 
     public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {

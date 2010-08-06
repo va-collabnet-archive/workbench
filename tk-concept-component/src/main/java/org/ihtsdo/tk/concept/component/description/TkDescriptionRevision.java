@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.ihtsdo.tk.I_DescribeExternally;
+import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 import org.ihtsdo.tk.concept.component.TkRevision;
 
 public class TkDescriptionRevision extends TkRevision implements I_DescribeExternally {

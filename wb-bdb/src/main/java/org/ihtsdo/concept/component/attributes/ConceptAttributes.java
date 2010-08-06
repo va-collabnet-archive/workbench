@@ -359,6 +359,16 @@ public class ConceptAttributes
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples,
 				getVersions(), precedencePolicy, contradictionManager);
 	}
+	
+	public Collection<Version> getVersions(I_IntSet allowedStatus, 
+			PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(allowedStatus, viewPositions,
+				returnTuples, getVersions(), precedence, contradictionMgr);
+		return returnTuples;
+	}
+
 
 	public List<Version> getTuples(I_IntSet allowedStatus,
 			I_Position viewPosition, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
@@ -372,7 +382,7 @@ public class ConceptAttributes
 
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly promotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
-		int viewPathId = viewPosition.getPath().getConceptId();
+		int viewPathId = viewPosition.getPath().getConceptNid();
 		boolean promotedAnything = false;
 		for (I_Path promotionPath : promotionPaths) {
 			for (Version version : getTuples(allowedStatus,

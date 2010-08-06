@@ -7,16 +7,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-import org.ihtsdo.tk.I_VersionExternally;
+import org.ihtsdo.tk.api.ext.I_VersionExternally;
 
 public class TkRevision implements I_VersionExternally {
 
     public static final long serialVersionUID = 1;
     
-    public static UUID nidToUuid(int nid) {
-    	throw new UnsupportedOperationException();
-    }
-
     public UUID statusUuid;
     public UUID authorUuid;
     public UUID pathUuid;

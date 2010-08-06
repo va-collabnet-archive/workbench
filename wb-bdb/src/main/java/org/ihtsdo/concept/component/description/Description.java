@@ -129,17 +129,10 @@ public class Description
 			
 		}
 
-		@Override
 		public int getTypeId() {
-			if (index >= 0) {
-				assert revisions.get(index).getTypeId() != Integer.MAX_VALUE: Description.this;
-				return revisions.get(index).getTypeId();
-			} else {
-				assert Description.this.typeNid != Integer.MAX_VALUE: Description.this;
-				return Description.this.typeNid;
-			}
+			return typeNid;
 		}
-
+		
 		@Override
 		public void setTypeId(int type) {
 			if (index >= 0) {
@@ -187,8 +180,7 @@ public class Description
 		@Deprecated
 		public I_DescriptionPart duplicate() {
 			throw new UnsupportedOperationException("Use makeAnalog instead");
-		}
-		
+		}		
 	}
 	
 	private String text;
@@ -355,6 +347,10 @@ public class Description
 		return enclosingConceptNid;
 	}
 
+	public Concept getConcept() {
+		return getEnclosingConcept();
+	}
+
 	@Override
 	public int getDescId() {
 		return nid;
@@ -473,6 +469,15 @@ public class Description
 		matchingTuples.addAll(returnTuples);
 	}
 
+	public Collection<Description.Version> getVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
+				returnTuples, getVersions(), precedence, contradictionMgr);
+		return returnTuples;
+	}
+
 	public String getText() {
 		return text;
 	}
@@ -568,7 +573,7 @@ public class Description
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
-        int viewPathId = viewPosition.getPath().getConceptId();
+        int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.
         	getSpecifiedVersions(allowedStatus, 
         			viewPosition, 

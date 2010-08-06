@@ -219,7 +219,7 @@ public interface I_TermFactory {
 
     I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException;
 
-    I_Path newPath(Collection<I_Position> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
+    I_Path newPath(Collection<? extends I_Position> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException;
 
     I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException;

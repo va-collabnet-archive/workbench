@@ -203,7 +203,7 @@ public class TestEPath_New extends AbstractTask {
             for (I_Position p1 : thisLevel) {
                 for (I_Position p2 : p1.getPath().getOrigins())
                     if ((origins.contains(p2) == false)
-                            && (p2.getPath().getConceptId() != workbenchAuxPath)) {
+                            && (p2.getPath().getConceptNid() != workbenchAuxPath)) {
                         origins.add(p2);
                         nextLevel.add(p2);
                     }
@@ -273,7 +273,7 @@ public class TestEPath_New extends AbstractTask {
                 I_RelPart rPart1 = null;
                 for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
-                        if (pos.getPath().getConceptId() == rPart.getPathId()) {
+                        if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                             if (rPart1 == null) {
                                 rPart1 = rPart; // ... KEEP FIRST_INSTANCE
                             } else if (rPart1.getVersion() < rPart.getVersion()) {

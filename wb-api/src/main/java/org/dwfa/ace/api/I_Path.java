@@ -22,12 +22,13 @@ import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
-public interface I_Path {
+public interface I_Path extends PathBI {
 
     public int getConceptId();
 
-    public Collection<I_Position> getOrigins();
+    public Collection<? extends I_Position> getOrigins();
 
     /**
      * Get all origins and origin of origins, etc., for this path.

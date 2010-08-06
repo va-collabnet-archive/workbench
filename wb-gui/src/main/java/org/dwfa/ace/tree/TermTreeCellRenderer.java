@@ -227,7 +227,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 }
 
                                 for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
-                                    if (viewPosition.getPath().getConceptId() == cb.getConceptId()) {
+                                    if (viewPosition.getPath().getConceptNid() == cb.getConceptId()) {
                                         String version =
                                                 ThinVersionHelper.format(viewPosition.getVersion(),
                                                     MAX_VALUE_TYPE.LATEST);
@@ -235,7 +235,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             .add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
                                     }
                                     for (I_Position origin : viewPosition.getPath().getNormalisedOrigins()) {
-                                        if (origin.getPath().getConceptId() == cb.getConceptId()) {
+                                        if (origin.getPath().getConceptNid() == cb.getConceptId()) {
                                             if ((latestInheritedViewPosition == null)
                                                 || (origin.getVersion() > latestInheritedViewPosition.getVersion())) {
                                                 latestInheritedViewPosition = origin;

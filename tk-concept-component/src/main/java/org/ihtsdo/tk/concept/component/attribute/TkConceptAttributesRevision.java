@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.ihtsdo.tk.I_ConceptualizeExternally;
+import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.concept.component.TkRevision;
 
 public class TkConceptAttributesRevision extends TkRevision implements I_ConceptualizeExternally {

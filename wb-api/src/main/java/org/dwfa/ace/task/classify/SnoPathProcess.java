@@ -148,7 +148,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         I_ConceptAttributePart cPart1 = null;
         for (I_Position pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER
             for (I_ConceptAttributePart cPart : cParts) {
-                if (pos.getPath().getConceptId() == cPart.getPathId()) {
+                if (pos.getPath().getConceptNid() == cPart.getPathId()) {
                     if (cPart1 == null) {
                         cPart1 = cPart; // ...... KEEP FIRST INSTANCE
                     } else if (cPart1.getVersion() < cPart.getVersion()) {
@@ -215,7 +215,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
             I_RelPart rPart1 = null;
             for (I_Position pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER
                 for (I_RelPart rPart : rel.getMutableParts()) {
-                    if (pos.getPath().getConceptId() == rPart.getPathId()) {
+                    if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                         if (rPart1 == null) {
                             rPart1 = rPart; // ... KEEP FIRST_INSTANCE
                         } else if (rPart1.getVersion() < rPart.getVersion()) {

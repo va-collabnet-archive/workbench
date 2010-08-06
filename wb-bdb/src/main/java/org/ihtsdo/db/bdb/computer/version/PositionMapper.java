@@ -293,7 +293,7 @@ public class PositionMapper {
 		if (Bdb.getConceptDb() == null) {
 			return;
 		}
-		Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptId());
+		Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptNid());
         String pathDesc = pathConcept.getPrimUuid().toString(); 
         if (pathConcept.getDescriptions() != null && pathConcept.getDescriptions().size() > 0) {
             pathDesc = pathConcept.getDescriptions().iterator().next().getText();
@@ -313,7 +313,7 @@ public class PositionMapper {
                                 " thread: " + Thread.currentThread().getName());
 				}
 				Collection<I_Position> origins = 
-					pathManager.getAllPathOrigins(destination.getPath().getConceptId());
+					pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
 				origins.add(this.destination);
 
 				// Map of the origin position's path id, to the origin position... See
@@ -328,10 +328,10 @@ public class PositionMapper {
 				// (including itself).
 				TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
 				for (I_Position o : origins) {
-					originMap.put(o.getPath().getConceptId(), o);
-					depthMap.put(o.getPath().getConceptId(),
+					originMap.put(o.getPath().getConceptNid(), o);
+					depthMap.put(o.getPath().getConceptNid(),
 							getDepth(o, destination, 1));
-					precedingPathIdMap.put(o.getPath().getConceptId(),
+					precedingPathIdMap.put(o.getPath().getConceptNid(),
 							getPreceedingPathSet(o));
 				}
 
@@ -346,15 +346,15 @@ public class PositionMapper {
 				for (int p1index = 0; p1index < positionCount; p1index++) {
 					try {
                         I_Position p1 = Bdb.getSapDb().getPosition(p1index);
-                        Integer p1pathId = p1.getPath().getConceptId();
+                        Integer p1pathId = p1.getPath().getConceptNid();
                         Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
                         // see if position may be in route to the destination
                         if (originMap.containsKey(p1pathId)) {
                         	// compute the distance to the destination
                         	BigInteger pathDepth = depthMap
-                        			.get(p1.getPath().getConceptId());
+                        			.get(p1.getPath().getConceptNid());
 
-                        	if (destination.getPath().getConceptId() == p1.getPath()
+                        	if (destination.getPath().getConceptNid() == p1.getPath()
                         			.getConceptId()) {
                         		// On the same path as the destination...
                         		if (p1.getTime() <= destination.getTime()) {
@@ -376,7 +376,7 @@ public class PositionMapper {
                         		for (int p2index = 0; p2index < positionCount; p2index++) {
                         			I_Position p2 = Bdb.getSapDb()
                         					.getPosition(p2index);
-                        			Integer p2pathId = p2.getPath().getConceptId();
+                        			Integer p2pathId = p2.getPath().getConceptNid();
                         			if (originMap.containsKey(p2pathId)
                         					&& p2.getTime() <= originMap.get(p2pathId)
                         							.getTime()) {
@@ -481,7 +481,7 @@ public class PositionMapper {
 	 */
 	private Set<Integer> getPreceedingPathSetRecursion(I_Position path,
 			Set<Integer> preceedingPaths) {
-		preceedingPaths.add(path.getPath().getConceptId());
+		preceedingPaths.add(path.getPath().getConceptNid());
 		for (I_Position origin : path.getPath().getOrigins()) {
 			getPreceedingPathSetRecursion(origin, preceedingPaths);
 		}
@@ -503,7 +503,7 @@ public class PositionMapper {
 	 */
 	private BigInteger getDepth(I_Position testPath, I_Position depthFinder,
 			int depthSeed) {
-		if (testPath.getPath().getConceptId() == depthFinder.getPath()
+		if (testPath.getPath().getConceptNid() == depthFinder.getPath()
 				.getConceptId()) {
 			return BigInteger.valueOf(depthSeed);
 		}

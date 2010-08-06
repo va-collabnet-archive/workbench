@@ -30,6 +30,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.drools.EditPanelKb;
 
 public class ConceptView extends JPanel {
 
@@ -41,15 +42,19 @@ public class ConceptView extends JPanel {
 	private I_ConfigAceFrame config;
 
 	private ConceptViewSettings settings;
+	
+	private EditPanelKb kb;
 
 	public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
 		super();
 		this.config = config;
 		this.settings = settings;
+		kb = new EditPanelKb(config);
 	}
 	
 	
 	public void layoutConcept(I_GetConceptData concept) {
+		kb.setConcept(concept);
 		this.removeAll();
 		this.setLayout(new GridBagLayout());
 		if (concept != null) {

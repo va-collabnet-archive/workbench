@@ -782,7 +782,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         s.append("\r\n::: [SnorocketTaskExp] PATH ID -- " + pStr);
         try {
             for (I_Position position : pathPos) {
-                s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptId() + "\tVersion:\t"
+                s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptNid() + "\tVersion:\t"
                     + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUniversal());
             }
         } catch (IOException e) {

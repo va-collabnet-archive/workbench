@@ -360,7 +360,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-					origin.getPath().getConceptId()).with(
+					origin.getPath().getConceptNid()).with(
 					RefsetPropertyMap.REFSET_PROPERTY.INTEGER_VALUE,
 					origin.getVersion());
 			if (refsetHelper.hasCurrentRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
@@ -373,14 +373,14 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			// version (time) point
 
 			propMap = new RefsetPropertyMap().with(
-					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin
-							.getPath().getConceptId());
+					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin.
+							getPath().getConceptNid());
 			refsetHelper.retireRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
 					.getConceptId(), propMap);
 
 			propMap = new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-					origin.getPath().getConceptId()).with(
+					origin.getPath().getConceptNid()).with(
 					RefsetPropertyMap.REFSET_PROPERTY.INTEGER_VALUE,
 					origin.getVersion());
 			// Create the new origin/position
@@ -404,8 +404,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 			RefsetHelper refsetHelper = helperGetter.get(config);
 			refsetHelper.retireRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
 					.getConceptId(), new RefsetPropertyMap().with(
-					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin
-							.getPath().getConceptId()));
+					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin.
+					getPath().getConceptNid()));
 			path.getOrigins().remove(origin);
             pathMap.put(path.getConceptId(), (Path) path);
 
@@ -422,7 +422,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
         for (Path p: pathMap.values()) {
             if (p.getOrigins() != null) {
                 for (I_Position origin: p.getOrigins()) {
-                    if (origin.getPath().getConceptId() == nid) {
+                    if (origin.getPath().getConceptNid() == nid) {
                         children.add(p);
                     }
                 }

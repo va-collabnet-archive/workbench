@@ -152,7 +152,7 @@ public class EConceptExternalizableTest {
         
         
         // Add Images  
-        testConcept.images = new ArrayList<TkMedia>(1);
+        testConcept.media = new ArrayList<TkMedia>(1);
         EImage img = new EImage();
         img.conceptUuid = new UUID(120, 130);
         img.format = "jpg";
@@ -164,7 +164,7 @@ public class EConceptExternalizableTest {
         img.authorUuid = UUID.randomUUID();
         img.time = System.currentTimeMillis(); 
         img.primordialUuid = new UUID(206, 305);
-        testConcept.images.add(img);
+        testConcept.media.add(img);
         img.revisions = new ArrayList<TkMediaRevision>();
         // Image Versions 
         EImageRevision iv = new EImageRevision();

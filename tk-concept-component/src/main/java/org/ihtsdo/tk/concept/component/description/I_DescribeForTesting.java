@@ -1,7 +1,7 @@
 package org.ihtsdo.tk.concept.component.description;
 
 import org.ihtsdo.tk.I_AddCommonTestingProps;
-import org.ihtsdo.tk.I_DescribeExternally;
+import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 
 public interface I_DescribeForTesting extends I_DescribeExternally,
 		I_AddCommonTestingProps {

@@ -81,7 +81,7 @@ public class KindOfSpec {
 	}
 	@Override
 	public int hashCode() {
-		return HashFunction.hashCode(new int[] {kindNid, viewPosition.getPath().getConceptId()});
+		return HashFunction.hashCode(new int[] {kindNid, viewPosition.getPath().getConceptNid()});
 	}
 	
 	public PositionSetReadOnly getViewPositionSet() {

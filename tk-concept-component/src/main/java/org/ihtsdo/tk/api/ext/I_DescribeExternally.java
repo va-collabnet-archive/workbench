@@ -1,6 +1,7 @@
-package org.ihtsdo.tk;
+package org.ihtsdo.tk.api.ext;
 
 import java.util.UUID;
+
 
 public interface I_DescribeExternally extends I_VersionExternally {
 

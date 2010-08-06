@@ -38,6 +38,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class Position implements I_Position {
 
@@ -101,9 +102,9 @@ public class Position implements I_Position {
         return checkAntecedentOrEqualToOrigins(path.getOrigins(), version, pathId);
     }
 
-    private boolean checkSubsequentOrEqualToOrigins(Collection<I_Position> origins, int testVersion, int testPathId) {
-        for (I_Position origin : origins) {
-            if (testPathId == origin.getPath().getConceptId()) {
+    private boolean checkSubsequentOrEqualToOrigins(Collection<? extends PositionBI> origins, int testVersion, int testPathId) {
+        for (PositionBI origin : origins) {
+            if (testPathId == origin.getPath().getConceptNid()) {
                 return origin.getVersion() >= testVersion;
             } else if (checkSubsequentOrEqualToOrigins(origin.getPath().getOrigins(), testVersion, testPathId)) {
                 return true;
@@ -112,9 +113,9 @@ public class Position implements I_Position {
         return false;
     }
 
-    private boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins, int testVersion, int testPathId) {
-        for (I_Position origin : origins) {
-            if (testPathId == origin.getPath().getConceptId()) {
+    private boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins, int testVersion, int testPathId) {
+        for (PositionBI origin : origins) {
+            if (testPathId == origin.getPath().getConceptNid()) {
                 return origin.getVersion() <= testVersion;
             } else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins(), testVersion, testPathId)) {
                 return true;
@@ -130,11 +131,11 @@ public class Position implements I_Position {
      * org.dwfa.vodb.types.I_Position#isAntecedentOrEqualTo(org.dwfa.vodb.types
      * .Position)
      */
-    public boolean isAntecedentOrEqualTo(I_Position another) {
+    public boolean isAntecedentOrEqualTo(PositionBI another) {
         if (equals(another)) {
             return true;
         }
-        if (path.getConceptId() == another.getPath().getConceptId()) {
+        if (path.getConceptId() == another.getPath().getConceptNid()) {
             return version <= another.getVersion();
         }
         return checkAntecedentOrEqualToOrigins(another.getPath().getOrigins());
@@ -147,9 +148,9 @@ public class Position implements I_Position {
      * org.dwfa.vodb.types.I_Position#checkAntecedentOrEqualToOrigins(java.util
      * .List)
      */
-    public boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins) {
-        for (I_Position origin : origins) {
-            if (path.getConceptId() == origin.getPath().getConceptId()) {
+    public boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins) {
+        for (PositionBI origin : origins) {
+            if (path.getConceptId() == origin.getPath().getConceptNid()) {
                 return version <= origin.getVersion();
             } else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins())) {
                 return true;
@@ -165,7 +166,7 @@ public class Position implements I_Position {
      * org.dwfa.vodb.types.I_Position#isSubsequentOrEqualTo(org.dwfa.vodb.types
      * .I_Position)
      */
-    public boolean isSubsequentOrEqualTo(I_Position another) {
+    public boolean isSubsequentOrEqualTo(PositionBI another) {
         return another.isAntecedentOrEqualTo(this);
     }
 

@@ -58,6 +58,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
@@ -65,6 +66,7 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.ConceptVersionBI;
 
 /**
  * Classifier Normal Form (Label Format) Panel
@@ -534,6 +536,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public boolean hasExtensions() {
             return false;
         }
+
     }
 
     /**
@@ -1521,7 +1524,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 int tmpCountDupl = 0;
                 for (I_ConceptAttributePart cp : cvList) {
                     // FIND MOST RECENT
-                    if (cp.getPathId() == pos.getPath().getConceptId()) {
+                    if (cp.getPathId() == pos.getPath().getConceptNid()) {
                         if (cp1 == null) {
                             cp1 = cp; // ... KEEP FIRST_INSTANCE PART
                         } else if (cp1.getVersion() < cp.getVersion()) {

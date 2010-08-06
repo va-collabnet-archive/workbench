@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.RelationshipChronicleBI;
+
 public interface I_RelTuple extends I_AmTypedTuple {
 
     public int getC1Id();

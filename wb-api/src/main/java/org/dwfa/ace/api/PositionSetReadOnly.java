@@ -34,7 +34,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 		if (positionSet != null) {
 			this.positions = positionSet.toArray(this.positions);
 	        for (I_Position p: positionSet) {
-	            pathNids.add(p.getPath().getConceptId());
+	            pathNids.add(p.getPath().getConceptNid());
 	        }
 		}
 	}
@@ -42,7 +42,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 	public PositionSetReadOnly(I_Position viewPosition) {
 		if (viewPosition != null) {
 			positions = new I_Position[] { viewPosition};
-			pathNids.add(viewPosition.getPath().getConceptId());
+			pathNids.add(viewPosition.getPath().getConceptNid());
 		}
 	}
 

@@ -18,26 +18,12 @@ package org.dwfa.ace.api;
 
 import java.util.Collection;
 
-public interface I_Position {
+import org.ihtsdo.tk.api.PositionBI;
+
+public interface I_Position  extends PositionBI {
+
+    public Collection<? extends I_Position> getAllOrigins();
 
     public I_Path getPath();
-
-    public int getVersion();
-
-    public long getTime();
-
-    public boolean isSubsequentOrEqualTo(int version, int pathId);
-
-    public boolean isAntecedentOrEqualTo(int version, int pathId);
-
-    public boolean isAntecedentOrEqualTo(I_Position another);
-
-    public boolean checkAntecedentOrEqualToOrigins(Collection<I_Position> origins);
-
-    public boolean isSubsequentOrEqualTo(I_Position another);
-
-    public boolean equals(int version, int pathId);
-
-    public Collection<I_Position> getAllOrigins();
 
 }

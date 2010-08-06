@@ -18,7 +18,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
     public static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 3;
+    private static final int dataVersion = 4;
 
     public UUID primordialUuid;
 

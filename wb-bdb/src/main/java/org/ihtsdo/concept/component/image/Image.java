@@ -416,6 +416,15 @@ public class Image
 		matchingTuples.addAll(returnTuples);
 	}
 
+	public Collection<Image.Version> getVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
+				returnTuples, getVersions(), precedence, contradictionMgr);
+		return returnTuples;
+	}
+
 	private static Collection<UUID> getUids(int id) throws IOException,
 			TerminologyException {
 		return LocalFixedTerminology.getStore().getUids(id);
@@ -441,7 +450,7 @@ public class Image
 
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
-		int viewPathId = viewPosition.getPath().getConceptId();
+		int viewPathId = viewPosition.getPath().getConceptNid();
 		List<Version> matchingTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, 
 				getTuples(), precedence, null);

@@ -351,11 +351,56 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getDescriptions();
 	}
 
-	public ComponentList<Relationship> getSourceRels() throws IOException {
+	public Collection<Description.Version> getDescriptionVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
 		if (isCanceled()) {
-			return new ComponentList<Relationship>(new ArrayList<Relationship>());
+			return new ComponentList<Description.Version>(new ArrayList<Description.Version>());
 		}
-		return data.getSourceRels();
+		Collection<Description> descriptions = getDescriptions();
+		List<Description.Version> versions = new ArrayList<Version>(descriptions.size());
+		for (Description d: descriptions) {
+			versions.addAll(d.getVersions(allowedStatus, 
+					allowedTypes, viewPositions,  
+					precedence, contradictionMgr));
+		}
+		return versions;
+	}
+
+	public Collection<Relationship.Version> getSrcRelVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+		if (isCanceled()) {
+			return new ComponentList<Relationship.Version>(new ArrayList<Relationship.Version>());
+		}
+		Collection<Relationship> rels = getNativeSourceRels();
+		List<Relationship.Version> versions = new ArrayList<Relationship.Version>(rels.size());
+		for (Relationship r: rels) {
+			versions.addAll(r.getVersions(allowedStatus, 
+					allowedTypes, viewPositions,  
+					precedence, contradictionMgr));
+		}
+		return versions;
+	}
+
+	public Collection<Image.Version> getMediaVersions(I_IntSet allowedStatus, 
+			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+		if (isCanceled()) {
+			return new ComponentList<Image.Version>(new ArrayList<Image.Version>());
+		}
+		Collection<Image> media = getImages();
+		List<Image.Version> versions = new ArrayList<Image.Version>(media.size());
+		for (Image m: media) {
+			versions.addAll(m.getVersions(allowedStatus, 
+					allowedTypes, viewPositions,  
+					precedence, contradictionMgr));
+		}
+		return versions;
+	}
+
+	public ComponentList<Relationship> getSourceRels() throws IOException {
+		return getNativeSourceRels();
 	}
 
 	public ComponentList<Relationship> getNativeSourceRels() throws IOException {
@@ -454,6 +499,20 @@ public class Concept implements I_Transact, I_GetConceptData {
 		}
 		return null;
 	}
+
+	public Collection<ConceptAttributes.Version> getConceptAttrVersions(I_IntSet allowedStatus, 
+			PositionSetReadOnly viewPositions,  
+			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+		if (isCanceled()) {
+			return new ComponentList<ConceptAttributes.Version>(new ArrayList<ConceptAttributes.Version>());
+		}
+		List<ConceptAttributes.Version> versions = new ArrayList<ConceptAttributes.Version>(2);
+			versions.addAll(getConceptAttributes().getVersions(allowedStatus, 
+					viewPositions,  
+					precedence, contradictionMgr));
+		return versions;
+	}
+	
 
 	public ArrayList<ConceptAttributes> getConceptAttributesList()
 			throws IOException {

@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -17,7 +15,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -277,29 +274,6 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         super();
     }
     
-    private static Map<Integer, Set<I_ExtendByRef>> componentRefsetMap;
-    
-    private void initComponentRefsetMap() throws IOException, TerminologyException {
-    	componentRefsetMap = new HashMap<Integer, Set<I_ExtendByRef>>();
-    	addMembersToMap(RefsetAuxiliary.Concept.PATH_ORIGIN.localize().getNid());
-    	addMembersToMap(RefsetAuxiliary.Concept.REFSET_PATHS.localize().getNid());
-    	addMembersToMap(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid());
-    	addMembersToMap(ArchitectonicAuxiliary.Concept.PATH.localize().getNid());
-		System.out.println("component refset map: " + componentRefsetMap);
-    }
-
-	private void addMembersToMap(int nid) throws IOException {
-		for (I_ExtendByRef member: Terms.get().getRefsetExtensionMembers(nid)) {
-			System.out.println("adding to map: " + member);
-			Set<I_ExtendByRef> set = componentRefsetMap.get(member.getComponentId());
-			if (set == null) {
-				set = new HashSet<I_ExtendByRef>();
-				componentRefsetMap.put(member.getComponentId(), set);
-			}
-			set.add(member);
-    	}
-	}
-
     public EConcept(I_ConceptualizeLocally cNoHx, 
     		I_StoreLocalFixedTerminology mts) throws IOException, TerminologyException {
     	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
@@ -354,9 +328,6 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
 	 * @throws TerminologyException
 	 */
     public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
-    	if (componentRefsetMap == null) {
-    		initComponentRefsetMap();
-    	}
         conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
         EConcept.convertId(c.getIdentifier(), conceptAttributes);
         relationships = new ArrayList<TkRelationship>(c.getSourceRels().size());
@@ -367,14 +338,14 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         for (I_DescriptionVersioned desc : c.getDescriptions()) {
             descriptions.add(new EDescription(desc));
         }
-        images = new ArrayList<TkMedia>(c.getImages().size());
+        media = new ArrayList<TkMedia>(c.getImages().size());
         for (I_ImageVersioned img : c.getImages()) {
             EImage eImage = new EImage(img);
             if (eImage.getTime() == Long.MIN_VALUE) {
                 eImage.setTime(this.conceptAttributes.getTime());
                 // Fixup for a data issue.
             }
-            images.add(eImage);
+            media.add(eImage);
         }
         Collection<? extends I_ExtendByRef> members = getRefsetMembers(c.getNid());
         if (members != null) {
@@ -388,105 +359,14 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
                 }
             }
         }
-
-        Collection<? extends I_ExtendByRef> conceptMembers = componentRefsetMap.get(c.getNid());
-        if (conceptMembers != null) {
-        	ArrayList<TkRefsetAbstractMember<?>> refsetMemberForComponent = new ArrayList<TkRefsetAbstractMember<?>>(conceptMembers.size());
-        	refsetUuidMemberUuidForConcept = new ArrayList<UUID>(refsetMemberForComponent.size() * 2);
-        	for (I_ExtendByRef m : conceptMembers) {
-        		assert m.getComponentId() == c.getNid() : 
-        			"getRefsetMembersForComponent query error: componentId: " + m.getComponentId() + 
-        			" conceptId: " + c.getNid();
-                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-                refsetUuidMemberUuidForConcept.add(refsetUuid);
-                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
-                refsetUuidMemberUuidForConcept.add(memberUuid);
-            }
-        }
-
-        Collection<I_ExtendByRef> descriptionMembers = 
-        	new ArrayList<I_ExtendByRef>();
-        for (I_DescriptionVersioned desc: c.getDescriptions()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(desc.getNid());
-        	if (componentMembers != null) {
-        		descriptionMembers.addAll(componentMembers);
-        	}
-        }
-        if (descriptionMembers.size() > 0) {
-        	refsetUuidMemberUuidForDescriptions = 
-        		new ArrayList<UUID>(descriptionMembers.size() * 2);
-        	for (I_ExtendByRef m : descriptionMembers) {
-        		System.out.println("Found description extension: " + m + " for component: " + this);
-                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-                refsetUuidMemberUuidForDescriptions.add(refsetUuid);
-                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
-                refsetUuidMemberUuidForDescriptions.add(memberUuid);
-            }
-        }
-
-        Collection<I_ExtendByRef> relMembers = 
-        	new ArrayList<I_ExtendByRef>();
-        for (I_RelVersioned r: c.getSourceRels()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(r.getNid());
-        	if (componentMembers != null) {
-        		relMembers.addAll(componentMembers);
-        	}
-        }
-        if (relMembers.size() > 0) {
-        	refsetUuidMemberUuidForRels = new ArrayList<UUID>(relMembers.size() * 2);
-        	for (I_ExtendByRef m : relMembers) {
-        		System.out.println("Found rel extension: " + m + " for component: " + this);
-                UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-                refsetUuidMemberUuidForRels.add(refsetUuid);
-                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
-                refsetUuidMemberUuidForRels.add(memberUuid);
-            }
-        }
-        
-        Collection<I_ExtendByRef> imageMembers = 
-        	new ArrayList<I_ExtendByRef>();
-        for (I_ImageVersioned img: c.getImages()) {
-        	Collection<? extends I_ExtendByRef> componentMembers = 
-        		componentRefsetMap.get(img.getNid());
-        	if (componentMembers != null) {
-        		imageMembers.addAll(componentMembers);
-        	}
-        }
-        
-        if (imageMembers.size() > 0) {
-        	refsetUuidMemberUuidForImages = new ArrayList<UUID>(relMembers.size() * 2);
-        	for (I_ExtendByRef m : imageMembers) {
-        		System.out.println("Found image extension: " + m + " for component: " + this);
-        		UUID refsetUuid = Terms.get().nidToUuid(m.getRefsetId());
-                refsetUuidMemberUuidForImages.add(refsetUuid);
-                UUID memberUuid = Terms.get().nidToUuid(m.getNid());
-                refsetUuidMemberUuidForImages.add(memberUuid);
-            }
-        }
-        
-        destRelUuidTypeUuids = new ArrayList<UUID>();
-        for (I_RelVersioned r: c.getDestRels()) {
-            UUID relUuid = Terms.get().nidToUuid(r.getNid());
-            HashSet<UUID> typesAdded = new HashSet<UUID>();
-            for (I_RelPart p: r.getMutableParts()) {
-                UUID typeUuid = Terms.get().nidToUuid(p.getTypeId());
-                if (!typesAdded.contains(typeUuid)) {
-                    destRelUuidTypeUuids.add(relUuid);            	
-                    destRelUuidTypeUuids.add(typeUuid);
-                    typesAdded.add(typeUuid);
-                }
-            }
-        }
     }
     
 	public List<TkMedia> getImages() {
-        return images;
+        return media;
     }
 
     public void setImages(List<TkMedia> images) {
-        this.images = images;
+        this.media = images;
     }
 
     public void setConceptAttributes(EConceptAttributes conceptAttributes) {
@@ -510,55 +390,10 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
         buff.append(this.relationships);
         buff.append("\n   RefsetMembers: \n\t");
         buff.append(this.refsetMembers);
-        buff.append("\n   Images: \n\t");
-        buff.append(this.images);
-        buff.append("\n   destRelUuidTypeUuids: \n\t");
-        buff.append(this.destRelUuidTypeUuids);
-        buff.append("\n   refsetUuidMemberUuidForConcept: \n\t");
-        buff.append(this.refsetUuidMemberUuidForConcept);
-        buff.append("\n   refsetUuidMemberUuidForDescriptions: \n\t");
-        buff.append(this.refsetUuidMemberUuidForDescriptions);
-        buff.append("\n   refsetUuidMemberUuidForRels: \n\t");
-        buff.append(this.refsetUuidMemberUuidForRels);
-        buff.append("\n   refsetUuidMemberUuidForImages: \n\t");
-        buff.append(this.refsetUuidMemberUuidForImages);
+        buff.append("\n   Media: \n\t");
+        buff.append(this.media);
         return buff.toString();
     }
-
-	public List<UUID> getDestRelUuidTypeUuids() {
-		return destRelUuidTypeUuids;
-	}
-
-	public void setDestRelUuidTypeUuids(List<UUID> destRelOriginUuidTypeUuids) {
-		this.destRelUuidTypeUuids = destRelOriginUuidTypeUuids;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForConcept() {
-		return refsetUuidMemberUuidForConcept;
-	}
-
-	public void setRefsetUuidMemberUuidForConcept(
-			List<UUID> refsetUuidMemberUuidForConcept) {
-		this.refsetUuidMemberUuidForConcept = refsetUuidMemberUuidForConcept;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForDescriptions() {
-		return refsetUuidMemberUuidForDescriptions;
-	}
-
-	public void setRefsetUuidMemberUuidForDescriptions(
-			List<UUID> refsetUuidMemberUuidForDescriptions) {
-		this.refsetUuidMemberUuidForDescriptions = refsetUuidMemberUuidForDescriptions;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForRels() {
-		return refsetUuidMemberUuidForRels;
-	}
-
-	public void setRefsetUuidMemberUuidForRels(
-			List<UUID> refsetUuidMemberUuidForRels) {
-		this.refsetUuidMemberUuidForRels = refsetUuidMemberUuidForRels;
-	}
 	
     /**
      * Returns a hash code for this <code>EConcept</code>.
@@ -582,115 +417,8 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (EConcept.class.isAssignableFrom(obj.getClass())) {
-            EConcept another = (EConcept) obj;
-            
-            // =========================================================
-            // Compare properties of 'this' class to the 'another' class
-            // =========================================================
-            // Compare ConceptAttributes
-            if (this.conceptAttributes == null) {
-                if (this.conceptAttributes != another.conceptAttributes)
-                    return false;
-            } else if (!this.conceptAttributes.equals(another.conceptAttributes)) {
-                return false;
-            }
-            // Compare Descriptions
-            if (this.descriptions == null) {
-                if (another.descriptions == null) { // Equal!
-                } else if (another.descriptions.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.descriptions.equals(another.descriptions)) {
-                return false;
-            }
-            // Compare Relationships
-            if (this.relationships == null) {
-                if (another.relationships == null) { // Equal!
-                } else if (another.relationships.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.relationships.equals(another.relationships)) {
-                return false;
-            }
-            // Compare Images
-            if (this.images == null) {
-                if (another.images == null) { // Equal!
-                } else if (another.images.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.images.equals(another.images)) {
-                return false;
-            }
-            // Compare Refset Members
-            if (this.refsetMembers == null) {
-                if (another.refsetMembers == null) { // Equal!
-                } else if (another.refsetMembers.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetMembers.equals(another.refsetMembers)) {
-                return false;
-            }
-            // Compare destRelUuidTypeUuids
-            if (this.destRelUuidTypeUuids == null) {
-                if (another.destRelUuidTypeUuids == null) { // Equal!
-                } else if (another.destRelUuidTypeUuids.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.destRelUuidTypeUuids.equals(another.destRelUuidTypeUuids)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForConcept
-            if (this.refsetUuidMemberUuidForConcept == null) {
-                if (another.refsetUuidMemberUuidForConcept == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForConcept.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForConcept.equals(another.refsetUuidMemberUuidForConcept)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForDescriptions
-            if (this.refsetUuidMemberUuidForDescriptions == null) {
-                if (another.refsetUuidMemberUuidForDescriptions == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForDescriptions.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForDescriptions.equals(another.refsetUuidMemberUuidForDescriptions)) {
-                return false;
-            }
-            // Compare refsetUuidMemberUuidForRels
-            if (this.refsetUuidMemberUuidForRels == null) {
-                if (another.refsetUuidMemberUuidForRels == null) { // Equal!
-                } else if (another.refsetUuidMemberUuidForRels.size() == 0) { // Equal!
-                } else
-                    return false;
-            } else if (!this.refsetUuidMemberUuidForRels.equals(another.refsetUuidMemberUuidForRels)) {
-                return false;
-            }
-
-            // If none of the previous comparisons fail, the objects must be equal
-            return true;
-        }
-        return false;
+        return super.equals(obj);
     }
-
-	public List<UUID> getRefsetUuidMemberUuidForImages() {
-		return refsetUuidMemberUuidForImages;
-	}
-
-	public void setRefsetUuidMemberUuidForImages(
-			List<UUID> refsetUuidMemberUuidForImages) {
-		this.refsetUuidMemberUuidForImages = refsetUuidMemberUuidForImages;
-	}
-
-	public List<UUID> getRefsetUuidMemberUuidForRefsetMembers() {
-		return refsetUuidMemberUuidForRefsetMembers;
-	}
-
-	public void setRefsetUuidMemberUuidForRefsetMembers(
-			List<UUID> refsetUuidMemberUuidForRefsetMembers) {
-		this.refsetUuidMemberUuidForRefsetMembers = refsetUuidMemberUuidForRefsetMembers;
-	}
 
 	public UUID getPrimordialUuid() {
 		return primordialUuid;

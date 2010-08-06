@@ -316,7 +316,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	public boolean promote(I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
 			throws IOException, TerminologyException {
-        int viewPathId = viewPosition.getPath().getConceptId();
+        int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = 
         	getVersionComputer().getSpecifiedVersions(allowedStatus, 
         			viewPosition, 
