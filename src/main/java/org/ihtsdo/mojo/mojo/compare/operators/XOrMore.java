@@ -29,8 +29,8 @@ public class XOrMore implements CompareOperator {
     public boolean compare(List<Match> matches) {
         HashSet<Integer> uniqueset = new HashSet<Integer>();
         for (Match m : matches) {
-            uniqueset.add(m.getPath1().getPath().getConceptId());
-            uniqueset.add(m.getPath2().getPath().getConceptId());
+            uniqueset.add(m.getPath1().getPath().getConceptNid());
+            uniqueset.add(m.getPath2().getPath().getConceptNid());
         }
 
         return uniqueset.size() >= x;

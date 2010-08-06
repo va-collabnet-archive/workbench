@@ -1148,17 +1148,6 @@ public class SctSiToEConceptMojo extends AbstractMojo implements Serializable {
             ca.revisions = null;
         ec.setConceptAttributes(ca);
 
-        if (relDestList == null)
-            ec.setDestRelUuidTypeUuids(null);
-        else {
-            List<UUID> destRelOriginUuidTypeUuids = new ArrayList<UUID>(relDestList.size() * 2);
-            Collections.sort(relDestList);
-            for (SctXRelDestRecord r : relDestList) {
-                destRelOriginUuidTypeUuids.add(new UUID(r.uuidMostSigBits, r.uuidLeastSigBits));
-                destRelOriginUuidTypeUuids.add(lookupRoleType(r.roleType));
-            }
-            ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids);
-        }
 
         // ADD DESCRIPTIONS
         if (desList != null) {

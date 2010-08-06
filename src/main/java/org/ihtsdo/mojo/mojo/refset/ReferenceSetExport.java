@@ -600,7 +600,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      */
     boolean checkPath(int pathId) {
         for (I_Position position : positions) {
-            if (position.getPath().getConceptId() == pathId) {
+            if (position.getPath().getConceptNid() == pathId) {
                 return true;
             }
         }

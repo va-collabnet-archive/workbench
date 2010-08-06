@@ -3015,19 +3015,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
             ca.revisions = null;
         ec.setConceptAttributes(ca);
 
-        if (relDestList == null)
-            ec.setDestRelUuidTypeUuids(null);
-        else {
-            // [Relationship_UUID, RoleType_UUID] Pairs
-            List<UUID> destRelOriginUuidTypeUuids = new ArrayList<UUID>(relDestList.size() * 2);
-            Collections.sort(relDestList);
-            for (SctYRelDestRecord r : relDestList) {
-                destRelOriginUuidTypeUuids.add(new UUID(r.relUuidMsb, r.relUuidLsb));
-                destRelOriginUuidTypeUuids.add(lookupRoleType(r.roleTypeIdx));
-            }
-            ec.setDestRelUuidTypeUuids(destRelOriginUuidTypeUuids);
-        }
-
         // ADD DESCRIPTIONS
         if (desList != null) {
             Collections.sort(desList);
@@ -3212,17 +3199,6 @@ public class SctYToEConceptMojo extends AbstractMojo implements Serializable {
                 } else
                     throw new UnsupportedOperationException("Cannot handle case");
             }
-
-            if (listRefsetUuidMemberUuidForCon.size() > 0)
-                ec.setRefsetUuidMemberUuidForConcept(listRefsetUuidMemberUuidForCon);
-            if (listRefsetUuidMemberUuidForDes.size() > 0)
-                ec.setRefsetUuidMemberUuidForDescriptions(listRefsetUuidMemberUuidForDes);
-            if (listRefsetUuidMemberUuidForImage.size() > 0)
-                ec.setRefsetUuidMemberUuidForImages(listRefsetUuidMemberUuidForImage);
-            if (listRefsetUuidMemberUuidForRefsetMember.size() > 0)
-                ec.setRefsetUuidMemberUuidForRefsetMembers(listRefsetUuidMemberUuidForRefsetMember);
-            if (listRefsetUuidMemberUuidForRel.size() > 0)
-                ec.setRefsetUuidMemberUuidForRels(listRefsetUuidMemberUuidForRel);
 
             // :DEBUG:TEST:!!!: ec primordialUuid vs ca primordialUuid
             //            if (countRefsetMember < 10)

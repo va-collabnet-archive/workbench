@@ -36,8 +36,8 @@ public class MustContainPaths implements CompareOperator {
                 for (int i = 0; i < paths.length && !matched; i++) {
                     ConceptDescriptor cd = paths[i];
                     I_GetConceptData concept = cd.getVerifiedConcept();
-                    if (m.getPath1().getPath().getConceptId() == concept.getConceptId()
-                        || m.getPath2().getPath().getConceptId() == concept.getConceptId()) {
+                    if (m.getPath1().getPath().getConceptNid() == concept.getConceptId()
+                        || m.getPath2().getPath().getConceptNid() == concept.getConceptId()) {
                         // The match occurred on a required path
                         matched = true;
                         numberOfMatches++;
