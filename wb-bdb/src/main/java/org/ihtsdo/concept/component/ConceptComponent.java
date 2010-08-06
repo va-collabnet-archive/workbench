@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -261,6 +262,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 PRECEDENCE precedence) throws IOException, TerminologyException {
             return ConceptComponent.this.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
         }
+
+        @Override
+    	public boolean promote(I_TestComponent test, I_Position viewPosition,
+    			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+    			PRECEDENCE precedence) throws IOException, TerminologyException {
+    		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
+    			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+    		}
+    		return false;
+    	}
 
         @Override
         public boolean equals(Object obj) {
@@ -1493,4 +1504,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             clearVersions();
         }
     }
+    
+    @Override
+	public boolean promote(I_TestComponent test, I_Position viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+			PRECEDENCE precedence) throws IOException, TerminologyException {
+		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
+			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+		}
+		return false;
+	}
+
 }
