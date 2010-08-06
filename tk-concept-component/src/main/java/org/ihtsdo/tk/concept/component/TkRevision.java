@@ -12,6 +12,7 @@ import org.ihtsdo.tk.api.ext.I_VersionExternally;
 public class TkRevision implements I_VersionExternally {
 
     public static final long serialVersionUID = 1;
+    public static UUID unspecifiedUserUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
     
     public UUID statusUuid;
     public UUID authorUuid;
@@ -33,7 +34,7 @@ public class TkRevision implements I_VersionExternally {
         if (dataVersion >= 3) {
         	authorUuid = new UUID(in.readLong(), in.readLong());
         } else {
-         	authorUuid = new UUID(0, 0);
+         	authorUuid = unspecifiedUserUuid;
         }
         time = in.readLong();
         assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE. Was it initialized?";
@@ -47,6 +48,9 @@ public class TkRevision implements I_VersionExternally {
         out.writeLong(statusUuid.getMostSignificantBits());
         out.writeLong(statusUuid.getLeastSignificantBits());
         
+        if (authorUuid == null) {
+        	authorUuid = unspecifiedUserUuid;
+        }
         out.writeLong(authorUuid.getMostSignificantBits());
         out.writeLong(authorUuid.getLeastSignificantBits());
         

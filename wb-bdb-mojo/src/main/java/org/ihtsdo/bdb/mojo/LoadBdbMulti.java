@@ -64,7 +64,7 @@ public class LoadBdbMulti extends AbstractMojo {
     private String generatedResources;
 
     /**
-     * Generated resources directory.
+     * Lucene directory.
      * 
      * @parameter expression="${project.build.directory}/classes/berkeley-db/lucene"
      * @required
@@ -72,7 +72,7 @@ public class LoadBdbMulti extends AbstractMojo {
     private File luceneDir;
 
     /**
-     * Generated resources directory.
+     * Berkeley directory.
      * 
      * @parameter expression="${project.build.directory}/classes/berkeley-db"
      * @required
