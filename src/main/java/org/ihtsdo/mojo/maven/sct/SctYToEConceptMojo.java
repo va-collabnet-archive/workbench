@@ -67,13 +67,13 @@ import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.tk.concept.component.attribute.TkConceptAttributesRevision;
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
-import org.ihtsdo.tk.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.concept.component.relationship.TkRelationshipRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 /**
  * <b>DESCRIPTION: </b><br>
