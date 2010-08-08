@@ -77,7 +77,7 @@
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-bdb</artifactId>
 		</dependency>
-	</dependencies>
+   	</dependencies>
 	<build>
 		<plugins>
 			<plugin>

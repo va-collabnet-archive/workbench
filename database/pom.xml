@@ -6,39 +6,51 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-  <packaging>pom</packaging>
+	<packaging>pom</packaging>
 	<artifactId>database</artifactId>
 	<name>Workbench Bundle Database</name>
 	<description>Workbench Bundle Database</description>
 	<build>
 		<plugins>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <executions>
-              <execution>
-                  <id>attach-database</id>
-                  <configuration>
-                      <descriptors>
-                          <descriptor>src/main/assembly/database.xml</descriptor>
-                      </descriptors>
-                  </configuration>
-                  <goals>
-                      <goal>single</goal>
-                  </goals>
-                  <phase>package</phase>
-              </execution>
-          </executions>
-      </plugin>
 			<plugin>
-				<groupId>org.dwfa</groupId>
-				<artifactId>dwfa-mojo</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>export-cement-taxonomy</id>
-						<phase>generate-resources</phase>
+						<id>attach-database</id>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/database.xml</descriptor>
+							</descriptors>
+						</configuration>
 						<goals>
-							<goal>export-cement-taxonomy</goal>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>org.ihtsdo</groupId>
+						<artifactId>wb-bdb</artifactId>
+						<version>${org.ihtsdo.wb-bdb.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.lucene</groupId>
+						<artifactId>lucene-core</artifactId>
+						<version>${org.apache.lucene.version}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>export-cement-as-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-cement-as-econcept</goal>
 						</goals>
 						<configuration>
 							<taxonomies>
@@ -48,15 +60,10 @@
 								<String>HL7</String>
 								<String>QUEUE_TYPE</String>
 							</taxonomies>
-							<output>${project.build.directory}/generated-resources/ace</output>
+							<output>${project.build.directory}/generated-resources/jbin
+							</output>
 						</configuration>
 					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.dwfa</groupId>
-				<artifactId>term-mojo</artifactId>
-				<executions>
 					<execution>
 						<id>vodb-open</id>
 						<phase>generate-resources</phase>
@@ -64,98 +71,65 @@
 							<goal>vodb-open</goal>
 						</goals>
 						<configuration>
-							<vodbDirectory>${project.build.directory}/generated-resources/berkeley-db</vodbDirectory>
+							<vodbDirectory>${project.build.directory}/classes/berkeley-db
+							</vodbDirectory>
 						</configuration>
 					</execution>
 					<execution>
+						<id>vodb-set-default-config</id>
 						<phase>generate-resources</phase>
 						<goals>
-							<goal>berkley-vodb-dir</goal>
+							<goal>vodb-set-default-config</goal>
 						</goals>
 					</execution>
 					<execution>
-						<!-- Turn up the logger to show what change sets are being imported -->
+						<id>vodb-set-edit-path</id>
 						<phase>generate-resources</phase>
-						<id>set-log-to-fine</id>
 						<goals>
-							<goal>ace-set-logs</goal>
-						</goals>
-						<configuration>
-							<logSettings>
-								<setting>
-									<logger>root</logger>
-									<!-- <logger>org.dwfa.ace.log.AceLog.edit</logger> -->
-									<level>FINE</level>
-								</setting>
-							</logSettings>
-							<handlerSettings>
-								<setting>
-									<logger>root</logger>
-									<level>FINE</level>
-								</setting>
-							</handlerSettings>
-						</configuration>
-					</execution>
-					<execution>
-						<phase>generate-resources</phase>
-						<id>bcs-read-all</id>
-						<goals>
-							<goal>bcs-read-all</goal>
+							<goal>vodb-set-edit-paths</goal>
 						</goals>
 						<configuration>
-							<changeSetDir>${project.build.directory}/generated-resources/changesets</changeSetDir>
-							<validate>false</validate>
+							<editPaths>
+								<ConceptDescriptor>
+									<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+									<description>Workbench Auxiliary</description>
+								</ConceptDescriptor>
+							</editPaths>
 						</configuration>
 					</execution>
 					<execution>
-						<!-- Turn down the logger to default info -->
+						<id>create-inferred-path</id>
 						<phase>generate-resources</phase>
-						<id>set-log-to-info</id>
 						<goals>
-							<goal>ace-set-logs</goal>
+							<goal>vodb-create-new-path</goal>
 						</goals>
 						<configuration>
-							<logSettings>
-								<setting>
-									<logger>org.dwfa.ace.log.AceLog.edit </logger>
-									<level>INFO</level>
-								</setting>
-							</logSettings>
-							<handlerSettings>
-								<setting>
-									<logger>root</logger>
-									<level>INFO</level>
-								</setting>
-							</handlerSettings>
+							<pathParent>
+								<uuid>4459d8cf-5a6f-3952-9458-6d64324b27b7</uuid>
+								<description>path</description>
+							</pathParent>
+							<pathFsDesc>test path (path)</pathFsDesc>
+							<pathPrefDesc>test path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+										<description>Workbench Auxiliary</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
 						</configuration>
 					</execution>
 					<execution>
-						<id>vodb-commit2</id>
-						<phase>generate-resources</phase>
+						<id>vodb-commit</id>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>vodb-commit</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>vodb-checkpoint</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>vodb-checkpoint</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>vodb-export-econcepts</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>vodb-export-econcepts</goal>
-						</goals>
-						<configuration>
-							<targetDirectory>${project.build.directory}/generated-resources</targetDirectory>
-						</configuration>
-					</execution>
-					<execution>
 						<id>vodb-close</id>
-						<phase>generate-resources</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>vodb-close</goal>
 						</goals>
@@ -167,13 +141,17 @@
 				<artifactId>wb-bdb-mojo</artifactId>
 				<executions>
 					<execution>
-						<id>load-econcepts</id>
-						<phase>process-resources</phase>
+						<id>load-econcepts-multi</id>
+						<phase>process-sources</phase>
 						<goals>
-							<goal>load-econcepts</goal>
+							<goal>load-econcepts-multi</goal>
 						</goals>
 						<configuration>
-							<generatedResources>${project.build.directory}/generated-resources/classes</generatedResources>
+							<generatedResources>${project.build.directory}/generated-resources/jbin
+							</generatedResources>
+							<conceptsFileNames>
+								<String>cement.jbin</String>
+							</conceptsFileNames>
 						</configuration>
 					</execution>
 				</executions>

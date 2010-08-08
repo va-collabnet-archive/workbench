@@ -48,6 +48,15 @@
         <include>commons-discovery:commons-discovery</include>
         <include>com.collabnet:ce.soap</include>
         <!-- includes done for tracker integration -->
+       <!-- includes added for drools integration -->
+       <include>org.drools:drools-core</include>
+       <include>org.drools:drools-api</include>
+       <include>org.drools:drools-compiler</include>
+       <include>org.drools:drools-templates</include>
+       <include>org.eclipse.jdt:core</include>
+       <include>org.antlr:antlr-runtime</include>
+       <include>org.mvel:mvel2</include>
+       <!-- includes done for drools integration -->
       </includes>
     </dependencySet>
     <dependencySet>
