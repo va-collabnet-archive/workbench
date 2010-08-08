@@ -51,6 +51,7 @@ public class LuceneManager {
         if (searcher != null) {
             try {
                 searcher.close();
+                searcher = null;
             } catch (Throwable e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -59,6 +60,7 @@ public class LuceneManager {
 	        try {
                 writer.commit();
                 writer.close(true);
+                writer = null;
             } catch (Throwable e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }

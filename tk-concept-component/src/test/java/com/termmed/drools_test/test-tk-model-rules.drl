@@ -1,10 +1,10 @@
 package org.ihtsdo.rules.test;
 
-import org.ihtsdo.tk.concept.component.description.TkDescription;
-import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
-import org.ihtsdo.tk.concept.component.description.TkTestFriendlyDescription;
-import org.ihtsdo.tk.concept.component.description.marked.DescriptionCurrentVersion;
-import org.ihtsdo.tk.concept.component.description.marked.DescriptionPreviousVersion;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkTestFriendlyDescription;
+import org.ihtsdo.tk.dto.concept.component.description.marked.DescriptionCurrentVersion;
+import org.ihtsdo.tk.dto.concept.component.description.marked.DescriptionPreviousVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

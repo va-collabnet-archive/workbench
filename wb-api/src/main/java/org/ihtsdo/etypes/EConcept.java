@@ -279,9 +279,10 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     	UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
        	UUID pathUuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
        	long time = System.currentTimeMillis();
+       	primordialUuid = cNoHx.getUids().iterator().next();
         conceptAttributes = new EConceptAttributes();
         conceptAttributes.defined = false;
-    	conceptAttributes.primordialUuid = cNoHx.getUids().iterator().next();
+    	conceptAttributes.primordialUuid = primordialUuid;
     	conceptAttributes.statusUuid = currentUuid;
     	conceptAttributes.setPathUuid(pathUuid);
     	conceptAttributes.setTime(time);
@@ -319,6 +320,7 @@ public class EConcept extends  TkConcept implements I_AmChangeSetObject {
     		relationships.add(rel);
     		
     	}
+    	
 	}
 
 	/**

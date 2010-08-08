@@ -372,15 +372,15 @@ public class Bdb {
                 activity.setProgressInfoLower("3/10: Awaiting termination of sync service.");
                 syncService.awaitTermination(90, TimeUnit.MINUTES);
 
-                activity.setProgressInfoLower("4/10: Starting LuceneManager close.");
-		        LuceneManager.close();
 
-                activity.setProgressInfoLower("5/10: Starting PositionMapper close.");
+                activity.setProgressInfoLower("4/10: Starting PositionMapper close.");
 				PositionMapper.close();
-				activity.setProgressInfoLower("6/10: Canceling uncommitted changes.");
+				activity.setProgressInfoLower("5/10: Canceling uncommitted changes.");
 				Terms.get().cancel();
-				 activity.setProgressInfoLower("7/10: Starting BdbCommitManager shutdown.");
+				 activity.setProgressInfoLower("6/10: Starting BdbCommitManager shutdown.");
 				BdbCommitManager.shutdown();
+                activity.setProgressInfoLower("7/10: Starting LuceneManager close.");
+		        LuceneManager.close();
                 NidDataFromBdb.close();
                 activity.setProgressInfoLower("8/10: Starting mutable.bdbEnv.sync().");
 				mutable.bdbEnv.sync();
