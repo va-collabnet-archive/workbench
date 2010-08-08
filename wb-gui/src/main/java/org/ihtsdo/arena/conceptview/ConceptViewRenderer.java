@@ -21,13 +21,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-import org.drools.runtime.pipeline.JxlsTransformerProvider;
 import org.dwfa.ace.ACE;
 
 import com.mxgraph.model.mxCell;
@@ -38,7 +38,7 @@ import com.mxgraph.view.mxGraph;
  * @author Administrator
  * 
  */
-public class ConceptViewRenderer extends JComponent
+public class ConceptViewRenderer extends JLayeredPane
 {
 
 	private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
@@ -112,6 +112,9 @@ public class ConceptViewRenderer extends JComponent
 
 	private JPanel workflowPanel = new JPanel();
 
+
+	private JScrollPane scrollPane;
+
 		
     /**
      * 
@@ -131,7 +134,7 @@ public class ConceptViewRenderer extends JComponent
 
         add(title, BorderLayout.NORTH);
 
-        JScrollPane scrollPane = null;
+        scrollPane = null;
 
          if (graph.getModel().getChildCount(cell) == 0)  {
              renderedComponent = settings.getComponent(ace.getAceFrameConfig());
@@ -175,22 +178,30 @@ public class ConceptViewRenderer extends JComponent
                 
         gbc.gridx++;
         JToggleButton workflowToggleButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png")));
-
+        workflowToggleButton.setSelected(false);
         
         workflowToggleButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (workflowPanel.isVisible()) {
-					workflowPanel.setVisible(false);
-				} else {
+				JToggleButton button = (JToggleButton) e.getSource();
+				if (button.isSelected()) {
+		            remove(scrollPane);
+		            add(workflowPanel, BorderLayout.CENTER);
 					workflowPanel.setBackground(new Color(242, 172, 167, 128));
+					workflowPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 					workflowPanel.setVisible(true);
+					scrollPane.setVisible(false);
+				} else {
+					workflowPanel.setVisible(false);
+		            remove(workflowPanel);
+		            add(scrollPane, BorderLayout.CENTER);
+					scrollPane.setVisible(true);
 				}
 			}
 		});
         
-        workflowToggleButton.setBorder(BorderFactory.createEmptyBorder());
+        workflowToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(workflowToggleButton, gbc);
         
         gbc.weightx = 1;
@@ -202,15 +213,18 @@ public class ConceptViewRenderer extends JComponent
         gbc.weightx = 0;
         gbc.gridx++;
         JButton cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
-        cancelButton.setBorder(BorderFactory.createEmptyBorder());
+        cancelButton.addActionListener(new CancelActionListener());
+        cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(cancelButton, gbc);
         
         gbc.gridx++;
         JButton commitButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/check.png")));
-        commitButton.setBorder(BorderFactory.createEmptyBorder());
+        commitButton.addActionListener(new CommitActionListener());
+        commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(commitButton, gbc);
         
         gbc.gridx++;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
         footerPanel.add(settings.getResizeLabel(), gbc);
         footerPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.gray));
         add(footerPanel, BorderLayout.SOUTH);
