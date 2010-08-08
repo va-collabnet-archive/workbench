@@ -4,12 +4,18 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.DocumentAuxiliary;
 import org.dwfa.cement.HL7;
@@ -20,6 +26,9 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.spec.TaxonomySpec;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize
@@ -175,6 +184,50 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     			DataOutputStream eConceptDOS = new DataOutputStream(eConceptsBos);
     			for (I_ConceptualizeLocally localConcept: mts.getConcepts()) {
     				EConcept eC = new EConcept(localConcept, mts);
+    				if (RefsetAuxiliary.Concept.REFSET_PATHS.getUids().contains(eC.getPrimordialUuid())) {
+    					// Add the workbench auxiliary path...
+    					TkRefsetCidMember member = new TkRefsetCidMember();
+    					member.primordialUuid = UUID.fromString("9353a710-a1c0-11df-981c-0800200c9a66");
+    					member.componentUuid = ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid();
+    					member.c1Uuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+    					member.setRefsetUuid(eC.primordialUuid);
+    					member.statusUuid = eC.conceptAttributes.statusUuid;
+    					member.authorUuid = eC.conceptAttributes.authorUuid;
+    					member.pathUuid = eC.conceptAttributes.pathUuid;
+    					member.time = eC.conceptAttributes.time;
+    					List<TkRefsetAbstractMember<?>> memberList = new ArrayList<TkRefsetAbstractMember<?>>();
+    					memberList.add(member);
+    					eC.setRefsetMembers(memberList);
+    				}
+    				if (ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "1c4214ec-147a-11db-ac5d-0800200c9a66", "Semiotic Triangle with Circle",
+    			        		".gif", "/Informatics-Circle-Small.gif", ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "70e86440-7f31-11dc-8314-0800200c9a66", "icon for included individual",
+    			        		".png", "/16x16/plain/add.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.INCLUDE_LINEAGE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "70e86441-7f31-11dc-8314-0800200c9a66", "icon for included lineage",
+    			        		".png", "/16x16/plain/add2.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "70e86442-7f31-11dc-8314-0800200c9a66", "icon for excluded individual",
+    			        		".png", "/16x16/plain/delete.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.EXCLUDE_LINEAGE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "70e86443-7f31-11dc-8314-0800200c9a66", "icon for excluded lineage",
+    			        		".png", "/16x16/plain/delete2.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.BOOLEAN_CHECK_CROSS_ICONS_FALSE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "5b7f3f12-8034-11dc-8314-0800200c9a66", "icon for false",
+    			        		".png", "/16x16/plain/navigate_cross.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.BOOLEAN_CHECK_CROSS_ICONS_TRUE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "5b7f3f13-8034-11dc-8314-0800200c9a66", "icon for true",
+    			        		".png", "/16x16/plain/navigate_check.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "5b7f3f14-8034-11dc-8314-0800200c9a66", "icon for false",
+    			        		".png", "/16x16/plain/forbidden.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				} else if (RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.getPrimoridalUid().equals(eC.getPrimordialUuid())) {
+    			        addImage(eC, "5b7f3f15-8034-11dc-8314-0800200c9a66", "icon for true",
+    			        		".png", "/16x16/plain/check.png", ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getPrimoridalUid());
+    				}
+
     				eC.writeExternal(eConceptDOS);
     			}
     			eConceptDOS.close();
@@ -183,4 +236,45 @@ public class ExportCementAsEConcepts extends AbstractMojo {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
     }
+
+	private void addImage(EConcept eC, String primordialUuidStr,
+			String textDescription, String format, String resource,
+			UUID typeUuid) {
+		URL imageURL = ExportCementAsEConcepts.class.getResource(resource);
+		if (imageURL != null) {
+			try {
+				InputStream fis = imageURL.openStream();
+				int size = (int) fis.available();
+
+				byte[] image = new byte[size];
+				int read = fis.read(image, 0, image.length);
+				while (read != size) {
+				    size = size - read;
+				    read = fis.read(image, read, size);
+				}
+				TkMedia media = new TkMedia();
+				
+				
+				media.primordialUuid = UUID.fromString(primordialUuidStr);
+				media.conceptUuid = eC.conceptAttributes.primordialUuid;
+				media.textDescription = textDescription;
+				media.format = format;
+				media.image = image;
+				media.typeUuid = typeUuid;
+				media.statusUuid = eC.conceptAttributes.statusUuid;
+				media.authorUuid = eC.conceptAttributes.authorUuid;
+				media.pathUuid = eC.conceptAttributes.pathUuid;
+				media.time = eC.conceptAttributes.time;
+				List<TkMedia> images = new ArrayList<TkMedia>();
+				images.add(media);
+				eC.setImages(images);
+			} catch (Throwable e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		} else {
+			AceLog.getAppLog().warning("Null url for: " + resource);
+		}
+		
+		
+	}
 }

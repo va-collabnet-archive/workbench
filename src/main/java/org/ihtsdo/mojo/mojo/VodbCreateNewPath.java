@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -99,9 +98,15 @@ public class VodbCreateNewPath extends AbstractMojo {
      * Path Description
      * 
      * @parameter
-     * @required
      */
     String pathPrefDesc;
+
+    /**
+     * Path UUID
+     * 
+     * @parameter
+     */
+    String pathUuidStr;
 
     /**
      * Location of the build directory.
@@ -147,8 +152,11 @@ public class VodbCreateNewPath extends AbstractMojo {
 
             I_GetConceptData parent = pathParent.getVerifiedConcept();
             activeConfig.setHierarchySelection(parent);
-
+            
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
+            if (pathUuidStr != null && pathUuidStr.length() > 1) {
+            	pathUUID = UUID.fromString(pathUuidStr);
+            }
             getLog().info("VodbCreateNewPath pathUUID= "+pathUUID);	
 
             I_GetConceptData pathConcept;
@@ -176,12 +184,6 @@ public class VodbCreateNewPath extends AbstractMojo {
             }
 
             tf.newPath(pathOrigins, pathConcept);
-        } catch (TerminologyException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (ParseException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
