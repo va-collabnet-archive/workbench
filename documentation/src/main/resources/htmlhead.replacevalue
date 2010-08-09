@@ -2,7 +2,7 @@
         <STYLE TYPE="text/css"> 
                 .color { background-color: #ddeeff; }   
              H1 {font-family: Arial; font-size: 14pt; Color:red} 
-             X_UL  {list-style-type: square ; margin-left:-20px; margin-right:0px;} 
+             X_UL  {list-style-type: square ; margin-left:-20px; margin-right:0px; font-weight:bold } 
              X_LI>UL  {list-style-type: disc } 
              A  { font-family: Arial; font-size:9pt; line-height:12pt} 
              A     {text-decoration:none; } 
