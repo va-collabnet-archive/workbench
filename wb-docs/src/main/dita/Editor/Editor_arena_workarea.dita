@@ -28,7 +28,12 @@
     as they wish, and can pan and zoom the worksheet to best effect their
     editing tasks. The arena view is toggled from a tab at the top of the
     right hand component view panel, as shown in <xref
-    href="#arena/arena_overview"/></p>
+    href="#arena/arena_overview"/>. Additionally, the Editor's usual taxonomy
+    left hand panel can be toggled off using the <image
+    href="../images/Using_The_ACE_Editor_Images/icon_taxonomy_toggle_small.png"/>
+    button to give the Arena even more of the available screen real-state,
+    since taxonomy views can be associated with each concept displayed in the
+    arena.</p>
 
     <fig id="arena_overview">
       <title>The Editor's concept editing 'Arena'.</title>

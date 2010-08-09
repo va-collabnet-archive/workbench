@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
 "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
-<map id="RefSets" title="Reference Sets" xml:lang="en-us">
+<map id="RefSets" title="Reference Sets" xml:lang="en-US">
   <!--ee initially created 2009-07-13 -->
 
   <title>Reference Sets</title>
@@ -10,23 +10,12 @@
             navtitle="Reference Sets - Introduction" type="topic">
     <topicref format="dita" href="RefSets_morphology.dita" type="topic"/>
 
-    <topicref href="RefSets_creation_overview.dita" type="topic"/>
-
-    <topicref format="dita" href="RefSets_creation_tasks.dita" type="task"/>
+    <topicref href="RefSets_autocreation_overview.dita" type="topic"/>
 
     <topicref href="RefSets_creation_example.dita"/>
 
     <topicref format="dita" href="RefSets_concepts_autocreation.dita"
               type="task"/>
-
-    <topicref href="RefSets_create_manually.dita" type="topic"/>
-
-    <topicref href="RefSets_create_parent_member.dita" type="topic"/>
-
-    <topicref href="RefSets_spec_manually.dita" type="topic"/>
-
-    <topicref chunk="to-navigation" href="RefSets_associating_concepts.dita"
-              type="topic"/>
 
     <topicref href="associating_example.dita"/>
 
@@ -51,5 +40,13 @@
     <topicref href="RefSets_import.dita" type="topic"/>
 
     <topicref href="Subsets_export-maven.dita"/>
+
+    <topicref href="RefSets_report_intro.dita" type="topic"/>
+
+    <topicref href="RefSets_report_tasks.dita" type="task"/>
+
+    <topicref href="RefSets_create_manually.dita" type="topic"/>
+
+    <topicref href="RefSets_create_parent_member.dita" type="topic"/>
   </topicref>
 </map>

@@ -1,83 +1,90 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
-  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
-<topic id="topic2" xml:lang="en">
- <title>Creating a Marked Parent Refset.</title>
- <prolog>
-  <author/>
-  <metadata>
-   <keywords>
-    <indexterm>Marked Parent Refset</indexterm>
-    <indexterm>refsets<indexterm>marked parent</indexterm></indexterm>
-   </keywords>
-  </metadata>
- </prolog>
- <body>
-  <section>In its simplest form, a member refset merely holds references to the list of members that
-   constitute the refset. In many circumstances, particularly for navigation purposes, it is useful
-   to also "mark" the location of each of these members within the terminology taxonomy. A parent
-   member refset performs just this function.</section>
-  <section>
-   <title>Creating a marked parent refset</title>
-   <p>Just like a member refset, a marked parent refset has a name which is a concept. So the first
-    step in creating a marked parent refset is to create the concept which names the refset, and so
-    will have a fully qualified name and a preferred name. The Terminology Workbench IDE already has
-    a <i>refset</i> node in in the concept hierarchy under the <i>Refset Auxilliary Concept</i>
-    hierarchy, to which the concept should have a source <codeph>IS-A</codeph> relationship. Note
-    that the marked parent refset doesn't know about ( i.e. has no source relationship to ) the
-    refset for which it is associated. Hence creators of refsets should adhere to naming conventions
-    that preserve that association, such as matching the name of the member refset with "parent"
-    included. e.g. a member refset might be named  <i>Smoking refset</i>, and its marked parent
-    refset might be named <i>Smoking parent refset</i>.</p>
-  </section>
-  <table id="ak1007032">
-   <tgroup cols="4">
-    <colspec colnum="1" colname="col1" colwidth="71*"/>
-    <colspec colnum="2" colname="col2" colwidth="102*"/>
-    <colspec colnum="3" colname="col3" colwidth="69*"/>
-    <colspec colnum="4" colname="col4" colwidth="97*"/>
-    <thead>
-     <row>
-      <entry namest="col1" nameend="col4">
-       <p>Member Reference Set - Source Relationships</p>
-      </entry>
-     </row>
-    </thead>
-    <tbody>
-     <row>
-      <entry colname="col1">
-       <p>Type</p>
-      </entry>
-      <entry colname="col2">
-       <p>Hierarchy Location</p>
-      </entry>
-      <entry colname="col3">
-       <p>Destination</p>
-      </entry>
-      <entry colname="col4">
-       <p>Hierarchy Location</p>
-      </entry>
-     </row>
-     <row>
-      <entry colname="col1">
-       <p><b>is a</b></p>
-      </entry>
-      <entry colname="col2">
-       <p>Terminology Auxiliary concept /relationship</p>
-      </entry>
-      <entry colname="col3">
-       <p><b>refset</b></p>
-      </entry>
-      <entry colname="col4">
-       <p>Refset Auxiliary Concept</p>
-      </entry>
-     </row>
-    </tbody>
-   </tgroup>
-  </table>
-  <fig id="ak1007220">
-   <title>Example of Source Relationships for a New Refset </title>
-   <image href="../images/Refsets_Images/parent_refset_source_rels.jpg" placement="break"/>
-  </fig>
- </body>
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="create_markted_parent" xml:lang="en">
+  <title>Creating a Marked Parent Refset.</title>
+
+  <prolog>
+    <author/>
+
+    <metadata>
+      <keywords>
+        <indexterm>Marked Parent Refset</indexterm>
+
+        <indexterm>refsets<indexterm>marked parent</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>In its simplest form, a member refset merely holds references to
+    the list of members that constitute the refset. In many circumstances,
+    particularly for navigation purposes, it is useful to also "mark" the
+    location of each of these members within the terminology taxonomy. A
+    parent member refset performs just this function.</section>
+
+    <section><title>Creating a marked parent refset</title> <p>Just like a
+    member refset, a marked parent refset has a name which is a concept. So
+    the first step in creating a marked parent refset is to create the concept
+    which names the refset, and so will have a fully qualified name and a
+    preferred name. The Terminology Workbench IDE already has a <i>refset</i>
+    node in in the concept hierarchy under the <i>Refset Auxilliary
+    Concept</i> hierarchy, to which the concept should have a source
+    <codeph>IS-A</codeph> relationship. Note that the marked parent refset
+    doesn't know about ( i.e. has no source relationship to ) the refset for
+    which it is associated. Hence creators of refsets should adhere to naming
+    conventions that preserve that association, such as matching the name of
+    the member refset with "parent" included. e.g. a member refset might be
+    named <i>Smoking refset</i>, and its marked parent refset might be named
+    <i>Smoking parent refset</i>.</p></section>
+
+    <table id="ak1007032">
+      <tgroup cols="4">
+        <colspec colname="col1" colnum="1" colwidth="71*"/>
+
+        <colspec colname="col2" colnum="2" colwidth="102*"/>
+
+        <colspec colname="col3" colnum="3" colwidth="69*"/>
+
+        <colspec colname="col4" colnum="4" colwidth="97*"/>
+
+        <thead>
+          <row>
+            <entry nameend="col4" namest="col1"><p>Member Reference Set -
+            Source Relationships</p></entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry colname="col1"><p>Type</p></entry>
+
+            <entry colname="col2"><p>Hierarchy Location</p></entry>
+
+            <entry colname="col3"><p>Destination</p></entry>
+
+            <entry colname="col4"><p>Hierarchy Location</p></entry>
+          </row>
+
+          <row>
+            <entry colname="col1"><p><b>is a</b></p></entry>
+
+            <entry colname="col2"><p>Terminology Auxiliary concept
+            /relationship</p></entry>
+
+            <entry colname="col3"><p><b>refset</b></p></entry>
+
+            <entry colname="col4"><p>Refset Auxiliary Concept</p></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <fig id="ak1007220">
+      <title>Example of Source Relationships for a New Refset</title>
+
+      <image href="../images/Refsets_Images/parent_refset_source_rels.jpg"
+             placement="break"/>
+    </fig>
+  </body>
 </topic>

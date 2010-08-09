@@ -81,7 +81,7 @@
   <chapter format="ditamap" href="../Data_Checks/DataChecks.ditamap"
            navtitle="Data Checks and Search Filters"/>
 
-  <chapter format="ditamap" href="../RefSets/RefSets_NHS.ditamap"
+  <chapter format="ditamap" href="../RefSets/RefSets.ditamap"
            navtitle="Reference Sets"/>
 
   <chapter format="ditamap" href="../Classifying/Classifying.ditamap"

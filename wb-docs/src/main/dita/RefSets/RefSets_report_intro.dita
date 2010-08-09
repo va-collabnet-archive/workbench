@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
 "http://docs.oasis-open.org/dita/dtd/topic.dtd">
-<topic id="import-export">
+<topic id="report_intro">
   <title>Refset metadata report generation - overview</title>
 
   <body>
@@ -15,6 +15,6 @@
     report of the refset metadata in the Workbench database. The Maven POM
     should do a “<codeph>vodb-open</codeph>” prior to the
     “<codeph>refset-listing</codeph>” goal, followed by a
-    “<codeph>vodb-close</codeph>”. </p>
+    “<codeph>vodb-close</codeph>”.</p>
   </body>
 </topic>

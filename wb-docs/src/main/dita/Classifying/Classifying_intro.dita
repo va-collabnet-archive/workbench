@@ -16,21 +16,23 @@
 
   <body>
     <section>The IHTSDO Workbench IDE contains a high performance classifier
-    (the IHTSDO Classifier <fn id="ar1003160"><xref format="html"
-    href="http://e-hrc.net " scope="external"> from The Australian E-Health
-    Research Centre. ( http://e-hrc.net .)</xref></fn>) for validating the
-    inferred relationships inherent in the terminology, according to the
-    Description Logics upon which SNOMED CT is based. <xref format="dita"
+    (the IHTSDO Classifier ) for validating the inferred relationships
+    inherent in the terminology, according to the Description Logics upon
+    which SNOMED CT concepts are inter-related. <xref format="dita"
     href="#topic1/ar1003160" scope="local" type="fn"/>. The IHTSDO Classifier
     is a highly optimised module for performing complete or incremental
     classification of SNOMED CT and which can be configured through business
-    process plugins in a number of ways. Additional information on
-    configuration and performance characteristics for developers can be found
-    in <xref format="dita"
+    process plugins in a number of ways. The IHTSDO Classifier is based on the
+    SnoRocket classifier developed by the Australian E-Health Research
+    Centre.<fn id="ar1003160"><xref format="html" href="http://e-hrc.net "
+    scope="external"> from The Australian E-Health Research Centre. (
+    http://e-hrc.net .)</xref></fn> Additional information on configuration
+    and performance characteristics for developers can be found in <xref
+    format="dita"
     href="../Classifier/Classifier_intro.dita#topic1">Integrating the IHTSDO
     Classifier </xref>.</section>
 
-    <section>In most instances, the Workbench IDE is bundled with a Classifier
+    <section>In most releases, the Workbench IDE is bundled with a Classifier
     plugin, accessable via the <b>Tasks</b> section of the Editor's main menu.
     The following sections illustrate its use.</section>
   </body>
