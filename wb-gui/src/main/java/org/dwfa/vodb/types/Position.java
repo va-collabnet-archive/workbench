@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
@@ -276,8 +277,14 @@ public class Position implements I_Position {
                 I_Position position = readPosition(in);
                 I_GetConceptData pathConcept = Terms.get().getConcept(
                     position.getPath().getConceptId());
-                I_Path path = Terms.get().getPath(pathConcept.getUids());
-                positions.add(Terms.get().newPosition(path, position.getVersion()));
+                if (!pathConcept.isCanceled()) {
+    				try {
+    					I_Path path = Terms.get().getPath(pathConcept.getUids());
+    	                positions.add(Terms.get().newPosition(path, position.getVersion()));
+    				} catch (Exception e) {
+                        AceLog.getAppLog().alertAndLog(Level.SEVERE, "Getting path: " + pathConcept, e);
+    				}
+                }
             } catch (IOException ex) {
                 if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                     AceLog.getAppLog().alertAndLogException(ex.getCause());
