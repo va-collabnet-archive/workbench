@@ -334,7 +334,7 @@ public class ExportSpecification {
         uuidSnomedDbMapHandler = UuidSnomedDbMapHandler.getInstance();
         uuidSnomedDbMapHandler.updateNextSequenceMap();
 
-        adrsConceptParent = termFactory.getConcept(UUID.fromString("bbd4b076-8637-46d4-8ce9-609909566999"));
+        adrsConceptParent = termFactory.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 
         extensionProcessor = new ExtensionProcessor<I_ThinExtByRefPart>();
     }
@@ -392,14 +392,14 @@ public class ExportSpecification {
             for (I_DescriptionTuple tuple : matchingDescriptionTuples) {
                 setDescriptionDto(componentDto, tuple, latestDescriptionTuples.contains(tuple));
             }
-            for (I_DescriptionTuple latestDescription : latestDescriptionTuples) {
-                setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), latestDescription.getDescId(), latestDescription,
-                    descriptionInactivationIndicatorNid, TYPE.RELATIONSHIP);
-            }
+//            for (I_DescriptionTuple latestDescription : latestDescriptionTuples) {
+//                setComponentInactivationReferenceSet(componentDto.getDescriptionExtensionDtos(), latestDescription.getDescId(), latestDescription,
+//                    descriptionInactivationIndicatorNid, TYPE.RELATIONSHIP);
+//            }
 
             if (generateLangaugeRefset) {
-                if(adrsConceptParent.isParentOf(concept, false) || adrsConceptParent.equals(concept)){
-                updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
+                if(adrsConceptParent.isParentOf(concept, null, null, null, false) || adrsConceptParent.equals(concept)){
+                	updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
                 }
             }
 
@@ -408,11 +408,11 @@ public class ExportSpecification {
             for (I_RelTuple tuple : matchingRelationshipTuples) {
                 setRelationshipDto(componentDto, tuple, latestRelationshipTuples.contains(tuple));
             }
-            for (I_RelTuple latestRelationship : latestRelationshipTuples) {
-                setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), latestRelationship.getRelId(), latestRelationship,
-                    relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP);
-
-            }
+//            for (I_RelTuple latestRelationship : latestRelationshipTuples) {
+//                setComponentInactivationReferenceSet(componentDto.getRelationshipExtensionDtos(), latestRelationship.getRelId(), latestRelationship,
+//                    relationshipInactivationIndicatorNid, TYPE.RELATIONSHIP);
+//
+//            }
         }
 
         return (!matchingConceptTuples.isEmpty()) ? componentDto : null;
@@ -574,7 +574,7 @@ public class ExportSpecification {
 
         if (latest) {
             //TODO not implementing the concept history refsets yet
-            setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
+//            setConceptHistory(componentDto, tuple.getRelVersioned() ,latest);
             setRelationshipRefinabilityReferenceSet(componentDto.getRelationshipExtensionDtos(), tuple ,latest);
         }
 
