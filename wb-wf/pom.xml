@@ -7,19 +7,18 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ihtsdo</groupId>
   <artifactId>wb-wf</artifactId>
-  <version>2.6.0-trek-1-SNAPSHOT</version>
   <name>Workbench Workflow</name>
   <description>Workflow</description>
     <dependencies>
         <dependency>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>wb-api</artifactId>
-            <version>2.6.0-trek-1-SNAPSHOT</version>
+		<groupId>org.ihtsdo</groupId>
+		<artifactId>wb-api</artifactId>
+		<version>${project.version}</version>
         </dependency>
 	<dependency>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-bdb</artifactId>
-    		<version>2.6.0-trek-1-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</dependency>
     </dependencies>
 </project>
