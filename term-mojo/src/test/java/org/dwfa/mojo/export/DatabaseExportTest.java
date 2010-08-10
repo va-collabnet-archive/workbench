@@ -131,7 +131,7 @@ public class DatabaseExportTest extends ConceptMockery {
 
         I_GetConceptData sctAuModule = createMock(I_GetConceptData.class);
         expect(sctAuModule.getNid()).andReturn(234234234);
-        expect(termFactory.getConcept(UUID.fromString("bbd4b076-8637-46d4-8ce9-609909566999"))).andReturn(sctAuModule);
+        expect(termFactory.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"))).andReturn(sctAuModule);
         replay(sctAuModule);
 
         //set the default namespace
