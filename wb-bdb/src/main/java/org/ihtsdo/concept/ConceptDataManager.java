@@ -321,7 +321,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
 	void processNewRel(Relationship rel) throws IOException {
 		
-		AceLog.getAppLog().info("CDM processNewRel rel.getC2Id() = "+rel.getC2Id() +" type = "+rel.getTypeId());
+		//AceLog.getAppLog().info("CDM processNewRel rel.getC2Id() = "+rel.getC2Id() +" type = "+rel.getTypeId());
 		
         assert rel != null : "rel is null: " + this;
 		assert rel.nid != 0 : "relNid is 0: " + this;

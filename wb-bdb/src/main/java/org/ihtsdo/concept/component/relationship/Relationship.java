@@ -347,7 +347,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
 		
-		AceLog.getAppLog().info("Relationship writeToBdb c2Nid = "+c2Nid+" getTypeNid() = "+getTypeNid() +" typeNid = "+typeNid);
+		//AceLog.getAppLog().info("Relationship writeToBdb c2Nid = "+c2Nid+" getTypeNid() = "+getTypeNid() +" typeNid = "+typeNid);
 		
 		List<RelationshipRevision> partsToWrite = new ArrayList<RelationshipRevision>();
 		if (revisions != null) {
@@ -377,20 +377,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 				Bdb.addXrefPair(c2Nid, npr);
 			}*/
 		
-			NidPairForRel npr = null;	
+		NidPairForRel npr = null;	
 			
 		if(partsToWrite.size() == 0) {
 			npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
 			Bdb.addXrefPair(c2Nid, npr);
 		}
 		else {
-			/*for (RelationshipRevision p : partsToWrite) {
-				
-				p.writePartToBdb(output);
-			}*/
 			RelationshipRevision p = (RelationshipRevision) Bdb.getMaxVersionPart(partsToWrite);
-			p.writePartToBdb(output);
-			
+			p.writePartToBdb(output);	
 		}
 			
 			
