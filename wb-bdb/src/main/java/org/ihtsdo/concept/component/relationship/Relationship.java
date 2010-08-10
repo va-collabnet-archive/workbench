@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
@@ -345,6 +346,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
 		//
+		
+		AceLog.getAppLog().info("Relationship writeToBdb c2Nid = "+c2Nid+" getTypeNid() = "+getTypeNid() +" typeNid = "+typeNid);
+		
 		List<RelationshipRevision> partsToWrite = new ArrayList<RelationshipRevision>();
 		if (revisions != null) {
 			for (RelationshipRevision p : revisions) {
@@ -368,6 +372,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		
 		for (RelationshipRevision p : partsToWrite) {
 			if (p.getTypeId() != typeNid) {
+				AceLog.getAppLog().info("Adding XRef c2Nid = "+c2Nid+ " p.getTypeId() = "+p.getTypeId());
 				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
 				Bdb.addXrefPair(c2Nid, npr);
 			}

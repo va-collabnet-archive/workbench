@@ -99,6 +99,9 @@ public class BdbCommitManager {
 			    		AceLog.getAppLog().info("ConceptWriter run Stack = "+stacktrace);
 			    		System.out.println(e);
 			    	} */
+					
+					//AceLog.getAppLog().info("ConceptWriter c destrelnum = "+c.getDestRels().size());
+					
 					Bdb.getConceptDb().writeConcept(c);
 				}
 			} catch (Exception e) {
