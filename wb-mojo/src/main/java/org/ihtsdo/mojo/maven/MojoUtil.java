@@ -136,11 +136,12 @@ public class MojoUtil {
     public static URLClassLoader getProjectClassLoaderWithoutProvided(List<Artifact> dependencies) throws IOException {
         List<Artifact> dependencyWithoutProvided = new ArrayList<Artifact>();
         for (Artifact d : dependencies) {
-            if (d.getScope().equals("provided")) {
+            if (d.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                 // don't add
             } else if (d.getScope().equals("runtime-directory")) {
                 // don't add
-            } else if (d.getScope().equals("system")) {
+                // DEPRECATED - but ignored here as method appears unused regardless
+            } else if (d.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                 // don't add
             } else {
                 dependencyWithoutProvided.add(d);
@@ -154,11 +155,12 @@ public class MojoUtil {
 
         List<Dependency> dependencyWithoutProvided = new ArrayList<Dependency>();
         for (Dependency d : dependencies) {
-            if (d.getScope().equals("provided")) {
+            if (d.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                 // don't add
             } else if (d.getScope().equals("runtime-directory")) {
                 // don't add
-            } else if (d.getScope().equals("system")) {
+                // DEPRECATED - but ignored here as method appears unused regardless
+            } else if (d.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                 // don't add
             } else {
                 dependencyWithoutProvided.add(d);

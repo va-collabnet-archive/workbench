@@ -23,13 +23,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -103,6 +109,20 @@ public class WriteDirectories extends AbstractMojo {
      */
     private File targetDirectory;
 
+    /**
+     * A list of groupId:artifactId combinations to include as runtime directories
+     *
+     * @parameter
+     */
+    private List<String> runtimeArtifacts;
+
+    /**
+     * A list of groupId:artifactId combinations to include as resource directories
+     *
+     * @parameter
+     */
+    private List<String> resourceArtifacts;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         Log l = getLog();
         try {
@@ -116,15 +136,29 @@ public class WriteDirectories extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
 
+        ArtifactFilter legacyRuntimeFilter = new ScopeEqualsArtifactFilter( "runtime-directory" );
+        ArtifactFilter runtimeFilter = new IncludesArtifactFilter( runtimeArtifacts != null ? runtimeArtifacts : Collections.emptyList() );
+
+        ArtifactFilter legacyResourceFilter = new ScopeEqualsArtifactFilter( "resource-directory" );
+        ArtifactFilter resourceFilter = new IncludesArtifactFilter( resourceArtifacts != null ? resourceArtifacts : Collections.emptyList() );
+
         for (Artifact a : artifacts) {
-            if (a.getScope().equals("runtime-directory")) {
+            boolean legacyRuntime = legacyRuntimeFilter.include(a);
+            boolean legacyResource = legacyResourceFilter.include(a);
+            if (legacyRuntime || runtimeFilter.include(a)) {
+                if (legacyRuntime) {
+                    l.error( "DEPRECATED: instead of runtime-directory, the artifact should be listed in the runtimeArtifacts configuration element" );
+                }
                 File rootDir = this.outputDirectory;
                 if (targetSubDir != null) {
                     rootDir = new File(rootDir, targetSubDir);
                 }
                 extractArtifactDependencyToDir(l, rootDir, a);
 
-            } else if (a.getScope().equals("resource-directory")) {
+            } else if (legacyResource || resourceFilter.include(a)) {
+                if (legacyRuntime) {
+                    l.error( "DEPRECATED: instead of resource-directory, the artifact should be listed in the resourceArtifacts configuration element" );
+                }
                 File rootDir = new File(this.sourceDirectory.getParentFile(), "resources");
                 if (targetSubDir != null) {
                     rootDir = new File(rootDir, targetSubDir);
@@ -144,8 +178,8 @@ public class WriteDirectories extends AbstractMojo {
         try {
             FileInputStream fis = new FileInputStream(a.getFile());
             BufferedInputStream bis = new BufferedInputStream(fis);
-            JarInputStream jis = new JarInputStream(bis);
-            JarEntry je = jis.getNextJarEntry();
+            ZipInputStream jis = new ZipInputStream(bis);
+            ZipEntry je = jis.getNextEntry();
             while (je != null) {
                 // l.info(" entry: " + je.getName());
                 if (je.getName().contains("META-INF") == false) {
@@ -170,11 +204,28 @@ public class WriteDirectories extends AbstractMojo {
                         destFile.setLastModified(je.getTime());
                     }
                 }
-                je = jis.getNextJarEntry();
+                je = jis.getNextEntry();
             }
             jis.close();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage() + " file:" + a.getFile(), e);
+        }
+    }
+
+    private static class ScopeEqualsArtifactFilter
+        implements ArtifactFilter
+    {
+        private String scope;
+
+        public ScopeEqualsArtifactFilter( String scope )
+        {
+            this.scope = scope;
+        }
+
+        @Override
+        public boolean include( Artifact artifact )
+        {
+            return artifact.getScope().equals( scope );
         }
     }
 }

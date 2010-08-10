@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -99,9 +98,15 @@ public class VodbCreateNewPath extends AbstractMojo {
      * Path Description
      * 
      * @parameter
-     * @required
      */
     String pathPrefDesc;
+
+    /**
+     * Path UUID
+     * 
+     * @parameter
+     */
+    String pathUuidStr;
 
     /**
      * Location of the build directory.
@@ -147,8 +152,11 @@ public class VodbCreateNewPath extends AbstractMojo {
 
             I_GetConceptData parent = pathParent.getVerifiedConcept();
             activeConfig.setHierarchySelection(parent);
-
+            
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc);
+            if (pathUuidStr != null && pathUuidStr.length() > 1) {
+            	pathUUID = UUID.fromString(pathUuidStr);
+            }
             getLog().info("VodbCreateNewPath pathUUID= "+pathUUID);	
 
             I_GetConceptData pathConcept;
@@ -176,12 +184,6 @@ public class VodbCreateNewPath extends AbstractMojo {
             }
 
             tf.newPath(pathOrigins, pathConcept);
-        } catch (TerminologyException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (ParseException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
@@ -189,7 +191,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
     private I_GetConceptData createNewPathConcept(I_TermFactory tf, I_ConfigAceFrame activeConfig, UUID pathUUID)
             throws TerminologyException, IOException, Exception, NoSuchAlgorithmException, UnsupportedEncodingException {
-    	getLog().error("VodbCreateNewPath entering createNewPathConcept");
+    	getLog().info("VodbCreateNewPath entering createNewPathConcept");
     	
         List<I_AmTuple> newTuples = new ArrayList<I_AmTuple>();
 
@@ -205,7 +207,7 @@ public class VodbCreateNewPath extends AbstractMojo {
         
         I_DescriptionVersioned idv = tf.newDescription(fsDescUuid, pathConcept, "en", pathFsDesc,
         		descTypeConcept, activeConfig);
-        getLog().error("VodbCreateNewPath.createNewPathConcept should be adding a desc of "+pathFsDesc);
+        getLog().info("VodbCreateNewPath.createNewPathConcept should be adding a desc of "+pathFsDesc);
         newTuples.addAll(idv.getTuples());
 
         UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
@@ -232,17 +234,17 @@ public class VodbCreateNewPath extends AbstractMojo {
         // need to do an immediate commit so that new concept will be available
         // to path when read from changeset
         
-        getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
+        getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
         //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
         for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
-        	getLog().error("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
+        	getLog().info("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
         	for (I_DescriptionPart desl : desc.getMutableParts()) {
-        		getLog().error("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());
+        		getLog().info("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());
         	}
         	
         }
         
-        
+        tf.addUncommitted(pathConcept);
         tf.commit();
         return pathConcept;
     }

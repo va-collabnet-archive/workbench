@@ -35,6 +35,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -125,26 +127,26 @@ public class ExtractAndProcessFiles extends AbstractMojo {
             char[] cbuf = new char[1024];
             byte[] bbuf = new byte[1024];
             for (Artifact d : artifacts) {
-                if (d.getScope().equals("provided")) {
+                if (d.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                     continue;
                 }
-                if (d.getScope().equals("system")) {
+                if (d.getScope().equals(Artifact.SCOPE_SYSTEM)) {
                     continue;
                 }
                 if (d.getScope().equals("runtime-directory")) {
+                    l.error( "DEPRECATED: runtime-directory scope should be converted to ZIP artifact for " + d );
                     continue;
                 }
 
-                String dependencyPath = MojoUtil.artifactToPath(localRepository.getBasedir(), d);
-                File dependencyFile = new File(dependencyPath);
+                File dependencyFile = d.getFile();
                 if (dependencyFile.exists()) {
                     try {
 
-                        JarFile jf = new JarFile(dependencyPath);
+                        ZipFile jf = new ZipFile(dependencyFile);
 
-                        Enumeration<JarEntry> jarEnum = jf.entries();
+                        Enumeration<? extends ZipEntry> jarEnum = jf.entries();
                         while (jarEnum.hasMoreElements()) {
-                            JarEntry je = jarEnum.nextElement();
+                            ZipEntry je = jarEnum.nextElement();
 
                             Matcher m = filePattern.matcher(je.getName());
                             if (m.find()) {
@@ -228,10 +230,10 @@ public class ExtractAndProcessFiles extends AbstractMojo {
                             }
                         }
                     } catch (Exception e) {
-                        throw new MojoExecutionException(e.getMessage() + " path:" + dependencyPath + " spec" + spec, e);
+                        throw new MojoExecutionException(e.getMessage() + " path:" + dependencyFile + " spec" + spec, e);
                     }
                 } else {
-                    getLog().info("Warning. Dependency file does not exist: " + dependencyPath);
+                    getLog().info("Warning. Dependency file does not exist: " + dependencyFile);
                 }
 
             }
