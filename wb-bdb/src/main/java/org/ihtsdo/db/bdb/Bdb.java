@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -557,6 +558,20 @@ public class Bdb {
 
 	public static  List<NidPairForRefset> getRefsetPairs(int nid) {
 		return xref.getRefsetPairs(nid);
+	}
+	
+	public static I_AmPart getMaxVersionPart(Collection<? extends I_AmPart> parts) {
+		int versionI = Integer.MIN_VALUE;
+		I_AmPart retVal = null;
+		
+		for(I_AmPart atp: parts) {
+			int verI = atp.getVersion();
+			if(verI > versionI) {
+				versionI = verI;
+				retVal = atp;
+			}
+		}		
+		return retVal;
 	}
 
 }

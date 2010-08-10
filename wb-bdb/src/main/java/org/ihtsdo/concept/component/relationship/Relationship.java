@@ -367,17 +367,36 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		output.writeInt(getTypeNid());
 		output.writeShort(partsToWrite.size());
 		
-		NidPairForRel npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
+		/*NidPairForRel npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
 		Bdb.addXrefPair(c2Nid, npr);
 		
-		for (RelationshipRevision p : partsToWrite) {
+		   for (RelationshipRevision p : partsToWrite) {
 			if (p.getTypeId() != typeNid) {
 				AceLog.getAppLog().info("Adding XRef c2Nid = "+c2Nid+ " p.getTypeId() = "+p.getTypeId());
 				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
 				Bdb.addXrefPair(c2Nid, npr);
-			}
-			p.writePartToBdb(output);
+			}*/
+		
+			NidPairForRel npr = null;	
+			
+		if(partsToWrite.size() == 0) {
+			npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
+			Bdb.addXrefPair(c2Nid, npr);
 		}
+		else {
+			/*for (RelationshipRevision p : partsToWrite) {
+				
+				p.writePartToBdb(output);
+			}*/
+			RelationshipRevision p = (RelationshipRevision) Bdb.getMaxVersionPart(partsToWrite);
+			p.writePartToBdb(output);
+			
+		}
+			
+			
+			
+			
+		
 	}
 
 
