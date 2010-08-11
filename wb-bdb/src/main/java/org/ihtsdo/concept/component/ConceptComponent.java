@@ -46,6 +46,9 @@ import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -844,14 +847,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             Object denotation = idv.getDenotation();
             switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
             case LONG:
-                additionalIdentifierVersions.add(new IdentifierVersionLong((EIdentifierLong) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionLong((TkIdentifierLong) idv));
                 break;
             case STRING:
-                additionalIdentifierVersions.add(new IdentifierVersionString((EIdentifierString) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionString((TkIdentifierString) idv));
                 break;
             case UUID:
                 Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
-                additionalIdentifierVersions.add(new IdentifierVersionUuid((EIdentifierUuid) idv));
+                additionalIdentifierVersions.add(new IdentifierVersionUuid((TkIdentifierUuid) idv));
                 break;
             default:
                 throw new UnsupportedOperationException();

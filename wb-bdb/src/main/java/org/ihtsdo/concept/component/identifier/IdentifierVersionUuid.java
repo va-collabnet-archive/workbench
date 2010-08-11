@@ -6,6 +6,7 @@ import org.dwfa.ace.api.I_IdPart;
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EIdentifierUuid;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -18,7 +19,7 @@ public class IdentifierVersionUuid extends IdentifierVersion {
         uNid = input.readInt();
     }
 
-    public IdentifierVersionUuid(EIdentifierUuid idv) {
+    public IdentifierVersionUuid(TkIdentifierUuid idv) {
         super(idv);
         uNid = Bdb.getUuidsToNidMap().getUNid(idv.getDenotation());
     }

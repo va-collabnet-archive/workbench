@@ -3,6 +3,7 @@ package org.ihtsdo.concept.component.identifier;
 import org.dwfa.ace.api.I_IdPart;
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.etypes.EIdentifierLong;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -15,7 +16,7 @@ public class IdentifierVersionLong extends IdentifierVersion {
         longDenotation = input.readLong();
     }
 
-    public IdentifierVersionLong(EIdentifierLong idv) {
+    public IdentifierVersionLong(TkIdentifierLong idv) {
         super(idv);
         longDenotation = idv.getDenotation();
     }
