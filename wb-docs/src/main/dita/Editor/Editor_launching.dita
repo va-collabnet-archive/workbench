@@ -205,9 +205,8 @@
         id="ag935782">
         <title>Process Builder Toggle View On</title>
 
-        <image height="283"
-               href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_9.jpg"
-               placement="break" width="406"/>
+        <image href="../images/Using_The_ACE_Editor_Images/process_viewer.jpg"
+               placement="break"/>
       </fig> <p id="ag929057"> <b>Synchronize with Subversion Business
     Process</b> <image
     href="../images/Using_The_ACE_Editor_Images/icon_subversion_small.png"

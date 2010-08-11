@@ -557,9 +557,8 @@
     <fig id="ag937596">
       <title>Changing a Description</title>
 
-      <image height="87"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_32.jpg"
-             placement="break" width="445"/>
+      <image href="../images/Using_The_ACE_Editor_Images/change_description.jpg"
+             placement="break"/>
     </fig>
 
     <section>The focus concept is the first description listed in the section.
@@ -577,9 +576,8 @@
     <fig id="ag937610">
       <title>Adding a Description</title>
 
-      <image height="53"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_33.jpg"
-             placement="break" width="261"/>
+      <image href="../images/Using_The_ACE_Editor_Images/add_description.jpg"
+             placement="break"/>
     </fig>
 
     <section>The remaining fields are described below.</section>
@@ -643,9 +641,8 @@
     <fig id="ag970542">
       <title>Changing or Retiring a Source Relationship</title>
 
-      <image height="221"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_34.jpg"
-             placement="break" width="419"/>
+      <image href="../images/Using_The_ACE_Editor_Images/change_relationship.jpg"
+             placement="break"/>
     </fig>
 
     <section>To change a description, select the “Change” option.</section>
@@ -660,9 +657,8 @@
     <fig id="ag970577">
       <title>Adding a Source Relationship</title>
 
-      <image height="77"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_37.jpg"
-             placement="break" width="422"/>
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_37.jpg"
+             placement="break"/>
     </fig>
 
     <section>Remaining fields in the Source Relationships section are
@@ -703,9 +699,8 @@
     <fig id="ag937774">
       <title>Changing a Destination Relationship</title>
 
-      <image height="171"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_38.jpg"
-             placement="break" width="408"/>
+      <image href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_38.jpg"
+             placement="break"/>
     </fig>
 
     <section>To change the content of a destination relationship, right-click
@@ -721,9 +716,8 @@
     <fig id="ag937792">
       <title>Adding a Destination Relationship</title>
 
-      <image height="43"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_39.jpg"
-             placement="break" width="441"/>
+      <image href="../images/Using_The_ACE_Editor_Images/add_destination.jpg"
+             placement="break"/>
     </fig>
 
     <section>Remaining fields in the Destination Relationships section
@@ -767,9 +761,8 @@
     <fig id="ag949043">
       <title>Concept Lineage</title>
 
-      <image height="228"
-             href="../images/Using_The_ACE_Editor_Images/using_the_ace_editor_img_40.jpg"
-             placement="break" width="446"/>
+      <image href="../images/Using_The_ACE_Editor_Images/concept_lineage.jpg"
+             placement="break"/>
     </fig>
 
     <section>As described in the Hierarchy View discussion (<xref
