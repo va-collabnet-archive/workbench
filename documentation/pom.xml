@@ -141,9 +141,11 @@
 						<id>adjust-memory</id>
 						<phase>generate-sources</phase>
 						<configuration>
+			<!--
 							<tasks>
 								<replace file="${dita.ot.dir}/demo/fo/build.xml" token="maxmemory=&quot;256m&quot;" value="maxmemory=&quot;1024m&quot;"/>
 							</tasks>
+			-->
 						</configuration>
 						<goals>
 							<goal>run</goal>
@@ -245,7 +247,7 @@
 				<configuration>
 					<useDitaAnt>true</useDitaAnt>
 					<useDitaClasspath>true</useDitaClasspath>
-					<antOpts>-Xmx512m</antOpts>
+					<antOpts>-Xmx768m</antOpts>
 				</configuration>
 				<executions>
 					<execution>
