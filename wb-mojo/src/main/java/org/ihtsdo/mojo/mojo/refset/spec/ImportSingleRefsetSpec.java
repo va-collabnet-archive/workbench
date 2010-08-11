@@ -83,6 +83,13 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 
     private I_ConfigAceFrame config;
 
+    /**
+     * Set to true generate changesets
+     * 
+     * @parameter default-value = true
+     */
+    private boolean writeChangesets = true;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + refsetSpecFile.getCanonicalPath()
@@ -95,6 +102,9 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
 
         try {
             config = Terms.get().getActiveAceFrameConfig();
+            if (!writeChangesets) {
+                Terms.get().suspendChangeSetWriters();
+            }
             if (config == null) {
                 throw new MojoExecutionException(
                     "You must set up the configuration prior to this call. Please see: vodb-set-default-config and vodb-set-view-paths goals. ");
@@ -114,6 +124,10 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
             } else {
                 config.setProperty("override", false);
             }
+
+            boolean checkCreationTestsEnabled = Terms.get().isCheckCreationDataEnabled();
+            boolean checkCommitTestsEnabled = Terms.get().isCheckCommitDataEnabled();
+
             I_GetConceptData refsetSpec =
                     tupleImporter.importFile(refsetSpecFile, reportFile, config, Terms.get().newActivityPanel(false,
                         config, "Importing refset spec...", true));
@@ -136,7 +150,17 @@ public class ImportSingleRefsetSpec extends AbstractMojo {
                 Terms.get().commit();
             }
 
+            Terms.get().setCheckCommitDataEnabled(checkCommitTestsEnabled);
+            Terms.get().setCheckCreationDataEnabled(checkCreationTestsEnabled);
+
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
+
         } catch (Exception e) {
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }

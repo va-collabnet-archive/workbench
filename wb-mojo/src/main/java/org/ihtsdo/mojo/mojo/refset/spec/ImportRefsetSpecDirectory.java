@@ -79,6 +79,13 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
      */
     private boolean computeP;
 
+    /**
+     * Set to true generate changesets
+     * 
+     * @parameter default-value = true
+     */
+    private boolean writeChangesets = true;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + inputDir.getCanonicalPath(), this
@@ -91,6 +98,12 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
 
         try {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+
+            if (!writeChangesets) {
+                Terms.get().suspendChangeSetWriters();
+            } else {
+                Terms.get().resumeChangeSetWriters();
+            }
             if (config == null) {
                 throw new MojoExecutionException(
                     "You must set up the configuration prior to this call. Please see: vodb-set-default-config and vodb-set-view-paths goals. ");
@@ -102,6 +115,9 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
             }
             outputDir.mkdirs();
             getLog().info("Importing refset specs from " + inputDir.getPath());
+            boolean checkCreationTestsEnabled = Terms.get().isCheckCreationDataEnabled();
+            boolean checkCommitTestsEnabled = Terms.get().isCheckCommitDataEnabled();
+
             for (File inputFile : inputDir.listFiles()) {
                 if (inputFile.getName().endsWith(".txt")) {
                     String reportFileName = inputFile.getName().replace(".txt", ".log");
@@ -150,7 +166,16 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
 
             Terms.get().commit();
 
+            Terms.get().setCheckCommitDataEnabled(checkCommitTestsEnabled);
+            Terms.get().setCheckCreationDataEnabled(checkCreationTestsEnabled);
+
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
         } catch (Exception e) {
+            if (!writeChangesets) {
+                Terms.get().resumeChangeSetWriters();
+            }
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
