@@ -35,7 +35,7 @@ import org.dwfa.util.AceDateFormat;
 
 /**
  *  {@code DatabaseExportUtility} is a utility class for performing DatabaseExport Functions.
- * @author matt
+ * @author Matthew Edwards
  */
 public interface DatabaseExportUtility {
 

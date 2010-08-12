@@ -1,12 +1,12 @@
 /*
- *  Copyright 2010 matt.
- * 
+ *  Copyright 2010 International Health Terminology Standards Development  *  Organisation..
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,12 +39,19 @@ import org.dwfa.mojo.export.AbstractComponentDtoUpdater;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- *
- * @author matt
+ * {@code AmtComponentDtoUpdater} is an implementation of {@link AbstractComponentDtoUpdater} for performing AMT
+ * specific DTO updating functions.
+ * @author Matthew Edwards
  */
 public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
 
-    public AmtComponentDtoUpdater(NAMESPACE defaultNamespace, PROJECT defaultProject) throws Exception {
+    /**
+     * Creates an instance of {@code AmtComponentDtoUpdater} for performing DTO update functions for AMT.
+     * @param defaultNamespace the Name space of the data.
+     * @param defaultProject the Name space of the data.
+     * @throws Exception if there is an error accessing the terminology from the Internal Term Factory.
+     */
+    public AmtComponentDtoUpdater(final NAMESPACE defaultNamespace, final PROJECT defaultProject) throws Exception {
         super(defaultNamespace, defaultProject);
 
         I_GetConceptData erroneous = termFactory.getConcept(
@@ -52,29 +59,33 @@ public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
 
         I_GetConceptData conceptRetired = termFactory.getConcept(
                 ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getUids().iterator().next());
-        
+
          this.check = new AmtStatusChecker(activeConcept, currentConcept, erroneous, conceptRetired);
     }
 
     @Override
-    public ComponentDto updateComponentDto(ComponentDto componentDto, I_ConceptAttributeTuple tuple, boolean latest) throws Exception {
+    public ComponentDto updateComponentDto(final ComponentDto componentDto, final I_ConceptAttributeTuple tuple,
+            final boolean latest) throws Exception {
            ConceptDto conceptDto = new ConceptDto();
         I_GetConceptData conceptData = termFactory.getConcept(tuple.getConId());
         conceptDto.setConceptId(getIdMap(tuple, tuple.getConId()));
 
         this.getBaseConceptDto(conceptDto, tuple, conceptData.getId().getVersions(), latest);
 
-        this.addUuidSctIdIndentifierToConceptDto(conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
+        this.addUuidSctIdIndentifierToConceptDto(
+                conceptDto, tuple, conceptData.getId().getVersions(), TYPE.CONCEPT, tuple.getConId(), latest);
 
         List<I_DescriptionTuple> descriptionTuples = new ArrayList<I_DescriptionTuple>();
-        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIntSet, null, true)));
+        descriptionTuples.addAll(TupleVersionPart.getLatestMatchingTuples(
+                conceptData.getDescriptionTuples(null, fullySpecifiedDescriptionTypeIntSet, null, true)));
         Collections.sort(descriptionTuples, new TupleVersionComparator());
 
         String fsn = "NO FSN!!!";
         I_DescriptionTuple fsnTuple = null;
         if (!descriptionTuples.isEmpty()) {
             for (I_DescriptionTuple iDescriptionTuple : descriptionTuples) {
-                if (check.isDescriptionActive(iDescriptionTuple.getStatusId()) || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
+                if (check.isDescriptionActive(iDescriptionTuple.getStatusId())
+                        || iDescriptionTuple.getStatusId() == aceLimitedStatusNId) {
                     if (fsnTuple == null || fsnTuple.getVersion() < iDescriptionTuple.getVersion()) {
                         fsnTuple = iDescriptionTuple;
                     }
@@ -103,13 +114,15 @@ public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
     }
 
     @Override
-    public void updateComponentDto(ComponentDto componentDto, I_RelTuple tuple, boolean latest) throws Exception, TerminologyException {
+    public void updateComponentDto(final ComponentDto componentDto, final I_RelTuple tuple, final boolean latest)
+            throws Exception, TerminologyException {
           RelationshipDto relationshipDto = new RelationshipDto();
         List<I_IdPart> idParts = termFactory.getId(tuple.getRelId()).getVersions();
 
         this.getBaseConceptDto(relationshipDto, tuple, idParts, latest);
 
-        this.addUuidSctIdIndentifierToConceptDto(relationshipDto, tuple, idParts, TYPE.RELATIONSHIP, tuple.getRelId(), latest);
+        this.addUuidSctIdIndentifierToConceptDto(relationshipDto, tuple, idParts, TYPE.RELATIONSHIP, tuple.getRelId(),
+                latest);
 
         int snomedCharacter = ArchitectonicAuxiliary.getSnomedCharacteristicTypeId(termFactory.getUids(tuple.
                 getCharacteristicId()));
@@ -128,7 +141,5 @@ public final class AmtComponentDtoUpdater extends AbstractComponentDtoUpdater {
         relationshipDto.setTypeId(termFactory.getUids(tuple.getTypeId()).iterator().next());
 
         componentDto.getRelationshipDtos().add(relationshipDto);
-
-
     }
 }

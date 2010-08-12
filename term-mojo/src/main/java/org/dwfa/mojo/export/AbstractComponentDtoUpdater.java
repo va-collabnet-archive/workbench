@@ -1,12 +1,13 @@
 /*
- *  Copyright 2010 matt.
- * 
+ *  Copyright 2010 International Health Terminology Standards Development
+ *  Organisation.
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,12 +51,13 @@ import org.dwfa.vodb.types.ThinIdPart;
 
 /**
  *
- * @author matt
+ * @author Matthew Edwards
  */
 public abstract class AbstractComponentDtoUpdater {
 
     /** Class logger. */
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
+    /** TermFactory. */
     protected static final I_TermFactory termFactory = LocalVersionedTerminology.get();
     /** SNOMED Id concept. */
     private final I_GetConceptData snomedIntId;
@@ -67,9 +69,9 @@ public abstract class AbstractComponentDtoUpdater {
     private final UuidSnomedDbMapHandler uuidSnomedDbMapHandler;
     /** The active concept. */
     protected final I_GetConceptData activeConcept;
-    /** The default namespace to use for export */
+    /** The default namespace to use for export. */
     private final NAMESPACE defaultNamespace;
-    /** The default project to use for export */
+    /** The default project to use for export. */
     private final PROJECT defaultProject;
     /** International release path. */
     private final I_GetConceptData snomedReleasePath;
@@ -155,11 +157,11 @@ public abstract class AbstractComponentDtoUpdater {
      *
      * @param componentDto ComponentDto - updated with a new relationship
      * @param tuple I_RelTuple - to add to the ComponentDto
-     * @throws IOException DB errors
+     * @throws Exception DB errors
      * @throws TerminologyException DB errors
      */
-    public abstract void updateComponentDto(ComponentDto componentDto, I_RelTuple tuple, boolean latest) throws Exception,
-            TerminologyException;
+    public abstract void updateComponentDto(ComponentDto componentDto, I_RelTuple tuple, boolean latest)
+            throws Exception, TerminologyException;
 
     /**
      * Update the ComponentDto with the concept details.

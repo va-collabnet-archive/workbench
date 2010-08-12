@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 International Health Terminology Standards Development Organisation.
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
  */
 package org.dwfa.mojo.export;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -27,11 +28,11 @@ import org.dwfa.mojo.ConceptConstants;
  */
 class SnomedToRf2StatusConverter {
 
-    /** Pair Map.*/
-    private final Map<Integer, Integer> snomedToRf2Map = new HashMap<Integer, Integer>();
+    /** Unmodifiable Pair Map, ensures that the map will never be modified and therefore ensure data accuracy.*/
+    private final Map<Integer, Integer> snomedToRf2Map;
 
     /**
-     * Constructs an instance of {@code SnomedToRf2StatusConverter}. Loads the information for Snomed CT Statuses and
+     * Constructs an instance of {@code SnomedToRf2StatusConverter}. Loads the information for SNOMED CT Statuses and
      * RF2 meta-data statuses and places them in a map.
      * @throws Exception if there is an error accessing the Terminology Database.
      */
@@ -52,14 +53,17 @@ class SnomedToRf2StatusConverter {
         int aceMovedElsewhereStatusNId = ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid();
         int aceLimitedStatusNId = ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid();
 
+        Map<Integer, Integer> constructorMap = new HashMap<Integer, Integer>();
 
-        snomedToRf2Map.put(aceDuplicateStatusNId, duplicateStatusNId);
-        snomedToRf2Map.put(aceAmbiguousStatusNId, ambiguousStatusNId);
-        snomedToRf2Map.put(aceErroneousStatusNId, erroneousStatusNId);
-        snomedToRf2Map.put(aceOutdatedStatusNId, outdatedStatusNId);
-        snomedToRf2Map.put(aceInappropriateStatusNId, inappropriateStatusNId);
-        snomedToRf2Map.put(aceMovedElsewhereStatusNId, movedElsewhereStatusNId);
-        snomedToRf2Map.put(aceLimitedStatusNId, limitedStatusNId);
+        constructorMap.put(aceDuplicateStatusNId, duplicateStatusNId);
+        constructorMap.put(aceAmbiguousStatusNId, ambiguousStatusNId);
+        constructorMap.put(aceErroneousStatusNId, erroneousStatusNId);
+        constructorMap.put(aceOutdatedStatusNId, outdatedStatusNId);
+        constructorMap.put(aceInappropriateStatusNId, inappropriateStatusNId);
+        constructorMap.put(aceMovedElsewhereStatusNId, movedElsewhereStatusNId);
+        constructorMap.put(aceLimitedStatusNId, limitedStatusNId);
+
+        this.snomedToRf2Map = Collections.unmodifiableMap(constructorMap);
     }
 
     /**
@@ -69,7 +73,7 @@ class SnomedToRf2StatusConverter {
      * @return the RF2 Status if it exists or {@code -1} if no RF2 Status for the the given SNOMED CT component status
      * exists.
      */
-    int toRf2Status(int snomedStatusNid) {
+    int toRf2Status(final int snomedStatusNid) {
         if (snomedToRf2Map.containsKey(snomedStatusNid)) {
             return snomedToRf2Map.get(snomedStatusNid);
         } else {
