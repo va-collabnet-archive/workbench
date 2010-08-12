@@ -106,7 +106,7 @@ public abstract class AbstractExportSpecification implements ExportSpecification
 
     protected DatabaseExportUtility utility;
 
-     protected StatusChecker check;
+    protected StatusChecker check;
 
     public AbstractExportSpecification(final List<Position> positions, final List<I_GetConceptData> inclusions,
             final List<I_GetConceptData> exclusions, final NAMESPACE defaultNamespace, final PROJECT defaultProject)

@@ -94,7 +94,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
     private static final String EN = "en";
     private static final String EN_GB = "en-GB";
     private static final String EN_AU = "en-AU";
-    private I_GetConceptData adrsConceptParent;
+
     /** Int set of fsn type. */
     private final I_IntSet fullySpecifiedDescriptionTypeIntSet = new IntSet();
     private final int adrsNid;
@@ -149,7 +149,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         //TODO this needs to be re factored...
         adrsNid = termFactory.getConcept(UUID.fromString("e20f610b-fbc0-43fe-8130-8f9abca312d9")).getNid();
 
-        //structuralRefsets.add(adrsNid);
+        structuralRefsets.add(adrsNid);
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6f1e56b5-c127-4f0b-97fa-cb72c76ad58a")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("ef010cf1-cf06-4c8a-9684-a040e61b319d")).getNid());
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("f8834d2f-4e2d-4793-a9e0-5190391ad277")).getNid());
@@ -162,8 +162,6 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
         structuralRefsets.add(termFactory.getConcept(UUID.fromString("6c441f26-ed8a-42ff-91b7-fcb27191f9f6")).getNid());
 
         this.defaultProject = defaultProject;
-
-        adrsConceptParent = termFactory.getConcept(UUID.fromString("bbd4b076-8637-46d4-8ce9-609909566999"));
 
         extensionProcessor = new ExtensionProcessor<I_ThinExtByRefPart>();
 
@@ -246,9 +244,7 @@ public class SnomedExportSpecification extends AbstractExportSpecification {
             }
 
             if (generateLangaugeRefset) {
-                if (adrsConceptParent.isParentOf(concept, false) || adrsConceptParent.equals(concept)) {
-                    updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
-                }
+            	updateAdrsComponentDto(componentDto, matchingDescriptionTuples);
             }
 
             Set<I_RelTuple> latestRelationshipTuples = new HashSet<I_RelTuple>();
