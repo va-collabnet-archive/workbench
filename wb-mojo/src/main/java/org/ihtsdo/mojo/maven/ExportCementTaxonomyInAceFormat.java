@@ -38,6 +38,7 @@ import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.dwfa.tapi.spec.TaxonomySpec;
+import org.ihtsdo.cement.WorkflowAuxiliary;
 
 /**
  * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize
@@ -198,7 +199,10 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
                         RefsetAuxiliary ra = new RefsetAuxiliary();
                         ra.addToMemoryTermServer(mts);
                         break;
-
+                    case WORKFLOW_AUXILIARY:
+                    	WorkflowAuxiliary wa = new WorkflowAuxiliary();
+                    	wa.addToMemoryTermServer(mts);
+                    	break;
                     default:
                         throw new Exception("Don't know how to handle taxonomy: " + t);
                     }
