@@ -16,34 +16,27 @@
  */
 package org.dwfa.mojo.export;
 
+import org.dwfa.mojo.export.amt.AmtExportSpecification;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.process.I_ProcessQueue;
-import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.task.commit.validator.ValidationException;
-import org.dwfa.ace.task.path.PromoteToPath;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.dto.ComponentDto;
 import org.dwfa.maven.sctid.UuidSctidMapDb;
@@ -54,8 +47,6 @@ import org.dwfa.mojo.PositionDescriptor;
 import org.dwfa.mojo.export.file.AceOutputHandler;
 import org.dwfa.mojo.export.file.Rf1OutputHandler;
 import org.dwfa.mojo.export.file.Rf2OutputHandler;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.AceDateFormat;
 import org.dwfa.vodb.types.ThinConPart;
 
 
@@ -97,7 +88,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      *
      * @parameter
      */
-    private PositionDescriptor[] excludedPositions;
+    private PositionDescriptor[] excludedPositions = new PositionDescriptor[0];
 
     /**
      * Origins for export
@@ -242,18 +233,20 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private boolean testing = false;
 
     /**
-     * Iterate concepts.
-     *
-     * @see org.apache.maven.plugin.Mojo#execute()
+     * Export Flag determines which type of Export we are running. Allowed Values are AMT or SNOMED.
+     * @parameter
+     * @required
      */
+    private String exportFlag;
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         logger.info("Start exporting concepts");
 
         try {
-            promotesToConcept = getTermFactory().getConcept(ConceptConstants.PROMOTES_TO.localize().getNid());
             currentConcept = getTermFactory().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-
+            
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
             if (uuidSctidDbUsername != null) {
@@ -265,23 +258,23 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
             workQueue = LocalVersionedTerminology.get().newProcessQueue(numberOfThreads);
 
-            Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
-
             List<Position> positions = new ArrayList<Position>();
-            setTestOriginPositions(releasePathDateMap, positions);
 
             for (PositionDescriptor positionDescriptor : positionsForExport) {
                 Position position = new Position(positionDescriptor);
                 position.setLastest(true);
                 positions.add(position);
             }
+            
+            Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
+            OriginProcessor originProcessor = new OriginProcessorFactory(currentConcept, releasePosition,
+                    originsForExport, maintainedModuleParent).getInstance(exportFlag);
 
-            rf2OutputHandler = new Rf2OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf2" + File.separatorChar), releasePathDateMap);
-            rf1OutputHandler = new Rf1OutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "rf1" + File.separatorChar), releasePathDateMap);
-            aceOutputHandler = new AceOutputHandler(
-                new File(exportDirectory.getAbsolutePath() + File.separatorChar + "ace" + File.separatorChar), releasePathDateMap);
+            originProcessor.addOriginPositions(releasePathDateMap, positions, excludedPositions);
+
+            rf2OutputHandler = new Rf2OutputHandler(new File(exportDirectory, "rf2") , releasePathDateMap);
+            rf1OutputHandler = new Rf1OutputHandler(new File(exportDirectory, "rf1"), releasePathDateMap);
+            aceOutputHandler = new AceOutputHandler(new File(exportDirectory, "ace"), releasePathDateMap);
 
             List<I_GetConceptData> inclusionRoots = new ArrayList<I_GetConceptData>();
             for (ConceptDescriptor conceptDescriptor : inclusions) {
@@ -300,8 +293,17 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             releasePart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
             releasePart.setVersion(releasePosition.getPosition().getVersion());
 
-            exportSpecification = new ExportSpecification(positions, inclusionRoots, exclusionRoots, NAMESPACE.fromString(defaultNamespace), PROJECT.valueOf(defaultProject));
-            exportSpecification.setReleasePart(releasePart);
+            //TODO Create Export Specification Factory or Builder.
+            if(exportFlag.equalsIgnoreCase("amt")){
+                exportSpecification = new AmtExportSpecification(positions, inclusionRoots, exclusionRoots,
+                        NAMESPACE.fromString(defaultNamespace), PROJECT.valueOf(defaultProject));
+            } else if(exportFlag.equalsIgnoreCase("snomed")) {
+                exportSpecification = new SnomedExportSpecification(positions, inclusionRoots, exclusionRoots,
+                        NAMESPACE.fromString(defaultNamespace), PROJECT.valueOf(defaultProject));
+                ((SnomedExportSpecification)exportSpecification).setReleasePart(releasePart);
+            }
+
+            
         } catch (IOException e) {
             throw new MojoExecutionException("Execute error: ", e);
         } catch (SQLException e) {
@@ -331,64 +333,6 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     }
 
     /**
-     * Adds to the <code>positions</code> List all the paths that have been
-     * promoted to test.
-     *
-     * Adds release position Map to the <code>releasePathDateMap</code> Map for
-     * each test path so the correct module id and time stamp are export for the
-     * test paths.
-     *
-     * @param releasePathDateMap Map of UUID Date maps.
-     * @param positions list of export Positions
-     * @throws Exception
-     * @throws TerminologyException
-     * @throws IOException
-     * @throws ParseException
-     */
-    private void setTestOriginPositions(Map<UUID, Map<UUID, Date>> releasePathDateMap, List<Position> positions)
-            throws Exception, TerminologyException, IOException, ParseException {
-        if (originsForExport != null) {
-            I_GetConceptData matainedModuleParent = termFactory.getConcept(UUID.fromString(maintainedModuleParent.getUuid()));
-            I_IntSet allowedStatus = termFactory.newIntSet();
-            allowedStatus.add(currentConcept.getNid());
-
-            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-            I_IntSet currentStatus = config.getAllowedStatus();
-            config.setAllowedStatus(allowedStatus);
-
-            Set<I_Position> positionOrigins = new HashSet<I_Position>();
-            for (PositionDescriptor positionDescriptor : originsForExport) {
-                positionOrigins.addAll(
-                    PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, getTermFactory()));
-            }
-
-            config.setAllowedStatus(currentStatus);
-
-            for (I_Position iPosition : positionOrigins) {
-                UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
-                if (!isExcludedPath(pathUuid)) {
-                    Date timePoint = new Date();
-                    timePoint.setTime(iPosition.getTime());
-                    Position position = new Position(getTermFactory().getConcept(iPosition.getPath().getConceptId()),
-                        timePoint);
-                    position.setLastest(true);
-                    positions.add(position);
-
-                    if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus,null, null, false)) {
-                        if (!releasePathDateMap.containsKey(pathUuid)) {
-                            Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
-                            releasePathDateMap.put(pathUuid, mappedModuleDate);
-
-                            mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
-                                AceDateFormat.getVersionHelperDateFormat().parse(releasePosition.getTimeString()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Process a concept.
      *
      * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
@@ -406,7 +350,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     /**
      * @return the termFactory
      */
-    private final I_TermFactory getTermFactory() {
+    private I_TermFactory getTermFactory() {
         if(termFactory == null){
             termFactory = LocalVersionedTerminology.get();
         }
@@ -418,23 +362,6 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      */
     public void setTermFactory(I_TermFactory termFactory) {
         this.termFactory = termFactory;
-    }
-
-    /**
-     * Is the path UUID in the excluded path list
-     *
-     * @param uuid UUID
-     * @return true if and excluded Path UUID
-     */
-    private boolean isExcludedPath(UUID uuid) {
-        boolean excluded = false;
-        for (PositionDescriptor positionDescriptor : excludedPositions) {
-            if (positionDescriptor.getPath().getUuid().equals(uuid.toString())) {
-                excluded = true;
-                break;
-            }
-        }
-        return excluded;
     }
 
     /**

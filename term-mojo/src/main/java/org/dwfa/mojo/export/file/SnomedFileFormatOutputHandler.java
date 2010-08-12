@@ -87,8 +87,9 @@ public abstract class SnomedFileFormatOutputHandler implements ExportOutputHandl
                 validationErrors.append(System.getProperty("line.separator"));
             }
 
-            logger.warning(componentDto.getConceptDtos().get(0).getConceptId().keySet().iterator().next()
-                + " Validation Errors:" + validationErrors.toString());
+            logger.warning(String.format("%1$s Validation Errors: %2$s",
+                    componentDto.getConceptDtos().get(0).getConceptId().keySet().iterator().next(),
+                    validationErrors.toString()));
             if (failOnError) {
                 throw new ValidationException("Validation Errors:" + validationErrors);
             }

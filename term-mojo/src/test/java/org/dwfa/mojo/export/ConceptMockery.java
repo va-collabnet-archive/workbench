@@ -1345,7 +1345,7 @@ public class ConceptMockery {
         I_ConceptualizeLocally conceptualizeLocally = createMock(I_ConceptualizeLocally.class);
         I_GetConceptData conceptData = createMock(I_GetConceptData.class);
 
-        expect(conceptualizeLocally.getUids()).andReturn(uuidList);
+        expect(conceptualizeLocally.getUids()).andReturn(uuidList).times(2);
         expect(conceptualizeLocally.getNid()).andReturn(nid).anyTimes();
         conceptLocalField.set(enumConcept, conceptualizeLocally);
         conceptUidsField.set(enumConcept, uuidList);
