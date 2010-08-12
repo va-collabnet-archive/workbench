@@ -25,12 +25,17 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <version>2.4</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+		    <groupId>org.easymock</groupId>
+		    <artifactId>easymockclassextension</artifactId>
+		    <version>2.4</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-wf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.doxia</groupId>
 			<artifactId>doxia-core</artifactId>
