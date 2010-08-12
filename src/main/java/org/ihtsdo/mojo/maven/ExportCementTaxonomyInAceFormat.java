@@ -83,6 +83,10 @@ public class ExportCementTaxonomyInAceFormat extends AbstractMojo {
          * A taxonomy that provides the metadata necessary to implement refsets.
          */
         REFSET_AUXILIARY,
+        /**
+         * A taxonomy that provides the metadata necessary to implement workflow.
+         */
+        WORKFLOW_AUXILIARY
     };
 
     /**
