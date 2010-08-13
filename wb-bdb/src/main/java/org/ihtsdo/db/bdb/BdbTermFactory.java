@@ -1881,8 +1881,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 		if (authorNid == Integer.MAX_VALUE) {
 			try {
 				authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
-			} catch (IOException e) {
-				throw new RuntimeException();
+			} catch (Exception e) {
+				//throw new RuntimeException();
 			}
 		}
 		return authorNid;

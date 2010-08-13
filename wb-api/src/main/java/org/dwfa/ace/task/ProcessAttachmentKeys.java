@@ -124,7 +124,15 @@ public enum ProcessAttachmentKeys {
     ISSUE_REPO_CONCEPT,
     ISSUE_REPO_PROP_NAME,
     ISSUE_REPO_PROP_PASSWORD,
-    REFSET_NAME;
+    REFSET_NAME,
+    TERMINOLOGY_PROJECT,
+    PARTITION,
+    WORKLIST_MEMBER,
+    TRANSLATOR_ROLE_INBOX,
+    REVIEWER_1_ROLE_INBOX,
+    REVIEWER_2_ROLE_INBOX,
+    SME_ROLE_INBOX,
+    EDITORIAL_BOARD_ROLE_INBOX;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

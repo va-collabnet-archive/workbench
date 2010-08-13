@@ -466,7 +466,24 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
 		"rules context metadata refset" }, RULES_AUXILIARY),
         REALTIME_QA_CONTEXT(new String[] { "realtime qa context", "realtime qa context" },  RULES_CONTEXT),		
         BATCH_QA_CONTEXT(new String[] { "batch qa context", "batch qa context" },  RULES_CONTEXT),
-        TEMPLATE_CONTEXT(new String[] { "template context", "template context" },  RULES_CONTEXT),;		
+        TEMPLATE_CONTEXT(new String[] { "template context", "template context" },  RULES_CONTEXT),
+        
+        LANGUAGE_REFSET(new String[] { "language refset", "language refset" }, 
+	    		new I_ConceptualizeUniversally[] {REFSET_IDENTITY}),
+	    		LANGUAGE_REFSET_EN(new String[] { "english language refset", "english language refset" }, 
+	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
+	    		LANGUAGE_REFSET_EN_GB(new String[] { "gb english language refset", "gb english language refset" }, 
+	    				new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
+	    		LANGUAGE_REFSET_ES(new String[] { "spanish language refset", "spanish language refset" }, 
+	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),
+	    		LANGUAGE_REFSET_SV_SE(new String[] { "swedish sweden language refset", "swedish sweden language refset" }, 
+	    	    		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),			
+		        LANGUAGE_REFSET_DA(new String[] { "danish language refset", "danish language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),			
+		        LANGUAGE_REFSET_FR(new String[] { "french language refset", "french language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),		
+		        LANGUAGE_REFSET_FR_CA(new String[] { "french-canadian language refset", "french-canadian language refset" }, 
+		        		new I_ConceptualizeUniversally[] {LANGUAGE_REFSET}),;		
 
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
