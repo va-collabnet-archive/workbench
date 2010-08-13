@@ -126,8 +126,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 				Set<Integer> currentDNids = c.data.getDescNids();
 				for (TkDescription ed: eConcept.getDescriptions()) {
 					int dNid = Bdb.uuidToNid(ed.primordialUuid);
-					Description d = c.getDescription(dNid);
-					if (currentDNids.contains(dNid) && d != null) {
+					if (currentDNids.contains(dNid)) {
+						Description d = c.getDescription(dNid);
 						d.merge(new Description(ed, c));
 					} else {
 						c.getDescriptions().add(new Description(ed, c));
