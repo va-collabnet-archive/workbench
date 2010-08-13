@@ -146,8 +146,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 				Set<Integer> currentSrcRelNids = c.data.getSrcRelNids();
 				for (TkRelationship er: eConcept.getRelationships()) {
 					int rNid = Bdb.uuidToNid(er.primordialUuid);
-					Relationship r = c.getSourceRel(rNid);
-					if (currentSrcRelNids.contains(rNid) && r != null) {
+					if (currentSrcRelNids.contains(rNid)) {
+						Relationship r = c.getSourceRel(rNid);
 						r.merge(new Relationship(er, c));
 					} else {
 						c.getSourceRels().add(new Relationship(er, c));
@@ -163,8 +163,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 				Set<Integer> currentImageNids = c.data.getImageNids();
 				for (TkMedia eImg: eConcept.getImages()) {
 					int iNid = Bdb.uuidToNid(eImg.primordialUuid);
-					Image img = c.getImage(iNid);
-					if (currentImageNids.contains(iNid) && img != null) {
+					if (currentImageNids.contains(iNid)) {
+						Image img = c.getImage(iNid);
 						img.merge(new Image(eImg, c));
 					} else {
 						c.getImages().add(new Image(eImg, c));
