@@ -147,6 +147,8 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
 
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+
 import com.sleepycat.je.DatabaseException;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -1880,7 +1882,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 	public int getAuthorNid() {
 		if (authorNid == Integer.MAX_VALUE) {
 			try {
-				authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
+				if (getActiveAceFrameConfig() != null || getActiveAceFrameConfig().getDbConfig() != null ||
+						getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
+					authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
+				} else {
+					authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
+				}
 			} catch (Exception e) {
 				//throw new RuntimeException();
 			}
