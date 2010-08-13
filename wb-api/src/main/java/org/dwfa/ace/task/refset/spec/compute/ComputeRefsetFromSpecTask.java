@@ -210,9 +210,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         try {
             I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             boolean showActivityPanel = true;
-            excludedRefsets = new HashSet<Integer>(); // no excluded refsets
-            // when running as part
-            // of a task
+            excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of a task
             nestedRefsets = new HashSet<Integer>();
             Condition condition = computeRefset(configFrame, refset, showActivityPanel);
             configFrame.setCommitAbortButtonsVisible(true);
