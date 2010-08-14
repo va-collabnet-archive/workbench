@@ -39,24 +39,34 @@
         <include>au.csiro:snorocket-bridge</include>
         <include>au.csiro:snorocket-snapi</include>
         <include>au.csiro:snorocket-core</include>
-        <!-- includes added for tracker integration -->
-        <include>com.termmed:issue-manager</include>
-        <include>com.termmed:collabnet-tracker-test</include>
         <include>javax.xml:jaxrpc-api</include>
         <include>org.apache.axis:axis</include>
         <include>org.mod4j.org.apache.commons:logging</include>
         <include>commons-discovery:commons-discovery</include>
-        <include>com.collabnet:ce.soap</include>
-        <!-- includes done for tracker integration -->
-       <!-- includes added for drools integration -->
-       <include>org.drools:drools-core</include>
-       <include>org.drools:drools-api</include>
-       <include>org.drools:drools-compiler</include>
-       <include>org.drools:drools-templates</include>
-       <include>org.eclipse.jdt:core</include>
-       <include>org.antlr:antlr-runtime</include>
-       <include>org.mvel:mvel2</include>
-       <!-- includes done for drools integration -->
+        <!-- includes added for drools integration -->
+        <include>org.drools:drools-core</include>
+        <include>org.drools:drools-api</include>
+        <include>org.drools:drools-compiler</include>
+        <include>org.drools:drools-templates</include>
+        <include>org.eclipse.jdt:core</include>
+        <include>org.antlr:antlr-runtime</include>
+        <include>org.mvel:mvel2</include>
+        <include>org.codehaus.janino:janino</include>
+        <!-- includes done for drools integration -->
+        <!-- includes added for translation -->
+        <include>org.ihtsdo:rule-engine-integration</include>
+        <include>org.apache.lucene:lucene-highlighter</include>
+        <include>org.apache.lucene:lucene-spellchecker</include>
+        <include>org.apache.tika:tika-core</include>
+        <include>org.apache.tika:tika-parsers</include>
+        <include>commons-codec:commons-codec</include>
+        <include>org.apache.poi:poi</include>
+        <include>org.apache.poi:poi-scratchpad</include>
+        <include>org.apache.poi:poi-ooxml</include>
+        <include>org.apache.poi:poi-ooxml-schemas</include>
+        <include>pdfbox:pdfbox</include>
+        <include>org.fontbox:fontbox</include>
+        <!-- includes done for translation -->
       </includes>
     </dependencySet>
     <dependencySet>
