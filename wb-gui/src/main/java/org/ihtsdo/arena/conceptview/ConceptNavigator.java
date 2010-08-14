@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -86,13 +87,34 @@ public class ConceptNavigator extends JPanel {
 		JLabel navIcon = new JLabel(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/compass.png")));
 		topPanel.add(navIcon, gbc);
+		navIcon.setVisible(false);
 		gbc.weightx = 1;
+		gbc.gridx++;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		topPanel.add(new JLabel(" "), gbc);
 		
+		gbc.gridx++;
+		gbc.weightx = 0;
+		gbc.fill = GridBagConstraints.NONE;
+		JButton taxonomyButton = new JButton(new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
+		taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		topPanel.add(taxonomyButton, gbc);
+		gbc.gridx++;
+		JButton historyButton = new JButton(new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/radar-chart.png")));
+		historyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		topPanel.add(historyButton, gbc);
+		gbc.gridx++;
+		JButton statedInferredButton = new JButton(new ImageIcon(
+                ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png")));
+		statedInferredButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		topPanel.add(statedInferredButton, gbc);
+		
+		
 		topPanel.setBackground(ConceptViewTitle.TITLE_COLOR);
 		topPanel.setOpaque(true);
-		topPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.LIGHT_GRAY));
+		topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
 		return topPanel;
 	}
 }

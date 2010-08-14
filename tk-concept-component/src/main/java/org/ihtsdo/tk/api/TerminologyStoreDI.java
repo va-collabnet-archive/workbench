@@ -3,6 +3,8 @@ package org.ihtsdo.tk.api;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+
 public interface TerminologyStoreDI {
 
 	ComponentChroncileBI<?> getComponent(UUID... ids);

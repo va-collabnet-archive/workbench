@@ -37,7 +37,7 @@ public class FocusDrop extends JLabel implements I_AcceptConcept {
 		setTransferHandler(new TerminologyTransferHandler(this));
 	}
 
-	public void setConcept(I_GetConceptData c) {
+	public void sendConcept(I_GetConceptData c) {
         try {
             new ExpandPathToNodeStateListener(navigatorTree, config ,c);
         } catch (IOException e1) {

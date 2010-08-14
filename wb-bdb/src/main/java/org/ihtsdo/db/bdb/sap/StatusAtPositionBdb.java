@@ -365,14 +365,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	}
 
 	public int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
-		try {
-			assert getCurrentPaths().size() == 0
-					|| getCurrentPaths().contains(pathNid) : "pathNid: "
-					+ pathNid + " invalid. Concept: "
-					+ Concept.get(pathNid).getInitialText();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 		if (time == Long.MAX_VALUE) {
 			UncommittedStatusForPath usp = new UncommittedStatusForPath(
 					statusNid, pathNid);

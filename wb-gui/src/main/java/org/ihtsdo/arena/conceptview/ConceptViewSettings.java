@@ -194,19 +194,20 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	}
 
 	private void setNavigatorLocation() {
-		int space = 5;
+		int rightSpace = -19;
+		int leftSpace = -1;
    		JLayeredPane layers = renderer.getRootPane().getLayeredPane();
 		Point loc = SwingUtilities.convertPoint(renderer, new Point(0,0), layers);
-		if (layers.getWidth() > loc.x + renderer.getWidth() + getNavigator().getWidth() + space) {
-			loc.x = loc.x + renderer.getWidth() + space;
-			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+		if (layers.getWidth() > loc.x + renderer.getWidth() + getNavigator().getWidth() + rightSpace) {
+			loc.x = loc.x + renderer.getWidth() + rightSpace;
+			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
 			getNavigator().setDropSide(SIDE.RIGHT);
 		} else {
-			loc.x = loc.x - getNavigator().getWidth() - space;
-			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+			loc.x = loc.x - getNavigator().getWidth() - leftSpace;
+			getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
 			getNavigator().setDropSide(SIDE.LEFT);
 		}
-		getNavigator().setBounds(loc.x, loc.y, getNavigator().getWidth(), renderer.getHeight());
+		getNavigator().setBounds(loc.x, loc.y, getNavigator().getWidth(), renderer.getHeight() + 1);
 		layers.add(getNavigator(), JLayeredPane.PALETTE_LAYER);
 	}
 
@@ -219,7 +220,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				navigatorTree =  (JTreeWithDragImage) treeScroller.getViewport().getView();
 				navigatorTree.setFont(navigatorTree.getFont().deriveFont(getFontSize()));
 				navigator = new ConceptNavigator(treeScroller, ace.getAceFrameConfig());
-				navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
+				//navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
 				navigator.setOpaque(true);
 				navigator.setBounds(0, 0, 350, 20);
 			} catch (Exception e) {

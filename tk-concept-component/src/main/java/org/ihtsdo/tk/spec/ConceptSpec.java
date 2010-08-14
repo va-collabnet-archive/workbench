@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.TS;
-import org.ihtsdo.tk.api.ConceptVersionBI;
 import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.DescriptionVersionBI;
-import org.ihtsdo.tk.api.RelationshipVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class ConceptSpec {
 

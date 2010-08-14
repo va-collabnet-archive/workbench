@@ -286,10 +286,10 @@ public class TerminologyTransferHandler extends TransferHandler {
 				    }
 				    if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
 				        ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
-				        title.setConcept(cbt.getCoreBean());
+				        title.sendConcept(cbt.getCoreBean());
 		                return true;
 				    } else {
-				        title.setConcept((I_GetConceptData) obj);
+				        title.sendConcept((I_GetConceptData) obj);
 		                return true;
 				    }
 				}

@@ -33,7 +33,7 @@ public class ConceptViewTitle extends JPanel implements I_AcceptConcept {
 		this.settings = settings;
         setBackground(TITLE_COLOR);
         setOpaque(true);
-        setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.LIGHT_GRAY));
+        setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
         setLayout(new BorderLayout());
         add(settings.getLinkComponent(), BorderLayout.WEST);
         setTransferHandler(new TerminologyTransferHandler(this));
@@ -56,7 +56,7 @@ public class ConceptViewTitle extends JPanel implements I_AcceptConcept {
 		label.setText(settings.getTitle());
 	}
 	
-	public void setConcept(I_GetConceptData c) {
+	public void sendConcept(I_GetConceptData c) {
 		settings.getHost().setTermComponent(c);
 	}
 

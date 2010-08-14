@@ -66,7 +66,7 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.tk.api.ConceptVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * Classifier Normal Form (Label Format) Panel

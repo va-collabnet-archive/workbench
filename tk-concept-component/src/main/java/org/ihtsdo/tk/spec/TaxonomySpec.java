@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.ihtsdo.tk.api.ConceptVersionBI;
 import org.ihtsdo.tk.api.Coordinate;
-import org.ihtsdo.tk.api.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.RelationshipVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  * Class that allows a hierarchy to be specified or identified by specifying a
