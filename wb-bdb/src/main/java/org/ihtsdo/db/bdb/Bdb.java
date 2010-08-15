@@ -43,6 +43,7 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.CheckpointConfig;
@@ -169,6 +170,10 @@ public class Bdb {
 			    tf = (BdbTermFactory) Terms.get();
 			} else {
 	            Terms.set(tf);
+			}
+			BdbTerminologyStore ts = new BdbTerminologyStore();
+			if (Ts.get() != null) {
+				Ts.set(ts);
 			}
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 			inform(activity, "loading cross references...");

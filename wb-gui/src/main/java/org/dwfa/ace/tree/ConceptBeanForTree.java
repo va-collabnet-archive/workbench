@@ -52,10 +52,37 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public boolean promote(PositionBI viewPosition,
+    public ConAttrChronicleBI getConAttrs() throws IOException {
+		return bean.getConAttrs();
+	}
+
+	public Collection<? extends DescriptionChronicleBI> getDescs()
+			throws IOException {
+		return bean.getDescs();
+	}
+
+	public Collection<? extends MediaChronicleBI> getMedia() throws IOException {
+		return bean.getMedia();
+	}
+
+	public Collection<? extends RelationshipChronicleBI> getRelsIncoming()
+			throws IOException {
+		return bean.getRelsIncoming();
+	}
+
+	public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
+			throws IOException {
+		return bean.getRelsOutgoing();
+	}
+
+	public boolean promote(PositionBI viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
 			Precedence precedence) throws IOException, TerminologyException {
 		return bean.promote(viewPosition, pomotionPaths, allowedStatus,

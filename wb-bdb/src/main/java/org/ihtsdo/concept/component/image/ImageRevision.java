@@ -1,18 +1,23 @@
 package org.ihtsdo.concept.component.image;
 
+import java.util.Collection;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class ImageRevision extends Revision<ImageRevision, Image> 
-		implements I_ImagePart {
+		implements I_ImagePart, MediaAnalogBI {
 
 	private String textDescription;
 	private int typeNid;
@@ -170,10 +175,10 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
 	 */
 	public boolean hasNewData(ImageRevision another) {
-		return ((this.getPathId() != another.getPathId()) ||
-				(this.getStatusId() != another.getStatusId()) ||
+		return ((this.getPathNid() != another.getPathNid()) ||
+				(this.getStatusNid() != another.getStatusNid()) ||
 				((this.textDescription.equals(another.getTextDescription()) == false) ||
-				(this.typeNid != another.getTypeId())));
+				(this.typeNid != another.getTypeNid())));
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#convertIds(org.dwfa.vodb.jar.I_MapNativeToNative)
@@ -185,4 +190,33 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	public ImageRevision duplicate() {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public int getConceptNid() {
+		return primordialComponent.enclosingConceptNid;
+	}
+
+	@Override
+	public String getFormat() {
+		return primordialComponent.getFormat();
+	}
+
+	@Override
+	public byte[] getMedia() {		
+		return primordialComponent.getMedia();
+	}
+	
+	
+	@Override
+	public Image.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		return primordialComponent.getVersion(c);
+	}
+
+	@Override
+	public Collection<Image.Version> getVersions(
+			Coordinate c) {
+		return primordialComponent.getVersions(c);
+	}		
+
 }

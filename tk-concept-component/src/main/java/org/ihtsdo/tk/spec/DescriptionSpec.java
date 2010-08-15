@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.tk.spec;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
@@ -45,7 +46,7 @@ public class DescriptionSpec {
 		this.conceptSpec = concept;
 	}
 
-	public DescriptionVersionBI get(Coordinate c) {
+	public DescriptionVersionBI get(Coordinate c) throws IOException {
 		ConceptVersionBI concept = conceptSpec.get(c);
 		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(uuids);
 		if (concept.getNid() != desc.getConceptNid()) {

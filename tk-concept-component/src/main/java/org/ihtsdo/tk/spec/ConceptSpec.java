@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -65,15 +66,15 @@ public class ConceptSpec {
         this.relSpecs = relSpecs;
     }
 
-    public ConceptVersionBI get(Coordinate c) {
-        try {
-            ConceptVersionBI local = Ts.get().getConcept(c, uuids);
-            validateDescription(local, c);
-            validateRelationships(local, c);
-            return local;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public ConceptVersionBI get(Coordinate c) throws IOException  {
+            try {
+				ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
+				validateDescription(local, c);
+				validateRelationships(local, c);
+				return local;
+			} catch (ContraditionException e) {
+				throw new ValidationException(e);
+			}
     }
 
     private boolean validateRelationships(ConceptVersionBI local, Coordinate c) throws IOException {
@@ -117,9 +118,9 @@ public class ConceptSpec {
         return true;
     }
 
-    private void validateDescription(ConceptVersionBI local, Coordinate c) throws IOException {
+    private void validateDescription(ConceptVersionBI local, Coordinate c) throws IOException, ContraditionException {
         boolean found = false;
-        for (DescriptionVersionBI desc : local.getDescs()) {
+        for (DescriptionVersionBI desc : local.getDescsActive()) {
             if (desc.getText().equals(description)) {
                 found = true;
                 break;

@@ -65,6 +65,7 @@ import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class BdbCommitManager {
 
@@ -245,7 +246,7 @@ public class BdbCommitManager {
         }
 	    
 	}
-	public static void addUncommitted(I_GetConceptData igcd) {
+	public static void addUncommitted(ConceptChronicleBI igcd) {
 		if (igcd == null) {
 			return;
 		}

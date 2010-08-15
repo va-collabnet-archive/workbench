@@ -23,8 +23,9 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.media.MediaAnalogBI;
 
-public interface I_ImageVersioned extends I_AmTermComponent {
+public interface I_ImageVersioned extends I_AmTermComponent, MediaAnalogBI {
 
     public byte[] getImage();
 

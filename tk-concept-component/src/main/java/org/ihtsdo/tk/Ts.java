@@ -1,6 +1,6 @@
 package org.ihtsdo.tk;
 
-import org.ihtsdo.tk.api.TerminologyDI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 /**
  * Ts is short for Terminology store...
@@ -9,13 +9,13 @@ import org.ihtsdo.tk.api.TerminologyDI;
  *
  */
 public class Ts {
-	private static TerminologyDI store;
+	private static TerminologyStoreDI store;
 	
-	public static void set(TerminologyDI store) {
+	public static void set(TerminologyStoreDI store) {
 		Ts.store = store;
 	}
 
-	public static TerminologyDI get() {
+	public static TerminologyStoreDI get() {
 		return store;
 	}
 }

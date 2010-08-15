@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_ImageTuple extends I_AmTypedTuple {
+import org.ihtsdo.tk.api.media.MediaAnalogBI;
+
+public interface I_ImageTuple extends I_AmTypedTuple, MediaAnalogBI {
 
     public byte[] getImage();
 

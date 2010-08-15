@@ -27,8 +27,9 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
-public interface I_GetConceptData extends I_AmTermComponent {
+public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI {
 
     /**
      * @return the versioned concept attribute entity associated with this

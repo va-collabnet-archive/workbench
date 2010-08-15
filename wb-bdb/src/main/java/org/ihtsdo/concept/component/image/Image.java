@@ -29,9 +29,13 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
@@ -40,11 +44,11 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Image 
 	extends ConceptComponent<ImageRevision, Image> 
-	implements I_ImageVersioned, I_ImagePart {
+	implements I_ImageVersioned, I_ImagePart, MediaAnalogBI {
 	
 	public class Version 
 	extends ConceptComponent<ImageRevision, Image>.Version 
-	implements I_ImageTuple, I_ImagePart {
+	implements I_ImageTuple, I_ImagePart, MediaAnalogBI {
 
 		public Version() {
 			super();
@@ -70,6 +74,11 @@ public class Image
 		}
 
 		@Override
+		public byte[] getMedia() {
+			return image;
+		}
+
+		@Override
 		public int getImageId() {
 			return nid;
 		}
@@ -88,11 +97,28 @@ public class Image
 		}
 
 		@Override
+		public Image.Version getVersion(Coordinate c)
+				throws ContraditionException {
+			return Image.this.getVersion(c);
+		}
+
+		@Override
+		public Collection<Image.Version> getVersions(
+				Coordinate c) {
+			return Image.this.getVersions(c);
+		}		
+		
+	    public List<? extends Version> getVersions() {
+	    	return Image.this.getVersions();
+	    }
+
+		@Override
 		public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
+		@Deprecated
 		public int getTypeId() {
 			if (index >= 0) {
 				return revisions.get(index).getTypeId();
@@ -101,6 +127,7 @@ public class Image
 		}
 
 		@Override
+		@Deprecated
 		public void setTypeId(int type) {
 			if (index >= 0) {
 				revisions.get(index).setTypeId(type);
@@ -111,7 +138,7 @@ public class Image
 		@Override
 		public int getTypeNid() {
 			if (index >= 0) {
-				return revisions.get(index).getTypeId();
+				return revisions.get(index).getTypeNid();
 			}
 			return typeNid;
 		}
@@ -119,7 +146,7 @@ public class Image
 		@Override
 		public void setTypeNid(int type) {
 			if (index >= 0) {
-				revisions.get(index).setTypeId(type);
+				revisions.get(index).setTypeNid(type);
 			}
 			Image.this.setTypeNid(type);
 		}
@@ -362,6 +389,10 @@ public class Image
 		return image;
 	}
 
+	public byte[] getMedia() {
+		return image;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -405,7 +436,7 @@ public class Image
 	}
 
 	@Override
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {
@@ -606,5 +637,27 @@ public class Image
         }
         return false;
     }
+
+
+	@Override
+	public Image.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		List<Image.Version> vForC = getVersions(c);
+		if (vForC.size() == 0) {
+			return null;
+		}
+		if (vForC.size() > 1) {
+			throw new ContraditionException(vForC.toString());
+		}
+		return vForC.get(0);
+	}
+
+	@Override
+	public List<Image.Version> getVersions(Coordinate c) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
+				returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
+		return returnTuples;
+	}
 
 }

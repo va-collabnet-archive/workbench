@@ -68,6 +68,10 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -1391,5 +1395,33 @@ public class Concept implements I_Transact, I_GetConceptData {
     	}
         return false;
     }
+
+	@Override
+	public ConAttrChronicleBI getConAttrs() throws IOException {
+		return getConceptAttributes();
+	}
+
+	@Override
+	public Collection<? extends DescriptionChronicleBI> getDescs()
+			throws IOException {
+		return getDescriptions();
+	}
+
+	@Override
+	public Collection<? extends MediaChronicleBI> getMedia() throws IOException {
+		return getImages();
+	}
+
+	@Override
+	public Collection<? extends RelationshipChronicleBI> getRelsIncoming()
+			throws IOException {
+		return getDestRels();
+	}
+
+	@Override
+	public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
+			throws IOException {
+		return getSourceRels();
+	}
 
 }
