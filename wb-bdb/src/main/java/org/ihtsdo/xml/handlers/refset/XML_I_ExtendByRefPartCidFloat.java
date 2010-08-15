@@ -4,7 +4,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.I_Handle_XML;
-
 import org.w3c.dom.Element;
 
 public class XML_I_ExtendByRefPartCidFloat extends XML_RefSetBasic implements

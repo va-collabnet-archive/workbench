@@ -50,7 +50,7 @@ public class WorkflowHistoryRefsetSearcher extends RefsetSearcherUtility {
 		
 		UUID matchConceptUid = con.getUids().iterator().next();
 		
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptId());
+		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptNid());
 		
 		for (int i = 0; i < l.size(); i++)
 		{
@@ -69,7 +69,7 @@ public class WorkflowHistoryRefsetSearcher extends RefsetSearcherUtility {
 		
 		UUID matchConceptUid = con.getUids().iterator().next();
 		
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptId());
+		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptNid());
 		
 		ConceptWFHistoryComparer comparator = new ConceptWFHistoryComparer();
 		SortedSet<WorkflowHistoryJavaBean> sortedConceptList = new TreeSet<WorkflowHistoryJavaBean>(comparator);
@@ -90,7 +90,7 @@ public class WorkflowHistoryRefsetSearcher extends RefsetSearcherUtility {
 	public SortedMap<I_GetConceptData, WorkflowHistoryJavaBean> listWFHistoryRefsetMembers() throws TerminologyException, IOException, Exception {
 		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptId());
+		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, Terms.get().getConcept(WorkflowAuxiliary.Concept.WORKFLOW_HISTORY_INFORMATION.getUids()).getConceptNid());
 		
 		WFHistoryComparer comparator = new WFHistoryComparer();
 		SortedMap <I_GetConceptData, WorkflowHistoryJavaBean> retMap = new TreeMap<I_GetConceptData, WorkflowHistoryJavaBean>(comparator);

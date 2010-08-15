@@ -181,9 +181,9 @@ public class UniversalAceImage implements Serializable {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptId()
+     * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptNid()
      */
-    public Collection<UUID> getConceptId() {
+    public Collection<UUID> getConceptNid() {
         return conceptId;
     }
 

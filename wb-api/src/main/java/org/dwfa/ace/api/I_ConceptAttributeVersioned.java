@@ -23,6 +23,8 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
 
@@ -61,7 +63,7 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
      */
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
             List<I_ConceptAttributeTuple> returnTuples, 
-            PRECEDENCE precedencePolicy, 
+            Precedence precedencePolicy, 
             I_ManageContradiction contradictionManager) throws TerminologyException, IOException;
 
     public I_ConceptualizeLocally getLocalFixedConcept();
@@ -69,6 +71,6 @@ public interface I_ConceptAttributeVersioned extends I_AmTermComponent {
     public UniversalAceConceptAttributes getUniversal() throws IOException, TerminologyException;
 
     @Deprecated
-    public List<? extends I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus, Set<I_Position> viewPositionSet) throws TerminologyException, IOException;
+    public List<? extends I_ConceptAttributeTuple> getTuples(I_IntSet allowedStatus, PositionSetBI viewPositionSet) throws TerminologyException, IOException;
 
 }

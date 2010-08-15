@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class SelectPositionSetPanel extends JPanel {
 
@@ -61,11 +62,11 @@ public class SelectPositionSetPanel extends JPanel {
 	 */
     private static final long serialVersionUID = 1L;
 
-    private Set<I_Position> positionSet = new HashSet<I_Position>();
+    private Set<PositionBI> positionSet = new HashSet<PositionBI>();
 
     private JList positionList;
 
-    private ArrayListModel<I_Position> positionListModel;
+    private ArrayListModel<PositionBI> positionListModel;
 
     private SelectPathAndPositionPanelWithCombo pppwc;
 
@@ -113,7 +114,7 @@ public class SelectPositionSetPanel extends JPanel {
         gbc.gridy++;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1;
-        positionListModel = new ArrayListModel<I_Position>();
+        positionListModel = new ArrayListModel<PositionBI>();
         positionList = new JList(positionListModel);
         positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
         positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
@@ -127,11 +128,11 @@ public class SelectPositionSetPanel extends JPanel {
         add(positionScroller, gbc);
     }
 
-    public I_Position getCurrentPosition() throws TerminologyException, IOException {
+    public PositionBI getCurrentPosition() throws TerminologyException, IOException {
         return pppwc.getCurrentPosition();
     }
 
-    public Set<I_Position> getPositionSet() {
+    public Set<PositionBI> getPositionSet() {
         return positionSet;
     }
 

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -22,6 +21,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/db", type = BeanType.TASK_BEAN) })
 public class CommitAndPromote extends AbstractTask {
@@ -52,7 +52,7 @@ public class CommitAndPromote extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
-            Set<I_Position> viewPositionSet = config.getViewPositionSet();
+            Set<? extends PositionBI> viewPositionSet = config.getViewPositionSet();
             PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
             if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
                 throw new TaskFailedException(
@@ -60,7 +60,7 @@ public class CommitAndPromote extends AbstractTask {
                         + " promotionPaths: " + promotionPaths);
             }
 
-            I_Position viewPosition = viewPositionSet.iterator().next();
+            PositionBI viewPosition = viewPositionSet.iterator().next();
             List<I_GetConceptData> conceptsToPromote = new ArrayList<I_GetConceptData>();
         	for (I_Transact t: Terms.get().getUncommitted()) {
         		if (I_GetConceptData.class.isAssignableFrom(t.getClass())) {

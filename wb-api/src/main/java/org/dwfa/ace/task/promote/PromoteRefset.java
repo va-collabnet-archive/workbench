@@ -25,7 +25,6 @@ import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -44,6 +43,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/promote", type = BeanType.TASK_BEAN) })
 public class PromoteRefset extends AbstractTask {
@@ -108,7 +108,7 @@ public class PromoteRefset extends AbstractTask {
             }
             config.setShowPreferences(false);
 
-            Set<I_Position> viewPositionSet = config.getViewPositionSet();
+            Set<? extends PositionBI> viewPositionSet = config.getViewPositionSet();
             PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
 
             I_GetConceptData refsetToPromote = config.getRefsetInSpecEditor();
@@ -118,7 +118,7 @@ public class PromoteRefset extends AbstractTask {
 
             tf.commit();
 
-            I_Position viewPosition = viewPositionSet.iterator().next();
+            PositionBI viewPosition = viewPositionSet.iterator().next();
             promoteRefset(config, viewPosition, promotionPaths, tf, refsetToPromote);
 
             for (I_GetConceptData specificationRefsetIdentity : Terms.get().getRefsetHelper(config)
@@ -145,12 +145,12 @@ public class PromoteRefset extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, PathSetReadOnly promotionPaths,
+    private void promoteRefset(I_ConfigAceFrame config, PositionBI viewPosition, PathSetReadOnly promotionPaths,
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
         I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Promoting refset: " + refsetIdentity.toString(), false);
         activity.setIndeterminate(true);
         long start = System.currentTimeMillis();
-        Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetIdentity.getConceptId());
+        Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetIdentity.getConceptNid());
         int completedCount = 1;
         int size = extensions.size();
         activity.setValue(completedCount);

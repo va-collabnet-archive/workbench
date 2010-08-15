@@ -35,13 +35,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class SelectPathAndPositionPanelWithCombo extends JPanel implements ActionListener {
     /**
@@ -55,7 +55,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
     private I_ConfigAceFrame aceConfig;
     private PropertySetListenerGlue selectGlue;
     private PositionPanel currentPositionPanel;
-    private I_Path currentPath;
+    private PathBI currentPath;
 
     public SelectPathAndPositionPanelWithCombo(boolean selectPositionOnly, String purpose, I_ConfigAceFrame aceConfig,
             PropertySetListenerGlue selectGlue) throws Exception {
@@ -78,8 +78,8 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
         gbc.gridx++;
         gbc.weightx = 1;
 
-        SortedSet<I_Path> sortedPaths = new TreeSet<I_Path>(new Comparator<I_Path>() {
-            public int compare(I_Path o1, I_Path o2) {
+        SortedSet<PathBI> sortedPaths = new TreeSet<PathBI>(new Comparator<PathBI>() {
+            public int compare(PathBI o1, PathBI o2) {
                 return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
             }
         });
@@ -109,7 +109,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
 
     public void actionPerformed(ActionEvent evt) {
         try {
-            I_Path path = (I_Path) pathCombo.getSelectedItem();
+            PathBI path = (PathBI) pathCombo.getSelectedItem();
             if (path == null) {
                 return;
             }
@@ -117,7 +117,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
             int modTimeCount = 0;
             for (TimePathId tp : timePathEntries) {
                 if (tp != null && path != null) {
-                    if (tp.getPathId() == path.getConceptId()) {
+                    if (tp.getPathId() == path.getConceptNid()) {
                         modTimeCount++;
                     }
                 }
@@ -149,10 +149,10 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
         }
     }
 
-    private Map<I_Path, I_Position> positionMap = new HashMap<I_Path, I_Position>();
+    private Map<PathBI, PositionBI> positionMap = new HashMap<PathBI, PositionBI>();
     private boolean positionCheckBoxVisible = true;
 
-    public Collection<I_Position> getSelectedPositions() throws TerminologyException, IOException {
+    public Collection<PositionBI> getSelectedPositions() throws TerminologyException, IOException {
         if (currentPositionPanel.isPositionSelected()) {
             positionMap.put(currentPath, currentPositionPanel.getPosition());
         } else {
@@ -166,7 +166,7 @@ public class SelectPathAndPositionPanelWithCombo extends JPanel implements Actio
         positionCheckBoxVisible = b;
     }
 
-    public I_Position getCurrentPosition() throws TerminologyException, IOException {
+    public PositionBI getCurrentPosition() throws TerminologyException, IOException {
         return currentPositionPanel.getPosition();
     }
 

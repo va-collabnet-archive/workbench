@@ -92,8 +92,8 @@ public class PartDateOrderSortComparatorTest {
     	@Override
     	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
     		I_AmPart newPart = duplicate();
-    		newPart.setStatusId(statusNid);
-    		newPart.setPathId(pathNid);
+    		newPart.setStatusNid(statusNid);
+    		newPart.setPathNid(pathNid);
     		newPart.setTime(time);
     		return newPart;
     	}
@@ -112,6 +112,36 @@ public class PartDateOrderSortComparatorTest {
 		     throw new UnsupportedOperationException();
 		}
 
+		@Override
+		public int getPathNid() {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getStatusNid() {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setPathNid(int pathNid) {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setStatusNid(int statusNid) {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object makeAnalog(int statusNid, int authorNid, int pathNid,
+				long time) {
+		     throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getNid() {
+		     throw new UnsupportedOperationException();
+		}
     }
 
     private TestPart newestTestPart;

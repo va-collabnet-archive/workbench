@@ -56,7 +56,7 @@ public abstract class AbstractPopupFieldEditor extends DefaultCellEditor {
             }
 
             public Object getCellEditorValue() {
-                return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
+                return ((I_GetConceptData) combo.getSelectedItem()).getConceptNid();
             }
         };
         combo.addActionListener(delegate);

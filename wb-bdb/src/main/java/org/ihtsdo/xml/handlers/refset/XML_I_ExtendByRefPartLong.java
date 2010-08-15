@@ -1,6 +1,5 @@
 package org.ihtsdo.xml.handlers.refset;
 
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;

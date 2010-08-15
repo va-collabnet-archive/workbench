@@ -48,6 +48,8 @@ import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public interface I_TermFactory {
 
@@ -210,19 +212,19 @@ public interface I_TermFactory {
 
     LogWithAlerts getEditLog();
 
-    I_Path getPath(int nid) throws TerminologyException, IOException;
-    I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException;
+    PathBI getPath(int nid) throws TerminologyException, IOException;
+    PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
-    I_Path getPath(UUID... ids) throws TerminologyException, IOException;
+    PathBI getPath(UUID... ids) throws TerminologyException, IOException;
 
-    List<I_Path> getPaths() throws Exception;
+    List<PathBI> getPaths() throws Exception;
 
-    I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException;
+    PathBI newPath(Set<PositionBI> origins, I_GetConceptData pathConcept) throws TerminologyException, IOException;
 
-    I_Path newPath(Collection<? extends I_Position> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
+    PathBI newPath(Collection<? extends PositionBI> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException;
 
-    I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException;
+    PositionBI newPosition(PathBI path, int version) throws TerminologyException, IOException;
 
     I_IntSet newIntSet();
 
@@ -325,7 +327,7 @@ public interface I_TermFactory {
      * @return a mutable bit set, with all concept identifiers set to true.
      * @throws IOException
      */
-    public I_RepresentIdSet getConceptIdSet() throws IOException;
+    public I_RepresentIdSet getConceptNidSet() throws IOException;
 
     /**
      * 
@@ -561,12 +563,12 @@ public interface I_TermFactory {
      * @param p
      * @throws IOException
      */
-    public void writePath(I_Path p, I_ConfigAceFrame config) throws IOException;
+    public void writePath(PathBI p, I_ConfigAceFrame config) throws IOException;
 
     /**
      * Add or update an origin position to a path
      */
-    public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
  
@@ -631,7 +633,7 @@ public interface I_TermFactory {
 
     public boolean isCheckCommitDataEnabled();
 
-    public List<? extends I_Path> getPathChildren(int nid) throws TerminologyException;
+    public List<? extends PathBI> getPathChildren(int nid) throws TerminologyException;
 
     public void resetViewPositions();
 
@@ -643,7 +645,7 @@ public interface I_TermFactory {
 
     public int getCachePercent();
 
-    public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
 

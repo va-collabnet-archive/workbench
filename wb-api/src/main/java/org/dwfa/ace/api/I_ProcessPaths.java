@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.PathBI;
+
 public interface I_ProcessPaths {
-    public void processPath(I_Path path) throws Exception;
+    public void processPath(PathBI path) throws Exception;
 
 }

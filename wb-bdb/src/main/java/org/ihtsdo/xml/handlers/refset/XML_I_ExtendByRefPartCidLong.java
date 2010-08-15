@@ -1,10 +1,9 @@
 package org.ihtsdo.xml.handlers.refset;
 
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.I_Handle_XML;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.w3c.dom.Element;
 
 public class XML_I_ExtendByRefPartCidLong extends XML_RefSetBasic implements I_Handle_XML {
@@ -37,7 +36,7 @@ public class XML_I_ExtendByRefPartCidLong extends XML_RefSetBasic implements I_H
 		if (!debug) {
 			c1id = rpc.getC1id();
 			ival = rpc.getLongValue();
-			//conceptID = rpc.getConceptId();
+			//conceptID = rpc.getConceptNid();
 			
 			versionid = rpc.getVersion();
 			positionid = -2;

@@ -51,7 +51,7 @@ public class UniversalAceDescription implements Serializable {
     public UniversalAceDescription(I_DescriptionVersioned desc) throws IOException, TerminologyException {
         super();
         UniversalAceDescription universal = new UniversalAceDescription(
-        		Terms.get().getUids(desc.getDescId()), Terms.get().getUids(desc.getConceptId()),
+        		Terms.get().getUids(desc.getDescId()), Terms.get().getUids(desc.getConceptNid()),
         		desc.versionCount());
         for (I_DescriptionPart part : desc.getVersions((I_ManageContradiction) null)) {
             UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
@@ -168,9 +168,9 @@ public class UniversalAceDescription implements Serializable {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptId()
+     * @see org.dwfa.vodb.types.I_DescriptionVersioned#getConceptNid()
      */
-    public Collection<UUID> getConceptId() {
+    public Collection<UUID> getConceptNid() {
         return conceptId;
     }
 

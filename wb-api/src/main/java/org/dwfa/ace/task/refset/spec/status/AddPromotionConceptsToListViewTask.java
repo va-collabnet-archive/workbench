@@ -125,7 +125,7 @@ public class AddPromotionConceptsToListViewTask extends AbstractTask {
             I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(config);
             List<I_GetConceptData> filteredConcepts =
                     refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
-                        .getConceptId()), promotionStatusConcept);
+                        .getConceptNid()), promotionStatusConcept);
 
              JList conceptList = config.getBatchConceptList();
             I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();

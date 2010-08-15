@@ -109,7 +109,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusId()))
                     continue;
-                if (part.getTypeId() == fsn_type.getConceptId()) {
+                if (part.getTypeId() == fsn_type.getConceptNid()) {
                     if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
@@ -142,14 +142,14 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                             Document doc = hits.doc(i);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
-                            if (cnid == concept.getConceptId())
+                            if (cnid == concept.getConceptNid())
                                 continue;
                             try {
                                 I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
                                 if (potential_fsn != null) {
                                     for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                                         if (actives.contains(part_search.getStatusId())
-                                            && part_search.getTypeId() == fsn_type.getConceptId()
+                                            && part_search.getTypeId() == fsn_type.getConceptNid()
                                             && part_search.getText().equals(part.getText())
                                             && part_search.getLang().equals(part.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(

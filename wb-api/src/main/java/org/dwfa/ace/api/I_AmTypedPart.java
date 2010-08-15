@@ -18,9 +18,16 @@ package org.dwfa.ace.api;
 
 public interface I_AmTypedPart extends I_AmPart {
 
-    public int getTypeId();
+    public int getTypeNid();
 
-    public void setTypeId(int type);
+    public void setTypeNid(int typeNid);
 
+    @Deprecated
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
+    @Deprecated
+    public int getTypeId();
+    @Deprecated
+    public void setTypeId(int typeNid);
+    
+
 }

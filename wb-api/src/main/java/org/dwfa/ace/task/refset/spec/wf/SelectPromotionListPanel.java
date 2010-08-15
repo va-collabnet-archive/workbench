@@ -110,7 +110,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         options.add(option1);
 
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), unreviewedAdditionStatus)
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()), unreviewedAdditionStatus)
             .size() == 0) {
             option1.setEnabled(false);
         } else {
@@ -127,7 +127,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         option2.addActionListener(this);
         options.add(option2);
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()), unreviewedDeletionStatus)
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()), unreviewedDeletionStatus)
             .size() == 0) {
             option2.setEnabled(false);
         } else {
@@ -144,7 +144,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         option3.addActionListener(this);
         options.add(option3);
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()),
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()),
             reviewedApprovedAdditionStatus).size() == 0) {
             option3.setEnabled(false);
         } else {
@@ -161,7 +161,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         option4.addActionListener(this);
         options.add(option4);
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()),
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()),
             reviewedApprovedDeletionStatus).size() == 0) {
             option4.setEnabled(false);
         } else {
@@ -178,7 +178,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         option5.addActionListener(this);
         options.add(option5);
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()),
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()),
             reviewedRejectedAdditionStatus).size() == 0) {
             option5.setEnabled(false);
         } else {
@@ -195,7 +195,7 @@ public class SelectPromotionListPanel extends JPanel implements ActionListener {
         option6.addActionListener(this);
         options.add(option6);
         if (refsetHelper.filterListByConceptType(
-            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId()),
+            termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid()),
             reviewedRejectedDeletionStatus).size() == 0) {
             option6.setEnabled(false);
         } else {

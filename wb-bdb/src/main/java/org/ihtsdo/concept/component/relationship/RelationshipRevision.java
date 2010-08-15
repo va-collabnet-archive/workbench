@@ -86,7 +86,7 @@ public class RelationshipRevision
 		this.characteristicNid = another.getCharacteristicId();
 		this.group = another.getGroup();
 		this.refinabilityNid = another.getRefinabilityId();
-		this.typeNid = another.getTypeId();
+		this.typeNid = another.getTypeNid();
 	}
 
 	public RelationshipRevision(TupleInput input, 
@@ -149,12 +149,21 @@ public class RelationshipRevision
 		this.refinabilityNid = refinabilityNid;
         modified();
 	}
-
+	@Deprecated
 	public int getTypeId() {
 		return typeNid;
 	}
-
+	@Deprecated
 	public void setTypeId(int typeNid) {
+		this.typeNid = typeNid;
+        modified();
+	}
+
+	public int getTypeNid() {
+		return typeNid;
+	}
+
+	public void setTypeNid(int typeNid) {
 		this.typeNid = typeNid;
         modified();
 	}
@@ -171,11 +180,22 @@ public class RelationshipRevision
 	
 	@Override
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
 		return new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time,
+				primordialComponent);
+	}
+
+	@Override
+	public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            this.setAuthorNid(authorNid);
+            return this;
+        }
+		return new RelationshipRevision(this, statusNid, authorNid, pathNid, time,
 				primordialComponent);
 	}
 

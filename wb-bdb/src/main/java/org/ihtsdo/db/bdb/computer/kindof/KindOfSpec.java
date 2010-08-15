@@ -4,14 +4,14 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public class KindOfSpec {
 	
@@ -19,7 +19,7 @@ public class KindOfSpec {
 	/**
 	 * The view position for which this cache is valid.
 	 */
-	public I_Position viewPosition;
+	public PositionBI viewPosition;
 	/**
 	 * The allowed status cNids for which this cache is valid.
 	 */
@@ -33,7 +33,7 @@ public class KindOfSpec {
 	 */
 	public int kindNid;
 	
-	public PRECEDENCE precedence;
+	public Precedence precedence;
 	
 	public I_ManageContradiction contradictionMgr;
 	
@@ -43,8 +43,8 @@ public class KindOfSpec {
 	 */
 	private PositionSetReadOnly viewPositionSet;
 	
-	public KindOfSpec(I_Position viewPosition, I_IntSet allowedStatus,
-			I_IntSet relTypeNids, int kindNid, PRECEDENCE precedence, 
+	public KindOfSpec(PositionBI viewPosition, I_IntSet allowedStatus,
+			I_IntSet relTypeNids, int kindNid, Precedence precedence, 
 			I_ManageContradiction contradictionMgr) {
 		super();
 		this.viewPosition = viewPosition;

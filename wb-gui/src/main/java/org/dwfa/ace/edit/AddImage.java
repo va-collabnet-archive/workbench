@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -40,6 +39,7 @@ import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Path;
+import org.ihtsdo.tk.api.PathBI;
 
 public class AddImage extends AddComponent {
 
@@ -67,7 +67,7 @@ public class AddImage extends AddComponent {
         }
         
         Terms.get().newImage(UUID.randomUUID(), cb.getNid(), 
-        		config.getDefaultImageType().getConceptId(), image, 
+        		config.getDefaultImageType().getConceptNid(), image, 
         		"", format, config);
 
         Terms.get().addUncommitted(cb);
@@ -76,7 +76,7 @@ public class AddImage extends AddComponent {
 
     public static void addStockImages() throws IOException, TerminologyException {
 
-        I_Path aceAuxPath = new Path(Integer.MIN_VALUE + 1, new ArrayList<I_Position>());
+        PathBI aceAuxPath = new Path(Integer.MIN_VALUE + 1, new ArrayList<I_Position>());
 
         addStockImage("1c4214ec-147a-11db-ac5d-0800200c9a66", "Semiotic Triangle with Circle",
             ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT, ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE,
@@ -116,7 +116,7 @@ public class AddImage extends AddComponent {
 
     private static void addStockImage(String uuidStr, String textDesc,
             I_ConceptualizeUniversally conceptForImage, I_ConceptualizeUniversally imageType, String imageFormat,
-            String imageResource, I_Path aceAuxPath) throws TerminologyException, IOException {
+            String imageResource, PathBI aceAuxPath) throws TerminologyException, IOException {
 
         I_GetConceptData concept = Terms.get().getConcept(conceptForImage.getUids());
         int typeNid = Terms.get().uuidToNative(imageType.getUids());

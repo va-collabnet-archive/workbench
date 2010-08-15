@@ -95,7 +95,7 @@ public class RulesLibrary {
 				String ruleUid = rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
-					if (role != null && role.getConceptId() == excludeClause.getConceptId()) {
+					if (role != null && role.getConceptNid() == excludeClause.getConceptNid()) {
 						excluded = true;
 					}
 				}
@@ -526,7 +526,7 @@ public class RulesLibrary {
 		String id = null;
 		I_TermFactory tf = Terms.get();
 		try {
-			List<? extends I_IdPart> idParts = tf.getId(concept.getConceptId()).getMutableIdParts();
+			List<? extends I_IdPart> idParts = tf.getId(concept.getConceptNid()).getMutableIdParts();
 			for (I_IdPart idPart : idParts) {
 				if (idPart.getAuthorityNid() == ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()) {
 					id = (String) idPart.getDenotation();
@@ -579,7 +579,7 @@ public class RulesLibrary {
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		}
-		return concept.getConceptId();
+		return concept.getConceptNid();
 	}
 
 	/**

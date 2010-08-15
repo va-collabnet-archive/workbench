@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -39,6 +38,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class SetEditPathForProfile extends AbstractTask {
@@ -83,7 +83,7 @@ public class SetEditPathForProfile extends AbstractTask {
                 profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
 
-            I_Path editPath = Terms.get().getPath(editPathEntry.ids);
+            PathBI editPath = Terms.get().getPath(editPathEntry.ids);
 
             profile.addEditingPath(editPath);
 

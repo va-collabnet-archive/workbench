@@ -196,7 +196,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 }
 
                 public Object getCellEditorValue() {
-                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
+                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptNid();
                 }
             };
             combo.addActionListener(delegate);
@@ -875,30 +875,30 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             case BOOLEAN:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.BOOLEAN);
                 refsetDefaults = preferences.getBooleanPreferences();
-                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.BOOLEAN_VALUE, ((I_RefsetDefaultsBoolean) refsetDefaults)
                     .getDefaultForBooleanRefset());
                 break;
             case STRING:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.STR);
                 refsetDefaults = preferences.getStringPreferences();
-                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.STRING_VALUE, ((I_RefsetDefaultsString) refsetDefaults)
                     .getDefaultForStringRefset());
                 break;
             case CONCEPT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
                 refsetDefaults = preferences.getConceptPreferences();
-                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
-                    .getDefaultForConceptRefset().getConceptId());
+                    .getDefaultForConceptRefset().getConceptNid());
                 break;
             case CON_INT:
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults)
-                    .getDefaultForConceptRefset().getConceptId());
+                    .getDefaultForConceptRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults)
                     .getDefaultForIntegerValue());
                 break;
@@ -906,7 +906,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.INT);
                 refsetDefaults = preferences.getIntegerPreferences();
                 refsetDefaults = preferences.getConIntPreferences();
-                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptId());
+                extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
                 extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults)
                     .getDefaultForIntegerRefset());
                 break;
@@ -914,7 +914,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
             I_ExtendByRef extension =
-                    refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptId(),
+                    refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
                         tableComponentId, extProps.getMemberType(), extProps, UUID.randomUUID());
             Terms.get().addUncommitted(extension);
             propertyChange(null);

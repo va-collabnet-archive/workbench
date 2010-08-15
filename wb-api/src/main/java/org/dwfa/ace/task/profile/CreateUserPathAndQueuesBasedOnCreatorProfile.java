@@ -39,7 +39,6 @@ import net.jini.core.entry.Entry;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -58,6 +57,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
@@ -145,11 +146,11 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             }
 
             if (!creatorConfig.getEditingPathSet().contains(creatorConfig.getPromotionPathSet().iterator().next())) {
-                I_Path newPromotionPath = createPromotionPath(newConfig, promotePathProfile);
+                PathBI newPromotionPath = createPromotionPath(newConfig, promotePathProfile);
                 // Add new promotion paths as origins to developer path...
-                for (I_Path devPath : promotePathProfile.getEditingPathSet()) {
-                    for (I_Path devPathOrigin : Terms.get().getPathChildren(devPath.getConceptId())) {
-                        devPathOrigin.addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
+                for (PathBI devPath : promotePathProfile.getEditingPathSet()) {
+                    for (PathBI devPathOrigin : Terms.get().getPathChildren(devPath.getConceptNid())) {
+                    	((I_Path)devPathOrigin).addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
                         		creatorConfig);
                     }
                 }
@@ -236,8 +237,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             // clear the user's path color
             if (creatorConfig.getDbConfig().getUserPath() != null) {
                 Color userColor = newConfig.getPathColorMap().remove(
-                    creatorConfig.getDbConfig().getUserPath().getConceptId());
-                newConfig.setColorForPath(newConfig.getDbConfig().getUserPath().getConceptId(), userColor);
+                    creatorConfig.getDbConfig().getUserPath().getConceptNid());
+                newConfig.setColorForPath(newConfig.getDbConfig().getUserPath().getConceptNid(), userColor);
             }
 
             // Create inbox
@@ -375,35 +376,35 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     }
 
     private void createDevPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Set<I_Position> inputSet = getDeveloperOrigins(creatorConfig);
-        I_Path userPath = createNewPath(newConfig, creatorConfig, inputSet, " dev path");
+        Set<PositionBI> inputSet = getDeveloperOrigins(creatorConfig);
+        PathBI userPath = createNewPath(newConfig, creatorConfig, inputSet, " dev path");
         newConfig.addEditingPath(userPath);
-        I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptId());
+        I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         newConfig.setClassifierInputPath(userPathConcept);
         newConfig.getViewPositionSet().add(Terms.get().newPosition(userPath, Integer.MAX_VALUE));
         newConfig.getDbConfig().setUserPath(userPathConcept);
     }
 
     private void createClassifierPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Collection<? extends I_Position> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
-        I_Path classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
-        newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptId()));
+        Collection<? extends PositionBI> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
+        PathBI classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
+        newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
     }
 
-    private Set<I_Position> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
+    private Set<PositionBI> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
             IOException, TaskFailedException {
-    	I_Position developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
+    	PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
         if (developerViewPosition == null) {
             throw new TaskFailedException("developerViewPosition input path is null..."
                 + "You must set the view position prior to running the new user process...");
         }
-        Set<I_Position> inputSet = new HashSet<I_Position>(developerViewPosition.getPath().getOrigins());
+        Set<PositionBI> inputSet = new HashSet<PositionBI>(developerViewPosition.getPath().getOrigins());
         return inputSet;
     }
 
-    private I_Path createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
-        for (I_Path promotionPath : commitConfig.getPromotionPathSet()) {
-            I_Path newConfigPromotionPath = createNewPath(newConfig, commitConfig, new HashSet<I_Position>(
+    private PathBI createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
+        for (PathBI promotionPath : commitConfig.getPromotionPathSet()) {
+        	PathBI newConfigPromotionPath = createNewPath(newConfig, commitConfig, new HashSet<PositionBI>(
                 promotionPath.getOrigins()), " promotion path");
             newConfig.addPromotionPath(newConfigPromotionPath);
             return newConfigPromotionPath;
@@ -411,7 +412,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         return null;
     }
 
-    private I_Path createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Collection<? extends I_Position> positionSet,
+    private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 
+    		Collection<? extends PositionBI> positionSet,
             String suffix) throws TaskFailedException, TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {

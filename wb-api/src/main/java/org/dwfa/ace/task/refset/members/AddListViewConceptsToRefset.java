@@ -101,7 +101,7 @@ public class AddListViewConceptsToRefset extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            Terms.get().getMemberRefsetHelper(config, refset.getConceptId(), value.getConceptId()).addAllToRefset(newMembers,
+            Terms.get().getMemberRefsetHelper(config, refset.getConceptNid(), value.getConceptNid()).addAllToRefset(newMembers,
                 "Adding concepts from list view to refset");
 
             // use commit in business process

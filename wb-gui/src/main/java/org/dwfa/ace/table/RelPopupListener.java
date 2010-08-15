@@ -33,7 +33,6 @@ import javax.swing.JTable;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -43,6 +42,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.RelTableModel.FieldToChange;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class RelPopupListener extends MouseAdapter {
 
@@ -58,10 +58,10 @@ public class RelPopupListener extends MouseAdapter {
             try {
                 I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
                 I_GetConceptData destBean = Terms.get().getConcept(selectedObject.getTuple().getC2Id());
-                for (I_Path p : config.getEditingPathSet()) {
+                for (PathBI p : config.getEditingPathSet()) {
                     I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                     I_RelPart newPart =
-                            (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
+                            (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptNid(),
                                 Long.MAX_VALUE);
                     selectedObject.getTuple().getRelVersioned().addVersion(newPart);
 
@@ -126,7 +126,7 @@ public class RelPopupListener extends MouseAdapter {
                 I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
                 I_GetConceptData destBean = Terms.get().getConcept(selectedObject.getTuple().getC2Id());
                 I_RelVersioned srcRel = sourceBean.getSourceRel(selectedObject.getTuple().getRelId());
-                for (I_Path p : config.getEditingPathSet()) {
+                for (PathBI p : config.getEditingPathSet()) {
                     I_RelPart newPart = selectedObject.getTuple().getMutablePart();
                     if (newPart.getTime() != Long.MAX_VALUE) {
                         I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
@@ -135,7 +135,7 @@ public class RelPopupListener extends MouseAdapter {
                                     Long.MAX_VALUE);
                         srcRel.addVersion(newPart);
                     } else {
-                        newPart.setPathId(p.getConceptId());
+                        newPart.setPathId(p.getConceptNid());
                     }
                     switch (field) {
                     case STATUS:
@@ -143,15 +143,15 @@ public class RelPopupListener extends MouseAdapter {
                         break;
                     case CHARACTERISTIC:
                         newPart.setCharacteristicId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
                         break;
                     case REFINABILITY:
                         newPart.setRefinabilityId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
                         break;
                     case TYPE:
                         newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
                         break;
 
                     default:

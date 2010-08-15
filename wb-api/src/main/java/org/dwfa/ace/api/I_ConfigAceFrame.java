@@ -44,6 +44,9 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
 
@@ -108,7 +111,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setFrameName(String frameName);
 
-    public void setViewPositions(Set<I_Position> positions);
+    public void setViewPositions(Set<PositionBI> positions);
 
     public VetoableChangeSupport getVetoSupport();
 
@@ -131,33 +134,33 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setDestRelTypes(I_IntSet browseUpRels);
 
-    public void addEditingPath(I_Path p);
+    public void addEditingPath(PathBI p);
 
-    public void removeEditingPath(I_Path p);
+    public void removeEditingPath(PathBI p);
 
-    public void replaceEditingPath(I_Path oldPath, I_Path newPath);
+    public void replaceEditingPath(PathBI oldPath, PathBI newPath);
 
-    public Set<I_Path> getEditingPathSet();
+    public Set<PathBI> getEditingPathSet();
 
     public PathSetReadOnly getEditingPathSetReadOnly();
 
-    public void addPromotionPath(I_Path p);
+    public void addPromotionPath(PathBI p);
 
-    public void removePromotionPath(I_Path p);
+    public void removePromotionPath(PathBI p);
 
-    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath);
+    public void replacePromotionPathSet(PathBI oldPath, PathBI newPath);
 
-    public Set<I_Path> getPromotionPathSet();
+    public Set<PathBI> getPromotionPathSet();
 
     public PathSetReadOnly getPromotionPathSetReadOnly();
 
-    public void addViewPosition(I_Position p);
+    public void addViewPosition(PositionBI p);
 
-    public void removeViewPosition(I_Position p);
+    public void removeViewPosition(PositionBI p);
 
-    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition);
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition);
 
-    public Set<I_Position> getViewPositionSet();
+    public Set<PositionBI> getViewPositionSet();
 
     public PositionSetReadOnly getViewPositionSetReadOnly();
 
@@ -620,9 +623,9 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void refreshRefsetTab();
     
-    public void setPrecedence(PRECEDENCE precedence);
+    public void setPrecedence(Precedence precedence);
     
-    public PRECEDENCE getPrecedence();
+    public Precedence getPrecedence();
     
     
 }

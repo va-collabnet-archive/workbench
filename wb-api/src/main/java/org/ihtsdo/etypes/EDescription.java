@@ -23,7 +23,7 @@ public class EDescription extends TkDescription {
         EConcept.convertId(Terms.get().getId(desc.getNid()), this);
         int partCount = desc.getMutableParts().size();
         I_DescriptionPart part = desc.getMutableParts().get(0);
-        conceptUuid = Terms.get().nidToUuid(desc.getConceptId());
+        conceptUuid = Terms.get().nidToUuid(desc.getConceptNid());
         initialCaseSignificant = part.isInitialCaseSignificant();
         lang = part.getLang();
         text = part.getText();

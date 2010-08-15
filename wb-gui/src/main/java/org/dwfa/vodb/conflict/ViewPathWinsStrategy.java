@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTuple;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 public class ViewPathWinsStrategy extends ContradictionManagementStrategy {
 
@@ -35,7 +36,7 @@ public class ViewPathWinsStrategy extends ContradictionManagementStrategy {
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         List<T> returnValues = new ArrayList<T>(2);
         for (T v: parts) {
-            if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(v.getPathId())) {
+            if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(v.getPathNid())) {
                 returnValues.add(v);
             }
         }
@@ -46,12 +47,12 @@ public class ViewPathWinsStrategy extends ContradictionManagementStrategy {
     }
 
     @Override
-    public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+    public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
         List<T> returnValues = new ArrayList<T>(2);
-        if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(part1.getPathId())) {
+        if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(part1.getPathNid())) {
             returnValues.add(part1);
         }
-        if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(part2.getPathId())) {
+        if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(part2.getPathNid())) {
             returnValues.add(part2);
         }
         if (returnValues.size() == 0) {
@@ -65,12 +66,26 @@ public class ViewPathWinsStrategy extends ContradictionManagementStrategy {
     public <T extends I_AmTuple> List<T> resolveTuples(List<T> tuples) {
         List<T> returnValues = new ArrayList<T>(2);
         for (T v: tuples) {
-            if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(v.getPathId())) {
+            if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(v.getPathNid())) {
                 returnValues.add(v);
             }
         }
         if (returnValues.size() == 0) {
             returnValues.addAll(tuples);
+        }
+        return returnValues;
+    }
+
+    @Override
+    public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions) {
+        List<T> returnValues = new ArrayList<T>(2);
+        for (T v: versions) {
+            if (config.getViewPositionSetReadOnly().getViewPathNidSet().contains(v.getPathNid())) {
+                returnValues.add(v);
+            }
+        }
+        if (returnValues.size() == 0) {
+            returnValues.addAll(versions);
         }
         return returnValues;
     }

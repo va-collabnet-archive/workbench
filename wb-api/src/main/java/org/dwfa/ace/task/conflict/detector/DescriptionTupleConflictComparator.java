@@ -26,8 +26,8 @@ public class DescriptionTupleConflictComparator implements Comparator<I_Descript
         if (t1.getStatusId() != t2.getStatusId()) {
             return t1.getStatusId() - t2.getStatusId();
         }
-        if (t1.getConceptId() != t2.getConceptId()) {
-            return t1.getConceptId() - t2.getConceptId();
+        if (t1.getConceptNid() != t2.getConceptNid()) {
+            return t1.getConceptNid() - t2.getConceptNid();
         }
         if (t1.isInitialCaseSignificant() != t2.isInitialCaseSignificant()) {
             if (t1.isInitialCaseSignificant()) {

@@ -86,7 +86,7 @@ public class RefsetSpec {
                 // concept is used
                 return true;
             } else {
-                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -121,7 +121,7 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -144,7 +144,7 @@ public class RefsetSpec {
                 // concept is used
                 return false;
             } else {
-                if (computeType.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
+                if (computeType.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -247,7 +247,7 @@ public class RefsetSpec {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
             //TODO should use the version computer/handle contradiction better. 
@@ -279,7 +279,7 @@ public class RefsetSpec {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
             //TODO should use the version computer/handle contradiction differently
@@ -311,7 +311,7 @@ public class RefsetSpec {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         if (concept != null) {
             List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(null, allowedTypes, 
@@ -339,9 +339,9 @@ public class RefsetSpec {
 
             if (promotionRefsetConcept != null && memberRefsetConcept != null) {
                 Collection<? extends I_ExtendByRef> promotionExtensions =
-                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid());
                 for (I_ExtendByRef promotionExtension : promotionExtensions) {
-                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptNid()) {
                         I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
                         if (currentStatuses.contains(latestPart.getStatusId())) {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
@@ -370,16 +370,16 @@ public class RefsetSpec {
 
             if (promotionRefsetConcept != null && memberRefsetConcept != null) {
                 Collection<? extends I_ExtendByRef> promotionExtensions =
-                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                        Terms.get().getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid());
                 for (I_ExtendByRef promotionExtension : promotionExtensions) {
-                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptId()) {
+                    if (promotionExtension.getComponentId() == memberRefsetConcept.getConceptNid()) {
                         I_ExtendByRefPart latestPart = helper.getLatestPart(promotionExtension);
                         if (currentIds.contains(latestPart.getStatusId())) {
                             if (latestPart instanceof I_ExtendByRefPartCid) {
                                 I_ExtendByRefPartCid latestConceptPart = (I_ExtendByRefPartCid) latestPart;
                                 I_GetConceptData status = Terms.get().getConcept(latestConceptPart.getC1id());
-                                if (status.getConceptId() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-                                    || status.getConceptId() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids())) {
+                                if (status.getConceptNid() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+                                    || status.getConceptNid() == Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IN_DEVELOPMENT.getUids())) {
                                     return true;
                                 }
                             }
@@ -405,16 +405,16 @@ public class RefsetSpec {
 
             if (memberRefsetConcept != null && promotionRefsetConcept != null) {
                 helper
-                    .retireConceptExtension(promotionRefsetConcept.getConceptId(), memberRefsetConcept.getConceptId());
+                    .retireConceptExtension(promotionRefsetConcept.getConceptNid(), memberRefsetConcept.getConceptNid());
                 Terms.get().commit();
-                if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptId(),
-                    memberRefsetConcept.getConceptId())) {
-                    helper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), memberRefsetConcept
-                        .getConceptId(), newStatus.getConceptId(), Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+                if (helper.hasConceptRefsetExtensionWithAnyPromotionStatus(promotionRefsetConcept.getConceptNid(),
+                    memberRefsetConcept.getConceptNid())) {
+                    helper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), memberRefsetConcept
+                        .getConceptNid(), newStatus.getConceptNid(), Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
                     Terms.get().commit();
                 } else {
-                    helper.newRefsetExtension(promotionRefsetConcept.getConceptId(),
-                        memberRefsetConcept.getConceptId(), newStatus.getConceptId());
+                    helper.newRefsetExtension(promotionRefsetConcept.getConceptNid(),
+                        memberRefsetConcept.getConceptNid(), newStatus.getConceptNid());
                     Terms.get().commit();
                 }
             }

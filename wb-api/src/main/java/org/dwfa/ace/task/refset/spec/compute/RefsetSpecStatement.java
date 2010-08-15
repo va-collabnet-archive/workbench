@@ -220,7 +220,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             }
         }
 
-        if (latestTuple != null && latestTuple.getStatusId() == requiredStatus.getConceptId()) {
+        if (latestTuple != null && latestTuple.getStatusId() == requiredStatus.getConceptNid()) {
             return true;
         }
 
@@ -276,7 +276,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
         for (I_ExtendByRef ext : extensions) {
-            if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptId()) { // check
+            if (ext.getRefsetId() == ((I_GetConceptData) queryConstraint).getConceptNid()) { // check
 
                 List<? extends I_ExtendByRefPart> parts = ext.getMutableParts();
 

@@ -46,7 +46,7 @@ public abstract class RefsetCreatorUtility {
         // Commit
         Terms.get().addUncommitted(newRefsetConcept);
                 
-		return newRefsetConcept.getConceptId();
+		return newRefsetConcept.getConceptNid();
 	}
 
 	private I_GetConceptData createNewConcept(String conceptName) throws IOException, TerminologyException {

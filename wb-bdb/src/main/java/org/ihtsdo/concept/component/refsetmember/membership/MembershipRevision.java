@@ -3,10 +3,10 @@ package org.ihtsdo.concept.component.refsetmember.membership;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -43,6 +43,12 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 				primoridalMember);
 	}
 
+    public MembershipRevision(int statusNid, int authorNid, int pathNid, long time, 
+			MembershipMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+	}
+
 	public MembershipRevision(int statusAtPositionNid, 
 			MembershipMember primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
@@ -58,10 +64,15 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 		super(statusNid, pathNid, time, another.primordialComponent);
 	}
 
+	protected MembershipRevision(int statusNid, int authorNid, int pathNid, long time, 
+			MembershipRevision another) {
+		super(statusNid, pathNid, time, another.primordialComponent);
+	}
+
 	@Override
 	public MembershipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         MembershipRevision newR = new MembershipRevision(statusNid, pathNid, time, this);
@@ -69,9 +80,20 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
         return newR;
 	}
 
+	@Override
+	public MembershipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            return this;
+        }
+        MembershipRevision newR = new MembershipRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
     @Override
     public MembershipRevision makeAnalog() {
-         return new MembershipRevision(getStatusId(), getPathId(), getTime(), this);
+         return new MembershipRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public MembershipRevision(TkRefsetRevision eVersion,
@@ -91,7 +113,7 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
 	}
 
 	@Override
-	public RefsetRevision<MembershipRevision, MembershipMember> makePromotionPart(I_Path promotionPath) {
+	public RefsetRevision<MembershipRevision, MembershipMember> makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

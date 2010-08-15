@@ -32,6 +32,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class DifferenceConceptStatus extends AbstractSearchTest {
 
@@ -67,15 +68,15 @@ public class DifferenceConceptStatus extends AbstractSearchTest {
                 conceptToTest = (I_GetConceptData) component;
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-                conceptToTest = Terms.get().getConcept(desc.getConceptId());
+                conceptToTest = Terms.get().getConcept(desc.getConceptNid());
             } else {
                 return applyInversion(false);
             }
 
             I_ConceptAttributeTuple firstTuple = null;
             boolean firstPass = true;
-            for (I_Position p : frameConfig.getViewPositionSet()) {
-                Set<I_Position> positions = new HashSet<I_Position>();
+            for (PositionBI p : frameConfig.getViewPositionSet()) {
+                Set<PositionBI> positions = new HashSet<PositionBI>();
                 positions.add(p);
                 PositionSetReadOnly positionSet = new PositionSetReadOnly(positions);
                 List<? extends I_ConceptAttributeTuple> tuples = conceptToTest.getConceptAttributeTuples(

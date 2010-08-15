@@ -49,8 +49,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -76,6 +74,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
@@ -93,7 +93,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
     private TermComponentLabel replacementConceptLabel;
 
     private I_GetConceptData refsetSpec;
-    private Set<I_Position> refsetSpecVersionSet;
+    private Set<PositionBI> refsetSpecVersionSet;
     private PositionSetReadOnly sourceTerminologyVersionSet;
     private I_GetConceptData conceptUnderReview;
     private I_ConfigAceFrame frameConfig;
@@ -615,21 +615,21 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples,
                     config.getPrecedence(), config.getConflictResolutionStrategy());
                 PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
-                I_Position viewPosition = config.getViewPositionSet().iterator().next();
-                I_Path editPath = config.getEditingPathSet().iterator().next();
+                PositionBI viewPosition = config.getViewPositionSet().iterator().next();
+                PathBI editPath = config.getEditingPathSet().iterator().next();
 
                 for (I_ExtendByRefVersion tuple : tuples) {
                     I_ExtendByRefPartCidCid newRetiredPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart()
-                        .makeAnalog(retiredNid, editPath.getConceptId(), Long.MAX_VALUE);
+                        .makeAnalog(retiredNid, editPath.getConceptNid(), Long.MAX_VALUE);
                     member.addVersion(newRetiredPart);
 
                     RefsetPropertyMap propMap = new RefsetPropertyMap();
-                    if (newRetiredPart.getC1id() == conceptUnderReview.getConceptId()) {
+                    if (newRetiredPart.getC1id() == conceptUnderReview.getConceptNid()) {
                         propMap.put(REFSET_PROPERTY.CID_ONE, replacementConceptLabel.getTermComponent().getNid());
                     } else {
                         propMap.put(REFSET_PROPERTY.CID_ONE, newRetiredPart.getC1id());
                     }
-                    if (newRetiredPart.getC2id() == conceptUnderReview.getConceptId()) {
+                    if (newRetiredPart.getC2id() == conceptUnderReview.getConceptNid()) {
                         propMap.put(REFSET_PROPERTY.CID_TWO, replacementConceptLabel.getTermComponent().getNid());
                     } else {
                         propMap.put(REFSET_PROPERTY.CID_TWO, newRetiredPart.getC2id());
@@ -642,7 +642,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                         break;
                     case CID_CID_CID:
                         I_ExtendByRefPartCidCidCid c3Part = (I_ExtendByRefPartCidCidCid) newRetiredPart;
-                        if (c3Part.getC3id() == conceptUnderReview.getConceptId()) {
+                        if (c3Part.getC3id() == conceptUnderReview.getConceptNid()) {
                             propMap.put(REFSET_PROPERTY.CID_THREE, replacementConceptLabel.getTermComponent().getNid());
                         } else {
                             propMap.put(REFSET_PROPERTY.CID_THREE, c3Part.getC3id());
@@ -656,7 +656,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                     if (writeComment) {
                         RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
                         commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                        comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptId(),
+                        comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
                             newMember.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
                         tf.addUncommittedNoChecks(commentRefset);
                     }
@@ -680,16 +680,16 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             member.addTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), tuples,
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             PathSetReadOnly promotionPath = new PathSetReadOnly(config.getPromotionPathSet());
-            I_Position viewPosition = config.getViewPositionSet().iterator().next();
+            PositionBI viewPosition = config.getViewPositionSet().iterator().next();
 
             for (I_ExtendByRefVersion tuple : tuples) {
-                tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptId(), Long.MAX_VALUE));
+                tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid, viewPosition.getPath().getConceptNid(), Long.MAX_VALUE));
             }
             tf.addUncommittedNoChecks(refsetSpec);
             if (writeComment) {
                 RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
                 commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptId(),
+                comment = this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
                     member.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
                 tf.addUncommittedNoChecks(commentRefset);
             }

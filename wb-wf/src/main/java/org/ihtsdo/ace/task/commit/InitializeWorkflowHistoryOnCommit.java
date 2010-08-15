@@ -99,7 +99,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
         	     conceptMayBeInitialized(concept)))		// Concept not already in and existing Workflow (if so, don't re-init)
         	{
 	            // @ToDo Single Editing path allowed only
-	            writer.setPath(tf.getConcept(tf.getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptId()));
+	            writer.setPath(tf.getConcept(tf.getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptNid()));
 	        	
 	            String modelerStr = tf.getActiveAceFrameConfig().getUsername();
 	            writer.setModeler(WorkflowRefsetHelper.lookupModeler(modelerStr));
@@ -258,7 +258,7 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest {
     	
     //	I_IntSet ids = Terms.get().getConceptNids();
     	
-    //	return ids.contains(concept.getConceptId());
+    //	return ids.contains(concept.getConceptNid());
     }
     
     private boolean conceptMayBeInitialized(I_GetConceptData concept) throws Exception

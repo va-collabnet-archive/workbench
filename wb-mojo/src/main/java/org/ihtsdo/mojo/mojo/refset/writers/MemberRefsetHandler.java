@@ -174,7 +174,7 @@ public abstract class MemberRefsetHandler {
         String id = getMemberId(part, memberId, useSctId, componentId, refsetNid, namespace, project);
         String effectiveDate = getDate(tf, part.getVersion());
         boolean active = isActiveStatus(statusUuids);
-        String moduleId = toId(tf, getModule().getConceptId(), useSctId, namespace, project);
+        String moduleId = toId(tf, getModule().getConceptNid(), useSctId, namespace, project);
         String refsetId = toId(tf, refsetNid, useSctId, namespace, project);
         String referencedComponentId = toId(tf, componentId, useSctId, namespace, project);
 

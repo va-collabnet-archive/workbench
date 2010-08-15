@@ -24,8 +24,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -37,6 +35,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class SetEditPathFromProperty extends AbstractTask {
@@ -78,16 +78,16 @@ public class SetEditPathFromProperty extends AbstractTask {
 
             I_TermFactory tf = Terms.get();
 
-            I_Path editPath = tf.getPath(pathConcept.getUids());
+            PathBI editPath = tf.getPath(pathConcept.getUids());
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
 
-            Set<I_Path> editSet = frameConfig.getEditingPathSet();
+            Set<PathBI> editSet = frameConfig.getEditingPathSet();
             if (!keepExistingEditPaths) {
                 editSet.clear();
             }
             frameConfig.addEditingPath(editPath);
 
-            Set<I_Position> viewPositionSet = frameConfig.getViewPositionSet();
+            Set<PositionBI> viewPositionSet = frameConfig.getViewPositionSet();
             viewPositionSet.add(tf.newPosition(editPath, Integer.MAX_VALUE));
 
             frameConfig.fireUpdateHierarchyView();

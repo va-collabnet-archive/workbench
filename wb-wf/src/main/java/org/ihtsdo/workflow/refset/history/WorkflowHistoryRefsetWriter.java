@@ -1,18 +1,15 @@
 package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.ihtsdo.cement.WorkflowAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.cement.WorkflowAuxiliary;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.workflow.refset.RefsetFields;
 import org.ihtsdo.workflow.refset.utilities.RefsetWriterUtility;
-import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetHelper;
 
 
 
@@ -228,14 +225,14 @@ public class WorkflowHistoryRefsetWriter extends RefsetWriterUtility {
 		public String toString() {
 			try {
 				return "\nReferenced Component Id(Hard-Coded Workflow History Concept) = " + getReferencedComponentId().getInitialText() + 
-					   "(" + getReferencedComponentId().getConceptId() + ")" +
+					   "(" + getReferencedComponentId().getConceptNid() + ")" +
 					   "\nWorkflow Id = " + workflowId +
 					   "\nConcept Id = " + conceptId +
-					   "\nUse Case = " + useCase.getConceptId() + 
-					   "\nPath = " + path.getConceptId() +
-					   "\nModeler = " + modeler.getConceptId() + 
-					   "\nAction = " + action.getConceptId() +
-					   "\nState = " + state.getConceptId() +
+					   "\nUse Case = " + useCase.getConceptNid() + 
+					   "\nPath = " + path.getConceptNid() +
+					   "\nModeler = " + modeler.getConceptNid() + 
+					   "\nAction = " + action.getConceptNid() +
+					   "\nState = " + state.getConceptNid() +
 					   "\nFSN = " + fsn +
 					   "\nTimestamp = " + timeStamp;
 			} catch (IOException io) {
@@ -282,23 +279,23 @@ public class WorkflowHistoryRefsetWriter extends RefsetWriterUtility {
 				   	"</property>" + 
 				   	"<property>" +
 			   			"<key>useCase</key>" +
-			   			"<value>" + getUseCase().getConceptId() + "</value>" +
+			   			"<value>" + getUseCase().getConceptNid() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
 			   			"<key>path</key>" +
-			   			"<value>" + getPath().getConceptId() + "</value>" +
+			   			"<value>" + getPath().getConceptNid() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
 			   			"<key>modeler</key>" +
-			   			"<value>" + getModeler().getConceptId() + "</value>" +
+			   			"<value>" + getModeler().getConceptNid() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
 		   				"<key>action</key>" +
-		   				"<value>" + getAction().getConceptId() + "</value>" +
+		   				"<value>" + getAction().getConceptNid() + "</value>" +
 		   			"</property>" + 
 				   	"<property>" +
 			   			"<key>state</key>" +
-			   			"<value>" + getState().getConceptId() + "</value>" +
+			   			"<value>" + getState().getConceptNid() + "</value>" +
 			   		"</property>" + 
 			   		"<property>" +
 			   			"<key>fsn</key>" +

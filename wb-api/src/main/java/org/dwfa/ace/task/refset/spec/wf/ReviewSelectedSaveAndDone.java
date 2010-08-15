@@ -237,10 +237,10 @@ public class ReviewSelectedSaveAndDone extends AbstractTask {
         I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         List<I_GetConceptData> newAdditions =
                 refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
-                    .getConceptId()), unreviewedAdditionStatus);
+                    .getConceptNid()), unreviewedAdditionStatus);
         List<I_GetConceptData> newDeletions =
                 refsetHelper.filterListByConceptType(termFactory.getRefsetExtensionMembers(memberRefsetConcept
-                    .getConceptId()), unreviewedDeletionStatus);
+                    .getConceptNid()), unreviewedDeletionStatus);
 
         if (newAdditions.size() != 0) {
             return false;

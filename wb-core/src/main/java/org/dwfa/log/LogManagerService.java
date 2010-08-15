@@ -34,9 +34,6 @@ import java.util.logging.Logger;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 
-import org.dwfa.jini.JiniManager;
-import org.dwfa.jini.LookupJiniAndLocal;
-
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
@@ -56,6 +53,9 @@ import net.jini.lookup.JoinManager;
 import net.jini.lookup.entry.Name;
 import net.jini.lookup.entry.ServiceInfo;
 import net.jini.security.TrustVerifier;
+
+import org.dwfa.jini.JiniManager;
+import org.dwfa.jini.LookupJiniAndLocal;
 
 import com.sun.jini.start.LifeCycle;
 

@@ -20,9 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -35,6 +33,9 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -47,10 +48,10 @@ public class ConceptAttributesVersionTest {
 	EConcept testConcept;
 	String dbTarget;
 	I_ConfigAceFrame config;
-    private I_Path p0;
-    private I_Path p1_1;
-    private I_Path p1_2;
-    private I_Path p2;
+    private PathBI p0;
+    private PathBI p1_1;
+    private PathBI p1_2;
+    private PathBI p2;
     private long t0;
     private long t1;
     private long t2;
@@ -74,7 +75,7 @@ public class ConceptAttributesVersionTest {
         }
 
 		config = NewDefaultProfile.newProfile("", "", "", "", "");
-		for (I_Position pos: config.getViewPositionSet()) {
+		for (PositionBI pos: config.getViewPositionSet()) {
 	        config.getEditingPathSet().add(pos.getPath());
 		}
 
@@ -82,9 +83,9 @@ public class ConceptAttributesVersionTest {
 		addDescription("P-0", p0Concept);
 
 		p0 = Terms.get().newPath(config.getViewPositionSet(), p0Concept, config);
-		I_Position firstOrigin = Terms.get().newPosition(p0, Integer.MAX_VALUE);
+		PositionBI firstOrigin = Terms.get().newPosition(p0, Integer.MAX_VALUE);
         Terms.get().commit();
-		Set<I_Position> firstOriginSet = new HashSet<I_Position>();
+		Set<PositionBI> firstOriginSet = new HashSet<PositionBI>();
 		firstOriginSet.add(firstOrigin);
 		
 		Concept p1_1_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
@@ -97,7 +98,7 @@ public class ConceptAttributesVersionTest {
 
         Concept p2_concept = (Concept) Terms.get().newConcept(UUID.randomUUID(), false, config);
         addDescription("P-2", p2_concept);
-        Set<I_Position> secondOriginSet = new HashSet<I_Position>();
+        Set<PositionBI> secondOriginSet = new HashSet<PositionBI>();
         secondOriginSet.add(Terms.get().newPosition(p1_1, Integer.MAX_VALUE));
         secondOriginSet.add(Terms.get().newPosition(p1_2, Integer.MAX_VALUE));
 
@@ -156,18 +157,14 @@ public class ConceptAttributesVersionTest {
             
             Concept c = Concept.get(testConcept);
             
-            
-            
             IntSet allowedStatus = null;
-            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, Terms.get().newPosition(p1_1, Integer.MAX_VALUE), PRECEDENCE.PATH, config.getConflictResolutionStrategy());
+            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Integer.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
             
-            
-            tuples = c.getConceptAttributes().getTuples(allowedStatus, Terms.get().newPosition(p1_1, Integer.MAX_VALUE), PRECEDENCE.TIME, config.getConflictResolutionStrategy());
+            tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Integer.MAX_VALUE)), Precedence.TIME, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
-            
             
             tearDown();
             

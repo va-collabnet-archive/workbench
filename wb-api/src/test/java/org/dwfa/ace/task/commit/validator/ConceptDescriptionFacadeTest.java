@@ -118,7 +118,7 @@ public final class ConceptDescriptionFacadeTest {
             .iterator()
             .next());
 
-        assertEquals(mockConcept.getConceptId(), conceptId);
+        assertEquals(mockConcept.getConceptNid(), conceptId);
 
         List<I_DescriptionVersioned> descriptions = classBeingTested.getAllDescriptions(mockConcept);
         assertEquals(descriptions.size(), numExpectedDescriptions);
@@ -151,7 +151,7 @@ public final class ConceptDescriptionFacadeTest {
     }
 
     private ConceptDescriptionFacadeTest expectGetConceptIdFromMockConcept() throws Exception {
-        expect(mockConcept.getConceptId()).andReturn(Integer.MIN_VALUE).times(2);
+        expect(mockConcept.getConceptNid()).andReturn(Integer.MIN_VALUE).times(2);
         return this;
     }
 

@@ -171,7 +171,7 @@ public class IntList implements ListDataListener, I_IntList {
         clear();
         for (int i = 0; i < model.getSize(); i++) {
             I_GetConceptData cb = (I_GetConceptData) model.getElementAt(i);
-            add(cb.getConceptId());
+            add(cb.getConceptNid());
         }
     }
 

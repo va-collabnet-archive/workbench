@@ -37,7 +37,7 @@ public class XML_I_ExtendByRefPartCidCidCid extends XML_RefSetBasic implements I
 			c1id = rpcc.getC1id();
 			c2id = rpcc.getC2id();
 			c3id = rpcc.getC3id();
-			//conceptID = rpcc.getConceptId();
+			//conceptID = rpcc.getConceptNid();
 			
 			versionid = rpcc.getVersion();
 			positionid = -2;

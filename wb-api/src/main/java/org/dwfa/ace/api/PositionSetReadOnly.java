@@ -21,38 +21,41 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-public class PositionSetReadOnly  implements Set<I_Position> {
-	I_Position[] positions = new I_Position[0];
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
+
+public class PositionSetReadOnly  implements PositionSetBI {
+	PositionBI[] positions = new PositionBI[0];
     I_IntSet pathNids = Terms.get().newIntSet();
     
     public I_IntSet getViewPathNidSet() {
         return pathNids;
     }
  
-	public PositionSetReadOnly(Set<I_Position> positionSet) {
+	public PositionSetReadOnly(Set<? extends PositionBI> positionSet) {
 		super();
 		if (positionSet != null) {
 			this.positions = positionSet.toArray(this.positions);
-	        for (I_Position p: positionSet) {
+	        for (PositionBI p: positionSet) {
 	            pathNids.add(p.getPath().getConceptNid());
 	        }
 		}
 	}
 
-	public PositionSetReadOnly(I_Position viewPosition) {
+	public PositionSetReadOnly(PositionBI viewPosition) {
 		if (viewPosition != null) {
-			positions = new I_Position[] { viewPosition};
+			positions = new PositionBI[] { viewPosition};
 			pathNids.add(viewPosition.getPath().getConceptNid());
 		}
 	}
 
 	@Override
-	public boolean add(I_Position e) {
+	public boolean add(PositionBI e) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends I_Position> c) {
+	public boolean addAll(Collection<? extends PositionBI> c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -63,7 +66,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 
 	@Override
 	public boolean contains(Object o) {
-		for (I_Position p: positions) {
+		for (PositionBI p: positions) {
 			if (p.equals(o)) {
 				return true;
 			}
@@ -81,7 +84,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 		return positions.length == 0;
 	}
 	
-	private class PositionIterator implements Iterator<I_Position> {
+	private class PositionIterator implements Iterator<PositionBI> {
 		int index = 0;
 		@Override
 		public boolean hasNext() {
@@ -89,7 +92,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 		}
 
 		@Override
-		public I_Position next() {
+		public PositionBI next() {
 			return positions[index++];
 		}
 
@@ -101,7 +104,7 @@ public class PositionSetReadOnly  implements Set<I_Position> {
 	}
 
 	@Override
-	public Iterator<I_Position> iterator() {
+	public Iterator<PositionBI> iterator() {
 		return new PositionIterator();
 	}
 

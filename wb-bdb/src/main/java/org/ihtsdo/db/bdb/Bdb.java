@@ -504,7 +504,7 @@ public class Bdb {
 
 	
 	public static void addToWatchList(I_GetConceptData c) {
-		watchList.put(c.getNid(), c.getConceptId());
+		watchList.put(c.getNid(), c.getConceptNid());
 	}
 
 	public static void removeFromWatchList(I_GetConceptData c) {

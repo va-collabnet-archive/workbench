@@ -33,18 +33,18 @@ public class RefsetDefaultsCrossMapForRel extends RefsetDefaults implements I_Re
     public RefsetDefaultsCrossMapForRel() throws TerminologyException, IOException {
         super();
         refineFlag = Terms.get().getConcept(RefsetAuxiliary.Concept.MANDATORY_REFINABILITY_FLAG.getUids());
-        refineFlagPopupIds.add(refineFlag.getConceptId());
+        refineFlagPopupIds.add(refineFlag.getConceptNid());
         refineFlagPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.COMPLETE_REFINABILITY_FLAG.getUids())
-            .getConceptId());
+            .getConceptNid());
         refineFlagPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.POSSIBLE_REFINABILITY_FLAG.getUids())
-            .getConceptId());
+            .getConceptNid());
 
         additionalCode = Terms.get().getConcept(RefsetAuxiliary.Concept.MANDATORY_ADDITIONAL_CODE_FLAG.getUids());
-        additionalCodePopupIds.add(additionalCode.getConceptId());
+        additionalCodePopupIds.add(additionalCode.getConceptNid());
         additionalCodePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.COMPLETE_ADDITIONAL_CODE_FLAG.getUids())
-            .getConceptId());
+            .getConceptNid());
         additionalCodePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.POSSIBLE_ADDITIONAL_CODE_FLAG.getUids())
-            .getConceptId());
+            .getConceptNid());
 
     }
 

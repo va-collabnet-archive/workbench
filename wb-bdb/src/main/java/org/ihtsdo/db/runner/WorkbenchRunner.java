@@ -40,7 +40,6 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.config.AceConfig;
@@ -68,6 +67,7 @@ import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
+import org.ihtsdo.tk.api.PositionBI;
 
 import com.sun.jini.start.LifeCycle;
 
@@ -627,7 +627,7 @@ public class WorkbenchRunner {
 					firstStartup = false;
 					if (ace.getViewPositionSet() == null
 							|| ace.getViewPositionSet().size() == 0) {
-						Set<I_Position> viewPositions = new HashSet<I_Position>();
+						Set<PositionBI> viewPositions = new HashSet<PositionBI>();
 
 						viewPositions
 								.add(new Position(

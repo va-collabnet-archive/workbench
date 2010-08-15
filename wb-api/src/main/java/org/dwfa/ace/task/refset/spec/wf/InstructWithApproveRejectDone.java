@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -166,11 +165,11 @@ public class InstructWithApproveRejectDone extends AbstractTask {
 
                 for (I_GetConceptData concept : conceptsToCheck) {
 
-                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptId())) {
-                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), approveId)) {
+                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptNid())) {
+                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptNid(), approveId)) {
                             // nothing to do
                         } else {
-                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), approveId);
+                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptNid(), approveId);
                             temporaryList.remove(concept);
                         }
                     } else {
@@ -234,11 +233,11 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                 }
 
                 for (I_GetConceptData concept : conceptsToCheck) {
-                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptId())) {
-                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptId(), rejectId)) {
+                    if (refsetHelper.hasConceptRefsetExtensionWithAnyPromotionStatus(refsetId, concept.getConceptNid())) {
+                        if (refsetHelper.hasCurrentRefsetExtension(refsetId, concept.getConceptNid(), rejectId)) {
                             // nothing to do
                         } else {
-                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptId(), rejectId);
+                            refsetHelper.newConceptExtensionPart(refsetId, concept.getConceptNid(), rejectId);
                             temporaryList.remove(concept);
                         }
                     } else {
@@ -381,7 +380,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
         refsetId =
                 termFactory.getConcept(new UUID[] { (UUID) process.getProperty(memberRefsetUuidPropName) })
-                    .getConceptId();
+                    .getConceptNid();
         initialPromotionStatus = termFactory.getConcept(new UUID[] { (UUID) process.getProperty(statusUuidPropName) });
 
         unreviewedAdditionStatus =
@@ -400,13 +399,13 @@ public class InstructWithApproveRejectDone extends AbstractTask {
         if (initialPromotionStatus.equals(unreviewedAdditionStatus)
             || initialPromotionStatus.equals(reviewedApprovedAdditionStatus)
             || initialPromotionStatus.equals(reviewedRejectedAdditionStatus)) {
-            approveId = reviewedApprovedAdditionStatus.getConceptId();
-            rejectId = reviewedRejectedAdditionStatus.getConceptId();
+            approveId = reviewedApprovedAdditionStatus.getConceptNid();
+            rejectId = reviewedRejectedAdditionStatus.getConceptNid();
         } else if (initialPromotionStatus.equals(unreviewedDeletionStatus)
             || initialPromotionStatus.equals(reviewedApprovedDeletionStatus)
             || initialPromotionStatus.equals(reviewedRejectedDeletionStatus)) {
-            approveId = reviewedApprovedDeletionStatus.getConceptId();
-            rejectId = reviewedRejectedDeletionStatus.getConceptId();
+            approveId = reviewedApprovedDeletionStatus.getConceptNid();
+            rejectId = reviewedRejectedDeletionStatus.getConceptNid();
         }
 
         builderVisible = config.isBuilderToggleVisible();

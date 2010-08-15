@@ -3,12 +3,9 @@ package org.ihtsdo.concept.component.refsetmember.Boolean;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember;
-import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refsetmember.cidCid;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 

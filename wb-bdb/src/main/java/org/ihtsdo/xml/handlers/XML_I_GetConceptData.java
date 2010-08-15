@@ -19,7 +19,6 @@ import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.util.AceXMLUtil;
 import org.ihtsdo.xml.util.XMLUtil;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -185,7 +184,7 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 	
 	public void getConXML(){
 		
-		conIdi = concept.getConceptId();
+		conIdi = concept.getConceptNid();
 		//conIdi_S = Integer.toString(conIdi);
 		oc_key = AceXMLUtil.getOc_key(conIdi);
 		//oc_key = CommonXMLStatics.CONCEPT_PRE + conIdi_S;

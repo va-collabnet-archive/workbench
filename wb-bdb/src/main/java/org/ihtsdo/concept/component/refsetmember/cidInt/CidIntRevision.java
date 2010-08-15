@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refsetmember.cidInt;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -11,6 +10,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -60,6 +60,14 @@ public class CidIntRevision
 		intValue = primoridalMember.getIntValue();
 	}
 
+    protected CidIntRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidIntMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+		c1Nid = primoridalMember.getC1Nid();
+		intValue = primoridalMember.getIntValue();
+	}
+
 	protected CidIntRevision(int statusAtPositionNid, 
 			CidIntMember primoridalMember) {
 		super(statusAtPositionNid, 
@@ -75,10 +83,17 @@ public class CidIntRevision
 		intValue = another.intValue;
 	}
 
+	protected CidIntRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidIntRevision another) {
+		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+		c1Nid = another.c1Nid;
+		intValue = another.intValue;
+	}
+
 	@Override
 	public CidIntRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
@@ -86,10 +101,21 @@ public class CidIntRevision
         return newR;
 	}
 
+	@Override
+	public CidIntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            return this;
+        }
+        CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
 
     @Override
     public CidIntRevision makeAnalog() {
-         return new CidIntRevision(getStatusId(), getPathId(), getTime(), this);
+         return new CidIntRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public CidIntRevision(TupleInput input, 
@@ -120,7 +146,7 @@ public class CidIntRevision
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

@@ -94,7 +94,7 @@ public class RemoveConceptFromRefset extends AbstractTask {
                 "Removing concept '" + member.getInitialText() + "' as a '" + value.getInitialText()
                     + "' from refset '" + refset.getInitialText() + "'.");
 
-            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId()).removeFromRefset(member.getConceptId());
+            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid()).removeFromRefset(member.getConceptNid());
 
             // use commit in business process
 

@@ -76,7 +76,7 @@ public class DescriptionTransferable implements Transferable {
         I_TermFactory tf = Terms.get();
         if (flavor.equals(conceptBeanFlavor)) {
             try {
-                return tf.getConcept(tuple.getConceptId());
+                return tf.getConcept(tuple.getConceptNid());
             } catch (TerminologyException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -87,20 +87,20 @@ public class DescriptionTransferable implements Transferable {
             return tuple;
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptNid()).getUids());
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptId()).getUids());
+                return UniversalFixedConcept.get(tf.getConcept(tuple.getConceptNid()).getUids());
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescFlavor)) {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
-                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptNid()).getUids(),
                     tuple.isInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {
@@ -109,7 +109,7 @@ public class DescriptionTransferable implements Transferable {
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedDescInterfaceFlavor)) {
             try {
                 return new UniversalFixedDescription(tuple.getDescVersioned().getUniversal().getDescId(),
-                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptId()).getUids(),
+                    tf.getConcept(tuple.getStatusId()).getUids(), tf.getConcept(tuple.getConceptNid()).getUids(),
                     tuple.isInitialCaseSignificant(), tf.getConcept(tuple.getTypeId()).getUids(), tuple.getText(),
                     tuple.getLang());
             } catch (TerminologyException e) {

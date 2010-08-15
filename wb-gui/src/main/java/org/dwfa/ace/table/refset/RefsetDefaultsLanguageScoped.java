@@ -74,10 +74,10 @@ public class RefsetDefaultsLanguageScoped extends RefsetDefaultsLanguage impleme
     public RefsetDefaultsLanguageScoped() throws TerminologyException, IOException {
         super();
         defaultScopeForScopedLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-        scopePopupIds.add(defaultScopeForScopedLanguageRefset.getConceptId());
+        scopePopupIds.add(defaultScopeForScopedLanguageRefset.getConceptNid());
 
         defaultTagForScopedLanguageRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-        tagPopupIds.add(defaultTagForScopedLanguageRefset.getConceptId());
+        tagPopupIds.add(defaultTagForScopedLanguageRefset.getConceptNid());
 
         defaultPriorityForScopedLanguageRefset = 1;
         priorityPopupItems = new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };

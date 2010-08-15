@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_ConceptAttributeTuple extends I_AmTuple {
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+
+public interface I_ConceptAttributeTuple extends I_AmTuple, ConAttrVersionBI {
 
 
     public boolean isDefined();
@@ -30,21 +32,21 @@ public interface I_ConceptAttributeTuple extends I_AmTuple {
     /**
      * 
      * @return
-     * @deprecated use getStatusId();
+     * @deprecated ;
      */
     public int getConceptStatus();
 
     /**
      * 
      * @return
-     * @deprecated use getFixedPartId();
+     * @deprecated ;
      */
     public int getConId();
 
     /**
      * 
      * @return
-     * @deprecated use getFixedPart();
+     * @deprecated ;
      */
     public I_ConceptAttributeVersioned getConVersioned();
 

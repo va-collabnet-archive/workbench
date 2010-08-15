@@ -59,11 +59,11 @@ public class RefsetDefaultsTemplate extends RefsetDefaultsTemplateForRel impleme
     public RefsetDefaultsTemplate() throws TerminologyException, IOException {
         super();
         attribute = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
-        attributePopupIds.add(attribute.getConceptId());
+        attributePopupIds.add(attribute.getConceptNid());
         attributePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
-            .getConceptId());
+            .getConceptNid());
         attributePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
-            .getConceptId());
+            .getConceptNid());
     }
 
     /*

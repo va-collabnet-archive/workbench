@@ -96,10 +96,10 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
 
     public RefsetDefaults() throws TerminologyException, IOException {
         defaultRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-        refsetPopupIds.add(defaultRefset.getConceptId());
+        refsetPopupIds.add(defaultRefset.getConceptNid());
 
         defaultStatusForRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-        statusPopupIds.add(defaultStatusForRefset.getConceptId());
+        statusPopupIds.add(defaultStatusForRefset.getConceptNid());
     }
 
     public I_GetConceptData getDefaultRefset() {

@@ -35,8 +35,6 @@ import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -46,6 +44,8 @@ import org.dwfa.ace.task.classify.SnoAB;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Classifier Computed Normal Form Table Panel
@@ -65,8 +65,8 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
     private I_GetConceptData theCBean;
     private SnoTable theSnoTable;
 
-    private List<I_Position> cEditPathPos;
-    private List<I_Position> cClassPathPos;
+    private List<PositionBI> cEditPathPos;
+    private List<PositionBI> cClassPathPos;
 
 
     public CNFormsTablePanel() {
@@ -187,8 +187,8 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
             // CHECK & GET EDIT_PATH
             I_GetConceptData cEditPathObj = config.getClassifierInputPath();
             if (cEditPathObj != null) {
-                I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
-                cEditPathPos = new ArrayList<I_Position>();
+            	PathBI cEditIPath = tf.getPath(cEditPathObj.getUids());
+                cEditPathPos = new ArrayList<PositionBI>();
                 cEditPathPos.add(new Position(Integer.MAX_VALUE, cEditIPath));
                 addPathOrigins(cEditPathPos, cEditIPath);
             }
@@ -196,8 +196,8 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
             // CHECK & GET CLASSIFER_PATH
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
             if (cClassPathObj != null) {
-                I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-                cClassPathPos = new ArrayList<I_Position>();
+            	PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
+                cClassPathPos = new ArrayList<PositionBI>();
                 cClassPathPos.add(new Position(Integer.MAX_VALUE, cClassIPath));
                 addPathOrigins(cClassPathPos, cClassIPath);
             }
@@ -212,9 +212,9 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
         SnoAB.posList = cClassPathPos;
     }
 
-    private void addPathOrigins(List<I_Position> origins, I_Path p) {
+    private void addPathOrigins(List<PositionBI> origins, PathBI p) {
         origins.addAll(p.getOrigins());
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             addPathOrigins(origins, o.getPath());
         }
     }

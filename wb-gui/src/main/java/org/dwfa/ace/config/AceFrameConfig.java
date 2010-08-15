@@ -70,9 +70,7 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -125,6 +123,9 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -133,7 +134,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 46; // keep current with
+    private static final int dataVersion = 47; // keep current with
     // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
@@ -154,11 +155,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private I_IntSet descTypes = new IntSet();
 
-    private Set<I_Position> viewPositions = Collections.synchronizedSet(new HashSet<I_Position>());
+    private Set<PositionBI> viewPositions = Collections.synchronizedSet(new HashSet<PositionBI>());
 
     private Rectangle bounds = new Rectangle(0, 0, 1400, 1028);
 
-    private Set<I_Path> editingPathSet = new HashSet<I_Path>();
+    private Set<PathBI> editingPathSet = new HashSet<PathBI>();
 
     private I_IntSet childrenExpandedNodes = new IntSet();
 
@@ -326,13 +327,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private boolean searchWithDescTypeFilter = false;
 
     // 44
-    private Set<I_Path> promotionPathSet = new HashSet<I_Path>();
+    private Set<PathBI> promotionPathSet = new HashSet<PathBI>();
 
     // 45
     private I_GetConceptData classificationRoleRoot;
     
     // 46
-    private PRECEDENCE precedence;
+    private Precedence precedence;
 
     // transient
     private transient MasterWorker worker;
@@ -371,11 +372,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntSet.writeIntSet(out, statedViewTypes);
         IntSet.writeIntSet(out, inferredViewTypes);
 
-        out.writeObject(Terms.get().nativeToUuid(defaultStatus.getConceptId()));
-        out.writeObject(Terms.get().nativeToUuid(defaultDescriptionType.getConceptId()));
-        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipType.getConceptId()));
-        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipCharacteristic.getConceptId()));
-        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipRefinability.getConceptId()));
+        out.writeObject(Terms.get().nativeToUuid(defaultStatus.getConceptNid()));
+        out.writeObject(Terms.get().nativeToUuid(defaultDescriptionType.getConceptNid()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipType.getConceptNid()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipCharacteristic.getConceptNid()));
+        out.writeObject(Terms.get().nativeToUuid(defaultRelationshipRefinability.getConceptNid()));
 
         IntList.writeIntList(out, treeDescPreferenceList);
         IntList.writeIntList(out, tableDescPreferenceList);
@@ -383,7 +384,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         IntList.writeIntList(out, longLabelDescPreferenceList);
         out.writeInt(termTreeDividerLoc);
         if (hierarchySelection != null) {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(hierarchySelection.getConceptNid()));
         } else {
             out.writeObject(null);
         }
@@ -419,7 +420,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 defaultImageType =
                         AceConfig.getVodb().getConcept(ArchitectonicAuxiliary.Concept.AUXILLARY_IMAGE.getUids());
             }
-            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(defaultImageType.getConceptNid()));
         } catch (TerminologyException e) {
             IOException newEx = new IOException();
             newEx.initCause(e);
@@ -467,7 +468,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             IntList il = new IntList();
             for (I_GetConceptData concept : tabHistoryMap.get(keyStr)) {
             	if (concept.isCanceled() != true) {
-                    il.add(concept.getConceptId());
+                    il.add(concept.getConceptNid());
             	}
             }
             IntList.writeIntList(out, il);
@@ -482,7 +483,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 34
         IntList contextIntList = new IntList();
         if (context != null) {
-            contextIntList.add(context.getConceptId());
+            contextIntList.add(context.getConceptNid());
         }
         IntList.writeIntList(out, contextIntList);
 
@@ -533,7 +534,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         // 45
         writeConceptAsId(classificationRoleRoot, out);
         
-        // 46
+        // 46; 47 changed implementation class
         out.writeObject(precedence);
 
     }
@@ -542,7 +543,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (concept == null) {
             out.writeObject(null);
         } else {
-            out.writeObject(AceConfig.getVodb().nativeToUuid(concept.getConceptId()));
+            out.writeObject(AceConfig.getVodb().nativeToUuid(concept.getConceptNid()));
         }
     }
 
@@ -572,7 +573,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 3) {
                 editingPathSet = Path.readPathSet(in);
             } else {
-                editingPathSet = new HashSet<I_Path>();
+                editingPathSet = new HashSet<PathBI>();
             }
             if (objDataVersion >= 4) {
                 childrenExpandedNodes = IntSet.readIntSetIgnoreMapErrors(in);
@@ -757,7 +758,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     throw new ToIoException(e);
                 }
                 editImageTypePopup = new IntList();
-                editImageTypePopup.add(defaultImageType.getConceptId());
+                editImageTypePopup.add(defaultImageType.getConceptNid());
             }
             if (objDataVersion >= 22) {
                 enabledConceptExtTypes = (Set<REFSET_TYPES>) in.readObject();
@@ -975,7 +976,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             if (objDataVersion >= 44) {
                 promotionPathSet = Path.readPathSet(in);
             } else {
-                promotionPathSet = new HashSet<I_Path>();
+                promotionPathSet = new HashSet<PathBI>();
             }
 
             if (objDataVersion >= 45) {
@@ -990,13 +991,19 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 classificationRoleRoot = null;
             }
             
-            if (objDataVersion >= 46) {
-                precedence = (PRECEDENCE) in.readObject();
+            if (objDataVersion == 46) {
+            	PRECEDENCE p = (PRECEDENCE) in.readObject();
+            	precedence = p.getTkPrecedence();
                 if (precedence == null) {
-                    precedence = PRECEDENCE.PATH;
+                    precedence = Precedence.PATH;
+                }
+            } else if (objDataVersion >= 47) {
+                precedence = (Precedence) in.readObject();
+                if (precedence == null) {
+                    precedence = Precedence.PATH;
                 }
             } else {
-                precedence = PRECEDENCE.PATH;
+                precedence = Precedence.PATH;
             }
               
 
@@ -1150,7 +1157,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setViewPositions(java.util.Set)
      */
-    public void setViewPositions(Set<I_Position> positions) {
+    public void setViewPositions(Set<PositionBI> positions) {
         if (positions == this.viewPositions) {
             return;
         }
@@ -1256,7 +1263,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
      * .Path)
      */
-    public void addEditingPath(I_Path p) {
+    public void addEditingPath(PathBI p) {
         editingPathSet.add(p);
     }
 
@@ -1266,7 +1273,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
      * types.Path)
      */
-    public void removeEditingPath(I_Path p) {
+    public void removeEditingPath(PathBI p) {
         editingPathSet.remove(p);
     }
 
@@ -1276,7 +1283,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
      * .types.Path, org.dwfa.vodb.types.Path)
      */
-    public void replaceEditingPath(I_Path oldPath, I_Path newPath) {
+    public void replaceEditingPath(PathBI oldPath, PathBI newPath) {
         this.editingPathSet.remove(oldPath);
         this.editingPathSet.add(newPath);
     }
@@ -1285,7 +1292,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
      */
-    public Set<I_Path> getEditingPathSet() {
+    public Set<PathBI> getEditingPathSet() {
         return editingPathSet;
     }
 
@@ -1295,7 +1302,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#addEditingPath(org.dwfa.vodb.types
      * .Path)
      */
-    public void addPromotionPath(I_Path p) {
+    public void addPromotionPath(PathBI p) {
         promotionPathSet.add(p);
     }
 
@@ -1305,7 +1312,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#removeEditingPath(org.dwfa.vodb.
      * types.Path)
      */
-    public void removePromotionPath(I_Path p) {
+    public void removePromotionPath(PathBI p) {
         promotionPathSet.remove(p);
     }
 
@@ -1315,7 +1322,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceEditingPath(org.dwfa.vodb
      * .types.Path, org.dwfa.vodb.types.Path)
      */
-    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+    public void replacePromotionPathSet(PathBI oldPath, PathBI newPath) {
         this.promotionPathSet.remove(oldPath);
         this.promotionPathSet.add(newPath);
     }
@@ -1324,7 +1331,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getEditingPathSet()
      */
-    public Set<I_Path> getPromotionPathSet() {
+    public Set<PathBI> getPromotionPathSet() {
         return promotionPathSet;
     }
 
@@ -1334,7 +1341,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#addViewPosition(org.dwfa.ace.api
      * .I_Position)
      */
-    public void addViewPosition(I_Position p) {
+    public void addViewPosition(PositionBI p) {
         if (viewPositions.contains(p)) {
             return;
         }
@@ -1349,7 +1356,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#removeViewPosition(org.dwfa.ace.
      * api.I_Position)
      */
-    public void removeViewPosition(I_Position p) {
+    public void removeViewPosition(PositionBI p) {
         if (viewPositions.contains(p) == false) {
             return;
         }
@@ -1364,7 +1371,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * org.dwfa.ace.config.I_ConfigAceFrame#replaceViewPosition(org.dwfa.ace
      * .api.I_Position, org.dwfa.ace.api.I_Position)
      */
-    public void replaceViewPosition(I_Position oldPosition, I_Position newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
         if (oldPosition.equals(newPosition)) {
             return;
         }
@@ -1378,7 +1385,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getViewPositionSet()
      */
-    public Set<I_Position> getViewPositionSet() {
+    public Set<PositionBI> getViewPositionSet() {
         return viewPositions;
     }
 
@@ -2980,12 +2987,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
     }
     
-    public PRECEDENCE getPrecedence() {
+    public Precedence getPrecedence() {
         return precedence;
     }
 
-    public void setPrecedence(PRECEDENCE precedence) {
-        PRECEDENCE old = this.precedence;
+    public void setPrecedence(Precedence precedence) {
+        Precedence old = this.precedence;
         this.precedence = precedence;
         this.changeSupport.firePropertyChange("precedence", old, precedence);
         this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);        

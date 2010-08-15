@@ -52,14 +52,14 @@ public final class RefSetNameRetrieverImpl implements RefSetNameRetriever {
 
     private I_IntSet createFullySpecifiedUUIDs(final I_TermFactory termFactory) throws Exception {
         I_IntSet fsn = termFactory.newIntSet();
-        fsn.add(termFactory.getConcept(FULLY_SPECIFIED_UUIDS).getConceptId());
+        fsn.add(termFactory.getConcept(FULLY_SPECIFIED_UUIDS).getConceptNid());
         fsn.add(ArchitectonicAuxiliary.getSnomedDescriptionTypeId(FULLY_SPECIFIED_UUIDS));
         return fsn;
     }
 
     private I_IntSet createCurrentStatus(final I_TermFactory termFactory) throws Exception {
         I_IntSet status = termFactory.newIntSet();
-        status.add(termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId());
+        status.add(termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptNid());
         status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(CURRENT_STATUS_UUIDS));
         return status;
     }

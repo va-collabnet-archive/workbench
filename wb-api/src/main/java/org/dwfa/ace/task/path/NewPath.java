@@ -32,7 +32,6 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -51,6 +50,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * @author Ming Zhang
@@ -116,13 +116,13 @@ public class NewPath extends AbstractTask {
             String descriptionForNewPath = (String) process.getProperty(PathDescription);
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
-            Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile.getEditingPathSet());
+            Set<PathBI> savedEditingPaths = new HashSet<PathBI>(activeProfile.getEditingPathSet());
 
             // create parent of path
             I_GetConceptData newPathConcept = createComponents(descriptionForNewPath, tf, activeProfile,
                 parentPathTermEntry);
 
-            I_Path editPath = tf.newPath(null, newPathConcept);
+            PathBI editPath = tf.newPath(null, newPathConcept);
 
             if (!isBlank(profilePropName)) {
                 I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
@@ -140,7 +140,7 @@ public class NewPath extends AbstractTask {
             // pass on the new path concept for subsequent tasks that may wish
             // to use it
             if (!isBlank(newConceptPropName)) {
-                process.setProperty(newConceptPropName, tf.getConcept(editPath.getConceptId()));
+                process.setProperty(newConceptPropName, tf.getConcept(editPath.getConceptNid()));
             }
 
             if (!isBlank(profilePropName)) {

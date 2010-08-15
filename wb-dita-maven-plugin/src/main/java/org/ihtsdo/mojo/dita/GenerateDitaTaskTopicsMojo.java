@@ -4,24 +4,29 @@
 package org.ihtsdo.mojo.dita;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
-import java.util.regex.*;
-import java.io.*; 
-
-import org.jdom.*;
-import org.jdom.output.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jdom.Comment;
+import org.jdom.DocType;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
-import com.thoughtworks.qdox.*;
-import com.thoughtworks.qdox.model.*;
+import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DocletTag;
+import com.thoughtworks.qdox.model.JavaMethod;
 
 
 

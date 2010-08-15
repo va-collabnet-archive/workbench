@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_AmTermComponent extends ComponentBI {
 
@@ -39,11 +41,11 @@ public interface I_AmTermComponent extends ComponentBI {
      * @throws TerminologyException
      */
     public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths, 
-            I_IntSet allowedStatus, PRECEDENCE precedence)
+            I_IntSet allowedStatus, Precedence precedence)
             throws IOException, TerminologyException;
 
-    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, 
-            I_IntSet allowedStatus, PRECEDENCE precedence)
+    public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, 
+            I_IntSet allowedStatus, Precedence precedence)
             throws IOException, TerminologyException;
 
 }

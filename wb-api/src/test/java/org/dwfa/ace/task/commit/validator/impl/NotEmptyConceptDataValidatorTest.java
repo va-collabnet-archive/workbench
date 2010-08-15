@@ -104,7 +104,7 @@ public class NotEmptyConceptDataValidatorTest {
             .iterator()
             .next());
 
-        Assert.assertEquals(mockConcept.getConceptId(), conceptId);
+        Assert.assertEquals(mockConcept.getConceptNid(), conceptId);
 
         classBeingTested = new NotEmptyConceptDataValidator(mockConcept, descriptions, mockNotRequiredConcept);
         try {
@@ -139,7 +139,7 @@ public class NotEmptyConceptDataValidatorTest {
             .iterator()
             .next());
 
-        Assert.assertEquals(mockConcept.getConceptId(), conceptId);
+        Assert.assertEquals(mockConcept.getConceptNid(), conceptId);
 
         classBeingTested = new NotEmptyConceptDataValidator(mockConcept, descriptions, mockNotRequiredConcept);
         try {
@@ -173,7 +173,7 @@ public class NotEmptyConceptDataValidatorTest {
             .iterator()
             .next());
 
-        Assert.assertEquals(mockConcept.getConceptId(), conceptId);
+        Assert.assertEquals(mockConcept.getConceptNid(), conceptId);
 
         classBeingTested = new NotEmptyConceptDataValidator(mockConcept, descriptions, mockNotRequiredConcept);
         try {
@@ -205,7 +205,7 @@ public class NotEmptyConceptDataValidatorTest {
             .iterator()
             .next());
 
-        Assert.assertEquals(mockConcept.getConceptId(), conceptId);
+        Assert.assertEquals(mockConcept.getConceptNid(), conceptId);
 
         classBeingTested = new NotEmptyConceptDataValidator(mockConcept, descriptions, mockConcept);
         try {
@@ -241,7 +241,7 @@ public class NotEmptyConceptDataValidatorTest {
     }
 
     private NotEmptyConceptDataValidatorTest expectGetConceptIdWithCorrectValue(int times) throws Exception {
-        EasyMock.expect(mockConcept.getConceptId()).andReturn(Integer.MIN_VALUE).times(times);
+        EasyMock.expect(mockConcept.getConceptNid()).andReturn(Integer.MIN_VALUE).times(times);
         return this;
     }
 
@@ -251,7 +251,7 @@ public class NotEmptyConceptDataValidatorTest {
     }
 
     private NotEmptyConceptDataValidatorTest expectGetConceptIdWithWrongValue(int times) throws Exception {
-        EasyMock.expect(mockConcept.getConceptId()).andReturn(Integer.MIN_VALUE).times(times);
+        EasyMock.expect(mockConcept.getConceptNid()).andReturn(Integer.MIN_VALUE).times(times);
         return this;
     }
 

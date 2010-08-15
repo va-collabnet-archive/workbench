@@ -23,8 +23,8 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.tk.api.PathBI;
 
 public class AddConceptPart extends AddComponent {
 
@@ -40,8 +40,8 @@ public class AddConceptPart extends AddComponent {
     	List<? extends I_ConceptAttributeTuple> tuples = cb.getConceptAttributes().
     		getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly());
     	I_ConceptAttributeTuple tuple = tuples.get(0);
-        for (I_Path p : config.getEditingPathSet()) {
-        	tuple.makeAnalog(tuple.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+        for (PathBI p : config.getEditingPathSet()) {
+        	tuple.makeAnalog(tuple.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
         }
         Terms.get().addUncommitted(cb);
         termContainer.setTermComponent(cb);

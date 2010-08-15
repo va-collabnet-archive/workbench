@@ -57,7 +57,7 @@ public class CheckAndProcessSearchTest implements Runnable {
 
     public void run() {
         if (checkList == null || checkList.size() == 0) {
-                matches.setMember(conceptToTest.getConceptId());
+                matches.setMember(conceptToTest.getConceptNid());
         } else {
             try {
                 boolean failed = false;
@@ -69,7 +69,7 @@ public class CheckAndProcessSearchTest implements Runnable {
                 }
 
                 if (failed == false) {
-                    matches.setMember(conceptToTest.getConceptId());
+                    matches.setMember(conceptToTest.getConceptNid());
                 }
             } catch (TaskFailedException e) {
                 if (ACE.editMode) {

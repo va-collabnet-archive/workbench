@@ -78,7 +78,7 @@ public class SetPropertyToRefsetSpecUuid extends AbstractTask {
             I_TermFactory termFactory = Terms.get();
             I_GetConceptData refsetSpec = termFactory.getActiveAceFrameConfig().getRefsetSpecInSpecEditor();
             if (refsetSpec != null) {
-                process.setProperty(propName, termFactory.getUids(refsetSpec.getConceptId()).iterator().next());
+                process.setProperty(propName, termFactory.getUids(refsetSpec.getConceptNid()).iterator().next());
             } else {
                 process.setProperty(propName, null);
             }

@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.log.AceLog;
@@ -21,11 +20,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
-import org.ihtsdo.cern.colt.list.IntArrayList;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -45,7 +44,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	private static PositionArrays readWriteArray;
 
 	private static PositionArrayBinder positionArrayBinder = new PositionArrayBinder();
-	private static ConcurrentHashMap<I_Position, PositionMapper> mapperCache = new ConcurrentHashMap<I_Position, PositionMapper>();
+	private static ConcurrentHashMap<PositionBI, PositionMapper> mapperCache = new ConcurrentHashMap<PositionBI, PositionMapper>();
 	private static Set<Integer> currentPaths;
 
 	private static final int MIN_ARRAY_SIZE = 100;
@@ -230,11 +229,11 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			pathNid = readWriteArray.pathNids[getReadWriteIndex(index)];
 			time = readWriteArray.commitTimes[getReadWriteIndex(index)];
 		}
-		I_Path path = Bdb.getPathManager().get(pathNid);
+		PathBI path = Bdb.getPathManager().get(pathNid);
 		return new Position(ThinVersionHelper.convert(time), path);
 	}
 
-	public int getPathId(int index) {
+	public int getPathNid(int index) {
         if (index < 0) {
             return Integer.MIN_VALUE;
         }
@@ -245,7 +244,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		}
 	}
 
-	public int getStatusId(int index) {
+	public int getStatusNid(int index) {
 	    if (index < 0) {
 	        return Integer.MIN_VALUE;
 	    }
@@ -287,7 +286,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		mapperCache.clear();
 	}
 
-	public PositionMapper getMapper(I_Position position) {
+	public PositionMapper getMapper(PositionBI position) {
 		PositionMapper pm = mapperCache.get(position);
 		if (pm != null) {
 			return pm;
@@ -310,8 +309,8 @@ public class StatusAtPositionBdb extends ComponentBdb {
 	    boolean continueTrim = mapperCache.size() > 1;
 	    long now = System.currentTimeMillis();
 		while (continueTrim) {
-			Entry<I_Position, PositionMapper> looser = null;
-			for (Entry<I_Position, PositionMapper> entry : mapperCache
+			Entry<PositionBI, PositionMapper> looser = null;
+			for (Entry<PositionBI, PositionMapper> entry : mapperCache
 					.entrySet()) {
 				if (looser == null) {
 					looser = entry;
@@ -348,7 +347,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 			for (int sapNid : uncomittedStatusPathEntries.values()) {
 				changedSinceSync = true;
 				readWriteArray.commitTimes[getReadWriteIndex(sapNid)] = time;
-	            sapToIntMap.put(getStatusId(sapNid), getAuthorNid(sapNid), getPathId(sapNid), time, sapNid);
+	            sapToIntMap.put(getStatusNid(sapNid), getAuthorNid(sapNid), getPathNid(sapNid), time, sapNid);
 
 				committedSapNids.add(sapNid);
 			}
@@ -468,7 +467,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 		Collection<Integer> values = sapToIntMap.values();
 		for (int sapNid: values) {
 			returnValues.add(new TimePathId(getVersion(sapNid),
-					getPathId(sapNid)));
+					getPathNid(sapNid)));
 		}
 		return new ArrayList<TimePathId>(returnValues);
 	}
@@ -487,7 +486,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
         Collection<Integer> values = sapToIntMap.values();
         if (pathIds != null && pathIds.size() > 0) {
     		for (int sapNid: values) {
-                if (pathIds.contains(getPathId(sapNid))) {
+                if (pathIds.contains(getPathNid(sapNid))) {
                     checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
                 }
             }

@@ -38,7 +38,6 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.QueueType;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;

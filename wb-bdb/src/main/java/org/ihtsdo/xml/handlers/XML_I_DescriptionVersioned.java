@@ -1,9 +1,7 @@
 package org.ihtsdo.xml.handlers;
 
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -43,7 +41,7 @@ public class XML_I_DescriptionVersioned extends XML_basic_getCon implements
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.DESC_ENAME);
 		
 		if (!debug) {
-			con_id = desc.getConceptId();
+			con_id = desc.getConceptNid();
 			desc_id = desc.getDescId();
 			BasicXMLStruct.getNativeIdAtts_i(desc_id,localE);
 			BasicXMLStruct.getIntAtt(con_id, CommonXMLStatics.CONCEPT_ID_ATT, localE);

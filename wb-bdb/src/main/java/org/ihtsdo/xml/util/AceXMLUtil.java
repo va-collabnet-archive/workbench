@@ -23,7 +23,7 @@ public class AceXMLUtil {
 	 */
 	
 	public static boolean checkProc(int conID){
-		//conIdi =concept.getConceptId();
+		//conIdi =concept.getConceptNid();
 		String oc_key = getOc_key(conID);
 		if(ObjectCache.get(oc_key) != null){
 			return true;

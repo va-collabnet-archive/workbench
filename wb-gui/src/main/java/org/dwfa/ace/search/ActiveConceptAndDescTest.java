@@ -44,7 +44,7 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
 		try {
 		    if (component != null) {
 	            I_DescriptionVersioned descV = (I_DescriptionVersioned) component;
-	            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptId());
+	            I_GetConceptData concept = Terms.get().getConcept(descV.getConceptNid());
 	            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
 	                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), 
 	                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());

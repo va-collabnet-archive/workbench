@@ -19,9 +19,9 @@ package org.dwfa.ace.api.ebr;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public interface I_ExtendByRefPart extends Comparable<I_ExtendByRefPart>, I_AmPart {
 
@@ -41,6 +41,6 @@ public interface I_ExtendByRefPart extends Comparable<I_ExtendByRefPart>, I_AmPa
 
     public I_ExtendByRefPart duplicate();
 
-    public I_ExtendByRefPart makePromotionPart(I_Path promotionPath);
+    public I_ExtendByRefPart makePromotionPart(PathBI promotionPath);
 
 }

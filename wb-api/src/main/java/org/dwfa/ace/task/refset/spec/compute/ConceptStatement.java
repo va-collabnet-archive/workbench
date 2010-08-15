@@ -71,7 +71,7 @@ public class ConceptStatement extends RefsetSpecStatement {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
 
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
-            if (queryToken.getConceptId() == token.nid) {
+            if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
                 break;
             }
@@ -104,16 +104,16 @@ public class ConceptStatement extends RefsetSpecStatement {
         queryConstraint = (I_GetConceptData) queryConstraint;
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
-            parentPossibleConcepts = termFactory.getConceptIdSet();
+            parentPossibleConcepts = termFactory.getConceptNidSet();
         }
 
         switch (tokenEnum) {
         case CONCEPT_IS:
             if (isNegated()) {
                 possibleConcepts.or(parentPossibleConcepts);
-                possibleConcepts.setNotMember(queryConstraintConcept.getConceptId());
+                possibleConcepts.setNotMember(queryConstraintConcept.getConceptNid());
             } else {
-                possibleConcepts.setMember(queryConstraintConcept.getConceptId());
+                possibleConcepts.setMember(queryConstraintConcept.getConceptNid());
             }
             break;
         case CONCEPT_IS_CHILD_OF:
@@ -142,7 +142,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             activity = setupActivityPanel(parentPossibleConcepts);
             activities.add(activity);
             Collection<? extends I_ExtendByRef> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptId());
+                    termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -251,7 +251,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean conceptIsMemberOf(I_GetConceptData conceptBeingTested) throws IOException, TerminologyException {
-        return componentIsMemberOf(conceptBeingTested.getConceptId());
+        return componentIsMemberOf(conceptBeingTested.getConceptNid());
     }
 
     /**
@@ -335,7 +335,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             }
         }
 
-        if (latestTuple != null && latestTuple.getStatusId() == requiredStatusConcept.getConceptId()) {
+        if (latestTuple != null && latestTuple.getStatusId() == requiredStatusConcept.getConceptNid()) {
             return true;
         }
 

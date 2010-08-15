@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeExpansionEvent;
@@ -140,7 +139,7 @@ public class TermTreeHelper implements PropertyChangeListener {
             TreePath path = tree.getPathForRow(i);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             ConceptBeanForTree treeBean = (ConceptBeanForTree) node.getUserObject();
-            if (aceFrameConfig.getChildrenExpandedNodes().contains(treeBean.getConceptId())) {
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(treeBean.getConceptNid())) {
                 tree.expandPath(new TreePath(node.getPath()));
             }
         }
@@ -158,7 +157,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         for (int i = 0; i < root.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root.getChildAt(i);
             I_GetConceptData cb = (I_GetConceptData) childNode.getUserObject();
-            if (aceFrameConfig.getChildrenExpandedNodes().contains(cb.getConceptId())) {
+            if (aceFrameConfig.getChildrenExpandedNodes().contains(cb.getConceptNid())) {
                 TreePath tp = new TreePath(childNode);
                 TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
                 handleCollapse(treeEvent, aceFrameConfig);
@@ -194,7 +193,7 @@ public class TermTreeHelper implements PropertyChangeListener {
 
     protected void treeTreeCollapsed(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
         I_GetConceptDataForTree userObject = handleCollapse(evt, aceFrameConfig);
-        aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptId());
+        aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptNid());
 
     }
 
@@ -205,7 +204,7 @@ public class TermTreeHelper implements PropertyChangeListener {
             stopWorkersOnPath(idPath, "stopping before expansion");
             I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
             if (userObject != null) {
-                aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptId());
+                aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
                 FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
                 ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
                     node, new CompareConceptBeansForTree(configSnap), this, configSnap);

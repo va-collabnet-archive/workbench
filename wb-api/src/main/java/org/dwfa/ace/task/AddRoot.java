@@ -82,7 +82,7 @@ public class AddRoot extends AbstractTask {
             if (rootConcept == null) {
                 throw new TaskFailedException("rootConcept is null. Ids: " + Arrays.asList(root.ids));
             }
-            int id = rootConcept.getConceptId();
+            int id = rootConcept.getConceptNid();
             if (worker.getLogger().isLoggable(Level.INFO)) {
                 worker.getLogger().info(("ID: " + id));
             }

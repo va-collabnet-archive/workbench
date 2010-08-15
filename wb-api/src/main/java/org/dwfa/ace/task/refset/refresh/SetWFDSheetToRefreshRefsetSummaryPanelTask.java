@@ -36,8 +36,6 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -53,6 +51,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * This task prepares the Workflow Details Sheet to display the PanelRefreshSummary
@@ -274,15 +274,15 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 	        
 	        // Refset Spec Version	        
 			try {
-				Set<I_Position> currentRefsetSpecVersion = new HashSet<I_Position>();
+				Set<PositionBI> currentRefsetSpecVersion = new HashSet<PositionBI>();
 		        I_TermFactory tf = Terms.get();
 				
 				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
 				Set<UniversalAcePosition> universalPositions = 
 					(Set<UniversalAcePosition>) process.getProperty(refsetSpecVersionPropName);
 		        for (UniversalAcePosition univPos: universalPositions) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PathBI path = tf.getPath(univPos.getPathId());
+		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
 		           currentRefsetSpecVersion.add(thinPos);
 		        }
 
@@ -306,15 +306,15 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 			
 			// SNOMED Version 	        
 			try {
-				Set<I_Position> currentSnomedVersion = new HashSet<I_Position>();
+				Set<PositionBI> currentSnomedVersion = new HashSet<PositionBI>();
 		        I_TermFactory tf = Terms.get();
 				
 				// Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
 				Set<UniversalAcePosition> universalPositions = 
 					(Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);
 		        for (UniversalAcePosition univPos: universalPositions) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PathBI path = tf.getPath(univPos.getPathId());
+		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
 		           currentSnomedVersion.add(thinPos);
 		        }
 

@@ -27,10 +27,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
@@ -44,6 +41,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class NewDefaultProfile extends NewProfile {
@@ -287,11 +287,11 @@ public class NewDefaultProfile extends NewProfile {
         activeConfig.setDefaultRelationshipRefinability(tf.getConcept(Concept.OPTIONAL_REFINABILITY.getUids()));
 
         try {
-            I_Path editPath = tf.getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI editPath = tf.getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
             // activeConfig.addEditingPath(editPath);
 
-            I_Position viewPosition = tf.newPosition(editPath, Integer.MAX_VALUE);
-            Set<I_Position> viewSet = new HashSet<I_Position>();
+            PositionBI viewPosition = tf.newPosition(editPath, Integer.MAX_VALUE);
+            Set<PositionBI> viewSet = new HashSet<PositionBI>();
             viewSet.add(viewPosition);
             activeConfig.setViewPositions(viewSet);
         } catch (Exception e) {
@@ -312,7 +312,7 @@ public class NewDefaultProfile extends NewProfile {
         activeConfig.setTogglesInComponentPanelVisible(TOGGLES.HISTORY, true);
         activeConfig.setTogglesInComponentPanelVisible(TOGGLES.REFSETS, false);
         
-        activeConfig.setPrecedence(PRECEDENCE.PATH);
+        activeConfig.setPrecedence(Precedence.PATH);
 
         return activeConfig;
     }

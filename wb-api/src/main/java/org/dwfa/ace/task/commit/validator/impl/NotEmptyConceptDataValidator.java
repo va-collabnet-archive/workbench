@@ -108,7 +108,7 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
             for (I_DescriptionPart part : description.getMutableParts()) {
                 if (comparer.isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
                     throw new ValidationException(String.format("Concept %1$s has empty %2$s",
-                        conceptToValidate.getConceptId(), requiredConcept.toString()));
+                        conceptToValidate.getConceptNid(), requiredConcept.toString()));
                 }
             }
         }

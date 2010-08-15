@@ -443,7 +443,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 List<I_GetConceptData> historyToRemove = new ArrayList<I_GetConceptData>();
                 for (I_GetConceptData historyItem : tabHistoryList) {
                     try {
-                        if (Terms.get().getUids(historyItem.getConceptId()) != null) {
+                        if (Terms.get().getUids(historyItem.getConceptNid()) != null) {
                             JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
                             popup.add(menuItem);
                         } else {

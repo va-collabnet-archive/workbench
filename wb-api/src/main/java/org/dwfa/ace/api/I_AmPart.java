@@ -17,14 +17,21 @@
 package org.dwfa.ace.api;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
-public interface I_AmPart {
+public interface I_AmPart extends ComponentVersionBI {
 	
-	public int getPathId();
-	public int getVersion();
+	public int getStatusNid();
+	public void setStatusNid(int statusNid);
+
+	public int getAuthorNid();
+	public void setAuthorNid(int authorNid);
+
+	public int getPathNid();
+	public void setPathNid(int pathNid);
+
 	public long getTime();
-	public void setTime(long value);
-	public int getStatusId();
+	public void setTime(long time);
 	
 	public ArrayIntList getPartComponentNids();
 	
@@ -36,18 +43,19 @@ public interface I_AmPart {
 	 * @param time
 	 * @return
 	 */
-	public I_AmPart makeAnalog(int statusNid, int pathNid, long time);
+	public Object makeAnalog(int statusNid, int pathNid, long time);
 
-	/**
-	 * 
-	 * @param pathId
-	 */
+	public Object makeAnalog(int statusNid, int authorNid, int pathNid, long time);
+	
+	@Deprecated
+	public int getPathId();
+	@Deprecated
+	public int getStatusId();
+	@Deprecated
+	public int getVersion();
+	@Deprecated
 	public void setPathId(int pathId);
-	
-	
+	@Deprecated
 	public void setStatusId(int statusId);
-	
-	public void setAuthorNid(int authorNid);
-	public int getAuthorNid();
 
 }

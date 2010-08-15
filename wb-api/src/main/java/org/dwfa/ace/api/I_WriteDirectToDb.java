@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * Methods in this interface write directly to the database, and bypass the
@@ -111,7 +112,7 @@ public interface I_WriteDirectToDb {
      * @param p
      * @throws IOException
      */
-    public void writePath(I_Path p) throws IOException;
+    public void writePath(PathBI p) throws IOException;
 
     /**
      * Ensures that all changes are checkpointed to the database.
@@ -174,7 +175,7 @@ public interface I_WriteDirectToDb {
      * @throws TerminologyException
      * @throws IOException
      */
-    public int uuidToNativeDirectWithGeneration(Collection<UUID> uids, int source, I_Path idPath, int version)
+    public int uuidToNativeDirectWithGeneration(Collection<UUID> uids, int source, PathBI idPath, int version)
             throws TerminologyException, IOException;
 
     /**

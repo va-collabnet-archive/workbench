@@ -56,7 +56,7 @@ public final class DescriptionWriterImplTest {
         I_DescriptionTuple mockDescriptionTuple = mockControl.createMock(I_DescriptionTuple.class);
 
         EasyMock.expect(mockWriter.append(LINE_SEPARATOR)).andReturn(mockWriter);
-        EasyMock.expect(mockConcept.getConceptId()).andReturn(CONCEPT_ID);
+        EasyMock.expect(mockConcept.getConceptNid()).andReturn(CONCEPT_ID);
         EasyMock.expect(mockRefsetUtil.getSnomedId(CONCEPT_ID, mockTermFactory)).andReturn(SNOMED_ID);
         EasyMock.expect(mockWriter.append(SNOMED_ID)).andReturn(mockWriter);
         EasyMock.expect(mockWriter.append(TAB_SEPARATOR)).andReturn(mockWriter);

@@ -122,7 +122,7 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(config, refset.getConceptId(), value.getConceptId());
+            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(config, refset.getConceptNid(), value.getConceptNid());
             helper.addAllToRefset(newMembers, "Adding new members to member refset");
 
             computeRefsetActivityPanel.setProgressInfoLower("<html>" + "1) Creating refset spec query.   "

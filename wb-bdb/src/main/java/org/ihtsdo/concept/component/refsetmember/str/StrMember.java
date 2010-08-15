@@ -14,7 +14,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetStrMember;
@@ -161,7 +160,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		StrRevision newR = new StrRevision(statusNid, pathNid, time, this);
@@ -169,10 +168,19 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 		return newR;
 	}
 
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		StrRevision newR = new StrRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
 
     @Override
     public StrRevision makeAnalog() {
-        StrRevision newR = new StrRevision(getStatusId(), getPathId(), getTime(), this);
+        StrRevision newR = new StrRevision(getStatusNid(), getPathNid(), getTime(), this);
         return newR;
     }
 

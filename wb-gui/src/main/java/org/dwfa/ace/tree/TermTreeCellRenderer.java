@@ -46,8 +46,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -64,6 +62,8 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.bind.ThinVersionHelper.MAX_VALUE_TYPE;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements PropertyChangeListener,
         I_RenderAndFocusOnBean {
@@ -134,7 +134,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         Object value = UIManager.get("Tree.drawDashedFocusIndicator");
         drawDashedFocusIndicator = (value != null && ((Boolean) value).booleanValue());
         I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
-        viewerImageTypes.add(viewerImageType.getConceptId());
+        viewerImageTypes.add(viewerImageType.getConceptNid());
     }
 
     @SuppressWarnings("deprecation")
@@ -185,57 +185,57 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 viewerImageTypes, aceConfig.getViewPositionSetReadOnly(), 
                                 aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                 htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
-                                    + imageTuple.getConceptId() + "' align=center>");
+                                    + imageTuple.getConceptNid() + "' align=center>");
                             }
                         }
 
                         if (aceConfig.getClassificationRoot() != null &&
-                                aceConfig.getClassificationRoot().getConceptId() == cb.getConceptId()) {
+                                aceConfig.getClassificationRoot().getConceptNid() == cb.getConceptNid()) {
                             htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classification Root]</font>");
                         }
 
                         if (aceConfig.getClassificationRoleRoot() != null && 
-                                aceConfig.getClassificationRoleRoot().getConceptId() == cb.getConceptId()) {
+                                aceConfig.getClassificationRoleRoot().getConceptNid() == cb.getConceptNid()) {
                             htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Role Root]</font>");
                         }
 
                         if (showPathInfoInTaxonomy) {
-                            if (Terms.get().pathExistsFast(cb.getConceptId())) {
+                            if (Terms.get().pathExistsFast(cb.getConceptNid())) {
                                 addChildrenToolTipText(cb);
-                                I_Position latestInheritedViewPosition = null;
+                                PositionBI latestInheritedViewPosition = null;
 
-                                for (I_Path editPath : aceConfig.getEditingPathSet()) {
-                                    if (editPath.getConceptId() == cb.getConceptId()) {
+                                for (PathBI editPath : aceConfig.getEditingPathSet()) {
+                                    if (editPath.getConceptNid() == cb.getConceptNid()) {
                                         htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");
                                     }
                                 }
 
-                                for (I_Path promotionPath : aceConfig.getPromotionPathSet()) {
-                                    if (promotionPath.getConceptId() == cb.getConceptId()) {
+                                for (PathBI promotionPath : aceConfig.getPromotionPathSet()) {
+                                    if (promotionPath.getConceptNid() == cb.getConceptNid()) {
                                         htmlSuffixes.add("<font color='#669900'>&nbsp;[Promotion]</font>");
                                     }
                                 }
 
                                 if (aceConfig.getClassifierInputPath() != null && 
-                                        aceConfig.getClassifierInputPath().getConceptId() == cb.getConceptId()) {
+                                        aceConfig.getClassifierInputPath().getConceptNid() == cb.getConceptNid()) {
                                     htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Input]</font>");
                                 }
 
                                 if (aceConfig.getClassifierOutputPath() != null &&
-                                        aceConfig.getClassifierOutputPath().getConceptId() == cb.getConceptId()) {
+                                        aceConfig.getClassifierOutputPath().getConceptNid() == cb.getConceptNid()) {
                                     htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Output]</font>");
                                 }
 
-                                for (I_Position viewPosition : aceConfig.getViewPositionSet()) {
-                                    if (viewPosition.getPath().getConceptNid() == cb.getConceptId()) {
+                                for (PositionBI viewPosition : aceConfig.getViewPositionSet()) {
+                                    if (viewPosition.getPath().getConceptNid() == cb.getConceptNid()) {
                                         String version =
                                                 ThinVersionHelper.format(viewPosition.getVersion(),
                                                     MAX_VALUE_TYPE.LATEST);
                                         htmlSuffixes
                                             .add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
                                     }
-                                    for (I_Position origin : viewPosition.getPath().getNormalisedOrigins()) {
-                                        if (origin.getPath().getConceptNid() == cb.getConceptId()) {
+                                    for (PositionBI origin : viewPosition.getPath().getNormalisedOrigins()) {
+                                        if (origin.getPath().getConceptNid() == cb.getConceptNid()) {
                                             if ((latestInheritedViewPosition == null)
                                                 || (origin.getVersion() > latestInheritedViewPosition.getVersion())) {
                                                 latestInheritedViewPosition = origin;
@@ -259,7 +259,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 new ArrayList<I_DescriptionVersioned>();
                         if (showRefsetInfoInTaxonomy) {
                             List<I_ExtendByRef> extensions =
-                                     (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb.getConceptId());
+                                     (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb.getConceptNid());
                             Collection<? extends I_DescriptionVersioned> descriptions = cb.getDescriptions();
                             List<I_ExtendByRef> descriptionExtensions = new ArrayList<I_ExtendByRef>();
                             for (I_DescriptionVersioned desc : descriptions) {
@@ -298,7 +298,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                             .getViewPositionSetReadOnly(), 
                                                             aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                                         htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId()
-                                                            + "$" + imageTuple.getConceptId() + "' align=center>");
+                                                            + "$" + imageTuple.getConceptNid() + "' align=center>");
                                                     }
                                                 } catch (TerminologyException e) {
                                                     AceLog.getAppLog().alertAndLogException(e);
@@ -316,7 +316,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                                     .getAllowedStatus(), viewerImageTypes, aceConfig
                                                     .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
                                                     htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
-                                                        + imageTuple.getConceptId() + "' align=center>");
+                                                        + imageTuple.getConceptNid() + "' align=center>");
                                                 }
                                             }
                                             break;
@@ -406,13 +406,13 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 this.setIcon(multiParentRoot);
                             } else {
                                 if (cb.isParentOpened()) {
-                                    if (focusBean != null && cb.getConceptId() == focusBean.getConceptId()) {
+                                    if (focusBean != null && cb.getConceptNid() == focusBean.getConceptNid()) {
                                         this.setIcon(focusMultiParentOpen);
                                     } else {
                                         this.setIcon(multiParentOpen);
                                     }
                                 } else {
-                                    if (focusBean != null && cb.getConceptId() == focusBean.getConceptId()) {
+                                    if (focusBean != null && cb.getConceptNid() == focusBean.getConceptNid()) {
                                         this.setIcon(focusMultiParentOpen);
                                     } else {
                                         this.setIcon(multiParentClosed);
@@ -449,7 +449,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
         StringBuffer toolTipText = new StringBuffer();
         toolTipText.append("<html>");
         int originCount = 0;
-         for (I_Position child: Terms.get().getPath(Terms.get().getUids(cb.getConceptId())).getOrigins()) {
+         for (PositionBI child: Terms.get().getPath(Terms.get().getUids(cb.getConceptNid())).getOrigins()) {
             originCount++;
             toolTipText.append("<font color=blue>origin:</font> ");
             toolTipText.append(child.toString());
@@ -461,7 +461,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
             toolTipText.append("<br>");
         }
         int childCount = 0;
-        for (I_Path child: Terms.get().getPathChildren(cb.getConceptId())) {
+        for (PathBI child: Terms.get().getPathChildren(cb.getConceptNid())) {
             childCount++;
             toolTipText.append("<font color=green>child:</font> ");
             toolTipText.append(child.toString());

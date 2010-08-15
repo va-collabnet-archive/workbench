@@ -93,7 +93,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
@@ -101,10 +101,20 @@ public class LongMember extends RefsetMember<LongRevision, LongMember> {
 		return newR;
 	}
 
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		LongRevision newR = new LongRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
 
     @Override
     public LongRevision makeAnalog() {
-        LongRevision newR = new LongRevision(getStatusId(), getPathId(), getTime(), this);
+        LongRevision newR = new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
         return newR;
     }
 

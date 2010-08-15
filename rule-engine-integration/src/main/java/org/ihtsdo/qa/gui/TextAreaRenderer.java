@@ -20,7 +20,6 @@ package org.ihtsdo.qa.gui;
  * @(#)TextAreaRenderer.java 
  */ 
  
-import java.awt.Color;
 import java.awt.Component;
 import java.util.Enumeration;
 import java.util.HashMap;

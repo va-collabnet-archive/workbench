@@ -56,7 +56,7 @@ public class SecondaryLoad {
 	            	EConcept eConcept = new EConcept(in);
 	            	Concept newConcept = Concept.get(eConcept);
 
-	            	Bdb.getConceptDb().getConcept(newConcept.getConceptId());
+	            	Bdb.getConceptDb().getConcept(newConcept.getConceptNid());
 	            
 	    			if (conceptsReread % 10000 == 0) {
 	    				System.out.println("concepts re-read: " + conceptsReread);

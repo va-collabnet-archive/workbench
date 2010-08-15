@@ -39,14 +39,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -61,6 +58,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 import au.csiro.snorocket.snapi.Snorocket;
 import au.csiro.snorocket.snapi.I_Snorocket.I_Callback;
@@ -143,13 +143,13 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 
 	// INPUT PATHS
 	int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
-	I_Path cEditIPath = null;
-	List<I_Position> cEditPathPos = null; // Edit (Stated) Path I_Positions
+	PathBI cEditIPath = null;
+	List<PositionBI> cEditPathPos = null; // Edit (Stated) Path I_Positions
 
 	// OUTPUT PATHS
 	int cClassPathNid; // :TODO: move to logging
-	I_Path cClassIPath; // Used for write back value
-	List<I_Position> cClassPathPos; // Classifier (Inferred) Path I_Positions
+	PathBI cClassIPath; // Used for write back value
+	List<PositionBI> cClassPathPos; // Classifier (Inferred) Path I_Positions
 
 	// MASTER DATA SETS
 	List<SnoRel> cEditSnoRels; // "Edit Path" Concepts
@@ -161,7 +161,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 	private Logger logger;
 	I_TermFactory tf = null;
 	I_ConfigAceFrame config = null;
-	private PRECEDENCE precedence;
+	private Precedence precedence;
 	private I_ManageContradiction contradictionMgr;
 	I_ShowActivity gui = null;
 	private boolean continueThisAction = true;
@@ -619,19 +619,19 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 		return Condition.CONTINUE;
 	}
 
-	private void addPathOrigins(List<I_Position> origins, I_Path p) {
-		List<I_Position> thisLevel = new ArrayList<I_Position>();
+	private void addPathOrigins(List<PositionBI> origins, PathBI p) {
+		List<PositionBI> thisLevel = new ArrayList<PositionBI>();
 
-		for (I_Position o : p.getOrigins()) {
+		for (PositionBI o : p.getOrigins()) {
 			origins.add(o);
 			thisLevel.add(o);
 		}
 
 		// do a breadth first traversal of path origins.
 		while (thisLevel.size() > 0) {
-			List<I_Position> nextLevel = new ArrayList<I_Position>();
-			for (I_Position p1 : thisLevel) {
-				for (I_Position p2 : p1.getPath().getOrigins())
+			List<PositionBI> nextLevel = new ArrayList<PositionBI>();
+			for (PositionBI p1 : thisLevel) {
+				for (PositionBI p2 : p1.getPath().getOrigins())
 					if ((origins.contains(p2) == false)
 							&& (p2.getPath().getConceptNid() != workbenchAuxPath)) {
 						origins.add(p2);
@@ -1055,7 +1055,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
 			for (I_RelVersioned rv : thisLevel) {
 				I_RelPart rPart1 = null;
-				for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
+				for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
 					for (I_RelPart rPart : rv.getMutableParts()) {
 						if (pos.getPath().getConceptNid() == rPart.getPathId()) {
 							if (rPart1 == null) {
@@ -1235,16 +1235,16 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			UUID wAuxUuid = UUID
 					.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
 			I_GetConceptData wAuxCb = tf.getConcept(wAuxUuid);
-			workbenchAuxPath = wAuxCb.getConceptId();
+			workbenchAuxPath = wAuxCb.getConceptNid();
 
-			cEditPathNid = cEditPathObj.getConceptId();
+			cEditPathNid = cEditPathObj.getConceptNid();
 			cEditIPath = tf.getPath(cEditPathObj.getUids());
 			cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath,
 					Integer.MAX_VALUE));
 			// cEditPosSet = new
 			// PositionSetReadOnly(cEditIPath.getOrigins().get(0));
 
-			cEditPathPos = new ArrayList<I_Position>();
+			cEditPathPos = new ArrayList<PositionBI>();
 			cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
 			setupPathOrigins(cEditPathPos, cEditIPath);
 
@@ -1256,14 +1256,14 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 						new Exception(errStr));
 				return Condition.STOP;
 			}
-			cClassPathNid = cClassPathObj.getConceptId();
+			cClassPathNid = cClassPathObj.getConceptNid();
 			cClassIPath = tf.getPath(cClassPathObj.getUids());
 			cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath,
 					Integer.MAX_VALUE));
 			// cClassPosSet = new
 			// PositionSetReadOnly(cClassIPath.getOrigins().get(0));
 
-			cClassPathPos = new ArrayList<I_Position>();
+			cClassPathPos = new ArrayList<PositionBI>();
 			cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
 			setupPathOrigins(cClassPathPos, cClassIPath);
 
@@ -1278,19 +1278,19 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 		return Condition.CONTINUE;
 	}
 
-	private void setupPathOrigins(List<I_Position> origins, I_Path p) {
-		List<I_Position> thisLevel = new ArrayList<I_Position>();
+	private void setupPathOrigins(List<PositionBI> origins, PathBI p) {
+		List<PositionBI> thisLevel = new ArrayList<PositionBI>();
 
-		for (I_Position o : p.getOrigins()) {
+		for (PositionBI o : p.getOrigins()) {
 			origins.add(o);
 			thisLevel.add(o);
 		}
 
 		// do a breadth first traversal of path origins.
 		while (thisLevel.size() > 0) {
-			List<I_Position> nextLevel = new ArrayList<I_Position>();
-			for (I_Position p1 : thisLevel) {
-				for (I_Position p2 : p1.getPath().getOrigins())
+			List<PositionBI> nextLevel = new ArrayList<PositionBI>();
+			for (PositionBI p1 : thisLevel) {
+				for (PositionBI p2 : p1.getPath().getOrigins())
 					if ((origins.contains(p2) == false)
 							&& (p2.getPath().getConceptNid() != workbenchAuxPath)) {
 						origins.add(p2);
@@ -1306,21 +1306,15 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 	 * 
 	 * @return Classifier input and output paths as a string.
 	 */
-	private String toStringPathPos(List<I_Position> pathPos, String pStr) {
+	private String toStringPathPos(List<PositionBI> pathPos, String pStr) {
 		// BUILD STRING
 		StringBuffer s = new StringBuffer();
 		s.append("\r\n::: [SnorocketTask] PATH ID -- " + pStr);
-		try {
-			for (I_Position position : pathPos) {
-				s.append("\r\n::: ... PathID:\t"
-						+ position.getPath().getConceptNid() + "\tVersion:\t"
-						+ position.getVersion() + "\tUUIDs:\t"
-						+ position.getPath().getUniversal());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
+		for (PositionBI position : pathPos) {
+			s.append("\r\n::: ... PathID:\t"
+					+ position.getPath().getConceptNid() + "\tVersion:\t"
+					+ position.getVersion() + "\tUUIDs:\t"
+					+ position.getPath().getUUIDs());
 		}
 		s.append("\r\n:::");
 		return s.toString();

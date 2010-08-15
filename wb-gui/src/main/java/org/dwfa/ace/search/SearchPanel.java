@@ -144,9 +144,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                 HashSet<Integer> conceptsAdded = new HashSet<Integer>();
                 for (int i = 0; i < model.getRowCount(); i++) {
                     I_DescriptionTuple desc = model.getDescription(i);
-                    if (conceptsAdded.contains(desc.getConceptId()) == false) {
-                        conceptsAdded.add(desc.getConceptId());
-                        I_GetConceptData cb = Terms.get().getConcept(desc.getConceptId());
+                    if (conceptsAdded.contains(desc.getConceptNid()) == false) {
+                        conceptsAdded.add(desc.getConceptNid());
+                        I_GetConceptData cb = Terms.get().getConcept(desc.getConceptNid());
                         conceptListModel.addElement(cb);
                     }
                 }
@@ -235,7 +235,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 				    lastSelectedRow = viewRowIndex;
 				    int modelRow = descTable.convertRowIndexToModel(viewRowIndex);
 				    I_DescriptionTuple tuple = model.getDescription(modelRow);
-				    I_GetConceptData cb = Terms.get().getConcept(tuple.getConceptId());
+				    I_GetConceptData cb = Terms.get().getConcept(tuple.getConceptNid());
 				    for (I_ContainTermComponent l : linkedComponents) {
 				        l.setTermComponent(cb);
 				    }

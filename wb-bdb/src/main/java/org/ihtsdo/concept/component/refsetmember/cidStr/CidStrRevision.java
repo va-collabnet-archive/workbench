@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refsetmember.cidStr;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -12,6 +11,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.str.StrRevision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -60,6 +60,14 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 		strValue = primoridalMember.getStringValue();
 	}
 
+    public CidStrRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidStrMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+		c1Nid = primoridalMember.getC1Nid();
+		strValue = primoridalMember.getStringValue();
+	}
+
 	public CidStrRevision(int statusAtPositionNid, 
 			CidStrMember primoridalMember) {
 		super(statusAtPositionNid, 
@@ -75,10 +83,17 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 		strValue = another.strValue;
 	}
 
+	protected CidStrRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidStrRevision another) {
+		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+		c1Nid = another.c1Nid;
+		strValue = another.strValue;
+	}
+
 	@Override
 	public CidStrRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         CidStrRevision newR = new CidStrRevision(statusNid, pathNid, time, this);
@@ -86,9 +101,20 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
         return newR;
 	}
 
+	@Override
+	public CidStrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            return this;
+        }
+        CidStrRevision newR = new CidStrRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
     @Override
     public CidStrRevision makeAnalog() {
-         return new CidStrRevision(getStatusId(), getPathId(), getTime(), this);
+         return new CidStrRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public CidStrRevision(TupleInput input, 
@@ -117,7 +143,7 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

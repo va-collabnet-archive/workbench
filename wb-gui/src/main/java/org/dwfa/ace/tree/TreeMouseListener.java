@@ -193,7 +193,7 @@ public class TreeMouseListener extends MouseAdapter {
             return;
         }
         if (addNodes) {
-            ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptId());
+            ace.getAceFrameConfig().getParentExpandedNodes().add(treeBean.getConceptNid());
             List<? extends I_RelTuple> tuples;
             try {
                 tuples = treeBean.getSourceRelTuples(ace.getAceFrameConfig().getAllowedStatus(),
@@ -205,7 +205,7 @@ public class TreeMouseListener extends MouseAdapter {
                 for (I_RelTuple t : tuples) {
                     newNodeIndices[index++] = insertIndex;
 
-                    if (t.getC2Id() == parentBean.getConceptId() && treeBean.getParentDepth() == 0) {
+                    if (t.getC2Id() == parentBean.getConceptNid() && treeBean.getParentDepth() == 0) {
                         AceLog.getAppLog().info(" parent depth: " + treeBean.getParentDepth());
                         continue;
                     }
@@ -224,7 +224,7 @@ public class TreeMouseListener extends MouseAdapter {
             }
         } else { // remove nodes
             removeAllExtraParents(model, treeBean, parentNode);
-            ace.getAceFrameConfig().getParentExpandedNodes().remove(treeBean.getConceptId());
+            ace.getAceFrameConfig().getParentExpandedNodes().remove(treeBean.getConceptNid());
         }
         model.nodeStructureChanged(parentNode);
     }

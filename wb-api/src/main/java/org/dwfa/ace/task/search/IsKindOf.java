@@ -70,11 +70,11 @@ public class IsKindOf extends AbstractSearchTest {
                 potChild = (I_GetConceptData) component;
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-                potChild = Terms.get().getConcept(desc.getConceptId());
+                potChild = Terms.get().getConcept(desc.getConceptNid());
             } else {
                 return applyInversion(false);
             }
-            if (parent.getConceptId() == potChild.getConceptId()) {
+            if (parent.getConceptNid() == potChild.getConceptNid()) {
                 return applyInversion(true);
             }
 

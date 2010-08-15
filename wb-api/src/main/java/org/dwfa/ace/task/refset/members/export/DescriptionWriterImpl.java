@@ -44,7 +44,7 @@ public final class DescriptionWriterImpl implements DescriptionWriter {
             throws Exception {
         I_DescriptionTuple descriptionTuple = descriptionTuples.iterator().next();
         writer.append(lineSeparator);
-        writer.append(refsetUtil.getSnomedId(concept.getConceptId(), termFactory));
+        writer.append(refsetUtil.getSnomedId(concept.getConceptNid(), termFactory));
         writer.append("\t");
         writer.append(descriptionTuple.getText());
     }

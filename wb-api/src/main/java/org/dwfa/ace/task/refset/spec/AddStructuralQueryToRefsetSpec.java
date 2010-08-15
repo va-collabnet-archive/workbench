@@ -79,10 +79,10 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
         } else {
             if (c3Description == null) {
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
-            			configFrame.getHierarchySelection().getConceptId());
+            			configFrame.getHierarchySelection().getConceptNid());
             } else {
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
-            			c3Description.getConceptId());
+            			c3Description.getConceptNid());
             }
         }
         return refsetMap;        

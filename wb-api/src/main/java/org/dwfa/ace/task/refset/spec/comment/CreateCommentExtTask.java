@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -41,6 +40,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * Creates a comment extension on the refset currently in the refset spec panel,
@@ -118,10 +118,10 @@ public class CreateCommentExtTask extends AbstractTask {
                     if (commentsRefset != null && memberRefset != null) {
                         I_HelpSpecRefset specRefsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
                         specRefsetHelper.setAutocommitActive(true);
-                        for (I_Path path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
-                            boolean added = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptId(),
-                                memberRefset.getConceptId(), comments, UUID.randomUUID(), termFactory.getConcept(
-                                    path.getConceptId()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+                        for (PathBI path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                            boolean added = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptNid(),
+                                memberRefset.getConceptNid(), comments, UUID.randomUUID(), termFactory.getConcept(
+                                    path.getConceptNid()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
                             if (added) {
                             	AceLog.getAppLog().info("added comment: " + comments);
                             } else {

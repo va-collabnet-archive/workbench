@@ -95,7 +95,7 @@ public class RefsetViewerPanel extends JPanel {
                 newRoot.add(committedNodes);
                 newRoot.add(uncommittedNodes);
                 Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
-                    refsetConcept.getConceptId());
+                    refsetConcept.getConceptNid());
 
                 for (I_ExtendByRef ext : extensions) {
                     committedNodes.add(new DefaultMutableTreeNode(ext));

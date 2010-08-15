@@ -21,11 +21,9 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;

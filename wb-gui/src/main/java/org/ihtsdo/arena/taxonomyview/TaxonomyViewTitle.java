@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.ihtsdo.arena.ArenaComponentSettings;
 

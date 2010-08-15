@@ -18,12 +18,13 @@ package org.dwfa.ace.api;
 
 import java.util.Collection;
 
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 public interface I_Position  extends PositionBI {
 
-    public Collection<? extends I_Position> getAllOrigins();
+    public Collection<? extends PositionBI> getAllOrigins();
 
-    public I_Path getPath();
+    public PathBI getPath();
 
 }

@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.path.SelectPositionSetPanel;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -38,6 +37,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
 public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
@@ -87,7 +87,7 @@ public class GetPositionSetFromWorkflowDetailsPanel extends AbstractTask {
             for (Component c : workflowDetailsSheet.getComponents()) {
                 if (SelectPositionSetPanel.class.isAssignableFrom(c.getClass())) {
                     SelectPositionSetPanel spsp = (SelectPositionSetPanel) c;
-                    Set<I_Position> positionSet = spsp.getPositionSet();
+                    Set<PositionBI> positionSet = spsp.getPositionSet();
                     process.setProperty(positionSetPropName, positionSet);
                     return Condition.CONTINUE;
                 }

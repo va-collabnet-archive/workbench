@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
-import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
-import org.ihtsdo.concept.component.refsetmember.membership.MembershipRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

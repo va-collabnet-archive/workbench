@@ -57,12 +57,12 @@ public class TerminologyIntListModel implements I_ModelTerminologyList {
     }
 
     public boolean addElement(I_GetConceptData o) {
-        boolean rv = elements.add(o.getConceptId());
+        boolean rv = elements.add(o.getConceptNid());
         return rv;
     }
 
     public void addElement(int index, I_GetConceptData element) {
-        elements.add(index, element.getConceptId());
+        elements.add(index, element.getConceptNid());
     }
 
     public I_GetConceptData removeElement(int index) {

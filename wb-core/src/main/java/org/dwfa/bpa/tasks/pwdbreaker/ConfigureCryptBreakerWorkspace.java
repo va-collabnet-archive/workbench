@@ -24,9 +24,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 import org.dwfa.bpa.gui.FieldInputPanel;
 import org.dwfa.bpa.gui.InstructionPanel;
 import org.dwfa.bpa.process.Condition;
@@ -36,6 +33,9 @@ import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.util.ComponentFrame;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec

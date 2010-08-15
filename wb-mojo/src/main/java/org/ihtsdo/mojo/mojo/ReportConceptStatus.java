@@ -33,7 +33,6 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -42,6 +41,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.maven.graph.MojoGraph;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -154,7 +154,7 @@ public class ReportConceptStatus extends AbstractMojo {
 
         public void processConcept(I_GetConceptData concept) throws Exception {
 
-            // I_Path architectonicPath = termFactory.getPath(
+            // PathBI architectonicPath = termFactory.getPath(
             // ArchitectonicAuxiliary.
             // Concept.ARCHITECTONIC_BRANCH.
             // getUids());
@@ -171,7 +171,7 @@ public class ReportConceptStatus extends AbstractMojo {
 
             if (!viewPath.equalsIgnoreCase("DEFAULT")) {
 
-                positionSet = new PositionSetReadOnly(new HashSet<I_Position>((termFactory.getPath(ArchitectonicAuxiliary.Concept.valueOf(viewPath).getUids())
+                positionSet = new PositionSetReadOnly(new HashSet<PositionBI>((termFactory.getPath(ArchitectonicAuxiliary.Concept.valueOf(viewPath).getUids())
                     .getOrigins())));
 
             } else {

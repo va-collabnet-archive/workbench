@@ -193,7 +193,7 @@ public class AddTopLevelOr extends AbstractTask {
             DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
             if (rootNode.getChildCount() == 0) {
                 ;
-                int specRefsetId = Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept, configFrame).iterator().next().getConceptId();
+                int specRefsetId = Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept, configFrame).iterator().next().getConceptNid();
                 int componentId = specRefsetId;
                 I_TermFactory tf = Terms.get();
                 I_HelpRefsets refsetHelper = tf.getRefsetHelper(configFrame);

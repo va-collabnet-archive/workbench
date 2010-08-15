@@ -127,7 +127,7 @@ public class ExtensionValidator {
                     if (currentVersion.getVersion() == latest) {
                         I_ExtendByRefPartCid temp = (I_ExtendByRefPartCid) currentVersion;
                         // System.out.println("ext part version type concept -> "
-                        // + termFactory.getConcept(temp.getConceptId()));
+                        // + termFactory.getConcept(temp.getConceptNid()));
                         I_GetConceptData extConceptType = termFactory.getConcept(temp.getC1id());
 
                         // Check 1 >>> concept value is child of Refset Auxilary
@@ -172,7 +172,7 @@ public class ExtensionValidator {
                             // alertString,
                             // termFactory.getConcept(extension.getComponentId()));
                             AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType,
-                                alertString, termFactory.getConcept(refsetConcept.getConceptId()));
+                                alertString, termFactory.getConcept(refsetConcept.getConceptNid()));
 
                             if (!alertList.contains(alert)) {
                                 alertList.add(alert);

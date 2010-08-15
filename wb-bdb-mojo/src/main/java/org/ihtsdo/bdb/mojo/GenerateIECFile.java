@@ -102,7 +102,7 @@ public class GenerateIECFile extends AbstractMojo  {
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
             if (sapsToWrite.size() > 0) {
                 ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-                    Bdb.getConceptDb().getConceptIdSet(), System.currentTimeMillis(),
+                    Bdb.getConceptDb().getConceptNidSet(), System.currentTimeMillis(),
                     sapsToWrite, changeSetPolicy, 
                     ChangeSetWriterThreading.MULTI_THREAD, null);
                 handler.run();

@@ -32,7 +32,6 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -67,6 +66,8 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -354,7 +355,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public Collection<Description.Version> getDescriptionVersions(I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Description.Version>(new ArrayList<Description.Version>());
 		}
@@ -370,7 +371,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public Collection<Relationship.Version> getSrcRelVersions(I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Relationship.Version>(new ArrayList<Relationship.Version>());
 		}
@@ -386,7 +387,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public Collection<Image.Version> getMediaVersions(I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Image.Version>(new ArrayList<Image.Version>());
 		}
@@ -473,7 +474,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
 			I_IntSet allowedStatus, PositionSetReadOnly positionSet, 
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+	        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException, TerminologyException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
 		ConceptAttributes attr = getConceptAttributes();
@@ -485,7 +486,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples( 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException,
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException,
 			TerminologyException {
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -503,7 +504,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 	public Collection<ConceptAttributes.Version> getConceptAttrVersions(I_IntSet allowedStatus, 
 			PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws IOException {
+			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<ConceptAttributes.Version>(new ArrayList<ConceptAttributes.Version>());
 		}
@@ -523,14 +524,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return returnList;
 	}
 
-	public int getConceptId() {
+	public int getConceptNid() {
 		return nid;
 	}
 
 	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
 			I_IntList langPrefOrder, I_IntSet allowedStatus,
 			PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException {
 		I_IntSet typeSet = new IntSet();
 		for (int nid : typePrefOrder.getListArray()) {
@@ -640,7 +641,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public List<I_DescriptionTuple> getDescriptionTuples(
 			I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
 		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
 		for (Description desc : getDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positions,
@@ -660,7 +661,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException, TerminologyException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -795,7 +796,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws IOException, TerminologyException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -878,15 +879,15 @@ public class Concept implements I_Transact, I_GetConceptData {
     @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-			PRECEDENCE precedence) throws IOException, TerminologyException {
+			Precedence precedence) throws IOException, TerminologyException {
 		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
 		}
 		return false;
 	}
 
-	public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-            PRECEDENCE precedence) throws IOException, TerminologyException {
+	public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+            Precedence precedence) throws IOException, TerminologyException {
         boolean promotedAnything = false;
 
         if (getConceptAttributes().promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
@@ -924,7 +925,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException {
         List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
         for (I_ImageVersioned img : getImages()) {
@@ -935,7 +936,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
@@ -947,7 +948,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {
@@ -958,9 +959,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException {
-        for (I_Position p : positions) {
+        for (PositionBI p : positions) {
             KindOfSpec kindOfSpec =
                     new KindOfSpec(p, allowedStatus, allowedTypes, getNid(), precedencePolicy, contradictionManager);
             if (KindOfComputer.isKindOf((Concept) child, kindOfSpec)) {
@@ -985,7 +986,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException {
         if (child == this) {
             return true;
@@ -1292,7 +1293,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
         Set<Concept> returnValues = new HashSet<Concept>();
         for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
             contradictionManager)) {
@@ -1306,7 +1307,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
     @Override
     public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();

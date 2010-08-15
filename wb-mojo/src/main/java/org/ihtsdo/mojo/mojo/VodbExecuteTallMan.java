@@ -38,14 +38,14 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Converts specified description types to tall-man capitalisation.
@@ -260,28 +260,28 @@ public class VodbExecuteTallMan extends AbstractMojo {
             // term)
             I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
             for (I_GetConceptData descriptionConcept : descriptionTypes) {
-                descriptionTypesToCheck.add(descriptionConcept.getConceptId());
+                descriptionTypesToCheck.add(descriptionConcept.getConceptNid());
             }
 
             int currentUnreviewedId = termFactory.getConcept(
-                ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptId();
+                ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()).getConceptNid();
 
             // get origins
-            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            I_Position originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
+            PositionBI originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
 
-            Set<I_Position> origins = new HashSet<I_Position>();
+            Set<PositionBI> origins = new HashSet<PositionBI>();
             origins.add(originPosition);
 
             // get the copy-to concept/path
-            I_Path copyToPath = termFactory.getPath(editingBranch.getUids());
+            PathBI copyToPath = termFactory.getPath(editingBranch.getUids());
 
             // get concept/path/position of the branch being copied
-            I_Path oldPath = termFactory.getPath(viewingBranch.getUids());
+            PathBI oldPath = termFactory.getPath(viewingBranch.getUids());
 
-            I_Position oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
-            Set<I_Position> positionsToCheck = new HashSet<I_Position>();
+            PositionBI oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
+            Set<PositionBI> positionsToCheck = new HashSet<PositionBI>();
             positionsToCheck.add(oldPosition);
 
             // get latest descriptions
@@ -293,7 +293,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
             for (I_DescriptionTuple tuple : descriptionTuples) {
 
                 String currentDescription = tuple.getText();
-                tuple.getConceptId();
+                tuple.getConceptNid();
 
                 // find descriptions that contain the tall man word
                 // (ignoring case)
@@ -310,7 +310,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         modifiedUuids.add(uuids);
 
                         // update the description with the tall man alternative
-                        I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(currentUnreviewedId, copyToPath.getConceptId(), Long.MAX_VALUE);
+                        I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(currentUnreviewedId, copyToPath.getConceptNid(), Long.MAX_VALUE);
                         newPart.setText(updatedCurrentDescription);
                         tuple.getDescVersioned().addVersion(newPart);
                         // termFactory.addUncommitted(concept);
@@ -322,7 +322,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             config.getPrecedence(), config.getConflictResolutionStrategy());
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
-                            I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId, copyToPath.getConceptId(), Long.MAX_VALUE);
+                            I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId, copyToPath.getConceptNid(), Long.MAX_VALUE);
                             concept.getConceptAttributes().addVersion(newAttributePart);
                         }
                         termFactory.addUncommitted(concept);

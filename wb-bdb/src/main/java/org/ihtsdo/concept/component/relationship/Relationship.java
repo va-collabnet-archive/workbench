@@ -12,12 +12,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -31,6 +28,9 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -138,6 +138,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 	}
 	@Override
+	@Deprecated
 	public int getTypeId() {
 		return getTypeNid();
 	}
@@ -146,6 +147,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return Bdb.getConcept(getTypeNid());
 	}
 	@Override
+	@Deprecated
 	public void setTypeId(int type) {
 		if (index >= 0) {
 			revisions.get(index).setTypeId(type);
@@ -153,7 +155,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			Relationship.this.setTypeId(type);
 		}		
 	}
-	
+	public void setTypeNid(int type) {
+		if (index >= 0) {
+			revisions.get(index).setTypeNid(type);
+		} else {
+			Relationship.this.setTypeNid(type);
+		}		
+	}
+
 	public Relationship getFixedPart() {
 		return Relationship.this;
 	}
@@ -175,13 +184,28 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
 		if (index >= 0) {
 		    RelationshipRevision rev = revisions.get(index);
-            if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
-			    rev.setStatusId(statusNid);
+            if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			    rev.setStatusNid(statusNid);
                 return rev;
             }
             return rev.makeAnalog(statusNid, pathNid, time);
 		} else {
 			return Relationship.this.makeAnalog(statusNid, pathNid, time);
+		}
+	}
+
+	@Override
+	public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+		if (index >= 0) {
+		    RelationshipRevision rev = revisions.get(index);
+            if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			    rev.setStatusNid(statusNid);
+			    rev.setAuthorNid(authorNid);
+                return rev;
+            }
+            return rev.makeAnalog(statusNid, authorNid, pathNid, time);
+		} else {
+			return Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
 		}
 	}
 
@@ -421,7 +445,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return specifiedVersions;
     }
 
-    public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
+    public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
         List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
         computer.addSpecifiedVersions(allowedStatus, positions, specifiedVersions,
             getTuples(), precedencePolicy, contradictionManager);
@@ -439,7 +463,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	public Collection<Relationship.Version> getVersions(I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+			Precedence precedence, I_ManageContradiction contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -554,8 +578,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	@Override
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.
@@ -563,12 +587,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         			viewPosition, 
         			getVersions(), precedence, null);
         boolean promotedAnything = false;
-        for (I_Path promotionPath : pomotionPaths) {
+        for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
                 if (v.getPathId() == viewPathId) {
                 	
                     RelationshipRevision revision =  v.makeAnalog(v.getStatusId(), 
-							promotionPath.getConceptId(), Long.MAX_VALUE);
+							promotionPath.getConceptNid(), Long.MAX_VALUE);
                     addRevision(revision);
                     promotedAnything = true;
                 }
@@ -581,7 +605,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, List<I_RelTuple> relTupleList,
-			PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+			Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> tuplesToReturn = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
 					getVersions(), precedencePolicy, contradictionManager);
@@ -660,10 +684,20 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		RelationshipRevision newR = new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
+	@Override
+	public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		RelationshipRevision newR = new RelationshipRevision(this, statusNid, authorNid, pathNid, time, this);
 		addRevision(newR);
 		return newR;
 	}

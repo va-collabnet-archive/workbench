@@ -102,7 +102,7 @@ public class NotNumericConceptDataValidator implements GetConceptDataValidationS
             for (I_DescriptionPart part : description.getMutableParts()) {
                 if (comparer.isPartRequiredConceptType(requiredConcept, part) && isNumeric(part)) {
                     throw new ValidationException(String.format(" %2$s for concept %1$s has contains only numeric "
-                        + "characters", conceptToValidate.getConceptId(), requiredConcept.toString()));
+                        + "characters", conceptToValidate.getConceptNid(), requiredConcept.toString()));
                 }
             }
         }

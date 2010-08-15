@@ -25,7 +25,7 @@ public interface I_DescriptionTuple extends I_AmTypedTuple {
 
     public String getText();
 
-    public int getConceptId();
+    public int getConceptNid();
 
     public int getDescId();
 

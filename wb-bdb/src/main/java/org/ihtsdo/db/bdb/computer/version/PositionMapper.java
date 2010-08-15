@@ -17,18 +17,18 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.cern.colt.bitvector.BitMatrix;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
-
-import org.ihtsdo.cern.colt.bitvector.BitMatrix;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Assumptions: 1. Each path can participate as an origin only once 2. The
@@ -189,7 +189,7 @@ public class PositionMapper {
 	 * @throws IOException
 	 */
 	public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION 
-	  fastRelativePosition(V part1, V part2, PRECEDENCE precedencePolicy) {
+	  fastRelativePosition(V part1, V part2, Precedence precedencePolicy) {
 		queryCount++;
 		lastRequestTime = System.currentTimeMillis();
 		// Forms a barrier to ensure that the setup is complete prior to use
@@ -200,8 +200,8 @@ public class PositionMapper {
 				  " rows: " + conflictMatrix.rows() + 
 				  " columns: " + conflictMatrix.columns() +
 				  " time: " + new Date(Bdb.getSapDb().getTime(part1.getSapNid())) +
-				  " status: " + Concept.get(Bdb.getSapDb().getStatusId(part1.getSapNid())) +
-				  " path: " + Concept.get(Bdb.getSapDb().getPathId(part1.getSapNid())) + 
+				  " status: " + Concept.get(Bdb.getSapDb().getStatusNid(part1.getSapNid())) +
+				  " path: " + Concept.get(Bdb.getSapDb().getPathNid(part1.getSapNid())) + 
 				  " destination: " + destination + " latch: " + completeLatch.getCount() +
 				  " positionCount: " + positionCount;
 			assert part2.getSapNid() < conflictMatrix.rows():
@@ -209,8 +209,8 @@ public class PositionMapper {
 				  " rows: " + conflictMatrix.rows() + 
 				  " columns: " + conflictMatrix.columns() + 
 				  " time: " + new Date(Bdb.getSapDb().getTime(part2.getSapNid())) +
-				  " status: " + Concept.get(Bdb.getSapDb().getStatusId(part2.getSapNid())) +
-				  " path: " + Concept.get(Bdb.getSapDb().getPathId(part2.getSapNid())) + 
+				  " status: " + Concept.get(Bdb.getSapDb().getStatusNid(part2.getSapNid())) +
+				  " path: " + Concept.get(Bdb.getSapDb().getPathNid(part2.getSapNid())) + 
 				  " destination: " + destination + " latch: " + completeLatch.getCount() +
 				  " positionCount: " + positionCount;
 		} catch (IOException e) {
@@ -254,7 +254,7 @@ public class PositionMapper {
 	 * route to this <code>destination</code>, and to also determine the
 	 * relative location of positions on that route to one another.
 	 */
-	private I_Position destination;
+	private PositionBI destination;
 	
 	/**
 	 * An array with an index of position identifiers, and values that
@@ -312,13 +312,13 @@ public class PositionMapper {
                                 + TimeUtil.formatDate(destination.getTime()) + 
                                 " thread: " + Thread.currentThread().getName());
 				}
-				Collection<I_Position> origins = 
+				Collection<PositionBI> origins = 
 					pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
 				origins.add(this.destination);
 
 				// Map of the origin position's path id, to the origin position... See
 				// assumption 1.
-				Map<Integer, I_Position> originMap = new TreeMap<Integer, I_Position>();
+				Map<Integer, PositionBI> originMap = new TreeMap<Integer, PositionBI>();
 
 				// Map of the origin position's path to it's 'depth' (how many origins
 				// below the destination it is)
@@ -327,7 +327,7 @@ public class PositionMapper {
 				// Map of the origin's position path to the set of paths that precede it
 				// (including itself).
 				TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
-				for (I_Position o : origins) {
+				for (PositionBI o : origins) {
 					originMap.put(o.getPath().getConceptNid(), o);
 					depthMap.put(o.getPath().getConceptNid(),
 							getDepth(o, destination, 1));
@@ -355,7 +355,7 @@ public class PositionMapper {
                         			.get(p1.getPath().getConceptNid());
 
                         	if (destination.getPath().getConceptNid() == p1.getPath()
-                        			.getConceptId()) {
+                        			.getConceptNid()) {
                         		// On the same path as the destination...
                         		if (p1.getTime() <= destination.getTime()) {
                         			positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(p1.getTime()));
@@ -468,7 +468,7 @@ public class PositionMapper {
 	 *            the path to get all the preceding paths for.
 	 * @return the set of all path identifiers that precede this path
 	 */
-	private Set<Integer> getPreceedingPathSet(I_Position path) {
+	private Set<Integer> getPreceedingPathSet(PositionBI path) {
 		return getPreceedingPathSetRecursion(path, new TreeSet<Integer>());
 	}
 
@@ -479,10 +479,10 @@ public class PositionMapper {
 	 * @param preceedingPaths
 	 * @return the set of all path identifiers that precede this path
 	 */
-	private Set<Integer> getPreceedingPathSetRecursion(I_Position path,
+	private Set<Integer> getPreceedingPathSetRecursion(PositionBI path,
 			Set<Integer> preceedingPaths) {
 		preceedingPaths.add(path.getPath().getConceptNid());
-		for (I_Position origin : path.getPath().getOrigins()) {
+		for (PositionBI origin : path.getPath().getOrigins()) {
 			getPreceedingPathSetRecursion(origin, preceedingPaths);
 		}
 		return preceedingPaths;
@@ -501,13 +501,13 @@ public class PositionMapper {
 	 * @return the depth of the testPath with respect to the destination
 	 *         specified by the instance of this class.
 	 */
-	private BigInteger getDepth(I_Position testPath, I_Position depthFinder,
+	private BigInteger getDepth(PositionBI testPath, PositionBI depthFinder,
 			int depthSeed) {
 		if (testPath.getPath().getConceptNid() == depthFinder.getPath()
-				.getConceptId()) {
+				.getConceptNid()) {
 			return BigInteger.valueOf(depthSeed);
 		}
-		for (I_Position child : depthFinder.getPath().getOrigins()) {
+		for (PositionBI child : depthFinder.getPath().getOrigins()) {
 			BigInteger depth = getDepth(testPath, child, depthSeed + 1);
 			if (depth.compareTo(BigInteger.ZERO) > 0) {
 				return depth;
@@ -525,11 +525,11 @@ public class PositionMapper {
 	 * @throws TerminologyException
 	 * @throws PathNotExistsException
 	 */
-	public PositionMapper(I_Position destination) {
+	public PositionMapper(PositionBI destination) {
 		this.destination = destination;
 	}
 
-	public I_Position getDestination() {
+	public PositionBI getDestination() {
 		return destination;
 	}
 
@@ -550,10 +550,10 @@ public class PositionMapper {
 						new Date(Bdb.getSapDb().getPosition(i).getTime())));
 				buf.append("|");
 				buf.append(Bdb.getConceptDb().getConcept( // path
-						Bdb.getSapDb().getPathId(i)));
+						Bdb.getSapDb().getPathNid(i)));
 				buf.append("|");
 				buf.append(Bdb.getConceptDb().getConcept( // status
-						Bdb.getSapDb().getStatusId(i)));
+						Bdb.getSapDb().getStatusNid(i)));
 			} catch (PathNotExistsException e) {
 				buf.append(e.getLocalizedMessage());
 			} catch (IOException e) {

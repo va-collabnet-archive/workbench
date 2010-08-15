@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -45,14 +45,14 @@ import org.dwfa.tapi.TerminologyException;
 public class SnoAB {
     public static int isCURRENT = Integer.MIN_VALUE;
     public static int isaNid = Integer.MIN_VALUE;
-    public static List<I_Position> posList = null; //
+    public static List<PositionBI> posList = null; //
     I_TermFactory tf;
 
     public SnoAB() {
         tf = Terms.get();
         try {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-            isaNid = config.getClassifierIsaType().getConceptId();
+            isaNid = config.getClassifierIsaType().getConceptNid();
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -63,7 +63,7 @@ public class SnoAB {
         }
     }
 
-    public void setPathPosList(List<I_Position> posList) {
+    public void setPathPosList(List<PositionBI> posList) {
         SnoAB.posList = posList;
     }
 
@@ -101,24 +101,24 @@ public class SnoAB {
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
-                for (I_Position pos : posList) { // FOR EACH PATH POSITION
+                for (PositionBI pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
-                        if (rp.getPathId() == pos.getPath().getConceptNid()) {
+                        if (rp.getPathNid() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
-                            } else if (rp1.getVersion() < rp.getVersion()) {
+                            } else if (rp1.getTime() < rp.getTime()) {
                                 rp1 = rp; // ... KEEP MORE_RECENT PART
-                            } else if (rp1.getVersion() == rp.getVersion()) {
+                            } else if (rp1.getTime() == rp.getTime()) {
                                 // DUPLICATE PART SHOULD NEVER HAPPEN
                                 tmpCountDupl++;
                             }
                         }
                     }
                     if (rp1 != null) {
-                        if (rp1.getStatusId() == isCURRENT && rp1.getTypeId() == isaNid) {
-                            returnSnoRels.add(new SnoRel(rel.getC1Id(), rel.getC2Id(), rp1.getTypeId(), rp1.getGroup(), rel.getNid()));
+                        if (rp1.getStatusNid() == isCURRENT && rp1.getTypeNid() == isaNid) {
+                            returnSnoRels.add(new SnoRel(rel.getC1Id(), rel.getC2Id(), rp1.getTypeNid(), rp1.getGroup(), rel.getNid()));
                         }
                         break; // IF FOUND ON THIS PATH, STOP SEARCHING
                     }

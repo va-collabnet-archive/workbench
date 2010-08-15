@@ -30,8 +30,6 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -45,6 +43,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeConceptStatusToPropertyValue extends AbstractTask {
@@ -92,19 +92,19 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
 
             Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
 
-            Set<I_Position> positionSet = new HashSet<I_Position>();
-            for (I_Path editPath : config.getEditingPathSet()) {
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
+            for (PathBI editPath : config.getEditingPathSet()) {
                 positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
             }
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = (I_GetConceptData) process.getProperty(newStatusPropName);
-            for (I_Path editPath : config.getEditingPathSet()) {
+            for (PathBI editPath : config.getEditingPathSet()) {
                 List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit,
                     config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_ConceptAttributeTuple t : tuples) {
-                    if (t.getStatusId() != newStatusConcept.getConceptId()) {
+                    if (t.getStatusNid() != newStatusConcept.getConceptNid()) {
                         I_ConceptAttributePart newPart = 
-                        	(I_ConceptAttributePart) t.makeAnalog(newStatusConcept.getNid(), editPath.getConceptId(), Long.MAX_VALUE);
+                        	(I_ConceptAttributePart) t.makeAnalog(newStatusConcept.getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
                         partsToAdd.add(newPart);
                     }
                 }

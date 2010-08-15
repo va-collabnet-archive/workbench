@@ -29,8 +29,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -86,7 +84,7 @@ public class TestForIsa extends AbstractConceptTest {
     }
 
     private boolean isRootConcept(final I_GetConceptData concept) throws Exception {
-        return getActiveProfile().getRoots().contains(concept.getConceptId());
+        return getActiveProfile().getRoots().contains(concept.getConceptNid());
     }
 
     private I_ConfigAceFrame getActiveProfile() throws TerminologyException, IOException {

@@ -94,7 +94,7 @@ public class AddConceptToRefset extends AbstractTask {
                 "Adding concept '" + member.getInitialText() + "' as member of refset '" + refset.getInitialText()
                     + "' with a value '" + value.getInitialText() + "'.");
 
-            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId()).addToRefset(member.getConceptId());
+            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid()).addToRefset(member.getConceptNid());
 
             // use commit in business process
 

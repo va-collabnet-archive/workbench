@@ -37,7 +37,7 @@ public class DescTupleFileUtil {
         I_TermFactory termFactory = Terms.get();
 
         UUID tupleUuid = ArchitectonicAuxiliary.Concept.DESC_TUPLE.getUids().iterator().next();
-        UUID conceptUuid = termFactory.getUids(descTuple.getConceptId()).iterator().next();
+        UUID conceptUuid = termFactory.getUids(descTuple.getConceptNid()).iterator().next();
         UUID descUuid = termFactory.getUids(descTuple.getDescId()).iterator().next();
         String text = descTuple.getText();
         String lang = descTuple.getLang();

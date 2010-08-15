@@ -31,7 +31,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.bpa.process.TaskFailedException;
 
 public class CheckAndProcessRegexMatch implements Runnable {
     Pattern p;

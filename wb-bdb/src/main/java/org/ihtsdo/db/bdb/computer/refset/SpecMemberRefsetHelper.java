@@ -28,9 +28,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.batch.Batch;
 import org.dwfa.ace.refset.ConceptConstants;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
@@ -68,8 +68,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                if (newRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
-                    newMembers.add(item.getConceptId());
+                if (newRefsetExtension(getMemberRefsetId(), item.getConceptNid(), getMemberTypeId())) {
+                    newMembers.add(item.getConceptNid());
                 }
             }
 
@@ -156,8 +156,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), getMemberTypeId())) {
-                    removedMembers.add(item.getConceptId());
+                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptNid(), getMemberTypeId())) {
+                    removedMembers.add(item.getConceptNid());
                 }
             }
 
@@ -299,8 +299,8 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
             // Check origin is a refset (ie. has not been retired as a refset)
             for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, 
                 getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
-                if (target.getConceptId() == ReferenceConcepts.REFSET_IDENTITY.getNid()) {
-                    memberRefsets.add(origin.getConceptId());
+                if (target.getConceptNid() == ReferenceConcepts.REFSET_IDENTITY.getNid()) {
+                    memberRefsets.add(origin.getConceptNid());
                 }
             }
         }
@@ -331,7 +331,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
                 // relationship exists so use the is-a specified by the
                 // marked-parent-is-a relationship
                 for (I_GetConceptData concept : requiredIsAType) {
-                    results.add(concept.getConceptId());
+                    results.add(concept.getConceptNid());
                 }
 
                 // Added for backwards compatability. All newly created refset specs will have one or more

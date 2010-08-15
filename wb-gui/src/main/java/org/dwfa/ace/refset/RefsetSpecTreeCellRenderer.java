@@ -79,7 +79,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         setOpenIcon(null);
         I_GetConceptData viewerImageType =
                 Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
-        viewerImageTypes.add(viewerImageType.getConceptId());
+        viewerImageTypes.add(viewerImageType.getConceptNid());
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
@@ -361,7 +361,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         for (I_ImageTuple imageTuple : prefixConcept.getImageTuples(configAceFrame.getAllowedStatus(),
             viewerImageTypes, configAceFrame.getViewPositionSetReadOnly(),
             configAceFrame.getPrecedence(), configAceFrame.getConflictResolutionStrategy())) {
-            htmlParts.add("<img src='ace:" + imageTuple.getNid() + "$" + imageTuple.getConceptId()
+            htmlParts.add("<img src='ace:" + imageTuple.getNid() + "$" + imageTuple.getConceptNid()
                 + "' align=absbottom>");
         }
     }

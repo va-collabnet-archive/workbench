@@ -119,7 +119,7 @@ public class VerifyNoPotentialDups extends AbstractTask {
             // }
             // else{
             // selectedConcept = Terms.get().getConcept(
-            // config.getHierarchySelection().getConceptId() );
+            // config.getHierarchySelection().getConceptNid() );
             // }
 
             boolean statusValid = false;

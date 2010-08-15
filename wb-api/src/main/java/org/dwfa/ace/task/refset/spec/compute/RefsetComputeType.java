@@ -16,7 +16,7 @@ public enum RefsetComputeType {
     public static RefsetComputeType getTypeFromGrouping(I_GetConceptData groupingToken) {
         GROUPING_TYPE grouping = null;
         for (GROUPING_TYPE token : GROUPING_TYPE.values()) {
-            if (groupingToken.getConceptId() == token.getNid()) {
+            if (groupingToken.getConceptNid() == token.getNid()) {
                 grouping = token;
                 break;
             }
@@ -43,7 +43,7 @@ public enum RefsetComputeType {
     public static RefsetComputeType getTypeFromQueryToken(I_GetConceptData groupingToken) {
         QUERY_TOKENS tokenEnum = null;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
-            if (groupingToken.getConceptId() == token.nid) {
+            if (groupingToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
                 break;
             }

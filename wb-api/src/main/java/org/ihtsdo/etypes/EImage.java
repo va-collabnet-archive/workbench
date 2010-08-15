@@ -23,7 +23,7 @@ public class EImage extends TkMedia {
         EConcept.convertId(Terms.get().getId(imageVer.getNid()), this);
         int partCount = imageVer.getMutableParts().size();
         I_ImagePart part = imageVer.getMutableParts().get(0);
-        conceptUuid = Terms.get().nidToUuid(imageVer.getConceptId());
+        conceptUuid = Terms.get().nidToUuid(imageVer.getConceptNid());
         format = imageVer.getFormat();
         image = imageVer.getImage();
         textDescription = part.getTextDescription();

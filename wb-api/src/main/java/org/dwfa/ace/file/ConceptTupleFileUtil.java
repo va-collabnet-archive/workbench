@@ -26,12 +26,12 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class ConceptTupleFileUtil {
 
@@ -47,7 +47,7 @@ public class ConceptTupleFileUtil {
         I_ConceptAttributePart part = refsetUtil.getLastestAttributePart(concept);
 
         UUID conceptTupleUuid = ArchitectonicAuxiliary.Concept.CON_TUPLE.getUids().iterator().next();
-        UUID conceptUuid = termFactory.getUids(concept.getConceptId()).iterator().next();
+        UUID conceptUuid = termFactory.getUids(concept.getConceptNid()).iterator().next();
         UUID statusUuid = termFactory.getUids(part.getStatusId()).iterator().next();
         boolean isDefined = part.isDefined();
         UUID pathUuid = termFactory.getUids(part.getPathId()).iterator().next();
@@ -142,10 +142,10 @@ public class ConceptTupleFileUtil {
                 if (latestTuple == null) {
                     throw new Exception("Concept UUID exists but has no tuples.");
                 } else {
-                    for (I_Path p : importConfig.getEditingPathSet()) {
+                    for (PathBI p : importConfig.getEditingPathSet()) {
                         I_ConceptAttributePart newPart =
                                 (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
-                                    termFactory.uuidToNative(statusUuid), p.getConceptId(), effectiveDate);
+                                    termFactory.uuidToNative(statusUuid), p.getConceptNid(), effectiveDate);
                         newPart.setDefined(isDefined);
                     }
                     termFactory.addUncommittedNoChecks(concept);

@@ -281,7 +281,7 @@ public class Ace2Rf2 extends AbstractMojo {
                 rf2ConceptRow = rf2ConceptWriter.new Rf2ConceptRow();
                 aceConceptRow = conceptIterator.next();
 
-                rf2ConceptRow.setConceptSctId(uuidToSctIdConcept.transform(aceConceptRow.getConceptId()));
+                rf2ConceptRow.setConceptSctId(uuidToSctIdConcept.transform(aceConceptRow.getConceptNid()));
                 rf2ConceptRow.setEffectiveTime(aceConceptRow.getEffectiveTime());
                 rf2ConceptRow.setActive(aceConceptRow.getConceptStatus());
                 rf2ConceptRow.setModuleSctId(uuidToSctIdConcept.transform(aceConceptRow.getPathUuid()));
@@ -359,7 +359,7 @@ public class Ace2Rf2 extends AbstractMojo {
                 rf2DescriptionRow.setEffectiveTime(aceDescriptionRow.getEffectiveTime());
                 rf2DescriptionRow.setActive(aceDescriptionRow.getDescriptionStatus());
                 rf2DescriptionRow.setModuleSctId(uuidToSctIdConcept.transform(aceDescriptionRow.getPathUuid()));
-                rf2DescriptionRow.setConceptSctId(uuidToSctIdConcept.transform(aceDescriptionRow.getConceptId()));
+                rf2DescriptionRow.setConceptSctId(uuidToSctIdConcept.transform(aceDescriptionRow.getConceptNid()));
                 rf2DescriptionRow.setLanaguageCode(aceDescriptionRow.getLanguageCode());
                 rf2DescriptionRow.setTypeSctId(uuidToSctIdConcept.transform(aceDescriptionRow.getDescriptionTypeId()));// covert
                 // from

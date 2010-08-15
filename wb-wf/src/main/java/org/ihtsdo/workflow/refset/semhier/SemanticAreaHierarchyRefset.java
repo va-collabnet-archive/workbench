@@ -44,7 +44,7 @@ public class SemanticAreaHierarchyRefset extends WorkflowRefset implements I_Wor
 	"<properties>\n" +
 			   	"<property>\n" +
 			   		"<key>childSemanticArea</key>" +
-			   		"<value>" + getSemanticAreaHierarchy().getConceptId() + "</value>" +
+			   		"<value>" + getSemanticAreaHierarchy().getConceptNid() + "</value>" +
 			   	"</property>" + 
 			   	"<property>" +
 		   		"<key>semanticArea</key>" +

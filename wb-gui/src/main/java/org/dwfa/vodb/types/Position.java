@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -38,19 +37,20 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 public class Position implements I_Position {
 
     private int version;
-    private I_Path path;
+    private PathBI path;
 
     /*
      * (non-Javadoc)
      * 
      * @see org.dwfa.vodb.types.I_Position#getPath()
      */
-    public I_Path getPath() {
+    public PathBI getPath() {
         return path;
     }
 
@@ -63,7 +63,7 @@ public class Position implements I_Position {
         return version;
     }
 
-    public Position(int version, I_Path path) {
+    public Position(int version, PathBI path) {
         super();
         if (path == null) {
             throw new IllegalArgumentException("path cannot be null");
@@ -81,7 +81,7 @@ public class Position implements I_Position {
         if (equals(version, pathId)) {
             return true;
         }
-        if (path.getConceptId() == pathId) {
+        if (path.getConceptNid() == pathId) {
             return this.version >= version;
         }
         return checkSubsequentOrEqualToOrigins(path.getOrigins(), version, pathId);
@@ -96,7 +96,7 @@ public class Position implements I_Position {
         if (equals(version, pathId)) {
             return true;
         }
-        if (path.getConceptId() == pathId) {
+        if (path.getConceptNid() == pathId) {
             return this.version <= version;
         }
         return checkAntecedentOrEqualToOrigins(path.getOrigins(), version, pathId);
@@ -135,7 +135,7 @@ public class Position implements I_Position {
         if (equals(another)) {
             return true;
         }
-        if (path.getConceptId() == another.getPath().getConceptNid()) {
+        if (path.getConceptNid() == another.getPath().getConceptNid()) {
             return version <= another.getVersion();
         }
         return checkAntecedentOrEqualToOrigins(another.getPath().getOrigins());
@@ -150,7 +150,7 @@ public class Position implements I_Position {
      */
     public boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins) {
         for (PositionBI origin : origins) {
-            if (path.getConceptId() == origin.getPath().getConceptNid()) {
+            if (path.getConceptNid() == origin.getPath().getConceptNid()) {
                 return version <= origin.getVersion();
             } else if (checkAntecedentOrEqualToOrigins(origin.getPath().getOrigins())) {
                 return true;
@@ -176,7 +176,7 @@ public class Position implements I_Position {
      * @see org.dwfa.vodb.types.I_Position#equals(int, int)
      */
     public boolean equals(int version, int pathId) {
-        return ((this.version == version) && (path.getConceptId() == pathId));
+        return ((this.version == version) && (path.getConceptNid() == pathId));
     }
 
     /*
@@ -185,7 +185,7 @@ public class Position implements I_Position {
      * @see org.dwfa.vodb.types.I_Position#equals(org.dwfa.vodb.types.Position)
      */
     public boolean equals(I_Position another) {
-        return ((version == another.getVersion()) && (path.getConceptId() == another.getPath().getConceptId()));
+        return ((version == another.getVersion()) && (path.getConceptNid() == another.getPath().getConceptNid()));
     }
 
     @Override
@@ -195,7 +195,7 @@ public class Position implements I_Position {
 
     @Override
     public int hashCode() {
-        return HashFunction.hashCode(new int[] { version, path.getConceptId() });
+        return HashFunction.hashCode(new int[] { version, path.getConceptNid() });
     }
 
     /*
@@ -205,19 +205,19 @@ public class Position implements I_Position {
      */
     public int getDepth(int pathId) {
         int depth = 0;
-        if (pathId == path.getConceptId()) {
+        if (pathId == path.getConceptNid()) {
             return depth;
         }
-        List<I_Position> depthOrigins = new ArrayList<I_Position>(path.getOrigins());
+        List<PositionBI> depthOrigins = new ArrayList<PositionBI>(path.getOrigins());
         while (depthOrigins.size() > 0) {
             depth++;
-            for (I_Position o : depthOrigins) {
-                if (o.getPath().getConceptId() == pathId) {
+            for (PositionBI o : depthOrigins) {
+                if (o.getPath().getConceptNid() == pathId) {
                     return depth;
                 }
             }
-            List<I_Position> newOrigins = new ArrayList<I_Position>();
-            for (I_Position p : depthOrigins) {
+            List<PositionBI> newOrigins = new ArrayList<PositionBI>();
+            for (PositionBI p : depthOrigins) {
                 newOrigins.addAll(p.getPath().getOrigins());
             }
             depthOrigins = newOrigins;
@@ -226,11 +226,11 @@ public class Position implements I_Position {
         return Integer.MAX_VALUE;
     }
 
-    public static void writePosition(ObjectOutputStream out, I_Position p) throws IOException {
+    public static void writePosition(ObjectOutputStream out, PositionBI p) throws IOException {
         out.writeInt(p.getVersion());
         try {
-            if (Terms.get().getId(p.getPath().getConceptId()) != null) {
-                out.writeObject(Terms.get().nativeToUuid(p.getPath().getConceptId()));
+            if (Terms.get().getId(p.getPath().getConceptNid()) != null) {
+                out.writeObject(Terms.get().nativeToUuid(p.getPath().getConceptNid()));
             } else {
                 out.writeObject(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             }
@@ -238,13 +238,13 @@ public class Position implements I_Position {
 			throw new IOException(e);
 		}
         out.writeInt(p.getPath().getOrigins().size());
-        for (I_Position origin : p.getPath().getOrigins()) {
+        for (PositionBI origin : p.getPath().getOrigins()) {
             writePosition(out, origin);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static I_Position readPosition(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public static PositionBI readPosition(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int version = in.readInt();
         int pathConceptId;
         try {
@@ -261,7 +261,7 @@ public class Position implements I_Position {
             throw newEx;
         }
         int size = in.readInt();
-        List<I_Position> origins = new ArrayList<I_Position>(size);
+        List<PositionBI> origins = new ArrayList<PositionBI>(size);
         for (int i = 0; i < size; i++) {
             origins.add(readPosition(in));
         }
@@ -269,15 +269,15 @@ public class Position implements I_Position {
         return new Position(version, p);
     }
 
-    public static Set<I_Position> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public static Set<PositionBI> readPositionSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int size = in.readInt();
-        Set<I_Position> positions = Collections.synchronizedSet(new HashSet<I_Position>(size));
+        Set<PositionBI> positions = Collections.synchronizedSet(new HashSet<PositionBI>(size));
         for (int i = 0; i < size; i++) {
             try {
-                I_Position position = readPosition(in);
+            	PositionBI position = readPosition(in);
                 I_GetConceptData pathConcept = Terms.get().getConcept(
-                    position.getPath().getConceptId());
-                I_Path path = Terms.get().getPath(pathConcept.getUids());
+                    position.getPath().getConceptNid());
+                PathBI path = Terms.get().getPath(pathConcept.getUids());
                 positions.add(Terms.get().newPosition(path, position.getVersion()));
             } catch (IOException ex) {
                 if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
@@ -296,9 +296,9 @@ public class Position implements I_Position {
         return positions;
     }
 
-    public static void writePositionSet(ObjectOutputStream out, Set<I_Position> viewPositions) throws IOException {
+    public static void writePositionSet(ObjectOutputStream out, Set<PositionBI> viewPositions) throws IOException {
         out.writeInt(viewPositions.size());
-        for (I_Position p : viewPositions) {
+        for (PositionBI p : viewPositions) {
             writePosition(out, p);
         }
     }
@@ -308,7 +308,7 @@ public class Position implements I_Position {
     public String toString() {
         StringBuffer buff = new StringBuffer();
         try {
-            I_GetConceptData cb = Terms.get().getConcept(path.getConceptId());
+            I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
             buff.append(cb.getInitialText());
         } catch (IOException e) {
             buff.append(e.getMessage());

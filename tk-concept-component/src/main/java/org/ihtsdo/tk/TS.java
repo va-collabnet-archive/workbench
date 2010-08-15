@@ -1,16 +1,16 @@
 package org.ihtsdo.tk;
 
-import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.TerminologyDI;
 
 
 public class TS {
-	private static TerminologyStoreDI store;
+	private static TerminologyDI store;
 	
-	public static void set(TerminologyStoreDI store) {
+	public static void set(TerminologyDI store) {
 		TS.store = store;
 	}
 
-	public static TerminologyStoreDI get() {
+	public static TerminologyDI get() {
 		return store;
 	}
 }

@@ -28,8 +28,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -75,14 +75,14 @@ public class RefsetMatch extends AbstractSearchTest {
     public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
         try {
             I_GetConceptData refsetToMatch = AceTaskUtil.getConceptFromObject(refset);
-            int refsetId = refsetToMatch.getConceptId();
+            int refsetId = refsetToMatch.getConceptNid();
 
             I_TermFactory termFactory = Terms.get();
 
             boolean result = false;
 
             if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-                return isComponentInRefset(frameConfig, termFactory, ((I_GetConceptData) component).getConceptId(),
+                return isComponentInRefset(frameConfig, termFactory, ((I_GetConceptData) component).getConceptNid(),
                     refsetId);
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned description = (I_DescriptionVersioned) component;
@@ -90,7 +90,7 @@ public class RefsetMatch extends AbstractSearchTest {
                 if (isComponentInRefset(frameConfig, termFactory, description.getDescId(), refsetId)) {
                     result = true;
                 } else {
-                    result = isComponentInRefset(frameConfig, termFactory, description.getConceptId(), refsetId);
+                    result = isComponentInRefset(frameConfig, termFactory, description.getConceptNid(), refsetId);
                 }
             } else if (I_RelVersioned.class.isAssignableFrom(component.getClass())) {
                 result = isComponentInRefset(frameConfig, termFactory, ((I_RelVersioned) component).getRelId(),

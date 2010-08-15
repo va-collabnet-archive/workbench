@@ -83,7 +83,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
 	@Override
 	public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
@@ -91,10 +91,20 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 		return newR;
 	}
 
+	@Override
+	public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
 
     @Override
     public CidFloatRevision makeAnalog() {
-        return new CidFloatRevision(getStatusId(), getPathId(), getTime(), this);
+        return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public int getC1Nid() {

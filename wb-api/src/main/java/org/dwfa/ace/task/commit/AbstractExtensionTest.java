@@ -22,13 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
@@ -78,9 +76,9 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         return termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
         /*
          * I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-         * Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
+         * Set<PathBI> editingPaths = activeProfile.getEditingPathSet();
          * Set<I_Position> allPositions = new HashSet<I_Position>();
-         * for (I_Path path : editingPaths) {
+         * for (PathBI path : editingPaths) {
          * allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
          * for (I_Position position : path.getOrigins()) {
          * addOriginPositions(termFactory, position, allPositions);
@@ -88,13 +86,6 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
          * }
          * return new PositionSetReadOnly(allPositions);
          */
-    }
-
-    private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {
-        allPositions.add(position);
-        for (I_Position originPosition : position.getPath().getOrigins()) {
-            addOriginPositions(termFactory, originPosition, allPositions);
-        }
     }
 
     public I_IntSet getActiveStatus(I_TermFactory termFactory) throws Exception {
@@ -111,7 +102,7 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
             ArchitectonicAuxiliary.Concept.PROMOTED)) {
             I_GetConceptData c = getConceptSafe(termFactory, con.getUids());
             if (c != null) {
-                activeSet.add(c.getConceptId());
+                activeSet.add(c.getConceptNid());
             }
         }
         return activeSet;
@@ -131,7 +122,7 @@ public abstract class AbstractExtensionTest extends AbstractDataConstraintTest {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         I_TermFactory termFactory = Terms.get();
         PositionSetReadOnly allPositions = getPositions(termFactory);

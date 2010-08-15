@@ -151,7 +151,7 @@ public class AceDescriptionReader extends IterableFileReader<AceDescriptionReade
         /**
          * @return the conceptId
          */
-        public final String getConceptId() {
+        public final String getConceptNid() {
             return conceptId;
         }
 

@@ -155,8 +155,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             if (userPath == null) {
                 userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
             }
-            out.writeObject(Terms.get().nativeToUuid(userConcept.getConceptId()));
-            out.writeObject(Terms.get().nativeToUuid(userPath.getConceptId()));
+            out.writeObject(Terms.get().nativeToUuid(userConcept.getConceptNid()));
+            out.writeObject(Terms.get().nativeToUuid(userPath.getConceptNid()));
             out.writeObject(fullName);
         } catch (TerminologyException e) {
             throw new IOException(e);

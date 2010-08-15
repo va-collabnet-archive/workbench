@@ -77,7 +77,7 @@ public class AddRootToProfileFromProperty extends AbstractTask {
             if (profile == null) {
                 profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             }
-            profile.getRoots().add(AceTaskUtil.getConceptFromProperty(process, rootPropName).getConceptId());
+            profile.getRoots().add(AceTaskUtil.getConceptFromProperty(process, rootPropName).getConceptNid());
             return Condition.CONTINUE;
 
         } catch (IllegalArgumentException e) {

@@ -27,19 +27,20 @@ public interface ConceptVersionBI extends ComponentBI {
 	public Collection<? extends RelationshipVersionBI> getRelsIncomingActive() throws IOException;
 	public Collection<? extends MediaVersionBI> getMediaActive() throws IOException;
 
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive(Collection<ConceptVersionBI> types) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActiveIsa() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(Collection<ConceptVersionBI> types) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException;
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargets() throws IOException;
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargets(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargets(Collection<ConceptVersionBI> types) throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsIsa() throws IOException;
+	
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins() throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(NidSetBI typeNids) throws IOException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa(Collection<ConceptVersionBI> types) throws IOException;
+
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive() throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive(NidSetBI typeNids) throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActiveIsa() throws IOException;
+	
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException;
 
 }

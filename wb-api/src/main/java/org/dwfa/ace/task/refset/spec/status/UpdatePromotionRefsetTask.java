@@ -174,9 +174,9 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
             Collection<? extends I_ExtendByRef> memberExtensions =
-                    termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptId());
+                    termFactory.getRefsetExtensionMembers(memberRefsetConcept.getConceptNid());
             Collection<? extends I_ExtendByRef> promotionExtensions =
-                    termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptId());
+                    termFactory.getRefsetExtensionMembers(promotionRefsetConcept.getConceptNid());
 
             activity.setValue(0);
             activity.setMaximum(memberExtensions.size());
@@ -185,7 +185,7 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             updatePromotionsRefset(memberExtensions, promotionExtensions, activity, start);
 
             process.setProperty(ProcessAttachmentKeys.PROMOTION_UUID.getAttachmentKey(), termFactory.getUids(
-                promotionRefsetConcept.getConceptId()).iterator().next());
+                promotionRefsetConcept.getConceptNid()).iterator().next());
 
             termFactory.commit();
             long endTime = System.currentTimeMillis();
@@ -229,17 +229,17 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
             if (latestMemberPart == null) {
                 AceLog.getAppLog().warning("Member extension exists with no parts: " + memberExtension);
             } else {
-                if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptId()
-                    || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptId()
-                    || latestMemberPart.getStatusId() == readyToPromoteStatusConcept.getConceptId()
-                    || latestMemberPart.getStatusId() == promotedStatusConcept.getConceptId()
-                    || latestMemberPart.getStatusId() == activeStatusConcept.getConceptId()) {
+                if (latestMemberPart.getStatusId() == currentStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusId() == unreviewedStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusId() == readyToPromoteStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusId() == promotedStatusConcept.getConceptNid()
+                    || latestMemberPart.getStatusId() == activeStatusConcept.getConceptNid()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed addition
-                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
+                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptNid(), 
                             memberExtension.getNid(), 
-                            unreviewedAdditionStatus.getConceptId());
+                            unreviewedAdditionStatus.getConceptNid());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
@@ -247,26 +247,26 @@ public class UpdatePromotionRefsetTask extends AbstractTask {
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {
-                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
+                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), 
                             memberExtension.getNid(), 
-                            unreviewedAdditionStatus.getConceptId(), 
-                            currentStatusConcept.getConceptId());
+                            unreviewedAdditionStatus.getConceptNid(), 
+                            currentStatusConcept.getConceptNid());
                     }
 
-                } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptId()) {
+                } else if (latestMemberPart.getStatusId() == retiredStatusConcept.getConceptNid()) {
                     if (promotionStatus == null) {
                         // add a new promotion refset member with value
                         // unreviewed deletion
-                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptId(), 
+                        refsetHelper.newRefsetExtension(promotionRefsetConcept.getConceptNid(), 
                             memberExtension.getNid(), 
-                            unreviewedDeletionStatus.getConceptId());
+                            unreviewedDeletionStatus.getConceptNid());
                     } else if (promotionStatus.equals(unreviewedAdditionStatus)
                         || promotionStatus.equals(reviewedApprovedAdditionStatus)
                         || promotionStatus.equals(reviewedRejectedAdditionStatus)) {
-                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptId(), 
+                        refsetHelper.newConceptExtensionPart(promotionRefsetConcept.getConceptNid(), 
                             memberExtension.getNid(), 
-                            unreviewedDeletionStatus.getConceptId(), 
-                            currentStatusConcept.getConceptId());
+                            unreviewedDeletionStatus.getConceptNid(), 
+                            currentStatusConcept.getConceptNid());
                     } else if (promotionStatus.equals(unreviewedDeletionStatus)
                         || promotionStatus.equals(reviewedApprovedDeletionStatus)
                         || promotionStatus.equals(reviewedRejectedDeletionStatus)) {

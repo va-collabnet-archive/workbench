@@ -21,6 +21,7 @@ package org.dwfa.jini;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+
 import net.jini.loader.pref.PreferredClassProvider;
 import net.jini.url.httpmd.HttpmdUtil;
 

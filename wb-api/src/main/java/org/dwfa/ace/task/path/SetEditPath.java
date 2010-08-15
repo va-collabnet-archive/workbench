@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -37,6 +36,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class SetEditPath extends AbstractTask {
@@ -73,9 +73,9 @@ public class SetEditPath extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_TermFactory tf = Terms.get();
-            I_Path editPath = tf.getPath(editPathEntry.ids);
+            PathBI editPath = tf.getPath(editPathEntry.ids);
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
-            Set<I_Path> editSet = frameConfig.getEditingPathSet();
+            Set<PathBI> editSet = frameConfig.getEditingPathSet();
             editSet.clear();
             frameConfig.addEditingPath(editPath);
             frameConfig.fireUpdateHierarchyView();

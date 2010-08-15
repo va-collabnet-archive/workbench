@@ -40,7 +40,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -56,6 +55,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class SearchReplaceTermsInList extends AbstractTask {
@@ -149,13 +149,13 @@ public class SearchReplaceTermsInList extends AbstractTask {
             // term)
             I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
             if (searchFsn) {
-                descriptionTypesToCheck.add(FSN_UUID.getConceptId());
+                descriptionTypesToCheck.add(FSN_UUID.getConceptNid());
             }
             if (searchPft) {
-                descriptionTypesToCheck.add(PFT_UUID.getConceptId());
+                descriptionTypesToCheck.add(PFT_UUID.getConceptNid());
             }
             if (searchSynonym) {
-                descriptionTypesToCheck.add(SYNONYM_UUID.getConceptId());
+                descriptionTypesToCheck.add(SYNONYM_UUID.getConceptNid());
             }
 
             JList conceptList = config.getBatchConceptList();
@@ -217,21 +217,21 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     origDescHtml, finalDescHtml, descType);
                                 searchReplaceDescriptions.add(srDesc);
 
-                                Set<I_Path> paths = config.getEditingPathSet();
+                                Set<PathBI> paths = config.getEditingPathSet();
 
                                 // Create a new, cloned, description
                                 I_DescriptionVersioned newDesc = termFactory.newDescription(UUID.randomUUID(), child,
                                     description.getLang(), finalDesc, termFactory.getConcept(description.getTypeId()),
                                     config);
 
-                                for (I_Path path : paths) {
+                                for (PathBI path : paths) {
                                     // retire the existing description
                                     I_DescriptionPart newRetiredPart;
                                     
                                     if (retireAsStatus != -1) {
-                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retireAsStatus, path.getConceptId(), Long.MAX_VALUE);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retireAsStatus, path.getConceptNid(), Long.MAX_VALUE);
                                     } else {
-                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retiredConceptId, path.getConceptId(), Long.MAX_VALUE);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retiredConceptId, path.getConceptNid(), Long.MAX_VALUE);
                                     }
                                     description.getDescVersioned().addVersion(newRetiredPart);
                                     termFactory.addUncommitted(child);

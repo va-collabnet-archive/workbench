@@ -157,7 +157,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		IntRevision newR = new IntRevision(statusNid, pathNid, time, this);
@@ -165,9 +165,19 @@ public class IntMember extends RefsetMember<IntRevision, IntMember> implements I
 		return newR;
 	}
 
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		IntRevision newR = new IntRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
     @Override
     public IntRevision makeAnalog() {
-        IntRevision newR = new IntRevision(getStatusId(), getPathId(), getTime(), this);
+        IntRevision newR = new IntRevision(getStatusNid(), getPathNid(), getTime(), this);
         return newR;
     }
 

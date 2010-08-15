@@ -10,9 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -30,6 +27,9 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -73,7 +73,15 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 			return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, pathNid, time);
 		}
 
-        @Override
+		@Override
+		public RefsetRevision<?, ?> makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog(statusNid, authorNid, pathNid, time);
+            } 
+			return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, authorNid, pathNid, time);
+		}
+
+		@Override
         public R makeAnalog() {
             if (index >= 0) {
                 return revisions.get(index).makeAnalog();
@@ -109,6 +117,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		}
 
 		@Override
+		@Deprecated
 		public int getStatus() {
 			if (index >= 0) {
 				return revisions.get(index).getStatus();
@@ -127,6 +136,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		}
 
 		@Override
+		@Deprecated
 		public void setStatus(int idStatus) {
 			if (index >= 0) {
 				revisions.get(index).setStatus(idStatus);
@@ -142,7 +152,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 		}
 
 		@Override
-		public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+		public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -313,8 +323,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	
 	
 	@Override
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = 
@@ -322,11 +332,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
         			viewPosition, 
         			getVersions(), precedence, null);
         boolean promotedAnything = false;
-        for (I_Path promotionPath : pomotionPaths) {
+        for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
-                if (v.getPathId() == viewPathId) {
-                    RefsetRevision<?, ?> revision =  v.makeAnalog(v.getStatusId(), 
-							promotionPath.getConceptId(), Long.MAX_VALUE);
+                if (v.getPathNid() == viewPathId) {
+                    RefsetRevision<?, ?> revision =  v.makeAnalog(v.getStatusNid(), 
+							promotionPath.getConceptNid(), Long.MAX_VALUE);
                     addVersion(revision);
                     promotedAnything = true;
                 }
@@ -456,8 +466,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	}
 	
 
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
-		return (I_ExtendByRefPart) makeAnalog(getStatusId(), promotionPath.getConceptId(), Long.MAX_VALUE);
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
+		return (I_ExtendByRefPart) makeAnalog(getStatusNid(), promotionPath.getConceptNid(), Long.MAX_VALUE);
 	}
 
 	public final int compareTo(I_ExtendByRefPart o) {
@@ -468,7 +478,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 
 	@Override
 	public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-			List<I_ExtendByRefVersion> returnTuples, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+			List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 
@@ -480,7 +490,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addTuples(List<I_ExtendByRefVersion> returnTuples,
-	        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+	        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), 
@@ -493,7 +503,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly positions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+			PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
 			throws TerminologyException, IOException {
 		List<RefsetMember<R,C>.Version> versionsToAdd = new ArrayList<RefsetMember<R,C>.Version>();
 		getVersionComputer().addSpecifiedVersions(allowedStatus, 

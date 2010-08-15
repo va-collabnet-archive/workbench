@@ -36,6 +36,7 @@ import org.ihtsdo.arena.editor.EditorActions.TogglePropertyItem;
 import org.ihtsdo.arena.editor.EditorActions.ToggleRulersItem;
 import org.ihtsdo.arena.editor.EditorActions.WarningAction;
 import org.ihtsdo.arena.editor.EditorActions.ZoomPolicyAction;
+
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxPoint;

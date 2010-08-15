@@ -36,11 +36,11 @@ public abstract class RefsetWriterUtility extends RefsetUtility {
 			{
 		        refCompStr = fields.getReferencedComponentId().getInitialText();
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				helper.newRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptId(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
+				helper.newRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), REFSET_TYPES.STR, propMap, Terms.get().getActiveAceFrameConfig());
 				retVal = true;
 			}
 		} catch (Exception io) {
-			System.out.println("Failed adding member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptId() + ")");
+			System.out.println("Failed adding member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptNid() + ")");
 			System.out.println("to refset: " + refsetName);
 			System.out.println("Attempting to add these properties: " + fields.toString());
 			System.out.println(io.getMessage());
@@ -58,10 +58,10 @@ public abstract class RefsetWriterUtility extends RefsetUtility {
 
 			refCompStr = fields.getReferencedComponentId().getInitialText();
 			propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-			helper.retireRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptId(), propMap);
+			helper.retireRefsetExtension(refsetId, fields.getReferencedComponentId().getConceptNid(), propMap);
 			return true;
 		} catch (Exception io) {
-			System.out.println("Failed removing member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptId() + ")");
+			System.out.println("Failed removing member: " + refCompStr + " (" + fields.getReferencedComponentId().getConceptNid() + ")");
 			System.out.println("to refset: " + refsetName);
 			System.out.println("Attempting to add these properties: " + fields.toString());
 			System.out.println(io.getMessage());

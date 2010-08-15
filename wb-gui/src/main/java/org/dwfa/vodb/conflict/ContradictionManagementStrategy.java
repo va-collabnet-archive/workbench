@@ -125,13 +125,7 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
     }
 
     public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute) throws TerminologyException, IOException {
-        I_ConfigAceFrame config = getConfig();
-
-        if (isNull(conceptAttribute, config)) {
-            return false;
-        }
-
-        return doesConflictExist(conceptAttribute.getTuples(config.getAllowedStatus(), config.getViewPositionSet()));
+        throw new UnsupportedOperationException();
     }
 
     public boolean isInConflict(I_Identify id) throws IOException {

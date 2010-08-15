@@ -108,12 +108,12 @@ public class HasDisapprovedItemsTask extends AbstractTask {
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION.getUids());
 
         if (refsetHelper.countMembersOfType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-            .getConceptId()), disapprovedAdditionStatus) > 0) {
+            .getConceptNid()), disapprovedAdditionStatus) > 0) {
             return true;
         }
         
         if (refsetHelper.countMembersOfType(termFactory.getRefsetExtensionMembers(promotionRefsetConcept
-            .getConceptId()), disapprovedDeletionStatus) > 0) {
+            .getConceptNid()), disapprovedDeletionStatus) > 0) {
             return true;
         }
 

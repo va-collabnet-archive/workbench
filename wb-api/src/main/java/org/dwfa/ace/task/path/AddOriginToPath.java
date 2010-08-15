@@ -36,6 +36,7 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * @author Ming Zhang
@@ -116,10 +117,10 @@ public class AddOriginToPath extends AbstractTask {
                 throw new TaskFailedException("Invalid position (time): '" + originPositionStr + "'.", e);
             }
 
-            I_Path subjectPath = termFactory.getPath(subjectPathConcept.getUids());
-            I_Path originPath = termFactory.getPath(originPathConcept.getUids());
+            PathBI subjectPath = termFactory.getPath(subjectPathConcept.getUids());
+            PathBI originPath = termFactory.getPath(originPathConcept.getUids());
 
-            subjectPath.addOrigin(termFactory.newPosition(originPath, version),
+            ((I_Path)subjectPath).addOrigin(termFactory.newPosition(originPath, version),
             		Terms.get().getActiveAceFrameConfig());
 
             return Condition.CONTINUE;

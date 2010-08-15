@@ -150,7 +150,7 @@ public final class WriteSingleRefsetDescriptionTest {
         EasyMock.expect(mockCleanableProcessBuilder.withLogger(EasyMock.isA(Logger.class))).andReturn(
             mockCleanableProcessBuilder);
         EasyMock.expect(mockCleanableProcessBuilder.build()).andReturn(mockCleanableProcess);
-        EasyMock.expect(mockRefset.getConceptId()).andReturn(REFSET_CONCEPT_ID);
+        EasyMock.expect(mockRefset.getConceptNid()).andReturn(REFSET_CONCEPT_ID);
 
         I_ExtendByRef mockExt1 = mockControl.createMock(I_ExtendByRef.class);
         I_ExtendByRef mockExt2 = mockControl.createMock(I_ExtendByRef.class);

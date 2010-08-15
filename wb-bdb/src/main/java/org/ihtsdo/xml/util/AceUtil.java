@@ -47,8 +47,8 @@ public class AceUtil {
 	public static I_GetConceptData getConceptUUID(UUID uuid) throws Exception {
 		getTf();
 		I_GetConceptData icd = tf.getConcept(uuid);
-		AceXMLUtil.addtoUuidInt(uuid.toString(),icd.getConceptId());
-		//getUidI().put(uuid.toString(), new Integer(icd.getConceptId()));
+		AceXMLUtil.addtoUuidInt(uuid.toString(),icd.getConceptNid());
+		//getUidI().put(uuid.toString(), new Integer(icd.getConceptNid()));
 		return icd;
 	}
 
@@ -67,7 +67,7 @@ public class AceUtil {
 			return Integer.parseInt(AceXMLUtil.getUuidInt().get(uuidS));
 		}
 		else{
-		return getConceptUUID_S(uuidS).getConceptId();	
+		return getConceptUUID_S(uuidS).getConceptNid();	
 		}
 	}
 

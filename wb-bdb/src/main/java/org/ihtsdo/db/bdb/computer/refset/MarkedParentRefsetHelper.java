@@ -44,7 +44,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
         this.parentMemberTypeId = Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
-            .getConceptId();
+            .getConceptNid();
         this.parentRefsetId = getParentRefset();
     }
 
@@ -61,7 +61,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         }
 
         for (I_GetConceptData concept : ancestors) {
-            newRefsetExtension(parentRefsetId, concept.getConceptId(), REFSET_TYPES.CID,
+            newRefsetExtension(parentRefsetId, concept.getConceptNid(), REFSET_TYPES.CID,
                 new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, parentMemberTypeId),
                 getConfig());
         }
@@ -81,7 +81,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
                 toBeRetired.add(conceptId);
             }
             for (I_GetConceptData concept : getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions)) {
-                toBeRetired.add(concept.getConceptId());
+                toBeRetired.add(concept.getConceptNid());
             }
         }
 
@@ -107,7 +107,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
         for (Integer conceptId : lineageToExclude) {
             for (I_GetConceptData concept : getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions)) {
-                ancestorIdsToExclude.add(concept.getConceptId());
+                ancestorIdsToExclude.add(concept.getConceptNid());
             }
         }
 
@@ -142,7 +142,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         I_GetConceptData memberRefset = Terms.get().getConcept(refsetId);
 
         I_IntSet allowedType = Terms.get().newIntSet();
-        allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
+        allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptNid());
 
         Set<? extends I_GetConceptData> targetParentRefsets = memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType,
             null,
@@ -157,7 +157,7 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
                 + "Defaulting to the first one found!");
         }
         I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
-        return parentRefset.getConceptId();
+        return parentRefset.getConceptNid();
     }
 
     /* (non-Javadoc)

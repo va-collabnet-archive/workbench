@@ -87,7 +87,7 @@ public class AddConceptAndPotDupToList extends AbstractTask {
             I_IntSet potDupTypeSet = Terms.get().newIntSet();
             I_GetConceptData potDupRelType = Terms.get().getConcept(
                 ArchitectonicAuxiliary.Concept.IS_POT_DUP_REL.getUids());
-            potDupTypeSet.add(potDupRelType.getConceptId());
+            potDupTypeSet.add(potDupRelType.getConceptNid());
             model.clear();
             model.addElement(conceptWithPotDup);
 

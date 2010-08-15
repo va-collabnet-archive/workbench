@@ -83,7 +83,7 @@ public class DescStatement extends RefsetSpecStatement {
             int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
-            if (queryToken.getConceptId() == token.nid) {
+            if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
                 break;
             }
@@ -109,7 +109,7 @@ public class DescStatement extends RefsetSpecStatement {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
 
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
-            if (queryToken.getConceptId() == token.nid) {
+            if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
                 break;
             }
@@ -174,7 +174,7 @@ public class DescStatement extends RefsetSpecStatement {
 
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
-            parentPossibleConcepts = termFactory.getConceptIdSet();
+            parentPossibleConcepts = termFactory.getConceptNidSet();
         }
         activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
@@ -184,7 +184,7 @@ public class DescStatement extends RefsetSpecStatement {
             break;
         case DESC_IS_MEMBER_OF:
             Collection<? extends I_ExtendByRef> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -236,7 +236,7 @@ public class DescStatement extends RefsetSpecStatement {
         possibleLuceneConcMatches = null;
 
         if (parentPossibleDescriptions == null) {
-            parentPossibleDescriptions = termFactory.getConceptIdSet();
+            parentPossibleDescriptions = termFactory.getConceptNidSet();
         }
 
         switch (tokenEnum) {
@@ -244,7 +244,7 @@ public class DescStatement extends RefsetSpecStatement {
             if (isNegated()) {
                 possibleDescriptions.or(parentPossibleDescriptions);
             } else {
-                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getConceptId());
+                possibleDescriptions.setMember(((I_DescriptionVersioned) queryConstraint).getConceptNid());
             }
             break;
         case DESC_IS_MEMBER_OF:
@@ -258,7 +258,7 @@ public class DescStatement extends RefsetSpecStatement {
                 } else {
                     I_DescriptionVersioned desc = Terms.get().getDescription(componentId);
                     if (desc != null) {
-                        refsetMembers.add(desc.getConceptId());
+                        refsetMembers.add(desc.getConceptNid());
                     }
                 }
             }
@@ -338,7 +338,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionTypeIs(I_GetConceptData requiredDescriptionType,
             I_DescriptionTuple descriptionBeingTested) {
-        return descriptionBeingTested.getTypeId() == requiredDescriptionType.getConceptId();
+        return descriptionBeingTested.getTypeId() == requiredDescriptionType.getConceptNid();
     }
 
     /**
@@ -403,12 +403,12 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     private boolean descriptionStatusIs(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException {
-        return descriptionBeingChecked.getStatusId() == ((I_GetConceptData) queryConstraint).getConceptId();
+        return descriptionBeingChecked.getStatusId() == ((I_GetConceptData) queryConstraint).getConceptNid();
     }
 
     private boolean descriptionStatusIs(I_GetConceptData requiredStatus, I_DescriptionTuple descriptionBeingChecked)
             throws TerminologyException {
-        return descriptionBeingChecked.getStatusId() == requiredStatus.getConceptId();
+        return descriptionBeingChecked.getStatusId() == requiredStatus.getConceptNid();
     }
 
     private boolean descriptionStatusIsChildOf(I_DescriptionTuple descriptionBeingChecked) throws TerminologyException,

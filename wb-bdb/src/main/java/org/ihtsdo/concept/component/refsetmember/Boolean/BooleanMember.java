@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -21,6 +20,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
@@ -149,7 +149,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		throw new UnsupportedOperationException();
 	}
 	
@@ -188,7 +188,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
@@ -197,8 +197,18 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember> 
 	}
 
 	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
+	@Override
 	public BooleanRevision makeAnalog() {
-	    BooleanRevision newR = new BooleanRevision(getStatusId(), getPathId(), getTime(), this);
+	    BooleanRevision newR = new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
 	    return newR;
 	}
 

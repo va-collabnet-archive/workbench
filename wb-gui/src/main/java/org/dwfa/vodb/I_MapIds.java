@@ -19,12 +19,12 @@ package org.dwfa.vodb;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_Path;
+import org.ihtsdo.tk.api.PathBI;
 
 public interface I_MapIds {
-    public int getIntId(Collection<UUID> uids, I_Path idPath, int version) throws Exception;
+    public int getIntId(Collection<UUID> uids, PathBI idPath, int version) throws Exception;
 
-    public int getIntId(UUID uid, I_Path idPath, int version) throws Exception;
+    public int getIntId(UUID uid, PathBI idPath, int version) throws Exception;
 
     public void flushIdBuffer() throws Exception;
 

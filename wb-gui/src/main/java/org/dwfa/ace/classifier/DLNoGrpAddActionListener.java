@@ -55,7 +55,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
 
         int parentId = Integer.MAX_VALUE;
         if (config.getHierarchySelection() != null) {
-            parentId = config.getHierarchySelection().getConceptId();
+            parentId = config.getHierarchySelection().getConceptNid();
         }
 
     }

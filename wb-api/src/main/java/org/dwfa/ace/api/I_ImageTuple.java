@@ -24,7 +24,7 @@ public interface I_ImageTuple extends I_AmTypedTuple {
 
     public String getFormat();
 
-    public int getConceptId();
+    public int getConceptNid();
 
     public I_ImageVersioned getVersioned();
 

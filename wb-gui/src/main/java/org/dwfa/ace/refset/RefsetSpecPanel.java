@@ -53,7 +53,6 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -83,6 +82,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.PathBI;
 
 public class RefsetSpecPanel extends JPanel {
 
@@ -698,7 +698,7 @@ public class RefsetSpecPanel extends JPanel {
 
                 for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
                     RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
-                    int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptId();
+                    int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptNid();
                     if (promotionRefsetId == extForMember.getRefsetId()) {
                         List<? extends I_ExtendByRefVersion> promotionTuples =
                                 extForMember.getTuples(aceFrameConfig.getAllowedStatus(), aceFrameConfig
@@ -707,7 +707,7 @@ public class RefsetSpecPanel extends JPanel {
                         if (promotionTuples.size() > 0) {
                             I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
                             if (promotionPart instanceof I_ExtendByRefPartCid) {
-                                for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+                                for (PathBI p : aceFrameConfig.getEditingPathSet()) {
                                     I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
                                     PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
                                     PROMOTION_STATUS newStatus = null;
@@ -720,7 +720,7 @@ public class RefsetSpecPanel extends JPanel {
                                     if (newStatus != null) {
                                         I_ExtendByRefPartCid analog =
                                                 (I_ExtendByRefPartCid) partToPromote.makeAnalog(promotionPart
-                                                    .getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                                                    .getStatusId(), p.getConceptNid(), Long.MAX_VALUE);
                                         analog.setC1id(newStatus.getNid());
 
                                         extForMember.addVersion(analog);
@@ -899,7 +899,7 @@ public class RefsetSpecPanel extends JPanel {
             return null;
         } else {
             I_GetConceptData concept = (I_GetConceptData) o;
-            return concept.getConceptId();
+            return concept.getConceptNid();
         }
     }
 

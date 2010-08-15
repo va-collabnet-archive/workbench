@@ -484,7 +484,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
             case IMAGE_ID:
                 return new StringWithImageTuple(Integer.toString(image.getImageId()), image, inConflict);
             case CON_ID:
-                return new StringWithImageTuple(Integer.toString(image.getConceptId()), image, inConflict);
+                return new StringWithImageTuple(Integer.toString(image.getConceptNid()), image, inConflict);
             case DESC:
                 if (BasicHTML.isHTMLString(image.getTextDescription())) {
                     return new StringWithImageTuple(image.getTextDescription(), image, inConflict);
@@ -628,19 +628,19 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                     break;
                 case DESC:
                     image.getMutablePart().setTextDescription(value.toString());
-                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptId()));
+                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptNid()));
                     break;
                 case STATUS:
                     Integer statusId = (Integer) value;
                     image.getMutablePart().setStatusId(statusId);
                     getReferencedConcepts().put(statusId, Terms.get().getConcept(statusId));
-                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptId()));
+                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptNid()));
                     break;
                 case TYPE:
                     Integer typeId = (Integer) value;
                     image.getMutablePart().setTypeId(typeId);
                     getReferencedConcepts().put(typeId, Terms.get().getConcept(typeId));
-                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptId()));
+                    Terms.get().addUncommitted(Terms.get().getConcept(image.getConceptNid()));
                     break;
                 case VERSION:
                     break;

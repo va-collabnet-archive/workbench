@@ -16,33 +16,9 @@
  */
 package org.ihtsdo.rules.testmodel;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 
 /**
  * The Class TestModelUtil.

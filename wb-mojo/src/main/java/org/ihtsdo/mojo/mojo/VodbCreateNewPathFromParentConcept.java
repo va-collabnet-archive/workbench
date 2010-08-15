@@ -27,12 +27,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  *This goal will add all the given concept as path.
@@ -81,12 +81,12 @@ public class VodbCreateNewPathFromParentConcept extends AbstractMojo {
             } catch (NoSuchAlgorithmException e) {
                 throw new MojoExecutionException(e.getLocalizedMessage(), e);
             }
-            I_TermFactory tf = LocalVersionedTerminology.get();
-            Set<I_Position> pathOrigins = null;
+            I_TermFactory tf = Terms.get();
+            Set<PositionBI> pathOrigins = null;
             if (origins != null) {
-                pathOrigins = new HashSet<I_Position>(origins.length);
+                pathOrigins = new HashSet<PositionBI>(origins.length);
                 for (SimpleUniversalAcePosition pos : origins) {
-                    I_Path originPath = tf.getPath(pos.getPathId());
+                    PathBI originPath = tf.getPath(pos.getPathId());
                     pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
                 }
             }

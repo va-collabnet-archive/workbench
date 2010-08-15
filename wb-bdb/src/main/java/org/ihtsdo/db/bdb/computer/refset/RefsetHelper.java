@@ -30,7 +30,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
@@ -49,6 +48,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 
 @AllowDataCheckSuppression
 public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
@@ -299,7 +299,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * @return The edit paths from the active config. Returns null if no config
      *         set or the config defines no paths for editing.
      */
-    protected Set<I_Path> getEditPaths() throws Exception {
+    protected Set<PathBI> getEditPaths() throws Exception {
         access();
         return this.getConfig().getEditingPathSet();
     }
@@ -308,11 +308,11 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
      * (non-Javadoc)
      * @see
      * org.ihtsdo.db.bdb.computer.refset.I_HelpWithRefsets#setEditPaths(org.
-     * dwfa.ace.api.I_Path)
+     * dwfa.ace.api.PathBI)
      */
-    public void setEditPaths(I_Path... editPaths) {
+    public void setEditPaths(PathBI... editPaths) {
         access();
-        HashSet<I_Path> editPathSet = new HashSet<I_Path>();
+        HashSet<PathBI> editPathSet = new HashSet<PathBI>();
         Collections.addAll(editPathSet, editPaths);
         useConfigClone();
         this.getConfig().getEditingPathSet().clear();
@@ -340,7 +340,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
             HashSet<Integer> cachedOrigins = new HashSet<Integer>();
             for (I_GetConceptData concept : destRelOrigins) {
-                cachedOrigins.add(concept.getConceptId());
+                cachedOrigins.add(concept.getConceptNid());
             }
             refsetPurposeCache.put(purposeId, cachedOrigins);
 
@@ -368,7 +368,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         }
 
         public boolean evaluate(I_GetConceptData concept) throws Exception {
-            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptId(), new RefsetPropertyMap().with(
+            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptNid(), new RefsetPropertyMap().with(
                 RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, this.memberTypeId));
         }
     }
@@ -481,8 +481,8 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             // Check origin is a refset (ie. has not been retired as a refset)
             for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null,
                 getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
-                if (target.getConceptId() == refsetIdenityId) {
-                    memberRefsets.add(origin.getConceptId());
+                if (target.getConceptNid() == refsetIdenityId) {
+                    memberRefsets.add(origin.getConceptNid());
                 }
             }
         }

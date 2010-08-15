@@ -183,7 +183,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 			            switch (columnDesc) {
 
 			            case CON_ID:
-			                return new ConceptTransferable(Terms.get().getConcept(desc.getConceptId()));
+			                return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
 			            case STATUS:
 			                return new ConceptTransferable(Terms.get().getConcept(desc.getStatusId()));
 			            case TYPE:
@@ -414,7 +414,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                 if (table.isCellEditable(row, column)) {
                     try {
                         I_GetConceptData obj = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
-                        table.setValueAt(obj.getConceptId(), row, column);
+                        table.setValueAt(obj.getConceptNid(), row, column);
                     } catch (UnsupportedFlavorException e) {
                         AceLog.getAppLog().info("Unsupported flavor: " + e.getMessage());
                     } catch (IOException e) {
@@ -431,7 +431,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                     I_GetConceptData obj;
                     try {
                         obj = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
-                        table.setValueAt(obj.getConceptId(), table.getSelectedRow(), table.getSelectedColumn());
+                        table.setValueAt(obj.getConceptNid(), table.getSelectedRow(), table.getSelectedColumn());
                         return true;
                     } catch (UnsupportedFlavorException e) {
                         AceLog.getAppLog().info("Unsupported flavor: " + e.getMessage());

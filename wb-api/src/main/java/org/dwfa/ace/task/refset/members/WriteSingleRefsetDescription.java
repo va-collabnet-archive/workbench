@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -83,7 +82,7 @@ public final class WriteSingleRefsetDescription extends AbstractTask {
                 new TaskLogger(worker)).withSelectedDir(outputDirecotry).build();
 
             try {
-                Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptId());
+                Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(refset.getConceptNid());
                 for (I_ExtendByRef extension : extensions) {
                     processor.processExtensionByReference(extension);
                 }

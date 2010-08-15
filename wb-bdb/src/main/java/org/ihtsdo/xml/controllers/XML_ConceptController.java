@@ -1,7 +1,6 @@
 package org.ihtsdo.xml.controllers;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -52,7 +51,7 @@ public class XML_ConceptController {
 	
 	
 	/*public boolean checkProc(int conID){
-		//conIdi =concept.getConceptId();
+		//conIdi =concept.getConceptNid();
 		String oc_key = CommonXMLStatics.CONCEPT_PRE+Integer.toString(conID);
 		if(ObjectCache.get(oc_key) != null){
 			return true;
@@ -86,7 +85,7 @@ public class XML_ConceptController {
 		
 		if(!AceXMLUtil.getUuidInt().containsKey(uuid.toString())){
 		I_GetConceptData editPathConcept = tf.getConcept(uuid);
-		AceXMLUtil.addtoUuidInt(uuid.toString(), editPathConcept.getConceptId());
+		AceXMLUtil.addtoUuidInt(uuid.toString(), editPathConcept.getConceptNid());
 		
 			add_I_GetConceptData(editPathConcept);
 		}
@@ -106,7 +105,7 @@ public class XML_ConceptController {
 			Iterator<I_GetConceptData> conIt = conCol.iterator();
 			while (conIt.hasNext()) {
 				I_GetConceptData editPathConcept = conIt.next();
-				if(!AceXMLUtil.checkProc(editPathConcept.getConceptId())){
+				if(!AceXMLUtil.checkProc(editPathConcept.getConceptNid())){
 					add_I_GetConceptData(editPathConcept);
 				}
 			}
@@ -128,7 +127,7 @@ public class XML_ConceptController {
 	
 	public Document getXMLConceptID(String Con_id, int sourceID) throws Exception{	
 		I_GetConceptData editPathConcept = tf.getConcept(Con_id,sourceID);
-		if(!AceXMLUtil.checkProc(editPathConcept.getConceptId())){
+		if(!AceXMLUtil.checkProc(editPathConcept.getConceptNid())){
 			add_I_GetConceptData(editPathConcept);
 		}
 		return retDoc;

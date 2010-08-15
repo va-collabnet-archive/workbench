@@ -34,11 +34,11 @@ import javax.swing.JTextField;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class CreatePathPanel extends JPanel implements ActionListener {
     /**
@@ -122,7 +122,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
                 return;
             }
-            HashSet<I_Position> origins = new HashSet<I_Position>();
+            HashSet<PositionBI> origins = new HashSet<PositionBI>();
             origins.addAll(this.sppp.getSelectedPositions());
 
             AceLog.getAppLog().info(origins.toString());

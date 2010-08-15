@@ -31,13 +31,13 @@ public class ClosestDistanceHashSet implements Map<Integer, ConceptRefsetInclusi
 
     public void add(ConceptRefsetInclusionDetails o) {
 
-        ConceptRefsetInclusionDetails oldObject = map.get(o.getConceptId());
+        ConceptRefsetInclusionDetails oldObject = map.get(o.getConceptNid());
 
         if (oldObject == null) {
-            map.put(o.getConceptId(), o);
+            map.put(o.getConceptNid(), o);
         } else {
             if (o.getDistance() < oldObject.getDistance()) {
-                map.put(o.getConceptId(), o);
+                map.put(o.getConceptNid(), o);
             }
         }
     }

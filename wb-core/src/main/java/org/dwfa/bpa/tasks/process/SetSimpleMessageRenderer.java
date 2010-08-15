@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 import org.dwfa.bpa.gui.SimpleMessageRenderer;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -30,6 +27,9 @@ import org.dwfa.bpa.process.I_RenderMessage;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/set tasks", type = BeanType.TASK_BEAN) })
 public class SetSimpleMessageRenderer extends AbstractTask {

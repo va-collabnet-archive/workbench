@@ -5,6 +5,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import org.ihtsdo.arena.editor.EditorActions.HistoryAction;
+
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxResources;
 

@@ -31,8 +31,6 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -46,6 +44,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
 public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTask {
@@ -145,19 +145,19 @@ public class SetWorkflowDetailsSheetToRefreshSpecClausePanel extends AbstractTas
             
            UUID refsetSpecUuid = (UUID) process.getProperty(refsetUuidPropName);
            Set<UniversalAcePosition> universalRefsetSpecVersionSet = (Set<UniversalAcePosition>) process.getProperty(refsetPositionSetPropName);
-           Set<I_Position> refsetSpecPositionSet = new HashSet<I_Position>();
+           Set<PositionBI> refsetSpecPositionSet = new HashSet<PositionBI>();
 	        for (UniversalAcePosition univPos: universalRefsetSpecVersionSet) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PathBI path = tf.getPath(univPos.getPathId());
+		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
 		           refsetSpecPositionSet.add(thinPos);
 		        }
 
 	        PositionSetReadOnly refsetSpecVersionSet = new PositionSetReadOnly(refsetSpecPositionSet);
 	        Set<UniversalAcePosition> universalSourceTerminologyVersionSet = (Set<UniversalAcePosition>) process.getProperty(snomedPositionSetPropName);
-           Set<I_Position> sourceTerminologyPositionSet = new HashSet<I_Position>();
+           Set<PositionBI> sourceTerminologyPositionSet = new HashSet<PositionBI>();
 	        for (UniversalAcePosition univPos: universalSourceTerminologyVersionSet) {
-		           I_Path path = tf.getPath(univPos.getPathId());
-		           I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PathBI path = tf.getPath(univPos.getPathId());
+		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
 		           sourceTerminologyPositionSet.add(thinPos);
 		        }
 

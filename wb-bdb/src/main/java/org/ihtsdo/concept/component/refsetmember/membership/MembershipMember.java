@@ -90,7 +90,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		MembershipRevision newR = new MembershipRevision(statusNid, pathNid, time, this);
@@ -98,9 +98,19 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 		return newR;
 	}
 
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		MembershipRevision newR = new MembershipRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
     @Override
     public MembershipRevision makeAnalog() {
-        MembershipRevision newR = new MembershipRevision(getStatusId(), getPathId(), getTime(), this);
+        MembershipRevision newR = new MembershipRevision(getStatusNid(), getPathNid(), getTime(), this);
         return newR;
     }
 	

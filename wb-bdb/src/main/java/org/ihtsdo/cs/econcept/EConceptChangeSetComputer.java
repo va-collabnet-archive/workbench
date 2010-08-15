@@ -137,7 +137,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                         if (eImg == null) {
                             eImg = new EImage();
                             eImages.add(eImg);
-                            eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptId()));
+                            eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
                             eImg.setFormat(v.getFormat());
                             eImg.setImage(v.getImage());
                             eImg.setTextDescription(v.getTextDescription());
@@ -200,7 +200,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                         if (ecd == null) {
                             ecd = new EDescription();
                             eDescriptions.add(ecd);
-                            ecd.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptId()));
+                            ecd.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
                             ecd.setInitialCaseSignificant(v.isInitialCaseSignificant());
                             ecd.setLang(v.getLang());
                             ecd.setText(v.getText());

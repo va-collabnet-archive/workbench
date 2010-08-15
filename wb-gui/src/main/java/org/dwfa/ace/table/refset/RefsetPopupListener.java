@@ -33,7 +33,6 @@ import javax.swing.JTable;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -45,6 +44,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class RefsetPopupListener extends MouseAdapter {
 
@@ -59,10 +59,10 @@ public class RefsetPopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             try {
                 if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
-                    for (I_Path p : config.getEditingPathSet()) {
+                    for (PathBI p : config.getEditingPathSet()) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
                         I_ExtendByRefPart newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(),
-                        		p.getConceptId(), Long.MAX_VALUE);
+                        		p.getConceptNid(), Long.MAX_VALUE);
                         setProperStatus(newPart);
                         model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().addVersion(newPart);
@@ -110,7 +110,7 @@ public class RefsetPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                for (I_Path p : config.getEditingPathSet()) {
+                for (PathBI p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
                     if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
@@ -118,7 +118,7 @@ public class RefsetPopupListener extends MouseAdapter {
                     } else {
                         newPart = selectedObject.getTuple().getMutablePart();
                     }
-                    newPart.setPathId(p.getConceptId());
+                    newPart.setPathId(p.getConceptNid());
                     setProperStatus(newPart);
                     switch (field) {
                     case STATUS:
@@ -168,11 +168,11 @@ public class RefsetPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                for (I_Path p : config.getEditingPathSet()) {
+                for (PathBI p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
                     if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
-                        newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                        newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(currentPart.getStatusId(), p.getConceptNid(), Long.MAX_VALUE);
                     } else {
                         newPart = selectedObject.getTuple().getMutablePart();
                     }
@@ -219,7 +219,7 @@ public class RefsetPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                for (I_Path p : config.getEditingPathSet()) {
+                for (PathBI p : config.getEditingPathSet()) {
                     I_ExtendByRefPart newPart;
                     if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
                     	I_ExtendByRefPart currentPart = selectedObject.getTuple();
@@ -228,7 +228,7 @@ public class RefsetPopupListener extends MouseAdapter {
                         newPart = selectedObject.getTuple().getMutablePart();
                     }
 
-                    newPart.setPathId(p.getConceptId());
+                    newPart.setPathId(p.getConceptNid());
                     newPart.setTime(Long.MAX_VALUE);
                     setProperStatus(newPart);
                     switch (field) {
@@ -347,7 +347,7 @@ public class RefsetPopupListener extends MouseAdapter {
     }
 
     private void setProperStatus(I_ExtendByRefPart newPart) throws Exception {
-        newPart.setStatusId(preferences.getDefaultStatusForRefset().getConceptId());
+        newPart.setStatusId(preferences.getDefaultStatusForRefset().getConceptNid());
     }
 
     private void addSubmenuItems(JMenu menu, REFSET_FIELDS field, I_IntList possibleValues)

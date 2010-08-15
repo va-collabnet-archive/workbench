@@ -22,9 +22,6 @@ package org.dwfa.bpa.tasks.ws;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 import org.dwfa.bpa.gui.FieldInputPanel;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -33,6 +30,9 @@ import org.dwfa.bpa.process.I_Workspace;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.pwdbreaker.ConfigureCryptBreakerWorkspace;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 /**
  * @author kec

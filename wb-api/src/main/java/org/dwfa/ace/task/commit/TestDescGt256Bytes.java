@@ -95,9 +95,9 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
         if (fsn_type == null) {
             return alertList;
         }
-        typesToCheck.add(fsn_type.getConceptId());
-        typesToCheck.add(pt_type.getConceptId());
-        typesToCheck.add(syn_type.getConceptId());
+        typesToCheck.add(fsn_type.getConceptNid());
+        typesToCheck.add(pt_type.getConceptNid());
+        typesToCheck.add(syn_type.getConceptNid());
         for (I_DescriptionVersioned desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {
@@ -124,8 +124,8 @@ public class TestDescGt256Bytes extends AbstractConceptTest {
         // TEST IF Preferred or Synonym DESCRIPTION EXCEEDS 80 CHARACTERS
         // :NOTE:MEC: Global restriction added per Kaiser Pilot requirement.
         /* typesToCheck.clear();
-        typesToCheck.add(pt_type.getConceptId());
-        typesToCheck.add(syn_type.getConceptId());
+        typesToCheck.add(pt_type.getConceptNid());
+        typesToCheck.add(syn_type.getConceptNid());
         for (I_DescriptionVersioned desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (part.getVersion() == Integer.MAX_VALUE) {

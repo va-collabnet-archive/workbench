@@ -178,7 +178,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                 "No member spec found. Please put the refset to be exported in the refset spec panel.");
         }
 
-        Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptId());
+        Collection<? extends I_ExtendByRef> extensions = termFactory.getRefsetExtensionMembers(memberRefset.getConceptNid());
 
         writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);
@@ -203,11 +203,11 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
 
             if (latestTuple != null) {
                 if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
-                    if (latestTuple.getRefsetId() == memberRefset.getConceptId()) {
+                    if (latestTuple.getRefsetId() == memberRefset.getConceptNid()) {
                         if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
                             I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) latestTuple.getMutablePart();
                             if (part.getC1id() == termFactory.getConcept(
-                                RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptId()) {
+                                RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid()) {
                                 lineCount++;
                                 if (lineCount > maxLineCount) {
                                     fileNumber++;
@@ -259,7 +259,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             throws TerminologyException, Exception {
         exportFileWriter.write("Refset Name: ");
         exportFileWriter.write(getDescription(Terms.get().getConcept(
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptId()));
+            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptNid()));
         exportFileWriter.newLine();
     }
 
@@ -291,7 +291,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 
         I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(descType.getConceptId());
+        allowedTypes.add(descType.getConceptNid());
 
         String latestDescription =
                 getLatestDescription(componentId, helper.getCurrentStatusIntSet(), allowedTypes, termFactory

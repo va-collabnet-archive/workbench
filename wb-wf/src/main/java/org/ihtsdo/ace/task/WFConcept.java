@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.ace.task;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -24,50 +23,38 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
-import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.cement.WorkflowAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
@@ -128,8 +115,8 @@ public class WFConcept extends AbstractTask {
     	 try {
             I_TermFactory tf = Terms.get();
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<I_Position> positionSet = new HashSet<I_Position>();
-            for (I_Path path : config.getEditingPathSet()) {
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
+            for (PathBI path : config.getEditingPathSet()) {
             	positionSet.add(tf.newPosition(path, Integer.MAX_VALUE));
             }
       

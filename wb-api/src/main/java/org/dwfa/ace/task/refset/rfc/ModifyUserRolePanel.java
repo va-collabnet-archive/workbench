@@ -36,8 +36,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -48,6 +46,8 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * The modify user role panel allows the user to select a user from the drop down list and remove their roles
@@ -269,7 +269,7 @@ public class ModifyUserRolePanel extends JPanel {
             I_GetConceptData descriptionType =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = Terms.get().newIntSet();
-            descAllowedTypes.add(descriptionType.getConceptId());
+            descAllowedTypes.add(descriptionType.getConceptNid());
 
             for (I_GetConceptData user : allUsers) {
 
@@ -313,15 +313,15 @@ public class ModifyUserRolePanel extends JPanel {
             I_IntSet currentStatus = helper.getCurrentStatusIntSet();
 
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.OWNER_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ADMIN_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.AUTHOR_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.SME_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
 
             Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();
             // (null, roleAllowedTypes, positions, true, true);
@@ -357,15 +357,15 @@ public class ModifyUserRolePanel extends JPanel {
             I_IntSet currentStatus = helper.getCurrentStatusIntSet();
 
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.OWNER_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ADMIN_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.AUTHOR_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.SME_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
             roleAllowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids())
-                .getConceptId());
+                .getConceptNid());
 
             Collection<? extends I_RelVersioned> roleRels = currentUser.getSourceRels();// (null, roleAllowedTypes, positions,
             // true,
@@ -375,7 +375,7 @@ public class ModifyUserRolePanel extends JPanel {
                 if (roleRel.getLastTuple().getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
                     if (currentStatus.contains(roleRel.getLastTuple().getStatusId())) {
                         if (roleAllowedTypes.contains(roleRel.getLastTuple().getTypeId())) {
-                            if (currentHierarchy.getConceptId() == roleRel.getC2Id()) {
+                            if (currentHierarchy.getConceptNid() == roleRel.getC2Id()) {
                                 roles.add(termFactory.getConcept(roleRel.getLastTuple().getTypeId()));
                             }
                         }
@@ -388,22 +388,22 @@ public class ModifyUserRolePanel extends JPanel {
         return roles;
     }
 
-    public Set<I_Position> getPositions(I_TermFactory termFactory) throws Exception {
+    public Set<PositionBI> getPositions(I_TermFactory termFactory) throws Exception {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-        Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
-        Set<I_Position> allPositions = new HashSet<I_Position>();
-        for (I_Path path : editingPaths) {
+        Set<PathBI> editingPaths = activeProfile.getEditingPathSet();
+        Set<PositionBI> allPositions = new HashSet<PositionBI>();
+        for (PathBI path : editingPaths) {
             allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
-            for (I_Position position : path.getOrigins()) {
+            for (PositionBI position : path.getOrigins()) {
                 addOriginPositions(termFactory, position, allPositions);
             }
         }
         return allPositions;
     }
 
-    private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {
+    private void addOriginPositions(I_TermFactory termFactory, PositionBI position, Set<PositionBI> allPositions) {
         allPositions.add(position);
-        for (I_Position originPosition : position.getPath().getOrigins()) {
+        for (PositionBI originPosition : position.getPath().getOrigins()) {
             addOriginPositions(termFactory, originPosition, allPositions);
         }
     }
@@ -432,7 +432,7 @@ public class ModifyUserRolePanel extends JPanel {
                 if (currentUser != null && currentHierarchy != null && currentRole != null) {
                     // get associated relationship
                     I_IntSet roleAllowedTypes = termFactory.newIntSet();
-                    roleAllowedTypes.add(currentRole.getConceptId());
+                    roleAllowedTypes.add(currentRole.getConceptNid());
                     I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
                     I_IntSet currentStatus = helper.getCurrentStatusIntSet();
 
@@ -442,15 +442,15 @@ public class ModifyUserRolePanel extends JPanel {
                                 config.getPrecedence(), config.getConflictResolutionStrategy());
 
                     for (I_RelTuple roleRel : roleRels) {
-                        if (currentHierarchy.getConceptId() == roleRel.getC2Id()) {
+                        if (currentHierarchy.getConceptNid() == roleRel.getC2Id()) {
                             // retire this rel
                             I_RelVersioned relVersioned = roleRel.getFixedPart();
 
-                            for (I_Path editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                            for (PathBI editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                                 I_RelPart oldPart = relVersioned.getLastTuple().getMutablePart();
                                 I_RelPart newPart =
                                         (I_RelPart) oldPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED
-                                            .localize().getNid(), editPath.getConceptId(), Long.MAX_VALUE);
+                                            .localize().getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
                                 if (oldPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
                                     relVersioned.addVersion(newPart);
                                 }
@@ -460,7 +460,7 @@ public class ModifyUserRolePanel extends JPanel {
                 }
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
-                Set<I_Position> viewPositionSet = config.getViewPositionSet();
+                Set<PositionBI> viewPositionSet = config.getViewPositionSet();
                 PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
                 if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
                     throw new TaskFailedException(
@@ -471,7 +471,7 @@ public class ModifyUserRolePanel extends JPanel {
                 retiredSet.add(ArchitectonicAuxiliary.Concept.RETIRED
                     .localize().getNid());
                 
-                I_Position viewPosition = viewPositionSet.iterator().next();
+                PositionBI viewPosition = viewPositionSet.iterator().next();
                 currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
                     retiredSet, config.getPrecedence());
                 termFactory.addUncommittedNoChecks(currentUser);

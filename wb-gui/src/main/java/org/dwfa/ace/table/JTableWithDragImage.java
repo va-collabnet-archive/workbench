@@ -281,7 +281,7 @@ public class JTableWithDragImage extends JTable {
             case DESC_ID:
                 throw new UnsupportedOperationException();
             case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptId()));
+                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptNid()));
             case TEXT:
                 return new DescriptionTransferable(swdt.tuple);
             case LANG:
@@ -323,7 +323,7 @@ public class JTableWithDragImage extends JTable {
         private Transferable transferableFromIWImgT(Object obj) throws IOException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
             return new StringSelection("<img src='ace:" + Terms.get().nativeToUuid(iwit.tuple.getNid())
-                + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptId()) + "'>");
+                + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptNid()) + "'>");
         }
 
         private Transferable transferableFromSWImgT(Object obj, int column) throws IOException, TerminologyException {
@@ -333,15 +333,15 @@ public class JTableWithDragImage extends JTable {
             case IMAGE_ID:
                 return new StringSelection("<img src='ace:"
                     + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
-                    + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
+                    + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
             case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptId()));
+                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptNid()));
             case DESC:
                 return new StringSelection(swit.getTuple().getTextDescription());
             case IMAGE:
                 return new StringSelection("<img src='ace:"
                     + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
-                    + Terms.get().nativeToUuid(swit.getTuple().getConceptId()) + "'>");
+                    + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
             case FORMAT:
                 return new StringSelection(swit.getTuple().getFormat());
             case STATUS:

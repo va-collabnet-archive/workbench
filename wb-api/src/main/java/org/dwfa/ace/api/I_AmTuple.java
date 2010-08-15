@@ -18,7 +18,9 @@ package org.dwfa.ace.api;
 
 import java.io.IOException;
 
-public interface I_AmTuple extends I_AmPart {
+import org.ihtsdo.tk.api.ComponentVersionBI;
+
+public interface I_AmTuple extends I_AmPart, ComponentVersionBI {
 
     public int getNid();
 

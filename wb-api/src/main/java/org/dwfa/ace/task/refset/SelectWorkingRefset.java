@@ -91,10 +91,10 @@ public class SelectWorkingRefset extends AbstractTask {
             // view selected refset
             I_IntList refsetsToShow = config.getRefsetsToShowInTaxonomy();
             refsetsToShow.clear();
-            refsetsToShow.add(refset.getConceptId());
+            refsetsToShow.add(refset.getConceptNid());
 
             // view ancillary refsets
-            int parentRefsetId = Terms.get().getMarkedParentRefsetHelper(config, refset.getConceptId(), 0).getParentRefset();
+            int parentRefsetId = Terms.get().getMarkedParentRefsetHelper(config, refset.getConceptNid(), 0).getParentRefset();
             refsetsToShow.add(parentRefsetId);
 
             // TODO: enable concept refsets

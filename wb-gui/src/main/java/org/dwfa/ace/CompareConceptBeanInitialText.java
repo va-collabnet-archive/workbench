@@ -27,7 +27,7 @@ public class CompareConceptBeanInitialText implements Comparator<I_GetConceptDat
         try {
             int comparison = cb1.getInitialText().compareTo(cb2.getInitialText());
             if (comparison == 0) {
-                comparison = cb1.getConceptId() - cb2.getConceptId();
+                comparison = cb1.getConceptNid() - cb2.getConceptNid();
             }
             return comparison;
         } catch (IOException e) {

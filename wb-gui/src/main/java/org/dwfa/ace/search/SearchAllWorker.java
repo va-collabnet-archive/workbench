@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.Timer;

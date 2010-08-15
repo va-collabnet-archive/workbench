@@ -97,7 +97,7 @@ public class RelSubsumptionMatch extends AbstractSearchTest {
                 testConcept = (I_GetConceptData) component;
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-                testConcept = Terms.get().getConcept(desc.getConceptId());
+                testConcept = Terms.get().getConcept(desc.getConceptNid());
             } else {
                 AceLog.getAppLog().info("Can't handle component: " + component);
                 return applyInversion(false);

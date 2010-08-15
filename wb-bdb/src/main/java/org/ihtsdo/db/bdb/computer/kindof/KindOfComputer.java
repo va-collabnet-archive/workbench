@@ -1,18 +1,14 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.db.bdb.Bdb;
 
 public class KindOfComputer {
 	private static int cacheLimit = 10;

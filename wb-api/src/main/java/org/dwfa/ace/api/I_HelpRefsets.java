@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 
 public interface I_HelpRefsets extends I_HelpLineage {
 
@@ -93,7 +94,7 @@ public interface I_HelpRefsets extends I_HelpLineage {
 	public boolean retireRefsetExtension(int refsetId, int conceptId,
 			final RefsetPropertyMap extProps) throws Exception;
 
-	public void setEditPaths(I_Path... editPaths);
+	public void setEditPaths(PathBI... editPaths);
 
 	public boolean hasPurpose(int refsetId, int purposeId) throws Exception;
 

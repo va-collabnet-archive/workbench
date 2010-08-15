@@ -33,8 +33,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -43,6 +41,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Goal which monitors two branches for changes. Agreed changes are copied
@@ -141,27 +141,27 @@ public class VodbMonitorBranches extends AbstractMojo {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             if (flaggedConcept != null) {
-                flaggedStatusId = termFactory.getConcept(flaggedConcept.getVerifiedConcept().getUids()).getConceptId();
+                flaggedStatusId = termFactory.getConcept(flaggedConcept.getVerifiedConcept().getUids()).getConceptNid();
             }
 
-            int updatedStatusId = termFactory.getConcept(updatedStatus.getVerifiedConcept().getUids()).getConceptId();
+            int updatedStatusId = termFactory.getConcept(updatedStatus.getVerifiedConcept().getUids()).getConceptNid();
 
             // get origins
-            I_Path architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            I_Position latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
-            Set<I_Position> origins = new HashSet<I_Position>();
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            Set<PositionBI> origins = new HashSet<PositionBI>();
             origins.add(latestOnArchitectonicPath);
 
             // get the branch to copy to concept/path
             I_GetConceptData copyToConcept = branchToCopyTo.getVerifiedConcept();
-            I_Path copyToPath = termFactory.getPath(copyToConcept.getUids());
+            PathBI copyToPath = termFactory.getPath(copyToConcept.getUids());
 
             // get all the positions for the branches to be compared
-            List<I_Position> positions = new LinkedList<I_Position>();
+            List<PositionBI> positions = new LinkedList<PositionBI>();
             for (ConceptDescriptor branch : branchesToCompare) {
                 I_GetConceptData compareConcept = branch.getVerifiedConcept();
-                I_Position comparePosition = termFactory.newPosition(termFactory.getPath(compareConcept.getUids()),
+                PositionBI comparePosition = termFactory.newPosition(termFactory.getPath(compareConcept.getUids()),
                     Integer.MAX_VALUE);
                 positions.add(comparePosition);
             }
@@ -183,9 +183,9 @@ public class VodbMonitorBranches extends AbstractMojo {
             boolean relationshipsMatch = true;
             for (int i = 0; i > positions.size(); i++) {
 
-                Set<I_Position> firstPosition = new HashSet<I_Position>();
+                Set<PositionBI> firstPosition = new HashSet<PositionBI>();
                 firstPosition.add(positions.get(0));
-                Set<I_Position> secondPosition = new HashSet<I_Position>();
+                Set<PositionBI> secondPosition = new HashSet<PositionBI>();
                 secondPosition.add(positions.get(i + 1));
 
                 conceptAttributeTuples1 = concept.getConceptAttributeTuples(null, new PositionSetReadOnly(firstPosition), 
@@ -248,17 +248,17 @@ public class VodbMonitorBranches extends AbstractMojo {
                 agreedChanges++;
                 // copy latest attributes to new path/version
                 for (I_ConceptAttributeTuple tuple : allConceptAttributeTuples) {
-                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
+                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
                     tuple.getConVersioned().addVersion(newPart);
                 }
                 // copy latest descriptions to new path/version
                 for (I_DescriptionTuple tuple : allDescriptionTuples) {
-                    I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
+                    I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
                     tuple.getDescVersioned().addVersion(newPart);
                 }
                 // copy latest relationships to new path/version
                 for (I_RelTuple tuple : allRelationshipTuples) {
-                    I_RelPart newPart = (I_RelPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptId(), Long.MAX_VALUE);
+                    I_RelPart newPart = (I_RelPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
                     tuple.getRelVersioned().addVersion(newPart);
                 }
             } else {

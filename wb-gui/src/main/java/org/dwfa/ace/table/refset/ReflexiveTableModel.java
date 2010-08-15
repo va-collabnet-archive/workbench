@@ -178,7 +178,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 }
 
                 public Object getCellEditorValue() {
-                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptId();
+                    return ((I_GetConceptData) combo.getSelectedItem()).getConceptNid();
                 }
             };
             combo.addActionListener(delegate);
@@ -499,7 +499,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                     return new StringWithExtTuple(Integer.toString(conceptId), tuple, id);
                 } else if (I_DescriptionTuple.class.isAssignableFrom(value.getClass())) {
                     I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
-                    return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptId());
+                    return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid());
                 }
                 return new StringWithExtTuple(value.toString(), tuple, id);
             case COMPONENT_IDENTIFIER:

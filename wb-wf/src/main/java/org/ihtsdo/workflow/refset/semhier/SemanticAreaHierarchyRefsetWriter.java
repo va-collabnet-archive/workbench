@@ -64,7 +64,7 @@ public class SemanticAreaHierarchyRefsetWriter extends RefsetWriterUtility {
 		public String toString() {
 			try {
 				return "\nReferenced Component Id (Same for each row -- HardCoded) = " + getReferencedComponentId().getInitialText() + 
-					   "(" + getReferencedComponentId().getConceptId() + ")" +
+					   "(" + getReferencedComponentId().getConceptNid() + ")" +
 					   "\nChild Semantic Area = " + childSemanticArea +
 					   "\nParentSemantic Area = " + parentSemanticArea;
 			} catch (IOException io) {

@@ -47,11 +47,9 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -68,6 +66,9 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 /**
@@ -82,7 +83,24 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     I_ConfigAceFrame baseFrame;
 
-    public I_ShowActivity getTopActivity() {
+	public Set<PathBI> getPromotionPathSet() {
+		return baseFrame.getPromotionPathSet();
+	}
+
+	public void addViewPosition(PositionBI p) {
+		baseFrame.addViewPosition(p);
+	}
+
+	public void removeViewPosition(PositionBI p) {
+		baseFrame.removeViewPosition(p);
+	}
+
+	public void replaceViewPosition(PositionBI oldPosition,
+			PositionBI newPosition) {
+		baseFrame.replaceViewPosition(oldPosition, newPosition);
+	}
+
+	public I_ShowActivity getTopActivity() {
         return baseFrame.getTopActivity();
     }
 
@@ -90,11 +108,11 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setTopActivity(activity);
     }
 
-    public PRECEDENCE getPrecedence() {
+    public Precedence getPrecedence() {
         return baseFrame.getPrecedence();
     }
 
-    public void setPrecedence(PRECEDENCE precedence) {
+    public void setPrecedence(Precedence precedence) {
         baseFrame.setPrecedence(precedence);
     }
 
@@ -361,7 +379,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setAdministrative(isAdministrative);
     }
 
-    Set<I_Position> viewPositionSet;
+    Set<PositionBI> viewPositionSet;
 
     I_IntSet allowedStatus;
 
@@ -372,16 +390,16 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
     public FrameConfigSnapshot(I_ConfigAceFrame baseFrame) {
         super();
         this.baseFrame = baseFrame;
-        Set<I_Position> baseViewPositions = baseFrame.getViewPositionSet();
+        Set<? extends PositionBI> baseViewPositions = baseFrame.getViewPositionSet();
         synchronized (baseViewPositions) {
-            viewPositionSet = new HashSet<I_Position>(baseViewPositions);
+            viewPositionSet = new HashSet<PositionBI>(baseViewPositions);
         }
         this.allowedStatus = new IntSet(baseFrame.getAllowedStatus().getSetValues());
         this.destRelTypes = new IntSet(baseFrame.getDestRelTypes().getSetValues());
         this.srcRelTypes = new IntSet(baseFrame.getSourceRelTypes().getSetValues());
     }
 
-    public Set<I_Position> getViewPositionSet() {
+    public Set<PositionBI> getViewPositionSet() {
         return viewPositionSet;
     }
 
@@ -397,7 +415,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return this.srcRelTypes;
     }
 
-    public void addEditingPath(I_Path p) {
+    public void addEditingPath(PathBI p) {
         throw new UnsupportedOperationException();
     }
 
@@ -440,7 +458,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void removeEditingPath(I_Path p) {
+    public void removeEditingPath(PathBI p) {
         throw new UnsupportedOperationException();
 
     }
@@ -465,7 +483,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void replaceEditingPath(I_Path oldPath, I_Path newPath) {
+    public void replaceEditingPath(PathBI oldPath, PathBI newPath) {
         throw new UnsupportedOperationException();
 
     }
@@ -785,7 +803,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     }
 
-    public void setViewPositions(Set<I_Position> positions) {
+    public void setViewPositions(Set<PositionBI> positions) {
         throw new UnsupportedOperationException();
 
     }
@@ -954,7 +972,7 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getEditImageTypePopup();
     }
 
-    public Set<I_Path> getEditingPathSet() {
+    public Set<PathBI> getEditingPathSet() {
         return baseFrame.getEditingPathSet();
     }
 
@@ -1203,19 +1221,16 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         baseFrame.setSearchWithDescTypeFilter(filter);
     }
 
-    public void addPromotionPath(I_Path p) {
+    public void addPromotionPath(PathBI p) {
         baseFrame.addPromotionPath(p);
     }
 
-    public Set<I_Path> getPromotionPathSet() {
-        return baseFrame.getPromotionPathSet();
-    }
-
-    public void removePromotionPath(I_Path p) {
+ 
+    public void removePromotionPath(PathBI p) {
         baseFrame.removePromotionPath(p);
     }
 
-    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+    public void replacePromotionPathSet(PathBI oldPath, PathBI newPath) {
         baseFrame.replacePromotionPathSet(oldPath, newPath);
     }
 

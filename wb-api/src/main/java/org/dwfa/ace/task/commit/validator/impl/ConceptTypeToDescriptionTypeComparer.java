@@ -53,12 +53,12 @@ public final class ConceptTypeToDescriptionTypeComparer implements ConceptDataCo
      * {@link I_GetConceptData} to the {@link I_DescriptionPart} by checking to
      * see if the int value from the {@link I_DescriptionPart#getTypeId()}
      * method is equal (==) to the int value from
-     * {@link I_GetConceptData#getConceptId()}.
+     * {@link I_GetConceptData#getConceptNid()}.
      * 
      * @see ConceptDataComparerStrategy#isPartRequiredConceptType(org.dwfa.ace.api.I_GetConceptData,
      *      org.dwfa.ace.api.I_DescriptionPart)
      */
     public boolean isPartRequiredConceptType(I_GetConceptData requiredConceptType, I_DescriptionPart part) {
-        return part.getTypeId() == requiredConceptType.getConceptId();
+        return part.getTypeId() == requiredConceptType.getConceptNid();
     }
 }

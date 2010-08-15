@@ -36,19 +36,19 @@ public  class StateTransitionRefsetSearcher extends RefsetSearcherUtility
 		List<I_ExtendByRefPartStr> l = null;
 
 		// Modeler's Role
-		l = helper.getAllCurrentRefsetExtensions(refsetId, category.getConceptId());
+		l = helper.getAllCurrentRefsetExtensions(refsetId, category.getConceptNid());
 		if (l != null)
 			results = addToList(results, findPossibleActions(l, testInitialState, testUseCase));
 		
 		// ANY Role
-		l = helper.getAllCurrentRefsetExtensions(refsetId,  Terms.get().getConcept(WorkflowAuxiliary.Concept.ROLE_ANY.getUids()).getConceptId());
+		l = helper.getAllCurrentRefsetExtensions(refsetId,  Terms.get().getConcept(WorkflowAuxiliary.Concept.ROLE_ANY.getUids()).getConceptNid());
 		if (l != null)
 			results = addToList(results, findPossibleActions(l, testInitialState, testUseCase));
 
 		// B+ Role
 		if (category != Terms.get().getConcept(WorkflowAuxiliary.Concept.ROLE_A.getUids()))
 		{
-			l = helper.getAllCurrentRefsetExtensions(refsetId,  Terms.get().getConcept(WorkflowAuxiliary.Concept.ROLE_BPLUS.getUids()).getConceptId());
+			l = helper.getAllCurrentRefsetExtensions(refsetId,  Terms.get().getConcept(WorkflowAuxiliary.Concept.ROLE_BPLUS.getUids()).getConceptNid());
 			results = addToList(results, findPossibleActions(l, testInitialState, testUseCase));
 		}
 			

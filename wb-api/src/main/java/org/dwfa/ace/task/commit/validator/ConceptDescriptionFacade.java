@@ -38,7 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -80,7 +79,7 @@ public final class ConceptDescriptionFacade {
      */
     public List<I_DescriptionVersioned> getAllDescriptions(final I_GetConceptData concept) throws Exception {
         Logger.getLogger(this.getClass().getName()).log(Level.FINEST,
-            String.format("Getting all descriptions for %1$s", concept.getConceptId()));
+            String.format("Getting all descriptions for %1$s", concept.getConceptNid()));
         List<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
         descriptions.addAll(getVersionedDescriptions(concept));
         descriptions.addAll(getUncommittedDescriptions(concept));

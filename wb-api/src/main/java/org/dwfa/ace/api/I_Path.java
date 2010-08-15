@@ -23,17 +23,18 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public interface I_Path extends PathBI {
 
-    public int getConceptId();
+    public int getConceptNid();
 
-    public Collection<? extends I_Position> getOrigins();
+    public Collection<? extends PositionBI> getOrigins();
 
     /**
      * Get all origins and origin of origins, etc., for this path.
      */
-    public Set<I_Position> getInheritedOrigins();
+    public Set<? extends PositionBI> getInheritedOrigins();
 
     /**
      * Similar to {@link #getInheritedOrigins()} however superseded origins
@@ -42,7 +43,7 @@ public interface I_Path extends PathBI {
      * should be
      * excluded.
      */
-    public Set<I_Position> getNormalisedOrigins();
+    public Set<? extends PositionBI> getNormalisedOrigins();
 
     /**
      * Similar to {@link #getNormalisedOrigins()} however additional peer paths
@@ -51,15 +52,13 @@ public interface I_Path extends PathBI {
      * origins of the
      * additional paths provided.
      */
-    public Set<I_Position> getNormalisedOrigins(Collection<I_Path> paths);
-
-    public I_Path getMatchingPath(int pathId);
+    public Set<? extends PositionBI> getNormalisedOrigins(Collection<I_Path> paths);
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
 
     public UniversalAcePath getUniversal() throws IOException, TerminologyException;
 
-    public String toHtmlString() throws IOException, TerminologyException;
+    public String toHtmlString() throws IOException;
 
     /**
      * Add an origin position to a path.
@@ -71,5 +70,5 @@ public interface I_Path extends PathBI {
      *            an origin
      * @throws TerminologyException If unable to complete
      */
-    public void addOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException;
+    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws TerminologyException;
 }

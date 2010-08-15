@@ -115,7 +115,7 @@ public class SearchReplaceDialog extends JDialog {
                 Integer integer = itr.next();
                 I_GetConceptData status = termFactory.getConcept(integer);
                 retireAsStatus.addItem(status);
-                if (status.getConceptId() == retiredConceptId) {
+                if (status.getConceptNid() == retiredConceptId) {
                     retireAsStatus.setSelectedItem(status);
                 }
             }
@@ -177,7 +177,7 @@ public class SearchReplaceDialog extends JDialog {
     }
 
     public int getRetireAsStatus() {
-        return ((I_GetConceptData) retireAsStatus.getSelectedItem()).getConceptId();
+        return ((I_GetConceptData) retireAsStatus.getSelectedItem()).getConceptNid();
     }
 
     {

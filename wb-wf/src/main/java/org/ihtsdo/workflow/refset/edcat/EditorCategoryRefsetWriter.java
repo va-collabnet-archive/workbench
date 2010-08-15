@@ -78,10 +78,10 @@ public class EditorCategoryRefsetWriter extends RefsetWriterUtility {
 		public String toString() {
 			try {
 				return "\nReferenced Component Id(Editor SCT) = " + getReferencedComponentId().getInitialText() + 
-					   "(" + getReferencedComponentId().getConceptId() + ")" +
+					   "(" + getReferencedComponentId().getConceptNid() + ")" +
 					   "\nSemantic Area = " + semanticArea +
 					   "\nEditor Category = " + editorCategory.getInitialText() +
-					   "(" + editorCategory.getConceptId() + ")";
+					   "(" + editorCategory.getConceptNid() + ")";
 			} catch (IOException io) {
 				return "Fai" +
 						"led to identify referencedComponentId or editorCategory" + 
@@ -110,7 +110,7 @@ public class EditorCategoryRefsetWriter extends RefsetWriterUtility {
 		return "<properties>\n" +
 				   	"<property>\n" +
 				   		"<key>editorCategory</key>" +
-				   		"<value>" + getEditorCategory().getConceptId() + "</value>" +
+				   		"<value>" + getEditorCategory().getConceptNid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 			   		"<key>semanticArea</key>" +

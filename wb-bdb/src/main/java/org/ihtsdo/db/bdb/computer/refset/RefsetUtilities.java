@@ -160,16 +160,16 @@ public abstract class RefsetUtilities extends LineageHelper implements
 			throws TerminologyException, IOException {
 		return att.getStatusId() == termFactory.getConcept(
 				ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-				.getConceptId()
+				.getConceptNid()
 				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())
-						.getConceptId()
+						.getConceptNid()
 				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED
-								.getUids()).getConceptId()
+								.getUids()).getConceptNid()
 				|| att.getStatusId() == termFactory.getConcept(
 						ArchitectonicAuxiliary.Concept.DO_NOT_EDIT_FOR_RELEASE
-								.getUids()).getConceptId();
+								.getUids()).getConceptNid();
 	}
 
 	public Set<Integer> getAncestorsOfConcept(int conceptId,
@@ -233,18 +233,18 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		I_IntSet status = termFactory.newIntSet();
 		status.add(termFactory.getConcept(
 				ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-				.getConceptId());
+				.getConceptNid());
 
 		I_IntSet is_a = termFactory.newIntSet();
 		if (this.altIsA == null) {
 			is_a.add(termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-					.getConceptId());
+					.getConceptNid());
 			is_a.add(termFactory.getConcept(
 					ConceptConstants.SNOMED_IS_A.localize().getUids())
-					.getConceptId());
+					.getConceptNid());
 		} else {
-			is_a.add(this.altIsA.getConceptId());
+			is_a.add(this.altIsA.getConceptNid());
 		}
 
 		I_GetConceptData refsetRoot = termFactory
@@ -262,10 +262,10 @@ public abstract class RefsetUtilities extends LineageHelper implements
 				for (I_RelTuple tuple : tuples) {
 					if (tuple.getStatusId() == termFactory.getConcept(
 							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-							.getConceptId()
+							.getConceptNid()
 							&& tuple.getTypeId() == termFactory.getConcept(
 									RefsetAuxiliary.Concept.REFSET_PURPOSE_REL
-											.getUids()).getConceptId()) {
+											.getUids()).getConceptNid()) {
 
 						purposeConcepts.add(getConcept(tuple.getC2Id()));
 					}
@@ -274,16 +274,16 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
 			if (purposeConcepts.size() == 1) {
 
-				if (purposeConcepts.iterator().next().getConceptId() == termFactory
+				if (purposeConcepts.iterator().next().getConceptNid() == termFactory
 						.getConcept(
 								RefsetAuxiliary.Concept.INCLUSION_SPECIFICATION
-										.getUids()).getConceptId()) {
-					if (getMemberSetConcept(refsetConcept.getConceptId()) == null) {
+										.getUids()).getConceptNid()) {
+					if (getMemberSetConcept(refsetConcept.getConceptNid()) == null) {
 						System.out
 								.println("ERROR: inclusion specification concept does not have a defined 'generates' relationship. Skipping generation of refset "
 										+ refsetConcept);
 					} else {
-						allowedRefsets.add(refsetConcept.getConceptId());
+						allowedRefsets.add(refsetConcept.getConceptNid());
 					}
 				}
 			}
@@ -298,7 +298,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		for (ArchitectonicAuxiliary.Concept concept : concepts) {
 			status
 					.add(termFactory.getConcept(concept.getUids())
-							.getConceptId());
+							.getConceptNid());
 		}
 		assert status.getSetValues().length > 0 : "getIntSet returns an empty set";
 		return status;
@@ -318,7 +318,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		I_IntSet status = termFactory.newIntSet();
 
 		for (I_GetConceptData concept : concepts) {
-			status.add(concept.getConceptId());
+			status.add(concept.getConceptNid());
 		}
 		assert status.getSetValues().length > 0 : "getIntSet returns an empty set";
 		return status;
@@ -435,7 +435,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		if (ext != null) {
 			I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
 					ext).makeAnalog(ReferenceConcepts.CURRENT.getNid(),
-					pathConcept.getConceptId(), Long.MAX_VALUE);
+					pathConcept.getConceptNid(), Long.MAX_VALUE);
 			I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
 			conceptClone.setC1id(getMembershipType(includeTypeConceptId));
 			ext.addVersion(conceptClone);
@@ -469,7 +469,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 		if (ext != null) {
 			I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
 					ext).makeAnalog(ReferenceConcepts.CURRENT.getNid(),
-					pathConcept.getConceptId(), Long.MAX_VALUE);
+					pathConcept.getConceptNid(), Long.MAX_VALUE);
 			I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
 			conceptClone.setC1id(parentMarker);
 			ext.addVersion(conceptClone);
@@ -530,7 +530,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 									.next());
 		}
 
-		return membershipTypes.iterator().next().getConceptId();
+		return membershipTypes.iterator().next().getConceptNid();
 	}
 
 	public int getMembershipType(int includeTypeConceptId) throws Exception {

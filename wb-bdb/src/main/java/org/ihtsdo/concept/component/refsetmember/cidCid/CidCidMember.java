@@ -180,7 +180,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
 	@Override
 	public CidCidRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		CidCidRevision newR = new CidCidRevision(statusNid, pathNid, time, this);
@@ -188,9 +188,19 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 		return newR;
 	}
 
+	@Override
+	public CidCidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		CidCidRevision newR = new CidCidRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
     @Override
     public CidCidRevision makeAnalog() {
-        return new CidCidRevision(getStatusId(), getPathId(), getTime(), this);
+        return new CidCidRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public int getC1Nid() {

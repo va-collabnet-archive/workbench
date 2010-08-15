@@ -37,7 +37,7 @@ public class TreeIdPath {
             if (cb == null) {
                 ids[i] = Integer.MIN_VALUE;
             } else {
-                ids[i] = cb.getConceptId();
+                ids[i] = cb.getConceptNid();
             }
         }
     }
@@ -62,7 +62,7 @@ public class TreeIdPath {
             if (cb == null) {
                 ids[i] = Integer.MIN_VALUE;
             } else {
-                ids[i] = cb.getConceptId();
+                ids[i] = cb.getConceptNid();
             }
         }
     }

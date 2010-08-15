@@ -25,11 +25,12 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TestComponent;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public class MockTuple implements I_AmTuple {
 
@@ -59,15 +60,15 @@ public class MockTuple implements I_AmTuple {
 
 
             @Override
-            public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-                    PRECEDENCE precedence) throws IOException, TerminologyException {
+            public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+                    Precedence precedence) throws IOException, TerminologyException {
                 throw new UnsupportedOperationException();
             }
 
 			@Override
 			public boolean promote(I_TestComponent test,
 					I_Position viewPosition, PathSetReadOnly pomotionPaths,
-					I_IntSet allowedStatus, PRECEDENCE precedence)
+					I_IntSet allowedStatus, Precedence precedence)
 					throws IOException, TerminologyException {
                 throw new UnsupportedOperationException();
 			}
@@ -154,8 +155,8 @@ public class MockTuple implements I_AmTuple {
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
 		I_AmPart newPart = duplicate();
-		newPart.setStatusId(statusNid);
-		newPart.setPathId(pathNid);
+		newPart.setStatusNid(statusNid);
+		newPart.setPathNid(pathNid);
 		newPart.setTime(time);
 		return newPart;
 	}
@@ -172,6 +173,32 @@ public class MockTuple implements I_AmTuple {
 
 	@Override
 	public void setAuthorNid(int authorNid) {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getPathNid() {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getStatusNid() {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setPathNid(int pathNid) {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setStatusNid(int statusNid) {
+	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Object makeAnalog(int statusNid, int authorNid, int pathNid,
+			long time) {
 	     throw new UnsupportedOperationException();
 	}
 

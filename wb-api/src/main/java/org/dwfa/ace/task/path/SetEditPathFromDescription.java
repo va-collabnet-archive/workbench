@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -37,6 +36,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * @author Ming Zhang
@@ -86,13 +86,13 @@ public class SetEditPathFromDescription extends AbstractTask {
             String DescriptionForExistingPath = (String) process.getProperty(PathDescription);
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
-            for (I_Path path : tf.getPaths()) {
-                worker.getLogger().info(Integer.toString(path.getConceptId()));
-                for (I_DescriptionVersioned description : tf.getConcept(path.getConceptId()).getDescriptions()) {
+            for (PathBI path : tf.getPaths()) {
+                worker.getLogger().info(Integer.toString(path.getConceptNid()));
+                for (I_DescriptionVersioned description : tf.getConcept(path.getConceptNid()).getDescriptions()) {
                     int id = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid();
                     if (description.getLastTuple().getTypeId() == id
                         && description.getLastTuple().getText().equals(DescriptionForExistingPath)) {
-                        Set<I_Path> editSet = frameConfig.getEditingPathSet();
+                        Set<PathBI> editSet = frameConfig.getEditingPathSet();
                         editSet.clear();
                         frameConfig.addEditingPath(path);
                         return Condition.CONTINUE;

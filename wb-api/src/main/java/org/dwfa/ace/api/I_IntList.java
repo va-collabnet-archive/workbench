@@ -16,11 +16,6 @@
  */
 package org.dwfa.ace.api;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 

@@ -2,6 +2,7 @@ package org.ihtsdo.concept.component.description;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -12,6 +13,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -19,7 +23,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class DescriptionRevision 
 	extends Revision<DescriptionRevision, Description> 
-	implements I_DescriptionPart {
+	implements I_DescriptionPart, DescriptionAnalogBI {
 	
 	@SuppressWarnings("unused")
 	private static Charset utf8 = Charset.forName("UTF-8");
@@ -122,7 +126,7 @@ public class DescriptionRevision
 			Description primoridalMember) {
 		super(statusNid, authorNid, pathNid, time, primoridalMember);
 		this.text = another.getText();
-		this.typeNid = another.getTypeId();
+		this.typeNid = another.getTypeNid();
 		this.lang = another.getLang();
 		this.initialCaseSignificant = another.isInitialCaseSignificant();
 	}
@@ -226,12 +230,22 @@ public class DescriptionRevision
 	}
 
 	@Override
+	@Deprecated
 	public int getTypeId() {
+		return typeNid;
+	}
+	@Override
+	public int getTypeNid() {
 		return typeNid;
 	}
 
 	@Override
+	@Deprecated
 	public void setTypeId(int typeNid) {
+		this.typeNid = typeNid;
+        modified();
+	}
+	public void setTypeNid(int typeNid) {
 		this.typeNid = typeNid;
         modified();
 	}
@@ -244,8 +258,8 @@ public class DescriptionRevision
 	@Override
 	public DescriptionRevision makeAnalog(int statusNid, int pathNid, 
 			long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
 		try {
@@ -258,9 +272,44 @@ public class DescriptionRevision
 	}
 
 	@Override
+	public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, 
+			long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            this.setAuthorNid(authorNid);
+            return this;
+        }
+		try {
+			return new DescriptionRevision(this, statusNid, 
+					authorNid,
+					pathNid, time, this.primordialComponent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public int getConceptNid() {
+		return primordialComponent.getConceptNid();
+	}
+
+	@Override
     public ArrayIntList getVariableVersionNids() {
 		ArrayIntList list = new ArrayIntList(3);
 		list.add(typeNid);
 		return list;
 	}
+	
+	@Override
+	public Description.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		return primordialComponent.getVersion(c);
+	}
+
+	@Override
+	public Collection<Description.Version> getVersions(
+			Coordinate c) {
+		return primordialComponent.getVersions(c);
+	}		
+
 }

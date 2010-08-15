@@ -147,9 +147,9 @@ public class LuceneManager {
 			throws IOException {
         Document doc = new Document();
 		doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-		doc.add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+		doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.UN_TOKENIZED));
 		addIdsToIndex(doc, desc);
-		addIdsToIndex(doc, Concept.get(desc.getConceptId()).getConceptAttributes());
+		addIdsToIndex(doc, Concept.get(desc.getConceptNid()).getConceptAttributes());
 
 		String lastDesc = null;
 		for (I_DescriptionTuple tuple : desc.getTuples()) {

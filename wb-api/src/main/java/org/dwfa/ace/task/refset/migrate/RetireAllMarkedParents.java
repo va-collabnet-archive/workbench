@@ -69,7 +69,7 @@ public class RetireAllMarkedParents extends AbstractTask {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        int refsetId = memberRefsetConcept.getConceptId();
+        int refsetId = memberRefsetConcept.getConceptNid();
 
         Collection<? extends I_ExtendByRef> extVersions = termFactory.getRefsetExtensionMembers(refsetId);
 
@@ -82,10 +82,10 @@ public class RetireAllMarkedParents extends AbstractTask {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
                     I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) thinExtByRefTuple.getMutablePart();
-                    if (part.getC1id() == concepts.get("PARENT_MARKER").getConceptId()
-                        && part.getStatusId() == concepts.get("CURRENT").getConceptId()) {
+                    if (part.getC1id() == concepts.get("PARENT_MARKER").getConceptNid()
+                        && part.getStatusId() == concepts.get("CURRENT").getConceptNid()) {
 
-                        I_ExtendByRefPart clone = (I_ExtendByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptId(), part.getPathId(), Long.MAX_VALUE);
+                        I_ExtendByRefPart clone = (I_ExtendByRefPart) part.makeAnalog(concepts.get("RETIRED").getConceptNid(), part.getPathId(), Long.MAX_VALUE);
                         thinExtByRefVersioned.addVersion(clone);
 
                         String subject = termFactory.getConcept(thinExtByRefTuple.getComponentId()).getInitialText();

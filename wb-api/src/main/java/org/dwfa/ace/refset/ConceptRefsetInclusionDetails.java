@@ -23,7 +23,7 @@ public class ConceptRefsetInclusionDetails {
     private int inclusionReasonId;
     private int distance;
 
-    public int getConceptId() {
+    public int getConceptNid() {
         return conceptId;
     }
 
@@ -75,7 +75,7 @@ public class ConceptRefsetInclusionDetails {
             return false;
         } else {
             ConceptRefsetInclusionDetails c = (ConceptRefsetInclusionDetails) obj;
-            if (c.getConceptId() == conceptId) {
+            if (c.getConceptNid() == conceptId) {
                 return true;
             } else {
                 return false;

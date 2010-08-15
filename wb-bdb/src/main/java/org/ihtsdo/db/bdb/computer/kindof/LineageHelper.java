@@ -110,7 +110,7 @@ public class LineageHelper implements I_HelpLineage {
             positions,
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
-            if (parentConcept.getConceptId() == child.getConceptId()) {
+            if (parentConcept.getConceptNid() == child.getConceptNid()) {
                 continue ITERATE_PARENTS;
             }
             if (conditions != null) {
@@ -156,7 +156,7 @@ public class LineageHelper implements I_HelpLineage {
             positions,
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
-            if (childConcept.getConceptId() == parent.getConceptId()) {
+            if (childConcept.getConceptNid() == parent.getConceptNid()) {
                 continue ITERATE_CHILDREN;
             }
             if (conditions != null) {
@@ -240,7 +240,7 @@ public class LineageHelper implements I_HelpLineage {
         };
 
         public boolean evaluate(I_GetConceptData concept) throws Exception {
-            return visited.add(concept.getConceptId());
+            return visited.add(concept.getConceptNid());
         }
     }
 

@@ -91,7 +91,7 @@ public class IsValidPath extends AbstractTask {
                 I_IntSet allowedStatus = termFactory.getActiveAceFrameConfig().getAllowedStatus();
                 I_IntSet allowedTypes = termFactory.newIntSet();
                 allowedTypes.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids())
-                    .getConceptId());
+                    .getConceptNid());
                 PositionSetReadOnly positions = termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly();
 
                 if (pathTopHierarchy.isParentOf(path, allowedStatus, allowedTypes, positions, 

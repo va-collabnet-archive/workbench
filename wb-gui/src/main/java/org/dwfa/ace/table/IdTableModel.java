@@ -47,7 +47,6 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.exceptions.ToIoException;
@@ -56,6 +55,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.PathBI;
 
 public class IdTableModel extends AbstractTableModel implements PropertyChangeListener {
     /**
@@ -424,7 +424,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             nid = dv.getDescId();
         } else if (I_GetConceptData.class.isAssignableFrom(tc.getClass())) {
             I_GetConceptData cb = (I_GetConceptData) tc;
-            nid = cb.getConceptId();
+            nid = cb.getConceptNid();
         } else if (I_RelVersioned.class.isAssignableFrom(tc.getClass())) {
             I_RelVersioned rel = (I_RelVersioned) tc;
             nid = rel.getRelId();
@@ -449,9 +449,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             public void actionPerformed(ActionEvent e) {
                 try {
-					for (I_Path p : config.getEditingPathSet()) {
+					for (PathBI p : config.getEditingPathSet()) {
 					    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-					    newPart.setPathId(p.getConceptId());
+					    newPart.setPathId(p.getConceptNid());
 					    newPart.setVersion(Integer.MAX_VALUE);
 					    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
 					}
@@ -474,9 +474,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             public void actionPerformed(ActionEvent e) {
                 try {
-                    for (I_Path p : config.getEditingPathSet()) {
+                    for (PathBI p : config.getEditingPathSet()) {
                         I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-                        newPart.setPathId(p.getConceptId());
+                        newPart.setPathId(p.getConceptNid());
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setStatusId(Terms.get().uuidToNative(
                             ArchitectonicAuxiliary.Concept.RETIRED.getUids()));

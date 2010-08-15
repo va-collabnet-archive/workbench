@@ -42,7 +42,7 @@ public class EditorCategoryRefset extends WorkflowRefset implements I_WorkflowRe
 	"<properties>\n" +
 			   	"<property>\n" +
 			   		"<key>editorCategory</key>" +
-			   		"<value>" + getEditorCategory().getConceptId() + "</value>" +
+			   		"<value>" + getEditorCategory().getConceptNid() + "</value>" +
 			   	"</property>" + 
 			   	"<property>" +
 		   		"<key>semanticArea</key>" +

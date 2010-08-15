@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_RelVersioned extends I_AmTermComponent {
 
@@ -98,13 +99,13 @@ public interface I_RelVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<I_RelTuple> returnRels, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) 
+            List<I_RelTuple> returnRels, Precedence precedencePolicy, I_ManageContradiction contradictionManager) 
                     throws TerminologyException, IOException;
 
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException;
 
     public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, 
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, 
             IOException;
     
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);

@@ -172,7 +172,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
         // and this node
         // or based on the node and this node. Need to get extensions on the rel
         // and on the concept.
-        List<I_ExtendByRef> extensions = (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb1.getConceptId());
+        List<I_ExtendByRef> extensions = (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb1.getConceptNid());
         extensions.addAll((Collection<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb1.getRelId()));
         return extensions;
     }
@@ -182,7 +182,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
         I_DescriptionTuple cb2dt = cb2.getDescTuple(aceConfig);
 
         if (cb1dt == cb2dt) {
-            return cb1.getConceptId() - cb2.getConceptId();
+            return cb1.getConceptNid() - cb2.getConceptNid();
         }
         if (cb1dt == null || cb1dt.getText() == null) {
             return 1;
@@ -195,7 +195,7 @@ public class CompareConceptBeansForTree implements Comparator<I_GetConceptDataFo
             comparison = cb1dt.getText().compareTo(cb2dt.getText());
         }
         if (comparison == 0) {
-            comparison = cb1.getConceptId() - cb2.getConceptId();
+            comparison = cb1.getConceptNid() - cb2.getConceptNid();
         }
         return comparison;
     }

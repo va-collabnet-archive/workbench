@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTuple;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  * Implements the original ACE conflict resolution strategy. This is also used
@@ -84,11 +85,11 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
                 Iterator<T> tupleIterator = map.values().iterator();
                 T first = tupleIterator.next();
 
-                I_AmPart firstDuplicate = first.makeAnalog(1, 0, 0);
+                I_AmPart firstDuplicate = (I_AmPart) first.makeAnalog(1, 0, 0);
 
                 while (tupleIterator.hasNext()) {
                     T tuple = (T) tupleIterator.next();
-                    I_AmPart tupleDuplicate = tuple.makeAnalog(1, 0, 0);
+                    I_AmPart tupleDuplicate = (I_AmPart) tuple.makeAnalog(1, 0, 0);
 
                     if (tupleDuplicate.equals(firstDuplicate)) {
                         continue; // identical, no conflict with this one, check
@@ -121,9 +122,9 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
             if (map == null) {
                 map = new HashMap<Integer, T>();
             }
-            T existingTuple = map.get(t.getPathId());
-            if (existingTuple == null || existingTuple.getVersion() < t.getVersion()) {
-                map.put(t.getPathId(), t);
+            T existingTuple = map.get(t.getPathNid());
+            if (existingTuple == null || existingTuple.getTime() < t.getTime()) {
+                map.put(t.getPathNid(), t);
                 sortedTuples.put(termId, map);
             }
         }
@@ -134,12 +135,16 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
         return tuples;
     }
 
+    public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions) {
+        return versions;
+    }
+
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         return parts;
     }
 
     @Override
-    public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+    public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
         ArrayList<T> values = new ArrayList<T>();
         values.add(part1);
         values.add(part2);

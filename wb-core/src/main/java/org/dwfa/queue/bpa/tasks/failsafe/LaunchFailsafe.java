@@ -26,14 +26,14 @@ import java.util.Collection;
 import java.util.Stack;
 import java.util.logging.Level;
 
-import org.dwfa.util.bean.BeanList;
-import org.dwfa.util.bean.BeanType;
-import org.dwfa.util.bean.Spec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 
 /**
  * This task will unmarshal and continue execution of a process that has been

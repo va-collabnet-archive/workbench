@@ -37,8 +37,6 @@ import net.jini.core.entry.Entry;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -57,6 +55,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class CreateUserPathAndQueues extends AbstractTask {
@@ -114,7 +114,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
             I_ConfigAceFrame commitConfig = (I_ConfigAceFrame) process.getProperty(commitProfilePropName);
-            Set<I_Position> positionSet = (Set<I_Position>) process.getProperty(positionSetPropName);
+            Set<PositionBI> positionSet = (Set<PositionBI>) process.getProperty(positionSetPropName);
 
             String userDirStr = "profiles" + File.separator + config.getUsername();
             File userDir = new File(userDirStr);
@@ -164,8 +164,8 @@ public class CreateUserPathAndQueues extends AbstractTask {
             // clear the user's path color
             if (commitConfig.getDbConfig().getUserPath() != null) {
                 Color userColor = config.getPathColorMap().remove(
-                    commitConfig.getDbConfig().getUserPath().getConceptId());
-                config.setColorForPath(config.getDbConfig().getUserPath().getConceptId(), userColor);
+                    commitConfig.getDbConfig().getUserPath().getConceptNid());
+                config.setColorForPath(config.getDbConfig().getUserPath().getConceptNid(), userColor);
             }
 
             // Create inbox
@@ -295,23 +295,23 @@ public class CreateUserPathAndQueues extends AbstractTask {
         config.getDbConfig().setUserConcept(userConcept);
     }
 
-    private void createUserPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<I_Position> positionSet)
+    private void createUserPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<PositionBI> positionSet)
             throws Exception {
-        I_Path userPath = createNewPath(config, commitConfig, positionSet, " user path");
+        PathBI userPath = createNewPath(config, commitConfig, positionSet, " user path");
         config.addEditingPath(userPath);
-        I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptId());
+        I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         config.setClassifierInputPath(userPathConcept);
         config.getViewPositionSet().add(Terms.get().newPosition(userPath, Integer.MAX_VALUE));
         config.getDbConfig().setUserPath(userPathConcept);
     }
 
     private void createClassifierPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig,
-            Set<I_Position> positionSet) throws Exception {
-        I_Path classifierPath = createNewPath(config, commitConfig, positionSet, " classifier path");
-        config.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptId()));
+            Set<PositionBI> positionSet) throws Exception {
+        PathBI classifierPath = createNewPath(config, commitConfig, positionSet, " classifier path");
+        config.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
     }
 
-    private I_Path createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<I_Position> positionSet,
+    private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<PositionBI> positionSet,
             String suffix) throws TaskFailedException, TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {

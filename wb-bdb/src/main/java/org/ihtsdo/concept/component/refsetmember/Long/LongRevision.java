@@ -3,12 +3,12 @@ package org.ihtsdo.concept.component.refsetmember.Long;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -52,10 +52,23 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 		longValue = primoridalMember.getLongValue();
 	}
 
+    public LongRevision(int statusNid, int authorNid, int pathNid, long time, 
+			LongMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+		longValue = primoridalMember.getLongValue();
+	}
+
 	public LongRevision(int statusAtPositionNid, 
 			LongMember primoridalMember) {
 		super(statusAtPositionNid, primoridalMember);
 		longValue = primoridalMember.getLongValue();
+	}
+
+	protected LongRevision(int statusNid, int authorNid, int pathNid, long time, 
+			LongRevision another) {
+		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+		longValue = another.longValue;
 	}
 
 	protected LongRevision(int statusNid, int pathNid, long time, 
@@ -72,9 +85,17 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	}
 
 
+	@Override
+	public LongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        LongRevision newR = new LongRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
+
     @Override
     public LongRevision makeAnalog() {
-         return new LongRevision(getStatusId(), getPathId(), getTime(), this);
+         return new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public LongRevision(TupleInput input, 
@@ -101,7 +122,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

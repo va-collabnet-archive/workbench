@@ -24,8 +24,10 @@ import java.util.regex.Pattern;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
-public interface I_DescriptionVersioned extends I_AmTermComponent {
+public interface I_DescriptionVersioned extends I_AmTermComponent, DescriptionAnalogBI {
 
     public boolean addVersion(I_DescriptionPart newPart);
 
@@ -35,7 +37,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
 
     public boolean matches(Pattern p);
 
-    public int getConceptId();
+    public int getConceptNid();
 
     public int getDescId();
 
@@ -88,7 +90,7 @@ public interface I_DescriptionVersioned extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positionSet,
-            List<I_DescriptionTuple> matchingTuples, PRECEDENCE precedence, I_ManageContradiction contradictionMgr)
+            List<I_DescriptionTuple> matchingTuples, Precedence precedence, I_ManageContradiction contradictionMgr)
             throws TerminologyException, IOException;
 
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);

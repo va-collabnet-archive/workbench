@@ -88,23 +88,23 @@ public class TestForStatusForRefset extends AbstractConceptTest {
             I_GetConceptData isa_con;
             isa_con = getConceptSafe(termFactory, SNOMED.Concept.IS_A.getUids());
             if (isa_con != null)
-                types.add(isa_con.getConceptId());
+                types.add(isa_con.getConceptNid());
             isa_con = getConceptSafe(termFactory, ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             if (isa_con != null)
-                types.add(isa_con.getConceptId());
+                types.add(isa_con.getConceptNid());
 
             for (I_GetConceptData refset : refset_con.getDestRelOrigins(activeProfile.getAllowedStatus(), types,
                 allPositions, 
                 getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy())) {
                 // System.out.println(refset.getInitialText());
-                for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(refset.getConceptId())) {
+                for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(refset.getConceptNid())) {
                     // List<I_ExtendByRef> extensions = termFactory
-                    // .getAllExtensionsForComponent(refset.getConceptId(),
+                    // .getAllExtensionsForComponent(refset.getConceptNid(),
                     // true);
                     // for (I_ExtendByRef ext : extensions) {
                     // System.out.println(ext.getComponentId() + " "
                     // + termFactory.getConcept(ext.getComponentId()));
-                    if (mem.getComponentId() == concept.getConceptId()) {
+                    if (mem.getComponentId() == concept.getConceptNid()) {
                         alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
                             "<html>Refset, but inactive", concept));
                         return alertList;

@@ -99,7 +99,7 @@ public class RemoveConceptChildrenFromRefset extends AbstractTask {
                 "Removing children of concept '" + member.getInitialText() + "' as '" + value.getInitialText()
                     + "' members from refset '" + refset.getInitialText() + "'.");
 
-            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId());
+            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
             Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
 
             helper.removeAllFromRefset(newMembers, "Removing children of concept " + member.getInitialText());

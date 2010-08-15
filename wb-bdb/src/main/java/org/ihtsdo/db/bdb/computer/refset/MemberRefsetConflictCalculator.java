@@ -37,7 +37,7 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
             if (newMembers != null) {
 
                 for (ConceptRefsetInclusionDetails i : newMembers.values()) {
-                    if (oldMembers != null && oldMembers.containsKey(i.getConceptId())) {
+                    if (oldMembers != null && oldMembers.containsKey(i.getConceptNid())) {
                         List<Integer> addedConcepts = new ArrayList<Integer>();
                         for (ConceptRefsetInclusionDetails old : oldMembers.values()) {
                             // Show only first level conflict
@@ -45,19 +45,19 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
                             isARel.add(Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
                             isARel.add(Terms.get().uuidToNative(SNOMED.Concept.IS_A.getUids()));
                             if (old.equals(i)) {
-                                for (I_GetConceptData c : Terms.get().getConcept(i.getConceptId())
+                                for (I_GetConceptData c : Terms.get().getConcept(i.getConceptNid())
                                     .getSourceRelTargets(null, isARel, null,
                                         getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
-                                    int conceptId = c.getConceptId();
+                                    int conceptId = c.getConceptNid();
                                     if (conceptId == Terms.get().getConcept(i.getInclusionReasonId())
-                                        .getConceptId()
+                                        .getConceptNid()
                                         || conceptId == Terms.get().getConcept(old.getInclusionReasonId())
-                                            .getConceptId()) {
+                                            .getConceptNid()) {
 
                                         if (!addedConcepts.contains(new Integer(conceptId))) {
 
                                             StringBuffer sb = new StringBuffer();
-                                            sb.append(Terms.get().getConcept(i.getConceptId()).toString());
+                                            sb.append(Terms.get().getConcept(i.getConceptNid()).toString());
                                             sb.append(" because of "
                                                 + Terms.get().getConcept(i.getInclusionReasonId()).toString());
                                             sb.append(" contradicts "
@@ -72,7 +72,7 @@ public class MemberRefsetConflictCalculator extends MemberRefsetCalculator imple
                             // Show all levels conflicts
                             // if (old.equals(i)) {
                             // StringBuffer sb = new StringBuffer();
-                            // sb.append(Terms.get().getConcept(i.getConceptId()).toString());
+                            // sb.append(Terms.get().getConcept(i.getConceptNid()).toString());
                             // sb.append(" because of " +
                             // Terms.get().getConcept(i.getInclusionReasonId()).toString());
                             // sb.append(" conflicts with "

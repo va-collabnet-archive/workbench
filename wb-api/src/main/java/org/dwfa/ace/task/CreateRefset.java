@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -36,6 +35,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class CreateRefset extends AbstractTask {
@@ -76,7 +76,7 @@ public class CreateRefset extends AbstractTask {
         I_GetConceptData fully_specified_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         I_GetConceptData preferred_description_type = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
         I_ConfigAceFrame config = termFactory.newAceFrameConfig();
-        I_Path path = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+        PathBI path = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
         config.addEditingPath(path);
         config.setDefaultStatus(termFactory.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
         UUID uuid = UUID.randomUUID();

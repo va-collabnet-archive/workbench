@@ -57,7 +57,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_IntSet createIntSet(final I_TermFactory termFactory, final Collection<UUID> uuid) throws Exception {
         I_IntSet status = termFactory.newIntSet();
-        status.add(termFactory.getConcept(uuid).getConceptId());
+        status.add(termFactory.getConcept(uuid).getConceptNid());
         status.add(ArchitectonicAuxiliary.getSnomedDescriptionStatusId(uuid));
         return status;
     }
@@ -84,7 +84,7 @@ public final class RefsetUtilImpl implements RefsetUtil {
             final I_TermFactory termFactory) throws Exception {
         I_ExtendByRefPart latest = getLatestVersion(ext, termFactory);
 
-        if (latest != null && !(latest.getStatusId() == termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptId())) {
+        if (latest != null && !(latest.getStatusId() == termFactory.getConcept(CURRENT_STATUS_UUIDS).getConceptNid())) {
             latest = null;
         }
 

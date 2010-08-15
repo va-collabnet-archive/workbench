@@ -79,7 +79,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 				authorNid, 
 				pathNid, time, primoridalMember);
 		this.textDescription = another.getTextDescription();
-		this.typeNid = another.getTypeId();
+		this.typeNid = another.getTypeNid();
 	}
 
 	protected ImageRevision() {
@@ -88,13 +88,26 @@ public class ImageRevision extends Revision<ImageRevision, Image>
     
     @Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
 			return new ImageRevision(this, statusNid, 
 					Terms.get().getAuthorNid(), 
 					pathNid, time, this.primordialComponent);
+	}
+
+    @Override
+	public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            this.setAuthorNid(authorNid);
+            return this;
+        }
+			return new ImageRevision(this, statusNid, 
+					authorNid, 
+					pathNid, time, 
+					this.primordialComponent);
 	}
 
 	@Override
@@ -130,17 +143,29 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#getTypeId()
 	 */
+	@Deprecated
 	public int getTypeId() {
 		return typeNid;
 	}
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#setTypeId(int)
 	 */
+	@Deprecated
 	public void setTypeId(int type) {
 		this.typeNid = type;
         modified();
 	}
-	
+	public int getTypeNid() {
+		return typeNid;
+	}
+	/* (non-Javadoc)
+	 * @see org.dwfa.vodb.types.I_ImagePart#setTypeId(int)
+	 */
+	public void setTypeNid(int type) {
+		this.typeNid = type;
+        modified();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.dwfa.vodb.types.I_ImagePart#hasNewData(org.dwfa.vodb.types.ThinImagePart)
 	 */

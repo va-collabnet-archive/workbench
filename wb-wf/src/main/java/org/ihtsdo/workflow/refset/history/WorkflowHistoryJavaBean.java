@@ -105,7 +105,7 @@ public class WorkflowHistoryJavaBean {
 	public String toString() {
 		try {
 			return "\nReferenced Component Id(Hard-Coded Workflow History Concept) = " + getReferencedComponent().getInitialText() + 
-				   "(" + getReferencedComponent().getConceptId() + ")" +
+				   "(" + getReferencedComponent().getConceptNid() + ")" +
 				   "\nWorkflow Id = " + workflowId +
 				   "\nConcept Id = " + conceptId +
 				   "\nUse Case = " + useCase.getInitialText() + 

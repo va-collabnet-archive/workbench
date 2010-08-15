@@ -25,8 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -40,6 +38,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/view", type = BeanType.TASK_BEAN) })
 public class AddViewsFromUniversalPositionList extends AbstractTask {
@@ -87,16 +87,16 @@ public class AddViewsFromUniversalPositionList extends AbstractTask {
             I_TermFactory tf = Terms.get();
 
             for (UniversalAcePosition univPos : positionList) {
-                I_Path path = tf.getPath(univPos.getPathId());
-                if (profile.getEditingPathSet().contains(path.getConceptId())) {
-                    I_Position thinPos = tf.newPosition(path, tf.convertToThinVersion(Integer.MAX_VALUE));
+            	PathBI path = tf.getPath(univPos.getPathId());
+                if (profile.getEditingPathSet().contains(path.getConceptNid())) {
+                	PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(Integer.MAX_VALUE));
                     profile.addViewPosition(thinPos);
                 } else {
                     int version = tf.convertToThinVersion(univPos.getTime());
                     if (version < Integer.MAX_VALUE) {
                         version++;
                     }
-                    I_Position thinPos = tf.newPosition(path, version);
+                    PositionBI thinPos = tf.newPosition(path, version);
                     profile.addViewPosition(thinPos);
                 }
             }

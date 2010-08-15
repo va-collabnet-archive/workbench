@@ -31,19 +31,19 @@ public class SetStatusUtil {
 
     public static void setStatusOfRelInfo(I_GetConceptData status, List<I_RelTuple> reltuples) {
         for (I_RelTuple rt : reltuples) {
-            rt.setStatusId(status.getConceptId());
+            rt.setStatusId(status.getConceptNid());
         }
     }
 
     public static void setStatusOfConceptInfo(I_GetConceptData status, List<? extends I_ConceptAttributeTuple> contuples) {
         for (I_ConceptAttributeTuple cat : contuples) {
-            cat.setStatusId(status.getConceptId());
+            cat.setStatusId(status.getConceptNid());
         }
     }
 
     public static void setStatusOfDescriptionInfo(I_GetConceptData status, List<? extends I_DescriptionTuple> desctuples) {
         for (I_DescriptionTuple dt : desctuples) {
-            dt.setStatusId(status.getConceptId());
+            dt.setStatusId(status.getConceptNid());
         }
     }
 }

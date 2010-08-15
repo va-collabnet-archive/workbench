@@ -2,7 +2,6 @@ package org.ihtsdo.concept.component.identifier;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
-import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 
 import com.sleepycat.bind.tuple.TupleInput;

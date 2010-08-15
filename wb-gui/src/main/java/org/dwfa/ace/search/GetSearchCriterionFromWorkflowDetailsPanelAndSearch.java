@@ -39,7 +39,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TrackContinuation;
 import org.dwfa.ace.api.Terms;
@@ -56,6 +55,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/gui/workflow/detail sheet", type = BeanType.TASK_BEAN) })
 public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
@@ -134,7 +134,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 			total = -1;
 			config = (I_ConfigAceFrame) process
 					.getProperty(getProfilePropName());
-			Set<I_Position> positionSet = (Set<I_Position>) process
+			Set<PositionBI> positionSet = (Set<PositionBI>) process
 					.getProperty(getPositionSetPropName());
 			worker.getLogger().info("Position set for search: " + positionSet);
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();

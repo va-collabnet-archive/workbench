@@ -212,7 +212,7 @@ public class ModifyOverallSpecStatusPanel extends JPanel {
             I_GetConceptData ownerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OWNER_ROLE.getUids());
 
             I_IntSet roleAllowedTypes = termFactory.newIntSet();
-            roleAllowedTypes.add(ownerRole.getConceptId());
+            roleAllowedTypes.add(ownerRole.getConceptNid());
 
             I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(termFactory.getActiveAceFrameConfig());
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();

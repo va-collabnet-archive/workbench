@@ -28,8 +28,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -43,6 +41,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
 public class CloneConcept extends AbstractTask {
@@ -81,8 +81,8 @@ public class CloneConcept extends AbstractTask {
         try {
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<I_Position> positionSet = new HashSet<I_Position>();
-            for (I_Path path : config.getEditingPathSet()) {
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
+            for (PathBI path : config.getEditingPathSet()) {
             	positionSet.add(tf.newPosition(path, Integer.MAX_VALUE));
             }
             PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);

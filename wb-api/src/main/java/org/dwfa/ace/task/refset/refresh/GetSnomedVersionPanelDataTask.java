@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -45,6 +44,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * This task collects the SNOMED Version data entered on the PanelSnomedVersion
@@ -148,7 +148,7 @@ public class GetSnomedVersionPanelDataTask extends AbstractTask {
                     // Retrieve values from the panel
                     // and verify required fields
                     // --------------------------------
-                    Set<I_Position> positionSet = null;
+                    Set<PositionBI> positionSet = null;
                     positionSet = panel.getPositionSet();
 
                     if (positionSet == null || positionSet.isEmpty()) {
@@ -160,12 +160,12 @@ public class GetSnomedVersionPanelDataTask extends AbstractTask {
                         // change all I_Positions to UniversalAcePositions
                         Set<UniversalAcePosition> universalPositions = new HashSet<UniversalAcePosition>();
 
-                        for (I_Position position : positionSet) {
+                        for (PositionBI position : positionSet) {
                             try {
                                 I_GetConceptData pathConcept = termFactory.getConcept(position.getPath().getConceptNid());
 
                                 universalPositions.add(new UniversalAcePosition(
-                                    termFactory.getUids(pathConcept.getConceptId()),
+                                    termFactory.getUids(pathConcept.getConceptNid()),
                                     termFactory.convertToThickVersion(position.getVersion())));
 
                             } catch (TerminologyException e) {

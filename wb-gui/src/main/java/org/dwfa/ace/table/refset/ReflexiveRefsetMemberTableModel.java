@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -36,6 +35,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
 
@@ -73,7 +73,7 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                 return false;
             }
             I_IntSet statusSet = host.getConfig().getAllowedStatus();
-            Set<I_Position> positionSet = host.getConfig().getViewPositionSet();
+            Set<PositionBI> positionSet = host.getConfig().getViewPositionSet();
             if (positionSet == null || positionSet.size() == 0) {
                 AceLog.getAppLog().alertAndLogException(new Exception("View position set is empty: " + 
                     positionSet));

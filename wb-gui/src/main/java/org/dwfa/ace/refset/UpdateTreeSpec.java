@@ -76,7 +76,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
     private int getId(RefsetSpecTreeNode node) {
         if (I_GetConceptData.class.isAssignableFrom(node.getUserObject().getClass())) {
             I_GetConceptData refsetConcept = (I_GetConceptData) node.getUserObject();
-            return refsetConcept.getConceptId();
+            return refsetConcept.getConceptNid();
         } else if (I_ExtendByRef.class.isAssignableFrom(node.getUserObject().getClass())) {
             I_ExtendByRef ext = (I_ExtendByRef) node.getUserObject();
             return ext.getMemberId();
@@ -127,7 +127,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
 
         if (oldRoot.getUserObject() != null && localRefsetSpecConcept != null) {
             I_GetConceptData oldRefsetSpecConcept = (I_GetConceptData) oldRoot.getUserObject();
-            newRefset = oldRefsetSpecConcept.getConceptId() != localRefsetSpecConcept.getConceptId();
+            newRefset = oldRefsetSpecConcept.getConceptNid() != localRefsetSpecConcept.getConceptNid();
         }
 
         if (localRefsetSpecConcept != null) {
@@ -151,7 +151,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
                 ;
                 I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
                 if (localRefsetSpecConcept != null && ext != null) {
-                    if (ext.getComponentId() == localRefsetSpecConcept.getConceptId()) {
+                    if (ext.getComponentId() == localRefsetSpecConcept.getConceptNid()) {
                         root.add(extNode);
                     } else {
                         if (extensionMap.containsKey(ext.getComponentId())) {

@@ -3,21 +3,24 @@ package org.ihtsdo.tk.api;
 
 public class Coordinate {
 	private Precedence precedence;
-	private PositionBI position;
+	private PositionSetBI positionSet;
 	private NidSetBI   allowedStatusNids;
 	private NidSetBI   isaTypeNids;
+	private ContradictionManagerBI contradictionManager;
 	
-	public Coordinate(Precedence precedence, PositionBI position,
-			NidSetBI allowedStatusNids, NidSetBI isaTypeNids) {
+	public Coordinate(Precedence precedence, PositionSetBI positionSet,
+			NidSetBI allowedStatusNids, NidSetBI isaTypeNids, 
+			ContradictionManagerBI contradictionManager) {
 		super();
 		this.precedence = precedence;
-		this.position = position;
+		this.positionSet = positionSet;
 		this.allowedStatusNids = allowedStatusNids;
 		this.isaTypeNids = isaTypeNids;
+		this.contradictionManager = contradictionManager;
 	}
 	
-	public PositionBI getPosition() {
-		return position;
+	public PositionSetBI getPositionSet() {
+		return positionSet;
 	}
 
 	public NidSetBI getAllowedStatusNids() {
@@ -30,6 +33,10 @@ public class Coordinate {
 	
 	public NidSetBI getIsaTypeNids() {
 		return isaTypeNids;
+	}
+
+	public ContradictionManagerBI getContradictionManager() {
+		return contradictionManager;
 	}
 
 }

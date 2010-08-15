@@ -144,7 +144,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
 
             if (memberRefset != null) {
                 process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(),
-                    Terms.get().getUids(memberRefset.getConceptId()).iterator().next());
+                    Terms.get().getUids(memberRefset.getConceptNid()).iterator().next());
             }
 
             Terms.get().getActiveAceFrameConfig().setBuilderToggleVisible(true);

@@ -171,7 +171,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
                         config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         buff.append("    <description type='");
-                        I_GetConceptData type = tf.getConcept(dt.getTypeId());
+                        I_GetConceptData type = tf.getConcept(dt.getTypeNid());
 
                         I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
                             config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),

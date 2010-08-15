@@ -46,11 +46,9 @@ import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
@@ -66,13 +64,35 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     I_ConfigAceFrame frameConfig;
 
-    public I_ShowActivity getTopActivity() {
+
+	public Set<PathBI> getPromotionPathSet() {
+		return frameConfig.getPromotionPathSet();
+	}
+
+
+	public void addViewPosition(PositionBI p) {
+		frameConfig.addViewPosition(p);
+	}
+
+	public void removeViewPosition(PositionBI p) {
+		frameConfig.removeViewPosition(p);
+	}
+
+	public void replaceViewPosition(PositionBI oldPosition,
+			PositionBI newPosition) {
+		frameConfig.replaceViewPosition(oldPosition, newPosition);
+	}
+
+	public I_ShowActivity getTopActivity() {
         return frameConfig.getTopActivity();
     }
 
@@ -80,11 +100,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setTopActivity(activity);
     }
 
-    public PRECEDENCE getPrecedence() {
+    public Precedence getPrecedence() {
         return frameConfig.getPrecedence();
     }
 
-    public void setPrecedence(PRECEDENCE precedence) {
+    public void setPrecedence(Precedence precedence) {
         frameConfig.setPrecedence(precedence);
     }
 
@@ -92,9 +112,9 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.refreshRefsetTab();
     }
 
-    Set<I_Position> positionSet;
+    Set<PositionBI> positionSet;
 
-    public DifferenceSearchConfig(I_ConfigAceFrame frameConfig, Set<I_Position> positionSet) {
+    public DifferenceSearchConfig(I_ConfigAceFrame frameConfig, Set<PositionBI> positionSet) {
         super();
         this.frameConfig = frameConfig;
         this.positionSet = positionSet;
@@ -104,7 +124,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.addConceptPanelPlugins(host, id, plugin);
     }
 
-    public void addEditingPath(I_Path p) {
+    public void addEditingPath(PathBI p) {
         frameConfig.addEditingPath(p);
     }
 
@@ -284,7 +304,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getEditImageTypePopup();
     }
 
-    public Set<I_Path> getEditingPathSet() {
+    public Set<PathBI> getEditingPathSet() {
         return frameConfig.getEditingPathSet();
     }
 
@@ -489,7 +509,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.getVetoSupport();
     }
 
-    public Set<I_Position> getViewPositionSet() {
+    public Set<PositionBI> getViewPositionSet() {
         return positionSet;
     }
 
@@ -573,7 +593,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         return frameConfig.removeConceptPanelPlugin(host, id);
     }
 
-    public void removeEditingPath(I_Path p) {
+    public void removeEditingPath(PathBI p) {
         frameConfig.removeEditingPath(p);
     }
 
@@ -597,7 +617,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.repaint();
     }
 
-    public void replaceEditingPath(I_Path oldPath, I_Path newPath) {
+    public void replaceEditingPath(PathBI oldPath, PathBI newPath) {
         frameConfig.replaceEditingPath(oldPath, newPath);
     }
 
@@ -921,7 +941,7 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setVetoSupport(vetoSupport);
     }
 
-    public void setViewPositions(Set<I_Position> positions) {
+    public void setViewPositions(Set<PositionBI> positions) {
         frameConfig.setViewPositions(positions);
     }
 
@@ -1072,19 +1092,15 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
         frameConfig.setSearchWithDescTypeFilter(filter);
     }
 
-    public void addPromotionPath(I_Path p) {
+    public void addPromotionPath(PathBI p) {
         frameConfig.addPromotionPath(p);
     }
 
-    public Set<I_Path> getPromotionPathSet() {
-        return frameConfig.getPromotionPathSet();
-    }
-
-    public void removePromotionPath(I_Path p) {
+    public void removePromotionPath(PathBI p) {
         frameConfig.removePromotionPath(p);
     }
 
-    public void replacePromotionPathSet(I_Path oldPath, I_Path newPath) {
+    public void replacePromotionPathSet(PathBI oldPath, PathBI newPath) {
         frameConfig.replacePromotionPathSet(oldPath, newPath);
     }
 

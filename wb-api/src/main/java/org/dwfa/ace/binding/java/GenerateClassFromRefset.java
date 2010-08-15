@@ -163,7 +163,7 @@ public class GenerateClassFromRefset {
     public List<I_GetConceptData> getRefsetConcepts(I_GetConceptData con) throws Exception {
         I_TermFactory termFactory = Terms.get();
         List<I_GetConceptData> ret = new ArrayList<I_GetConceptData>();
-        for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(con.getConceptId())) {
+        for (I_ExtendByRef mem : termFactory.getRefsetExtensionMembers(con.getConceptNid())) {
             I_GetConceptData mem_con = termFactory.getConcept(mem.getComponentId());
             ret.add(mem_con);
         }

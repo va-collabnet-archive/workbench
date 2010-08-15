@@ -31,6 +31,7 @@ import java.util.Map;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  * "Last commit wins" implementation of a conflict resolution strategy.
@@ -91,6 +92,27 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
         return map.values();
     }
 
+    private <T extends ComponentVersionBI> Collection<List<T>> getSortedVersionsCopy(List<T> originalTuples) {
+        Map<Integer, List<T>> map = new HashMap<Integer, List<T>>();
+
+        for (T t : originalTuples) {
+            List<T> tuples;
+            if (map.containsKey(t.getNid())) {
+                tuples = map.get(t.getNid());
+            } else {
+                tuples = new ArrayList<T>();
+            }
+            tuples.add(t);
+            map.put(t.getNid(), tuples);
+        }
+
+        for (List<T> list : map.values()) {
+            Collections.sort(list, new VersionDateOrderSortComparator(true));
+        }
+
+        return map.values();
+    }
+
     private <T extends I_AmTuple> List<T> getLatestTuples(List<T> tuples) {
         Collection<List<T>> sortedTuples = getSortedTuplesCopy(tuples);
 
@@ -101,7 +123,25 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
             T first = iterator.next();
             returnList.add(first);
             T tuple;
-            while (iterator.hasNext() && (tuple = iterator.next()).getVersion() == first.getVersion()) {
+            while (iterator.hasNext() && (tuple = iterator.next()).getTime() == first.getTime()) {
+                returnList.add(tuple);
+            }
+        }
+
+        return returnList;
+    }
+
+    private <T extends ComponentVersionBI> List<T> getLatestVersions(List<T> tuples) {
+        Collection<List<T>> sortedTuples = getSortedVersionsCopy(tuples);
+
+        List<T> returnList = new ArrayList<T>();
+
+        for (List<T> t : sortedTuples) {
+            Iterator<T> iterator = t.iterator();
+            T first = iterator.next();
+            returnList.add(first);
+            T tuple;
+            while (iterator.hasNext() && (tuple = iterator.next()).getTime() == first.getTime()) {
                 returnList.add(tuple);
             }
         }
@@ -133,13 +173,13 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
         Iterator<T> copyIterator = copy.iterator();
         I_AmPart firstPart = copyIterator.next();
 
-        I_AmPart firstPartDuplicate = firstPart.makeAnalog(firstPart.getStatusId(), 0, Long.MAX_VALUE);
+        I_AmPart firstPartDuplicate = (I_AmPart) firstPart.makeAnalog(firstPart.getStatusNid(), 0, Long.MAX_VALUE);
  
 
         while (copyIterator.hasNext()) {
             T amPart = (T) copyIterator.next();
-            if (amPart.getVersion() == firstPart.getVersion()) {
-                I_AmPart amPartDuplicate = amPart.makeAnalog(amPart.getStatusId(), 0, Long.MAX_VALUE);
+            if (amPart.getTime() == firstPart.getTime()) {
+                I_AmPart amPartDuplicate = (I_AmPart) amPart.makeAnalog(amPart.getStatusNid(), 0, Long.MAX_VALUE);
 
 
                 if (amPartDuplicate.equals(firstPartDuplicate)) {
@@ -174,6 +214,13 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
 
         return getLatestTuples(tuples);
     }
+    public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> tuples) {
+        if (tuples == null || tuples.size() == 0) {
+            return tuples;
+        }
+
+        return getLatestVersions(tuples);
+    }
 
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
         if (parts == null || parts.size() == 0) {
@@ -185,7 +232,7 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
         T first = iterator.next();
         returnList.add(first);
         T part;
-        while (iterator.hasNext() && (part = iterator.next()).getVersion() == first.getVersion()) {
+        while (iterator.hasNext() && (part = iterator.next()).getTime() == first.getTime()) {
             returnList.add(part);
         }
 
@@ -193,7 +240,7 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
     }
     
     @Override
-    public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+    public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
         ArrayList<T> values = new ArrayList<T>();
         if (part1.getTime() > part2.getTime()) {
             values.add(part1);

@@ -17,7 +17,6 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -43,12 +42,13 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 
 @AllowDataCheckSuppression
 public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     protected PositionSetReadOnly viewPositions;
-    protected Set<I_Path> editPaths;
+    protected Set<PathBI> editPaths;
     protected I_IntSet allowedStatuses;
     protected I_IntSet isARelTypes;
 
@@ -540,7 +540,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
         try {
-            Collection<I_Path> paths = Terms.get().getPaths();
+            Collection<PathBI> paths = Terms.get().getPaths();
             paths.clear();
             paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -554,7 +554,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
             // check subject is not already a member
             if (hasCurrentConceptConceptRefsetExtension(refsetId, componentId, c1Id, c2Id, Terms.get().getConcept(
-                new UUID[] { statusUuid }).getConceptId())) {
+                new UUID[] { statusUuid }).getConceptNid())) {
                 if (logger.isLoggable(Level.FINE)) {
                     logger.fine("Component is already a member of the refset. Skipping.");
                 }
@@ -593,7 +593,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newStringRefsetExtension(int refsetId, int componentId, String extString, UUID memberUuid,
             UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
         try {
-            Collection<I_Path> paths = Terms.get().getPaths();
+            Collection<PathBI> paths = Terms.get().getPaths();
             paths.clear();
             paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -608,7 +608,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
             // check subject is not already a member
             if (hasCurrentStringRefsetExtension(refsetId, componentId, extString, Terms.get().getConcept(
-                new UUID[] { statusUuid }).getConceptId())) {
+                new UUID[] { statusUuid }).getConceptNid())) {
                 if (logger.isLoggable(Level.FINE)) {
                     logger.fine("Component is already a member of the refset. Skipping.");
                 }
@@ -647,7 +647,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, String extString,
             UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
         try {
-            Collection<I_Path> paths = Terms.get().getPaths();
+            Collection<PathBI> paths = Terms.get().getPaths();
             paths.clear();
             paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -662,7 +662,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
             // check subject is not already a member
             if (hasCurrentConceptStringRefsetExtension(refsetId, componentId, c1Id, extString, Terms.get().getConcept(
-                new UUID[] { statusUuid }).getConceptId())) {
+                new UUID[] { statusUuid }).getConceptNid())) {
                 if (logger.isLoggable(Level.FINE)) {
                     logger.fine("Component is already a member of the refset. Skipping.");
                 }
@@ -699,7 +699,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newIntRefsetExtension(int refsetId, int componentId, int value, UUID memberUuid, UUID pathUuid,
             UUID statusUuid, long effectiveTime) throws Exception {
 
-        Collection<I_Path> paths = Terms.get().getPaths();
+        Collection<PathBI> paths = Terms.get().getPaths();
         paths.clear();
         paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -714,7 +714,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         // check subject is not already a member
         if (hasCurrentIntRefsetExtension(refsetId, componentId, value, Terms.get()
-            .getConcept(new UUID[] { statusUuid }).getConceptId())) {
+            .getConcept(new UUID[] { statusUuid }).getConceptNid())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Component is already a member of the refset. Skipping.");
             }
@@ -745,7 +745,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newConceptRefsetExtension(int refsetId, int componentId, int conceptId, UUID memberUuid,
             UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
-        Collection<I_Path> paths = Terms.get().getPaths();
+        Collection<PathBI> paths = Terms.get().getPaths();
         paths.clear();
         paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -760,7 +760,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         // check subject is not already a member
         if (hasCurrentConceptRefsetExtension(refsetId, componentId, conceptId, Terms.get().getConcept(
-            new UUID[] { statusUuid }).getConceptId())) {
+            new UUID[] { statusUuid }).getConceptNid())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Component is already a member of the refset. Skipping.");
             }
@@ -791,7 +791,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newConceptConceptConceptRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id, int c3Id,
             UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
-        Collection<I_Path> paths = Terms.get().getPaths();
+        Collection<PathBI> paths = Terms.get().getPaths();
         paths.clear();
         paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
@@ -806,7 +806,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         // check subject is not already a member
         if (hasCurrentConceptConceptConceptRefsetExtension(refsetId, componentId, c1Id, c2Id, c3Id, Terms.get()
-            .getConcept(new UUID[] { statusUuid }).getConceptId())) {
+            .getConcept(new UUID[] { statusUuid }).getConceptNid())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Component is already a member of the refset. Skipping.");
             }
@@ -841,13 +841,13 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     public boolean newConceptConceptStringRefsetExtension(int refsetId, int componentId, int c1Id, int c2Id,
             String stringValue, UUID memberUuid, UUID pathUuid, UUID statusUuid, long effectiveTime) throws Exception {
 
-        Collection<I_Path> paths = Terms.get().getPaths();
+        Collection<PathBI> paths = Terms.get().getPaths();
         paths.clear();
         paths.add(Terms.get().getPath(new UUID[] { pathUuid }));
 
         // check subject is not already a member
         if (hasCurrentConceptConceptStringRefsetExtension(refsetId, componentId, c1Id, c2Id, stringValue, Terms.get()
-            .getConcept(new UUID[] { statusUuid }).getConceptId())) {
+            .getConcept(new UUID[] { statusUuid }).getConceptNid())) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Component is already a member of the refset. Skipping.");
             }
@@ -907,16 +907,16 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // confirm its the right extension value and its status is one
                 // of the possible current status IDs
                 for (Integer statusId : getCurrentStatusIds()) {
-                    if (latestPart.getStatusId() == statusId) {
+                    if (latestPart.getStatusNid() == statusId) {
                         if (latestPart instanceof I_ExtendByRefPartCid) {
                             int partValue = ((I_ExtendByRefPartCid) latestPart).getC1id();
                             if (partValue == memberTypeId) {
                                 // found a member to retire
-                                for (I_Path editPath : getEditPaths()) {
+                                for (PathBI editPath : getEditPaths()) {
 
                                     I_ExtendByRefPartCid clone =
                                             (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED
-                                                .getNid(), editPath.getConceptId(), Long.MAX_VALUE);
+                                                .getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
                                     extension.addVersion(clone);
                                     Terms.get().addUncommittedNoChecks(extension);
 
@@ -970,7 +970,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             positions, 
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
-            if (childConcept.getConceptId() == parent.getConceptId()) {
+            if (childConcept.getConceptNid() == parent.getConceptNid()) {
                 continue ITERATE_CHILDREN;
             }
             if (conditions != null) {
@@ -1015,7 +1015,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             positions, 
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
-            if (parentConcept.getConceptId() == child.getConceptId()) {
+            if (parentConcept.getConceptNid() == child.getConceptNid()) {
                 continue ITERATE_PARENTS;
             }
             if (conditions != null) {
@@ -1056,7 +1056,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
      * @return The edit paths from the active config. Returns null if no config
      *         set or the config defines no paths for editing.
      */
-    protected Set<I_Path> getEditPaths() throws Exception {
+    protected Set<PathBI> getEditPaths() throws Exception {
         if (this.editPaths == null) {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -1065,7 +1065,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
 
             if (this.editPaths == null) {
-                this.editPaths = new HashSet<I_Path>();
+                this.editPaths = new HashSet<PathBI>();
             }
         }
         return (this.editPaths.isEmpty()) ? null : this.editPaths;
@@ -1145,9 +1145,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 }
 
                 if (latestPart instanceof I_ExtendByRefPartCid) {
-                    for (I_Path editPath : getEditPaths()) {
+                    for (PathBI editPath : getEditPaths()) {
                         I_ExtendByRefPartCid clone =
-                                (I_ExtendByRefPartCid) latestPart.makeAnalog(statusId, editPath.getConceptId(),
+                                (I_ExtendByRefPartCid) latestPart.makeAnalog(statusId, editPath.getConceptNid(),
                                     Long.MAX_VALUE);
                         clone.setC1id(c1Id);
                         extension.addVersion(clone);
@@ -1184,13 +1184,13 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 // confirm its the right extension value and its status is
                 // current
                 for (Integer currentId : getCurrentStatusIds()) {
-                    if (latestPart.getStatusId() == currentId) {
+                    if (latestPart.getStatusNid() == currentId) {
                         if (latestPart instanceof I_ExtendByRefPartCid) {
                             // found a member to retire
-                            for (I_Path editPath : getEditPaths()) {
+                            for (PathBI editPath : getEditPaths()) {
                                 I_ExtendByRefPartCid clone =
                                         (I_ExtendByRefPartCid) latestPart
-                                            .makeAnalog(ReferenceConcepts.RETIRED.getNid(), editPath.getConceptId(),
+                                            .makeAnalog(ReferenceConcepts.RETIRED.getNid(), editPath.getConceptNid(),
                                                 Long.MAX_VALUE);
                                 extension.addVersion(clone);
                                 Terms.get().addUncommittedNoChecks(extension);
@@ -1226,14 +1226,14 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
 
             if (promotionStatus != null
-                && promotionStatus.getConceptId() == requiredPromotionStatusConcept.getConceptId()) {
+                && promotionStatus.getConceptNid() == requiredPromotionStatusConcept.getConceptNid()) {
                 if (Terms.get().hasConcept(extension.getComponentId())) {
                     filteredList.add(Terms.get().getConcept(extension.getComponentId()));
                 } else {
                     Object tc = Terms.get().getComponent(extension.getComponentId());
                     if (I_DescriptionVersioned.class.isAssignableFrom(tc.getClass())) {
                         I_DescriptionVersioned d = (I_DescriptionVersioned) tc;
-                        filteredList.add(Terms.get().getConcept(d.getConceptId()));
+                        filteredList.add(Terms.get().getConcept(d.getConceptNid()));
                     } else if (I_ExtendByRef.class.isAssignableFrom(tc.getClass())) {
                         I_ExtendByRef ext = (I_ExtendByRef) tc;
                         if (Terms.get().hasConcept(extension.getComponentId())) {
@@ -1271,7 +1271,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             }
 
             if (promotionStatus != null
-                && promotionStatus.getConceptId() == requiredPromotionStatusConcept.getConceptId()) {
+                && promotionStatus.getConceptNid() == requiredPromotionStatusConcept.getConceptNid()) {
                 count++;
             }
         }
@@ -1410,7 +1410,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
         I_GetConceptData descriptionType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(descriptionType.getConceptId());
+        allowedTypes.add(descriptionType.getConceptNid());
         String latestDescription = null;
         long latestVersion = Long.MIN_VALUE;
 

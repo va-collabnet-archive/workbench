@@ -61,7 +61,6 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -72,6 +71,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class ConflictPanel extends JPanel implements ActionListener {
 
@@ -409,7 +410,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
                     AceLog.getEditLog().fine("edit path set: " + config.getEditingPathSet());
                     AceLog.getEditLog().fine("view position set: " + config.getViewPositionSet());
                 }
-                for (I_Path editPath : config.getEditingPathSet()) {
+                for (PathBI editPath : config.getEditingPathSet()) {
                     processPathForImplementation(descsForResolution, relsForResolution, attributesForResolution,
                         editPath);
                 }
@@ -425,7 +426,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
     private void processPathForImplementation(HashMap<Integer, I_DescriptionTuple> descsForResolution,
             HashMap<Integer, I_RelTuple> relsForResolution,
-            HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution, I_Path editPath) throws IOException,
+            HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution, PathBI editPath) throws IOException,
             TerminologyException {
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine("processing editPath: " + editPath);
@@ -448,7 +449,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
         }
     }
 
-    private void processRelsForResolution(HashMap<Integer, I_RelTuple> relsForResolution, I_Path editPath,
+    private void processRelsForResolution(HashMap<Integer, I_RelTuple> relsForResolution, PathBI editPath,
             Set<I_Position> positions, I_RelVersioned rel) throws IOException, TerminologyException {
         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
             AceLog.getEditLog().fine("  processing rel: " + rel.getRelId() + " " + rel);
@@ -457,45 +458,45 @@ public class ConflictPanel extends JPanel implements ActionListener {
     }
 
     private void processDescriptionsForImplementation(HashMap<Integer, I_DescriptionTuple> descsForResolution,
-            I_Path editPath, Set<I_Position> positions, I_DescriptionVersioned desc) throws IOException,
+            PathBI editPath, Set<I_Position> positions, I_DescriptionVersioned desc) throws IOException,
             TerminologyException {
     	throw new UnsupportedOperationException();
     }
 
     private void processAttributesForImplementation(HashMap<Integer, I_ConceptAttributeTuple> attributesForResolution,
-            I_Path editPath, Set<I_Position> positions, I_ConceptAttributeVersioned attributes) throws IOException,
+            PathBI editPath, Set<I_Position> positions, I_ConceptAttributeVersioned attributes) throws IOException,
             TerminologyException {
         throw new UnsupportedOperationException("Model change requires reimplementation...");
     }
 
-    private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, I_Path editPath,
+    private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, PathBI editPath,
             I_ConceptAttributeVersioned attr) {
-        I_ConceptAttributePart newPart = (I_ConceptAttributePart) attrsForResolution.get(attr.getConId()).makeAnalog(config.getDefaultStatus().getConceptId(), editPath.getConceptId(), Integer.MAX_VALUE);
+        I_ConceptAttributePart newPart = (I_ConceptAttributePart) attrsForResolution.get(attr.getConId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
   
         attr.addVersion(newPart);
     }
 
-    private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, I_Path editPath,
+    private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, PathBI editPath,
             I_DescriptionVersioned desc) {
-        I_DescriptionPart newPart = (I_DescriptionPart) descsForResolution.get(desc.getDescId()).makeAnalog(config.getDefaultStatus().getConceptId(), editPath.getConceptId(), Integer.MAX_VALUE);
+        I_DescriptionPart newPart = (I_DescriptionPart) descsForResolution.get(desc.getDescId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
  
         desc.addVersion(newPart);
     }
 
-    private void retireDescPart(I_Path editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
-        I_DescriptionPart newPart = (I_DescriptionPart) desc.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptId(), Integer.MAX_VALUE);
+    private void retireDescPart(PathBI editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
+        I_DescriptionPart newPart = (I_DescriptionPart) desc.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
 
         desc.addVersion(newPart);
     }
 
-    private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, I_Path editPath, I_RelVersioned rel) {
-        I_RelPart newPart = (I_RelPart) relsForResolution.get(rel.getRelId()).makeAnalog(config.getDefaultStatus().getConceptId(), editPath.getConceptId(), Integer.MAX_VALUE);
+    private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, PathBI editPath, I_RelVersioned rel) {
+        I_RelPart newPart = (I_RelPart) relsForResolution.get(rel.getRelId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
 
         rel.addVersion(newPart);
     }
 
-    private void retireRelPart(I_Path editPath, I_RelVersioned rel) throws IOException, TerminologyException {
-        I_RelPart newPart = (I_RelPart) rel.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptId(), Integer.MAX_VALUE);
+    private void retireRelPart(PathBI editPath, I_RelVersioned rel) throws IOException, TerminologyException {
+        I_RelPart newPart = (I_RelPart) rel.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
 
         rel.addVersion(newPart);
     }
@@ -615,7 +616,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
             c.gridx = 0;
             c.gridy = 0;
 
-            for (I_Position p : config.getViewPositionSet()) {
+            for (PositionBI p : config.getViewPositionSet()) {
                 JPanel statePanel = getVersionView(p, config, conAttrColorMap, desColorMap, relColorMap);
                 setMinAndMax(statePanel);
                 versionPanel.add(statePanel, c);
@@ -705,8 +706,8 @@ public class ConflictPanel extends JPanel implements ActionListener {
         Set<I_DescriptionTuple> allDescTuples = new HashSet<I_DescriptionTuple>();
         Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
 
-        for (I_Position p : config.getViewPositionSet()) {
-            Set<I_Position> posSet = new HashSet<I_Position>();
+        for (PositionBI p : config.getViewPositionSet()) {
+            Set<PositionBI> posSet = new HashSet<PositionBI>();
             posSet.add(p);
             PositionSetReadOnly positionSet = new PositionSetReadOnly(posSet);
             // concept attributes
@@ -767,7 +768,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
         return labelList;
     }
 
-    public JPanel getVersionView(I_Position p, I_ConfigAceFrame config,
+    public JPanel getVersionView(PositionBI p, I_ConfigAceFrame config,
             Map<I_ConceptAttributeTuple, Color> conAttrColorMap, Map<I_DescriptionTuple, Color> desColorMap,
             Map<I_RelTuple, Color> relColorMap) throws IOException, TerminologyException {
         JPanel versionView = getMinAndMaxPanel();
@@ -779,7 +780,7 @@ public class ConflictPanel extends JPanel implements ActionListener {
         c.weighty = 0;
         c.gridx = 0;
         c.gridy = 0;
-        Set<I_Position> pSet = new HashSet<I_Position>(1);
+        Set<PositionBI> pSet = new HashSet<PositionBI>(1);
         pSet.add(p);
         PositionSetReadOnly posSet = new PositionSetReadOnly(pSet);
         c.gridx = 1;

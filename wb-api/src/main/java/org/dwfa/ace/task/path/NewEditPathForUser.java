@@ -25,8 +25,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -41,6 +39,8 @@ import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/path", type = BeanType.TASK_BEAN) })
 public class NewEditPathForUser extends AbstractTask {
@@ -97,7 +97,7 @@ public class NewEditPathForUser extends AbstractTask {
             String username = (String) process.getProperty(userPropName);
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeProfile = tf.getActiveAceFrameConfig();
-            Set<I_Path> savedEditingPaths = new HashSet<I_Path>(activeProfile.getEditingPathSet());
+            Set<PathBI> savedEditingPaths = new HashSet<PathBI>(activeProfile.getEditingPathSet());
             try {
 
                 I_GetConceptData newPathConcept = NewEditPathForUserFromProperty.createComponents(username, tf,
@@ -105,12 +105,12 @@ public class NewEditPathForUser extends AbstractTask {
 
                 tf.commit();
 
-                Set<I_Position> origins = new HashSet<I_Position>();
+                Set<PositionBI> origins = new HashSet<PositionBI>();
 
-                I_Path parentPath = tf.getPath(parentPathTermEntry.ids);
+                PathBI parentPath = tf.getPath(parentPathTermEntry.ids);
                 origins.add(tf.newPosition(parentPath, tf.convertToThinVersion(originTime)));
 
-                I_Path editPath = tf.newPath(origins, newPathConcept);
+                PathBI editPath = tf.newPath(origins, newPathConcept);
                 I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
                 if (profile == null) {
                     profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());

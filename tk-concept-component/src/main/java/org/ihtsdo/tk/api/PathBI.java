@@ -1,7 +1,10 @@
 package org.ihtsdo.tk.api;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 public interface PathBI {
@@ -21,5 +24,11 @@ public interface PathBI {
      * earlier version) will be excluded.
      */
     public Set<? extends PositionBI> getNormalisedOrigins();
+
+    public PathBI getMatchingPath(int pathNid);
+
+	public String toHtmlString() throws IOException;
+	
+	public List<UUID> getUUIDs();
 
 }

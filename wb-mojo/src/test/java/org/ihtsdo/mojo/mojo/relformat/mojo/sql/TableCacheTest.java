@@ -22,12 +22,12 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hamcrest.core.IsEqual;
 import org.ihtsdo.mojo.mojo.relformat.mojo.sql.builder.TableCacheBuilder;
 import org.ihtsdo.mojo.mojo.relformat.mojo.sql.parser.Table;
 import org.ihtsdo.mojo.mojo.relformat.mojo.sql.parser.TableColumn;
 import org.ihtsdo.mojo.mojo.relformat.xml.ReleaseConfig;
 import org.ihtsdo.mojo.mojo.relformat.xml.ReleaseFormat;
-import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Test;
 

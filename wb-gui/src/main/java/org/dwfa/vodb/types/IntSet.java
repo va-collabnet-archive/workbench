@@ -34,11 +34,11 @@ import javax.swing.event.ListDataListener;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class IntSet implements ListDataListener, I_IntSet {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
@@ -89,12 +89,12 @@ public class IntSet implements ListDataListener, I_IntSet {
         this.setValues = new int[0];
     }
 
-    public IntSet(Collection<I_Path> pathSet) {
+    public IntSet(Collection<PathBI> pathSet) {
         super();
         setValues = new int[pathSet.size()];
         int i = 0;
-        for (I_Path p: pathSet) {
-        	setValues[i++] = p.getConceptId();
+        for (PathBI p: pathSet) {
+        	setValues[i++] = p.getConceptNid();
         }
         Arrays.sort(setValues);
     }
@@ -367,7 +367,7 @@ public class IntSet implements ListDataListener, I_IntSet {
         clear();
         for (int i = 0; i < model.getSize(); i++) {
             I_GetConceptData cb = (I_GetConceptData) model.getElementAt(i);
-            add(cb.getConceptId());
+            add(cb.getConceptNid());
         }
     }
 

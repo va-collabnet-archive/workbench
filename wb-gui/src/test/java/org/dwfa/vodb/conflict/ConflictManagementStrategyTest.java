@@ -41,6 +41,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -138,15 +139,22 @@ public class ConflictManagementStrategyTest {
             throw new UnsupportedOperationException();
         }
 
-        public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
-
+		@Override
+		public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
             throw new UnsupportedOperationException();
-        }
+		}
 
-        @Override
-        public <T extends I_AmPart> List<T> resolveParts(T part1, T part2) {
+		@Override
+		public <T extends ComponentVersionBI> List<T> resolveVersions(
+				List<T> versions) {
             throw new UnsupportedOperationException();
-        }
+		}
+
+		@Override
+		public <T extends ComponentVersionBI> List<T> resolveVersions(T part1,
+				T part2) {
+            throw new UnsupportedOperationException();
+		}
 
     }
 

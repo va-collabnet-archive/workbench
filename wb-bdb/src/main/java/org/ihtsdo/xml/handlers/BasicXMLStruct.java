@@ -6,10 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.xml.common.CommonXMLStatics;
-import org.ihtsdo.xml.util.XMLUtil;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.xml.common.CommonXMLStatics;
+import org.ihtsdo.xml.util.XMLUtil;
 import org.w3c.dom.Element;
 
 public class BasicXMLStruct {

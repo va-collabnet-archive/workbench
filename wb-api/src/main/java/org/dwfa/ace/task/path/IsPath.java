@@ -69,7 +69,7 @@ public class IsPath extends AbstractTask {
             I_GetConceptData concept = getProperty(process, I_GetConceptData.class, getPropName());
 
             I_TermFactory termFactory = Terms.get();
-            if (termFactory.hasPath(concept.getConceptId())) {
+            if (termFactory.hasPath(concept.getConceptNid())) {
                 return Condition.TRUE;
             } else {
                 return Condition.FALSE;

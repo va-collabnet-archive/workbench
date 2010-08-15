@@ -49,17 +49,17 @@ public class RefsetQueryFactory {
 
         // create tree object that corresponds to the database's refset spec
         Collection<? extends I_ExtendByRef> extensions =
-                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-        fetchedComponents.add(refsetSpec.getConceptId());
+        fetchedComponents.add(refsetSpec.getConceptNid());
 
-        addExtensionsToMap(extensions, extensionMap, fetchedComponents, refsetSpec.getConceptId());
+        addExtensionsToMap(extensions, extensionMap, fetchedComponents, refsetSpec.getConceptNid());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
             I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
-            if (ext.getComponentId() == refsetSpec.getConceptId()) {
+            if (ext.getComponentId() == refsetSpec.getConceptNid()) {
                 root.add(extNode);
             } else {
                 extensionMap.get(ext.getComponentId()).add(extNode);
@@ -110,15 +110,15 @@ public class RefsetQueryFactory {
      * ParseException {
      * // create tree object that corresponds to the database's refset spec
      * List<I_ExtendByRef> extensions =
-     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(), true);
      * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
      * HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-     * fetchedComponents.add(refsetSpec.getConceptId());
+     * fetchedComponents.add(refsetSpec.getConceptNid());
      * addExtensionsToMap(extensions, extensionMap, fetchedComponents);
      * DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
      * for (DefaultMutableTreeNode extNode : extensionMap.values()) {
      * I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
-     * if (ext.getComponentId() == refsetSpec.getConceptId()) {
+     * if (ext.getComponentId() == refsetSpec.getConceptNid()) {
      * root.add(extNode);
      * } else {
      * extensionMap.get(ext.getComponentId()).add(extNode);

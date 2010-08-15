@@ -408,7 +408,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 Document doc = hits.doc(i);
                 int cnid = Integer.parseInt(doc.get("cnid"));
                 int dnid = Integer.parseInt(doc.get("dnid"));
-                if (cnid == concept.getConceptId())
+                if (cnid == concept.getConceptNid())
                     continue;
                 I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
                 for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
@@ -430,7 +430,7 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
     public void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
             I_GetConceptData destination, I_ConfigAceFrame aceConfig) throws Exception {
         try {
-            int statusId = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptId();
+            int statusId = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
             UUID relUuid = UUID.randomUUID();
 
             I_GetConceptData charConcept =

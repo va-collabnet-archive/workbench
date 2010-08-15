@@ -116,10 +116,10 @@ public class ImportRefsetFromFile extends AbstractTask {
             // Load in all concepts from the import file
             HashMap<Integer, I_GetConceptData> importConcepts = new HashMap<Integer, I_GetConceptData>();
             for (I_GetConceptData concept : reader) {
-                importConcepts.put(concept.getConceptId(), concept);
+                importConcepts.put(concept.getConceptNid(), concept);
             }
 
-            I_HelpMemberRefsets refsetHelper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId());
+            I_HelpMemberRefsets refsetHelper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
 
             // Find existing members of the refset that are not in the import
             // set. These need to be retired.

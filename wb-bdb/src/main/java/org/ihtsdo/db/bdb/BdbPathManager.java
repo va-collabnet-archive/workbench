@@ -29,7 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
@@ -50,6 +49,8 @@ import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntMember;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Path management.
@@ -61,7 +62,7 @@ import org.ihtsdo.etypes.EConcept;
  * marshals to to the Extension store (indirectly).
  * 
  */
-public class BdbPathManager implements I_Manage<I_Path> {
+public class BdbPathManager implements I_Manage<PathBI> {
 
 	protected Path editPath;
 	
@@ -152,11 +153,11 @@ public class BdbPathManager implements I_Manage<I_Path> {
 
 	
 	
-	public I_Path get(int nid) throws IOException, TerminologyException {
+	public PathBI get(int nid) throws IOException, TerminologyException {
 		if (exists(nid)) {
 			return pathMap.get(nid);
 		} else {
-		    I_Path p = getFromDisk(nid);
+		    PathBI p = getFromDisk(nid);
 		    if (p != null) {
 		        return p;
 		    }
@@ -184,8 +185,8 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	public Set<I_Path> getAll() throws TerminologyException {
-	    return new HashSet<I_Path>(pathMap.values());
+	public Set<PathBI> getAll() throws TerminologyException {
+	    return new HashSet<PathBI>(pathMap.values());
 	}
 	
 	public synchronized void resetPathMap() throws IOException {
@@ -241,16 +242,16 @@ public class BdbPathManager implements I_Manage<I_Path> {
         return null;
 	}
 	
-	public List<I_Position> getAllPathOrigins(int nid) throws TerminologyException, IOException {
+	public List<PositionBI> getAllPathOrigins(int nid) throws TerminologyException, IOException {
         Path p = pathMap.get(nid);
         if (p == null) {
             p = getFromDisk(nid);
         }
-        return new ArrayList<I_Position>(p.getInheritedOrigins());
+        return new ArrayList<PositionBI>(p.getInheritedOrigins());
 	}
 
     
-    public Collection<I_Position> getPathOrigins(int nid) throws TerminologyException {
+    public Collection<? extends PositionBI> getPathOrigins(int nid) throws TerminologyException {
         try {
             Path p = pathMap.get(nid);
             return p.getOrigins();
@@ -323,26 +324,26 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	/**
 	 * Add or update a path and all its origin positions NOTE it will not
 	 * automatically remove origins. This must be done explicitly with
-	 * {@link #removeOrigin(I_Path, I_Position)}.
+	 * {@link #removeOrigin(PathBI, I_Position)}.
 	 */
-	public void write(final I_Path path, I_ConfigAceFrame config)
+	public void write(final PathBI path, I_ConfigAceFrame config)
 			throws TerminologyException {
 		try {
 			// write path
 
 			RefsetPropertyMap propMap = new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, path
-							.getConceptId());
+							.getConceptNid());
 			helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(), ReferenceConcepts.PATH.getNid(),
 					EConcept.REFSET_TYPES.CID, propMap, config);
 			BdbCommitManager.addUncommittedNoChecks(getPathRefsetConcept());
 
 			// write position
 
-			for (I_Position origin : path.getOrigins()) {
+			for (PositionBI origin : path.getOrigins()) {
 				writeOrigin(path, origin, config);
 			}
-			pathMap.put(path.getConceptId(), (Path) path);
+			pathMap.put(path.getConceptNid(), (Path) path);
 			logger.info("Wrote path : " + path);
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to write path: " + path, e);
@@ -352,7 +353,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 	/**
 	 * Set an origin on a path
 	 */
-	public void writeOrigin(final I_Path path, final I_Position origin, I_ConfigAceFrame config) 
+	public void writeOrigin(final PathBI path, final PositionBI origin, I_ConfigAceFrame config) 
 		throws TerminologyException {
 	    assert path.getOrigins().contains(origin): "Must add origin: " + origin + " before writing: " + 
 	        path;
@@ -364,7 +365,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					RefsetPropertyMap.REFSET_PROPERTY.INTEGER_VALUE,
 					origin.getVersion());
 			if (refsetHelper.hasCurrentRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
-					.getConceptId(), propMap)) {
+					.getConceptNid(), propMap)) {
 				// Skip already exists
 				return;
 			}
@@ -376,7 +377,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin.
 							getPath().getConceptNid());
 			refsetHelper.retireRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
-					.getConceptId(), propMap);
+					.getConceptNid(), propMap);
 
 			propMap = new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
@@ -385,10 +386,10 @@ public class BdbPathManager implements I_Manage<I_Path> {
 					origin.getVersion());
 			// Create the new origin/position
 			refsetHelper.newRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
-					.getConceptId(), EConcept.REFSET_TYPES.CID_INT, propMap,
+					.getConceptNid(), EConcept.REFSET_TYPES.CID_INT, propMap,
 					config);
 			BdbCommitManager.addUncommittedNoChecks(getRefsetPathOriginsConcept());
-            pathMap.put(path.getConceptId(), (Path) path);
+            pathMap.put(path.getConceptNid(), (Path) path);
 			logger.info("Wrote origin path : " + origin + " to path " + path);
 		} catch (Exception e) {
 			throw new TerminologyException("Unable to write path origin: "
@@ -396,18 +397,18 @@ public class BdbPathManager implements I_Manage<I_Path> {
 		}
 	}
 
-	public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config)
+	public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config)
 			throws TerminologyException {
         assert path.getOrigins().contains(origin): "Must remove origin: " + origin + " before removing: " + 
         path;
 		try {
 			RefsetHelper refsetHelper = helperGetter.get(config);
 			refsetHelper.retireRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path
-					.getConceptId(), new RefsetPropertyMap().with(
+					.getConceptNid(), new RefsetPropertyMap().with(
 					RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin.
 					getPath().getConceptNid()));
 			path.getOrigins().remove(origin);
-            pathMap.put(path.getConceptId(), (Path) path);
+            pathMap.put(path.getConceptNid(), (Path) path);
 
 			logger.info("Removed origin path : " + origin + " from path "
 					+ path);
@@ -421,7 +422,7 @@ public class BdbPathManager implements I_Manage<I_Path> {
         List<Path> children = new ArrayList<Path>();
         for (Path p: pathMap.values()) {
             if (p.getOrigins() != null) {
-                for (I_Position origin: p.getOrigins()) {
+                for (PositionBI origin: p.getOrigins()) {
                     if (origin.getPath().getConceptNid() == nid) {
                         children.add(p);
                     }

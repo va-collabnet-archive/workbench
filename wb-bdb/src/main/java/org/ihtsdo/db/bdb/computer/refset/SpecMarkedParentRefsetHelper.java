@@ -45,7 +45,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         this.refsetId = refsetId;
         this.memberTypeId = memberTypeId;
         this.parentMemberTypeId =
-                Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptId();
+                Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptNid();
         this.parentRefsetId = getParentRefset();
     }
 
@@ -62,7 +62,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         }
 
         for (I_GetConceptData concept : ancestors) {
-            newRefsetExtension(parentRefsetId, concept.getConceptId(), parentMemberTypeId);
+            newRefsetExtension(parentRefsetId, concept.getConceptNid(), parentMemberTypeId);
         }
     }
 
@@ -76,13 +76,13 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
         for (Integer descriptionId : descriptionIds) {
             I_GetConceptData concept =
-                    Terms.get().getConcept(Terms.get().getDescription(descriptionId).getConceptId());
+                    Terms.get().getConcept(Terms.get().getDescription(descriptionId).getConceptNid());
             ancestors.addAll(getAllAncestors(concept, traversingConditions));
             // ancestors.add(concept);
         }
 
         for (I_GetConceptData concept : ancestors) {
-            newRefsetExtension(parentRefsetId, concept.getConceptId(), parentMemberTypeId);
+            newRefsetExtension(parentRefsetId, concept.getConceptNid(), parentMemberTypeId);
         }
     }
 
@@ -100,7 +100,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
                 toBeRetired.add(conceptId);
             }
             for (I_GetConceptData concept : getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions)) {
-                toBeRetired.add(concept.getConceptId());
+                toBeRetired.add(concept.getConceptNid());
             }
         }
 
@@ -125,7 +125,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
         for (Integer conceptId : lineageToExclude) {
             for (I_GetConceptData concept : getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions)) {
-                ancestorIdsToExclude.add(concept.getConceptId());
+                ancestorIdsToExclude.add(concept.getConceptNid());
             }
         }
 
@@ -149,13 +149,13 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         Set<Integer> toBeRetired = new HashSet<Integer>();
         for (Integer descriptionId : descriptionIds) {
             I_GetConceptData concept =
-                    Terms.get().getConcept(Terms.get().getDescription(descriptionId).getConceptId());
-            if (isMarkedParent(concept.getConceptId())) {
-                toBeRetired.add(concept.getConceptId());
+                    Terms.get().getConcept(Terms.get().getDescription(descriptionId).getConceptNid());
+            if (isMarkedParent(concept.getConceptNid())) {
+                toBeRetired.add(concept.getConceptNid());
             }
-            for (I_GetConceptData ancestor : getAllAncestors(Terms.get().getConcept(concept.getConceptId()),
+            for (I_GetConceptData ancestor : getAllAncestors(Terms.get().getConcept(concept.getConceptNid()),
                 traversingConditions)) {
-                toBeRetired.add(ancestor.getConceptId());
+                toBeRetired.add(ancestor.getConceptNid());
             }
         }
 
@@ -180,7 +180,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
         for (Integer conceptId : lineageToExclude) {
             for (I_GetConceptData concept : getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions)) {
-                ancestorIdsToExclude.add(concept.getConceptId());
+                ancestorIdsToExclude.add(concept.getConceptNid());
             }
         }
 
@@ -212,7 +212,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         I_GetConceptData memberRefset = Terms.get().getConcept(refsetId);
 
         I_IntSet allowedType = Terms.get().newIntSet();
-        allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptId());
+        allowedType.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids()).getConceptNid());
 
         Set<? extends I_GetConceptData> targetParentRefsets =
                 memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, null,
@@ -227,7 +227,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
                 + "Defaulting to the first one found!");
         }
         I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
-        return parentRefset.getConceptId();
+        return parentRefset.getConceptNid();
     }
 
     /**
@@ -241,7 +241,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
             try {
                 I_IntSet isATypes = Terms.get().newIntSet();
                 isATypes.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
-                    .getConceptId());
+                    .getConceptNid());
                 I_GetConceptData memberRefset = Terms.get().getConcept(this.refsetId);
                 Set<? extends I_GetConceptData> requiredIsAType =
                         memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null,
@@ -252,7 +252,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
                     // marked-parent-is-a relationship
                     this.isARelTypes = Terms.get().newIntSet();
                     for (I_GetConceptData concept : requiredIsAType) {
-                        this.isARelTypes.add(concept.getConceptId());
+                        this.isARelTypes.add(concept.getConceptNid());
                     }
 
                     // Added for backwards compatability. All newly created refset specs will have one or more
@@ -294,7 +294,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         }
 
         public boolean evaluate(I_GetConceptData concept) throws Exception {
-            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptId(), this.memberTypeId);
+            return hasCurrentRefsetExtension(this.refsetId, concept.getConceptNid(), this.memberTypeId);
         }
     }
 
@@ -302,7 +302,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
         private HashSet<Integer> visited = new HashSet<Integer>();
 
         public boolean evaluate(I_GetConceptData concept) throws Exception {
-            return visited.add(concept.getConceptId());
+            return visited.add(concept.getConceptNid());
         }
     }
 }

@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -33,6 +32,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -44,7 +44,7 @@ import org.dwfa.tapi.TerminologyException;
  */
 
 public class SnoPathProcess implements I_ProcessConcepts {
-    private List<I_Position> fromPathPos;
+    private List<PositionBI> fromPathPos;
     private Logger logger;
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
@@ -89,7 +89,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
     I_ShowActivity gui = null;
 
     public SnoPathProcess(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
-            int[] allowedRoles, List<I_Position> fromPathPos, I_ShowActivity gui,
+            int[] allowedRoles, List<PositionBI> fromPathPos, I_ShowActivity gui,
             boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
         this.logger = logger;
         this.snocons = snocons;
@@ -129,8 +129,8 @@ public class SnoPathProcess implements I_ProcessConcepts {
         int cNid = concept.getNid();
 
         // :!!!:???:
-        if (concept.getConceptId() != cNid)
-            logger.info("::: [SnoPathProcess] concept.getConceptId(" + concept.getConceptId()
+        if (concept.getConceptNid() != cNid)
+            logger.info("::: [SnoPathProcess] concept.getConceptNid(" + concept.getConceptNid()
                     + ") != concept.getNid(" + cNid + ")");
 
         if (cNid == rootNid) {
@@ -146,7 +146,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         List<? extends I_ConceptAttributePart> cParts;
         cParts = concept.getConceptAttributes().getMutableParts();
         I_ConceptAttributePart cPart1 = null;
-        for (I_Position pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER
+        for (PositionBI pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER
             for (I_ConceptAttributePart cPart : cParts) {
                 if (pos.getPath().getConceptNid() == cPart.getPathId()) {
                     if (cPart1 == null) {
@@ -213,7 +213,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         for (I_RelVersioned rel : concept.getSourceRels()) {
             // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
             I_RelPart rPart1 = null;
-            for (I_Position pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER
+            for (PositionBI pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER
                 for (I_RelPart rPart : rel.getMutableParts()) {
                     if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                         if (rPart1 == null) {

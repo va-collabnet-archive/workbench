@@ -149,7 +149,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             case DESC_ID:
                 return new StringWithDescTuple(Integer.toString(desc.getDescId()), desc, false, inConflict);
             case CON_ID:
-                return new StringWithDescTuple(Integer.toString(desc.getConceptId()), desc, false, inConflict);
+                return new StringWithDescTuple(Integer.toString(desc.getConceptNid()), desc, false, inConflict);
             case TEXT:
                 if (BasicHTML.isHTMLString(desc.getText())) {
                     return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
@@ -252,7 +252,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 if (changed) {
                     AceLog.getAppLog().info("Description table changed");
                     updateDataAlerts(row);
-                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptId()));
+                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
                }
             }
         } catch (IOException e) {
@@ -280,7 +280,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                             try {
                                 I_DescriptionTuple desc = getDescription(row);
                                 if (desc != null) {
-                                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptId()));
+                                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
                                 }
                             } catch (IOException e) {
                                 AceLog.getAppLog().alertAndLogException(e);

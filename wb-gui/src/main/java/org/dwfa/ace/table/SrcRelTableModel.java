@@ -79,7 +79,7 @@ public class SrcRelTableModel extends RelTableModel {
         throw new UnsupportedOperationException();
         /*
          * ThinRelVersioned rel = new ThinRelVersioned(int relId,
-         * this.tableBean.getConceptId(), obj.getConceptId(),
+         * this.tableBean.getConceptNid(), obj.getConceptNid(),
          * 1);
          * ThinRelPart relPart = new ThinRelPart();
          * relPart.setCharacteristicId(characteristicId);

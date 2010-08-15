@@ -80,7 +80,7 @@ public class SetRefsetToShowInTaxonomyView extends AbstractTask {
             Object obj = process.getProperty(propName);
             I_GetConceptData refsetConcept = AceTaskUtil.getConceptFromObject(obj);
 
-            refsetsToShow.add(refsetConcept.getConceptId());
+            refsetsToShow.add(refsetConcept.getConceptNid());
 
             config.fireCommit();
 

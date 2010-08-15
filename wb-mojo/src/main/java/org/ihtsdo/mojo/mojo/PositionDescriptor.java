@@ -17,10 +17,10 @@
 package org.ihtsdo.mojo.mojo;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class PositionDescriptor {
     private ConceptDescriptor path;
@@ -42,11 +42,11 @@ public class PositionDescriptor {
         this.timeString = timeString;
     }
 
-    public I_Position getPosition() throws Exception {
+    public PositionBI getPosition() throws Exception {
         I_GetConceptData pathConcept = path.getVerifiedConcept();
-        I_Path pathForPosition = LocalVersionedTerminology.get().getPath(pathConcept.getUids());
+        PathBI pathForPosition = Terms.get().getPath(pathConcept.getUids());
         int version = ThinVersionHelper.convert(timeString);
-        return LocalVersionedTerminology.get().newPosition(pathForPosition, version);
+        return Terms.get().newPosition(pathForPosition, version);
     }
 
     public String toString() {

@@ -103,7 +103,7 @@ public class AddConceptChildrenToRefset extends AbstractTask {
                     + refset.getInitialText() + "' with a value '" + value.getInitialText() + "'.");
 
             I_HelpMemberRefsets helper = 
-            	Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId());
+            	Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
             Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
 
             helper.addAllToRefset(newMembers, "Adding children of concept " + member.getInitialText());

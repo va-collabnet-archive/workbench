@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 
 /**
  * Interface for classes that resolve contradictions - i.e. the scenario where two
@@ -31,7 +32,7 @@ import org.dwfa.tapi.TerminologyException;
  * without a time point), implementations of this interface will calculate the
  * "conflict resolved view" of the component at that time point.
  */
-public interface I_ManageContradiction extends Serializable {
+public interface I_ManageContradiction extends ContradictionManagerBI, Serializable {
     
     void setConfig(I_ConfigAceFrame config);
     /**
@@ -85,7 +86,6 @@ public interface I_ManageContradiction extends Serializable {
      */
     <T extends I_AmPart> List<T> resolveParts(List<T> parts);
 
-    <T extends I_AmPart> List<T> resolveParts(T part1, T part2);
 
     /**
      * @param concept concept to test

@@ -80,7 +80,7 @@ public class RegenerateMarkedParents extends AbstractTask {
 
     private void regenerateMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {
 
-        int refsetId = memberRefsetConcept.getConceptId();
+        int refsetId = memberRefsetConcept.getConceptNid();
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -96,7 +96,7 @@ public class RegenerateMarkedParents extends AbstractTask {
                 if (thinExtByRefTuple.getRefsetId() == refsetId) {
 
                     I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) thinExtByRefTuple.getMutablePart();
-                    if (part.getC1id() == memberConcept.getConceptId()) {
+                    if (part.getC1id() == memberConcept.getConceptNid()) {
                         normalMemberIds.add(thinExtByRefTuple.getComponentId());
                     }
                 }
@@ -104,7 +104,7 @@ public class RegenerateMarkedParents extends AbstractTask {
         }
 
         Terms.get().getMarkedParentRefsetHelper(Terms.get().getActiveAceFrameConfig(),
-        		refsetId, memberConcept.getConceptId()).addParentMembers(normalMemberIds.toArray(new Integer[] {}));
+        		refsetId, memberConcept.getConceptNid()).addParentMembers(normalMemberIds.toArray(new Integer[] {}));
     }
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {

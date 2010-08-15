@@ -29,8 +29,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -53,6 +51,8 @@ import org.dwfa.tapi.spec.ConceptSpec;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * The RefreshRefsetSpecCompareTask uses the information
@@ -190,23 +190,23 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 
             // Get the Refset Position (must convert from UniversalAcePosition type)
             // Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
-            Set<I_Position> refsetPositionSet = new HashSet<I_Position>();
+            Set<PositionBI> refsetPositionSet = new HashSet<PositionBI>();
             Set<UniversalAcePosition> universalRefsetPositions =
                     (Set<UniversalAcePosition>) process.getProperty(refsetSpecVersionPropName);
             for (UniversalAcePosition univPos : universalRefsetPositions) {
-                I_Path path = termFactory.getPath(univPos.getPathId());
-                I_Position thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+                PathBI path = termFactory.getPath(univPos.getPathId());
+                PositionBI thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
                 refsetPositionSet.add(thinPos);
             }
 
             // Get the SNOMED Position (must convert from UniversalAcePosition type)
             // Retrieve the positions as Set<UniversalAcePosition> and convert them back to Set<I_Position>
-            Set<I_Position> positionSet = new HashSet<I_Position>();
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
             Set<UniversalAcePosition> universalSnomedPositions =
                     (Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);
             for (UniversalAcePosition univPos : universalSnomedPositions) {
-                I_Path path = termFactory.getPath(univPos.getPathId());
-                I_Position thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+                PathBI path = termFactory.getPath(univPos.getPathId());
+                PositionBI thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
                 positionSet.add(thinPos);
             }
             PositionSetReadOnly snomedPositionSet = new PositionSetReadOnly(positionSet);
@@ -244,8 +244,8 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
             Set<? extends I_GetConceptData> children = getAllDescendants(statusParent, allowedStatus, relTypes, config);
 
             for (I_GetConceptData child : children) {
-                if (!currentStatus.contains(child.getConceptId())) {
-                    notCurrentStatus.add(child.getConceptId());
+                if (!currentStatus.contains(child.getConceptNid())) {
+                    notCurrentStatus.add(child.getConceptNid());
                 }
             }
 

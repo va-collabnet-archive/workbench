@@ -61,7 +61,7 @@ public class RefsetDefaultsConcept extends RefsetDefaults implements I_RefsetDef
     public RefsetDefaultsConcept() throws TerminologyException, IOException {
         super();
         defaultForConceptRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
-        conceptPopupIds.add(defaultForConceptRefset.getConceptId());
+        conceptPopupIds.add(defaultForConceptRefset.getConceptNid());
     }
 
     public I_GetConceptData getDefaultForConceptRefset() {

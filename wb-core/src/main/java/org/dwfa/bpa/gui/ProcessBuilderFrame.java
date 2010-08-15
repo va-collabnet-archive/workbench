@@ -44,6 +44,7 @@ import net.jini.config.ConfigurationException;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.tapi.NoMappingException;
 
 import com.sun.jini.start.LifeCycle;
 

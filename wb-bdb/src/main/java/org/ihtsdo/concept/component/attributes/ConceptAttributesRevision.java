@@ -5,13 +5,14 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes> implements
-        I_ConceptAttributePart {
+public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes> 
+	implements I_ConceptAttributePart, ConAttrAnalogBI {
 
     private boolean defined = false;
 
@@ -34,7 +35,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
     }
 
     public ConceptAttributesRevision(I_ConceptAttributePart another, ConceptAttributes primoridalMember) {
-        super(another.getStatusId(), another.getAuthorNid(), another.getPathId(), another.getTime(), primoridalMember);
+        super(another.getStatusNid(), another.getAuthorNid(), another.getPathNid(), another.getTime(), primoridalMember);
         this.defined = another.isDefined();
     }
 
@@ -49,13 +50,29 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
     @Override
     public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         try {
 			return new ConceptAttributesRevision(this, statusNid, 
-					Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId(),
+					Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
+					pathNid, time, this.primordialComponent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} 
+    }
+
+    @Override
+    public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            this.setAuthorNid(authorNid);
+            return this;
+        }
+        try {
+			return new ConceptAttributesRevision(this, statusNid, 
+					authorNid,
 					pathNid, time, this.primordialComponent);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

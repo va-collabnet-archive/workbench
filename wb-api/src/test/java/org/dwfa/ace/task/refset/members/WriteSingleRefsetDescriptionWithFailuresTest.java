@@ -131,7 +131,7 @@ public final class WriteSingleRefsetDescriptionWithFailuresTest {
         EasyMock.expect(mockCleanableProcessBuilder.build()).andReturn(mockCleanableProcess);
         I_ExtendByRef mockExt1 = mockControl.createMock(I_ExtendByRef.class);
         I_ExtendByRef mockExt2 = mockControl.createMock(I_ExtendByRef.class);
-        EasyMock.expect(mockRefset.getConceptId()).andReturn(REFSET_CONCEPT_ID);
+        EasyMock.expect(mockRefset.getConceptNid()).andReturn(REFSET_CONCEPT_ID);
         // TODO fix this one EasyMock.expect(mockTermFactory.getRefsetExtensionMembers(REFSET_CONCEPT_ID)).andReturn(Arrays.asList(mockExt1, mockExt2));
 
         mockCleanableProcess.processExtensionByReference(mockExt1);

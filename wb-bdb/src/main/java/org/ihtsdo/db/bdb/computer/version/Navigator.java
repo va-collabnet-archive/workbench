@@ -7,11 +7,11 @@ import java.util.List;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.OpenBitSet;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * The Navigation class can take multiple positions and determine where they are
@@ -28,7 +28,7 @@ public abstract class Navigator {
 			I_ConfigAceFrame config) throws IOException, PathNotExistsException, TerminologyException {
 		V latest = null;
 		OpenBitSet resultsPartSet = new OpenBitSet(parts.size());
-		for (I_Position pos : config.getViewPositionSetReadOnly()) {
+		for (PositionBI pos : config.getViewPositionSetReadOnly()) {
 			PositionMapper mapper = Bdb.getSapDb().getMapper(pos);
 			OpenBitSet iteratorPartSet = new OpenBitSet(parts.size());
 			for (int i = 0; i < parts.size(); i++) {

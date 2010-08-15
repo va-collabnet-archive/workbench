@@ -74,18 +74,18 @@ public class RefsetDefaultsLanguage extends RefsetDefaults implements I_RefsetDe
     public RefsetDefaultsLanguage() throws TerminologyException, IOException {
         super();
         defaultAcceptabilityForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
-        acceptabilityPopupIds.add(defaultAcceptabilityForLanguageRefset.getConceptId());
+        acceptabilityPopupIds.add(defaultAcceptabilityForLanguageRefset.getConceptNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_SPECIFIED.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.INVALID.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_RECOMMENDED.localize().getNid());
         acceptabilityPopupIds.add(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.localize().getNid());
 
         defaultCorrectnessForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RECOMMENDED.getUids());
-        correctnessPopupIds.add(defaultCorrectnessForLanguageRefset.getConceptId());
+        correctnessPopupIds.add(defaultCorrectnessForLanguageRefset.getConceptNid());
         correctnessPopupIds.add(ArchitectonicAuxiliary.Concept.INCORRECT.localize().getNid());
 
         defaultDegreeOfSynonymyForLanguageRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SYNONYMOUS.getUids());
-        degreeOfSynonymyPopupIds.add(defaultDegreeOfSynonymyForLanguageRefset.getConceptId());
+        degreeOfSynonymyPopupIds.add(defaultDegreeOfSynonymyForLanguageRefset.getConceptNid());
         degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NEAR_SYNONYMOUS.localize().getNid());
         degreeOfSynonymyPopupIds.add(ArchitectonicAuxiliary.Concept.NON_SYNONYMOUS.localize().getNid());
     }

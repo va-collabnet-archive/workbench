@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
@@ -20,6 +19,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/promote", type = BeanType.TASK_BEAN) })
 public class PromoteConcept extends AbstractTask {
@@ -62,7 +62,7 @@ public class PromoteConcept extends AbstractTask {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(profilePropName);
             Terms.get().commit();
-            Set<I_Position> viewPositionSet = config.getViewPositionSet();
+            Set<PositionBI> viewPositionSet = config.getViewPositionSet();
             PathSetReadOnly promotionPaths = new PathSetReadOnly(config.getPromotionPathSet());
             if (viewPositionSet.size() != 1 || promotionPaths.size() != 1) {
                 throw new TaskFailedException(
@@ -74,7 +74,7 @@ public class PromoteConcept extends AbstractTask {
                 throw new TaskFailedException("The conceptToPromote is null. ");
             }
 
-            I_Position viewPosition = viewPositionSet.iterator().next();
+            PositionBI viewPosition = viewPositionSet.iterator().next();
             conceptToPromote.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
                 config.getAllowedStatus(), config.getPrecedence());
             Terms.get().addUncommittedNoChecks(conceptToPromote);

@@ -33,7 +33,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
@@ -43,6 +42,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * The Class DomainModelTestCheck.
@@ -156,7 +156,7 @@ public class DomainModelTestCheck extends TestCase {
 	        newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
 	        config.setDbConfig(newDbProfile);
 			
-			config.setPrecedence(PRECEDENCE.TIME);
+			config.setPrecedence(Precedence.TIME);
 	        
 		} catch (TerminologyException e) {
 			e.printStackTrace();

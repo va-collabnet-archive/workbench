@@ -35,11 +35,11 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * The PanelSnomedVersion class displays a list of paths and lets the user
@@ -52,16 +52,16 @@ import org.dwfa.tapi.TerminologyException;
 public class PanelSnomedVersion extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private Set<I_Position> positionSet = new HashSet<I_Position>();
+    private Set<PositionBI> positionSet = new HashSet<PositionBI>();
     private JList positionList;
-    private ArrayListModel<I_Position> positionListModel;
+    private ArrayListModel<PositionBI> positionListModel;
     private SelectPathAndPositionPanelWithCombo pppwc;
 
     public class DeleteAction extends AbstractAction {
         private static final long serialVersionUID = 1L;
 
         public void actionPerformed(ActionEvent e) {
-            I_Position p = (I_Position) positionList.getSelectedValue();
+        	PositionBI p = (PositionBI) positionList.getSelectedValue();
             positionListModel.remove(p);
             positionSet.remove(p);
         }
@@ -112,7 +112,7 @@ public class PanelSnomedVersion extends JPanel {
         gbc.gridy++;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1;
-        positionListModel = new ArrayListModel<I_Position>();
+        positionListModel = new ArrayListModel<PositionBI>();
         positionList = new JList(positionListModel);
         positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
         positionList.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
@@ -126,15 +126,15 @@ public class PanelSnomedVersion extends JPanel {
         add(positionScroller, gbc);
     }
 
-    public I_Position getCurrentPosition() throws TerminologyException, IOException {
+    public PositionBI getCurrentPosition() throws TerminologyException, IOException {
         return pppwc.getCurrentPosition();
     }
 
-    public Set<I_Position> getPositionSet() {
+    public Set<PositionBI> getPositionSet() {
         return positionSet;
     }
 
-    public void setPositionSet(Set<I_Position> newPositions) {
+    public void setPositionSet(Set<PositionBI> newPositions) {
         positionListModel.clear();
         positionSet.clear();
         positionListModel.addAll(newPositions);

@@ -50,7 +50,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
@@ -58,6 +57,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.gui.GridBagPanel;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * @author kec
@@ -86,9 +87,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
 
     private int fineControlSize = 10;
 
-    private I_Path path;
+    private PathBI path;
 
-    private I_Position position;
+    private PositionBI position;
 
     private boolean selectPositionOnly = false;
 
@@ -104,9 +105,9 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
     private JCheckBox colorPath;
 
     private class Setup implements Runnable {
-        I_Position startingPosition;
+    	PositionBI startingPosition;
 
-        public Setup(I_Position startingPosition) {
+        public Setup(PositionBI startingPosition) {
             this.startingPosition = startingPosition;
         }
 
@@ -115,7 +116,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
                 dates = new ArrayList<Date>();
                 dates.add(new Date(Terms.get().convertToThickVersion(Integer.MIN_VALUE)));
                 for (TimePathId tp : Terms.get().getTimePathList()) {
-                    if (tp.getPathId() == path.getConceptId()) {
+                    if (tp.getPathId() == path.getConceptNid()) {
                         dates.add(new Date(Terms.get().convertToThickVersion(tp.getTime())));
                     }
 
@@ -128,7 +129,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     AceLog.getAppLog().fine(
                         "Processing path: "
-                            + Terms.get().getConcept(path.getConceptId()).getInitialText()
+                            + Terms.get().getConcept(path.getConceptNid()).getInitialText()
                             + " with " + dates.size() + " coordinates");
                 }
                 PositionPanel.this.positionStrings = new ArrayList<String>();
@@ -192,7 +193,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
         }
     }
 
-    public PositionPanel(I_Path path, boolean selectPositionOnly, String purpose, String name,
+    public PositionPanel(PathBI path, boolean selectPositionOnly, String purpose, String name,
             I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue) throws IOException {
         this(path, selectPositionOnly, purpose, name, aceConfig, selectGlue, null);
     }
@@ -203,8 +204,8 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
      * @throws RemoteException
      * 
      */
-    public PositionPanel(I_Path path, boolean selectPositionOnly, String purpose, String name,
-            I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue, I_Position position) throws IOException {
+    public PositionPanel(PathBI path, boolean selectPositionOnly, String purpose, String name,
+            I_ConfigAceFrame aceConfig, PropertySetListenerGlue selectGlue, PositionBI position) throws IOException {
         super(new GridBagLayout(), name, null);
         Font defaultFont = new JLabel().getFont();
         monoSpaceFont = new Font("Monospaced", defaultFont.getStyle(), defaultFont.getSize());
@@ -222,13 +223,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
 
         this.selectGlue = selectGlue;
         this.editGlue = new PropertySetListenerGlue("removeEditingPath", "addEditingPath", "replaceEditingPath",
-            "getEditingPathSet", I_Path.class, aceConfig);
+            "getEditingPathSet", PathBI.class, aceConfig);
         this.promoteGlue = new PropertySetListenerGlue("removePromotionPath", "addPromotionPath",
-            "replacePromotionPathSet", "getPromotionPathSet", I_Path.class, aceConfig);
+            "replacePromotionPathSet", "getPromotionPathSet", PathBI.class, aceConfig);
         colorPath = new JCheckBox("color path");
-        if (aceConfig.getColorForPath(path.getConceptId()) != null) {
+        if (aceConfig.getColorForPath(path.getConceptNid()) != null) {
             colorPath.setSelected(true);
-            colorPath.setBackground(aceConfig.getColorForPath(path.getConceptId()));
+            colorPath.setBackground(aceConfig.getColorForPath(path.getConceptNid()));
             colorPath.setOpaque(true);
         }
 
@@ -264,7 +265,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
      * @throws SecurityException
      */
     @SuppressWarnings("unchecked")
-    private JComponent setupSliderPanel(I_Position startingPosition) throws SecurityException,
+    private JComponent setupSliderPanel(PositionBI startingPosition) throws SecurityException,
             IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         int coarseLabelInset = 8;
         JPanel sliderPanel = new JPanel(new GridBagLayout());
@@ -362,7 +363,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
                 synchronized (this.selectGlue.getSet()) {
                     positions = new HashSet<I_Position>((Collection<? extends I_Position>) this.selectGlue.getSet());
                 }
-                for (I_Position position : positions) {
+                for (PositionBI position : positions) {
                     if (position.getPath() != null && this.path != null) {
                         if (position.getPath().equals(this.path)) {
                             setupPathsEqual(position);
@@ -403,7 +404,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
     /**
      * @param position
      */
-    private void setupPathsEqual(I_Position position) {
+    private void setupPathsEqual(PositionBI position) {
         this.position = position;
         this.selectPositionCheckBox.setSelected(true);
         Date coordinate = new Date(Terms.get().convertToThickVersion(position.getVersion()));
@@ -517,7 +518,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
             this.fineControl.addChangeListener(this);
         }
         if (this.position != null) {
-            I_Position oldPosition = this.position;
+        	PositionBI oldPosition = this.position;
             Date d = this.dates.get(this.fineControl.getValue());
             if (d == null) {
                 d = new Date(Long.MAX_VALUE);
@@ -580,13 +581,13 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
                         colorPath.setOpaque(true);
                         colorPath.setBackground(selectedColor);
                     }
-                    aceConfig.setColorForPath(path.getConceptId(), selectedColor);
+                    aceConfig.setColorForPath(path.getConceptNid(), selectedColor);
                     aceConfig.invalidate();
                     aceConfig.validate();
                     aceConfig.repaint();
                 } else {
                     colorPath.setOpaque(false);
-                    aceConfig.setColorForPath(path.getConceptId(), null);
+                    aceConfig.setColorForPath(path.getConceptNid(), null);
                     aceConfig.invalidate();
                     aceConfig.validate();
                     aceConfig.repaint();
@@ -609,7 +610,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
      * @throws IOException
      * @throws TerminologyException
      */
-    public I_Position getPosition() throws TerminologyException, IOException {
+    public PositionBI getPosition() throws TerminologyException, IOException {
         Date d = this.dates.get(this.fineControl.getValue());
         if (d == null) {
             d = new Date(Long.MAX_VALUE);

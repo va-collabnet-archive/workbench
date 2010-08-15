@@ -80,7 +80,6 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
@@ -96,6 +95,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.tk.api.PathBI;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins, PropertyChangeListener, Scrollable {
 
@@ -126,7 +126,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 List<I_GetConceptData> historyToRemove = new ArrayList<I_GetConceptData>();
                 for (I_GetConceptData historyItem : tabHistoryList) {
                     try {
-                        if (historyItem.getConceptId() != 0 && Terms.get().getUids(historyItem.getConceptId()) != null) {
+                        if (historyItem.getConceptNid() != 0 && Terms.get().getUids(historyItem.getConceptNid()) != null) {
                             JMenuItem menuItem = new JMenuItem(new ShowHistoryAction(historyItem));
                             popup.add(menuItem);
                         } else {
@@ -958,7 +958,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         return Terms.get().getConcept(Arrays.asList(ids));
     }
 
-    public I_Position newPosition(I_Path path, int version) {
+    public I_Position newPosition(PathBI path, int version) {
         return new Position(version, path);
     }
 

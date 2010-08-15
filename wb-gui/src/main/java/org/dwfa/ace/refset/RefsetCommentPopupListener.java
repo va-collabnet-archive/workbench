@@ -83,7 +83,7 @@ public class RefsetCommentPopupListener extends MouseAdapter {
 									.getOrCreateRefsetExtension(
 											commentRefsetIdentityConcept
 													.getNid(),
-											conceptForComment.getConceptId(),
+											conceptForComment.getConceptNid(),
 											REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
 							Terms.get().addUncommitted(newExtension);
 						}

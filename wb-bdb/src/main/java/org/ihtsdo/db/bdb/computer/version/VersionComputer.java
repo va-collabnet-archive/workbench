@@ -9,16 +9,18 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.dwfa.ace.api.I_AmTypedPart;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
@@ -30,10 +32,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 return -1;
             }
             if (p1.getTime() == p2.getTime()) {
-                if (p1.getPathId() == p2.getPathId()) {
+                if (p1.getPathNid() == p2.getPathNid()) {
                     return 0;
                 } else {
-                    if (p1.getPathId() > p2.getPathId()) {
+                    if (p1.getPathNid() > p2.getPathNid()) {
                         return -1;
                     } else {
                         return 1;
@@ -45,23 +47,23 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
     }
 
-    public void addSpecifiedVersions(I_IntSet allowedStatus, I_Position viewPosition, List<V> specifiedVersions,
-            List<V> versions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
-        addSpecifiedVersions(allowedStatus, (I_IntSet) null, new PositionSetReadOnly(viewPosition),
+    public void addSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition, List<V> specifiedVersions,
+            List<V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+        addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
             specifiedVersions, versions, precedencePolicy, contradictionManager);
      }
 
-    public Collection<V> getSpecifiedVersions(I_IntSet allowedStatus, I_Position viewPosition,
-            List<? extends V> versions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+    public Collection<V> getSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition,
+            List<? extends V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
         List<V> specifiedVersions = new ArrayList<V>();
-        addSpecifiedVersions(allowedStatus, (I_IntSet) null, new PositionSetReadOnly(viewPosition),
+        addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
             specifiedVersions, versions, precedencePolicy, contradictionManager);
         return specifiedVersions;
 
     }
 
-    public void addSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, List<V> matchingTuples,
-            List<V> versions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+    public void addSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions, List<V> matchingTuples,
+            List<V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
         addSpecifiedVersions(allowedStatus, null, positions, matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 
@@ -78,8 +80,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
      * @param versions
      * @param core
      */
-    public void addSpecifiedVersions(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<V> specifiedVersions, List<? extends V> versions, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+    public void addSpecifiedVersions(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+            List<V> specifiedVersions, List<? extends V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         if (positions == null || positions.size() < 1) {
             addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes, specifiedVersions, versions, precedencePolicy, contradictionManager);
         } else {
@@ -88,11 +90,11 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
     }
 
     @SuppressWarnings("unchecked")
-    private void addSpecifiedVersionsWithPositions(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, List<V> specifiedVersions, List<? extends V> versions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+    private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus, NidSetBI allowedTypes,
+    		PositionSetBI positions, List<V> specifiedVersions, List<? extends V> versions, 
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         HashSet<V> partsToAdd = new HashSet<V>();
-        for (I_Position p : positions) {
+        for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
             nextpart: for (V part : versions) {
@@ -100,7 +102,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     continue nextpart;
                 }
                 if (allowedTypes != null) {
-                    if (allowedTypes.contains(((I_AmTypedPart) part).getTypeId()) == false) {
+                    if (allowedTypes.contains(((I_AmTypedPart) part).getTypeNid()) == false) {
                         continue nextpart;
                     }
                 }
@@ -120,7 +122,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                             case CONTRADICTION:
                                 if (contradictionManager != null && allowedStatus != null) {
                                     partsForPosition.remove(prevPartToTest);
-                                    partsForPosition.addAll(contradictionManager.resolveParts(part, prevPartToTest));
+                                    partsForPosition.addAll(contradictionManager.resolveVersions(part, prevPartToTest));
                                 } else {
                                     partsForPosition.add(part);
                                     partsForPosition.add(prevPartToTest);
@@ -156,7 +158,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 List<V> partsToCompare = new ArrayList<V>(partsForPosition);
                 for (V part : partsToCompare) {
                     if (allowedStatus != null) {
-                        if (!allowedStatus.contains(part.getStatusId())) {
+                        if (!allowedStatus.contains(part.getStatusNid())) {
                             partsForPosition.remove(part);
                         }
                     }
@@ -178,9 +180,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
      * @param versions
      * @param core
      */
-    private void addSpecifiedVersionsNullPositions(I_IntSet allowedStatus, I_IntSet allowedTypes,
+    private void addSpecifiedVersionsNullPositions(NidSetBI allowedStatus, NidSetBI allowedTypes,
             List<V> specifiedVersions, List<? extends V> versions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         if (versions == null) {
             return;
         }
@@ -191,11 +193,11 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
-            if (allowedStatus != null && allowedStatus.contains(part.getStatusId()) == false) {
+            if (allowedStatus != null && allowedStatus.contains(part.getStatusNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
-            if (allowedTypes != null && allowedTypes.contains(((I_AmTypedPart) part).getTypeId()) == false) {
+            if (allowedTypes != null && allowedTypes.contains(((I_AmTypedPart) part).getTypeNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
@@ -204,8 +206,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         ArrayList<V> versionToRemove = new ArrayList<V>();
         for (V reject : rejectedVersions) {
             for (V possibleAdd : versionsToAdd) {
-                if (reject.getPathId() == possibleAdd.getPathId()) {
-                    if (reject.getVersion() > possibleAdd.getVersion()) {
+                if (reject.getPathNid() == possibleAdd.getPathNid()) {
+                    if (reject.getTime() > possibleAdd.getTime()) {
                         versionToRemove.add(possibleAdd);
                     }
                 }

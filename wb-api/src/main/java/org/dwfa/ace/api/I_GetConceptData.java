@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_GetConceptData extends I_AmTermComponent {
 
@@ -36,7 +37,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException;
 
-    public int getConceptId();
+    public int getConceptNid();
     
     public boolean everHadSrcRelOfType(int typeNid) throws IOException;
 
@@ -57,7 +58,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples using the conflict strategy if specified
@@ -69,7 +70,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples( 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -90,7 +91,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
     public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus, 
         I_IntSet allowedTypes,
         PositionSetReadOnly positionSet, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -126,7 +127,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -165,7 +166,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -187,7 +188,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
@@ -204,7 +205,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * If you want to get all the is-a immediate parents for this concept, pass
@@ -230,7 +231,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -249,7 +250,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, 
-        PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     /**
      * Gets the relationship origins based on the passed statuses, relationship
@@ -275,7 +276,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      */
     public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager)
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager)
             throws IOException, TerminologyException;
 
     /**
@@ -327,7 +328,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
             PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException;
 
     public I_DescriptionTuple getDescTuple(I_IntList descTypePreferenceList, I_ConfigAceFrame config)
             throws IOException;
@@ -338,14 +339,14 @@ public interface I_GetConceptData extends I_AmTermComponent {
 
     public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     @Deprecated
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
             PositionSetReadOnly positions, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException, TerminologyException;
 
     @Deprecated
     public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException,

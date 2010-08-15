@@ -127,7 +127,7 @@ public class VerifyValidIsADups extends AbstractTask {
             // }
             // else{
             // selectedConcept = Terms.get().getConcept(
-            // config.getHierarchySelection().getConceptId() );
+            // config.getHierarchySelection().getConceptNid() );
             // }
 
             I_IntSet pendingRetirementStatusSet = termFact.newIntSet();

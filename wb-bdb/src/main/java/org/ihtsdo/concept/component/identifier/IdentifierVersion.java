@@ -114,12 +114,12 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion, I_Hand
 
     @Override
     public int getPathId() {
-        return sapBdb.getPathId(statusAtPositionNid);
+        return sapBdb.getPathNid(statusAtPositionNid);
     }
 
     @Override
     public int getStatusId() {
-        return sapBdb.getStatusId(statusAtPositionNid);
+        return sapBdb.getStatusNid(statusAtPositionNid);
     }
     
     public int getAuthorId() {

@@ -21,34 +21,36 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-public class PathSetReadOnly implements Set<I_Path> {
-	I_Path[] paths = new I_Path[0];
+import org.ihtsdo.tk.api.PathBI;
+
+public class PathSetReadOnly implements Set<PathBI> {
+	PathBI[] paths = new PathBI[0];
 	I_IntSet pathNids = Terms.get().newIntSet();
 	
 	public I_IntSet getPathNidSet() {
 	    return pathNids;
 	}
-	public PathSetReadOnly(Set<I_Path> paths) {
+	public PathSetReadOnly(Set<PathBI> paths) {
 		super();
 		this.paths = paths.toArray(this.paths);
-		for (I_Path p: paths) {
-		    pathNids.add(p.getConceptId());
+		for (PathBI p: paths) {
+		    pathNids.add(p.getConceptNid());
 		}
 	}
 
-	public PathSetReadOnly(I_Path path) {
+	public PathSetReadOnly(PathBI path) {
 		super();
-		this.paths = new I_Path[1];
+		this.paths = new PathBI[1];
 		this.paths[0] = path;
 	}
 
 	@Override
-	public boolean add(I_Path e) {
+	public boolean add(PathBI e) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends I_Path> c) {
+	public boolean addAll(Collection<? extends PathBI> c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -59,7 +61,7 @@ public class PathSetReadOnly implements Set<I_Path> {
 
 	@Override
 	public boolean contains(Object o) {
-		for (I_Path p: paths) {
+		for (PathBI p: paths) {
 			if (p.equals(o)) {
 				return true;
 			}
@@ -77,7 +79,7 @@ public class PathSetReadOnly implements Set<I_Path> {
 		return paths.length == 0;
 	}
 	
-	private class PositionIterator implements Iterator<I_Path> {
+	private class PositionIterator implements Iterator<PathBI> {
 		int index = 0;
 		@Override
 		public boolean hasNext() {
@@ -85,7 +87,7 @@ public class PathSetReadOnly implements Set<I_Path> {
 		}
 
 		@Override
-		public I_Path next() {
+		public PathBI next() {
 			return paths[index++];
 		}
 
@@ -97,7 +99,7 @@ public class PathSetReadOnly implements Set<I_Path> {
 	}
 
 	@Override
-	public Iterator<I_Path> iterator() {
+	public Iterator<PathBI> iterator() {
 		return new PositionIterator();
 	}
 

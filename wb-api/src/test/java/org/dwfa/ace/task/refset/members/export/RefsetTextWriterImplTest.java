@@ -66,7 +66,7 @@ public final class RefsetTextWriterImplTest {
         I_DescriptionTuple mockDescriptionTuple2 = mockControl.createMock(I_DescriptionTuple.class);
         List<I_DescriptionTuple> descriptionTupleList = Arrays.asList(mockDescriptionTuple1, mockDescriptionTuple2);
 
-        EasyMock.expect(mockPartConcept.getConceptId()).andReturn(PART_CONCEPT_ID);
+        EasyMock.expect(mockPartConcept.getConceptNid()).andReturn(PART_CONCEPT_ID);
         EasyMock.expect(mockRefsetUtil.getLocalizedParentMarkerNid()).andReturn(LOCALIZED_PARENT_NID);
         mockDescriptionWriter.write(mockRefsetConcept, descriptionTupleList);
         mockControl.replay();

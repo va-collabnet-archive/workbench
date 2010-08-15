@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
@@ -51,6 +50,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.ihtsdo.tk.api.PathBI;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
@@ -171,7 +171,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
             if (refsetSpec != null) {
                 JTree specTree = configFrame.getTreeInSpecEditor();
 
-                int refsetId = refsetSpec.getConceptId();
+                int refsetId = refsetSpec.getConceptNid();
                 int componentId = refsetId;
 
                 TreePath selection = specTree.getSelectionPath();
@@ -216,10 +216,10 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                                 ext.getTuples(null, configFrame.getViewPositionSetReadOnly(), configFrame
                                     .getPrecedence(), configFrame.getConflictResolutionStrategy());
                         for (I_ExtendByRefVersion t : lastTuple) {
-                            for (I_Path p : configFrame.getEditingPathSet()) {
+                            for (PathBI p : configFrame.getEditingPathSet()) {
                                 I_ExtendByRefPart analog =
                                         (I_ExtendByRefPart) t.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT
-                                            .localize().getNid(), p.getConceptId(), Long.MAX_VALUE);
+                                            .localize().getNid(), p.getConceptNid(), Long.MAX_VALUE);
                                 ext.addVersion(analog);
                                 tf.addUncommitted(ext);
                             }

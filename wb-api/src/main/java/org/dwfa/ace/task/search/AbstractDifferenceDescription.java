@@ -29,12 +29,12 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.conflict.detector.DescriptionTupleConflictComparator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
 
@@ -76,14 +76,14 @@ public abstract class AbstractDifferenceDescription extends AbstractSearchTest {
                 conceptToTest = (I_GetConceptData) component;
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-                conceptToTest = Terms.get().getConcept(desc.getConceptId());
+                conceptToTest = Terms.get().getConcept(desc.getConceptNid());
             } else {
                 return applyInversion(false);
             }
 
             Set<I_DescriptionTuple> firstSet = null;
-            for (I_Position p : frameConfig.getViewPositionSet()) {
-                Set<I_Position> positionSet = new HashSet<I_Position>();
+            for (PositionBI p : frameConfig.getViewPositionSet()) {
+                Set<PositionBI> positionSet = new HashSet<PositionBI>();
                 positionSet.add(p);
                 PositionSetReadOnly viewSet = new PositionSetReadOnly(positionSet);
                 List<? extends I_DescriptionTuple> tuples = conceptToTest.getDescriptionTuples(frameConfig.getAllowedStatus(),

@@ -74,7 +74,7 @@ public class SetPropertyToHierarchySelectionUuid extends AbstractTask {
             I_TermFactory termFactory = Terms.get();
             I_GetConceptData selection = config.getHierarchySelection();
             if (selection != null) {
-                process.setProperty(propName, termFactory.getUids(selection.getConceptId()).iterator().next());
+                process.setProperty(propName, termFactory.getUids(selection.getConceptNid()).iterator().next());
             }
             return Condition.CONTINUE;
         } catch (Exception e) {

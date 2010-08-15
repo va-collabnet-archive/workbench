@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.api;
 
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public interface I_RelTuple extends I_AmTypedTuple {
 

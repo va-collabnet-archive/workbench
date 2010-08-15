@@ -70,12 +70,12 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                boolean extAdded = newRefsetExtension(getMemberRefsetId(), item.getConceptId(),
+                boolean extAdded = newRefsetExtension(getMemberRefsetId(), item.getConceptNid(),
                 		REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
                         getMemberTypeId()),
                         getConfig());
                 if (extAdded) {
-                    newMembers.add(item.getConceptId());
+                    newMembers.add(item.getConceptNid());
                 }
             }
 
@@ -138,9 +138,9 @@ public class MemberRefsetHelper extends RefsetHelper implements I_HelpMemberRefs
 
             @Override
             public void processItem(I_GetConceptData item) throws Exception {
-                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptId(), new RefsetPropertyMap().with(
+                if (retireRefsetExtension(getMemberRefsetId(), item.getConceptNid(), new RefsetPropertyMap().with(
                 		RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, getMemberTypeId()))) {
-                    removedMembers.add(item.getConceptId());
+                    removedMembers.add(item.getConceptNid());
                 }
             }
 

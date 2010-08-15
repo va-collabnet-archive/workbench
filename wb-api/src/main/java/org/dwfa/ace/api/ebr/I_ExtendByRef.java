@@ -22,9 +22,9 @@ import java.util.List;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_ExtendByRef extends I_AmTermComponent {
 
@@ -82,7 +82,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, List<I_ExtendByRefVersion> returnTuples,
-            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -101,7 +101,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(List<I_ExtendByRefVersion> returnTuples,
-            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -121,7 +121,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-        PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+        Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions

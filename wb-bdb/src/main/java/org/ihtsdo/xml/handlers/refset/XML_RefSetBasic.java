@@ -1,6 +1,5 @@
 package org.ihtsdo.xml.handlers.refset;
 
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.ihtsdo.xml.handlers.BasicXMLStruct;
 import org.ihtsdo.xml.handlers.I_Handle_XML;

@@ -32,13 +32,13 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * The select user panel allows the user to select a particular user from the drop down list.
@@ -146,7 +146,7 @@ public class SelectUserPanel extends JPanel {
             I_GetConceptData descriptionType =
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
             I_IntSet descAllowedTypes = Terms.get().newIntSet();
-            descAllowedTypes.add(descriptionType.getConceptId());
+            descAllowedTypes.add(descriptionType.getConceptNid());
 
             for (I_GetConceptData user : allUsers) {
 
@@ -179,22 +179,22 @@ public class SelectUserPanel extends JPanel {
         return validUsers;
     }
 
-    public Set<I_Position> getPositions(I_TermFactory termFactory) throws Exception {
+    public Set<PositionBI> getPositions(I_TermFactory termFactory) throws Exception {
         I_ConfigAceFrame activeProfile = termFactory.getActiveAceFrameConfig();
-        Set<I_Path> editingPaths = activeProfile.getEditingPathSet();
-        Set<I_Position> allPositions = new HashSet<I_Position>();
-        for (I_Path path : editingPaths) {
+        Set<PathBI> editingPaths = activeProfile.getEditingPathSet();
+        Set<PositionBI> allPositions = new HashSet<PositionBI>();
+        for (PathBI path : editingPaths) {
             allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
-            for (I_Position position : path.getOrigins()) {
+            for (PositionBI position : path.getOrigins()) {
                 addOriginPositions(termFactory, position, allPositions);
             }
         }
         return allPositions;
     }
 
-    private void addOriginPositions(I_TermFactory termFactory, I_Position position, Set<I_Position> allPositions) {
+    private void addOriginPositions(I_TermFactory termFactory, PositionBI position, Set<PositionBI> allPositions) {
         allPositions.add(position);
-        for (I_Position originPosition : position.getPath().getOrigins()) {
+        for (PositionBI originPosition : position.getPath().getOrigins()) {
             addOriginPositions(termFactory, originPosition, allPositions);
         }
     }

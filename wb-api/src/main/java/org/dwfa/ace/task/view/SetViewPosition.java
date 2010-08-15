@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -42,6 +40,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/view", type = BeanType.TASK_BEAN) })
 public class SetViewPosition extends AbstractTask {
@@ -89,7 +89,7 @@ public class SetViewPosition extends AbstractTask {
         try {
             I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
 
-            I_Path path = Terms.get().getPath(viewPathEntry.ids);
+            PathBI path = Terms.get().getPath(viewPathEntry.ids);
             int version = Integer.MAX_VALUE;
             if (positionStr.equalsIgnoreCase("latest")) {
                 version = Integer.MAX_VALUE;
@@ -98,7 +98,7 @@ public class SetViewPosition extends AbstractTask {
                 version = Terms.get().convertToThinVersion(date.getTime());
             }
 
-            I_Position position = Terms.get().newPosition(path, version);
+            PositionBI position = Terms.get().newPosition(path, version);
             profile.addViewPosition(position);
 
             return Condition.CONTINUE;

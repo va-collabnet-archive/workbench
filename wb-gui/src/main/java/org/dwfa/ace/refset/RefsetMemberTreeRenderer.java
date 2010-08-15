@@ -51,7 +51,7 @@ public class RefsetMemberTreeRenderer extends DefaultTreeCellRenderer {
         setClosedIcon(null);
         setOpenIcon(null);
         I_GetConceptData viewerImageType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
-        viewerImageTypes.add(viewerImageType.getConceptId());
+        viewerImageTypes.add(viewerImageType.getConceptNid());
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,

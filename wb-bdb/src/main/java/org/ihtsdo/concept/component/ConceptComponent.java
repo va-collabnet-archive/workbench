@@ -22,7 +22,6 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TestComponent;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
@@ -40,10 +39,9 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
-import org.ihtsdo.etypes.EIdentifierLong;
-import org.ihtsdo.etypes.EIdentifierString;
-import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
@@ -241,6 +239,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        @Deprecated
         public Set<TimePathId> getTimePathSet() {
             return ConceptComponent.this.getTimePathSet();
         }
@@ -261,15 +260,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
-        public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-                PRECEDENCE precedence) throws IOException, TerminologyException {
+        public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+                Precedence precedence) throws IOException, TerminologyException {
             return ConceptComponent.this.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
         }
 
         @Override
     	public boolean promote(I_TestComponent test, I_Position viewPosition,
     			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-    			PRECEDENCE precedence) throws IOException, TerminologyException {
+    			Precedence precedence) throws IOException, TerminologyException {
     		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
     			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
     		}
@@ -338,19 +337,37 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        @Deprecated
         public int getPathId() {
             if (index >= 0) {
                 return getMutablePart().getPathId();
             }
-            return Bdb.getSapDb().getPathId(primordialSapNid);
+            return Bdb.getSapDb().getPathNid(primordialSapNid);
         }
 
         @Override
+        public int getPathNid() {
+            if (index >= 0) {
+                return getMutablePart().getPathNid();
+            }
+            return Bdb.getSapDb().getPathNid(primordialSapNid);
+        }
+
+        @Override
+        @Deprecated
         public int getStatusId() {
             if (index >= 0) {
                 return getMutablePart().getStatusId();
             }
-            return Bdb.getSapDb().getStatusId(primordialSapNid);
+            return Bdb.getSapDb().getStatusNid(primordialSapNid);
+        }
+        
+        @Override
+        public int getStatusNid() {
+            if (index >= 0) {
+                return getMutablePart().getStatusNid();
+            }
+            return Bdb.getSapDb().getStatusNid(primordialSapNid);
         }
 
         @Override
@@ -378,6 +395,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
+        @Deprecated
         public int getVersion() {
             if (index >= 0) {
                 return getMutablePart().getVersion();
@@ -385,6 +403,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return Bdb.getSapDb().getVersion(primordialSapNid);
         }
 
+        
         @Override
         public I_AmTermComponent getFixedPart() {
             return ConceptComponent.this;
@@ -398,14 +417,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public final ArrayIntList getPartComponentNids() {
             ArrayIntList resultList = getVariableVersionNids();
-            resultList.add(getPathId());
-            resultList.add(getStatusId());
+            resultList.add(getPathNid());
+            resultList.add(getStatusNid());
             return resultList;
         }
 
         public abstract ArrayIntList getVariableVersionNids();
 
         @Override
+        @Deprecated
         public void setPathId(int pathId) {
             if (index >= 0) {
                 revisions.get(index).setPathId(pathId);
@@ -413,22 +433,34 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ConceptComponent.this.setPathId(pathId);
             }
         }
+        public void setPathNid(int pathId) {
+            if (index >= 0) {
+                revisions.get(index).setPathNid(pathId);
+            } else {
+                ConceptComponent.this.setPathNid(pathId);
+            }
+        }
 
         @Override
-        public void setStatusId(int statusId) {
+        @Deprecated
+        public void setStatusId(int statusNid) {
+            setStatusNid(statusNid);
+        }
+        @Override
+         public void setStatusNid(int statusNid) {
             if (index >= 0) {
-                revisions.get(index).setStatusId(statusId);
+                revisions.get(index).setStatusNid(statusNid);
             } else {
-                ConceptComponent.this.setStatusId(statusId);
+                ConceptComponent.this.setStatusNid(statusNid);
             }
         }
 
         @Override
         public void setAuthorNid(int authorNid) {
             if (index >= 0) {
-                revisions.get(index).setStatusId(authorNid);
+                revisions.get(index).setAuthorNid(authorNid);
             } else {
-                ConceptComponent.this.setStatusId(authorNid);
+                ConceptComponent.this.setAuthorNid(authorNid);
             }
         }
         public UUID getPrimUuid() {
@@ -466,7 +498,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             if (index >= 0) {
                 return getMutableIdPart().getPathId();
             }
-            return Bdb.getSapDb().getPathId(primordialSapNid);
+            return Bdb.getSapDb().getPathNid(primordialSapNid);
         }
 
         @Override
@@ -474,7 +506,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             if (index >= 0) {
                 return getMutableIdPart().getStatusId();
             }
-            return Bdb.getSapDb().getStatusId(primordialSapNid);
+            return Bdb.getSapDb().getStatusNid(primordialSapNid);
         }
 
         @Override
@@ -675,11 +707,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         if (primordialSapNid >= 0) {
             buf.append(" status:");
-            ConceptComponent.addNidToBuffer(buf, getStatusId());
+            ConceptComponent.addNidToBuffer(buf, getStatusNid());
             buf.append(" author:");
             ConceptComponent.addNidToBuffer(buf, getAuthorNid());
             buf.append(" path:");
-            ConceptComponent.addNidToBuffer(buf, getPathId());
+            ConceptComponent.addNidToBuffer(buf, getPathNid());
             buf.append(" tm: ");
             buf.append(TimeUtil.formatDate(getTime()));
             buf.append(" "); 
@@ -1021,8 +1053,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             universal = new UniversalAceIdentification(additionalIdentifierVersions.size() + 1);
         }
         UniversalAceIdentificationPart universalPart = new UniversalAceIdentificationPart();
-        universalPart.setIdStatus(getUuids(getStatusId()));
-        universalPart.setPathId(getUuids(getPathId()));
+        universalPart.setIdStatus(getUuids(getStatusNid()));
+        universalPart.setPathId(getUuids(getPathNid()));
         universalPart.setSource(getUuids(getAuthorityNid()));
         universalPart.setSourceId(getDenotation());
         universalPart.setTime(getTime());
@@ -1141,12 +1173,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return revisions.size() + 1;
     }
 
+    @Deprecated
     public final Set<TimePathId> getTimePathSet() {
         Set<TimePathId> set = new TreeSet<TimePathId>();
-        set.add(new TimePathId(getVersion(), getPathId()));
+        set.add(new TimePathId(getVersion(), getPathNid()));
         if (revisions != null) {
             for (R p : revisions) {
-                set.add(new TimePathId(p.getVersion(), p.getPathId()));
+                set.add(new TimePathId(p.getVersion(), p.getPathNid()));
             }
         }
         return set;
@@ -1181,20 +1214,32 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             throw new UnsupportedOperationException(
                 "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
-        if (authorNid != getPathId()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusId(), authorNid, getPathId(), Long.MAX_VALUE);
+        if (authorNid != getPathNid()) {
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), authorNid, getPathNid(), Long.MAX_VALUE);
             modified();
         }
 	}
 
 	@Override
+	@Deprecated
     public final int getPathId() {
-        return Bdb.getSapDb().getPathId(primordialSapNid);
+        return Bdb.getSapDb().getPathNid(primordialSapNid);
+    }
+
+	@Override
+    public final int getPathNid() {
+        return Bdb.getSapDb().getPathNid(primordialSapNid);
     }
 
     @Override
+    @Deprecated
     public final int getStatusId() {
-        return Bdb.getSapDb().getStatusId(primordialSapNid);
+        return Bdb.getSapDb().getStatusNid(primordialSapNid);
+    }
+
+    @Override
+    public final int getStatusNid() {
+        return Bdb.getSapDb().getStatusNid(primordialSapNid);
     }
 
     @Override
@@ -1203,11 +1248,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Override
+    @Deprecated
     public final int getVersion() {
         return ThinVersionHelper.convert(getTime());
     }
 
     @Override
+    @Deprecated
     public final void setPathId(int pathId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1215,6 +1262,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         if (pathId != getPathId()) {
 				this.primordialSapNid = Bdb.getSapNid(getStatusId(), 
+						Terms.get().getAuthorNid(),
+						pathId, Long.MAX_VALUE);
+				modified();
+        }
+    }
+    @Override
+    public final void setPathNid(int pathId) {
+        if (getTime() != Long.MAX_VALUE) {
+            throw new UnsupportedOperationException(
+                "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+        }
+        if (pathId != getPathNid()) {
+				this.primordialSapNid = Bdb.getSapNid(getStatusNid(), 
 						Terms.get().getAuthorNid(),
 						pathId, Long.MAX_VALUE);
 				modified();
@@ -1228,11 +1288,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
         if (time != getTime()) {
-				this.primordialSapNid = Bdb.getSapNid(getStatusId(), 
+				this.primordialSapNid = Bdb.getSapNid(getStatusNid(), 
 						Terms.get().getAuthorNid(),
-						getPathId(), time);
+						getPathNid(), time);
         }
     }
+    @Deprecated
 	public final void setStatusId(int statusId) {
         if (getTime() != Long.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -1244,6 +1305,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 						getPathId(), Long.MAX_VALUE);
         }
 	}
+	public final void setStatusNid(int statusId) {
+        if (getTime() != Long.MAX_VALUE) {
+            throw new UnsupportedOperationException(
+                "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
+        }
+        if (statusId != this.getStatusNid()) {
+				this.primordialSapNid = Bdb.getSapNid(statusId, 
+						Terms.get().getAuthorNid(), 
+						getPathNid(), Long.MAX_VALUE);
+        }
+	}
     @Override
     public final void setVersion(int version) {
         throw new UnsupportedOperationException("Use makeAnalog instead.");
@@ -1251,8 +1323,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public final ArrayIntList getPartComponentNids() {
         ArrayIntList resultList = getVariableVersionNids();
-        resultList.add(getPathId());
-        resultList.add(getStatusId());
+        resultList.add(getPathNid());
+        resultList.add(getStatusNid());
         return resultList;
     }
 
@@ -1511,7 +1583,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-			PRECEDENCE precedence) throws IOException, TerminologyException {
+			Precedence precedence) throws IOException, TerminologyException {
 		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
 		}

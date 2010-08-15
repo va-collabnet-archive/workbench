@@ -3,13 +3,13 @@ package org.ihtsdo.concept.component.refsetmember.cidFloat;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidflt.TkRefsetCidFloatRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -56,6 +56,14 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		floatValue = primoridalMember.getFloatValue();
 	}
 
+    public CidFloatRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidFloatMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+		c1Nid = primoridalMember.getC1Nid();
+		floatValue = primoridalMember.getFloatValue();
+	}
+
 	public CidFloatRevision(int statusAtPositionNid, 
 			CidFloatMember primoridalMember) {
 		super(statusAtPositionNid, 
@@ -71,10 +79,17 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 		floatValue = another.floatValue;
 	}
 
+	protected CidFloatRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidFloatRevision another) {
+		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+		c1Nid = another.c1Nid;
+		floatValue = another.floatValue;
+	}
+
 	@Override
 	public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
@@ -82,10 +97,21 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
         return newR;
 	}
 
+	@Override
+	public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            return this;
+        }
+        CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
 
     @Override
     public CidFloatRevision makeAnalog() {
-         return new CidFloatRevision(getStatusId(), getPathId(), getTime(), this);
+         return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	public CidFloatRevision(TupleInput input, 
@@ -114,7 +140,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

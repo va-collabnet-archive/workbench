@@ -53,7 +53,6 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_IterateIds;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
@@ -146,7 +145,8 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.CheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.LuceneManager;
-
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
@@ -400,8 +400,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_RepresentIdSet getConceptIdSet() throws IOException {
-        return Bdb.getConceptDb().getConceptIdSet();
+    public I_RepresentIdSet getConceptNidSet() throws IOException {
+        return Bdb.getConceptDb().getConceptNidSet();
     }
 
     @Override
@@ -438,7 +438,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public I_RepresentIdSet getDescriptionIdSet() throws IOException {
         I_RepresentIdSet descriptionIdSet = new IdentifierSet();
-        I_IterateIds iterator = getConceptIdSet().iterator();
+        I_IterateIds iterator = getConceptNidSet().iterator();
         while (iterator.next()) {
             Concept concept = Bdb.getConcept(iterator.nid());
             for (Description description : concept.getDescriptions()) {
@@ -513,23 +513,23 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public I_Path getPath(Collection<UUID> uids) throws TerminologyException, IOException {
+    public PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException {
         return pathManager.get(uuidToNative(uids));
     }
 
     @Override
-    public I_Path getPath(UUID... ids) throws TerminologyException, IOException {
+    public PathBI getPath(UUID... ids) throws TerminologyException, IOException {
         return pathManager.get(Bdb.uuidToNid(ids));
     }
 
     @Override
-    public I_Path getPath(int nid) throws TerminologyException, IOException {
+    public PathBI getPath(int nid) throws TerminologyException, IOException {
         return pathManager.get(nid);
     }
 
     @Override
-    public List<I_Path> getPaths() throws Exception {
-        return new ArrayList<I_Path>(pathManager.getAll());
+    public List<PathBI> getPaths() throws Exception {
+        return new ArrayList<PathBI>(pathManager.getAll());
     }
 
     @Override
@@ -827,15 +827,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(newConceptUuid);
         a.primordialSapNid = Integer.MIN_VALUE;
                 
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
                 a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
-                		getUserNid(aceFrameConfig), p.getConceptId(), time);
+                		getUserNid(aceFrameConfig), p.getConceptNid(), time);
             } else {
                 if (a.revisions == null) {
                     a.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
                 }
-                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptId(), time));
+                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptNid(), time));
             }
         }
         return newC;
@@ -844,7 +844,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 	private static int getUserNid(I_ConfigAceFrame aceFrameConfig) {
 		int userNid = ReferenceConcepts.USER.getNid();
         if (aceFrameConfig.getDbConfig() != null && aceFrameConfig.getDbConfig().getUserConcept() != null) {
-        	userNid = aceFrameConfig.getDbConfig().getUserConcept().getConceptId();
+        	userNid = aceFrameConfig.getDbConfig().getUserConcept().getConceptNid();
         }
 		return userNid;
 	}
@@ -892,18 +892,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         d.setLang(lang);
         d.setText(text);
         d.setInitialCaseSignificant(false);
-        d.setTypeId(descType.getNid());
+        d.setTypeNid(descType.getNid());
         d.primordialSapNid = Integer.MIN_VALUE;
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
                 d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), 
                 		getUserNid(aceFrameConfig),
-                		p.getConceptId(), effectiveDate);
+                		p.getConceptNid(), effectiveDate);
             } else {
                 if (d.revisions == null) {
                     d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
                 }
-                d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptId(), effectiveDate));
+                d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptNid(), effectiveDate));
             }
         }
         c.getDescriptions().add(d);
@@ -1068,14 +1068,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             statusNid = propMap.getInt(REFSET_PROPERTY.STATUS);
         }
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
-        for (I_Path p : config.getEditingPathSet()) {
+        for (PathBI p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
                 		getUserNid(config),
-                		p.getConceptId(), time);
+                		p.getConceptNid(), time);
                 propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
             } else {
-                I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptId(), time);
+                I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
                 propMap.setProperties(revision);
                 member.addVersion(revision);
             }
@@ -1112,27 +1112,27 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     @Deprecated
-    public I_Path newPath(Set<I_Position> origins, I_GetConceptData pathConcept) throws TerminologyException,
+    public PathBI newPath(Set<PositionBI> origins, I_GetConceptData pathConcept) throws TerminologyException,
             IOException {
         return newPath(origins, pathConcept, getActiveAceFrameConfig());
     }
 
     @Override
-    public I_Path newPath(Collection<? extends I_Position> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
+    public PathBI newPath(Collection<? extends PositionBI> origins, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException {
-        assert pathConcept != null && pathConcept.getConceptId() != 0;
-        ArrayList<I_Position> originList = new ArrayList<I_Position>();
+        assert pathConcept != null && pathConcept.getConceptNid() != 0;
+        ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
         if (origins != null) {
             originList.addAll(origins);
         }
-        Path newPath = new Path(pathConcept.getConceptId(), originList);
+        Path newPath = new Path(pathConcept.getConceptNid(), originList);
         AceLog.getEditLog().fine("writing new path: \n" + newPath);
         pathManager.write(newPath, commitConfig);
         return newPath;
     }
 
     @Override
-    public I_Position newPosition(I_Path path, int version) throws TerminologyException, IOException {
+    public Position newPosition(PathBI path, int version) throws TerminologyException, IOException {
         return new Position(version, path);
     }
 
@@ -1184,16 +1184,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.primordialSapNid = Integer.MIN_VALUE;
         r.setGroup(group);
         int statusNid = relStatus.getNid();
-        for (I_Path p : aceFrameConfig.getEditingPathSet()) {
+        for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
                 r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
                 		getUserNid(aceFrameConfig),
-                		p.getConceptId(), effectiveDate);
+                		p.getConceptNid(), effectiveDate);
             } else {
                 if (r.revisions == null) {
                     r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
                 }
-                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptId(), effectiveDate));
+                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptNid(), effectiveDate));
             }
         }
         c.getSourceRels().add(r);
@@ -1224,7 +1224,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
         r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, 
-        		getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId(),
+        		getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
         		pathNid, effectiveDate);
         c.getSourceRels().add(r);
         return r;
@@ -1282,7 +1282,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void writePath(I_Path p, I_ConfigAceFrame config) throws IOException {
+    public void writePath(PathBI p, I_ConfigAceFrame config) throws IOException {
         try {
             pathManager.write(p, config);
         } catch (TerminologyException e) {
@@ -1296,7 +1296,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void writePathOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
+    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws TerminologyException {
         pathManager.writeOrigin(path, origin, config);
     }
 
@@ -1669,7 +1669,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 } else { // assume it is a description member
                     I_DescriptionVersioned desc = Terms.get().getDescription(v.getComponentId());
                     if (desc != null) {
-                        currentMembersList.add(desc.getConceptId());
+                        currentMembersList.add(desc.getConceptNid());
                     }
                 }
             }
@@ -1810,16 +1810,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         img.setTypeNid(typeNid);
         img.primordialSapNid = Integer.MIN_VALUE;
         int statusNid = aceConfig.getDefaultStatus().getNid();
-        for (I_Path p : aceConfig.getEditingPathSet()) {
+        for (PathBI p : aceConfig.getEditingPathSet()) {
             if (img.primordialSapNid == Integer.MIN_VALUE) {
                 img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, 
                 		aceConfig.getDbConfig().getUserConcept().getNid(),
-                		p.getConceptId(), Long.MAX_VALUE);
+                		p.getConceptNid(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
                     img.revisions = new CopyOnWriteArrayList<ImageRevision>();
                 }
-                img.revisions.add(img.makeAnalog(statusNid, p.getConceptId(), Long.MAX_VALUE));
+                img.revisions.add(img.makeAnalog(statusNid, p.getConceptNid(), Long.MAX_VALUE));
             }
         }
         c.getImages().add(img);
@@ -1868,7 +1868,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    public void removeOrigin(I_Path path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException {
         pathManager.removeOrigin(path, origin, config);
     }
 
@@ -1884,7 +1884,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 			try {
 				if (getActiveAceFrameConfig() != null || getActiveAceFrameConfig().getDbConfig() != null ||
 						getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
-					authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
+					authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid();
 				} else {
 					authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
 				}

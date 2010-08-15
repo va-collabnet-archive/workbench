@@ -21,6 +21,12 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
 				pathNid, time, primordialComponent);
 	}
 
+	public RefsetRevision(int statusNid, int authorNid, int pathNid, long time, 
+			C primordialComponent) {
+		super(statusNid, authorNid, 
+				pathNid, time, primordialComponent);
+	}
+
 	public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
 		super(statusAtPositionNid, primordialComponent);
 	}
@@ -48,16 +54,19 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
     }
 
     @Override
+    @Deprecated
 	public final int getStatus() {
-		return getStatusId();
+		return getStatusNid();
 	}
 
 	@Override
+	@Deprecated
 	public final void setStatus(int idStatus) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	@Deprecated
 	public I_ExtendByRefPart duplicate() {
 		throw new UnsupportedOperationException();
 	}

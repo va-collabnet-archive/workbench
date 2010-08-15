@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refsetmember.cid;
 import java.io.IOException;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
@@ -11,6 +10,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -56,16 +56,29 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 		c1Nid = primoridalMember.getC1Nid();
 	}
 
+    protected CidRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidMember primoridalMember) {
+		super(statusNid, authorNid, pathNid, time, 
+				primoridalMember);
+		c1Nid = primoridalMember.getC1Nid();
+	}
+
 	protected CidRevision(int statusNid, int pathNid, long time, 
 			CidRevision another) {
 		super(statusNid, pathNid, time, another.primordialComponent);
 		c1Nid = another.c1Nid;
 	}
 
+	protected CidRevision(int statusNid, int authorNid, int pathNid, long time, 
+			CidRevision another) {
+		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+		c1Nid = another.c1Nid;
+	}
+
 	@Override
 	public CidRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathId() == pathNid) {
-            this.setStatusId(statusNid);
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
             return this;
         }
         CidRevision newR = new CidRevision(statusNid, pathNid, time, this);
@@ -73,9 +86,20 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
         return newR;
 	}
 
+	@Override
+	public CidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (this.getTime() == time && this.getPathNid() == pathNid) {
+            this.setStatusNid(statusNid);
+            return this;
+        }
+        CidRevision newR = new CidRevision(statusNid, authorNid, pathNid, time, this);
+        primordialComponent.addRevision(newR);
+        return newR;
+	}
+
     @Override
     public CidRevision makeAnalog() {
-         return new CidRevision(getStatusId(), getPathId(), getTime(), this);
+         return new CidRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
 	protected CidRevision(int statusAtPositionNid, 
@@ -109,7 +133,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		// TODO
 		throw new UnsupportedOperationException();
 	}

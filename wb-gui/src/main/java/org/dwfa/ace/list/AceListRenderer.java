@@ -57,15 +57,15 @@ public class AceListRenderer extends DefaultListCellRenderer {
                     if (desc != null) {
                         renderComponent.setText(desc.getText());
                     } else {
-                        AceLog.getAppLog().info("element: " + index + " descTuple is null: " + concept.getConceptId());
-                        renderComponent.setText("removing concept with null descTuple: " + concept.getConceptId());
+                        AceLog.getAppLog().info("element: " + index + " descTuple is null: " + concept.getConceptNid());
+                        renderComponent.setText("removing concept with null descTuple: " + concept.getConceptNid());
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 I_GetConceptData concept = (I_GetConceptData) value;
                                 I_ModelTerminologyList listModel = (I_ModelTerminologyList) list.getModel();
                                 if (index < list.getModel().getSize()) {
                                     I_GetConceptData another = listModel.getElementAt(index);
-                                    if (another != null && another.getConceptId() == concept.getConceptId()) {
+                                    if (another != null && another.getConceptNid() == concept.getConceptNid()) {
                                         listModel.removeElement(index);
                                         AceLog.getAppLog().info(
                                             "element " + another + " with index " + index + " removed.");

@@ -16,9 +16,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -32,6 +30,14 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
@@ -40,14 +46,14 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Description 
 	extends ConceptComponent<DescriptionRevision, Description> 
-	implements I_DescriptionVersioned, I_DescriptionPart {
+	implements I_DescriptionVersioned, I_DescriptionPart, DescriptionAnalogBI {
 
 	private static VersionComputer<Description.Version> computer = 
 		new VersionComputer<Description.Version>();
 	
 	public class Version 
 		extends ConceptComponent<DescriptionRevision, Description>.Version 
-		implements I_DescriptionTuple, I_DescriptionPart {
+		implements I_DescriptionTuple, I_DescriptionPart, DescriptionAnalogBI {
 
 		public Version() {
 			super();
@@ -58,7 +64,7 @@ public class Description
 		}
 
 		@Override
-		public int getConceptId() {
+		public int getConceptNid() {
 			return enclosingConceptNid;
 		}
 
@@ -124,21 +130,42 @@ public class Description
 		}
 
 		@Override
+		@Deprecated
 		public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		public int getTypeId() {
-			return typeNid;
+			return getTypeNid();
 		}
 		
+		public int getTypeNid() {
+			if (index >= 0) {
+				return revisions.get(index).getTypeNid();
+			}
+			return Description.this.typeNid;
+		}
+		
+        public List<? extends Version> getVersions() {
+        	return Description.this.getVersions();
+        }
+
 		@Override
+		@Deprecated
 		public void setTypeId(int type) {
 			if (index >= 0) {
 				revisions.get(index).setTypeId(type);
 			} else {
 				Description.this.setTypeId(type);
+			}
+		}
+		@Override
+		public void setTypeNid(int typeNid) {
+			if (index >= 0) {
+				revisions.get(index).setTypeNid(typeNid);
+			} else {
+				Description.this.setTypeNid(typeNid);
 			}
 		}
 
@@ -159,8 +186,8 @@ public class Description
 		public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
 			    DescriptionRevision rev = revisions.get(index);
-                if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
-			        rev.setStatusId(statusNid);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
                     return rev;
                 }
 				return revisions.get(index).makeAnalog(statusNid, pathNid, time);
@@ -180,6 +207,34 @@ public class Description
 		@Deprecated
 		public I_DescriptionPart duplicate() {
 			throw new UnsupportedOperationException("Use makeAnalog instead");
+		}
+
+		@Override
+		public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid,
+				long time) {
+			if (index >= 0) {
+			    DescriptionRevision rev = revisions.get(index);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
+			        rev.setAuthorNid(authorNid);
+                    return rev;
+                }
+				return revisions.get(index).makeAnalog(statusNid, authorNid, pathNid, time);
+			} else {
+				return Description.this.makeAnalog(statusNid, authorNid, pathNid, time);
+			}
+		}
+
+		@Override
+		public Description.Version getVersion(Coordinate c)
+				throws ContraditionException {
+			return Description.this.getVersion(c);
+		}
+
+		@Override
+		public Collection<Description.Version> getVersions(
+				Coordinate c) {
+			return Description.this.getVersions(c);
 		}		
 	}
 	
@@ -342,11 +397,6 @@ public class Description
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int getConceptId() {
-		return enclosingConceptNid;
-	}
-
 	public Concept getConcept() {
 		return getEnclosingConcept();
 	}
@@ -403,7 +453,7 @@ public class Description
 
 	@Override
 	public I_DescribeConceptLocally toLocalFixedDesc() {
-        return new LocalFixedDesc(nid, getStatusId(), getConceptId(), isInitialCaseSignificant(),
+        return new LocalFixedDesc(nid, getStatusNid(), getConceptNid(), isInitialCaseSignificant(),
             getTypeId(), getText(), getLang());
 	}
 
@@ -453,7 +503,7 @@ public class Description
 	}
 
 	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Description.Version> matchingTuples, PRECEDENCE precedence,
+			List<Description.Version> matchingTuples, Precedence precedence,
 			I_ManageContradiction contradictionMgr) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition,
 				matchingTuples, getVersions(), precedence, contradictionMgr);
@@ -462,16 +512,16 @@ public class Description
 	@Override
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples, 
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+			Precedence precedence, I_ManageContradiction contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
 		matchingTuples.addAll(returnTuples);
 	}
 
-	public Collection<Description.Version> getVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+	public List<Description.Version> getVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetReadOnly viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -513,24 +563,50 @@ public class Description
 	}
 
 	@Override
+	@Deprecated
 	public int getTypeId() {
 		return typeNid;
 	}
 
 	@Override
+	public int getTypeNid() {
+		return typeNid;
+	}
+
+	@Override
+	@Deprecated
 	public void setTypeId(int typeNid) {
 		this.typeNid = typeNid;
         modified();
 	}
 
 	@Override
+	public void setTypeNid(int typeNid) {
+		this.typeNid = typeNid;
+        modified();
+	}
+
+	@Override
 	public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		DescriptionRevision newR;
 			newR = new DescriptionRevision(this, statusNid, 
 					Terms.get().getAuthorNid(),
+					pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+	
+	@Override
+	public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		DescriptionRevision newR;
+			newR = new DescriptionRevision(this, statusNid, 
+					authorNid,
 					pathNid, time, this);
 		addRevision(newR);
 		return newR;
@@ -570,8 +646,8 @@ public class Description
     }
 
 	@Override
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence)
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.
@@ -579,12 +655,12 @@ public class Description
         			viewPosition, 
         			getVersions(), precedence, null);
         boolean promotedAnything = false;
-        for (I_Path promotionPath : pomotionPaths) {
+        for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
-                if (v.getPathId() == viewPathId) {
+                if (v.getPathNid() == viewPathId) {
                 	
-                    DescriptionRevision revision =  v.makeAnalog(v.getStatusId(), 
-							promotionPath.getConceptId(), Long.MAX_VALUE);
+                    DescriptionRevision revision =  v.makeAnalog(v.getStatusNid(), 
+							promotionPath.getConceptNid(), Long.MAX_VALUE);
                     addRevision(revision);
                     promotedAnything = true;
                 }
@@ -602,5 +678,26 @@ public class Description
     public boolean hasExtensions() throws IOException {
         return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
+
+	@Override
+	public Description.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		List<Description.Version> vForC = getVersions(c);
+		if (vForC.size() == 0) {
+			return null;
+		}
+		if (vForC.size() > 1) {
+			throw new ContraditionException(vForC.toString());
+		}
+		return vForC.get(0);
+	}
+
+	@Override
+	public List<Description.Version> getVersions(Coordinate c) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
+				returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
+		return returnTuples;
+	}
 
 }

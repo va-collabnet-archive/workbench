@@ -59,7 +59,7 @@ public class ReflexiveRefsetCommentTableModel extends ReflexiveRefsetTableModel 
                     .getAllowedStatus(), allowedTypes, host.getConfig().getViewPositionSetReadOnly(), 
                     host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
                 if (commentRefsets.size() > 0) {
-                    this.tableComponentId = commentRefsets.iterator().next().getConceptId();
+                    this.tableComponentId = commentRefsets.iterator().next().getConceptNid();
                 }
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);

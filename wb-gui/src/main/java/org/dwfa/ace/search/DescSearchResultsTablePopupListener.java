@@ -107,7 +107,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
             StringWithDescTuple swdt = (StringWithDescTuple) descTable.getValueAt(selectedRow, 0);
             descTuple = swdt.getTuple();
             UUID descUuid = Terms.get().getId(descTuple.getDescId()).getUUIDs().iterator().next();
-            descConcept = Terms.get().getConcept(descTuple.getConceptId());
+            descConcept = Terms.get().getConcept(descTuple.getConceptNid());
 
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem = new JMenuItem(" ");

@@ -1,10 +1,8 @@
 package org.ihtsdo.xml.handlers;
 
 
-import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 

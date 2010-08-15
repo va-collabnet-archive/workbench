@@ -30,7 +30,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -39,8 +38,10 @@ import org.dwfa.ace.utypes.UniversalAcePosition;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
-public class Path implements I_Path {
+public class Path implements PathBI {
     /**
 	 * 
 	 */
@@ -48,20 +49,20 @@ public class Path implements I_Path {
 
     int conceptNid;
 
-    Set<I_Position> origins;
+    Set<PositionBI> origins;
 
-    public Path(int conceptId, List<I_Position> origins) {
+    public Path(int conceptId, List<? extends PositionBI> origins) {
         super();
         this.conceptNid = conceptId;
         if (origins != null) {
-            this.origins = new HashSet<I_Position>(origins);
+            this.origins = new HashSet<PositionBI>(origins);
         } else {
-            this.origins = new HashSet<I_Position>(0);
+            this.origins = new HashSet<PositionBI>(0);
         }
     }
 
-    public boolean equals(I_Path another) {
-        return (conceptNid == another.getConceptId());
+    public boolean equals(PathBI another) {
+        return (conceptNid == another.getConceptNid());
     }
 
     @Override
@@ -69,8 +70,8 @@ public class Path implements I_Path {
         if (obj == null) {
             return false;
         }
-        if (I_Path.class.isAssignableFrom(obj.getClass())) {
-            return equals((I_Path) obj);
+        if (PathBI.class.isAssignableFrom(obj.getClass())) {
+            return equals((PathBI) obj);
         }
         return false;
     }
@@ -83,11 +84,8 @@ public class Path implements I_Path {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_Path#getConceptId()
+     * @see org.dwfa.vodb.types.PathBI#getConceptNid()
      */
-    public int getConceptId() {
-        return conceptNid;
-    }
     public int getConceptNid() {
         return conceptNid;
     }
@@ -95,37 +93,37 @@ public class Path implements I_Path {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_Path#getOrigins()
+     * @see org.dwfa.vodb.types.PathBI#getOrigins()
      */
-    public Collection<I_Position> getOrigins() {
+    public Collection<? extends PositionBI> getOrigins() {
         return Collections.unmodifiableSet(origins);
     }
 
-    public Set<I_Position> getInheritedOrigins() {
-        HashSet<I_Position> inheritedOrigins = new HashSet<I_Position>();
-        for (I_Position origin : this.origins) {
+    public Set<PositionBI> getInheritedOrigins() {
+        HashSet<PositionBI> inheritedOrigins = new HashSet<PositionBI>();
+        for (PositionBI origin : this.origins) {
             inheritedOrigins.addAll(origin.getPath().getInheritedOrigins());
             inheritedOrigins.add(origin);
         }
         return inheritedOrigins;
     }
 
-    public Set<I_Position> getNormalisedOrigins() {
+    public Set<PositionBI> getNormalisedOrigins() {
         return getNormalisedOrigins(null);
     }
 
-    public Set<I_Position> getNormalisedOrigins(Collection<I_Path> paths) {
-        final Set<I_Position> inheritedOrigins = getInheritedOrigins();
+    public Set<PositionBI> getNormalisedOrigins(Collection<PathBI> paths) {
+        final Set<PositionBI> inheritedOrigins = getInheritedOrigins();
         if (paths != null) {
-            for (I_Path path : paths) {
+            for (PathBI path : paths) {
                 if (path != this) {
                     inheritedOrigins.addAll(path.getInheritedOrigins());
                 }
             }
         }
-        Set<I_Position> normalisedOrigins = new HashSet<I_Position>(inheritedOrigins);
-        for (I_Position a : inheritedOrigins) {
-            for (I_Position b : inheritedOrigins) {
+        Set<PositionBI> normalisedOrigins = new HashSet<PositionBI>(inheritedOrigins);
+        for (PositionBI a : inheritedOrigins) {
+            for (PositionBI b : inheritedOrigins) {
                 if ((a.getPath().getConceptNid()) == b.getPath().getConceptNid() && (a.getVersion() < b.getVersion())) {
                     normalisedOrigins.remove(a);
                 }
@@ -137,13 +135,13 @@ public class Path implements I_Path {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dwfa.vodb.types.I_Path#getMatchingPath(int)
+     * @see org.dwfa.vodb.types.PathBI#getMatchingPath(int)
      */
-    public I_Path getMatchingPath(int pathId) {
+    public PathBI getMatchingPath(int pathId) {
         if (conceptNid == pathId) {
             return this;
         }
-        for (I_Position origin : origins) {
+        for (PositionBI origin : origins) {
             if (origin.getPath().getMatchingPath(pathId) != null) {
                 return origin.getPath();
             }
@@ -151,19 +149,23 @@ public class Path implements I_Path {
         return null;
     }
 
-    public static String toHtmlString(I_Path path) throws IOException, TerminologyException {
-        StringBuffer buff = new StringBuffer();
-        buff.append("<html><font color='blue' size='+1'><u>");
-        I_GetConceptData cb = Terms.get().getConcept(path.getConceptId());
-        buff.append(cb.getInitialText());
-        buff.append("</u></font>");
-        if (path != null) {
-            for (I_Position origin : path.getOrigins()) {
-                buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
-                buff.append(origin);
-            }
-        }
-        return buff.toString();
+    public static String toHtmlString(PathBI path) throws IOException {
+        try {
+			StringBuffer buff = new StringBuffer();
+			buff.append("<html><font color='blue' size='+1'><u>");
+			I_GetConceptData cb = Terms.get().getConcept(path.getConceptNid());
+			buff.append(cb.getInitialText());
+			buff.append("</u></font>");
+			if (path != null) {
+			    for (PositionBI origin : path.getOrigins()) {
+			        buff.append("<br>&nbsp;&nbsp;&nbsp;Origin: ");
+			        buff.append(origin);
+			    }
+			}
+			return buff.toString();
+		} catch (TerminologyException e) {
+			throw new IOException(e);
+		}
     }
 
 
@@ -176,40 +178,38 @@ public class Path implements I_Path {
      * 
      * 
      * 
-     * org.dwfa.vodb.types.I_Path#convertIds(org.dwfa.ace.api.I_MapNativeToNative
+     * org.dwfa.vodb.types.PathBI#convertIds(org.dwfa.ace.api.I_MapNativeToNative
      * )
      */
+    @Deprecated
     public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
-        conceptNid = jarToDbNativeMap.get(conceptNid);
-        for (I_Position origin : origins) {
-            origin.getPath().convertIds(jarToDbNativeMap);
-        }
+        throw new UnsupportedOperationException();
     }
 
     public UniversalAcePath getUniversal() throws IOException, TerminologyException {
              List<UniversalAcePosition> universalOrigins = new ArrayList<UniversalAcePosition>(origins.size());
-            for (I_Position position : origins) {
+            for (PositionBI position : origins) {
                 universalOrigins.add(new UniversalAcePosition(Terms.get().nativeToUuid(
                     position.getPath().getConceptNid()), Terms.get().convertToThickVersion(position.getVersion())));
             }
             return new UniversalAcePath(Terms.get().nativeToUuid(conceptNid), universalOrigins);
     }
 
-    public static void writePath(ObjectOutputStream out, I_Path p) throws IOException {
-    	List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptId());
+    public static void writePath(ObjectOutputStream out, PathBI p) throws IOException {
+    	List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptNid());
     	if (uuids.size() > 0) {
-    		out.writeObject(Terms.get().nativeToUuid(p.getConceptId()));
+    		out.writeObject(Terms.get().nativeToUuid(p.getConceptNid()));
     	} else {
     		throw new IOException("no uuids for component: " + p);
     	}
     	out.writeInt(p.getOrigins().size());
-    	for (I_Position origin : p.getOrigins()) {
+    	for (PositionBI origin : p.getOrigins()) {
     		Position.writePosition(out, origin);
     	}
     }
 
     @SuppressWarnings("unchecked")
-    public static I_Path readPath(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public static PathBI readPath(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int pathId;
         try {
             List<UUID> pathIdList = (List<UUID>) in.readObject();
@@ -225,16 +225,16 @@ public class Path implements I_Path {
             throw newEx;
         }
         int size = in.readInt();
-        List<I_Position> origins = new ArrayList<I_Position>(size);
+        List<PositionBI> origins = new ArrayList<PositionBI>(size);
         for (int i = 0; i < size; i++) {
             origins.add(Position.readPosition(in));
         }
         return new Path(pathId, origins);
     }
 
-    public static Set<I_Path> readPathSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public static Set<PathBI> readPathSet(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int size = in.readInt();
-        Set<I_Path> positions = new HashSet<I_Path>(size);
+        Set<PathBI> positions = new HashSet<PathBI>(size);
         for (int i = 0; i < size; i++) {
             try {
                 positions.add(readPath(in));
@@ -249,9 +249,9 @@ public class Path implements I_Path {
         return positions;
     }
 
-    public static void writePathSet(ObjectOutputStream out, Set<I_Path> viewPositions) throws IOException {
+    public static void writePathSet(ObjectOutputStream out, Set<PathBI> viewPositions) throws IOException {
         out.writeInt(viewPositions.size());
-        for (I_Path p : viewPositions) {
+        for (PathBI p : viewPositions) {
             writePath(out, p);
         }
     }
@@ -259,7 +259,7 @@ public class Path implements I_Path {
     public String toString() {
         StringBuffer buff = new StringBuffer();
         try {
-            I_GetConceptData cb = Terms.get().getConcept(getConceptId());
+            I_GetConceptData cb = Terms.get().getConcept(getConceptNid());
             buff.append(cb.getInitialText());
         } catch (IOException e) {
             buff.append(e.getMessage());
@@ -271,11 +271,11 @@ public class Path implements I_Path {
         return buff.toString();
     }
 
-    public String toHtmlString() throws IOException, TerminologyException {
+    public String toHtmlString() throws IOException {
         return Path.toHtmlString(this);
     }
 
-    public void addOrigin(I_Position position, I_ConfigAceFrame config) throws TerminologyException {
+    public void addOrigin(PositionBI position, I_ConfigAceFrame config) throws TerminologyException {
         assert this.origins.contains(position) == false: "Attempt to add duplicate origin to path: " +
             this.toString() + " duplicate origin: " + position;
         this.origins.add(position);
@@ -288,4 +288,15 @@ public class Path implements I_Path {
         this.origins.remove(position);
         Terms.get().removeOrigin(this, position, config);
     }
+
+	@Override
+	public List<UUID> getUUIDs() {
+		try {
+			return new ArrayList<UUID>(Terms.get().getUids(conceptNid));
+		} catch (TerminologyException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

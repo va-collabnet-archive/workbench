@@ -2,8 +2,6 @@ package org.ihtsdo.xml.handlers;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 

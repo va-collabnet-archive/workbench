@@ -138,7 +138,7 @@ public class JTreeWithDragImage extends JTree {
         }
 
         private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
-            return new ConceptTransferable(Terms.get().getConcept(obj.getConceptId()));
+            return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
         }
 
         public Image getDragImage(I_GetConceptData obj) throws IOException {

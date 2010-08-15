@@ -1,9 +1,7 @@
 package org.ihtsdo.xml.handlers;
 
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Element;
 
@@ -46,7 +44,7 @@ public class XML_I_ImageVersioned extends XML_basic_getCon implements I_Handle_X
 		Element localE = parent.getOwnerDocument().createElement(CommonXMLStatics.IMG_ENAME);
 		
 		if (!debug) {
-			con_id = img.getConceptId();
+			con_id = img.getConceptNid();
 			imageid = img.getImageId();
 			format = img.getFormat();
 			BasicXMLStruct.getNativeIdAtts_i(imageid,localE);

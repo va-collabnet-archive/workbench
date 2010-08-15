@@ -25,10 +25,10 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class ConflictDetector {
     /**
@@ -43,8 +43,8 @@ public class ConflictDetector {
         Set<I_ConceptAttributeTuple> attributeTuples = null;
         Set<I_DescriptionTuple> descTuples = null;
         Set<I_RelTuple> relTuples = null;
-        for (I_Position viewPos : profileForConflictDetection.getViewPositionSet()) {
-            Set<I_Position> positionSet = new HashSet<I_Position>();
+        for (PositionBI viewPos : profileForConflictDetection.getViewPositionSet()) {
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
             positionSet.add(viewPos);
             PositionSetReadOnly viewPositionSet = new PositionSetReadOnly(positionSet);
             if (attributeTuples == null) {

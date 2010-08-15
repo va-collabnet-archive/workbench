@@ -140,11 +140,11 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_GetConceptData smeRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SME_ROLE.getUids());
         I_GetConceptData reviewerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
         I_IntSet roleAllowedTypes = termFactory.newIntSet();
-        roleAllowedTypes.add(ownerRole.getConceptId());
-        roleAllowedTypes.add(adminRole.getConceptId());
-        roleAllowedTypes.add(authorRole.getConceptId());
-        roleAllowedTypes.add(smeRole.getConceptId());
-        roleAllowedTypes.add(reviewerRole.getConceptId());
+        roleAllowedTypes.add(ownerRole.getConceptNid());
+        roleAllowedTypes.add(adminRole.getConceptNid());
+        roleAllowedTypes.add(authorRole.getConceptNid());
+        roleAllowedTypes.add(smeRole.getConceptNid());
+        roleAllowedTypes.add(reviewerRole.getConceptNid());
 
         I_IntSet isAAllowedTypes = termFactory.getActiveAceFrameConfig().getDestRelTypes();
 
@@ -180,7 +180,7 @@ public class TestForEditRefsetPermission extends AbstractExtensionTest {
         I_GetConceptData createNewRefsetPermissionRel =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.EDIT_REFSET.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(createNewRefsetPermissionRel.getConceptId());
+        allowedTypes.add(createNewRefsetPermissionRel.getConceptNid());
 
         Set<? extends I_GetConceptData> refsets =
                 concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions,

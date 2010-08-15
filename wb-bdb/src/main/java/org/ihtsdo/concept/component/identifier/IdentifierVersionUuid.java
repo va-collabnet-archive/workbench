@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_IdPart;
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;

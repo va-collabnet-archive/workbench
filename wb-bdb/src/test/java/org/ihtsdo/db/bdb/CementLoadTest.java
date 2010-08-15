@@ -81,7 +81,7 @@ public class CementLoadTest {
 			Bdb.close();
 			
 			Bdb.setup(dbTarget);
-			IdentifierSet cids = (IdentifierSet) Bdb.getConceptDb().getConceptIdSet();
+			IdentifierSet cids = (IdentifierSet) Bdb.getConceptDb().getConceptNidSet();
 			IdentifierSet roCids = Bdb.getConceptDb().getReadOnlyConceptIdSet();
 			System.out.println("Differences: " + cids.getDifferences(roCids));
 			System.out.println("Concept count: " + cids.cardinality());

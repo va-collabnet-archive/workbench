@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
 
 public interface I_ImageVersioned extends I_AmTermComponent {
 
@@ -35,7 +36,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public String getFormat();
 
-    public int getConceptId();
+    public int getConceptNid();
 
     public I_ImageTuple getLastTuple();
 
@@ -47,7 +48,7 @@ public interface I_ImageVersioned extends I_AmTermComponent {
 
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, 
             PositionSetReadOnly positions, List<I_ImageTuple> returnImages, 
-            PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager);
+            Precedence precedencePolicy, I_ManageContradiction contradictionManager);
 
     public UniversalAceImage getUniversal() throws IOException, TerminologyException;
 }

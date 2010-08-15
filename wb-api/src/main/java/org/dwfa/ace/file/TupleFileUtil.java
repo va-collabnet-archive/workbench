@@ -447,17 +447,17 @@ public class TupleFileUtil {
 
         // add refset spec members
         List<? extends I_ExtendByRef> extensions =
-                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptId(), true);
+                Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(), true);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
-        fetchedComponents.add(refsetSpec.getConceptId());
+        fetchedComponents.add(refsetSpec.getConceptNid());
         RefsetQueryFactory.addExtensionsToMap((List<? extends I_ExtendByRef>) extensions, extensionMap,
-            fetchedComponents, refsetSpec.getConceptId());
+            fetchedComponents, refsetSpec.getConceptNid());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
             I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
-            if (ext.getComponentId() == refsetSpec.getConceptId()) {
+            if (ext.getComponentId() == refsetSpec.getConceptNid()) {
                 root.add(extNode);
             } else {
                 extensionMap.get(ext.getComponentId()).add(extNode);
@@ -535,7 +535,7 @@ public class TupleFileUtil {
 
     private void exportRefsetMembers(I_GetConceptData refset, I_ConfigAceFrame configFrame,
             BufferedWriter exportFileWriter, TupleCounter tupleCounter) throws Exception {
-        Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(refset.getConceptId());
+        Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(refset.getConceptNid());
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         for (I_ExtendByRef ext : extensions) {
@@ -605,9 +605,9 @@ public class TupleFileUtil {
                     I_ExtendByRefPartCidCidCid part = (I_ExtendByRefPartCidCidCid) thinTuple.getMutablePart();
                     I_GetConceptData clause = Terms.get().getConcept(part.getC2id());
                     I_GetConceptData potentialRefset = Terms.get().getConcept(part.getC3id());
-                    if (clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids())
-                        || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
-                        || clause.getConceptId() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
+                    if (clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF.getUids())
+                        || clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF.getUids())
+                        || clause.getConceptNid() == Terms.get().uuidToNative(RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
                         if (isMemberRefset(potentialRefset)) {
                             RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true, configFrame);
                             exportRefsetSpecToFile(outputFileWriter, refsetSpecHelper.getRefsetSpecConcept(),
@@ -649,7 +649,7 @@ public class TupleFileUtil {
         long latestVersion = Long.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -682,7 +682,7 @@ public class TupleFileUtil {
         long latestVersion = Long.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();

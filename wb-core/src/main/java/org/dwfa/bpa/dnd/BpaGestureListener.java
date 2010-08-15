@@ -44,6 +44,7 @@ import javax.swing.JLabel;
 
 import org.dwfa.bpa.process.I_ContainData;
 import org.dwfa.bpa.process.I_DefineTask;
+import org.dwfa.tapi.NoMappingException;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 

@@ -48,6 +48,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -145,7 +146,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
         try {
             allowedStatuses = null;
             positions = null;
-            Set<I_Position> refsetPositions = new HashSet<I_Position>();
+            Set<PositionBI> refsetPositions = new HashSet<PositionBI>();
             refsetPositions.addAll(Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly());
             referenceSetExport.setPositions(refsetPositions);
 
@@ -184,7 +185,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
                 return;
             }
 
-            exportRefsets(concept.getConceptId());
+            exportRefsets(concept.getConceptNid());
 
             // export relationship refsets
             for (I_RelVersioned rel : concept.getSourceRels()) {

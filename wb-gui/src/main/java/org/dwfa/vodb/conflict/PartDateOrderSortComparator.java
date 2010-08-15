@@ -28,9 +28,19 @@ class PartDateOrderSortComparator implements Comparator<I_AmPart> {
 
     public int compare(I_AmPart o1, I_AmPart o2) {
         if (reverseOrder) {
-            return o2.getVersion() - o1.getVersion();
+        	if (o2.getTime() - o1.getTime() > 0) {
+        		return 1;
+        	} else if (o2.getTime() - o1.getTime() < 0) {
+        		return -1;
+        	}
+            return 0;
         } else {
-            return o1.getVersion() - o2.getVersion();
+        	if (o2.getTime() - o1.getTime() > 0) {
+        		return -1;
+        	} else if (o2.getTime() - o1.getTime() < 0) {
+        		return 1;
+        	}
+            return 0;
         }
     }
 

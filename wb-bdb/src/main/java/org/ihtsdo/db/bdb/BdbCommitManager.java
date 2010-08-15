@@ -637,7 +637,7 @@ public class BdbCommitManager {
 
 	public static void forget(I_DescriptionVersioned desc) throws IOException {
 		Description d = (Description) desc;
-		Concept c = Bdb.getConcept(d.getConceptId());
+		Concept c = Bdb.getConcept(d.getConceptNid());
 		if (d.getTime() != Long.MAX_VALUE) {
 		    // Only need to forget additional versions;
 		    if (d.revisions == null) {

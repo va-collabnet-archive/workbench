@@ -26,8 +26,6 @@ import java.util.Set;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -39,6 +37,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/view", type = BeanType.TASK_BEAN) })
 public class SetViewPositionFromProperty extends AbstractTask {
@@ -94,7 +94,7 @@ public class SetViewPositionFromProperty extends AbstractTask {
             I_GetConceptData viewPathConcept = getProperty(process, I_GetConceptData.class, viewPathConceptPropName);
 
             I_TermFactory tf = Terms.get();
-            I_Path viewPath = tf.getPath(viewPathConcept.getUids());
+            PathBI viewPath = tf.getPath(viewPathConcept.getUids());
 
             int version = Integer.MAX_VALUE;
             if (!positionStr.equalsIgnoreCase("latest")) {
@@ -102,8 +102,8 @@ public class SetViewPositionFromProperty extends AbstractTask {
                 version = tf.convertToThinVersion(date.getTime());
             }
 
-            I_Position newPosition = tf.newPosition(viewPath, version);
-            Set<I_Position> viewPositionSet = profile.getViewPositionSet();
+            PositionBI newPosition = tf.newPosition(viewPath, version);
+            Set<PositionBI> viewPositionSet = profile.getViewPositionSet();
             if (!keepExistingViewPaths) {
                 viewPositionSet.clear();
             }

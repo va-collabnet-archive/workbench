@@ -38,12 +38,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ConceptAttributeTableModel.FieldToChange;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class AttributePopupListener extends MouseAdapter {
 
@@ -65,11 +65,11 @@ public class AttributePopupListener extends MouseAdapter {
             } catch (IOException e1) {
                 throw new RuntimeException(e1);
             }
-            for (I_Path p : config.getEditingPathSet()) {
+            for (PathBI p : config.getEditingPathSet()) {
                 I_ConceptAttributePart currentPart = (I_ConceptAttributePart) selectedObject.getTuple()
                     .getMutablePart();
                 I_ConceptAttributePart newPart = (I_ConceptAttributePart) currentPart.makeAnalog(
-                    currentPart.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                    currentPart.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
                 ((I_ConceptAttributeVersioned) selectedObject.getTuple().getFixedPart()).addVersion(newPart);
             }
             Terms.get().addUncommitted(sourceBean);
@@ -117,17 +117,17 @@ public class AttributePopupListener extends MouseAdapter {
                 I_ConceptAttributePart newPart = selectedObject.getTuple().getMutablePart();
                 if (selectedObject.getTuple().getTime() != Long.MAX_VALUE) {
                     I_ConceptAttributePart currentPart = selectedObject.getTuple().getMutablePart();
-                    for (I_Path p : config.getEditingPathSet()) {
+                    for (PathBI p : config.getEditingPathSet()) {
                         switch (field) {
                         case STATUS:
                             Collection<UUID> ids = (Collection<UUID>) obj;
 
                             newPart = (I_ConceptAttributePart) currentPart.makeAnalog(Terms.get().uuidToNative(ids),
-                                p.getConceptId(), Long.MAX_VALUE);
+                                p.getConceptNid(), Long.MAX_VALUE);
                             break;
                         case DEFINED:
                             newPart = (I_ConceptAttributePart) currentPart.makeAnalog(config.getDefaultStatus()
-                                .getConceptId(), p.getConceptId(), Long.MAX_VALUE);
+                                .getConceptNid(), p.getConceptNid(), Long.MAX_VALUE);
                             newPart.setDefined((Boolean) obj);
                             break;
 
@@ -139,11 +139,11 @@ public class AttributePopupListener extends MouseAdapter {
                     switch (field) {
                     case STATUS:
                         Collection<UUID> ids = (Collection<UUID>) obj;
-                        newPart.setStatusId(Terms.get().uuidToNative(ids));
+                        newPart.setStatusNid(Terms.get().uuidToNative(ids));
                         break;
                     case DEFINED:
                         newPart.setDefined((Boolean) obj);
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusNid(config.getDefaultStatus().getConceptNid());
                         break;
 
                     default:

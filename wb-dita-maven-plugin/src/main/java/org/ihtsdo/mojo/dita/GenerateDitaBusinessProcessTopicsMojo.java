@@ -3,35 +3,38 @@
 // perhaps package dwfa.org.ace.maven-mojos/maven-dita.plugin ??
 package org.ihtsdo.mojo.dita;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.beans.XMLDecoder;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashMap;
-import java.io.*; 
-
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
-import java.beans.XMLDecoder;
-import java.beans.IntrospectionException;
-
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_DefineTask;
-import org.dwfa.bpa.process.PropertySpec;
-import org.dwfa.bpa.process.I_RenderDocumentation;
-import org.dwfa.bpa.*;
-
-import org.jdom.*;
-import org.jdom.output.*;
 
 import org.apache.commons.io.DirectoryWalker;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.StringUtils;
+import org.dwfa.bpa.PropertyDescriptorWithTarget;
+import org.dwfa.bpa.process.I_DefineTask;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.PropertySpec;
+import org.jdom.Comment;
+import org.jdom.DocType;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 
 /**

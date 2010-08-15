@@ -32,8 +32,6 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -49,6 +47,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class SnoTaskCheckRedundant extends AbstractTask implements ActionListener {
@@ -83,13 +83,13 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     // INPUT PATHS
     int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
-    I_Path cEditIPath = null;
-    List<I_Position> cEditPathPos = null; // Edit (Stated) Path I_Positions
+    PathBI cEditIPath = null;
+    List<PositionBI> cEditPathPos = null; // Edit (Stated) Path I_Positions
 
     // OUTPUT PATHS
     int cClassPathNid; // :TODO: move to logging
-    I_Path cClassIPath; // Used for write back value
-    List<I_Position> cClassPathPos; // Classifier (Inferred) Path I_Positions
+    PathBI cClassIPath; // Used for write back value
+    List<PositionBI> cClassPathPos; // Classifier (Inferred) Path I_Positions
 
     // MASTER DATA SETS
     // List<SnoRel> cEditSnoRels; // "Edit Path" Concepts
@@ -380,9 +380,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
                 return Condition.STOP;
             }
 
-            cEditPathNid = cEditPathObj.getConceptId();
+            cEditPathNid = cEditPathObj.getConceptNid();
             cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cEditPathPos = new ArrayList<I_Position>();
+            cEditPathPos = new ArrayList<PositionBI>();
             cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
             addPathOrigins(cEditPathPos, cEditIPath);
 
@@ -393,9 +393,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 return Condition.STOP;
             }
-            cClassPathNid = cClassPathObj.getConceptId();
+            cClassPathNid = cClassPathObj.getConceptNid();
             cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cClassPathPos = new ArrayList<I_Position>();
+            cClassPathPos = new ArrayList<PositionBI>();
             cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
             addPathOrigins(cClassPathPos, cClassIPath);
 
@@ -409,9 +409,9 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
         return Condition.CONTINUE;
     }
 
-    private void addPathOrigins(List<I_Position> origins, I_Path p) {
+    private void addPathOrigins(List<PositionBI> origins, PathBI p) {
         origins.addAll(p.getOrigins());
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             addPathOrigins(origins, o.getPath());
         }
     }
@@ -466,20 +466,14 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
         return s.toString();
     }
 
-    private String toStringPathPos(List<I_Position> pathPos, String pStr) {
+    private String toStringPathPos(List<PositionBI> pathPos, String pStr) {
         // BUILD STRING
         StringBuffer s = new StringBuffer();
         s.append("\r\n::: [SnorocketTaskExp] PATH ID -- " + pStr);
-        try {
-            for (I_Position position : pathPos) {
-                s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptNid() + "\tVersion:\t"
-                    + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUniversal());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        }
+        for (PositionBI position : pathPos) {
+		    s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptNid() + "\tVersion:\t"
+		        + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUUIDs());
+		}
         s.append("\r\n:::");
         return s.toString();
     }

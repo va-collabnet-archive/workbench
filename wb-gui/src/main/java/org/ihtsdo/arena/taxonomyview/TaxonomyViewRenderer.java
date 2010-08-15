@@ -10,25 +10,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 
 import org.dwfa.ace.ACE;
-import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
-import org.ihtsdo.arena.conceptview.ConceptViewSettings;
-import org.ihtsdo.arena.conceptview.ConceptViewTitle;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;

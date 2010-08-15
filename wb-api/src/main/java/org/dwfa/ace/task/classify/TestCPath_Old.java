@@ -1,7 +1,5 @@
 package org.dwfa.ace.task.classify;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +12,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -32,6 +28,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class TestCPath_Old extends AbstractTask {
@@ -51,7 +49,7 @@ public class TestCPath_Old extends AbstractTask {
     private int isCURRENT;
     private I_IntSet statusSet;
     private I_IntSet allowedRoleTypes;
-    private ArrayList<I_Position> cClassPathPos;
+    private ArrayList<PositionBI> cClassPathPos;
     private int workbenchAuxPath;
 
     // :DEBUG:
@@ -125,16 +123,16 @@ public class TestCPath_Old extends AbstractTask {
                 return Condition.STOP;
             }
 
-            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
+            PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
             cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
             // cClassPosSet = new PositionSetReadOnly(cClassIPath.getOrigins().get(0));
 
             // Setup to exclude Workbench Auxiliary on path
             UUID wAuxUuid = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
             I_GetConceptData wAuxCb = tf.getConcept(wAuxUuid);
-            workbenchAuxPath = wAuxCb.getConceptId();
+            workbenchAuxPath = wAuxCb.getConceptNid();
 
-            cClassPathPos = new ArrayList<I_Position>();
+            cClassPathPos = new ArrayList<PositionBI>();
             cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
             getPathOrigins(cClassPathPos, cClassIPath);
 
@@ -149,19 +147,19 @@ public class TestCPath_Old extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void getPathOrigins(List<I_Position> origins, I_Path p) {
-        List<I_Position> thisLevel = new ArrayList<I_Position>();
+    private void getPathOrigins(List<PositionBI> origins, PathBI p) {
+        List<PositionBI> thisLevel = new ArrayList<PositionBI>();
 
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             origins.add(o);
             thisLevel.add(o);
         }
 
         // do a breadth first traversal of path origins.
         while (thisLevel.size() > 0) {
-            List<I_Position> nextLevel = new ArrayList<I_Position>();
-            for (I_Position p1 : thisLevel) {
-                for (I_Position p2 : p1.getPath().getOrigins())
+            List<PositionBI> nextLevel = new ArrayList<PositionBI>();
+            for (PositionBI p1 : thisLevel) {
+                for (PositionBI p2 : p1.getPath().getOrigins())
                     if ((origins.contains(p2) == false)
                             && (p2.getPath().getConceptNid() != workbenchAuxPath)) {
                         origins.add(p2);
@@ -231,7 +229,7 @@ public class TestCPath_Old extends AbstractTask {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rv : thisLevel) {
                 I_RelPart rPart1 = null;
-                for (I_Position pos : cClassPathPos) { // PATHS_IN_PRIORITY_ORDER
+                for (PositionBI pos : cClassPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
                         if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                             if (rPart1 == null) {

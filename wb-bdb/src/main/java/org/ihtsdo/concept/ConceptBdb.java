@@ -226,7 +226,7 @@ public class ConceptBdb extends ComponentBdb {
      * @return a mutable bit set, with all concept identifiers set to true.
      * @throws IOException
      */
-    public I_RepresentIdSet getConceptIdSet() throws IOException {
+    public I_RepresentIdSet getConceptNidSet() throws IOException {
         return new IdentifierSet(conceptIdSet);
     }
 

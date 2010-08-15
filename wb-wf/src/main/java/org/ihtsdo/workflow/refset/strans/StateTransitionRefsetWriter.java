@@ -97,7 +97,7 @@ public class StateTransitionRefsetWriter extends RefsetWriterUtility {
 		public String toString() {
 			try {
 				return "\nReferenced Component Id (Editor Category) = " + getReferencedComponentId().getInitialText() + 
-					   "(" + getReferencedComponentId().getConceptId() + ")" +
+					   "(" + getReferencedComponentId().getConceptNid() + ")" +
 					   "\nWorkflow Type = " + workflowType.getInitialText() +
 					   "\nInitial State = " + initialState.getInitialText() +
 					   "\nAction = " + action.getInitialText() +
@@ -132,19 +132,19 @@ public class StateTransitionRefsetWriter extends RefsetWriterUtility {
 		return  "<properties>\n" +
 				   	"<property>\n" +
 				   		"<key>workflowType</key>" +
-				   		"<value>" + getWorkflowType().getConceptId() + "</value>" +
+				   		"<value>" + getWorkflowType().getConceptNid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 			   			"<key>initialState</key>" +
-			   			"<value>" + getInitialState().getConceptId() + "</value>" +
+			   			"<value>" + getInitialState().getConceptNid() + "</value>" +
 			   		"</property>" + 
 					   	"<property>" +
 				   		"<key>action</key>" +
-				   		"<value>" + getAction().getConceptId() + "</value>" +
+				   		"<value>" + getAction().getConceptNid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 				   		"<key>finalState</key>" +
-				   		"<value>" + getFinalState().getConceptId() + "</value>" +
+				   		"<value>" + getFinalState().getConceptNid() + "</value>" +
 				   	"</property>" +
 				"</properties>"; 
 	}

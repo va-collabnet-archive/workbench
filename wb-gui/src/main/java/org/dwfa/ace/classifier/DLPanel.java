@@ -577,7 +577,7 @@ public class DLPanel extends JPanel {
 
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
-                cNid = config.getHierarchySelection().getConceptId();
+                cNid = config.getHierarchySelection().getConceptNid();
                 int isRole = SnoTable.testIsRole(cNid);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
@@ -622,7 +622,7 @@ public class DLPanel extends JPanel {
 
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
-                cNid = config.getHierarchySelection().getConceptId();
+                cNid = config.getHierarchySelection().getConceptNid();
                 int isRole = SnoTable.testIsRole(cNid);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
@@ -662,7 +662,7 @@ public class DLPanel extends JPanel {
                 }
                 int cNid = Integer.MAX_VALUE;
                 if (config.getHierarchySelection() != null) {
-                    cNid = config.getHierarchySelection().getConceptId();
+                    cNid = config.getHierarchySelection().getConceptNid();
                     int isRole = SnoTable.testIsRole(cNid);
                     if (isRole == 1) {
                         AceLog.getAppLog().log(Level.INFO,

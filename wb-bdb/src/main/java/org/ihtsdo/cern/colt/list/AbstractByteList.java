@@ -8,6 +8,8 @@ It is provided "as is" without expressed or implied warranty.
 */
 package org.ihtsdo.cern.colt.list;
 
+import java.util.Comparator;
+
 import org.ihtsdo.cern.colt.function.ByteComparator;
 import org.ihtsdo.cern.colt.function.ByteProcedure;
 /**

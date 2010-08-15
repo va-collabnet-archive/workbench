@@ -125,7 +125,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
@@ -187,6 +186,7 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.Precedence;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
@@ -2109,13 +2109,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 new JScrollPane(descriptionPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        JComboBox precedenceCombo = new JComboBox(PRECEDENCE.values());
+        JComboBox precedenceCombo = new JComboBox(Precedence.values());
         precedenceCombo.setSelectedItem(aceFrameConfig.getPrecedence());
         descriptionPanel.setText(aceFrameConfig.getPrecedence().getDescription());
         precedenceCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionevent) {
                 JComboBox cb = (JComboBox) actionevent.getSource();
-                PRECEDENCE selectedPrecedence = (PRECEDENCE) cb.getSelectedItem();
+                Precedence selectedPrecedence = (Precedence) cb.getSelectedItem();
                 aceFrameConfig.setPrecedence(selectedPrecedence);
                 descriptionPanel.setText(selectedPrecedence.getDescription());
             }

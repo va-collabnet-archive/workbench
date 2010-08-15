@@ -127,11 +127,11 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
 
         I_GetConceptData reviewerRole = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
         I_IntSet roleAllowedTypes = termFactory.newIntSet();
-        roleAllowedTypes.add(reviewerRole.getConceptId());
+        roleAllowedTypes.add(reviewerRole.getConceptNid());
 
         I_IntSet isAAllowedTypes = termFactory.newIntSet();
         I_GetConceptData isARel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
-        isAAllowedTypes.add(isARel.getConceptId());
+        isAAllowedTypes.add(isARel.getConceptNid());
 
         List<? extends I_RelTuple> roleRels = concept.getSourceRelTuples(activeStatuses, roleAllowedTypes, allPositions, 
                 getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
@@ -162,7 +162,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         I_IntSet activeStatuses = getActiveStatus(termFactory);
         I_GetConceptData reviewRefsetPermissionRel = termFactory.getConcept(ArchitectonicAuxiliary.Concept.REVIEWER_ROLE.getUids());
         I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(reviewRefsetPermissionRel.getConceptId());
+        allowedTypes.add(reviewRefsetPermissionRel.getConceptNid());
 
         Set<? extends I_GetConceptData> refsets = concept.getSourceRelTargets(activeStatuses, allowedTypes, allPositions, 
             getFrameConfig().getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
@@ -184,7 +184,7 @@ public class TestForReviewRefsetPermission extends AbstractExtensionTest {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(relationshipType.getConceptId());
+        allowedTypes.add(relationshipType.getConceptNid());
 
         I_TermFactory termFactory = Terms.get();
         PositionSetReadOnly allPositions = getPositions(termFactory);

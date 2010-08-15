@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -14,12 +13,10 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -33,6 +30,11 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 
@@ -42,7 +44,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class ConceptAttributes 
 		extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
 		implements I_ConceptAttributeVersioned,
-				   I_ConceptAttributePart {
+				   I_ConceptAttributePart, 
+				   ConAttrAnalogBI {
 
 	private boolean defined;
 		
@@ -98,8 +101,8 @@ public class ConceptAttributes
 		public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
 			    ConceptAttributesRevision rev = revisions.get(index);
-			    if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
-			        rev.setStatusId(statusNid);
+			    if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
 			        return rev;
 			    }
 				return rev.makeAnalog(statusNid, pathNid, time);
@@ -113,7 +116,28 @@ public class ConceptAttributes
 				throw new RuntimeException(e);
 			} 
 		}
-        @Override
+
+		@Override
+		public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+			if (index >= 0) {
+			    ConceptAttributesRevision rev = revisions.get(index);
+			    if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
+			        return rev;
+			    }
+				return rev.makeAnalog(statusNid, authorNid, pathNid, time);
+			}
+			try {
+				return new ConceptAttributesRevision(ConceptAttributes.this, 
+						statusNid, 
+						authorNid,
+						pathNid, time, ConceptAttributes.this);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} 
+		}
+
+		@Override
         public ConceptAttributesRevision makeAnalog() {
             if (index >= 0) {
                 ConceptAttributesRevision rev = revisions.get(index);
@@ -145,7 +169,7 @@ public class ConceptAttributes
 		@Override
 		@Deprecated
 		public int getConceptStatus() {
-			return getStatusId();
+			return getStatusNid();
 		}
 
 
@@ -301,9 +325,9 @@ public class ConceptAttributes
 				getUids(nid), this.versionCount());
 		for (Version part : getVersions()) {
 			UniversalAceConceptAttributesPart universalPart = new UniversalAceConceptAttributesPart();
-			universalPart.setStatusId(getUids(part.getStatusId()));
+			universalPart.setStatusId(getUids(part.getStatusNid()));
 			universalPart.setDefined(part.isDefined());
-			universalPart.setPathId(getUids(part.getPathId()));
+			universalPart.setPathId(getUids(part.getPathNid()));
 			universalPart.setTime(part.getTime());
 			conceptAttributes.addVersion(universalPart);
 		}
@@ -335,7 +359,7 @@ public class ConceptAttributes
 
     @Override
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-            List<I_ConceptAttributeTuple> returnTuples, PRECEDENCE precedencePolicy,
+            List<I_ConceptAttributeTuple> returnTuples, Precedence precedencePolicy,
             I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
         List<Version> returnList = new ArrayList<Version>();
         computer.addSpecifiedVersions(allowedStatus, positionSet, returnList, 
@@ -344,7 +368,7 @@ public class ConceptAttributes
     }
 
 	public List<Version> getTuples(I_IntSet allowedStatus,
-			PositionSetReadOnly viewPositionSet, PRECEDENCE precedencePolicy, 
+			PositionSetBI viewPositionSet, Precedence precedencePolicy, 
 			I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
         computer.addSpecifiedVersions(allowedStatus, viewPositionSet, returnList, 
@@ -353,25 +377,35 @@ public class ConceptAttributes
 	}
 
 
-	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
-			List<Version> returnTuples, PRECEDENCE precedencePolicy, 
+	public void addTuples(I_IntSet allowedStatus, PositionBI viewPosition,
+			List<Version> returnTuples, Precedence precedencePolicy, 
 			I_ManageContradiction contradictionManager) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples,
 				getVersions(), precedencePolicy, contradictionManager);
 	}
 	
 	public Collection<Version> getVersions(I_IntSet allowedStatus, 
-			PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+			PositionSetBI viewPositions,  
+			Precedence precedence, I_ManageContradiction contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
 		return returnTuples;
 	}
 
+	@Override
+	public List<? extends I_ConceptAttributeTuple> getTuples(
+			I_IntSet allowedStatus, PositionSetBI viewPositionSet)
+			throws TerminologyException, IOException {
+		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+		return getTuples(allowedStatus,
+				viewPositionSet, config.getPrecedence(), config.getConflictResolutionStrategy());
+	}
 
+
+	
 	public List<Version> getTuples(I_IntSet allowedStatus,
-			I_Position viewPosition, PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+			PositionBI viewPosition, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
 
 		addTuples(allowedStatus, viewPosition, returnList, precedencePolicy,
@@ -380,17 +414,17 @@ public class ConceptAttributes
 		return returnList;
 	}
 
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly promotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly promotionPaths, I_IntSet allowedStatus, Precedence precedence) {
 		int viewPathId = viewPosition.getPath().getConceptNid();
 		boolean promotedAnything = false;
-		for (I_Path promotionPath : promotionPaths) {
+		for (PathBI promotionPath : promotionPaths) {
 			for (Version version : getTuples(allowedStatus,
 					viewPosition, precedence, null)) {
-				if (version.getPathId() == viewPathId) {
+				if (version.getPathNid() == viewPathId) {
 					ConceptAttributesRevision promotionPart = 
-						version.makeAnalog(version.getStatusId(),
-									promotionPath.getConceptId(),
+						version.makeAnalog(version.getStatusNid(),
+									promotionPath.getConceptNid(),
 									Long.MAX_VALUE);
 					addRevision(promotionPart);
 					promotedAnything = true;
@@ -410,13 +444,6 @@ public class ConceptAttributes
 		return super.addRevision(new ConceptAttributesRevision(part, this));
 	}
 
-	@Override
-	@Deprecated
-	public List<Version> getTuples(I_IntSet allowedStatus,
-			Set<I_Position> viewPositionSet) throws TerminologyException, IOException {
-		return getTuples(allowedStatus, new PositionSetReadOnly(viewPositionSet), Terms.get().getActiveAceFrameConfig().getPrecedence(),
-		    Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
-	}
 
 	@Override
 	public boolean isDefined() {
@@ -431,7 +458,20 @@ public class ConceptAttributes
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-	    if (getTime() == time && getPathId() == pathNid) {
+	    if (getTime() == time && getPathNid() == pathNid) {
+	        throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+	    }
+		ConceptAttributesRevision newR;
+			newR = new ConceptAttributesRevision(this, statusNid, 
+					Terms.get().getAuthorNid(),
+					pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
+	@Override
+	public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+	    if (getTime() == time && getPathNid() == pathNid) {
 	        throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
 	    }
 		ConceptAttributesRevision newR;
@@ -507,7 +547,5 @@ public class ConceptAttributes
     public boolean hasExtensions() throws IOException {
         return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
-
-
  	
 }

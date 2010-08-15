@@ -38,12 +38,12 @@ import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ImageTableModel.StringWithImageTuple;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class ImagePopupListener extends MouseAdapter {
 
@@ -63,17 +63,17 @@ public class ImagePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             I_GetConceptData sourceBean;
 			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
 			} catch (TerminologyException e1) {
 				throw new RuntimeException(e1);
 			} catch (IOException e1) {
 				throw new RuntimeException(e1);
 			}
-            for (I_Path p : config.getEditingPathSet()) {
+            for (PathBI p : config.getEditingPathSet()) {
                 I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
                 I_ImagePart newPart =
-                        (I_ImagePart) currentPart.makeAnalog(config.getDefaultStatus().getConceptId(),
-                            p.getConceptId(), Long.MAX_VALUE);
+                        (I_ImagePart) currentPart.makeAnalog(config.getDefaultStatus().getConceptNid(),
+                            p.getConceptNid(), Long.MAX_VALUE);
 
                 selectedObject.getTuple().getVersioned().addVersion(newPart);
             }
@@ -93,7 +93,7 @@ public class ImagePopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             I_GetConceptData sourceBean;
 			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
 			} catch (TerminologyException e1) {
 				throw new RuntimeException(e1);
 			} catch (IOException e1) {
@@ -120,11 +120,11 @@ public class ImagePopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
-                for (I_Path p : config.getEditingPathSet()) {
+                I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
+                for (PathBI p : config.getEditingPathSet()) {
                     I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
                     I_ImagePart newPart =
-                            (I_ImagePart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptId(),
+                            (I_ImagePart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptNid(),
                                 Integer.MAX_VALUE);
                     switch (field) {
                     case STATUS:
@@ -132,7 +132,7 @@ public class ImagePopupListener extends MouseAdapter {
                         break;
                     case TYPE:
                         newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptId());
+                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
                         break;
 
                     default:

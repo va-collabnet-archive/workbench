@@ -22,6 +22,7 @@ import org.ihtsdo.arena.editor.EditorActions.NewAction;
 import org.ihtsdo.arena.editor.EditorActions.OpenAction;
 import org.ihtsdo.arena.editor.EditorActions.PrintAction;
 import org.ihtsdo.arena.editor.EditorActions.SaveAction;
+
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.util.mxGraphActions;
 import com.mxgraph.util.mxConstants;

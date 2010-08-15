@@ -27,8 +27,9 @@ import java.util.TreeSet;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTypedPart;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public abstract class TupleAdder<V, W> {
     private class AdmitAndSortParts implements Comparator<I_AmPart> {
@@ -121,10 +122,10 @@ public abstract class TupleAdder<V, W> {
 
     }
 
-    public void addPaths(ArrayList<PathSortInfo> pathInfo, int depth, int maxVersion, I_Path p) {
-        pathInfo.add(new PathSortInfo(depth, maxVersion, p.getConceptId()));
+    public void addPaths(ArrayList<PathSortInfo> pathInfo, int depth, int maxVersion, PathBI p) {
+        pathInfo.add(new PathSortInfo(depth, maxVersion, p.getConceptNid()));
         depth++;
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             addPaths(pathInfo, depth, o.getVersion(), o.getPath());
         }
     }

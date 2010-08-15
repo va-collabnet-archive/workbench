@@ -16,9 +16,6 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -32,6 +29,9 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
@@ -55,7 +55,7 @@ public class Image
 		}
 
 		@Override
-		public int getConceptId() {
+		public int getConceptNid() {
 			return enclosingConceptNid;
 		}
 
@@ -108,6 +108,22 @@ public class Image
 			Image.this.setTypeNid(type);
 		}
 
+		@Override
+		public int getTypeNid() {
+			if (index >= 0) {
+				return revisions.get(index).getTypeId();
+			}
+			return typeNid;
+		}
+
+		@Override
+		public void setTypeNid(int type) {
+			if (index >= 0) {
+				revisions.get(index).setTypeId(type);
+			}
+			Image.this.setTypeNid(type);
+		}
+
 		public ArrayIntList getVariableVersionNids() {
 			if (index >= 0) {
 				ArrayIntList resultList = new ArrayIntList(3);
@@ -121,13 +137,27 @@ public class Image
 		public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
                 ImageRevision rev = revisions.get(index);
-                if (rev.getTime() == Long.MAX_VALUE && rev.getPathId() == pathNid) {
-			        rev.setStatusId(statusNid);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
                     return rev;
                 }
                 return rev.makeAnalog(statusNid, pathNid, time);
 			}
 			return Image.this.makeAnalog(statusNid, pathNid, time);
+		}
+
+		@Override
+		public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+			if (index >= 0) {
+                ImageRevision rev = revisions.get(index);
+                if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
+			        rev.setStatusNid(statusNid);
+			        rev.setAuthorNid(authorNid);
+                    return rev;
+                }
+                return rev.makeAnalog(statusNid, authorNid, pathNid, time);
+			}
+			return Image.this.makeAnalog(statusNid, authorNid, pathNid, time);
 		}
         @Override
         public ImageRevision makeAnalog() {
@@ -353,9 +383,9 @@ public class Image
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptId()
+	 * @see org.dwfa.vodb.types.I_ImageVersioned#getConceptNid()
 	 */
-	public int getConceptId() {
+	public int getConceptNid() {
 		return enclosingConceptNid;
 	}
 
@@ -409,7 +439,7 @@ public class Image
 
 	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, List<I_ImageTuple> matchingTuples, 
-			PRECEDENCE precedencePolicy, I_ManageContradiction contradictionManager) {
+			Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, 
 				returnTuples, getVersions(), precedencePolicy, contradictionManager);
@@ -418,7 +448,7 @@ public class Image
 
 	public Collection<Image.Version> getVersions(I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			PRECEDENCE precedence, I_ManageContradiction contradictionMgr) {
+			Precedence precedence, I_ManageContradiction contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -438,8 +468,8 @@ public class Image
 
 		for (org.ihtsdo.concept.component.image.Image.Version part : getVersions()) {
 			UniversalAceImagePart universalPart = new UniversalAceImagePart();
-			universalPart.setPathId(getUids(part.getPathId()));
-			universalPart.setStatusId(getUids(part.getStatusId()));
+			universalPart.setPathId(getUids(part.getPathNid()));
+			universalPart.setStatusId(getUids(part.getStatusNid()));
 			universalPart.setTextDescription(part.getTextDescription());
 			universalPart.setTypeId(getUids(part.getTypeId()));
 			universalPart.setTime(part.getTime());
@@ -448,18 +478,18 @@ public class Image
 		return universal;
 	}
 
-	public boolean promote(I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, PRECEDENCE precedence) {
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence) {
 		int viewPathId = viewPosition.getPath().getConceptNid();
 		List<Version> matchingTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, 
 				getTuples(), precedence, null);
 		boolean promotedAnything = false;
-		for (I_Path promotionPath : pomotionPaths) {
+		for (PathBI promotionPath : pomotionPaths) {
 			for (Version it : matchingTuples) {
-				if (it.getPathId() == viewPathId) {
+				if (it.getPathNid() == viewPathId) {
 					ImageRevision promotionPart = (ImageRevision) it.makeAnalog(
-							it.getStatusId(), promotionPath.getConceptId(),
+							it.getStatusNid(), promotionPath.getConceptNid(),
 							Long.MAX_VALUE);
 					it.getVersioned().addVersion(promotionPart);
 					promotedAnything = true;
@@ -506,12 +536,25 @@ public class Image
 
 	@Override
 	public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		ImageRevision newR;
 			newR = new ImageRevision(this, statusNid,
 					Terms.get().getAuthorNid(),
+					pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
+	@Override
+	public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		ImageRevision newR;
+			newR = new ImageRevision(this, statusNid,
+					authorNid,
 					pathNid, time, this);
 		addRevision(newR);
 		return newR;

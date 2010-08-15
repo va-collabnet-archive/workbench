@@ -111,7 +111,7 @@ public class MigrateAllSpecRefsets extends AbstractTask {
      */
     private void copySpecRefsetExtensions(I_GetConceptData specRefsetConcept, I_GetConceptData memberRefsetConcept)
             throws Exception {
-        int exclusionExtRefset = Terms.get().getRefsetHelper(config).getExcludeMembersRefset(specRefsetConcept.getConceptId());
+        int exclusionExtRefset = Terms.get().getRefsetHelper(config).getExcludeMembersRefset(specRefsetConcept.getConceptNid());
         if (exclusionExtRefset != Integer.MIN_VALUE) {
             termFactory.newRelationship(UUID.randomUUID(), memberRefsetConcept,
                 concepts.get("EXCLUDE_MEMBERS_REL_TYPE"), termFactory.getConcept(exclusionExtRefset),
@@ -229,8 +229,8 @@ public class MigrateAllSpecRefsets extends AbstractTask {
 
     @SuppressWarnings("unchecked")
     private <T extends I_AmPart> List<T> retireParts(List<T> parts) {
-        final int retiredStatusId = concepts.get("RETIRED").getConceptId();
-        final int currentStatusId = concepts.get("CURRENT").getConceptId();
+        final int retiredStatusId = concepts.get("RETIRED").getConceptNid();
+        final int currentStatusId = concepts.get("CURRENT").getConceptNid();
 
         ArrayList<T> newRetirees = new ArrayList<T>();
 

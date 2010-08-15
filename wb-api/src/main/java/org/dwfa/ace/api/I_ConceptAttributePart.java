@@ -22,6 +22,7 @@ public interface I_ConceptAttributePart extends I_AmPart {
 
     public void setDefined(boolean defined);
 
+    @Deprecated
     public I_ConceptAttributePart duplicate();
 
 }

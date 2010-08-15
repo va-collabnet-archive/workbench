@@ -24,12 +24,12 @@ import javax.swing.JTabbedPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.bpa.gui.glue.PropertySetListenerGlue;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class SelectPathAndPositionPanel extends JTabbedPane {
 
@@ -42,11 +42,11 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
             PropertySetListenerGlue selectGlue) throws Exception {
         super();
         List<TimePathId> timePathEntries = Terms.get().getTimePathList();
-        for (I_Path p : Terms.get().getPaths()) {
-            I_GetConceptData cb = Terms.get().getConcept(p.getConceptId());
+        for (PathBI p : Terms.get().getPaths()) {
+            I_GetConceptData cb = Terms.get().getConcept(p.getConceptNid());
             int modTimeCount = 0;
             for (TimePathId tp : timePathEntries) {
-                if (tp.getPathId() == p.getConceptId()) {
+                if (tp.getPathId() == p.getConceptNid()) {
                     modTimeCount++;
                 }
             }
@@ -57,8 +57,8 @@ public class SelectPathAndPositionPanel extends JTabbedPane {
         setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
 
-    public List<I_Position> getSelectedPositions() throws TerminologyException, IOException {
-        List<I_Position> positions = new ArrayList<I_Position>();
+    public List<PositionBI> getSelectedPositions() throws TerminologyException, IOException {
+        List<PositionBI> positions = new ArrayList<PositionBI>();
         for (int i = 0; i < getTabCount(); i++) {
             PositionPanel pp = (PositionPanel) getComponentAt(i);
             if (pp.isPositionSelected()) {

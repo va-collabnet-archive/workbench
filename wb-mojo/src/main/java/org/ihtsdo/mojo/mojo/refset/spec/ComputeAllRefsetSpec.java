@@ -82,7 +82,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
             if (excludedRefsetSpecDescriptors != null) {
                 for (ConceptDescriptor refsetSpecDescriptor : excludedRefsetSpecDescriptors) {
                     RefsetSpec spec = new RefsetSpec(refsetSpecDescriptor.getVerifiedConcept(), config);
-                    excludedRefsets.add(spec.getMemberRefsetConcept().getConceptId());
+                    excludedRefsets.add(spec.getMemberRefsetConcept().getConceptNid());
                 }
             }
 
@@ -90,7 +90,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
             I_GetConceptData supportingRefsetConcept =
                     termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
             I_IntSet isA = termFactory.newIntSet();
-            isA.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+            isA.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
             I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
 
             I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
@@ -108,9 +108,9 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
                     RefsetSpec refsetSpecHelper = new RefsetSpec(child, Terms.get().getActiveAceFrameConfig());
                     I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
                     boolean showActivityPanel = false;
-                    if (!computedRefsets.contains(memberRefset.getConceptId())) {
+                    if (!computedRefsets.contains(memberRefset.getConceptNid())) {
 
-                        if (!excludedRefsets.contains(memberRefset.getConceptId())) {
+                        if (!excludedRefsets.contains(memberRefset.getConceptNid())) {
 
                             ComputeRefsetFromSpecTask task = new ComputeRefsetFromSpecTask();
                             task.setExcludedRefsets(excludedRefsets);
@@ -119,7 +119,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
                              * need to keep track of any calculated nested
                              * refsets so we don't compute them twice
                              */
-                            computedRefsets.add(memberRefset.getConceptId());
+                            computedRefsets.add(memberRefset.getConceptNid());
                             for (Integer nestedRefsetId : task.getNestedRefsets()) {
                                 if (!excludedRefsets.contains(nestedRefsetId)) {
                                     computedRefsets.add(nestedRefsetId);
@@ -150,7 +150,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
         I_GetConceptData specifiesRefsetRel =
                 termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
         I_IntSet relType = termFactory.newIntSet();
-        relType.add(specifiesRefsetRel.getConceptId());
+        relType.add(specifiesRefsetRel.getConceptNid());
 
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
         I_IntSet currentStatuses = helper.getCurrentStatusIntSet();

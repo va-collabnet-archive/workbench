@@ -33,42 +33,42 @@ public class RefsetDefaultsTemplateForRel extends RefsetDefaults implements I_Re
     public RefsetDefaultsTemplateForRel() throws TerminologyException, IOException {
         super();
         valueType = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CODE_VALUE_TYPE.getUids());
-        valueTypePopupIds.add(valueType.getConceptId());
+        valueTypePopupIds.add(valueType.getConceptNid());
         valueTypePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_NUMBER_VALUE_TYPE.getUids())
-            .getConceptId());
+            .getConceptNid());
         valueTypePopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
-            .getConceptId());
+            .getConceptNid());
 
         semanticStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_FINAL_SEMANTIC_STATUS.getUids());
-        semanticStatusPopupIds.add(semanticStatus.getConceptId());
+        semanticStatusPopupIds.add(semanticStatus.getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_DATE_VALUE_TYPE.getUids())
-            .getConceptId());
+            .getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_REFINABLE_SEMANTIC_STATUS.getUids())
-            .getConceptId());
+            .getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_NUMERIC_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_MANDATORY_TO_REFINE_SEMANTIC_STATUS.getUids()).getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_CHILD_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_CHILD_REFINE_SEMANTIC_STATUS.getUids()).getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_QUALIFIER_REFINE_SEMANTIC_STATUS.getUids()).getConceptNid());
         semanticStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_UNSPECIFIED_SEMANTIC_STATUS.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_UNSPECIFIED_SEMANTIC_STATUS.getUids()).getConceptNid());
 
         attributeDisplayStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_DISPLAYED.getUids());
-        attributeDisplayStatusPopupIds.add(attributeDisplayStatus.getConceptId());
+        attributeDisplayStatusPopupIds.add(attributeDisplayStatus.getConceptNid());
         attributeDisplayStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_HIDDEN.getUids())
-            .getConceptId());
+            .getConceptNid());
         attributeDisplayStatusPopupIds.add(Terms.get().getConcept(
-            RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_UNSPECIFIED.getUids()).getConceptId());
+            RefsetAuxiliary.Concept.TEMPLATE_ATTRIBUTE_UNSPECIFIED.getUids()).getConceptNid());
 
         characteristicStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_QUALIFIER.getUids());
-        characteristicStatusPopupIds.add(characteristicStatus.getConceptId());
+        characteristicStatusPopupIds.add(characteristicStatus.getConceptNid());
         characteristicStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_ATOM.getUids())
-            .getConceptId());
+            .getConceptNid());
         characteristicStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CHARACTERSITIC_FACT.getUids())
-            .getConceptId());
+            .getConceptNid());
 
     }
 

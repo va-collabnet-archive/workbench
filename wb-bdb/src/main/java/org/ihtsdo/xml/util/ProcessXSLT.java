@@ -37,7 +37,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.xml.common.CommonXMLStatics;
 import org.w3c.dom.Document;

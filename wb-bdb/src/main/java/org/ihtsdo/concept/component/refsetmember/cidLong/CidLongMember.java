@@ -101,7 +101,7 @@ public class CidLongMember
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
@@ -109,9 +109,19 @@ public class CidLongMember
 		return newR;
 	}
 
+	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
     @Override
     public CidLongRevision makeAnalog() {
-        CidLongRevision newR = new CidLongRevision(getStatusId(), getPathId(), getTime(), this);
+        CidLongRevision newR = new CidLongRevision(getStatusNid(), getPathNid(), getTime(), this);
         return newR;
     }
 

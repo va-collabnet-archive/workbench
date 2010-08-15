@@ -27,8 +27,6 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -36,6 +34,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class SnoTable {
 
@@ -82,8 +82,8 @@ public class SnoTable {
     private static int roleRootNid = Integer.MIN_VALUE;
 
     // STATED & INFERRED PATHS
-    static List<I_Position> cStatedPath = null; // Classifier Stated Path
-    static List<I_Position> cInferredPath = null; // Classifier Inferred Path
+    static List<PositionBI> cStatedPath = null; // Classifier Stated Path
+    static List<PositionBI> cInferredPath = null; // Classifier Inferred Path
 
     // ** STATISTICS **
     // :NYI: need reset statistics routine
@@ -157,7 +157,7 @@ public class SnoTable {
             IOException {
         // Setup core constants
         if (config.getClassifierIsaType() != null)
-            isaNid = config.getClassifierIsaType().getConceptId();
+            isaNid = config.getClassifierIsaType().getConceptNid();
         else {
             String errStr = "'Is a' -- not set in Classifier preferences tab!";
             if (showDialogs)
@@ -168,7 +168,7 @@ public class SnoTable {
         }
 
         if (config.getClassificationRoleRoot() != null)
-            roleRootNid = config.getClassificationRoleRoot().getConceptId();
+            roleRootNid = config.getClassificationRoleRoot().getConceptNid();
         else {
             String errStr = "Classifier Role Root -- not set in Classifier preferences tab!";
             if (showDialogs)
@@ -194,8 +194,8 @@ public class SnoTable {
         // GET ALL EDIT_PATH ORIGINS
         I_GetConceptData cEditPathObj = config.getClassifierInputPath();
         if (cEditPathObj != null) {
-            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
-            cStatedPath = new ArrayList<I_Position>();
+            PathBI cEditIPath = tf.getPath(cEditPathObj.getUids());
+            cStatedPath = new ArrayList<PositionBI>();
             cStatedPath.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
             addPathOrigins(cStatedPath, cEditIPath);
         } else {
@@ -210,8 +210,8 @@ public class SnoTable {
         // GET ALL CLASSIFER_PATH ORIGINS
         I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
         if (cClassPathObj != null) {
-            I_Path cClassIPath = tf.getPath(cClassPathObj.getUids());
-            cInferredPath = new ArrayList<I_Position>();
+            PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
+            cInferredPath = new ArrayList<PositionBI>();
             cInferredPath.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
             addPathOrigins(cInferredPath, cClassIPath);
         } else {
@@ -225,9 +225,9 @@ public class SnoTable {
         return null;
     }
 
-    private static void addPathOrigins(List<I_Position> origins, I_Path p) {
+    private static void addPathOrigins(List<PositionBI> origins, PathBI p) {
         origins.addAll(p.getOrigins());
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             addPathOrigins(origins, o.getPath());
         }
     }
@@ -451,18 +451,18 @@ public class SnoTable {
      */
 
     private static ArrayList<SnoRel> findIsaProximal(I_GetConceptData cBean,
-            List<I_Position> posList) {
+            List<PositionBI> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
         try {
             Collection<? extends I_RelVersioned> relList = cBean.getSourceRels();
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
-                for (I_Position pos : posList) { // FOR EACH PATH POSITION
+                for (PositionBI pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
-                        if (rp.getPathId() == pos.getPath().getConceptId()) {
+                        if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
                             } else if (rp1.getVersion() < rp.getVersion()) {
@@ -509,7 +509,7 @@ public class SnoTable {
         int testNid = c1;
 
         I_GetConceptData cBean = tf.getConcept(startNid);
-        List<I_Position> posList = cStatedPath;
+        List<PositionBI> posList = cStatedPath;
 
         //
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
@@ -584,7 +584,7 @@ public class SnoTable {
         int[] testNids = parents;
 
         I_GetConceptData cBean = tf.getConcept(startNid);
-        List<I_Position> posList = cStatedPath;
+        List<PositionBI> posList = cStatedPath;
 
         //
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
@@ -622,7 +622,7 @@ public class SnoTable {
         return false;
     }
 
-    private ArrayList<SnoRel> findIsaProximalPrim(I_GetConceptData cBean, List<I_Position> posList)
+    private ArrayList<SnoRel> findIsaProximalPrim(I_GetConceptData cBean, List<PositionBI> posList)
             throws TerminologyException, IOException {
 
         List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
@@ -664,17 +664,17 @@ public class SnoTable {
         return isaSnoRelFinal;
     }
 
-    private boolean isCDefined(I_GetConceptData cBean, List<I_Position> posList) {
+    private boolean isCDefined(I_GetConceptData cBean, List<PositionBI> posList) {
 
         try {
             I_ConceptAttributeVersioned cv = cBean.getConceptAttributes();
             List<? extends I_ConceptAttributePart> cvList = cv.getMutableParts();
             I_ConceptAttributePart cp1 = null;
-            for (I_Position pos : posList) {
+            for (PositionBI pos : posList) {
                 int tmpCountDupl = 0;
                 for (I_ConceptAttributePart cp : cvList) {
                     // FIND MOST RECENT
-                    if (cp.getPathId() == pos.getPath().getConceptId()) {
+                    if (cp.getPathId() == pos.getPath().getConceptNid()) {
                         if (cp1 == null) {
                             cp1 = cp; // ... KEEP FIRST_INSTANCE, CURRENT PART
                         } else if (cp1.getVersion() < cp.getVersion()) {
@@ -704,7 +704,7 @@ public class SnoTable {
         }
     }
 
-    private SnoGrpList findRoleGrpProximal(I_GetConceptData cBean, List<I_Position> posList) {
+    private SnoGrpList findRoleGrpProximal(I_GetConceptData cBean, List<PositionBI> posList) {
         SnoGrpList returnSnoGrpList;
 
         // Find individual proximal roles
@@ -725,7 +725,7 @@ public class SnoTable {
         return returnSnoGrpList;
     }
 
-    private List<SnoRel> findRoleProximal(I_GetConceptData cBean, List<I_Position> posList) {
+    private List<SnoRel> findRoleProximal(I_GetConceptData cBean, List<PositionBI> posList) {
         ArrayList<SnoRel> returnSnoRels = new ArrayList<SnoRel>();
 
         try {
@@ -733,11 +733,11 @@ public class SnoTable {
             for (I_RelVersioned rel : relList) { // FOR EACH [C1, C2] PAIR
                 // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
                 I_RelPart rp1 = null;
-                for (I_Position pos : posList) { // FOR EACH PATH POSITION
+                for (PositionBI pos : posList) { // FOR EACH PATH POSITION
                     // FIND MOST CURRENT
                     int tmpCountDupl = 0;
                     for (I_RelPart rp : rel.getMutableParts()) {
-                        if (rp.getPathId() == pos.getPath().getConceptId()) {
+                        if (rp.getPathId() == pos.getPath().getConceptNid()) {
                             if (rp1 == null) {
                                 rp1 = rp; // ... KEEP FIRST_INSTANCE PART
                             } else if (rp1.getVersion() < rp.getVersion()) {
@@ -817,7 +817,7 @@ public class SnoTable {
         return sgOut; // returns as sorted.
     }
 
-    private SnoGrpList findRoleGrpDiffFromRoot(I_GetConceptData cBean, List<I_Position> posList)
+    private SnoGrpList findRoleGrpDiffFromRoot(I_GetConceptData cBean, List<PositionBI> posList)
             throws TerminologyException, IOException {
         SnoGrpList grpListA;
         SnoGrpList grpListB;
@@ -861,7 +861,7 @@ public class SnoTable {
     }
 
     private SnoGrpList findRoleGrpDiffFromProx(I_GetConceptData cBean, List<SnoRel> isaList,
-            List<I_Position> posList) throws TerminologyException, IOException {
+            List<PositionBI> posList) throws TerminologyException, IOException {
 
         // FIND IMMEDIATE ROLES OF *THIS*CONCEPT*
         SnoGrpList grpListA = findRoleGrpProximal(cBean, posList);
@@ -891,7 +891,7 @@ public class SnoTable {
     }
 
     private SnoGrpList findRoleGrpDiffFromProxPrim(I_GetConceptData cBean, List<SnoRel> isaList,
-            List<I_Position> posList) throws TerminologyException, IOException {
+            List<PositionBI> posList) throws TerminologyException, IOException {
 
         // FIND ALL NON-REDUNDANT INHERITED ROLES OF *THIS*CONCEPT*
         SnoGrpList grpListA = findRoleGrpDiffFromRoot(cBean, posList);
@@ -948,7 +948,7 @@ public class SnoTable {
 
     // This routine is a simple version for check role roots.
     // Expansion would be needed to properly format more complex ancestry.
-    static public String toStringIsaAncestry(int conceptNid, List<I_Position> posList) {
+    static public String toStringIsaAncestry(int conceptNid, List<PositionBI> posList) {
         String barStr = new String(" || ");
         String commaStr = new String(", ");
         String delimStr = commaStr;

@@ -315,7 +315,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
 
     @Override
     protected int getComponentId() {
-        return ((I_GetConceptData) getHost().getTermComponent()).getConceptId();
+        return ((I_GetConceptData) getHost().getTermComponent()).getConceptNid();
     }
 
     public void tableChanged(TableModelEvent tme) {

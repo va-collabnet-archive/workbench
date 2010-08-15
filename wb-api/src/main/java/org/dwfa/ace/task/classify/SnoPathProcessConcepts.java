@@ -12,13 +12,12 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.Precedence;
 
 public class SnoPathProcessConcepts implements I_ProcessConcepts {
     private List<SnoRel> snorels;
@@ -54,12 +53,12 @@ public class SnoPathProcessConcepts implements I_ProcessConcepts {
     // GUI
     I_ShowActivity gui;
     private Logger logger;
-    private PRECEDENCE precedence;
+    private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
 
     public SnoPathProcessConcepts(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             I_IntSet roleSet, I_IntSet statSet, PositionSetReadOnly pathPos, I_ShowActivity gui,
-            PRECEDENCE precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
+            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException {
         this.logger = logger;
         this.snocons = snocons;
         this.snorels = snorels;

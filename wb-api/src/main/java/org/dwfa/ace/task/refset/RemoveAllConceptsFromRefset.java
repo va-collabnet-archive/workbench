@@ -81,7 +81,7 @@ public class RemoveAllConceptsFromRefset extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_GetConceptData refset = (I_GetConceptData) process.getProperty(componentPropName);
-            int refsetId = refset.getConceptId();
+            int refsetId = refset.getConceptNid();
 
             termFactory = Terms.get();
             retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()

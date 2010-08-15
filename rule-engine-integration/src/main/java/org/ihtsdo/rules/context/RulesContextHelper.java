@@ -10,10 +10,8 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpMemberRefsets;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
@@ -21,13 +19,12 @@ import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 
 public class RulesContextHelper {
 
@@ -117,17 +114,17 @@ public class RulesContextHelper {
 			if (currentRolePart == null && newRole != null) {
 				//new member in context refset
 				RefsetPropertyMap propertyMap = new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ruleUid);
-				propertyMap.put(REFSET_PROPERTY.CID_ONE, newRole.getConceptId());
-				refsetHelper.newRefsetExtension(contextRefset.getConceptId(), context.getConceptId(), 
+				propertyMap.put(REFSET_PROPERTY.CID_ONE, newRole.getConceptNid());
+				refsetHelper.newRefsetExtension(contextRefset.getConceptNid(), context.getConceptNid(), 
 						REFSET_TYPES.CID_STR, propertyMap, config);
 				tf.addUncommittedNoChecks(contextRefset);
 				tf.addUncommittedNoChecks(context);
 				tf.commit();
 			} else if (currentRolePart != null && newRole != null){
-				if (currentRolePart.getC1id() != newRole.getConceptId() || currentRolePart.getStatusId() != currentStatus.getConceptId()) {
+				if (currentRolePart.getC1id() != newRole.getConceptNid() || currentRolePart.getStatusId() != currentStatus.getConceptNid()) {
 					// update existing role
-					for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
-						if (extension.getComponentId() == context.getConceptId()) {
+					for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptNid())) {
+						if (extension.getComponentId() == context.getConceptNid()) {
 							List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 							for (I_ExtendByRefPart part : extension.getMutableParts()) {
 								I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -142,13 +139,13 @@ public class RulesContextHelper {
 										lastPart = loopPart;
 									}
 								}
-								for (I_Path editPath : config.getEditingPathSet()) {
+								for (PathBI editPath : config.getEditingPathSet()) {
 									I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
 									lastPart.makeAnalog(
 											ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-											editPath.getConceptId(),
+											editPath.getConceptNid(),
 											Long.MAX_VALUE);
-									newPart.setC1id(newRole.getConceptId());
+									newPart.setC1id(newRole.getConceptNid());
 									extension.addVersion(newPart);
 									tf.addUncommittedNoChecks(extension);
 								}
@@ -162,8 +159,8 @@ public class RulesContextHelper {
 				}
 			} else if (currentRole != null && newRole == null) {
 				// retire latest version of role
-				for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptId())) {
-					if (extension.getComponentId() == context.getConceptId()) {
+				for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(contextRefset.getConceptNid())) {
+					if (extension.getComponentId() == context.getConceptNid()) {
 						List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 						for (I_ExtendByRefPart part : extension.getMutableParts()) {
 							I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -178,11 +175,11 @@ public class RulesContextHelper {
 									lastPart = loopPart;
 								}
 							}
-							for (I_Path editPath : config.getEditingPathSet()) {
+							for (PathBI editPath : config.getEditingPathSet()) {
 								I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
 								lastPart.makeAnalog(
 										ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-										editPath.getConceptId(),
+										editPath.getConceptNid(),
 										Long.MAX_VALUE);
 								extension.addVersion(newPart);
 								tf.addUncommittedNoChecks(extension);
@@ -207,8 +204,8 @@ public class RulesContextHelper {
 			//I_GetConceptData includeClause = tf.getConcept(RefsetAuxiliary.Concept.INCLUDE_INDIVIDUAL.getUids());
 			//I_GetConceptData excludeClause = tf.getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
 			I_GetConceptData role = null;
-			for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(agendaMetadataRefset.getConceptId())) {
-				if (extension.getComponentId() == context.getConceptId()) {
+			for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(agendaMetadataRefset.getConceptNid())) {
+				if (extension.getComponentId() == context.getConceptNid()) {
 					List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 					for (I_ExtendByRefPart part : extension.getMutableParts()) {
 						I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
@@ -242,7 +239,7 @@ public class RulesContextHelper {
 			I_GetConceptData currentStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			I_ExtendByRefPartCidString lastPart = getLastStringPartForRule(ruleUid, context);
 			if (lastPart != null) {
-				if (lastPart.getStatusId() == currentStatus.getConceptId()) {
+				if (lastPart.getStatusId() == currentStatus.getConceptNid()) {
 					role = tf.getConcept(lastPart.getC1id());
 				}
 			}
@@ -273,10 +270,10 @@ public class RulesContextHelper {
 
 				if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
 					I_DescriptionVersioned description = tuple.getDescVersioned();
-					for (I_Path editPath : config.getEditingPathSet()) {
+					for (PathBI editPath : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptId(),
+								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						newPart.setText(newString);
 						description.addVersion(newPart);

@@ -74,7 +74,7 @@ public class HasStatus extends AbstractSearchTest {
                 conceptToTest = (I_GetConceptData) component;
             } else if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
                 I_DescriptionVersioned desc = (I_DescriptionVersioned) component;
-                conceptToTest = Terms.get().getConcept(desc.getConceptId());
+                conceptToTest = Terms.get().getConcept(desc.getConceptNid());
             } else {
                 return applyInversion(false);
             }

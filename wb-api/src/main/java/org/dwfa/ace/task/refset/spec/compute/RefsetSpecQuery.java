@@ -142,13 +142,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     private GROUPING_TYPE getGroupingTypeFromConcept(I_GetConceptData concept) throws TerminologyException, IOException {
-        if (concept.getConceptId() == GROUPING_TYPE.AND.nid) {
+        if (concept.getConceptNid() == GROUPING_TYPE.AND.nid) {
             return GROUPING_TYPE.AND;
-        } else if (concept.getConceptId() == GROUPING_TYPE.OR.nid) {
+        } else if (concept.getConceptNid() == GROUPING_TYPE.OR.nid) {
             return GROUPING_TYPE.OR;
-        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_REL.nid) {
+        } else if (concept.getConceptNid() == GROUPING_TYPE.CONCEPT_CONTAINS_REL.nid) {
             return GROUPING_TYPE.CONCEPT_CONTAINS_REL;
-        } else if (concept.getConceptId() == GROUPING_TYPE.CONCEPT_CONTAINS_DESC.nid) {
+        } else if (concept.getConceptNid() == GROUPING_TYPE.CONCEPT_CONTAINS_DESC.nid) {
             return GROUPING_TYPE.CONCEPT_CONTAINS_DESC;
         } else {
             throw new TerminologyException("No valid grouping token specified : " + concept.getInitialText());

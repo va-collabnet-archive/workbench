@@ -26,9 +26,9 @@ import static org.dwfa.util.id.Type3UuidFactory.SNOMED_ROOT_UUID;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
-import org.dwfa.cement.ArchitectonicAuxiliary;
-
 import junit.framework.TestCase;
+
+import org.dwfa.cement.ArchitectonicAuxiliary;
 
 public class Type3UuidFactoryTest extends TestCase {
 

@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -30,6 +28,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class TestSnoPathProcessConcepts extends AbstractTask {
@@ -49,7 +49,7 @@ public class TestSnoPathProcessConcepts extends AbstractTask {
     private int isCURRENT;
     private I_IntSet statusSet;
     private I_IntSet allowedRoleTypes;
-    private ArrayList<I_Position> cEditPathPos;
+    private ArrayList<PositionBI> cEditPathPos;
     private int workbenchAuxPath;
 
     @Override
@@ -113,16 +113,16 @@ public class TestSnoPathProcessConcepts extends AbstractTask {
                 return Condition.STOP;
             }
 
-            I_Path cEditIPath = tf.getPath(cEditPathObj.getUids());
+            PathBI cEditIPath = tf.getPath(cEditPathObj.getUids());
             cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
             // cEditPosSet = new PositionSetReadOnly(cEditIPath.getOrigins().get(0));
 
             // Setup to exclude Workbench Auxiliary on path
             UUID wAuxUuid = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
             I_GetConceptData wAuxCb = tf.getConcept(wAuxUuid);
-            workbenchAuxPath = wAuxCb.getConceptId();
+            workbenchAuxPath = wAuxCb.getConceptNid();
             
-            cEditPathPos = new ArrayList<I_Position>();
+            cEditPathPos = new ArrayList<PositionBI>();
             cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
             getPathOrigins(cEditPathPos, cEditIPath);
             
@@ -137,19 +137,19 @@ public class TestSnoPathProcessConcepts extends AbstractTask {
         return Condition.CONTINUE;
     }
 
-    private void getPathOrigins(List<I_Position> origins, I_Path p) {
-        List<I_Position> thisLevel = new ArrayList<I_Position>();
+    private void getPathOrigins(List<PositionBI> origins, PathBI p) {
+        List<PositionBI> thisLevel = new ArrayList<PositionBI>();
 
-        for (I_Position o : p.getOrigins()) {
+        for (PositionBI o : p.getOrigins()) {
             origins.add(o);
             thisLevel.add(o);
         }
 
         // do a breadth first traversal of path origins.
         while (thisLevel.size() > 0) {
-            List<I_Position> nextLevel = new ArrayList<I_Position>();
-            for (I_Position p1 : thisLevel) {
-                for (I_Position p2 : p1.getPath().getOrigins())
+            List<PositionBI> nextLevel = new ArrayList<PositionBI>();
+            for (PositionBI p1 : thisLevel) {
+                for (PositionBI p2 : p1.getPath().getOrigins())
                     if ((origins.contains(p2) == false)
                             && (p2.getPath().getConceptNid() != workbenchAuxPath)) {
                         origins.add(p2);
@@ -219,7 +219,7 @@ public class TestSnoPathProcessConcepts extends AbstractTask {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
             for (I_RelVersioned rv : thisLevel) {
                 I_RelPart rPart1 = null;
-                for (I_Position pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
+                for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
                         if (pos.getPath().getConceptNid() == rPart.getPathId()) {
                             if (rPart1 == null) {

@@ -107,7 +107,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
             I_GetConceptData fsnConcept =
                     termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_IntSet fsnAllowedTypes = termFactory.newIntSet();
-            fsnAllowedTypes.add(fsnConcept.getConceptId());
+            fsnAllowedTypes.add(fsnConcept.getConceptNid());
             for (I_GetConceptData validUser : allValidUsers) {
                 String latestDescription = null;
                 int latestVersion = Integer.MIN_VALUE;
@@ -275,23 +275,23 @@ public class RefsetSpecWizardTask extends AbstractTask {
         I_GetConceptData descriptionType =
                 Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
         I_IntSet allowedTypes = Terms.get().newIntSet();
-        allowedTypes.add(descriptionType.getConceptId());
+        allowedTypes.add(descriptionType.getConceptNid());
         String latestDescription = null;
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet activeStatuses = Terms.get().newIntSet();
         activeStatuses.add(Terms.get()
-            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptId());
+            .getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptNid());
         activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptId());
+            (ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptNid());
         activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())).getConceptId());
+            (ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids())).getConceptNid());
         activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids())).getConceptId());
+            (ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids())).getConceptNid());
         activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptId());
+            (ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptNid());
         activeStatuses.add(Terms.get().getConcept(
-            (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptId());
+            (ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids())).getConceptNid());
 
         List<? extends I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, null, 

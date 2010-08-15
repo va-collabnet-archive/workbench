@@ -79,7 +79,7 @@ public class RestoreSelectionSwingWorker extends SwingWorker<Object> implements 
                             for (int childNode = 0; childNode < parent.getChildCount(); childNode++) {
                                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(childNode);
                                 I_GetConceptData childObject = (I_GetConceptData) child.getUserObject();
-                                if (nodeToMatchObject.getConceptId() == childObject.getConceptId()) {
+                                if (nodeToMatchObject.getConceptNid() == childObject.getConceptNid()) {
                                     pathToSelect = pathToSelect.pathByAddingChild(child);
                                     break;
                                 }

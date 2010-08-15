@@ -110,7 +110,7 @@ public class LineageTreeCellRenderer extends DefaultTreeCellRenderer {
                     if ((node.getParent() != null) && (node.getParent().getParent() == null)) {
                         this.setIcon(multiParentRoot);
                     } else {
-                        if (cb.getConceptId() == focusBean.getConceptId()) {
+                        if (cb.getConceptNid() == focusBean.getConceptNid()) {
                             this.setIcon(focusMultiParentOpen);
                         } else {
                             this.setIcon(multiParentOpen);

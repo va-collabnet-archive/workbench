@@ -86,22 +86,22 @@ public class EditPopupAdd extends AbstractTask {
             }
             switch (type) {
             case REL_CHARACTERISTIC:
-                profile.getEditRelCharacteristicPopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditRelCharacteristicPopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             case REL_REFINABILITY:
-                profile.getEditRelRefinabiltyPopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditRelRefinabiltyPopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             case REL_TYPE:
-                profile.getEditRelTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditRelTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             case STATUS:
-                profile.getEditStatusTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditStatusTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             case DESC_TYPE:
-                profile.getEditDescTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditDescTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             case IMG_TYPE:
-                profile.getEditImageTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptId());
+                profile.getEditImageTypePopup().add(termFactory.getConcept(conceptToAdd.ids).getConceptNid());
                 break;
             default:
                 throw new TaskFailedException("Can't handle type: " + type);

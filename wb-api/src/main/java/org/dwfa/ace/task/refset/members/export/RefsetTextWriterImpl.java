@@ -46,7 +46,7 @@ public final class RefsetTextWriterImpl implements RefsetTextWriter {
             return;
         }
 
-        if (value.getConceptId() != refsetUtil.getLocalizedParentMarkerNid()) {
+        if (value.getConceptNid() != refsetUtil.getLocalizedParentMarkerNid()) {
             descriptionWriter.write(concept, descriptionTuples);
         }
     }

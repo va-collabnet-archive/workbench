@@ -38,12 +38,12 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PathBI;
 
 public class DescPopupListener extends MouseAdapter {
 
@@ -63,16 +63,16 @@ public class DescPopupListener extends MouseAdapter {
         public void actionPerformed(ActionEvent e) {
             I_GetConceptData sourceBean;
 			try {
-				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+				sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
 			} catch (TerminologyException e1) {
 				throw new RuntimeException(e1);
 			} catch (IOException e1) {
 				throw new RuntimeException(e1);
 			}
-            for (I_Path p : config.getEditingPathSet()) {
+            for (PathBI p : config.getEditingPathSet()) {
                 I_DescriptionPart current = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
                 I_DescriptionPart newPart =
-                        (I_DescriptionPart) current.makeAnalog(current.getStatusId(), p.getConceptId(), Long.MAX_VALUE);
+                        (I_DescriptionPart) current.makeAnalog(current.getStatusId(), p.getConceptNid(), Long.MAX_VALUE);
                 selectedObject.getTuple().getDescVersioned().addVersion(newPart);
             }
             Terms.get().addUncommitted(sourceBean);
@@ -89,7 +89,7 @@ public class DescPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
 			try {
-			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
+			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
 	            I_DescriptionTuple tuple = selectedObject.getTuple();
 	            I_DescriptionVersioned versioned = tuple.getDescVersioned();
 	            Terms.get().forget(versioned);
@@ -118,14 +118,14 @@ public class DescPopupListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                I_GetConceptData concept = Terms.get().getConcept(selectedObject.getTuple().getConceptId());
-                for (I_Path p : config.getEditingPathSet()) {
+                I_GetConceptData concept = Terms.get().getConcept(selectedObject.getTuple().getConceptNid());
+                for (PathBI p : config.getEditingPathSet()) {
                     I_DescriptionPart newPart = selectedObject.getTuple().getMutablePart();
                     if (newPart.getTime() != Long.MAX_VALUE) {
                         I_DescriptionPart currentPart = (I_DescriptionPart) 
                     			selectedObject.getTuple().getMutablePart();
                         newPart = (I_DescriptionPart) 
-                    		currentPart.makeAnalog(nid, p.getConceptId(), Long.MAX_VALUE);
+                    		currentPart.makeAnalog(nid, p.getConceptNid(), Long.MAX_VALUE);
                         selectedObject.getTuple().getDescVersioned().addVersion(newPart);
                 	}
                     switch (field) {

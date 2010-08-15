@@ -58,7 +58,6 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
@@ -66,7 +65,8 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 
 /**
  * Classifier Normal Form (Label Format) Panel
@@ -91,12 +91,28 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         I_ConceptAttributePart part;
 
-        public ArrayIntList getPartComponentNids() {
+        public int getPathNid() {
+			return part.getPathNid();
+		}
+
+		public int getStatusNid() {
+			return part.getStatusNid();
+		}
+
+		public void setPathNid(int pathNid) {
+			part.setPathNid(pathNid);
+		}
+
+		public void setStatusNid(int statusNid) {
+			part.setStatusNid(statusNid);
+		}
+
+		public ArrayIntList getPartComponentNids() {
             return part.getPartComponentNids();
         }
 
         public void setConceptStatus(int conceptStatus) {
-            part.setStatusId(conceptStatus);
+            part.setStatusNid(conceptStatus);
         }
 
         transient Integer hash;
@@ -136,6 +152,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * 
          * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
          */
+        @Deprecated
         public void setStatusId(int statusId) {
             part.setStatusId(statusId);
         }
@@ -145,6 +162,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * 
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getPathId()
          */
+        @Deprecated
         public int getPathId() {
             return part.getPathId();
         }
@@ -154,6 +172,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * 
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getVersion()
          */
+        @Deprecated
         public int getVersion() {
             return part.getVersion();
         }
@@ -174,6 +193,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * org.dwfa.vodb.types.I_ConceptAttributeTuple#setStatusId(java.lang.Integer
          * )
          */
+        @Deprecated
         public void setStatusId(Integer statusId) {
             part.setStatusId(statusId);
 
@@ -221,10 +241,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return part;
         }
 
+        @Deprecated
         public int getStatusId() {
             return getConceptStatus();
         }
 
+        @Deprecated
         public void setPathId(int pathId) {
             part.setPathId(pathId);
         }
@@ -237,6 +259,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return core;
         }
 
+        @Deprecated
         public I_ConceptAttributePart duplicate() {
             return part.duplicate();
         }
@@ -250,7 +273,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     	}
 
     	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-    		return part.makeAnalog(statusNid, pathNid, time);
+    		return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
+    	}
+
+    	public ConAttrAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    		return (ConAttrAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
     	}
 
 		@Override
@@ -275,7 +302,28 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         I_RelVersioned fixedPart;
         I_RelPart part;
 
-        public int getAuthorNid() {
+        public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid,
+				long time) {
+			return (I_AmPart) part.makeAnalog(statusNid, authorNid, pathNid, time);
+		}
+
+		public int getPathNid() {
+			return part.getPathNid();
+		}
+
+		public int getStatusNid() {
+			return part.getStatusNid();
+		}
+
+		public void setPathNid(int pathNid) {
+			part.setPathNid(pathNid);
+		}
+
+		public void setStatusNid(int statusNid) {
+			part.setStatusNid(statusNid);
+		}
+
+		public int getAuthorNid() {
 			return part.getAuthorNid();
 		}
 
@@ -288,12 +336,6 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         transient Integer hash;
-
-        public RelVersion(I_RelVersioned fixedPart, I_RelPart variablePart) {
-            super();
-            this.fixedPart = fixedPart;
-            this.part = variablePart;
-        }
 
         public RelVersion(int relNid) {
             // :NYI: needs to be implemented to construct tuple from rel nid
@@ -332,6 +374,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * 
          * @see org.dwfa.vodb.types.I_RelTuple#getPathId()
          */
+        @Deprecated
         public int getPathId() {
             return part.getPathId();
         }
@@ -372,12 +415,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public int getTypeId() {
             return part.getTypeId();
         }
+        public int getTypeNid() {
+            return part.getTypeNid();
+        }
 
         /*
          * (non-Javadoc)
          * 
          * @see org.dwfa.vodb.types.I_RelTuple#getStatusId()
          */
+        @Deprecated
         public int getStatusId() {
             return part.getStatusId();
         }
@@ -387,6 +434,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * 
          * @see org.dwfa.vodb.types.I_RelTuple#getVersion()
          */
+        @Deprecated
         public int getVersion() {
             return part.getVersion();
         }
@@ -402,11 +450,17 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         }
 
+        public void setTypeNid(int typeNid) {
+            part.setTypeNid(typeNid);
+
+        }
+
         /*
          * (non-Javadoc)
          * 
          * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
          */
+        @Deprecated
         public void setStatusId(int statusId) {
             part.setStatusId(statusId);
 
@@ -503,12 +557,9 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return buff.toString();
         }
 
+        @Deprecated
         public void setPathId(int pathId) {
             part.setPathId(pathId);
-        }
-
- 		public void setVersion(int version) {
-           throw new UnsupportedOperationException();
         }
 
         public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
@@ -524,7 +575,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     	}
 
     	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-    		return part.makeAnalog(statusNid, pathNid, time);
+    		return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
     	}
 
 		@Override
@@ -593,7 +644,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private SnoTable cSnoTable;
 
     // ** CONFIGURATION PARTICULARS **
-    private static final boolean debug = false; // :DEBUG:
+    @SuppressWarnings("unused")
+	private static final boolean debug = false; // :DEBUG:
     boolean showGroupLabels = true; // toggles grouped vs. single label display
 
     // ** GUI PARTICULARS **
@@ -908,8 +960,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         Set<I_RelTuple> allRelTuples = new HashSet<I_RelTuple>();
 
         // FIND ALL...
-        for (I_Position p : config.getViewPositionSet()) {
-            Set<I_Position> pSet = new HashSet<I_Position>();
+        for (PositionBI p : config.getViewPositionSet()) {
+            Set<PositionBI> pSet = new HashSet<PositionBI>();
             pSet.add(p);
             PositionSetReadOnly posSet = new PositionSetReadOnly(pSet);
 
@@ -1524,12 +1576,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
                 int tmpCountDupl = 0;
                 for (I_ConceptAttributePart cp : cvList) {
                     // FIND MOST RECENT
-                    if (cp.getPathId() == pos.getPath().getConceptNid()) {
+                    if (cp.getPathNid() == pos.getPath().getConceptNid()) {
                         if (cp1 == null) {
                             cp1 = cp; // ... KEEP FIRST_INSTANCE PART
-                        } else if (cp1.getVersion() < cp.getVersion()) {
+                        } else if (cp1.getTime()< cp.getTime()) {
                             cp1 = cp; // ... KEEP MORE_RECENT PART
-                        } else if (cp1.getVersion() == cp.getVersion()) {
+                        } else if (cp1.getTime() == cp.getTime()) {
                             // !!! THIS DUPLICATE SHOULD NEVER HAPPEN
                             tmpCountDupl++;
                         }

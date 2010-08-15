@@ -101,7 +101,7 @@ public class RemoveListViewConceptsFromRefset extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptId(), value.getConceptId()).removeAllFromRefset(newMembers,
+            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid()).removeAllFromRefset(newMembers,
                 "Removing concepts from list view from refset");
 
             // use commit in business process

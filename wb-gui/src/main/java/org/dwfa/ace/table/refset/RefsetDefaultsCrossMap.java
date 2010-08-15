@@ -33,13 +33,13 @@ public class RefsetDefaultsCrossMap extends RefsetDefaultsCrossMapForRel impleme
     public RefsetDefaultsCrossMap() throws TerminologyException, IOException {
         super();
         mapStatus = Terms.get().getConcept(RefsetAuxiliary.Concept.UNMAPPABLE_MAP_STATUS.getUids());
-        mapStatusPopupIds.add(mapStatus.getConceptId());
-        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids()).getConceptId());
-        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids()).getConceptId());
+        mapStatusPopupIds.add(mapStatus.getConceptNid());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.EXACT_MAP_STATUS.getUids()).getConceptNid());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.GENERAL_MAP_STATUS.getUids()).getConceptNid());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.DEFAULT_MAP_STATUS.getUids()).getConceptNid());
         mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.REQUIRES_CHECKING_MAP_STATUS.getUids())
-            .getConceptId());
-        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids()).getConceptId());
+            .getConceptNid());
+        mapStatusPopupIds.add(Terms.get().getConcept(RefsetAuxiliary.Concept.ALTERNATIVE_MAP_STATUS.getUids()).getConceptNid());
     }
 
     /**

@@ -49,8 +49,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.I_Transact;
@@ -69,6 +67,8 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /*
  * This class was constructed for the specific purpose of taking actions on a
@@ -178,17 +178,17 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_GetConceptData synonym_description_type =
                         termFactory.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
                 // See SearchReplaceTermsInList
-                Set<I_Path> paths = config.getEditingPathSet();
+                Set<PathBI> paths = config.getEditingPathSet();
                 I_DescriptionVersioned newDescr =
                         termFactory.newDescription(UUID.randomUUID(), con, language, newDescrString,
                             synonym_description_type, config);
                 I_DescriptionPart newLastPart = newDescr.getLastTuple().getMutablePart();
-                for (I_Path path : paths) {
+                for (PathBI path : paths) {
                     if (newLastPart == null) {
 
                         newLastPart =
                                 (I_DescriptionPart) newDescr.getLastTuple().getMutablePart().makeAnalog(
-                                    newLastPart.getStatusId(), path.getConceptId(), Long.MAX_VALUE);
+                                    newLastPart.getStatusId(), path.getConceptNid(), Long.MAX_VALUE);
                     }
                     // printDescriptionPart(newLastPart);
                     // System.out.println(">>> language: " + language);
@@ -237,18 +237,18 @@ public class InstructAndWaitDo extends AbstractTask {
         I_GetConceptData current_status = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
         I_GetConceptData fully_specified_description_type =
                 termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-        Set<I_Position> positionSet = new HashSet<I_Position>();
-        for (I_Path path : config.getEditingPathSet()) {
+        Set<PositionBI> positionSet = new HashSet<PositionBI>();
+        for (PathBI path : config.getEditingPathSet()) {
             positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
         }
         PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
         for (I_DescriptionTuple desc : con.getDescriptionTuples(null, null, clonePositions, config.getPrecedence(),
             config.getConflictResolutionStrategy())) {
             // Description is current
-            if (desc.getStatusId() != current_status.getConceptId())
+            if (desc.getStatusId() != current_status.getConceptNid())
                 continue;
             // Description is FSN
-            if (desc.getTypeId() != fully_specified_description_type.getConceptId())
+            if (desc.getTypeId() != fully_specified_description_type.getConceptNid())
                 continue;
             // Get the substring starting at the last left paren
             String fsn = desc.getText();
@@ -287,8 +287,8 @@ public class InstructAndWaitDo extends AbstractTask {
                 I_GetConceptData newConcept = createNewConcept(newDescrString, getSemanticTag(con));
                 // Now copy the rels from the exiting to the new
                 I_TermFactory termFactory = Terms.get();
-                Set<I_Position> positionSet = new HashSet<I_Position>();
-                for (I_Path path : config.getEditingPathSet()) {
+                Set<PositionBI> positionSet = new HashSet<PositionBI>();
+                for (PathBI path : config.getEditingPathSet()) {
                     positionSet.add(termFactory.newPosition(path, Integer.MAX_VALUE));
                 }
                 PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);

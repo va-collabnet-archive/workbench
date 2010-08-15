@@ -397,13 +397,13 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             TreePath childPath = new TreePath(child.getPath());
             I_GetConceptData cb = (I_GetConceptData) child.getUserObject();
 
-            if (config.getChildrenExpandedNodes().contains(cb.getConceptId())) {
+            if (config.getChildrenExpandedNodes().contains(cb.getConceptNid())) {
 
                 DefaultMutableTreeNode ancestor = (DefaultMutableTreeNode) child.getParent();
                 while (ancestor != null) {
                     I_GetConceptData parentBean = (I_GetConceptData) ancestor.getUserObject();
                     if (parentBean != null) {
-                        if (parentBean.getConceptId() == cb.getConceptId()) {
+                        if (parentBean.getConceptNid() == cb.getConceptNid()) {
                             AceLog.getAppLog().warning("###\n### Auto expand stopped. Found cycle.\n###");
                             return;
                         }

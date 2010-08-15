@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -21,6 +20,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 
@@ -168,7 +168,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 
 	@Override
 	public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathId() == pathNid) {
+        if (getTime() == time && getPathNid() == pathNid) {
             throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
         }
 		CidRevision newR = new CidRevision(statusNid, pathNid, time, this);
@@ -177,8 +177,18 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 
 	@Override
+	public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+        if (getTime() == time && getPathNid() == pathNid) {
+            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
+        }
+		CidRevision newR = new CidRevision(statusNid, authorNid, pathNid, time, this);
+		addRevision(newR);
+		return newR;
+	}
+
+	@Override
 	public CidRevision makeAnalog() {
-	    CidRevision newR = new CidRevision(getStatusId(), getPathId(), getTime(), this);
+	    CidRevision newR = new CidRevision(getStatusNid(), getPathNid(), getTime(), this);
 	    return newR;
 	}
 
@@ -212,7 +222,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember> implements I
 	}
 
 	@Override
-	public I_ExtendByRefPart makePromotionPart(I_Path promotionPath) {
+	public I_ExtendByRefPart makePromotionPart(PathBI promotionPath) {
 		throw new UnsupportedOperationException();
 	}
 	

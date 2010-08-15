@@ -29,8 +29,6 @@ import java.util.Set;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -46,6 +44,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
@@ -96,23 +96,23 @@ public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
                 throw new TaskFailedException("You must select at least one editing path. ");
             }
 
-            Set<I_Position> positionSet = new HashSet<I_Position>();
-            for (I_Path editPath : config.getEditingPathSet()) {
+            Set<PositionBI> positionSet = new HashSet<PositionBI>();
+            for (PathBI editPath : config.getEditingPathSet()) {
                 positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
             }
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_IntSet typeSet = Terms.get().newIntSet();
-            typeSet.add(relTypeConcept.getConceptId());
+            typeSet.add(relTypeConcept.getConceptNid());
 
             for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
                 config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                for (I_Path editPath : config.getEditingPathSet()) {
+                for (PathBI editPath : config.getEditingPathSet()) {
                     List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
                         positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {
-                        if (t.getStatusId() != newStatusConcept.getConceptId()) {
-                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptId(), editPath.getConceptId(), Long.MAX_VALUE);
+                        if (t.getStatusNid() != newStatusConcept.getConceptNid()) {
+                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
                             partsToAdd.add(newPart);
                         }
                     }

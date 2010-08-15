@@ -97,7 +97,7 @@ public  class SemanticAreaHierarchyRefsetSearcher extends RefsetSearcherUtility
 
 	public Set<String> searchForParentTagBySemTag(String tag) throws Exception 
 	{
-		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, ((SemanticAreaHierarchyRefset)refset).getSemanticTagParentRelationship().getConceptId());
+		List<I_ExtendByRefPartStr> l = helper.getAllCurrentRefsetExtensions(refsetId, ((SemanticAreaHierarchyRefset)refset).getSemanticTagParentRelationship().getConceptNid());
 		Set<String> results = new HashSet<String>();
 		
 		for (int i = 0; i < l.size(); i++)

@@ -67,7 +67,7 @@ public class RefsetDefaultsMeasurement extends RefsetDefaults implements I_Refse
     public RefsetDefaultsMeasurement() throws TerminologyException, IOException {
         super();
         defaultUnitsOfMeasureForMeasurementRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-        unitsOfMeasurePopupIds.add(defaultUnitsOfMeasureForMeasurementRefset.getConceptId());
+        unitsOfMeasurePopupIds.add(defaultUnitsOfMeasureForMeasurementRefset.getConceptNid());
 
         defaultMeasurementValueForMeasurementRefset = 1.0;
         measurementValuePopupItems = new Double[] { 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0 };

@@ -141,7 +141,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
 
             for (Integer i : allowedRefsets) {
 
-                int memberSetId = getMemberSetConcept(i).getConceptId();
+                int memberSetId = getMemberSetConcept(i).getConceptNid();
 
                 I_GetConceptData memberSet = Terms.get().getConcept(memberSetId);
                 System.out.println("Checking refset: " + memberSet);
@@ -375,7 +375,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
 	 */
     public void addToRefsetMembers(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
         if (isAdditionalLogging()) {
-            System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptId());
+            System.out.println("*** addToRefsetMembers refset=" + refset + " concept=" + conceptDetails.getConceptNid());
         }
         addToNestedSet(newRefsetMembers, conceptDetails, refset);
     }
@@ -386,7 +386,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
     public void addToRefsetExclusion(ConceptRefsetInclusionDetails conceptDetails, Integer refset) {
         if (isAdditionalLogging()) {
             System.out.println("*** addToRefsetExclusion refset=" + refset + " concept="
-                + conceptDetails.getConceptId());
+                + conceptDetails.getConceptNid());
         }
         addToNestedSet(newRefsetExclusion, conceptDetails, refset);
     }
@@ -427,7 +427,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
             ClosestDistanceHashSet newMembers = newRefsetMembers.get(refset);
             if (newMembers != null) {
                 for (ConceptRefsetInclusionDetails i : newMembers.values()) {
-                    reportWriter.write(Terms.get().getConcept(i.getConceptId()).toString());
+                    reportWriter.write(Terms.get().getConcept(i.getConceptNid()).toString());
                     reportWriter.newLine();
                 }
             }
@@ -438,7 +438,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
             ClosestDistanceHashSet newMembers = newRefsetExclusion.get(refset);
             if (newMembers != null) {
                 for (ConceptRefsetInclusionDetails i : newMembers.values()) {
-                    reportWriter.write(Terms.get().getConcept(i.getConceptId()).toString());
+                    reportWriter.write(Terms.get().getConcept(i.getConceptNid()).toString());
                     reportWriter.newLine();
                 }
             }
@@ -450,7 +450,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
             ClosestDistanceHashSet newMembers = existingRefsetMembers.get(refset);
             if (newMembers != null) {
                 for (ConceptRefsetInclusionDetails i : newMembers.values()) {
-                    reportWriter.write(Terms.get().getConcept(i.getConceptId()).toString());
+                    reportWriter.write(Terms.get().getConcept(i.getConceptNid()).toString());
                     reportWriter.newLine();
                 }
             }
@@ -515,11 +515,11 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     // check for conflict with self and if it is an individual
                     // include or exclude - if so suppress conflict from the
                     // report
-                    if ((newMember.getConceptId() == newMember.getInclusionReasonId() && isIndividualType(newMember.getInclusionTypeId()))
-                        || (newMember.getConceptId() == old.getInclusionReasonId() && isIndividualType(old.getInclusionTypeId()))) {
+                    if ((newMember.getConceptNid() == newMember.getInclusionReasonId() && isIndividualType(newMember.getInclusionTypeId()))
+                        || (newMember.getConceptNid() == old.getInclusionReasonId() && isIndividualType(old.getInclusionTypeId()))) {
                         resolvedTo = null;
                     } else {
-                        conflictWriter.addConflict(newMember.getConceptId(), newMember.getInclusionReasonId(),
+                        conflictWriter.addConflict(newMember.getConceptNid(), newMember.getInclusionReasonId(),
                             newMember.getInclusionTypeId(), old.getInclusionReasonId(), old.getInclusionTypeId(),
                             resolvedTo);
                     }
@@ -557,15 +557,15 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                         Terms.get().commit();
                     }
                     ConceptRefsetInclusionDetails member = newMembers.get(conceptId);
-                    reportWriter.write(Terms.get().getConcept(member.getConceptId()).toString());
+                    reportWriter.write(Terms.get().getConcept(member.getConceptNid()).toString());
                     reportWriter.newLine();
                     if (!validateOnly) {
                         if (useNonTxInterface) {
-                            nonTxWriter.addToRefset(null, member.getConceptId(),
+                            nonTxWriter.addToRefset(null, member.getConceptNid(),
                                 getMembershipType(member.getInclusionTypeId()), refset, 
                                 ReferenceConcepts.CURRENT.getNid());
                         } else {
-                            addToMemberSet(member.getConceptId(), member.getInclusionTypeId(), refset);
+                            addToMemberSet(member.getConceptNid(), member.getInclusionTypeId(), refset);
                         }
                     }
                 }
@@ -602,15 +602,15 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     + " are: ");
                 reportWriter.newLine();
                 for (ConceptRefsetInclusionDetails i : exclusions.values()) {
-                    reportWriter.write(Terms.get().getConcept(i.getConceptId()).toString());
+                    reportWriter.write(Terms.get().getConcept(i.getConceptNid()).toString());
                     reportWriter.newLine();
                     if (!validateOnly) {
-                        I_ExtendByRef ext = getExtensionForComponent(i.getConceptId(), refset);
+                        I_ExtendByRef ext = getExtensionForComponent(i.getConceptNid(), refset);
                         if (ext != null) {
                             if (!newestPartRetired(ext)) {
                                 if (useNonTxInterface) {
                                     I_ExtendByRefPartCid latestExtVersion = (I_ExtendByRefPartCid) getLatestVersion(ext);
-                                    nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptId(),
+                                    nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptNid(),
                                         latestExtVersion.getC1id(), refset, ReferenceConcepts.RETIRED.getNid());
                                 } else {
                                     retireLatestExtension(ext);
@@ -638,20 +638,20 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     reportWriter.newLine();
                     for (ConceptRefsetInclusionDetails parent : parents.values()) {
                         if (oldparents == null
-                            || (oldparents != null && !oldparents.containsKey(parent.getConceptId()))) {
+                            || (oldparents != null && !oldparents.containsKey(parent.getConceptNid()))) {
                             if (!validateOnly) {
                                 if (useNonTxInterface) {
-                                    nonTxWriter.addToRefset(null, parent.getConceptId(),
+                                    nonTxWriter.addToRefset(null, parent.getConceptNid(),
                                         ConceptConstants.PARENT_MARKER.localize().getNid(), refset, 
                                         	ReferenceConcepts.CURRENT.getNid());
                                 } else {
-                                    addToMemberSetAsParent(parent.getConceptId(), refset);
+                                    addToMemberSetAsParent(parent.getConceptNid(), refset);
                                 }
-                                reportWriter.write(Terms.get().getConcept(parent.getConceptId()).toString());
+                                reportWriter.write(Terms.get().getConcept(parent.getConceptNid()).toString());
                                 reportWriter.newLine();
                             }
                         } else {
-                            reportWriter.write(Terms.get().getConcept(parent.getConceptId()).toString()
+                            reportWriter.write(Terms.get().getConcept(parent.getConceptNid()).toString()
                                 + " ------- is already marked as parent");
                             reportWriter.newLine();
                         }
@@ -659,13 +659,13 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     if (oldparents != null) {
                         oldparents.removeAll(parents);
                         for (ConceptRefsetInclusionDetails existingParent : oldparents.values()) {
-                            I_ExtendByRef ext = getExtensionForComponent(existingParent.getConceptId(),
+                            I_ExtendByRef ext = getExtensionForComponent(existingParent.getConceptNid(),
                                 refset);
                             if (ext != null) {
                                 if (!newestPartRetired(ext)) {
                                     if (useNonTxInterface) {
                                         I_ExtendByRefPartCid latestExtVersion = (I_ExtendByRefPartCid) getLatestVersion(ext);
-                                        nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptId(),
+                                        nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptNid(),
                                             latestExtVersion.getC1id(), refset, ReferenceConcepts.RETIRED.getNid());
                                     } else {
                                         retireLatestExtension(ext);
@@ -673,9 +673,9 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                                 }
                             } else {
                                 System.out.println("No extension exists with this refset id for this component : "
-                                    + Terms.get().getConcept(existingParent.getConceptId()).toString());
+                                    + Terms.get().getConcept(existingParent.getConceptNid()).toString());
                             }
-                            reportWriter.write(Terms.get().getConcept(existingParent.getConceptId()).toString()
+                            reportWriter.write(Terms.get().getConcept(existingParent.getConceptNid()).toString()
                                 + " ------- to be retired");
                             reportWriter.newLine();
                         }
@@ -713,11 +713,11 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                 }
 
                 if (isAdditionalLogging()) {
-                    String conceptUuid = Terms.get().getUids(conceptId.getConceptId()).iterator().next().toString();
-                    System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptId() + ")");
+                    String conceptUuid = Terms.get().getUids(conceptId.getConceptNid()).iterator().next().toString();
+                    System.out.println("* concept " + conceptUuid + " (" + conceptId.getConceptNid() + ")");
                 }
 
-                Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptId(), concepts);
+                Set<Integer> parents = getAncestorsOfConcept(conceptId.getConceptNid(), concepts);
                 for (Integer parentId : parents) {
 
                     if (isAdditionalLogging()) {
@@ -726,7 +726,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     }
 
                     ConceptRefsetInclusionDetails parent = new ConceptRefsetInclusionDetails(parentId, 0, 0, 0);
-                    if (!concepts.containsKey(parent.getConceptId())) {
+                    if (!concepts.containsKey(parent.getConceptNid())) {
                         nonMarkedParents.add(parent);
                     }
                 }

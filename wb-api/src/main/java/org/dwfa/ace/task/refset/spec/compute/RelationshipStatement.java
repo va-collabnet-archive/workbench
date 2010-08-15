@@ -55,7 +55,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
         this.config = config;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
-            if (queryToken.getConceptId() == token.nid) {
+            if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
                 break;
             }
@@ -141,14 +141,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
         I_RepresentIdSet possibleConcepts = termFactory.getEmptyIdSet();
         if (parentPossibleConcepts == null) {
-            parentPossibleConcepts = termFactory.getConceptIdSet();
+            parentPossibleConcepts = termFactory.getConceptNidSet();
         }
         activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
 
         switch (tokenEnum) {
         case REL_IS_MEMBER_OF:
             Collection<? extends I_ExtendByRef> refsetExtensions =
-                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptId());
+                    termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
                 refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
@@ -279,7 +279,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRefinabilityIs(I_GetConceptData requiredRefinability, I_RelTuple relTuple) {
-        return relTuple.getRefinabilityId() == requiredRefinability.getConceptId();
+        return relTuple.getRefinabilityId() == requiredRefinability.getConceptNid();
     }
 
     private boolean relCharIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -346,7 +346,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relCharIs(I_GetConceptData requiredCharType, I_RelTuple relTuple) {
-        return relTuple.getCharacteristicId() == requiredCharType.getConceptId();
+        return relTuple.getCharacteristicId() == requiredCharType.getConceptNid();
     }
 
     private boolean relIsMemberOf(I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -358,7 +358,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relTypeIs(I_GetConceptData requiredRelType, I_RelTuple relTuple) {
-        return relTuple.getTypeId() == requiredRelType.getConceptId();
+        return relTuple.getTypeId() == requiredRelType.getConceptNid();
     }
 
     private boolean relTypeIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -518,7 +518,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relDestinationIs(I_GetConceptData requiredDestination, I_RelTuple relTuple) {
-        return relTuple.getC2Id() == requiredDestination.getConceptId();
+        return relTuple.getC2Id() == requiredDestination.getConceptNid();
     }
 
     private boolean relDestinationIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {

@@ -24,11 +24,11 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class StatusCounter implements I_ProcessConcepts {
 
@@ -79,11 +79,11 @@ public class StatusCounter implements I_ProcessConcepts {
         int tupleListSize = attrTupels.size();
         if (upperBound != null) {
             if (tupleListSize >= lowerBound && tupleListSize <= upperBound) {
-                identifiedNids.add(concept.getConceptId());
+                identifiedNids.add(concept.getConceptNid());
             }
         } else {
             if (tupleListSize >= lowerBound) {
-                identifiedNids.add(concept.getConceptId());
+                identifiedNids.add(concept.getConceptNid());
             }
         }
         if (tupleListSize > 1) {
@@ -122,13 +122,13 @@ public class StatusCounter implements I_ProcessConcepts {
     public String toString() {
         StringBuffer buff = new StringBuffer();
         if (profileForConflictDetection != null) {
-            for (I_Position view : profileForConflictDetection.getViewPositionSet()) {
+            for (PositionBI view : profileForConflictDetection.getViewPositionSet()) {
                 buff.append("\nview: " + view);
             }
             for (int statusNid : profileForConflictDetection.getAllowedStatus().getSetValues()) {
                 try {
                     I_GetConceptData status = Terms.get().getConcept(statusNid);
-                    buff.append("\nallowed status: " + status.getInitialText() + " (" + status.getConceptId() + "): ");
+                    buff.append("\nallowed status: " + status.getInitialText() + " (" + status.getConceptNid() + "): ");
                 } catch (TerminologyException e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 } catch (IOException e) {
@@ -142,7 +142,7 @@ public class StatusCounter implements I_ProcessConcepts {
             try {
                 I_GetConceptData status = Terms.get().getConcept(key);
                 Integer count = statusCount.get(key);
-                buff.append("\nstatus: " + status.getInitialText() + " (" + status.getConceptId() + "); count: "
+                buff.append("\nstatus: " + status.getInitialText() + " (" + status.getConceptNid() + "); count: "
                     + count);
             } catch (TerminologyException e) {
                 AceLog.getAppLog().alertAndLogException(e);
