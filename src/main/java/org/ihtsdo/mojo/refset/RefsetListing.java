@@ -39,7 +39,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -47,6 +46,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * 
@@ -70,7 +70,7 @@ public class RefsetListing extends AbstractMojo {
      */
     private String path_uuid = null;
 
-    private I_Path path = null;
+    private PathBI path = null;
 
     /**
      * The uuid of the refset concept. Can be set to some descendant to limit
@@ -132,7 +132,7 @@ public class RefsetListing extends AbstractMojo {
         out.println("</h2>");
         out.println("<p>");
         out.println(escapeString(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date())));
-        ArrayList<Integer> refsets = getCoreDescendants(refset_con.getConceptId(), getActiveStatus(), this.path);
+        ArrayList<Integer> refsets = getCoreDescendants(refset_con.getConceptNid(), getActiveStatus(), this.path);
         if (this.sort_by_name) {
             Collections.sort(refsets, new Comparator<Integer>() {
                 public int compare(Integer obj1, Integer obj2) {
@@ -167,11 +167,11 @@ public class RefsetListing extends AbstractMojo {
                     boolean found = false;
                     String head = r_con.getInitialText().replace(" rel", "");
                     I_IntSet r_set = tf.newIntSet();
-                    r_set.add(r_con.getConceptId());
+                    r_set.add(r_con.getConceptNid());
                     for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, 
                         config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                        // for (int val_id : getRelationship(con.getConceptId(),
-                        // r_con.getConceptId(), null, Integer.MAX_VALUE)) {
+                        // for (int val_id : getRelationship(con.getConceptNid(),
+                        // r_con.getConceptNid(), null, Integer.MAX_VALUE)) {
                         // I_GetConceptData val_con = tf.getConcept(val_id);
                         if (val_con != null) {
                             found = true;
@@ -199,7 +199,7 @@ public class RefsetListing extends AbstractMojo {
                     boolean found = false;
                     String head = r_con.getInitialText().replace(" rel", "");
                     I_IntSet r_set = tf.newIntSet();
-                    r_set.add(r_con.getConceptId());
+                    r_set.add(r_con.getConceptNid());
                     for (I_GetConceptData val_con : con.getSourceRelTargets(getActiveStatus(), r_set, null, 
                         config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         if (val_con != null) {
@@ -210,7 +210,7 @@ public class RefsetListing extends AbstractMojo {
                             out.println("<td>");
                             // out.println(val_con.getInitialText());
                             //
-                            for (I_ExtendByRef mem : tf.getRefsetExtensionMembers(val_con.getConceptId())) {
+                            for (I_ExtendByRef mem : tf.getRefsetExtensionMembers(val_con.getConceptNid())) {
                                 I_GetConceptData mem_con = tf.getConcept(mem.getComponentId());
                                 I_ExtendByRefPart p = mem.getMutableParts().get(0);
                                 if (p instanceof I_ExtendByRefPartStr) {
@@ -272,14 +272,14 @@ public class RefsetListing extends AbstractMojo {
         return ret;
     }
 
-    private ArrayList<Integer> getCoreDescendants(int concept_id, I_IntSet allowed_status, I_Path path)
+    private ArrayList<Integer> getCoreDescendants(int concept_id, I_IntSet allowed_status, PathBI path)
             throws Exception {
         ArrayList<Integer> ret = new ArrayList<Integer>();
         getCoreDescendants1(concept_id, allowed_status, path, ret);
         return ret;
     }
 
-    private void getCoreDescendants1(int concept_id, I_IntSet allowed_status, I_Path path, ArrayList<Integer> ret)
+    private void getCoreDescendants1(int concept_id, I_IntSet allowed_status, PathBI path, ArrayList<Integer> ret)
             throws Exception {
         if (ret.contains(concept_id))
             return;
@@ -289,7 +289,7 @@ public class RefsetListing extends AbstractMojo {
         }
     }
 
-    private ArrayList<Integer> getCoreChildren(int concept_id, I_IntSet allowed_status, I_Path path) throws Exception {
+    private ArrayList<Integer> getCoreChildren(int concept_id, I_IntSet allowed_status, PathBI path) throws Exception {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         ArrayList<Integer> ret = new ArrayList<Integer>();
@@ -300,7 +300,7 @@ public class RefsetListing extends AbstractMojo {
         isa_rels.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
         for (I_GetConceptData d : c.getDestRelOrigins(allowed_status, isa_rels, null, 
             config.getPrecedence(), config.getConflictResolutionStrategy())) {
-            ret.add(d.getConceptId());
+            ret.add(d.getConceptNid());
         }
         Collections.sort(ret, new Comparator<Integer>() {
             public int compare(Integer obj1, Integer obj2) {

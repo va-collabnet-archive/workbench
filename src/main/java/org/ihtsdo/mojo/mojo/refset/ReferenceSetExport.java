@@ -37,7 +37,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -55,6 +54,7 @@ import org.dwfa.tapi.spec.ConceptSpec;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 import org.ihtsdo.mojo.mojo.PositionDescriptor;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -159,7 +159,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
     private I_IntSet allowedStatuses;
 
-    private Set<I_Position> positions;
+    private Set<PositionBI> positions;
 
     private HashMap<String, BufferedWriter> writerMap = new HashMap<String, BufferedWriter>();
 
@@ -179,13 +179,13 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
         try {
             allowedStatuses = tf.newIntSet();
-            positions = new HashSet<I_Position>();
+            positions = new HashSet<PositionBI>();
             for (ExportSpecification spec : exportSpecifications) {
                 for (PositionDescriptor pd : spec.getPositionsForExport()) {
                     positions.add(pd.getPosition());
                 }
                 for (ConceptDescriptor status : spec.getStatusValuesForExport()) {
-                    allowedStatuses.add(status.getVerifiedConcept().getConceptId());
+                    allowedStatuses.add(status.getVerifiedConcept().getConceptNid());
                 }
             }
 
@@ -223,7 +223,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 return;
             }
 
-            exportRefsets(concept.getConceptId());
+            exportRefsets(concept.getConceptNid());
 
             // export relationship refsets
             for (I_RelVersioned rel : concept.getSourceRels()) {
@@ -237,8 +237,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
 
             // TODO commented out because it costs too many SCTIDs and we need
             // to release pathology - to be included later
-            // extractStatus(latest, concept.getConceptId());
-            // extractDefinitionType(latest, concept.getConceptId());
+            // extractStatus(latest, concept.getConceptNid());
+            // extractDefinitionType(latest, concept.getConceptNid());
         }
     }
 
@@ -495,8 +495,8 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      */
     protected String getReleaseVersion(I_GetConceptData refsetConcept) throws Exception {
 
-        if (pathReleaseVersions.containsKey(refsetConcept.getConceptId())) {
-            return pathReleaseVersions.get(refsetConcept.getConceptId());
+        if (pathReleaseVersions.containsKey(refsetConcept.getConceptNid())) {
+            return pathReleaseVersions.get(refsetConcept.getConceptNid());
         } else {
             int pathid = getLatestAttributePart(refsetConcept).getPathId();
 
@@ -529,7 +529,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                 }
 
                 String releaseVersion = getPreferredTerm(tf.getConcept(pathid)) + "_" + pathVersion;
-                pathReleaseVersions.put(refsetConcept.getConceptId(), releaseVersion);
+                pathReleaseVersions.put(refsetConcept.getConceptNid(), releaseVersion);
                 return releaseVersion;
 
             } catch (Exception e) {
@@ -599,7 +599,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
      * @return true if pathId in <code>positions</code> list
      */
     boolean checkPath(int pathId) {
-        for (I_Position position : positions) {
+        for (PositionBI position : positions) {
             if (position.getPath().getConceptNid() == pathId) {
                 return true;
             }
@@ -638,11 +638,11 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
         return descTuple.getText();
     }
 
-    public Set<I_Position> getPositions() {
+    public Set<PositionBI> getPositions() {
         return positions;
     }
 
-    public void setPositions(Set<I_Position> positions) {
+    public void setPositions(Set<PositionBI> positions) {
         this.positions = positions;
     }
 

@@ -32,8 +32,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -42,6 +40,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Goal which copies the latest changes on a component to another branch.
@@ -98,21 +98,21 @@ public class VodbCopyLatestComponent extends AbstractMojo {
         public void processConcept(I_GetConceptData concept) throws Exception {
 
             // get origins
-            I_Path originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI originPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            I_Position originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
+            PositionBI originPosition = termFactory.newPosition(originPath, Integer.MAX_VALUE);
 
-            Set<I_Position> origins = new HashSet<I_Position>();
+            Set<PositionBI> origins = new HashSet<PositionBI>();
             origins.add(originPosition);
 
             // get the copy-to concept/path
-            I_Path copyToPath = termFactory.getPath(branchToCopyToConcept.getUids());
+            PathBI copyToPath = termFactory.getPath(branchToCopyToConcept.getUids());
 
             // get concept/path/position of the branch being copied
-            I_Path oldPath = termFactory.getPath(branchToCopyConcept.getUids());
+            PathBI oldPath = termFactory.getPath(branchToCopyConcept.getUids());
 
-            I_Position oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
-            Set<I_Position> positions = new HashSet<I_Position>();
+            PositionBI oldPosition = termFactory.newPosition(oldPath, Integer.MAX_VALUE);
+            Set<PositionBI> positions = new HashSet<PositionBI>();
             positions.add(oldPosition);
 
             // TODO replace with passed in config...
@@ -123,7 +123,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest attributes to new path/version
             for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
-                I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
+                I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
                 concept.getConceptAttributes().addVersion(newPart);
             }
 
@@ -132,7 +132,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
-                I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
+                I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
                 tuple.getDescVersioned().addVersion(newPart);
             }
 
@@ -141,7 +141,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
-                I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptId(), Long.MAX_VALUE);
+                I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
                 tuple.getRelVersioned().addVersion(newPart);
             }
 

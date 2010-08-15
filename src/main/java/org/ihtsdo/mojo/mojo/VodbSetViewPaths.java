@@ -24,11 +24,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.tk.api.PathBI;
 
 /**
  * 
@@ -57,7 +57,7 @@ public class VodbSetViewPaths extends AbstractMojo {
                     path.setUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path.getDescription())
                         .toString());
                 }
-                I_Path viewPath = tf.getPath(path.getVerifiedConcept().getUids());
+                PathBI viewPath = tf.getPath(path.getVerifiedConcept().getUids());
                 activeConfig.addViewPosition(tf.newPosition(viewPath, Integer.MAX_VALUE));
             }
         } catch (TerminologyException e) {

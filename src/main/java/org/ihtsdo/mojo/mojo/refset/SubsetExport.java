@@ -51,6 +51,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetPurposeToSubsetTypeMap;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -174,7 +175,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             MemberRefsetHandler.setFixedMapDirectory(readWriteMapDirectory);
             MemberRefsetHandler.setReadWriteMapDirectory(readWriteMapDirectory);
 
-            Set<I_Position> refsetPositions = new HashSet<I_Position>();
+            Set<PositionBI> refsetPositions = new HashSet<PositionBI>();
             refsetPositions.addAll(Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly());
             referenceSetExport.setPositions(refsetPositions);
 
@@ -205,7 +206,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 return;
             }
 
-            exportRefsets(concept.getConceptId());
+            exportRefsets(concept.getConceptNid());
         } else {
             getLog().warn("Skipping : " + concept.getInitialText());
         }
@@ -364,13 +365,13 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             } else {
                 // check if the spec has the original snomed id
                 I_IntSet allowedTypes = tf.newIntSet();
-                allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptId());
+                allowedTypes.add(tf.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids()).getConceptNid());
 
                 Set<? extends I_GetConceptData> concepts =
                         refsetConcept.getDestRelOrigins(allowedStatuses, allowedTypes, new PositionSetReadOnly(
                             positions), null, null);
                 for (I_GetConceptData concept : concepts) {
-                    subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptId());
+                    subOriginalId = refsetType.getRefsetHandler().getSnomedIntegerId(tf, concept.getConceptNid());
                     if (subOriginalId != null) {
                         break;
                     }

@@ -30,8 +30,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
@@ -39,6 +37,8 @@ import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Goal which finds all concepts that have no parents.
@@ -89,7 +89,7 @@ public class VodbFindOrphans extends AbstractMojo {
     private class FindComponents implements I_ProcessConcepts {
 
         I_TermFactory termFactory;
-        Set<I_Position> origins;
+        Set<PositionBI> origins;
         BufferedWriter textWriter;
         BufferedWriter htmlWriter;
 
@@ -100,33 +100,33 @@ public class VodbFindOrphans extends AbstractMojo {
                 + outputTextFileName)));
             htmlWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputHtmlDirectory + File.separator
                 + outputHtmlFileName)));
-            origins = new HashSet<I_Position>();
+            origins = new HashSet<PositionBI>();
             termFactory = Terms.get();
         }
 
         public void processConcept(I_GetConceptData concept) throws Exception {
             // get origins
-            I_Path architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            I_Position latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
 
             origins.add(latestOnArchitectonicPath);
 
-            Set<I_Position> branchPositions = new HashSet<I_Position>();
+            Set<PositionBI> branchPositions = new HashSet<PositionBI>();
 
             // get the concepts/paths/positions for the branches to be compared
             for (ConceptDescriptor branch : branches) {
                 I_GetConceptData currentConcept = branch.getVerifiedConcept();
-                I_Path currentPath = termFactory.getPath(currentConcept.getUids());
-                I_Position currentPosition = termFactory.newPosition(currentPath, Integer.MAX_VALUE);
+                PathBI currentPath = termFactory.getPath(currentConcept.getUids());
+                PositionBI currentPosition = termFactory.newPosition(currentPath, Integer.MAX_VALUE);
                 branchPositions.add(currentPosition);
             }
 
             // get latest IS-A relationships
             I_IntSet isARel = termFactory.newIntSet();
-            isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptId());
+            isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
 
             List<? extends I_RelTuple> results = concept.getSourceRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());

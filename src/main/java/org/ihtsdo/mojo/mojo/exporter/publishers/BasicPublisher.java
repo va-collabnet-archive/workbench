@@ -80,7 +80,7 @@ public class BasicPublisher implements I_PublishConcepts {
 	 * @throws Exception
 	 */
 	public void localProcessConcept(I_GetConceptData concept) throws Exception {
-		con_id = concept.getConceptId();
+		con_id = concept.getConceptNid();
 		if(con_id != -1){
 			foundConCount++;
 		 try {
@@ -117,7 +117,7 @@ public class BasicPublisher implements I_PublishConcepts {
 		
 		if(pubDTO.getId_uuidS() != null){
 			log.severe("getId_int Publisher name ="+pubDTO.getName() +" pubDTO.getId_uuidS() = "+pubDTO.getId_uuidS());
-			id_int = getConceptUUID_S(pubDTO.getId_uuidS()).getConceptId();	
+			id_int = getConceptUUID_S(pubDTO.getId_uuidS()).getConceptNid();	
 			log.severe("getId_int id_int = "+id_int);
 		}
 		return id_int;
@@ -143,7 +143,7 @@ public class BasicPublisher implements I_PublishConcepts {
 		}
 		else{UUID uid = UUID.fromString(uuidS);
 		I_GetConceptData con = getConceptUUID(uid);
-		uidI.put(uuidS, new Integer(con.getConceptId()));
+		uidI.put(uuidS, new Integer(con.getConceptNid()));
 		log.severe("uidI adding "+uuidS +" size = "+uidI.size());
 		return con;
 		}
@@ -169,7 +169,7 @@ public class BasicPublisher implements I_PublishConcepts {
 			return uidI.get(uuidS).intValue();
 		}
 		else{
-		return getConceptUUID_S(uuidS).getConceptId();
+		return getConceptUUID_S(uuidS).getConceptNid();
 		}
 	}
 

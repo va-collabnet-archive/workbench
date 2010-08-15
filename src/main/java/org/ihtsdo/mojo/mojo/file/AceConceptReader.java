@@ -127,7 +127,7 @@ public class AceConceptReader extends IterableFileReader<AceConceptReader.AceCon
         /**
          * @return the conceptId
          */
-        public final String getConceptId() {
+        public final String getConceptNid() {
             return conceptId;
         }
 

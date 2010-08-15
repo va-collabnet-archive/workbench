@@ -23,7 +23,6 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
@@ -31,6 +30,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 import org.ihtsdo.mojo.mojo.PositionDescriptor;
+import org.ihtsdo.tk.api.PositionBI;
 
 public class ExportSpecification {
 
@@ -51,7 +51,7 @@ public class ExportSpecification {
 
         private I_IntSet relTypeIntSet;
 
-        private HashSet<I_Position> positions;
+        private HashSet<PositionBI> positions;
 
         private I_IntSet statusValues;
 
@@ -67,7 +67,7 @@ public class ExportSpecification {
             I_TermFactory termFactory = LocalVersionedTerminology.get();
 
             if (positionsForExport != null && positionsForExport.length > 0) {
-                positions = new HashSet<I_Position>(positionsForExport.length);
+                positions = new HashSet<PositionBI>(positionsForExport.length);
                 for (PositionDescriptor pd : positionsForExport) {
                     positions.add(pd.getPosition());
                 }
@@ -78,7 +78,7 @@ public class ExportSpecification {
                 statusValues = termFactory.newIntSet();
                 for (ConceptDescriptor status : statusValuesForExport) {
                     I_GetConceptData statusConcept = status.getVerifiedConcept();
-                    statusValues.add(statusConcept.getConceptId());
+                    statusValues.add(statusConcept.getConceptNid());
                     statusValueList.add(statusConcept);
                 }
             }
@@ -88,7 +88,7 @@ public class ExportSpecification {
                 relTypeIntSet = termFactory.newIntSet();
                 for (ConceptDescriptor relType : relTypesForHierarchy) {
                     I_GetConceptData relTypeConcept = relType.getVerifiedConcept();
-                    relTypeIntSet.add(relTypeConcept.getConceptId());
+                    relTypeIntSet.add(relTypeConcept.getConceptNid());
                     relTypes.add(relTypeConcept);
                 }
             }

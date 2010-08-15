@@ -27,12 +27,12 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * Flag a concept to demonstrate how to change make changes to components...
@@ -62,9 +62,9 @@ public class VodbExampleChange extends AbstractMojo {
             I_GetConceptData architectonicRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
             I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
             I_GetConceptData architectonicBranch = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-            I_Path architectonicPath = termFactory.getPath(architectonicBranch.getUids());
-            I_Position latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
-            Set<I_Position> positions = new HashSet<I_Position>();
+            PathBI architectonicPath = termFactory.getPath(architectonicBranch.getUids());
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            Set<PositionBI> positions = new HashSet<PositionBI>();
             positions.add(latestOnArchitectonicPath);
             I_GetConceptData flaggedStatus = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FLAGGED_FOR_REVIEW.getUids());
             // TODO replace with passed in config...
@@ -72,7 +72,7 @@ public class VodbExampleChange extends AbstractMojo {
 
             for (I_ConceptAttributeTuple tuple : architectonicRoot.getConceptAttributeTuples(null, new PositionSetReadOnly(positions), 
                 config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                I_ConceptAttributePart part = (I_ConceptAttributePart) tuple.makeAnalog(flaggedStatus.getConceptId(), tuple.getPathId(), Long.MAX_VALUE);
+                I_ConceptAttributePart part = (I_ConceptAttributePart) tuple.makeAnalog(flaggedStatus.getConceptNid(), tuple.getPathId(), Long.MAX_VALUE);
 
                 conceptAttributes.addVersion(part);
                 termFactory.addUncommitted(architectonicRoot);

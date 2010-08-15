@@ -88,7 +88,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
         public void processDescription(I_DescriptionVersioned desc) throws Exception {
             Document doc = new Document();
             doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-            doc.add(new Field("cnid", Integer.toString(desc.getConceptId()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.UN_TOKENIZED));
             doc.add(new Field("tnid", Integer.toString(desc.getFirstTuple().getTypeId()), Field.Store.YES,
                 Field.Index.UN_TOKENIZED));
             String lastDesc = null;

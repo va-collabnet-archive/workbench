@@ -35,8 +35,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -46,6 +44,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  * 
@@ -141,11 +141,11 @@ public class VodbCreateNewPath extends AbstractMojo {
             if (activeConfig == null) {
                 throw new TaskFailedException("Use the vodb-set-default-config and vodb-set-ace-edit-path goals prior to calling this goal.");
             }
-            Set<I_Position> pathOrigins = null;
+            Set<PositionBI> pathOrigins = null;
             if (origins != null) {
-                pathOrigins = new HashSet<I_Position>(origins.length);
+                pathOrigins = new HashSet<PositionBI>(origins.length);
                 for (SimpleUniversalAcePosition pos : origins) {
-                    I_Path originPath = tf.getPath(pos.getPathId());
+                    PathBI originPath = tf.getPath(pos.getPathId());
                     pathOrigins.add(tf.newPosition(originPath, pos.getTime()));
                 }
             }
@@ -180,7 +180,7 @@ public class VodbCreateNewPath extends AbstractMojo {
             } else {
             	getLog().info("VodbCreateNewPath tf has NO pathUUID So creating NEW");
                 pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
-                getLog().info("VodbCreateNewPath createNewPathConcept called new concept ID = "+pathConcept.getConceptId());
+                getLog().info("VodbCreateNewPath createNewPathConcept called new concept ID = "+pathConcept.getConceptNid());
             }
 
             tf.newPath(pathOrigins, pathConcept);
@@ -234,8 +234,8 @@ public class VodbCreateNewPath extends AbstractMojo {
         // need to do an immediate commit so that new concept will be available
         // to path when read from changeset
         
-        getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
-        //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptId());
+        getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
+        //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
         for (I_DescriptionVersioned desc: pathConcept.getDescriptions()) {
         	getLog().info("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
         	for (I_DescriptionPart desl : desc.getMutableParts()) {

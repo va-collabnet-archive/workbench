@@ -14,7 +14,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefset;
 import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefsetWriter;
-import org.ihtsdo.workflow.refset.utilities.RefsetReaderUtility;
 
 /**
  * @author Jesse Efron

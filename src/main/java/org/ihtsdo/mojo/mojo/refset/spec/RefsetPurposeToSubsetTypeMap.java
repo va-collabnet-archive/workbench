@@ -62,7 +62,7 @@ public class RefsetPurposeToSubsetTypeMap {
         SUBSET_TYPE subsetType = null;
 
         for (SUBSET_TYPE currentType : SUBSET_TYPE.values()) {
-            if (currentType.getRefsetPurposeNid() == refsetPurpose.getConceptId()) {
+            if (currentType.getRefsetPurposeNid() == refsetPurpose.getConceptNid()) {
                 subsetType = currentType;
                 break;
             }
