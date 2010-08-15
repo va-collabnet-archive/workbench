@@ -14,9 +14,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -28,6 +26,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.PathBI;
 
 public class RulesDeploymentPackageReferenceHelper {
 
@@ -81,7 +80,7 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			rulesPackage.setUuids(newConcept.getUids());
 			String stringExtValue = url;
-			refsetHelper.newRefsetExtension(rulesPackagesRefset.getConceptId(), newConcept.getConceptId(), 
+			refsetHelper.newRefsetExtension(rulesPackagesRefset.getConceptNid(), newConcept.getConceptNid(), 
 					REFSET_TYPES.STR, 
 					new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, stringExtValue), config); 
 
@@ -124,8 +123,8 @@ public class RulesDeploymentPackageReferenceHelper {
 			descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 
 			List<I_ExtendByRefPart> currentExtensionParts = 
-				refsetHelper.getAllCurrentRefsetExtensions(rulesPackageRefset.getConceptId(), 
-						rulesPackageConcept.getConceptId());
+				refsetHelper.getAllCurrentRefsetExtensions(rulesPackageRefset.getConceptNid(), 
+						rulesPackageConcept.getConceptNid());
 
 			for (I_ExtendByRefPart loopPart : currentExtensionParts) {
 				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
@@ -165,15 +164,15 @@ public class RulesDeploymentPackageReferenceHelper {
 			String metadata = rulesPackageNewVersion.getUrl();
 
 			List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
-			extensions.addAll(termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptId()));
+			extensions.addAll(termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptNid()));
 			for (I_ExtendByRef extension : extensions) {
-				for (I_Path editPath : config.getEditingPathSet()) {
-					if (extension.getRefsetId() == rulesPackageRefset.getConceptId()) {
+				for (PathBI editPath : config.getEditingPathSet()) {
+					if (extension.getRefsetId() == rulesPackageRefset.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptId(),
+								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
 						extension.addVersion(part);
@@ -250,10 +249,10 @@ public class RulesDeploymentPackageReferenceHelper {
 
 				if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
 					I_DescriptionVersioned description = tuple.getDescVersioned();
-					for (I_Path editPath : config.getEditingPathSet()) {
+					for (PathBI editPath : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptId(),
+								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						newPart.setText(newString);
 						description.addVersion(newPart);
@@ -297,11 +296,11 @@ public class RulesDeploymentPackageReferenceHelper {
 		try {
 			conceptToRetireUpdatedFromDB = termFactory.getConcept(rulesPackage.getUuids());
 			I_ConceptAttributePart lastAttributePart = getLastestAttributePart(conceptToRetireUpdatedFromDB);
-			for (I_Path editPath : config.getEditingPathSet()) {
+			for (PathBI editPath : config.getEditingPathSet()) {
 				I_ConceptAttributePart newAttributeVersion = 
 					(I_ConceptAttributePart) lastAttributePart.makeAnalog(
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-							editPath.getConceptId(), 
+							editPath.getConceptNid(), 
 							Long.MAX_VALUE);
 				conceptToRetireUpdatedFromDB.getConceptAttributes().addVersion(newAttributeVersion);
 			}

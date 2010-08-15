@@ -21,7 +21,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
@@ -34,6 +33,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.tk.api.Precedence;
 
 public class TestContexts extends TestCase {
 
@@ -199,10 +199,10 @@ public class TestContexts extends TestCase {
 		for (Rule loopRule : rules) {
 			String ruleUid = loopRule.getMetaAttribute("UID");
 			if (ruleUid.equals("f7bd3b50-9c1e-11df-981c-0800200c9a66")) {
-				assertEquals(includeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context1).getConceptId());
+				assertEquals(includeClause.getConceptNid(), contextHelper.getRoleInContext(ruleUid, context1).getConceptNid());
 			} else {
 				if (ruleUid.equals("7feea960-9c23-11df-981c-0800200c9a66")) {
-					assertEquals(excludeClause.getConceptId(), contextHelper.getRoleInContext(ruleUid, context1).getConceptId());
+					assertEquals(excludeClause.getConceptNid(), contextHelper.getRoleInContext(ruleUid, context1).getConceptNid());
 				} else {
 					assertNull(contextHelper.getRoleInContext(ruleUid, context1));
 				}
@@ -213,15 +213,15 @@ public class TestContexts extends TestCase {
 		assertEquals(1,results.getErrorCodes().size());
 		
 		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, includeClause);
-		assertEquals(includeClause.getConceptId(), 
-				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptId());
+		assertEquals(includeClause.getConceptNid(), 
+				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptNid());
 
 		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(2,results.getErrorCodes().size());
 		
 		contextHelper.setRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1, excludeClause);
-		assertEquals(excludeClause.getConceptId(), 
-				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptId());
+		assertEquals(excludeClause.getConceptNid(), 
+				contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context1).getConceptNid());
 		
 		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(1,results.getErrorCodes().size());
@@ -258,7 +258,7 @@ public class TestContexts extends TestCase {
 			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
 			config.setDbConfig(newDbProfile);
 
-			config.setPrecedence(PRECEDENCE.TIME);
+			config.setPrecedence(Precedence.TIME);
 
 		} catch (TerminologyException e) {
 			e.printStackTrace();
