@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.TS;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -67,7 +67,7 @@ public class ConceptSpec {
 
     public ConceptVersionBI get(Coordinate c) {
         try {
-            ConceptVersionBI local = TS.get().getConcept(c, uuids);
+            ConceptVersionBI local = Ts.get().getConcept(c, uuids);
             validateDescription(local, c);
             validateRelationships(local, c);
             return local;

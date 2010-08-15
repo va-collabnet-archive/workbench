@@ -18,7 +18,7 @@ package org.ihtsdo.tk.spec;
 
 import java.util.UUID;
 
-import org.ihtsdo.tk.TS;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -47,7 +47,7 @@ public class DescriptionSpec {
 
 	public DescriptionVersionBI get(Coordinate c) {
 		ConceptVersionBI concept = conceptSpec.get(c);
-		DescriptionVersionBI desc = (DescriptionVersionBI) TS.get().getComponent(uuids);
+		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(uuids);
 		if (concept.getNid() != desc.getConceptNid()) {
 			throw new RuntimeException("Concept NIDs do not match. 1: "
 					+ desc.getConceptNid() + " " + descText + " 2: " + concept);
