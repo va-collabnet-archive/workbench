@@ -16,8 +16,10 @@
  */
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
-public interface I_RelTuple extends I_AmTypedTuple {
+
+public interface I_RelTuple extends I_AmTypedTuple, RelationshipAnalogBI {
 
     public int getC1Id();
 

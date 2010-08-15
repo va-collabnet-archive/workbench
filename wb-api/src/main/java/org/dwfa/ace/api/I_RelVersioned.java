@@ -23,8 +23,9 @@ import java.util.Set;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
-public interface I_RelVersioned extends I_AmTermComponent {
+public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI {
 
     public boolean addVersion(I_RelPart rel);
 

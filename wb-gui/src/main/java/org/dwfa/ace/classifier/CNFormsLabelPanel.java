@@ -23,6 +23,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -65,8 +67,13 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  * Classifier Normal Form (Label Format) Panel
@@ -89,7 +96,24 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
         I_ConceptAttributeVersioned core;
 
-        I_ConceptAttributePart part;
+        public List<UUID> getUUIDs() {
+			return core.getUUIDs();
+		}
+
+		public ConAttrVersionBI getVersion(Coordinate c)
+				throws ContraditionException {
+			return core.getVersion(c);
+		}
+
+		public Collection<? extends ConAttrVersionBI> getVersions() {
+			return core.getVersions();
+		}
+
+		public Collection<? extends ConAttrVersionBI> getVersions(Coordinate c) {
+			return core.getVersions(c);
+		}
+
+		I_ConceptAttributePart part;
 
         public int getPathNid() {
 			return part.getPathNid();
@@ -300,11 +324,61 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     private static class RelVersion implements I_RelTuple {
 
         I_RelVersioned fixedPart;
-        I_RelPart part;
+        public List<UUID> getUUIDs() {
+			return fixedPart.getUUIDs();
+		}
 
-        public I_AmPart makeAnalog(int statusNid, int authorNid, int pathNid,
+		public RelationshipVersionBI getVersion(Coordinate c)
+				throws ContraditionException {
+			return fixedPart.getVersion(c);
+		}
+
+		public Collection<? extends RelationshipVersionBI> getVersions() {
+			return fixedPart.getVersions();
+		}
+
+		public Collection<? extends RelationshipVersionBI> getVersions(
+				Coordinate c) {
+			return fixedPart.getVersions(c);
+		}
+
+		public int getCharacteristicNid() {
+			return fixedPart.getCharacteristicNid();
+		}
+
+		public int getDestinationNid() {
+			return fixedPart.getDestinationNid();
+		}
+
+		public int getOriginNid() {
+			return fixedPart.getOriginNid();
+		}
+
+		public int getRefinabilityNid() {
+			return fixedPart.getRefinabilityNid();
+		}
+
+		public void setC2Id(int destId) {
+			fixedPart.setC2Id(destId);
+		}
+
+		public void setCharacteristicNid(int nid) {
+			fixedPart.setCharacteristicNid(nid);
+		}
+
+		public void setDestinationNid(int nid) throws PropertyVetoException {
+			fixedPart.setDestinationNid(nid);
+		}
+
+		public void setRefinabilityNid(int nid) {
+			fixedPart.setRefinabilityNid(nid);
+		}
+
+		I_RelPart part;
+
+        public RelationshipAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid,
 				long time) {
-			return (I_AmPart) part.makeAnalog(statusNid, authorNid, pathNid, time);
+			return (RelationshipAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
 		}
 
 		public int getPathNid() {

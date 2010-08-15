@@ -23,9 +23,10 @@ import java.util.UUID;
 
 import org.ihtsdo.tk.TS;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class ConceptSpec {
 
@@ -86,17 +87,17 @@ public class ConceptSpec {
             boolean foundDestination = false;
             boolean foundType = false;
             List<ConceptVersionBI> destinationsOfType = new ArrayList<ConceptVersionBI>();
-
-            for (RelationshipVersionBI rel : local.getRelsOutgoing()) {
-                if (rel.getTypeNid() == relType.getNid()) {
+            NidSetBI typeNids = new NidSet();
+            typeNids.add(relType.getNid());
+            
+            for (ConceptVersionBI dest : local.getRelsOutgoingTargets(typeNids)) {
                     foundType = true;
-                    ConceptVersionBI testDestination = rel.getDestination(c);
-                    destinationsOfType.add(testDestination);
-                    if (testDestination.equals(destination)) {
+                    destinationsOfType.add(dest);
+                    if (dest.equals(destination)) {
                         foundDestination = true;
                         break;
                     }
-                }
+                
             }
             if (foundDestination == false) {
                 boolean foundTransitively = false;

@@ -30,6 +30,9 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -98,6 +101,22 @@ public class ConceptAttributes
 		}
 
 		@Override
+		public ConceptAttributes.Version getVersion(Coordinate c)
+				throws ContraditionException {
+			return ConceptAttributes.this.getVersion(c);
+		}
+
+		@Override
+		public Collection<ConceptAttributes.Version> getVersions(
+				Coordinate c) {
+			return ConceptAttributes.this.getVersions(c);
+		}		
+		
+	    public List<? extends Version> getVersions() {
+	    	return ConceptAttributes.this.getVersions();
+	    }
+
+	    @Override
 		public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
 			if (index >= 0) {
 			    ConceptAttributesRevision rev = revisions.get(index);
@@ -249,7 +268,7 @@ public class ConceptAttributes
 	
 	
 	@Override
-	protected List<Version> getVersions() {
+	public List<Version> getVersions() {
 		List<Version> list = versions;
 		if (list == null) {
 			int count = 1;
@@ -548,4 +567,26 @@ public class ConceptAttributes
         return getEnclosingConcept().hasExtensionsForComponent(nid);
     }
  	
+
+	@Override
+	public ConceptAttributes.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		List<ConceptAttributes.Version> vForC = getVersions(c);
+		if (vForC.size() == 0) {
+			return null;
+		}
+		if (vForC.size() > 1) {
+			throw new ContraditionException(vForC.toString());
+		}
+		return vForC.get(0);
+	}
+
+	@Override
+	public List<ConceptAttributes.Version> getVersions(Coordinate c) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
+				returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
+		return returnTuples;
+	}
+
 }

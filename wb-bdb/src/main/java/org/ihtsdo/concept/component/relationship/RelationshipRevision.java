@@ -1,5 +1,8 @@
 package org.ihtsdo.concept.component.relationship;
 
+import java.beans.PropertyVetoException;
+import java.util.Collection;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
@@ -7,6 +10,9 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
@@ -14,7 +20,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class RelationshipRevision 
 	extends Revision<RelationshipRevision, Relationship> 
-	implements I_RelPart {
+	implements I_RelPart, RelationshipAnalogBI {
 	
 	private int characteristicNid;
 	private int group;
@@ -206,5 +212,57 @@ public class RelationshipRevision
 		nids.add(refinabilityNid);
 		nids.add(typeNid);
 		return nids;
+	}
+
+
+	public int getRefinabilityNid() {
+		return refinabilityNid;
+	}
+
+
+	public int getCharacteristicNid() {
+		return characteristicNid;
+	}
+
+
+	public void setCharacteristicNid(int characteristicNid) {
+		this.characteristicNid = characteristicNid;
+	}
+
+
+	public void setRefinabilityNid(int refinabilityNid) {
+		this.refinabilityNid = refinabilityNid;
+	}
+
+
+	@Override
+	public void setDestinationNid(int nid) throws PropertyVetoException {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public int getDestinationNid() {
+		return primordialComponent.getDestinationNid();
+	}
+
+
+	@Override
+	public int getOriginNid() {
+		return primordialComponent.getOriginNid();
 	}	
+	
+	
+	@Override
+	public Relationship.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		return primordialComponent.getVersion(c);
+	}
+
+	@Override
+	public Collection<Relationship.Version> getVersions(
+			Coordinate c) {
+		return primordialComponent.getVersions(c);
+	}		
+
 }

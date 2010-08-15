@@ -16,8 +16,10 @@
  */
 package org.dwfa.ace.api;
 
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
-public interface I_DescriptionTuple extends I_AmTypedTuple {
+
+public interface I_DescriptionTuple extends I_AmTypedTuple, DescriptionAnalogBI {
 
     public boolean isInitialCaseSignificant();
 

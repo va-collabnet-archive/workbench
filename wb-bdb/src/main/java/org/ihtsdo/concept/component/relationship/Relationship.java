@@ -1,5 +1,6 @@
 package org.ihtsdo.concept.component.relationship;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,9 +29,13 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -38,11 +43,11 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship> 
-	implements I_RelVersioned, I_RelPart {
+	implements I_RelVersioned, I_RelPart, RelationshipAnalogBI {
 
 	public class Version 
 	extends ConceptComponent<RelationshipRevision, Relationship>.Version 
-	implements I_RelTuple, I_RelPart {
+	implements I_RelTuple, I_RelPart, RelationshipAnalogBI {
 	
 	public Version() {
 		super();
@@ -79,11 +84,35 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	@Override
+	@Deprecated
 	public int getRefinabilityId() {
 		if (index >= 0) {
 			return revisions.get(index).getRefinabilityId();
 		}
 		return getRefinabilityNid();
+	}
+	@Override
+	public int getRefinabilityNid() {
+		if (index >= 0) {
+			return revisions.get(index).getRefinabilityNid();
+		}
+		return Relationship.this.getRefinabilityNid();
+	}
+	@Override
+	public int getCharacteristicNid() {
+		if (index >= 0) {
+			return revisions.get(index).getCharacteristicNid();
+		}
+		return Relationship.this.getCharacteristicNid();
+	}
+
+	@Override
+	public int getDestinationNid() {
+		return Relationship.this.c2Nid;
+	}
+	@Override
+	public int getOriginNid() {
+		return Relationship.this.enclosingConceptNid;
 	}
 
 	@Override
@@ -97,11 +126,39 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	}
 
 	@Override
+	@Deprecated
 	public void setCharacteristicId(int characteristicId) {
 		if (index >= 0) {
 			revisions.get(index).setCharacteristicId(characteristicId);
 		} else {
 			Relationship.this.setCharacteristicId(characteristicId);
+		}
+	}
+
+	@Override
+	public void setCharacteristicNid(int characteristicNid) {
+		if (index >= 0) {
+			revisions.get(index).setCharacteristicNid(characteristicNid);
+		} else {
+			Relationship.this.setCharacteristicNid(characteristicNid);
+		}
+	}
+
+	@Override
+	public void setDestinationNid(int destNid) throws PropertyVetoException {
+		if (Relationship.this.getTime() == Long.MAX_VALUE) {
+			Relationship.this.setDestinationNid(destNid);
+		} else {
+			throw new UnsupportedOperationException("Relationship.this.getTime() != Long.MAX_VALUE");
+		}
+	}
+
+	@Override
+	public void setRefinabilityNid(int refinabilityNid) {
+		if (index >= 0) {
+			revisions.get(index).setRefinabilityNid(refinabilityNid);
+		} else {
+			Relationship.this.setRefinabilityNid(refinabilityNid);
 		}
 	}
 
@@ -130,8 +187,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	public int getTypeNid() {
 		if (index >= 0) {
-			assert revisions.get(index).getTypeId() != Integer.MAX_VALUE: Relationship.this;
-			return revisions.get(index).getTypeId();
+			assert revisions.get(index).getTypeNid() != Integer.MAX_VALUE: Relationship.this;
+			return revisions.get(index).getTypeNid();
 		} else {
 			assert Relationship.this.typeNid != Integer.MAX_VALUE: Relationship.this;
 			return Relationship.this.typeNid;
@@ -150,18 +207,35 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 	@Deprecated
 	public void setTypeId(int type) {
 		if (index >= 0) {
-			revisions.get(index).setTypeId(type);
+			revisions.get(index).setTypeNid(type);
 		} else {
-			Relationship.this.setTypeId(type);
+			Relationship.this.setTypeNid(type);
 		}		
 	}
+	@Override
+	public Relationship.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		return Relationship.this.getVersion(c);
+	}
+
+	@Override
+	public Collection<Relationship.Version> getVersions(
+			Coordinate c) {
+		return Relationship.this.getVersions(c);
+	}		
+	
+    public List<? extends Version> getVersions() {
+    	return Relationship.this.getVersions();
+    }
+
 	public void setTypeNid(int type) {
 		if (index >= 0) {
 			revisions.get(index).setTypeNid(type);
 		} else {
 			Relationship.this.setTypeNid(type);
 		}		
-	}
+
+}
 
 	public Relationship getFixedPart() {
 		return Relationship.this;
@@ -172,7 +246,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			ArrayIntList resultList = new ArrayIntList(7);
 			resultList.add(getCharacteristicId());
 			resultList.add(getRefinabilityId());
-			resultList.add(getTypeId());
+			resultList.add(getTypeNid());
 			resultList.add(getC1Id());
 			resultList.add(getC2Id());			
 			return resultList;
@@ -407,8 +481,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		Bdb.addXrefPair(c2Nid, npr);
 		
 		for (RelationshipRevision p : partsToWrite) {
-			if (p.getTypeId() != typeNid) {
-				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
+			if (p.getTypeNid() != typeNid) {
+				npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), nid);
 				Bdb.addXrefPair(c2Nid, npr);
 			}
 			p.writePartToBdb(output);
@@ -515,7 +589,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
 	}
 
-	protected List<? extends Version> getVersions() {
+	public List<? extends Version> getVersions() {
 		if (versions == null) {
 			int count = 1;
 			if (revisions != null) {
@@ -559,12 +633,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 				revisions.size());
 		for (Version part : getVersions()) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
-			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathId()).getUids());
-			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusId()).getUids());
+			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathNid()).getUids());
+			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusNid()).getUids());
 			universalPart.setCharacteristicId(Bdb.getConceptDb().getConcept(part.getCharacteristicId()).getUids());
 			universalPart.setGroup(part.getGroup());
 			universalPart.setRefinabilityId(Bdb.getConceptDb().getConcept(part.getRefinabilityId()).getUids());
-			universalPart.setTypeId(Bdb.getConceptDb().getConcept(part.getTypeId()).getUids());
+			universalPart.setTypeId(Bdb.getConceptDb().getConcept(part.getTypeNid()).getUids());
 			universalPart.setTime(part.getTime());
 			universal.addVersion(universalPart);
 		}
@@ -589,9 +663,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         boolean promotedAnything = false;
         for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
-                if (v.getPathId() == viewPathId) {
+                if (v.getPathNid() == viewPathId) {
                 	
-                    RelationshipRevision revision =  v.makeAnalog(v.getStatusId(), 
+                    RelationshipRevision revision =  v.makeAnalog(v.getStatusNid(), 
 							promotionPath.getConceptNid(), Long.MAX_VALUE);
                     addRevision(revision);
                     promotedAnything = true;
@@ -770,11 +844,50 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		}
 		if (revisions != null) {
 			for (RelationshipRevision rv: revisions) {
-				if (rv.getTypeId() == typeNid) {
+				if (rv.getTypeNid() == typeNid) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
+
+
+	@Override
+	public void setDestinationNid(int nid) throws PropertyVetoException {
+		this.c2Nid = nid;
+	}
+
+	@Override
+	public int getDestinationNid() {
+		return c2Nid;
+	}
+
+	@Override
+	public int getOriginNid() {
+		return enclosingConceptNid;
+	}
+	
+
+	@Override
+	public Relationship.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		List<Relationship.Version> vForC = getVersions(c);
+		if (vForC.size() == 0) {
+			return null;
+		}
+		if (vForC.size() > 1) {
+			throw new ContraditionException(vForC.toString());
+		}
+		return vForC.get(0);
+	}
+
+	@Override
+	public List<Relationship.Version> getVersions(Coordinate c) {
+		List<Version> returnTuples = new ArrayList<Version>(2);
+		computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
+				returnTuples, getVersions(), c.getPrecedence(), c.getContradictionManager());
+		return returnTuples;
+	}
+
 }

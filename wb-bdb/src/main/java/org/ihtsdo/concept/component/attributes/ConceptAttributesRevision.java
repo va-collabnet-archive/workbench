@@ -1,10 +1,14 @@
 package org.ihtsdo.concept.component.attributes;
 
+import java.util.Collection;
+
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
@@ -133,6 +137,18 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         return false;
     }
 
+	
+	@Override
+	public ConceptAttributes.Version getVersion(Coordinate c)
+			throws ContraditionException {
+		return primordialComponent.getVersion(c);
+	}
+
+	@Override
+	public Collection<ConceptAttributes.Version> getVersions(
+			Coordinate c) {
+		return primordialComponent.getVersions(c);
+	}		
 
 
 }
