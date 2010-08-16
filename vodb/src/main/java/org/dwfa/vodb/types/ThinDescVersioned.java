@@ -234,7 +234,7 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
 
         List<I_DescriptionTuple> tuples = new ArrayList<I_DescriptionTuple>();
 
-        addTuples(allowedStatus, allowedTypes, positionSet, tuples, addUncommitted);
+        addTuples(null, allowedTypes, positionSet, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -248,7 +248,16 @@ public class ThinDescVersioned implements I_DescriptionVersioned {
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
         }
 
-        matchingTuples.addAll(tuples);
+        if (allowedStatus != null) {
+            for (I_DescriptionTuple descTuple : tuples) {
+                // filter by allowed status
+                if (allowedStatus.contains(descTuple.getStatusId())) {
+                    matchingTuples.add(descTuple);
+                }
+            }
+        } else {
+            matchingTuples.addAll(tuples);
+        }
     }
 
     public void addTuples(I_IntSet allowedTypes, List<I_DescriptionTuple> matchingTuples, boolean addUncommitted,
