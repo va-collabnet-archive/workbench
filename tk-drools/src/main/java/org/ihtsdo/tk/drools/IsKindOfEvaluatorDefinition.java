@@ -45,9 +45,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 		@Override
 		public boolean evaluate(InternalWorkingMemory workingMemory,
 				InternalReadAccessor extractor, Object object, FieldValue value) {
-			throw new UnsupportedOperationException("evaluate 1: " + object + " value: "+ value);
-			//final Object objectValue = extractor.getValue(workingMemory, object);
-			//return this.getOperator().isNegated() ^ (objectValue == value.getValue());
+			return testKindOf(object, value.getValue());
 		}
 
 		@Override

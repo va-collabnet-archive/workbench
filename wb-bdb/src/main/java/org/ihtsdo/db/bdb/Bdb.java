@@ -172,7 +172,7 @@ public class Bdb {
 	            Terms.set(tf);
 			}
 			BdbTerminologyStore ts = new BdbTerminologyStore();
-			if (Ts.get() != null) {
+			if (Ts.get() == null) {
 				Ts.set(ts);
 			}
 			LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());

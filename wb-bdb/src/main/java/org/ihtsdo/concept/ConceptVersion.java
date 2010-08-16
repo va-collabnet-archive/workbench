@@ -302,4 +302,10 @@ public class ConceptVersion implements ConceptVersionBI {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "ConceptVersion coordinate: " + coordinate + 
+			"\nConcept: " + concept.toString();
+	}
+
 }

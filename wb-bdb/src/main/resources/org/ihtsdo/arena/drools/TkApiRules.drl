@@ -1,0 +1,48 @@
+#created on: Aug 15, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.tk.spec.Taxonomies;
+
+
+#declare any global variables here
+
+
+
+
+rule "isKindOf refset concept"
+	
+	when
+		$c : ConceptVersion(this isKindOf Taxonomies.REFSET_AUX);
+	then 
+   		System.out.println("isKindOf refset concept found: " + $c.toString());
+		
+end
+
+rule "isKindOf workbench auxiliary concept"
+	
+	when
+		$c : ConceptVersion(this isKindOf Taxonomies.WB_AUX);
+	then 
+   		System.out.println("isKindOf workbench auxiliary concept found: " + $c.toString());
+		
+end
+
+rule "isKindOf queue type concept"
+	
+	when
+		$c : ConceptVersion(this isKindOf Taxonomies.QUEUE_TYPE);
+	then 
+   		System.out.println("isKindOf queue type concept found: " + $c.toString());
+		
+end
+
+rule "isKindOf SNOMED concept"
+	
+	when
+		$c : ConceptVersion(this isKindOf Taxonomies.SNOMED);
+	then 
+   		System.out.println("isKindOf SNOMED concept found: " + $c.toString());
+		
+end
