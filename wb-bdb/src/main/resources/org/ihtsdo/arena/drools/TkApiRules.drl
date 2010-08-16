@@ -2,7 +2,7 @@
 package org.ihtsdo.arena.drools
 
 #list any import classes here.
-import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.spec.Taxonomies;
 
 
@@ -14,35 +14,35 @@ import org.ihtsdo.tk.spec.Taxonomies;
 rule "isKindOf refset concept"
 	
 	when
-		$c : ConceptVersion(this isKindOf Taxonomies.REFSET_AUX);
+		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX);
 	then 
-   		System.out.println("isKindOf refset concept found: " + $c.toString());
+   		System.out.println("isKindOf refset concept found: \n" + $c.toString());
 		
 end
 
 rule "isKindOf workbench auxiliary concept"
 	
 	when
-		$c : ConceptVersion(this isKindOf Taxonomies.WB_AUX);
+		$c : ConceptVersionBI(this isKindOf Taxonomies.WB_AUX);
 	then 
-   		System.out.println("isKindOf workbench auxiliary concept found: " + $c.toString());
+   		System.out.println("isKindOf workbench auxiliary concept found: \n" + $c.toString());
 		
 end
 
 rule "isKindOf queue type concept"
 	
 	when
-		$c : ConceptVersion(this isKindOf Taxonomies.QUEUE_TYPE);
+		$c : ConceptVersionBI(this isKindOf Taxonomies.QUEUE_TYPE);
 	then 
-   		System.out.println("isKindOf queue type concept found: " + $c.toString());
+   		System.out.println("isKindOf queue type concept found: \n" + $c.toString());
 		
 end
 
 rule "isKindOf SNOMED concept"
 	
 	when
-		$c : ConceptVersion(this isKindOf Taxonomies.SNOMED);
+		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
 	then 
-   		System.out.println("isKindOf SNOMED concept found: " + $c.toString());
+   		System.out.println("isKindOf SNOMED concept found: \n" + $c.toString());
 		
 end

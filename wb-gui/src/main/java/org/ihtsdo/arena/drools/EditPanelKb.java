@@ -37,7 +37,7 @@ public class EditPanelKb {
 
 		HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
 
-		resources.put(ResourceFactory.newFileResource(testResource),
+		resources.put(ResourceFactory.newClassPathResource(testResource),
 				ResourceType.DRL);
 
 		KnowledgeBuilderConfiguration builderConfig = KnowledgeBuilderFactory
@@ -59,7 +59,7 @@ public class EditPanelKb {
 	}
 
 	public void setConcept(I_GetConceptData c) {
-		setupKb("/Users/kec/Documents/wb-trek/wb-toolkit_trek/wb-bdb/src/main/resources/org/ihtsdo/arena/drools/TkApiRules.drl");
+		setupKb("org/ihtsdo/arena/drools/TkApiRules.drl");
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
 				.newConsoleLogger(ksession);
@@ -78,7 +78,7 @@ public class EditPanelKb {
 	}
 
 	public void setConceptOld(I_GetConceptData c) {
-		setupKb("/Users/kec/Documents/wb-trek/wb-toolkit_trek/wb-bdb/src/main/resources/org/ihtsdo/arena/drools/ConceptRules.drl");
+		setupKb("org/ihtsdo/arena/drools/ConceptRules.drl");
 		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 		KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
 				.newConsoleLogger(ksession);
