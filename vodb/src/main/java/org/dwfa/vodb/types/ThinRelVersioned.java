@@ -38,6 +38,7 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ManageConflict;
+import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
@@ -203,10 +204,10 @@ public class ThinRelVersioned implements I_RelVersioned {
         StringBuffer buff = new StringBuffer();
         buff.append("ThinRelVersioned: relId: ");
         buff.append(relId);
-        buff.append(" c1id: ");
-        buff.append(componentOneId);
-        buff.append(" c2id: ");
-        buff.append(componentTwoId);
+        buff.append(", c1id: ");
+        buff.append(nidToText(componentOneId));
+        buff.append(", c2id: ");
+        buff.append(nidToText(componentTwoId));
         buff.append("\n");
         for (I_RelPart rel : versions) {
             buff.append("     ");
@@ -217,6 +218,18 @@ public class ThinRelVersioned implements I_RelVersioned {
         return buff.toString();
     }
 
+    private String nidToText(int nid) {
+        try {
+            if (Boolean.parseBoolean(System.getProperty("verbose.nid"))) {
+                return "\"" + LocalVersionedTerminology.get().getConcept(nid).getInitialText() + "\"";
+            }
+        } catch (Exception e) {
+            System.err.println("Unable to convert nid to text. "+ e.getMessage());
+        }
+        return Integer.toString(nid);
+        
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -312,7 +325,7 @@ public class ThinRelVersioned implements I_RelVersioned {
 
         List<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
 
-        addTuples(allowedStatus, allowedTypes, positions, tuples, addUncommitted);
+        addTuples(null, allowedTypes, positions, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -326,7 +339,16 @@ public class ThinRelVersioned implements I_RelVersioned {
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
         }
 
-        returnRels.addAll(tuples);
+        if (allowedStatus != null) {
+            for (I_RelTuple relTuple : tuples) {
+                // filter by allowed status
+                if (allowedStatus.contains(relTuple.getStatusId())) {
+                    returnRels.add(relTuple);
+                }
+            }
+        } else {
+            returnRels.addAll(tuples);
+        }        
     }
 
     public void addTuples(I_IntSet allowedTypes, List<I_RelTuple> returnRels, boolean addUncommitted,
