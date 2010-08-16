@@ -10,14 +10,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
@@ -29,11 +26,13 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -519,7 +518,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return specifiedVersions;
     }
 
-    public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
+    public List<? extends I_RelTuple> getSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws TerminologyException, IOException {
         List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
         computer.addSpecifiedVersions(allowedStatus, positions, specifiedVersions,
             getTuples(), precedencePolicy, contradictionManager);
@@ -527,7 +526,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Deprecated
-	public void addTuples(I_IntSet allowedTypes, 
+	public void addTuples(NidSetBI allowedTypes, 
 						  List<I_RelTuple> returnRels,
 						  boolean addUncommitted, 
 						  boolean returnConflictResolvedLatestState)
@@ -535,9 +534,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		throw new UnsupportedOperationException("Use a method that specified the config");
 	}
 
-	public Collection<Relationship.Version> getVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) {
+	public Collection<Relationship.Version> getVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -611,12 +610,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 		return versions;
 	}
 	
-	public List<Version> getVersions(I_ManageContradiction contradictionManager) {
+	public List<Version> getVersions(ContradictionManagerBI contradictionManager) {
 		// TODO implement conflict resolution
 		return getTuples();
 	}
 	
-	public List<Version> getTuples(I_ManageContradiction contradictionManager) {
+	public List<Version> getTuples(ContradictionManagerBI contradictionManager) {
 		// TODO implement conflict resolution
 		return getTuples();
 	}
@@ -653,7 +652,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 	@Override
 	public boolean promote(PositionBI viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.
@@ -677,9 +676,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
 
 	@Override
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_RelTuple> relTupleList,
-			Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+	public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, List<I_RelTuple> relTupleList,
+			Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
 		List<Version> tuplesToReturn = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
 					getVersions(), precedencePolicy, contradictionManager);

@@ -14,11 +14,9 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributes;
 import org.dwfa.ace.utypes.UniversalAceConceptAttributesPart;
@@ -30,6 +28,7 @@ import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -377,16 +376,16 @@ public class ConceptAttributes
 	}
 
     @Override
-    public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positionSet,
+    public void addTuples(NidSetBI allowedStatus, PositionSetBI positionSet,
             List<I_ConceptAttributeTuple> returnTuples, Precedence precedencePolicy,
-            I_ManageContradiction contradictionManager) throws TerminologyException, IOException {
+            ContradictionManagerBI contradictionManager) throws TerminologyException, IOException {
         List<Version> returnList = new ArrayList<Version>();
         computer.addSpecifiedVersions(allowedStatus, positionSet, returnList, 
             getVersions(), precedencePolicy, contradictionManager);
         returnTuples.addAll(returnList);
     }
 
-	public List<Version> getTuples(I_IntSet allowedStatus,
+	public List<Version> getTuples(NidSetBI allowedStatus,
 			PositionSetBI viewPositionSet, Precedence precedencePolicy, 
 			I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
@@ -396,16 +395,16 @@ public class ConceptAttributes
 	}
 
 
-	public void addTuples(I_IntSet allowedStatus, PositionBI viewPosition,
+	public void addTuples(NidSetBI allowedStatus, PositionBI viewPosition,
 			List<Version> returnTuples, Precedence precedencePolicy, 
 			I_ManageContradiction contradictionManager) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples,
 				getVersions(), precedencePolicy, contradictionManager);
 	}
 	
-	public Collection<Version> getVersions(I_IntSet allowedStatus, 
+	public Collection<Version> getVersions(NidSetBI allowedStatus, 
 			PositionSetBI viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) {
+			Precedence precedence, ContradictionManagerBI contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -414,7 +413,7 @@ public class ConceptAttributes
 
 	@Override
 	public List<? extends I_ConceptAttributeTuple> getTuples(
-			I_IntSet allowedStatus, PositionSetBI viewPositionSet)
+			NidSetBI allowedStatus, PositionSetBI viewPositionSet)
 			throws TerminologyException, IOException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		return getTuples(allowedStatus,
@@ -423,7 +422,7 @@ public class ConceptAttributes
 
 
 	
-	public List<Version> getTuples(I_IntSet allowedStatus,
+	public List<Version> getTuples(NidSetBI allowedStatus,
 			PositionBI viewPosition, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
 		List<Version> returnList = new ArrayList<Version>();
 
@@ -434,7 +433,7 @@ public class ConceptAttributes
 	}
 
 	public boolean promote(PositionBI viewPosition,
-			PathSetReadOnly promotionPaths, I_IntSet allowedStatus, Precedence precedence) {
+			PathSetReadOnly promotionPaths, NidSetBI allowedStatus, Precedence precedence) {
 		int viewPathId = viewPosition.getPath().getConceptNid();
 		boolean promotedAnything = false;
 		for (PathBI promotionPath : promotionPaths) {

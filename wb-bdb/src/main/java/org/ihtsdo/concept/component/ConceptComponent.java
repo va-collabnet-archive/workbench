@@ -40,6 +40,7 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
@@ -260,14 +261,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
-        public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+        public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
                 Precedence precedence) throws IOException, TerminologyException {
             return ConceptComponent.this.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
         }
 
         @Override
     	public boolean promote(I_TestComponent test, I_Position viewPosition,
-    			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+    			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
     			Precedence precedence) throws IOException, TerminologyException {
     		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
     			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
@@ -1582,7 +1583,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     
     @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
 			Precedence precedence) throws IOException, TerminologyException {
 		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);

@@ -22,6 +22,9 @@ import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
@@ -33,7 +36,7 @@ public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI 
 
     public List<? extends I_RelPart> getMutableParts();
 
-    public List<? extends I_RelPart> getVersions(I_ManageContradiction contradictionManager) throws TerminologyException,
+    public List<? extends I_RelPart> getVersions(ContradictionManagerBI contradictionManager) throws TerminologyException,
             IOException;
 
     public int versionCount();
@@ -67,7 +70,7 @@ public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI 
      * @throws TerminologyException
      * @throws IOException
      */
-    public List<? extends I_RelTuple> getTuples(I_ManageContradiction contradictionManager) throws TerminologyException,
+    public List<? extends I_RelTuple> getTuples(ContradictionManagerBI contradictionManager) throws TerminologyException,
             IOException;
 
     public I_RelTuple getFirstTuple();
@@ -83,7 +86,7 @@ public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI 
      * It is strongly recommended that you use a method that does use a conflict
      * management strategy.
      * 
-     * @see #addTuples(I_IntSet, I_IntSet, PositionSetReadOnly, List, boolean, boolean)
+     * @see #addTuples(NidSetBI, NidSetBI, PositionSetBI, List, boolean, boolean)
      * 
      * @param allowedStatus
      *            statuses tuples must match to be returned
@@ -99,14 +102,14 @@ public interface I_RelVersioned extends I_AmTermComponent, RelationshipAnalogBI 
      * @throws IOException
      * @throws TerminologyException
      */
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            List<I_RelTuple> returnRels, Precedence precedencePolicy, I_ManageContradiction contradictionManager) 
+    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+            List<I_RelTuple> returnRels, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) 
                     throws TerminologyException, IOException;
 
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException;
 
-    public List<? extends I_RelTuple> getSpecifiedVersions(I_IntSet allowedStatus, PositionSetReadOnly positions, 
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws TerminologyException, 
+    public List<? extends I_RelTuple> getSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions, 
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws TerminologyException, 
             IOException;
     
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);

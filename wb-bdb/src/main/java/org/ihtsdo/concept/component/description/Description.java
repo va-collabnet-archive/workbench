@@ -13,12 +13,9 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
@@ -36,6 +33,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -417,15 +415,15 @@ public class Description
 		return vList.get(vList.size() - 1);
 	}
 	@Override
-	public List<Version> getVersions(I_ManageContradiction contradictionMgr)
+	public List<Version> getVersions(ContradictionManagerBI contradictionMgr)
 			throws TerminologyException, IOException {
 		return getTuples(contradictionMgr);
 	}
 
 	@Override
-	public List<Version> getTuples(I_ManageContradiction contradictionMgr)
+	public List<Version> getTuples(ContradictionManagerBI contradictionMgr)
 			throws TerminologyException, IOException {
-	    // TODO implement I_ManageContradiction contradictionMgr
+	    // TODO implement ContradictionManagerBI contradictionMgr
 		return getVersions();
 	}
 
@@ -502,25 +500,25 @@ public class Description
 		return versions;
 	}
 
-	public void addTuples(I_IntSet allowedStatus, I_Position viewPosition,
+	public void addTuples(NidSetBI allowedStatus, I_Position viewPosition,
 			List<Description.Version> matchingTuples, Precedence precedence,
-			I_ManageContradiction contradictionMgr) {
+			ContradictionManagerBI contradictionMgr) {
 		computer.addSpecifiedVersions(allowedStatus, viewPosition,
 				matchingTuples, getVersions(), precedence, contradictionMgr);
 	}
 
 	@Override
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_DescriptionTuple> matchingTuples, 
-			Precedence precedence, I_ManageContradiction contradictionMgr) {
+	public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, List<I_DescriptionTuple> matchingTuples, 
+			Precedence precedence, ContradictionManagerBI contradictionManager) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
-				returnTuples, getVersions(), precedence, contradictionMgr);
+				returnTuples, getVersions(), precedence, contradictionManager);
 		matchingTuples.addAll(returnTuples);
 	}
 
 	public List<Description.Version> getVersions(NidSetBI allowedStatus, 
-			NidSetBI allowedTypes, PositionSetReadOnly viewPositions,  
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
 			Precedence precedence, ContradictionManagerBI contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
@@ -647,7 +645,7 @@ public class Description
 
 	@Override
 	public boolean promote(PositionBI viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.

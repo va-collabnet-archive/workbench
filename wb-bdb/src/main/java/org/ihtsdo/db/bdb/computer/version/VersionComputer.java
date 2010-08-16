@@ -9,7 +9,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.dwfa.ace.api.I_AmTypedPart;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -48,13 +47,13 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
     }
 
     public void addSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition, List<V> specifiedVersions,
-            List<V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            List<V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionMgr) {
         addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
-            specifiedVersions, versions, precedencePolicy, contradictionManager);
+            specifiedVersions, versions, precedencePolicy, contradictionMgr);
      }
 
     public Collection<V> getSpecifiedVersions(NidSetBI allowedStatus, PositionBI viewPosition,
-            List<? extends V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            List<? extends V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         List<V> specifiedVersions = new ArrayList<V>();
         addSpecifiedVersions(allowedStatus, (NidSetBI) null, new PositionSetReadOnly(viewPosition),
             specifiedVersions, versions, precedencePolicy, contradictionManager);
@@ -63,7 +62,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
     }
 
     public void addSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions, List<V> matchingTuples,
-            List<V> versions, Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            List<V> versions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         addSpecifiedVersions(allowedStatus, null, positions, matchingTuples, versions, precedencePolicy, contradictionManager);
     }
 

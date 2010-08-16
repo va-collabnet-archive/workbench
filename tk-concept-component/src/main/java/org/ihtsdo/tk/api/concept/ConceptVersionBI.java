@@ -49,5 +49,7 @@ public interface ConceptVersionBI extends ComponentBI {
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException, ContraditionException;
+	
+	public boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
 
 }

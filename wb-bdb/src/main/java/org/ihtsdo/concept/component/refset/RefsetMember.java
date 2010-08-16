@@ -27,6 +27,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -324,7 +325,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>,
 	
 	@Override
 	public boolean promote(PositionBI viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence)
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus, Precedence precedence)
 			throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = 

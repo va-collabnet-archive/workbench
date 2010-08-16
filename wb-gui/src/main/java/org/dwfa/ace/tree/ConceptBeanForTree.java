@@ -50,7 +50,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -59,7 +62,244 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public ConAttrChronicleBI getConAttrs() throws IOException {
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
+			NidSetBI allowedStatus, PositionSetBI positions,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getConceptAttributeTuples(allowedStatus, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getConceptAttributeTuples(precedencePolicy,
+				contradictionManager);
+	}
+
+	public List<? extends I_DescriptionTuple> getDescriptionTuples(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positionSet, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException {
+		return bean.getDescriptionTuples(allowedStatus, allowedTypes,
+				positionSet, precedencePolicy, contradictionManager);
+	}
+
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+			I_IntList langPrefOrder, NidSetBI allowedStatus,
+			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException {
+		return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus,
+				positionSet, sortPref, precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getDestRelOrigins(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelTuples(allowedTypes, precedencePolicy,
+				contradictionManager);
+	}
+
+	public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getImageTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getSourceRelTargets(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getSourceRelTargets(
+			NidSetBI allowedTypes, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTargets(allowedTypes, precedencePolicy,
+				contradictionManager);
+	}
+
+	public List<? extends I_RelTuple> getSourceRelTuples(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public boolean promote(I_TestComponent test, I_Position viewPosition,
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
+			Precedence precedence) throws IOException, TerminologyException {
+		return bean.promote(test, viewPosition, pomotionPaths, allowedStatus,
+				precedence);
+	}
+
+	public boolean promote(PositionBI viewPosition,
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
+			Precedence precedence) throws IOException, TerminologyException {
+		return bean.promote(viewPosition, pomotionPaths, allowedStatus,
+				precedence);
+	}
+
+	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
+			NidSetBI allowedStatus, PositionSetBI positions,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getConceptAttributeTuples(allowedStatus, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public List<? extends I_DescriptionTuple> getDescriptionTuples(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positionSet, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException {
+		return bean.getDescriptionTuples(allowedStatus, allowedTypes,
+				positionSet, precedencePolicy, contradictionManager);
+	}
+
+	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
+			I_IntList langPrefOrder, NidSetBI allowedStatus,
+			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException {
+		return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus,
+				positionSet, sortPref, precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getDestRelOrigins(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getDestRelOrigins(
+			NidSetBI allowedTypes) throws IOException, TerminologyException {
+		return bean.getDestRelOrigins(allowedTypes);
+	}
+
+	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getDestRelTuples(allowedTypes, precedencePolicy,
+				contradictionManager);
+	}
+
+	public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getImageTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getSourceRelTargets(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public Set<? extends I_GetConceptData> getSourceRelTargets(
+			NidSetBI allowedTypes, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTargets(allowedTypes, precedencePolicy,
+				contradictionManager);
+	}
+
+	public List<? extends I_RelTuple> getSourceRelTuples(
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.isParentOf(child, allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public boolean isParentOfOrEqualTo(I_GetConceptData child,
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes,
+				positions, precedencePolicy, contradictionManager);
+	}
+
+	public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus,
+			NidSetBI allowedTypes, PositionSetBI positions,
+			Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.isParentOf(child, allowedStatus, allowedTypes, positions,
+				precedencePolicy, contradictionManager);
+	}
+
+	public boolean isParentOfOrEqualTo(I_GetConceptData child,
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, Precedence precedencePolicy,
+			I_ManageContradiction contradictionManager) throws IOException,
+			TerminologyException {
+		return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes,
+				positions, precedencePolicy, contradictionManager);
+	}
+
+	public ConAttrChronicleBI getConAttrs() throws IOException {
 		return bean.getConAttrs();
 	}
 
@@ -336,7 +576,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDescTuple(prefOrder, config);
     }
 
-    public I_IntSet getUncommittedIds() {
+    public NidSetBI getUncommittedIds() {
         return bean.getUncommittedIds();
     }
 

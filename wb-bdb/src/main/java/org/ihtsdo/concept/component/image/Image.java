@@ -13,11 +13,8 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
@@ -29,11 +26,13 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
@@ -468,18 +467,18 @@ public class Image
 		throw new UnsupportedOperationException();
 	}
 
-	public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, List<I_ImageTuple> matchingTuples, 
-			Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+	public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, List<I_ImageTuple> matchingTuples, 
+			Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
 		List<Version> returnTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, 
 				returnTuples, getVersions(), precedencePolicy, contradictionManager);
 		matchingTuples.addAll(returnTuples);
 	}
 
-	public Collection<Image.Version> getVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) {
+	public Collection<Image.Version> getVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) {
 		List<Version> returnTuples = new ArrayList<Version>(2);
 		computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions,
 				returnTuples, getVersions(), precedence, contradictionMgr);
@@ -510,7 +509,7 @@ public class Image
 	}
 
 	public boolean promote(PositionBI viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus, Precedence precedence) {
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus, Precedence precedence) {
 		int viewPathId = viewPosition.getPath().getConceptNid();
 		List<Version> matchingTuples = new ArrayList<Version>();
 		computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, 

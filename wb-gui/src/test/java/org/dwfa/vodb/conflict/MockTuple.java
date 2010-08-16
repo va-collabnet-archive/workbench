@@ -22,13 +22,13 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -60,7 +60,7 @@ public class MockTuple implements I_AmTuple {
 
 
             @Override
-            public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+            public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
                     Precedence precedence) throws IOException, TerminologyException {
                 throw new UnsupportedOperationException();
             }
@@ -68,7 +68,7 @@ public class MockTuple implements I_AmTuple {
 			@Override
 			public boolean promote(I_TestComponent test,
 					I_Position viewPosition, PathSetReadOnly pomotionPaths,
-					I_IntSet allowedStatus, Precedence precedence)
+					NidSetBI allowedStatus, Precedence precedence)
 					throws IOException, TerminologyException {
                 throw new UnsupportedOperationException();
 			}

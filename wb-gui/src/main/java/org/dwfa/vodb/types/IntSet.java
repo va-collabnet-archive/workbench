@@ -38,9 +38,10 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 
-public class IntSet implements ListDataListener, I_IntSet {
+public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
     private int[] setValues = new int[0];

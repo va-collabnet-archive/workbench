@@ -2,14 +2,14 @@ package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
 
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -23,11 +23,11 @@ public class KindOfSpec {
 	/**
 	 * The allowed status cNids for which this cache is valid.
 	 */
-	public I_IntSet allowedStatusNids;
+	public NidSetBI allowedStatusNids;
 	/**
 	 * The set of destination rels nids for which this cache is valid. 
 	 */
-	public I_IntSet relTypeNids;
+	public NidSetBI relTypeNids;
 	/**
 	 * The cNid of the kind this cache represents.
 	 */
@@ -35,7 +35,7 @@ public class KindOfSpec {
 	
 	public Precedence precedence;
 	
-	public I_ManageContradiction contradictionMgr;
+	public ContradictionManagerBI contradictionMgr;
 	
 	/**
 	 * cached value so that viewPositionSet does not have to be recreated
@@ -43,9 +43,9 @@ public class KindOfSpec {
 	 */
 	private PositionSetReadOnly viewPositionSet;
 	
-	public KindOfSpec(PositionBI viewPosition, I_IntSet allowedStatus,
-			I_IntSet relTypeNids, int kindNid, Precedence precedence, 
-			I_ManageContradiction contradictionMgr) {
+	public KindOfSpec(PositionBI viewPosition, NidSetBI allowedStatus,
+			NidSetBI relTypeNids, int kindNid, Precedence precedence, 
+			ContradictionManagerBI contradictionMgr) {
 		super();
 		this.viewPosition = viewPosition;
 		this.allowedStatusNids = new IntSet(allowedStatus.getSetValues());

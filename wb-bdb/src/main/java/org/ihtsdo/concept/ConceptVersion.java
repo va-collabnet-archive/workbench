@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
@@ -288,6 +289,17 @@ public class ConceptVersion implements ConceptVersionBI {
 	@Override
 	public int getNid() {
 		return concept.getNid();
+	}
+
+	@Override
+	public boolean isKindOf(ConceptVersionBI possibleKind) throws IOException {
+		Concept possibleParent = ((ConceptVersion) possibleKind).concept;
+		try {
+			return possibleParent.isParentOfOrEqualTo(concept, coordinate.getAllowedStatusNids(), 
+					coordinate.getIsaTypeNids(), coordinate.getPositionSet(), coordinate.getPrecedence(), coordinate.getContradictionManager());
+		} catch (TerminologyException e) {
+			throw new IOException(e);
+		}
 	}
 
 }

@@ -101,6 +101,7 @@
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>
         <module>tk-concept-component</module>
+        <module>tk-drools</module>
         <module>rule-engine-integration</module>
 <!--
   Not ready for prime time - unused, and not inheriting from this parent

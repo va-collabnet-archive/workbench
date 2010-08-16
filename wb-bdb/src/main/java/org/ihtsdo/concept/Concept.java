@@ -23,8 +23,6 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -33,7 +31,6 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
@@ -66,7 +63,10 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -357,9 +357,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return data.getDescriptions();
 	}
 
-	public Collection<Description.Version> getDescriptionVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
+	public Collection<Description.Version> getDescriptionVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Description.Version>(new ArrayList<Description.Version>());
 		}
@@ -373,9 +373,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return versions;
 	}
 
-	public Collection<Relationship.Version> getSrcRelVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
+	public Collection<Relationship.Version> getSrcRelVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Relationship.Version>(new ArrayList<Relationship.Version>());
 		}
@@ -389,9 +389,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return versions;
 	}
 
-	public Collection<Image.Version> getMediaVersions(I_IntSet allowedStatus, 
-			I_IntSet allowedTypes, PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
+	public Collection<Image.Version> getMediaVersions(NidSetBI allowedStatus, 
+			NidSetBI allowedTypes, PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<Image.Version>(new ArrayList<Image.Version>());
 		}
@@ -477,8 +477,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples(
-			I_IntSet allowedStatus, PositionSetReadOnly positionSet, 
-	        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+			NidSetBI allowedStatus, PositionSetBI positionSet, 
+	        Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
 			throws IOException, TerminologyException {
 		List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
 		ConceptAttributes attr = getConceptAttributes();
@@ -490,7 +490,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_ConceptAttributeTuple> getConceptAttributeTuples( 
-        Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException,
+        Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException,
 			TerminologyException {
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -506,9 +506,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return null;
 	}
 
-	public Collection<ConceptAttributes.Version> getConceptAttrVersions(I_IntSet allowedStatus, 
-			PositionSetReadOnly viewPositions,  
-			Precedence precedence, I_ManageContradiction contradictionMgr) throws IOException {
+	public Collection<ConceptAttributes.Version> getConceptAttrVersions(NidSetBI allowedStatus, 
+			PositionSetBI viewPositions,  
+			Precedence precedence, ContradictionManagerBI contradictionMgr) throws IOException {
 		if (isCanceled()) {
 			return new ComponentList<ConceptAttributes.Version>(new ArrayList<ConceptAttributes.Version>());
 		}
@@ -533,11 +533,11 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, I_IntSet allowedStatus,
-			PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, 
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+			I_IntList langPrefOrder, NidSetBI allowedStatus,
+			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref, 
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
 			throws IOException {
-		I_IntSet typeSet = new IntSet();
+		NidSetBI typeSet = new IntSet();
 		for (int nid : typePrefOrder.getListArray()) {
 			typeSet.add(nid);
 		}
@@ -558,8 +558,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 	private I_DescriptionTuple getLangPreferredDesc(
 			Collection<I_DescriptionTuple> descriptions,
 			I_IntList typePrefOrder, I_IntList langPrefOrder,
-			I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-			I_IntSet typeSet) throws IOException, ToIoException {
+			NidSetBI allowedStatus, PositionSetBI positionSet,
+			NidSetBI typeSet) throws IOException, ToIoException {
 		if (descriptions.size() > 0) {
 			if (descriptions.size() > 1) {
 				List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
@@ -602,14 +602,14 @@ public class Concept implements I_Transact, I_GetConceptData {
 	private I_DescriptionTuple getTypePreferredDesc(
 			Collection<I_DescriptionTuple> descriptions,
 			I_IntList typePrefOrder, I_IntList langPrefOrder,
-			I_IntSet allowedStatus, PositionSetReadOnly positionSet,
-			I_IntSet typeSet) throws IOException, ToIoException {
+			NidSetBI allowedStatus, PositionSetBI positionSet,
+			NidSetBI typeSet) throws IOException, ToIoException {
 		if (descriptions.size() > 0) {
 			if (descriptions.size() > 1) {
 				List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
 				for (int typeId : typePrefOrder.getListValues()) {
 					for (I_DescriptionTuple d : descriptions) {
-						if (d.getTypeId() == typeId) {
+						if (d.getTypeNid() == typeId) {
 							matchedList.add(d);
 							if (matchedList.size() == 2) {
 								break;
@@ -643,9 +643,9 @@ public class Concept implements I_Transact, I_GetConceptData {
 	}
 
 	public List<I_DescriptionTuple> getDescriptionTuples(
-			I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, 
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
+			NidSetBI allowedStatus, NidSetBI allowedTypes,
+			PositionSetBI positions, 
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException {
 		List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
 		for (Description desc : getDescriptions()) {
 			desc.addTuples(allowedStatus, allowedTypes, positions,
@@ -664,8 +664,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 	            config.getPrecedence(), config.getConflictResolutionStrategy());
 	}
 
-	public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, 
-        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes, 
+        Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
 			throws IOException, TerminologyException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -774,8 +774,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 					I_DescriptionVersioned desc = getDescriptions().iterator().next();
 					for (I_DescriptionVersioned d : getDescriptions()) {
 						for (I_DescriptionPart part : d.getMutableParts()) {
-							if ((part.getTypeId() == fsDescNid)
-									|| (part.getTypeId() == fsXmlDescNid)) {
+							if ((part.getTypeNid() == fsDescNid)
+									|| (part.getTypeNid() == fsXmlDescNid)) {
 								return part.getText();
 							}
 						}
@@ -799,8 +799,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return first.getText();
 	}
 
-	public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes, 
-        Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+	public Set<I_GetConceptData> getSourceRelTargets(NidSetBI allowedTypes, 
+        Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
 			throws IOException, TerminologyException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -808,7 +808,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 				config.getViewPositionSetReadOnly(), precedencePolicy, contradictionManager);
 	}
 
-	public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedTypes,
+	public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedTypes,
 			boolean addUncommitted, boolean returnConflictResolvedLatestState)
 			throws IOException, TerminologyException {
 		throw new UnsupportedOperationException(
@@ -827,7 +827,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return Collections.unmodifiableList(new ArrayList<I_Identify>());
 	}
 
-	public I_IntSet getUncommittedIds() {
+	public NidSetBI getUncommittedIds() {
 		return new IntSet();
 	}
 
@@ -864,7 +864,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted)
 			throws IOException {
 		
-        I_IntSet srcRelTypes = aceConfig.getSourceRelTypes();
+        NidSetBI srcRelTypes = aceConfig.getSourceRelTypes();
         if (srcRelTypes.size() > 0) {
             for (Relationship r : getSourceRels()) {
                 List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
@@ -882,7 +882,7 @@ public class Concept implements I_Transact, I_GetConceptData {
     
     @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
-			PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
 			Precedence precedence) throws IOException, TerminologyException {
 		if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
@@ -890,7 +890,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return false;
 	}
 
-	public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
+	public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
             Precedence precedence) throws IOException, TerminologyException {
         boolean promotedAnything = false;
 
@@ -928,8 +928,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public List<I_ImageTuple> getImageTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
         List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
         for (I_ImageVersioned img : getImages()) {
@@ -939,20 +939,20 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public Set<I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public Set<I_GetConceptData> getSourceRelTargets(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionMgr)
             throws IOException, TerminologyException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
         for (I_RelTuple rel : getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
-            contradictionManager)) {
+            contradictionMgr)) {
             returnValues.add(Concept.get(rel.getC2Id()));
         }
         return returnValues;
     }
 
     @Override
-    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+    		PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         for (I_RelVersioned rel : getSourceRels()) {
@@ -962,8 +962,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
+    		PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
         for (PositionBI p : positions) {
             KindOfSpec kindOfSpec =
@@ -989,8 +989,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     @Override
-    public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
         if (child == this) {
             return true;
@@ -1229,7 +1229,7 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
     
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
-        I_IntSet isATypes = config.getDestRelTypes();
+        NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
             if (isATypes.contains(pair.getTypeNid())) {
@@ -1242,7 +1242,7 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 
     private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes, I_ShowActivity activity)
+    		NidSetBI isATypes, I_ShowActivity activity)
             throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
@@ -1261,7 +1261,7 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     private void addPossibleKindOfConcepts(I_RepresentIdSet possibleKindOfConcepts, 
-    		I_IntSet isATypes)
+    		NidSetBI isATypes)
             throws IOException {
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
@@ -1276,7 +1276,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         }
     }
 
-    public Set<Integer> getPossibleDestRelsOfTypes(I_IntSet relTypes) throws IOException {
+    public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
         Set<Integer> possibleRelNids = new HashSet<Integer>();
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
             if (relTypes.contains(pair.getTypeNid())) {
@@ -1286,7 +1286,7 @@ public class Concept implements I_Transact, I_GetConceptData {
         return possibleRelNids;
     }
 
-    public Set<Concept> getDestRelOrigins(I_IntSet allowedTypes) throws IOException, TerminologyException {
+    public Set<Concept> getDestRelOrigins(NidSetBI allowedTypes) throws IOException, TerminologyException {
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -1296,8 +1296,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     
 
     @Override
-    public Set<Concept> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions,
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) throws IOException {
+    public Set<Concept> getDestRelOrigins(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException {
         Set<Concept> returnValues = new HashSet<Concept>();
         for (I_RelTuple rel : getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
             contradictionManager)) {
@@ -1310,8 +1310,8 @@ public class Concept implements I_Transact, I_GetConceptData {
 
 
     @Override
-    public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
-            PositionSetReadOnly positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+    public List<I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
@@ -1345,7 +1345,7 @@ public class Concept implements I_Transact, I_GetConceptData {
     @Override
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, 
     		I_ShowActivity activity) throws IOException {
-        I_IntSet isATypes = config.getDestRelTypes();
+        NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
@@ -1363,7 +1363,7 @@ public class Concept implements I_Transact, I_GetConceptData {
     }
 
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-        I_IntSet isATypes = config.getDestRelTypes();
+        NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
         for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {

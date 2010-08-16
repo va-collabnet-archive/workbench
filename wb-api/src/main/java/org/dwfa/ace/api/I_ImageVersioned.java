@@ -22,6 +22,9 @@ import java.util.Set;
 
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 
@@ -47,9 +50,9 @@ public interface I_ImageVersioned extends I_AmTermComponent, MediaAnalogBI {
 
     public Set<TimePathId> getTimePathSet();
 
-    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, 
-            PositionSetReadOnly positions, List<I_ImageTuple> returnImages, 
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager);
+    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, 
+            PositionSetBI positions, List<I_ImageTuple> returnImages, 
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager);
 
     public UniversalAceImage getUniversal() throws IOException, TerminologyException;
 }
