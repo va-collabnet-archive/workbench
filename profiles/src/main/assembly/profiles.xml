@@ -10,6 +10,9 @@
         <include>**/*.ace</include>
         <include>**/*.bp</include>
         <include>**/*.xls</include>
+        <include>**/*.eccs</include>
+        <include>**/*.config</include>
+        <include>**/*.oos</include>
       </includes>
     </fileSet>
   </fileSets>

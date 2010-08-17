@@ -147,6 +147,113 @@
 							</origins>
 						</configuration>
 					</execution>
+					<!-- Create paths for languages -->
+					<execution>
+						<id>vodb-create-new-path from Spanish language concept</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path-from-exist-concept</goal>
+						</goals>
+						<configuration>
+							<pathConcept>
+								<uuid>4d18f7e9-bcc3-3059-888f-5179d41f1f8e</uuid>
+								<description>spanish language path</description>
+							</pathConcept>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-create-new-path from Swedish language concept</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path-from-exist-concept</goal>
+						</goals>
+						<configuration>
+							<pathConcept>
+								<uuid>1810aeea-0127-3842-9ca0-65aa484a4f83</uuid>
+								<description>swedish language path</description>
+							</pathConcept>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-create-new-path from Danish language concept</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path-from-exist-concept</goal>
+						</goals>
+						<configuration>
+							<pathConcept>
+								<uuid>eeb380fd-827b-3fbd-8d49-73198cc4c6b7</uuid>
+								<description>danish language path</description>
+							</pathConcept>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-create-new-path from French Canadian language concept</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path-from-exist-concept</goal>
+						</goals>
+						<configuration>
+							<pathConcept>
+								<uuid>c47aeb30-1d13-34e8-991b-1d71eb8e7cfb</uuid>
+								<description>french-canadian language path</description>
+							</pathConcept>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-create-new-path from Gb English language concept</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path-from-exist-concept</goal>
+						</goals>
+						<configuration>
+							<pathConcept>
+								<uuid>9da07681-ed2a-3b59-a2b3-f0e54dc49daf</uuid>
+								<description>gb english language path</description>
+							</pathConcept>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					<!--  End of creating paths for languages -->
 					<execution>
                         <id>create-SNOMED-inferred-path</id>
                         <phase>generate-resources</phase>
@@ -342,9 +449,6 @@
                             </origins>
 						</configuration>
 					</execution>
-
-					<!--  -->
-
 					<!--  -->
 					<execution>
 						<id>create-inferred-promotion-origin-path</id>
@@ -364,6 +468,36 @@
 									<pathConcept>
 										<pathFsDesc>SNOMED Core Inferred</pathFsDesc>
 										<description>SNOMED Core Inferred</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>4d18f7e9-bcc3-3059-888f-5179d41f1f8e</uuid>
+										<description>spanish language path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>1810aeea-0127-3842-9ca0-65aa484a4f83</uuid>
+										<description>swedish language path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>eeb380fd-827b-3fbd-8d49-73198cc4c6b7</uuid>
+										<description>danish language path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>c47aeb30-1d13-34e8-991b-1d71eb8e7cfb</uuid>
+										<description>french-canadian language path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<uuid>9da07681-ed2a-3b59-a2b3-f0e54dc49daf</uuid>
+										<description>gb english language path</description>
 									</pathConcept>
 								</SimpleUniversalAcePath>
 							</origins>

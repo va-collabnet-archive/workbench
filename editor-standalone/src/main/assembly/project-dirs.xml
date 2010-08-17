@@ -156,6 +156,127 @@
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
+        <!-- Needed for translation integration -->
+        <fileSet>
+			<directory>target/generated-resources/documents/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>documents/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/documentsIndex/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>documentsIndex/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/icons/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>icons/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/rules/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>rules/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/spellIndexDirectory/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>spellIndexDirectory/
+			</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/translationMemory/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>translationMemory/
+			</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/org/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>org/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/dictionaries/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>dictionaries/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<fileSet>
+			<directory>target/generated-resources/sampleProcesses/
+			</directory>
+			<lineEnding>keep</lineEnding>
+			<filtered>false</filtered>
+			<useStrictFiltering>false</useStrictFiltering>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<outputDirectory>sampleProcesses/</outputDirectory>
+			<includes />
+			<excludes />
+			<fileMode>0644</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+		<!-- End for translation integration -->
     </fileSets>    
 </component>
         
