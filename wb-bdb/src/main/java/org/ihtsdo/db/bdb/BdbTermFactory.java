@@ -1882,14 +1882,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 	public int getAuthorNid() {
 		if (authorNid == Integer.MAX_VALUE) {
 			try {
-				if (getActiveAceFrameConfig() != null || getActiveAceFrameConfig().getDbConfig() != null ||
+				if (getActiveAceFrameConfig() != null && getActiveAceFrameConfig().getDbConfig() != null &&
 						getActiveAceFrameConfig().getDbConfig().getUserConcept() != null) {
 					authorNid = getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptId();
 				} else {
 					authorNid = uuidToNative(TkRevision.unspecifiedUserUuid);
 				}
 			} catch (Exception e) {
-				//throw new RuntimeException();
+				throw new RuntimeException();
 			}
 		}
 		return authorNid;
