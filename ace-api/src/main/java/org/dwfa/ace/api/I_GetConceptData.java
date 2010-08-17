@@ -202,7 +202,7 @@ public interface I_GetConceptData extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException;
+            boolean returnConflictResolvedLatestState) throws IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and

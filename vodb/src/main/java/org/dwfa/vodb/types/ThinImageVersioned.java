@@ -25,20 +25,25 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.TimePathId;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.table.TupleAdder;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 
 public class ThinImageVersioned implements I_ImageVersioned {
     public ThinImageVersioned() {
@@ -207,6 +212,38 @@ public class ThinImageVersioned implements I_ImageVersioned {
         adder.addTuples(allowedStatus, allowedTypes, positions, matchingTuples, true, versions, this);
     }
 
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            List<I_ImageTuple> matchingTuples, boolean returnConflictResolvedLatestState)
+            throws TerminologyException, IOException {
+
+        List<I_ImageTuple> tuples = new ArrayList<I_ImageTuple>();
+
+        addTuples(null, allowedTypes, positions, tuples);
+
+        if (returnConflictResolvedLatestState) {
+            I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
+            I_ManageConflict conflictResolutionStrategy;
+            if (config == null) {
+                conflictResolutionStrategy = new IdentifyAllConflictStrategy();
+            } else {
+                conflictResolutionStrategy = config.getConflictResolutionStrategy();
+            }
+
+            tuples = conflictResolutionStrategy.resolveTuples(tuples);
+        }
+
+        if (allowedStatus != null) {
+            for (I_ImageTuple descTuple : tuples) {
+                // filter by allowed status
+                if (allowedStatus.contains(descTuple.getStatusId())) {
+                    matchingTuples.add(descTuple);
+                }
+            }
+        } else {
+            matchingTuples.addAll(tuples);
+        }
+    }    
+    
     private static Collection<UUID> getUids(int id) throws IOException, TerminologyException {
         return LocalFixedTerminology.getStore().getUids(id);
     }

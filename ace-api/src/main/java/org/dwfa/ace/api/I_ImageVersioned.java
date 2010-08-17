@@ -49,6 +49,10 @@ public interface I_ImageVersioned extends I_AmVersioned<I_ImagePart> {
 
     public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
             List<I_ImageTuple> returnImages);
+    
+    public void addTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
+            List<I_ImageTuple> matchingTuples, boolean returnConflictResolvedLatestState)
+            throws TerminologyException, IOException;
 
     public UniversalAceImage getUniversal() throws IOException, TerminologyException;
 }

@@ -310,7 +310,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
     public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
+            boolean returnConflictResolvedLatestState) throws IOException {
         return bean.getImageTuples(allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
     }
 

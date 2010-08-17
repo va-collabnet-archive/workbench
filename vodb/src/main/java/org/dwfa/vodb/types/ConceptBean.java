@@ -322,22 +322,21 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
     }
 
     public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
-            boolean returnConflictResolvedLatestState) throws IOException, TerminologyException {
-
-        List<I_ImageTuple> returnTuples = getImageTuples(allowedStatus, allowedTypes, positions);
-        return AceConfig.getVodb()
-            .getActiveAceFrameConfig()
-            .getConflictResolutionStrategy()
-            .resolveTuples(returnTuples);
+            boolean returnConflictResolvedLatestState) throws IOException {
+        try {
+            List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
+            for (I_ImageVersioned img : getImages()) {
+                img.addTuples(allowedStatus, allowedTypes, positions, returnTuples, returnConflictResolvedLatestState);
+            }
+            return returnTuples;
+        } catch (TerminologyException e) {
+            throw new IOException(e);
+        }        
     }
 
     public List<I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions)
             throws IOException {
-        List<I_ImageTuple> returnTuples = new ArrayList<I_ImageTuple>();
-        for (I_ImageVersioned img : getImages()) {
-            img.addTuples(allowedStatus, allowedTypes, positions, returnTuples);
-        }
-        return returnTuples;
+        return getImageTuples(allowedStatus, allowedTypes, positions, true);
     }
 
     public List<I_ImageTuple> getImageTuples(boolean returnConflictResolvedLatestState) throws IOException,
@@ -384,16 +383,20 @@ public class ConceptBean implements I_GetConceptData, I_Transact {
      */
     public List<I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
             Set<I_Position> positionSet, boolean addUncommitted) throws IOException {
-        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-        for (I_RelVersioned rel : getSourceRels()) {
-            rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted);
-        }
-        if (addUncommitted) {
-            for (I_RelVersioned rel : getUncommittedSourceRels()) {
-                rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted);
+        try {
+            List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+            for (I_RelVersioned rel : getSourceRels()) {
+                rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted, true);
             }
+            if (addUncommitted) {
+                for (I_RelVersioned rel : getUncommittedSourceRels()) {
+                    rel.addTuples(allowedStatus, allowedTypes, positionSet, returnRels, addUncommitted, true);
+                }
+            }
+            return returnRels;
+        } catch (TerminologyException e) {
+            throw new IOException(e);
         }
-        return returnRels;
     }
 
     public List<I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes, Set<I_Position> positions,
