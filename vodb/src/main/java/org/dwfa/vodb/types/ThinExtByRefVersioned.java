@@ -25,6 +25,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageConflict;
 import org.dwfa.ace.api.I_Path;
@@ -366,7 +367,7 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
 
         List<I_ThinExtByRefTuple> tuples = new ArrayList<I_ThinExtByRefTuple>();
 
-        addTuples(allowedStatus, positions, returnTuples, addUncommitted);
+        addTuples(null, positions, tuples, addUncommitted);
 
         if (returnConflictResolvedLatestState) {
             I_ConfigAceFrame config = AceConfig.getVodb().getActiveAceFrameConfig();
@@ -380,7 +381,17 @@ public class ThinExtByRefVersioned implements I_ThinExtByRefVersioned {
             tuples = conflictResolutionStrategy.resolveTuples(tuples);
         }
 
-        returnTuples.addAll(tuples);
+        if (allowedStatus != null) {
+            for (I_ThinExtByRefTuple extTuple : tuples) {
+                // filter by allowed status
+                if (allowedStatus.contains(extTuple.getStatusId())) {
+                    returnTuples.add(extTuple);
+                }
+            }
+        } else {
+            returnTuples.addAll(tuples);
+        }        
+
     }
 
     public void addTuples(List<I_ThinExtByRefTuple> returnTuples, boolean addUncommitted,
