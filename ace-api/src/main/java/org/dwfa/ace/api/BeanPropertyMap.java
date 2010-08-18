@@ -38,7 +38,7 @@ import java.util.HashMap;
  * <code>new BeanPropertyMap().with("name", "foo").with("value", 5).validate(object)</code>
  * 
  */
-public class BeanPropertyMap {
+public class BeanPropertyMap implements Cloneable {
 
     protected HashMap<String, Object> properties = new HashMap<String, Object>();
 
@@ -59,6 +59,11 @@ public class BeanPropertyMap {
         return this;
     }
 
+    public <T extends BeanProperty> BeanPropertyMap without(T property) {
+        properties.remove(property.getPropertyName());
+        return this;
+    }
+    
     public BeanPropertyMap withType(Class<?> beanClass) {
         this.beanClass = beanClass;
         return this;
@@ -72,6 +77,8 @@ public class BeanPropertyMap {
         return properties.get(propertyName);
     }
 
+
+    
     public boolean validate(Object bean) {
 
         if (beanClass != null) {
@@ -106,6 +113,11 @@ public class BeanPropertyMap {
                 }
             }
         }
+    }
+
+    @Override
+    public BeanPropertyMap clone() throws CloneNotSupportedException {
+        return (BeanPropertyMap) super.clone();
     }
 
 }

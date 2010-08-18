@@ -227,6 +227,14 @@ public class LineageHelper {
         this.isARelTypes = isARelTypes;
     }
 
+    protected void setAllowedStatuses(final I_IntSet allowedStatuses) {
+        this.allowedStatuses = allowedStatuses;
+    }
+    
+    protected void setViewPositions(final Set<I_Position> viewPositions) {
+        this.viewPositions = viewPositions;
+    }
+    
     /**
      * A simple template for logic that defines if a process should be executed
      * on a particular subject (concept).

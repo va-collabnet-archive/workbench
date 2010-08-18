@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LineageHelper;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.StatusHelper;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPart;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
@@ -52,12 +53,16 @@ public class RefsetHelper extends LineageHelper {
     protected int currentStatusId;
     protected int retiredStatusId;
 
+    protected Set<Integer> activeStatusIds;
+    protected Set<Integer> inactiveStatusIds;
+    
     protected int unspecifiedUuid;
 
     protected Set<I_Path> editPaths;
 
     public RefsetHelper() {
         super();
+        
         try {
             currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
             retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
@@ -65,6 +70,10 @@ public class RefsetHelper extends LineageHelper {
         } catch (Exception e) {
             throw new TerminologyRuntimeException(e);
         }
+        
+        StatusHelper statusHelper = new StatusHelper();
+        activeStatusIds = statusHelper.getActiveStatuses();
+        inactiveStatusIds = statusHelper.getInactiveStatuses();
     }
 
     /**
@@ -142,8 +151,8 @@ public class RefsetHelper extends LineageHelper {
         }
 
         return result;
-    }
-
+    }    
+    
     public <T extends I_ThinExtByRefPart> T getLatestCurrentRefsetExtensions(int refsetId, int conceptId)
             throws Exception {
         T latestPart = null;
@@ -197,10 +206,9 @@ public class RefsetHelper extends LineageHelper {
      * 
      * @param refsetId The subject refset
      * @param conceptId The concept to be added
-     * @param memberTypeId The value of the concept extension to be added to the
-     *            new member concept.
-     * @param checkNotExists Is true, will only execute if the extension does
-     *            not already exist.
+     * @param type The class of extension to be created (must extend I_ThinExtByRefPart)
+     * @param extProps Additional extension properties (refer {@link org.dwfa.ace.api.ebr.ThinExtByRefPartProperty})
+     * @return True if the concept is added to the refset (new or reactivated), otherwise false
      */
     public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
             final BeanPropertyMap extProps) throws Exception {
@@ -210,16 +218,18 @@ public class RefsetHelper extends LineageHelper {
             return false;
         }
 
-        // create a new extension (with a part for each path the user is
-        // editing)
+        //check for a retired version which needs to be reactivated (rather than creating a new extension)
+        I_ThinExtByRefVersioned extension = getInactiveExtension(refsetId, conceptId, extProps);       
         
+        if (extension == null) {
+            // create a new extension (with a part for each path the user is editing)
         UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(conceptId) + termFactory.getUids(refsetId)).getBytes("8859_1"));
 
         int newMemberId = termFactory.uuidToNativeWithGeneration(uuid, unspecifiedUuid, getEditPaths(),
             Integer.MAX_VALUE);
-
-        I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
-
+            extension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
+        }
+        
         for (I_Path editPath : getEditPaths()) {
 
             I_ThinExtByRefPart newPart = termFactory.newExtensionPart(type);
@@ -230,11 +240,35 @@ public class RefsetHelper extends LineageHelper {
 
             extProps.writeTo(newPart);
 
-            newExtension.addVersion(newPart);
+            extension.addVersion(newPart);
         }
 
-        termFactory.addUncommittedNoChecks(newExtension);
+        termFactory.addUncommittedNoChecks(extension);
         return true;
+    }
+
+    
+    
+    private I_ThinExtByRefVersioned getInactiveExtension(int refsetId, int conceptId, final BeanPropertyMap extProps) 
+            throws Exception {
+
+        I_ThinExtByRefVersioned result = null;
+        
+        // Ignore the status, just need to compare the value(s) (c1id, c2id, etc)
+        BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);
+        
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+            if (extension.getRefsetId() == refsetId) {
+                I_ThinExtByRefPart part = extension.getLatestVersion();
+                if (inactiveStatusIds.contains(part.getStatusId()) && validProps.validate(part)) {
+                    if (result == null || part.getVersion() >= result.getLatestVersion().getVersion()) {
+                        result = extension;
+                    }
+                }
+            }
+        }
+        
+        return result;
     }
 
     /**
@@ -249,10 +283,7 @@ public class RefsetHelper extends LineageHelper {
      * @param effectiveTime
      * @return
      * @throws Exception
-     * @Deprecated This is currently not used 
-     * @see newRefsetExtension(int refsetId, int conceptId, Class<T> type, final BeanPropertyMap extProps)
      */
-    @Deprecated
     public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
             final BeanPropertyMap extProps, UUID memberUuid, UUID pathUuid, int effectiveTime) throws Exception {
 
@@ -267,9 +298,7 @@ public class RefsetHelper extends LineageHelper {
         if (memberUuid != null && termFactory.hasId(memberUuid)) {
             newMemberId = termFactory.getId(memberUuid).getNativeId();
         } else {
-            UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(conceptId) + termFactory.getUids(refsetId)).getBytes("8859_1"));
-
-            newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? uuid : memberUuid,
+            newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? UUID.randomUUID() : memberUuid,
                 unspecifiedUuid, Arrays.asList(path), effectiveTime);
         }
 
@@ -333,6 +362,7 @@ public class RefsetHelper extends LineageHelper {
         return false;
     }
 
+   
     /**
      * @return The edit paths from the active config.
      *         Returns null if no config set or the config defines no paths for
