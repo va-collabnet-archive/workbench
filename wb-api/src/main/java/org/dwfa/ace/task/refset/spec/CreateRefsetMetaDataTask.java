@@ -411,12 +411,14 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
                 if (cnid == concept.getConceptId())
                     continue;
                 I_DescriptionVersioned potential_fsn = termFactory.getDescription(dnid, cnid);
-                for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                    if (actives.contains(part_search.getStatusId())
-                        && part_search.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-                            .localize().getNid() && part_search.getText().equals(description)) {
-                        throw new TerminologyException("Concept already exists in database with FSN: " + description);
-                    }
+                if (potential_fsn != null) {
+	                for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+	                    if (actives.contains(part_search.getStatusId())
+	                        && part_search.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+	                            .localize().getNid() && part_search.getText().equals(description)) {
+	                        throw new TerminologyException("Concept already exists in database with FSN: " + description);
+	                    }
+	                }
                 }
             }
         }
