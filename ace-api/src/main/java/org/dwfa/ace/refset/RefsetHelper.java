@@ -212,8 +212,10 @@ public class RefsetHelper extends LineageHelper {
 
         // create a new extension (with a part for each path the user is
         // editing)
+        
+        UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(conceptId) + termFactory.getUids(refsetId)).getBytes("8859_1"));
 
-        int newMemberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(),
+        int newMemberId = termFactory.uuidToNativeWithGeneration(uuid, unspecifiedUuid, getEditPaths(),
             Integer.MAX_VALUE);
 
         I_ThinExtByRefVersioned newExtension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
@@ -247,7 +249,10 @@ public class RefsetHelper extends LineageHelper {
      * @param effectiveTime
      * @return
      * @throws Exception
+     * @Deprecated This is currently not used 
+     * @see newRefsetExtension(int refsetId, int conceptId, Class<T> type, final BeanPropertyMap extProps)
      */
+    @Deprecated
     public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
             final BeanPropertyMap extProps, UUID memberUuid, UUID pathUuid, int effectiveTime) throws Exception {
 
@@ -262,7 +267,9 @@ public class RefsetHelper extends LineageHelper {
         if (memberUuid != null && termFactory.hasId(memberUuid)) {
             newMemberId = termFactory.getId(memberUuid).getNativeId();
         } else {
-            newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? UUID.randomUUID() : memberUuid,
+            UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(conceptId) + termFactory.getUids(refsetId)).getBytes("8859_1"));
+
+            newMemberId = termFactory.uuidToNativeWithGeneration((memberUuid == null) ? uuid : memberUuid,
                 unspecifiedUuid, Arrays.asList(path), effectiveTime);
         }
 
