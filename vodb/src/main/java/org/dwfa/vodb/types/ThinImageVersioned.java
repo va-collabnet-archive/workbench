@@ -233,10 +233,10 @@ public class ThinImageVersioned implements I_ImageVersioned {
         }
 
         if (allowedStatus != null) {
-            for (I_ImageTuple descTuple : tuples) {
+            for (I_ImageTuple imgTuple : tuples) {
                 // filter by allowed status
-                if (allowedStatus.contains(descTuple.getStatusId())) {
-                    matchingTuples.add(descTuple);
+                if (allowedStatus.contains(imgTuple.getStatusId())) {
+                    matchingTuples.add(imgTuple);
                 }
             }
         } else {
