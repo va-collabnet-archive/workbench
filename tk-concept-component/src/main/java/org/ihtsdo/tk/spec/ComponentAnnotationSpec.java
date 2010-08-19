@@ -5,6 +5,6 @@ package org.ihtsdo.tk.spec;
  * @author kec
  *
  */
-public class ComponentAnnotationSpec {
+public class ComponentAnnotationSpec implements SpecBI {
 
 }

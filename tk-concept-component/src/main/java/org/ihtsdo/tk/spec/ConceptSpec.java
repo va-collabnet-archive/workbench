@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-public class ConceptSpec {
+public class ConceptSpec implements SpecBI {
 
     private UUID[] uuids;
 
@@ -169,4 +169,7 @@ public class ConceptSpec {
         this.relSpecs = relSpecs;
     }
 
+    public int getNid() throws IOException {
+    	return Ts.get().uuidsToNid(uuids);
+    }
 }

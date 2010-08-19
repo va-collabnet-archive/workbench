@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
@@ -398,6 +399,48 @@ public class ConceptVersion implements ConceptVersionBI {
 		default:
 			throw new UnsupportedOperationException("Illegal ConstraintCheckType: " + checkType);
 		}
+	}
+
+	@Override
+	public Collection<? extends DescriptionVersionBI> getDescsActive(int typeNid)
+			throws IOException, ContraditionException {
+		return getDescsActive(new IntSet(new int[] { typeNid }));
+	}
+
+	@Override
+	public Collection<? extends DescriptionVersionBI> getDescsActive(
+			NidSetBI typeNids) throws IOException, ContraditionException {
+		Collection<DescriptionVersionBI> results = new ArrayList<DescriptionVersionBI>();
+		for (DescriptionVersionBI d: getDescsActive()) {
+			if (typeNids.contains(d.getTypeNid())) {
+				results.add(d);
+			}
+		}
+		return results;
+	}
+
+	@Override
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(
+			int typeNid) throws IOException {
+		return getRelsIncomingOrigins(new IntSet(new int[] { typeNid }));
+	}
+
+	@Override
+	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(
+			int typeNid) throws IOException, ContraditionException {
+		return getRelsIncomingOriginsActive(new IntSet(new int[] { typeNid }));
+	}
+
+	@Override
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(
+			int typeNid) throws IOException {
+		return getRelsOutgoingDestinations(new IntSet(new int[] { typeNid }));
+	}
+
+	@Override
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(
+			int typeNid) throws IOException, ContraditionException {
+		return getRelsOutgoingDestinationsActive(new IntSet(new int[] { typeNid }));
 	}
 
 }

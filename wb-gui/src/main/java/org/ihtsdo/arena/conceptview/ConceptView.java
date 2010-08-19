@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
@@ -27,9 +28,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.drools.EditPanelKb;
+import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.SpecBI;
 
 public class ConceptView extends JPanel {
 
@@ -53,7 +57,7 @@ public class ConceptView extends JPanel {
 	
 	
 	public void layoutConcept(I_GetConceptData concept) {
-		kb.setConcept(concept);
+		Map<SpecBI, Integer> templates = kb.setConcept(concept);
 		this.removeAll();
 		this.setLayout(new GridBagLayout());
 		if (concept != null) {
@@ -102,9 +106,20 @@ public class ConceptView extends JPanel {
 						this.add(getRelGroupComponent(e.getValue()), gbc);
 						gbc.gridy++;
 					}
-				}				
-				this.add(getRelTemplate(), gbc);
-				gbc.gridy++;
+				}	
+				
+				for (Entry<SpecBI, Integer> entry: templates.entrySet()) {
+					Class<?> entryClass = entry.getKey().getClass();
+					if (RelSpec.class.isAssignableFrom(entryClass)) {
+						RelSpec spec = (RelSpec) entry.getKey();
+						this.add(getRelTemplate(spec), gbc);
+						gbc.gridy++;
+					} else if (DescriptionSpec.class.isAssignableFrom(entryClass)) {
+						DescriptionSpec spec = (DescriptionSpec) entry.getKey();
+						this.add(getDescTemplate(spec), gbc);
+						gbc.gridy++;
+					}
+				}
 				
 				gbc.weighty = 1;
 				this.add(new JPanel(), gbc);
@@ -164,7 +179,7 @@ public class ConceptView extends JPanel {
 		descPanel.add(descLabel, gbc);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx++;
-		descPanel.add(getLabel(desc.getTypeId()), gbc);
+		descPanel.add(getLabel(desc.getTypeNid()), gbc);
 		gbc.gridx++;
 		descPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
 		gbc.weightx = 1;		
@@ -239,7 +254,106 @@ public class ConceptView extends JPanel {
 		return descPanel;
 	}
 
-	public JComponent getRelTemplate() throws TerminologyException, IOException {
+	
+	public JComponent getDescTemplate(DescriptionSpec desc) throws TerminologyException, IOException {
+		DragPanelDescription descPanel = new DragPanelDescription(new GridBagLayout());
+		//descPanel.setupDrag(desc);
+		descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+		JLabel descLabel = getJLabel("T");
+		descLabel.setBackground(Color.ORANGE);
+		descLabel.setOpaque(true);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridheight = 1;
+		gbc.gridwidth = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		descPanel.add(descLabel, gbc);
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.gridx++;
+		descPanel.add(getLabel(desc.getDescTypeSpec().getNid()), gbc);
+		gbc.gridx++;
+		descPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
+		gbc.weightx = 1;		
+		gbc.gridx++;
+		JLabel textLabel = new JLabel() {
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			
+			int fixedWidth = 150;
+			
+		    Dimension wrapSize = new Dimension();
+		    
+		    @Override
+			public void setSize(Dimension d) {
+				setSize(d.width, d.height);
+			}
+
+			@Override
+			public void setSize(int width, int height) {
+				super.setSize(fixedWidth, height);
+			}
+			
+			@Override
+			public void setBounds(int x, int y, int width, int height) {
+				super.setBounds(x, y, wrapSize.width, wrapSize.height);
+			}
+
+			@Override
+			public void setBounds(Rectangle r) {
+				setBounds(r.x, r.y, r.width, r.height);
+			}
+
+			@Override
+			public Dimension getMaximumSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public Dimension getPreferredSize() {
+				return wrapSize;
+			}
+
+			@Override
+			public void setText(String text) {
+				if (!BasicHTML.isHTMLString(text)) {
+					text = "<html>" + text;
+				}
+            	super.setText(text);
+                View v = BasicHTML.createHTMLView(this, getText());
+                v.setSize(fixedWidth, 0);
+                float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+                if (prefYSpan > 16) {
+                	wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
+                	setSize(wrapSize);
+                } else {
+                	wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
+                	setSize(wrapSize);
+                }
+			}
+		};
+		
+		textLabel.setFont(textLabel.getFont().deriveFont(settings.getFontSize()));
+		textLabel.setText(desc.getDescText());
+		descPanel.add(textLabel, gbc);
+		return descPanel;
+	}
+
+	public JComponent getRelTemplate(RelSpec spec) throws TerminologyException, IOException {
+		Coordinate coordinate = new Coordinate(config.getPrecedence(),
+				config.getViewPositionSetReadOnly(), config
+						.getAllowedStatus(), config.getDestRelTypes(),
+				config.getConflictResolutionStrategy());
 		DragPanelRel relPanel = new DragPanelRel(new GridBagLayout());
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel relLabel = getJLabel("T");
@@ -257,12 +371,12 @@ public class ConceptView extends JPanel {
 		relPanel.add(relLabel, gbc);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.gridx++;
-		relPanel.add(getLabel(ArchitectonicAuxiliary.Concept.RELATIONSHIP.localize().getNid()), gbc);
+		relPanel.add(getLabel(spec.getRelTypeSpec().get(coordinate).getNid()), gbc);
 		gbc.gridx++;
 		relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
 		gbc.weightx = 1;		
 		gbc.gridx++;
-		relPanel.add(getLabel(ArchitectonicAuxiliary.Concept.ACCEPTABLE.localize().getNid()), gbc);
+		relPanel.add(getLabel(spec.getDestinationSpec().get(coordinate).getNid()), gbc);
 		
 		return relPanel;
 	}
@@ -285,7 +399,7 @@ public class ConceptView extends JPanel {
 		gbc.gridy = 0;
 		relPanel.add(relLabel, gbc);
 		gbc.gridx++;
-		relPanel.add(getLabel(r.getTypeId()), gbc);
+		relPanel.add(getLabel(r.getTypeNid()), gbc);
 		gbc.gridx++;
 		relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
 		gbc.weightx = 1;		

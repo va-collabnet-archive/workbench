@@ -19,7 +19,7 @@ package org.ihtsdo.tk.spec;
 import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
 import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
 
-public class RelSpec {
+public class RelSpec implements SpecBI {
 
     private ConceptSpec originSpec;
 	private ConceptSpec relTypeSpec;
@@ -50,4 +50,5 @@ public class RelSpec {
     public RelConstraintIncoming getDestinationRelConstraint() {
     	return new RelConstraintIncoming(originSpec, relTypeSpec, destinationSpec);
     }
+
 }

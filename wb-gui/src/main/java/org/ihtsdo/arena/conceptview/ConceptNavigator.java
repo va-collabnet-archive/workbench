@@ -3,6 +3,8 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -17,6 +19,42 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 
 public class ConceptNavigator extends JPanel {
+	
+	public class TaxonomyAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			treeScroller.setVisible(true);
+			focusDrop.setVisible(true);
+			historyScroller.setVisible(false);
+			statedInferredScroller.setVisible(false);
+		}
+
+	}
+
+	public class HistoryAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			treeScroller.setVisible(false);
+			focusDrop.setVisible(false);
+			historyScroller.setVisible(true);
+			statedInferredScroller.setVisible(false);
+		}
+
+	}
+
+	public class StatedInferredAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			treeScroller.setVisible(false);
+			focusDrop.setVisible(false);
+			historyScroller.setVisible(false);
+			statedInferredScroller.setVisible(true);
+		}
+
+	}
 
 	/**
 	 * 
@@ -25,12 +63,18 @@ public class ConceptNavigator extends JPanel {
 	
 	private JTreeWithDragImage navigatorTree;
 	private JScrollPane treeScroller;
+	private JScrollPane historyScroller;
+	private JScrollPane statedInferredScroller;
 	private FocusDrop focusDrop;
 	private SIDE side = SIDE.RIGHT;
 	
 	public ConceptNavigator(JScrollPane treeScroller, I_ConfigAceFrame config) {
 		super(new GridBagLayout());
 		this.treeScroller = treeScroller;
+		this.historyScroller = new JScrollPane(new JLabel("History panel"));
+		this.historyScroller.setVisible(false);
+		this.statedInferredScroller  = new JScrollPane(new JLabel("Stated inferred panel"));
+		this.statedInferredScroller.setVisible(false);
 		navigatorTree =  (JTreeWithDragImage) treeScroller.getViewport().getView();
 		focusDrop = new FocusDrop(new ImageIcon(ACE.class.getResource("/16x16/plain/flash.png")), 
 				navigatorTree, config);
@@ -62,6 +106,8 @@ public class ConceptNavigator extends JPanel {
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		add(treeScroller, gbc);
+		add(historyScroller, gbc);
+		add(statedInferredScroller, gbc);
 		gbc.weightx = 0;
 		switch (side) {
 			case LEFT:
@@ -99,16 +145,19 @@ public class ConceptNavigator extends JPanel {
 		JButton taxonomyButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
 		taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		taxonomyButton.addActionListener(new TaxonomyAction());
 		topPanel.add(taxonomyButton, gbc);
 		gbc.gridx++;
 		JButton historyButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/radar-chart.png")));
 		historyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		historyButton.addActionListener(new HistoryAction());
 		topPanel.add(historyButton, gbc);
 		gbc.gridx++;
 		JButton statedInferredButton = new JButton(new ImageIcon(
                 ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png")));
 		statedInferredButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		statedInferredButton.addActionListener(new StatedInferredAction());
 		topPanel.add(statedInferredButton, gbc);
 		
 		

@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.gui.concept;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -447,6 +448,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
         ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
         label = new TermComponentLabel(this.ace.getAceFrameConfig());
+        label.setBackground(Color.RED);
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
         this.ace.getAceFrameConfig().addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
         this.ace.getAceFrameConfig().addPropertyChangeListener(this);

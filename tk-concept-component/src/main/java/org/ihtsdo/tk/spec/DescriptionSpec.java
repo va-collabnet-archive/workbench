@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-public class DescriptionSpec {
+public class DescriptionSpec implements SpecBI {
 
 	private UUID[] descUuids;
 
@@ -35,7 +35,8 @@ public class DescriptionSpec {
 	private ConceptSpec descTypeSpec;
 
 
-	public DescriptionSpec(UUID[] descUuids, ConceptSpec concept, ConceptSpec descType, String description) {
+	public DescriptionSpec(UUID[] descUuids, ConceptSpec concept, 
+			ConceptSpec descType, String description) {
 		this.descUuids = descUuids;
 		this.descText = description;
 		this.conceptSpec = concept;
@@ -52,7 +53,7 @@ public class DescriptionSpec {
 		if (descText.equals(desc.getText())) {
 			return desc;
 		} else {
-			throw new RuntimeException("Descriptions to not match. 1: "
+			throw new RuntimeException("Descriptions do not match. 1: "
 					+ descText + " 2: " + desc.getText());
 		}
 	}

@@ -1,7 +1,10 @@
 package org.ihtsdo.arena.drools;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -22,6 +25,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
+import org.ihtsdo.tk.spec.SpecBI;
 
 public class EditPanelKb {
 
@@ -62,7 +66,15 @@ public class EditPanelKb {
 		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 	}
 
-	public void setConcept(I_GetConceptData c) {
+	public Map<SpecBI, Integer> setConcept(I_GetConceptData c) {
+		Map<SpecBI, Integer> templates = new TreeMap<SpecBI, Integer>(new Comparator<Object>() {
+
+			@Override
+			public int compare(Object o1, Object o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		
 		try {
 			setupKb("org/ihtsdo/arena/drools/TkApiRules.drl");
 			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
@@ -77,6 +89,7 @@ public class EditPanelKb {
 						config.getViewPositionSetReadOnly(), config
 								.getAllowedStatus(), config.getDestRelTypes(),
 						config.getConflictResolutionStrategy());
+				ksession.setGlobal("templates", templates);
 				ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
 				ksession.fireAllRules();
 			} catch (IOException e) {
@@ -89,6 +102,7 @@ public class EditPanelKb {
 		} catch (Throwable e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+		return templates;
 	}
 
 	public void setConceptOld(I_GetConceptData c) {
