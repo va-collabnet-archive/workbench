@@ -26,5 +26,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 	ConceptVersionBI getConceptVersion(Coordinate coordinate, int cNid) throws IOException;
 	ConceptVersionBI getConceptVersion(Coordinate coordinate, UUID... uuids) throws IOException;
 	ConceptVersionBI getConceptVersion(Coordinate coordinate, Collection<UUID> uuids) throws IOException;
+
+	int uuidsToNid(UUID... uuids) throws IOException;
+	int uuidsToNid(Collection<UUID> uuids) throws IOException;
 		
 }

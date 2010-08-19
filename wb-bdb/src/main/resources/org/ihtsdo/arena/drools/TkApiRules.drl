@@ -3,22 +3,47 @@ package org.ihtsdo.arena.drools
 
 #list any import classes here.
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.spec.Snomed;
+import org.ihtsdo.tk.spec.SnomedConstraints;
+import org.ihtsdo.tk.spec.SnomedRelType;
 import org.ihtsdo.tk.spec.Taxonomies;
+import org.ihtsdo.tk.spec.WbDescType;
 
 
 #declare any global variables here
 
 
-
+// Parameters x = don't care; e = equals, k = kind of, r = regex
 
 rule "isKindOf refset concept"
 	
 	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX);
+		$c : ConceptVersionBI(
+				this isKindOf Taxonomies.REFSET_AUX);
 	then 
    		System.out.println("isKindOf refset concept found: \n" + $c.toString());
 		
 end
+
+rule "not satisfies constraint"
+	
+	when
+		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
+	then 
+   		System.out.println("concept failing constraint found: \n" + $c.toString());
+		
+end
+
+rule "isKindOf refset concept and not satisfies constraint"
+	
+	when
+		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX,
+							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
+	then 
+   		System.out.println("isKindOf refset concept failing constraint found: \n" + $c.toString());
+		
+end
+
 
 rule "isKindOf workbench auxiliary concept"
 	

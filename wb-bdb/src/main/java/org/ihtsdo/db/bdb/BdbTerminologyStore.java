@@ -122,4 +122,14 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 		return getConcept(Bdb.uuidsToNid(uuids));
 	}
 
+	@Override
+	public int uuidsToNid(UUID... uuids) throws IOException {
+		return Bdb.uuidToNid(uuids);
+	}
+
+	@Override
+	public int uuidsToNid(Collection<UUID> uuids) throws IOException {
+		return Bdb.uuidsToNid(uuids);
+	}
+
 }

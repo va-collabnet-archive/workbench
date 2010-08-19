@@ -83,39 +83,20 @@ public class ConceptSpec {
         }
 
         for (RelSpec relSpec : relSpecs) {
-        	ConceptVersionBI relType = relSpec.getRelType().get(c);
-        	ConceptVersionBI destination = relSpec.getDestination().get(c);
-            boolean foundDestination = false;
-            boolean foundType = false;
+        	ConceptVersionBI relType = relSpec.getRelTypeSpec().get(c);
+        	ConceptVersionBI destination = relSpec.getDestinationSpec().get(c);
             List<ConceptVersionBI> destinationsOfType = new ArrayList<ConceptVersionBI>();
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
             
-            for (ConceptVersionBI dest : local.getRelsOutgoingTargets(typeNids)) {
-                    foundType = true;
-                    destinationsOfType.add(dest);
-                    if (dest.equals(destination)) {
-                        foundDestination = true;
-                        break;
-                    }
-                
-            }
-            if (foundDestination == false) {
-                boolean foundTransitively = false;
-                if (foundType == true && relSpec.isTransitive()) {
-                    for (ConceptVersionBI destinationOfType : destinationsOfType) {
-                        if (validateRelationships(destinationOfType, c)) {
-                            foundTransitively = true;
-                            break;
-                        }
-                    }
-                }
-                if (foundTransitively == false) {
-                    throw new RuntimeException("No matching rel: " + relSpec + " found for: " + local);
+            for (ConceptVersionBI dest : local.getRelsOutgoingDestinations(typeNids)) {
+                destinationsOfType.add(dest);
+                if (dest.equals(destination)) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     private void validateDescription(ConceptVersionBI local, Coordinate c) throws IOException, ContraditionException {

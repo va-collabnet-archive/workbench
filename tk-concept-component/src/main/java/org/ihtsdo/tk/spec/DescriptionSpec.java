@@ -26,29 +26,25 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class DescriptionSpec {
 
-	private UUID[] uuids;
+	private UUID[] descUuids;
 
 	private String descText;
 
 	private ConceptSpec conceptSpec;
 
-	public DescriptionSpec(String description, String uuid, ConceptSpec concept) {
-		this(description, UUID.fromString(uuid), concept);
-	}
+	private ConceptSpec descTypeSpec;
 
-	public DescriptionSpec(String description, UUID uuid, ConceptSpec concept) {
-		this(description, new UUID[] { uuid }, concept);
-	}
 
-	public DescriptionSpec(String description, UUID[] uuids, ConceptSpec concept) {
-		this.uuids = uuids;
+	public DescriptionSpec(UUID[] descUuids, ConceptSpec concept, ConceptSpec descType, String description) {
+		this.descUuids = descUuids;
 		this.descText = description;
 		this.conceptSpec = concept;
+		this.descTypeSpec = descType;
 	}
 
 	public DescriptionVersionBI get(Coordinate c) throws IOException {
 		ConceptVersionBI concept = conceptSpec.get(c);
-		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(uuids);
+		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(descUuids);
 		if (concept.getNid() != desc.getConceptNid()) {
 			throw new RuntimeException("Concept NIDs do not match. 1: "
 					+ desc.getConceptNid() + " " + descText + " 2: " + concept);
@@ -60,4 +56,31 @@ public class DescriptionSpec {
 					+ descText + " 2: " + desc.getText());
 		}
 	}
+	
+	public UUID[] getUuids() {
+		return descUuids;
+	}
+
+	public String getDescText() {
+		return descText;
+	}
+
+	public ConceptSpec getConceptSpec() {
+		return conceptSpec;
+	}
+
+	public ConceptSpec getDescTypeSpec() {
+		return descTypeSpec;
+	}
+
+	public DescriptionSpec(String description, String uuid, ConceptSpec concept, ConceptSpec descType) {
+		this(description, UUID.fromString(uuid), concept, descType);
+	}
+
+	public DescriptionSpec(String description, UUID uuid, ConceptSpec concept, ConceptSpec descType) {
+		this(new UUID[] { uuid }, concept, descType, description);
+	}
+	
+	
+
 }

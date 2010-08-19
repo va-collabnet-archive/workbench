@@ -9,6 +9,8 @@ import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.constraint.ConstraintBI;
+import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
@@ -34,22 +36,27 @@ public interface ConceptVersionBI extends ComponentBI {
 	public Collection<? extends RelationshipVersionBI> getRelsIncomingActive() throws IOException, ContraditionException;
 	public Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContraditionException;
 
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargets() throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargets(NidSetBI typeNids) throws IOException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsIsa() throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations() throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(NidSetBI typeNids) throws IOException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsIsa() throws IOException;
 	
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins() throws IOException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(NidSetBI typeNids) throws IOException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa() throws IOException;
 
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive() throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActive(NidSetBI typeNids) throws IOException, ContraditionException;
-	public Collection<? extends ConceptVersionBI> getRelsOutgoingTargetsActiveIsa() throws IOException, ContraditionException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive() throws IOException, ContraditionException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(NidSetBI typeNids) throws IOException, ContraditionException;
+	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActiveIsa() throws IOException, ContraditionException;
 	
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive() throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids) throws IOException, ContraditionException;
 	public Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa() throws IOException, ContraditionException;
 	
 	public boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
+	
+	public boolean satisfies(ConstraintBI constraint, 
+			ConstraintCheckType subjectCheck,
+			ConstraintCheckType propertyCheck,
+			ConstraintCheckType valueCheck) throws IOException, ContraditionException;
 
 }

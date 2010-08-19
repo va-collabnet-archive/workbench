@@ -16,28 +16,38 @@
  */
 package org.ihtsdo.tk.spec;
 
+import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
+import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
+
 public class RelSpec {
 
-    private ConceptSpec relType;
-    private ConceptSpec destination;
-    private boolean transitive;
+    private ConceptSpec originSpec;
+	private ConceptSpec relTypeSpec;
+    private ConceptSpec destinationSpec;
 
-    public RelSpec(ConceptSpec relType, ConceptSpec destination, boolean transitive) {
+    public RelSpec(ConceptSpec originSpec, ConceptSpec relTypeSpec, ConceptSpec destinationSpec) {
         super();
-        this.relType = relType;
-        this.destination = destination;
-        this.transitive = transitive;
+        this.originSpec = originSpec;
+        this.relTypeSpec = relTypeSpec;
+        this.destinationSpec = destinationSpec;
     }
 
-    public ConceptSpec getRelType() {
-        return relType;
+    public ConceptSpec getOriginSpec() {
+		return originSpec;
+	}
+
+    public ConceptSpec getRelTypeSpec() {
+        return relTypeSpec;
     }
 
-    public ConceptSpec getDestination() {
-        return destination;
+    public ConceptSpec getDestinationSpec() {
+        return destinationSpec;
     }
-
-    public boolean isTransitive() {
-        return transitive;
+    
+    public RelConstraintOutgoing getOriginatingRelConstraint() {
+    	return new RelConstraintOutgoing(originSpec, relTypeSpec, destinationSpec);
+    }
+    public RelConstraintIncoming getDestinationRelConstraint() {
+    	return new RelConstraintIncoming(originSpec, relTypeSpec, destinationSpec);
     }
 }

@@ -21,6 +21,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
 
 public class EditPanelKb {
 
@@ -45,6 +46,9 @@ public class EditPanelKb {
 		builderConfig.setOption(EvaluatorOption.get(
 				IsKindOfEvaluatorDefinition.IS_KIND_OF.getOperatorString(),
 				new IsKindOfEvaluatorDefinition()));
+		builderConfig.setOption(EvaluatorOption.get(
+				SatisfiesConstraintEvaluatorDefinition.SATISFIES_CONSTRAINT.getOperatorString(),
+				new SatisfiesConstraintEvaluatorDefinition()));
 		kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
@@ -59,21 +63,31 @@ public class EditPanelKb {
 	}
 
 	public void setConcept(I_GetConceptData c) {
-		setupKb("org/ihtsdo/arena/drools/TkApiRules.drl");
-		StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-		KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
-				.newConsoleLogger(ksession);
 		try {
-			Coordinate coordinate = new Coordinate(config.getPrecedence(),
-					config.getViewPositionSetReadOnly(), config
-							.getAllowedStatus(), config.getDestRelTypes(),
-					config.getConflictResolutionStrategy());
-			ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
-			ksession.fireAllRules();
-		} catch (IOException e) {
+			setupKb("org/ihtsdo/arena/drools/TkApiRules.drl");
+			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+			boolean uselogger = false;
+			
+			KnowledgeRuntimeLogger logger = null;
+			if (uselogger) {
+				logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			}
+			try {
+				Coordinate coordinate = new Coordinate(config.getPrecedence(),
+						config.getViewPositionSetReadOnly(), config
+								.getAllowedStatus(), config.getDestRelTypes(),
+						config.getConflictResolutionStrategy());
+				ksession.insert(Ts.get().getConceptVersion(coordinate, c.getNid()));
+				ksession.fireAllRules();
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} finally {
+				if (logger != null) {
+					logger.close();
+				}
+			}
+		} catch (Throwable e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} finally {
-			logger.close();
 		}
 	}
 
