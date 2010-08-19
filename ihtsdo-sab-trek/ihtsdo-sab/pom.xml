@@ -1,0 +1,942 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+	   <groupId>org.ihtsdo</groupId>
+    	<artifactId>ihtsdo-parent</artifactId>
+    	<version>1</version> 
+   </parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.ihtsdo</groupId>
+	<artifactId>ihtsdo-sab</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>IHTSDO stand-alone bundle with new bdb implementation</name>
+	<description>IHTSDO stand-alone bundle with new bdb</description>
+	<inceptionYear>2010</inceptionYear>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-sab</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-sab</developerConnection>
+		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-refset-sab/ihtsdo-sab/?root=wb-refset-sab&amp;system=exsy1002</url>
+	</scm>
+	<properties>
+		<maven.assembly.plugin.version>2.2-beta-4</maven.assembly.plugin.version>
+		<org.ihtsdo.wb-gui.version>2.6.0-trek-2-SNAPSHOT</org.ihtsdo.wb-gui.version>
+		<org.ihtsdo.wb-mojo.version>${org.ihtsdo.wb-gui.version}</org.ihtsdo.wb-mojo.version>
+		<org.ihtsdo.wb-bdb.version>${org.ihtsdo.wb-gui.version}</org.ihtsdo.wb-bdb.version>
+		<org.dwfa.pbl-mojo.version>1.3</org.dwfa.pbl-mojo.version>
+		<org.ihtsdo.wb-ide-admin-bp.version>1.4-SNAPSHOT</org.ihtsdo.wb-ide-admin-bp.version>
+		<org.ihtsdo.wb-ide-user-bp.version>1.5-SNAPSHOT</org.ihtsdo.wb-ide-user-bp.version>
+		
+		<!-- Classifier Projects -->
+		<snorocket.version>1.1.14</snorocket.version>    
+		
+		<!-- Controls the location and naming of the bundle -->
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-icons</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+            <groupId>org.dwfa.jini</groupId>
+            <artifactId>start</artifactId>
+            <scope>compile</scope>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dwfa.jini</groupId>
+            <artifactId>jsk-dl</artifactId>
+            <scope>compile</scope>
+            <version>2.1</version>
+        </dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>ihtsdo-stated-inferred-bdb</artifactId>
+			<scope>runtime-directory</scope>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.nhs.uktc</groupId>
+			<artifactId>nhs-subset-editor-doc</artifactId>
+			<scope>runtime-directory</scope>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-ide-admin-bp</artifactId>
+			<version>${org.ihtsdo.wb-ide-admin-bp.version}</version>
+			<type>zip</type>
+			<scope>runtime-directory</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>wb-api</artifactId>
+					<groupId>org.ihtsdo</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-ide-user-bp</artifactId>
+			<version>${org.ihtsdo.wb-ide-user-bp.version}</version>
+			<type>zip</type>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>ihtsdo-resources</artifactId>
+			<version>1.3-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<!--
+				A dependency required to use the jini/jehri dynamic provider
+				security model
+			-->
+			<groupId>org.dwfa.jini</groupId>
+			<artifactId>jsk-policy</artifactId>
+			<scope>provided</scope>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-bdb</artifactId>
+			<version>${org.ihtsdo.wb-bdb.version}</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven.assembly.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>assembly</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>directory-single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/bundle-all.xml</descriptor>
+							</descriptors>
+							<finalName>wb</finalName>
+							<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.ihtsdo</groupId>
+						<artifactId>wb-bdb</artifactId>
+						<version>${org.ihtsdo.wb-bdb.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.lucene</groupId>
+						<artifactId>lucene-core</artifactId>
+						<version>2.9.2</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>process-config</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process-config</goal>
+						</goals>
+						<configuration>
+							<specs>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*config$
+									</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+									<substitutions>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery" </patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup()
+											</replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/jehri/config.*config$</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+									<substitutions>
+										<substutionSpec>
+											<propertyName>org.dwfa.configname</propertyName>
+											<patternStr>UniqueConfig</patternStr>
+											<replacementStr />
+											<nullActionStr>EMPTY_STRING</nullActionStr>
+										</substutionSpec>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery" </patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup()
+											</replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/ace/config.*config$</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+									<substitutions>
+										<substutionSpec>
+											<propertyName>org.dwfa.configname</propertyName>
+											<patternStr>UniqueConfig</patternStr>
+											<replacementStr />
+											<nullActionStr>EMPTY_STRING</nullActionStr>
+										</substutionSpec>
+										<substutionSpec>
+											<patternStr>"org.dwfa.discovery"</patternStr>
+											<replacementStr>org.dwfa.jini.ConfigUtil.getUniqueJvmGroup()
+											</replacementStr>
+											<nullActionStr>REPLACE_LITERAL</nullActionStr>
+										</substutionSpec>
+									</substitutions>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/ace/config.*policy</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/jehri/config.*policy</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*policy
+									</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/config.*properties
+									</filePatternStr>
+									<destDir>generated-resources/config</destDir>
+								</extractAndProcessSpec>
+								<extractAndProcessSpec>
+									<filePatternStr>^org/dwfa/resources/core/icon.*
+									</filePatternStr>
+									<destDir>generated-resources/config/icon</destDir>
+								</extractAndProcessSpec>
+							</specs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>export-beans</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-beans</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources</targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-config</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-config</goal>
+						</goals>
+						<configuration>
+							<specs>
+								<configSpec>
+									<className>org.dwfa.ace.config.AceLocalConfiguration
+									</className>
+									<configFileName>generated-resources/config/start-ace-local.config
+									</configFileName>
+									<methodName>writeToFile</methodName>
+								</configSpec>
+								<configSpec>
+									<className>org.dwfa.ace.config.AceConfiguration</className>
+									<configFileName>generated-resources/config/start-ace.config
+									</configFileName>
+									<methodName>writeToFile</methodName>
+								</configSpec>
+							</specs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-scripts</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>generate-scripts</goal>
+						</goals>
+						<configuration>
+							<scriptOutputDir>wb-bundle/</scriptOutputDir>
+							<libDir>lib</libDir>
+                            <scriptNames>
+                                <param>wb</param>
+                                <param>dWb</param>
+                                <param>pWb</param>
+                            </scriptNames>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-directories-install</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources/</targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>write-directories-site</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources/</targetSubDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-open</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-open</goal>
+						</goals>
+						<configuration>
+							<vodbDirectory>target/generated-resources/berkeley-db</vodbDirectory>
+						</configuration>
+					</execution>
+                    <execution>
+                        <id>vodb-set-default-config</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-set-default-config</goal>
+                        </goals>
+                    </execution>
+                  <execution>
+                        <id>vodb-set-ace-edit-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-set-edit-paths</goal>
+                        </goals>
+                        <configuration>
+                            <editPaths>
+                                <ConceptDescriptor>
+                                    <uuid>2faa9260-8fb2-11db-b606-0800200c9a66</uuid>
+                                    <description>Workbench Auxiliary</description>
+                                </ConceptDescriptor>
+                            </editPaths>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-SNOMED-inferred-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                <description>SNOMED Core</description>
+                            </pathParent>
+                        	<pathFsDesc>SNOMED Core Inferred</pathFsDesc>
+                        	<pathPrefDesc>SNOMED Core Inferred</pathPrefDesc>
+                        	<origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+					<execution>
+                        <id>create-SNOMED-stated-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                <description>SNOMED Core</description>
+                            </pathParent>
+                            <pathFsDesc>SNOMED Core Stated</pathFsDesc>
+                            <pathPrefDesc>SNOMED Core Stated</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                		<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                		<description>SNOMED Core</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+                        <id>create-inferred-origin</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Inferred Origin Path</pathFsDesc>
+                            <pathPrefDesc>Inferred Origin Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                		<uuid>5e51196f-903e-5dd4-8b3e-658f7e0a4fe6</uuid>
+                                		<description>SNOMED Core Inferred</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+				
+					<execution>
+						<id>create-stated-origin-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+							</pathParent>
+							<pathFsDesc>Stated Origin Path</pathFsDesc>
+							<pathPrefDesc>Stated Origin Path</pathPrefDesc>
+							<origins>
+								<simpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>SNOMED Core Stated</pathFsDesc>
+										<description>SNOMED Core Stated</description>
+									</pathConcept>
+								</simpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+                        <id>create-stated-promotion-origin-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Stated Promotion Origin Path</pathFsDesc>
+                            <pathPrefDesc>Stated Promotion Origin Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                    	<pathFsDesc>Stated Origin Path</pathFsDesc>
+                                		<description>Stated Origin Path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+                        <id>create-stated-promotion-template-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Stated Promotion Template Path</pathFsDesc>
+                            <pathPrefDesc>Stated Promotion Template Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                    	<pathFsDesc>Stated Promotion Origin Path</pathFsDesc>
+                                    	<description>Stated Promotion Origin Path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+                        <id>create-stated-resolution-origin-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Stated Resolution Origin Path</pathFsDesc>
+                            <pathPrefDesc>Stated Resolution Origin Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                    	<pathFsDesc>Stated Promotion Template Path</pathFsDesc>
+                                    	<description>Stated Promotion Template Path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+
+					<execution>
+                        <id>create-stated-terminology-author-origin-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Stated Terminology Author Origin Path</pathFsDesc>
+                            <pathPrefDesc>Stated Terminology Author Origin Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                    	<pathFsDesc>Stated Resolution Origin Path</pathFsDesc>
+                                    	<description>Stated Resolution Origin Path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+
+					<execution>
+                        <id>create-stated-terminology-author-template-path</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>Stated Terminology Author Template Path</pathFsDesc>
+                            <pathPrefDesc>Stated Terminolgy Author Template Path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                    	<pathFsDesc>Stated Terminology Author Origin Path</pathFsDesc>
+                                    	<description>Stated Terminology Author Origin Path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-stated-release-candidate-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+							</pathParent>
+							<pathFsDesc>Stated Release Candidate Path</pathFsDesc>
+							<pathPrefDesc>Stated Release Candidate Path</pathPrefDesc>
+							<origins>
+								<simpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Stated Terminology Author Origin Path</pathFsDesc>
+										<description>Stated Terminology Author Origin Path</description>
+									</pathConcept>
+								</simpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					
+					<execution>
+						<id>create-classifier-output=path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>	
+							</pathParent>
+							<pathFsDesc>Classifier Output Path</pathFsDesc>
+							<pathPrefDesc>Classifier Output Path</pathPrefDesc>
+							<origins>
+								<simpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Origin Path</pathFsDesc>
+										<description>Inferred Origin Path</description>
+									</pathConcept>
+								</simpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-promotion-origin-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Promotion Origin Path</pathFsDesc>
+							<pathPrefDesc>Inferred Promotion Origin Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Origin Path</pathFsDesc>
+										<description>Inferred Origin Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-promotion-template-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Promotion Template Path</pathFsDesc>
+							<pathPrefDesc>Inferred Promotion Template Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Promotion Origin Path</pathFsDesc>
+										<description>Inferred Promotion Origin Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-resolution-origin-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Resolution Origin Path</pathFsDesc>
+							<pathPrefDesc>Inferred Resolution Origin Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Promotion Template Path</pathFsDesc>
+										<description>Inferred Promotion Template Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-terminology-author-origin-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Terminology Author Origin Path</pathFsDesc>
+							<pathPrefDesc>Inferred Terminology Author Origin Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Resolution Origin Path</pathFsDesc>
+										<description>Inferred Resolution Origin Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-terminology-author-template-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Terminology Author Template Path</pathFsDesc>
+							<pathPrefDesc>Inferred Terminology Author Template Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Terminology Author Origin Path</pathFsDesc>
+										<description>Inferred Terminology Author Origin Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+					
+					<execution>
+						<id>create-inferred-release-candidate-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-create-new-path</goal>
+						</goals>
+						<configuration>
+							<pathParent>
+								<uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+								<description>development</description>
+							</pathParent>
+							<pathFsDesc>Inferred Release Candidate Path</pathFsDesc>
+							<pathPrefDesc>Inferred Release Candidate Path</pathPrefDesc>
+							<origins>
+								<SimpleUniversalAcePath>
+									<pathConcept>
+										<pathFsDesc>Inferred Terminology Author Template Path</pathFsDesc>
+										<description>Inferred Terminology Author Template Path</description>
+									</pathConcept>
+								</SimpleUniversalAcePath>
+							</origins>
+						</configuration>
+					</execution>
+
+					
+					<execution>
+						<id>DBPropertyCreator</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>setproperties</goal>
+						</goals>
+						<configuration>
+							<inputDirectory>${user.home}/.m2</inputDirectory>
+							<fileName>properties</fileName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>refset-listing</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>refset-listing</goal>
+						</goals>
+						<configuration>
+							<name>default</name>
+							<sort_by_name>false</sort_by_name>
+							<list_file>target/classes/refsets.html</list_file>
+						</configuration>
+					</execution>
+					<execution>
+                        <id>vodb-commit</id>
+                        <phase>generate-resources</phase>
+						<goals>
+                            <goal>vodb-commit</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>vodb-close</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-close</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>run-on-mac</id>
+			<activation>
+				<os>
+					<name>Mac OS X</name>
+				</os>
+				<file>
+					<exists>target/wb-bundle/dAceOsX.sh
+					</exists>
+				</file>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>exec-maven-plugin</artifactId>
+							<version>1.1.1</version>
+							<executions>
+								<execution>
+									<id>exec-one</id>
+									<phase>run</phase>
+									<goals>
+										<goal>exec</goal>
+									</goals>
+								</execution>
+							</executions>
+							<configuration>
+								<workingDirectory>target/wb-bundle/
+								</workingDirectory>
+								<executable>./dAceOsX.sh</executable>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>run-on-pc</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+				<file>
+					<exists>target/wb-bundle/wb.bat
+					</exists>
+				</file>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>exec-maven-plugin</artifactId>
+							<version>1.1.1</version>
+							<executions>
+								<execution>
+									<id>exec-one</id>
+									<phase>run</phase>
+									<goals>
+										<goal>exec</goal>
+									</goals>
+								</execution>
+							</executions>
+							<configuration>
+								<workingDirectory>target/wb-bundle</workingDirectory>
+								<executable>wb.bat</executable>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>install4j</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>install4j</id>
+								<phase>install</phase>
+								<configuration>
+									<tasks>
+										<taskdef name="install4j"
+											classname="com.install4j.Install4JTask"
+											classpath="/Applications/install4j 4/bin/ant.jar;/opt/install4j/bin/ant.jar"/>
+										<install4j projectfile="src/main/install4j/ihtsdo_sa_wb.install4j">
+											<variable name="project.version" value="${project.version}"/>
+											<variable name="bundle.directory.rt.i4j" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.directory" value="${project.build.directory}/wb-bundle"/>
+											<variable name="bundle.file_description" value="IHTSDO Editor Release"/>
+											<variable name="bundle.copyright" value="2001 International Health Terminology Standards Development Organisation"/>
+											<variable name="bundle.version" value="1.3.2-ihtsdo-gr"/>
+											<variable name="bundle.publisher" value="IHTSDO"/>
+											<variable name="bundle.publisher.url" value="http://www.ihtsdo.org/members/uk00/"/>
+											<variable name="bundle.vm_args" value="config/start-wb-local.config"/>
+											<variable name="bundle.vm_main_class" value="com.sun.jini.start.ServiceStarter"/>
+											<variable name="bundle.vm_parameters" value="&quot;-Dorg.dwfa.AboutBoxGraphic=&quot;"/>
+											<variable name="pom.short.name" value="ihtsdo editor sa"/>
+											<variable name="media.dir" value="${project.build.directory}/site"/>
+											<variable name="icons.dir" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons"/>
+											<variable name="icon.icns" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles1_128x128.icns"/>
+											<variable name="icon.ico" value="${project.build.directory}/wb-bundle/resources/org/ihtsdo/icons/IHT_IconFiles2_48x48.ico"/>
+											<variable name="about.box" value="resources/org/ihtsdo/ihtsdo_sa_aboutbox.jpg"/>
+										</install4j>
+									</tasks>
+									
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>commons-net</groupId>
+								<artifactId>commons-net</artifactId>
+								<version>1.4.1</version>
+							</dependency>
+							<dependency>
+								<groupId>ant</groupId>
+								<artifactId>ant-commons-net</artifactId>
+								<version>1.6.5</version>
+							</dependency>
+							<dependency>
+								<groupId>ant</groupId>
+								<artifactId>ant-nodeps</artifactId>
+								<version>1.6.5</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>maestro_ihtsdo.wb-snapshots</id>
+			<name>IHTSDO Workbench Snapshots Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>maestro_ihtsdo.wb-releases</id>
+			<name>IHTSDO Workbench Releases Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
+		</repository>
+	</distributionManagement>
+</project>
