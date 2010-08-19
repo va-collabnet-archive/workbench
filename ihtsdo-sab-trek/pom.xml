@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.ihtsdo</groupId>
+	<artifactId>ihtsdo-sab-trek</artifactId>
+	<name>Workbench Trek Stand-alone Bundle</name>
+	<packaging>pom</packaging>
+	<description>multi-module build for building a stand-alone bundle on the wb trek branch </description>
+	<version>1.0-SNAPSHOT</version>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/</developerConnection>
+		<url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ihtsdo_subset_editor/scm</url>
+	</scm>
+	<modules>
+		<module>cement-jbin</module>
+		<module>ihtsdo-sct-stated-econcepts</module>
+		<module>ihtsdo-stated-inferred-bdb</module>
+		<module>ihtsdo-sab</module>
+	</modules>
+</project>
