@@ -462,8 +462,11 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 	
 	@Override
 	public void setBounds(int x, int y, int width, int height) {
-		if (lineWrapEnabled)
+		if (lineWrapEnabled) {
 			super.setBounds(x, y, wrapSize.width, wrapSize.height);
+		} else {
+			super.setBounds(x, y, width, height);
+		}
 	}
 
 	@Override
