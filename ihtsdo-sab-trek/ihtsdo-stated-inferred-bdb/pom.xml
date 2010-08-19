@@ -1,0 +1,106 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.dwfa</groupId>
+		<artifactId>dwfa-pom</artifactId>
+		<version>3</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.ihtsdo</groupId>
+	<artifactId>ihtsdo-stated-inferred-bdb</artifactId>
+	<name>IHTSDO stated/inferred berkeley database</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>IHTSDO stated/inferred berkeley database</description>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-stated-inferred-bdb</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-stated-inferred-bdb</developerConnection>
+		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-refset-sab/ihtsdo-stated-inferred-bdb/?root=wb-refset-sab&amp;system=exsy1002</url>
+	</scm>
+	<properties>
+		<org.ihtsdo.wb-gui.version>2.6.0-trek-2-SNAPSHOT</org.ihtsdo.wb-gui.version>
+		<org.ihtsdo.wb-mojo.version>${org.ihtsdo.wb-gui.version}</org.ihtsdo.wb-mojo.version>
+		<org.ihtsdo.wb-bdb.version>${org.ihtsdo.wb-gui.version}</org.ihtsdo.wb-bdb.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>ihtsdo-sct-stated-econcepts</artifactId>
+			<version>2010.01.31-SNAPSHOT</version>
+			<scope>runtime-directory</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>cement-jbin</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+			<scope>runtime-directory</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<executions>
+					<execution>
+						<!-- unjar sct-stated-econcepts -->
+						<id>write-directories</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>write-directories</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources</targetSubDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-bdb-mojo</artifactId>
+				<version>${org.ihtsdo.wb-mojo.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.ihtsdo</groupId>
+						<artifactId>wb-bdb</artifactId>
+						<version>${org.ihtsdo.wb-mojo.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.lucene</groupId>
+						<artifactId>lucene-core</artifactId>
+						<version>2.9.2</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>load-econcepts-multi</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>load-econcepts-multi</goal>
+						</goals>
+						<configuration>
+							<generatedResources>${project.build.directory}/generated-resources</generatedResources>
+							<conceptsFileNames>
+								<param>eConcepts.jbin</param>
+								<param>sctSiEConcepts.jbin</param>
+							</conceptsFileNames>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>maestro_ihtsdo.wb-snapshots</id>
+			<name>IHTSDO Workbench Snapshots Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>maestro_ihtsdo.wb-releases</id>
+			<name>IHTSDO Workbench Releases Repository</name>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
+		</repository>
+	</distributionManagement>
+</project>
