@@ -1,6 +1,8 @@
-package org.ihtsdo.tk.spec;
+package org.ihtsdo.tk.example.binding;
 
 import java.util.UUID;
+
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class Taxonomies {
 

@@ -3,11 +3,11 @@ package org.ihtsdo.arena.drools
 
 #list any import classes here.
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.spec.Snomed;
-import org.ihtsdo.tk.spec.SnomedConstraints;
-import org.ihtsdo.tk.spec.SnomedRelType;
-import org.ihtsdo.tk.spec.Taxonomies;
-import org.ihtsdo.tk.spec.WbDescType;
+import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedRelType;
+import org.ihtsdo.tk.example.binding.Taxonomies;
+import org.ihtsdo.tk.example.binding.WbDescType;
 
 
 #declare any global variables here
@@ -25,22 +25,32 @@ rule "isKindOf refset concept"
 		
 end
 
-rule "not satisfies constraint"
+rule "not satisfies rel constraint"
 	
 	when
 		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("concept failing constraint found: \n" + $c.toString());
+   		System.out.println("concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
 		
 end
 
-rule "isKindOf refset concept and not satisfies constraint"
+rule "not satisfies desc constraint"
+	
+	when
+		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,r] SnomedConstraints.FS_SEMANTIC_TAG);
+	then 
+   		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
+		
+end
+
+
+rule "isKindOf refset concept and not satisfies rel constraint"
 	
 	when
 		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX,
 							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("isKindOf refset concept failing constraint found: \n" + $c.toString());
+   		System.out.println("isKindOf refset concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
 		
 end
 
