@@ -1,19 +1,3 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.ihtsdo.tk.drools;
 
 import java.io.IOException;
@@ -30,22 +14,34 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.api.constraint.ConstraintBI;
+import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 
+public class SatisfiesConstraintEvaluatorDefinition implements EvaluatorDefinition {
+	
+	private static final String DEFAULT_PARAMETERS = "x,e,e";
 
-public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
-	public static class IsKindOfEvaluator extends BaseEvaluator {
-
-		public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
+	public static class SatisfiesConstraintEvaluator extends BaseEvaluator {
+		ConstraintCheckType subjectCheck;
+		ConstraintCheckType propertyCheck;
+		ConstraintCheckType valueCheck;
+		
+		public SatisfiesConstraintEvaluator(final ValueType type, final boolean isNegated, String parameterText) {
 			super(type, isNegated ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : IsKindOfEvaluatorDefinition.IS_KIND_OF);
+			if (parameterText == null) {
+				parameterText = DEFAULT_PARAMETERS;
+			}
+		      String [] params = parameterText.toLowerCase().replace(',', ' ').split("\\s+");
+		      subjectCheck = ConstraintCheckType.get(params[0]);
+		      propertyCheck = ConstraintCheckType.get(params[1]);
+		      valueCheck = ConstraintCheckType.get(params[2]);
 		}
 
 		@Override
 		public boolean evaluate(InternalWorkingMemory workingMemory,
 				InternalReadAccessor extractor, Object object, FieldValue value) {
-			return testKindOf(object, value.getValue());
+			return testSatisfiesConstraint(object, value.getValue());
 		}
 
 		@Override
@@ -55,22 +51,15 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 			final Object value1 = leftExtractor.getValue(workingMemory, left);
 			final Object value2 = rightExtractor.getValue(workingMemory, right);
 
-			return testKindOf(value1, value2);
+			return testSatisfiesConstraint(value1, value2);
 		}
 
-		private boolean testKindOf(final Object value1, final Object value2) {
+		private boolean testSatisfiesConstraint(final Object value1, final Object value2) {
 			try {
-				ConceptVersionBI possibleKind = (ConceptVersionBI) value1;
-				Coordinate coordinate = possibleKind.getCoordinate();	
-				ConceptVersionBI parentKind = null;
-				
-				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
-					parentKind = (ConceptVersionBI) value2;
-				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-					parentKind = ((ConceptSpec) value2).get(coordinate);
-				}
-				return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
-			} catch (IOException e) {
+				ConceptVersionBI conceptVersion = (ConceptVersionBI) value1;
+				ConstraintBI constraint = (ConstraintBI) value2;				
+				return this.getOperator().isNegated() ^ (conceptVersion.satisfies(constraint, subjectCheck, propertyCheck, valueCheck));
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -78,35 +67,33 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 		@Override
 		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
 				VariableContextEntry context, Object right) {
-			return testKindOf(((ObjectVariableContextEntry) context).left, right);
+			return testSatisfiesConstraint(((ObjectVariableContextEntry) context).left, right);
 		}
 
 		@Override
 		public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
 				VariableContextEntry context, Object left) {
-			return testKindOf(left, ((ObjectVariableContextEntry) context).right);
+			return testSatisfiesConstraint(left, ((ObjectVariableContextEntry) context).right);
 		}
 
 		@Override
 		public String toString() {
-			return "IsKindOf isKindOf";
+			return "SatisfiesConstraint satisfiesConstraint";
 		}
 
 	}
 
-	public static final Operator IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
-	public static final Operator NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);
-	private static final String[] SUPPORTED_IDS = { IS_KIND_OF.getOperatorString() };
+	public static final Operator SATISFIES_CONSTRAINT = Operator.addOperatorToRegistry("satisfiesConstraint", false);
+	public static final Operator NOT_SATISFIES_CONSTRAINT = Operator.addOperatorToRegistry(SATISFIES_CONSTRAINT.getOperatorString(), true);
+	private static final String[] SUPPORTED_IDS = { SATISFIES_CONSTRAINT.getOperatorString() };
 
-	private Evaluator[] evaluator;
 	@Override
 	public Evaluator getEvaluator(ValueType type, Operator operator) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
+		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), DEFAULT_PARAMETERS);
 	}
 
 	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator,
-			String parameterText) {
+	public Evaluator getEvaluator(ValueType type, Operator operator, String parameterText) {
 		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
 	}
 
@@ -120,14 +107,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 	public Evaluator getEvaluator(ValueType type, String operatorId,
 			boolean isNegated, String parameterText, Target leftTarget,
 			Target rightTarget) {
-		if (evaluator == null) {
-			evaluator = new Evaluator[2];
-		}
-		int index = isNegated ?  0 : 1;
-		if (evaluator[index] == null) {
-			evaluator[index] = new IsKindOfEvaluator(type, isNegated);
-		}
-		return evaluator[index];
+		return new SatisfiesConstraintEvaluator(type, isNegated, parameterText);
 	}
 
 	@Override
@@ -153,12 +133,12 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		evaluator = (Evaluator[]) in.readObject();
+		// Nothing to do...;
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(evaluator);
+		// Nothing to do...;
 	}
 	
 }
