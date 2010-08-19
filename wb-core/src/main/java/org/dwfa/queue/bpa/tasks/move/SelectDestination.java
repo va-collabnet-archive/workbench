@@ -104,8 +104,7 @@ public class SelectDestination extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        // Noting to do.
-
+        // Nothing to do.
     }
 
     /**
@@ -121,5 +120,4 @@ public class SelectDestination extends AbstractTask {
     public int[] getDataContainerIds() {
         return new int[] {};
     }
-
 }
