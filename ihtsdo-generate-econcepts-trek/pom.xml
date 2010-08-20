@@ -10,7 +10,7 @@
 	<artifactId>ihtsdo-generate-econcepts</artifactId>
 	<packaging>pom</packaging>
 	<version>2008-01-31</version>
-	<name>Convert SNOMED Stated and Inferred to eConcepts</name>
+	<name>ihtsdo-generate-econcepts -- Convert SNOMED Stated and Inferred to eConcepts</name>
 	<description>Convert SNOMED SCT RF1 Inferred release to eConcepts</description>
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-sct-stated-econcepts</connection>
