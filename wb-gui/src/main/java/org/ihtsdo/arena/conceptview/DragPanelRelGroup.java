@@ -2,14 +2,16 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.util.Collection;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.Action;
 import javax.swing.TransferHandler;
 
-import org.dwfa.ace.api.I_RelTuple;
+import org.ihtsdo.arena.context.action.I_HandleContext;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
-public class DragPanelRelGroup extends DragPanel<RelGroupForDragPanel> {
+public class DragPanelRelGroup extends DragPanel<RelGroupChronicleBI> {
 
 	
 	/**
@@ -18,12 +20,12 @@ public class DragPanelRelGroup extends DragPanel<RelGroupForDragPanel> {
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelRelGroup() {
-		super();
+	public DragPanelRelGroup(I_HandleContext context) {
+		super(context);
 	}
 
-	public DragPanelRelGroup(LayoutManager layout) {
-		super(layout);
+	public DragPanelRelGroup(LayoutManager layout, I_HandleContext context) {
+		super(layout, context);
 	}
 
 	@Override
@@ -46,28 +48,17 @@ public class DragPanelRelGroup extends DragPanel<RelGroupForDragPanel> {
 		return TransferHandler.COPY;
 	}
 
-	public RelGroupForDragPanel getDraggedRelGroup() {
+	public RelGroupChronicleBI getDraggedRelGroup() {
 		return thingToDrag;
 	}
 	
-	public void setDraggedRelGroup(RelGroupForDragPanel relGroup) {
-		setThingToDrag(relGroup);
-	}
-	public void setDraggedRelGroup(I_RelTuple[] relGroup) {
-		setThingToDrag(new RelGroupForDragPanel(relGroup));
+	public void setDraggedRelGroup(RelGroupChronicleBI relGroup) {
+		setDraggedThing(relGroup);
 	}
 
 	@Override
-	public String getDragPropertyString() {
-		return "draggedRelGroup";
+	protected Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent) {
+		return context.dropOnRelGroup(targetComponent.getNid(), droppedComponent.getNid());
 	}
-
-	@Override
-	protected void addToDropPopupMenu(JPopupMenu popup) {
-		popup.add(new JMenuItem("Add to Rel Group"));
-		popup.add(new JMenuItem("Move to Rel Group"));
-		
-	}
-
 
 }

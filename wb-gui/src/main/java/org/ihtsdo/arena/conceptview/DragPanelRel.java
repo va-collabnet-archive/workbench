@@ -2,13 +2,17 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.util.Collection;
 
-import javax.swing.JPopupMenu;
+import javax.swing.Action;
 import javax.swing.TransferHandler;
 
 import org.dwfa.ace.api.I_RelTuple;
+import org.ihtsdo.arena.context.action.I_HandleContext;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-public class DragPanelRel extends DragPanel<I_RelTuple> {
+public class DragPanelRel extends DragPanel<RelationshipVersionBI> {
 
 	/**
 	 * 
@@ -16,12 +20,12 @@ public class DragPanelRel extends DragPanel<I_RelTuple> {
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelRel() {
-		super();
+	public DragPanelRel(I_HandleContext context) {
+		super(context);
 	}
 
-	public DragPanelRel(LayoutManager layout) {
-		super(layout);
+	public DragPanelRel(LayoutManager layout, I_HandleContext context) {
+		super(layout, context);
 	}
 
 	@Override
@@ -44,24 +48,21 @@ public class DragPanelRel extends DragPanel<I_RelTuple> {
 		return TransferHandler.COPY;
 	}
 
-	public I_RelTuple getThingToDrag() {
+	public RelationshipVersionBI getThingToDrag() {
 		return thingToDrag;
 	}
 
-	public I_RelTuple getDraggedRel() {
+	public RelationshipVersionBI getDraggedRel() {
 		return thingToDrag;
 	}
 	
 	public void setDraggedRel(I_RelTuple rel) {
-		setThingToDrag(rel);
+		setDraggedThing(rel);
 	}
 
 	@Override
-	public String getDragPropertyString() {
-		return "draggedRel";
+	protected Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent) {
+		return context.dropOnRel(targetComponent.getNid(), droppedComponent.getNid());
 	}
-
-	protected void addToDropPopupMenu(JPopupMenu popup) {};
-	
 
 }

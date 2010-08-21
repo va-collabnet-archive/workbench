@@ -2,11 +2,14 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.util.Collection;
 
-import javax.swing.JPopupMenu;
+import javax.swing.Action;
 import javax.swing.TransferHandler;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.ihtsdo.arena.context.action.I_HandleContext;
+import org.ihtsdo.tk.api.ComponentBI;
 
 public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
 
@@ -16,12 +19,12 @@ public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
 	private static final long serialVersionUID = 1L;
 
 	
-	public DragPanelDescription() {
-		super();
+	public DragPanelDescription(I_HandleContext context) {
+		super(context);
 	}
 
-	public DragPanelDescription(LayoutManager layout) {
-		super(layout);
+	public DragPanelDescription(LayoutManager layout, I_HandleContext context) {
+		super(layout, context);
 	}
 
 	@Override
@@ -47,19 +50,9 @@ public class DragPanelDescription extends DragPanel<I_DescriptionTuple> {
 	public I_DescriptionTuple getThingToDrag() {
 		return thingToDrag;
 	}
-
-	public I_DescriptionTuple getDraggedDesc() {
-		return thingToDrag;
-	}
-	
-	public void setDraggedDesc(I_DescriptionTuple desc) {
-		setThingToDrag(desc);
-	}
-
 	@Override
-	public String getDragPropertyString() {
-		return "draggedDesc";
+	protected Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent) {
+		return context.dropOnDesc(targetComponent.getNid(), droppedComponent.getNid());
 	}
-	protected void addToDropPopupMenu(JPopupMenu popup) {};
 
 }

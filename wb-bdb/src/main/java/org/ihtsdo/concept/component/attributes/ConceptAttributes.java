@@ -198,7 +198,6 @@ public class ConceptAttributes
 			}
 			return ConceptAttributes.this.getVariableVersionNids();
 		}
-
 				
 	}
 

@@ -4,17 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
@@ -28,11 +30,21 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class ConceptVersion implements ConceptVersionBI {
 	
 	private Concept concept;
+	public int getConceptNid() {
+		return concept.getConceptNid();
+	}
+
+	public List<UUID> getUUIDs() throws IOException {
+		return concept.getUUIDs();
+	}
+
 	private Coordinate coordinate;
 
 	public ConceptVersion(Concept concept, Coordinate coordinate) {
@@ -49,11 +61,6 @@ public class ConceptVersion implements ConceptVersionBI {
 	@Override
 	public ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException {
 		return concept.getConceptAttributes().getVersion(coordinate);
-	}
-
-	@Override
-	public ConceptChronicleBI getConceptChronicle() {
-		return concept;
 	}
 
 	@Override
@@ -441,6 +448,19 @@ public class ConceptVersion implements ConceptVersionBI {
 	public Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(
 			int typeNid) throws IOException, ContraditionException {
 		return getRelsOutgoingDestinationsActive(new IntSet(new int[] { typeNid }));
+	}
+
+	@Override
+	public Collection<? extends RelGroupVersionBI> getRelGroups()
+			throws IOException, ContraditionException {
+		ArrayList<RelGroupVersionBI> results = new ArrayList<RelGroupVersionBI>();
+		for (RelGroupChronicleBI rgc: concept.getRelGroups()) {
+			RelGroupVersionBI rgv = new RelGroupVersion(rgc, coordinate);
+			if (rgv.getRels().size() > 0) {
+				results.add(rgv);
+			}
+		}
+		return results;
 	}
 
 }

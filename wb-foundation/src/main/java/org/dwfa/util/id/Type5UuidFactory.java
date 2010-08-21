@@ -39,6 +39,8 @@ import java.util.UUID;
 public class Type5UuidFactory {
 
     public static UUID PATH_ID_FROM_FS_DESC = UUID.fromString("5a2e7786-3e41-11dc-8314-0800200c9a66");
+	public static UUID REL_GROUP_NAMESPACE = UUID.fromString("8972fef0-ad53-11df-94e2-0800200c9a66");
+
 
     public static UUID OPCS_CONCEPT_ID = UUID.fromString("26854022-8bd0-11dc-8314-0800200c9a66");
     public static UUID OPCS_DESC_ID = UUID.fromString("26854023-8bd0-11dc-8314-0800200c9a66");

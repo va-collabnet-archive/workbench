@@ -17,6 +17,8 @@
 package org.dwfa.vodb.conflict;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -70,6 +72,16 @@ public class MockTuple implements I_AmTuple {
 					I_Position viewPosition, PathSetReadOnly pomotionPaths,
 					NidSetBI allowedStatus, Precedence precedence)
 					throws IOException, TerminologyException {
+                throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public int getConceptNid() {
+                throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public List<UUID> getUUIDs() throws IOException {
                 throw new UnsupportedOperationException();
 			}
 
@@ -200,6 +212,16 @@ public class MockTuple implements I_AmTuple {
 	public Object makeAnalog(int statusNid, int authorNid, int pathNid,
 			long time) {
 	     throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getConceptNid() {
+        throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<UUID> getUUIDs() throws IOException {
+        throw new UnsupportedOperationException();
 	}
 
 }

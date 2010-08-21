@@ -19,6 +19,10 @@
  */
 package org.dwfa.vodb.conflict;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
 import junit.framework.Assert;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
@@ -44,7 +48,17 @@ public class PartDateOrderSortComparatorTest {
     public class TestPart implements I_AmPart {
         int version;
 
-        public I_AmPart duplicate() {
+		@Override
+		public int getConceptNid() {
+            throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public List<UUID> getUUIDs() throws IOException {
+            throw new UnsupportedOperationException();
+		}
+
+		public I_AmPart duplicate() {
             throw new UnsupportedOperationException();
         }
 

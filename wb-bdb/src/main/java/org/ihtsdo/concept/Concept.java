@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import jsr166y.ConcurrentReferenceHashMap;
@@ -52,6 +55,7 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
+import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
@@ -72,6 +76,8 @@ import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -452,7 +458,15 @@ public class Concept implements I_Transact, I_GetConceptData {
 		return HashFunction.hashCode(new int[] { nid });
 	}
 
+	@Deprecated
 	public List<UUID> getUids() throws IOException {
+		if (getConceptAttributes() != null) {
+			return getConceptAttributes().getUUIDs();
+		}
+		return new ArrayList<UUID>();
+	}
+
+	public List<UUID> getUUIDs() throws IOException {
 		if (getConceptAttributes() != null) {
 			return getConceptAttributes().getUUIDs();
 		}
@@ -1213,8 +1227,8 @@ public class Concept implements I_Transact, I_GetConceptData {
     		Bdb.addXrefPair(r.getC2Id(), npr);
     		if (r.revisions != null) {
         		for (RelationshipRevision p : r.revisions) {
-        			if (p.getTypeId() != r.getTypeNid()) {
-        				npr = NidPair.getTypeNidRelNidPair(p.getTypeId(), nid);
+        			if (p.getTypeNid() != r.getTypeNid()) {
+        				npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), nid);
         				Bdb.addXrefPair(r.getC2Id(), npr);
         			}
         		}
@@ -1422,6 +1436,34 @@ public class Concept implements I_Transact, I_GetConceptData {
 	public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
 			throws IOException {
 		return getSourceRels();
+	}
+
+	@Override
+	public Collection<? extends RelGroupChronicleBI> getRelGroups()
+			throws IOException {
+		ArrayList<RelGroupChronicleBI> results = new ArrayList<RelGroupChronicleBI>();
+		Map<Integer, HashSet<RelationshipChronicleBI>> groupMap = new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
+		
+		for (RelationshipChronicleBI r: getRelsOutgoing()) {
+			for (RelationshipVersionBI rv: r.getVersions()) {
+				int group = rv.getGroup();
+				if (group > 0) {
+					HashSet<RelationshipChronicleBI> relsInGroup = groupMap.get(group);
+					if (relsInGroup == null) {
+						relsInGroup = new HashSet<RelationshipChronicleBI>();
+						groupMap.put(group, relsInGroup);
+					}
+					relsInGroup.add(r);
+				}
+			}
+		}
+		
+		for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry:  groupMap.entrySet()) {
+			results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
+		}
+		return results;
+		
+		
 	}
 
 }

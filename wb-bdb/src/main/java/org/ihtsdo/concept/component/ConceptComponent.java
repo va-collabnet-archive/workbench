@@ -19,7 +19,6 @@ import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -55,7 +54,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
 
-    public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
+	public static void addNidToBuffer(StringBuffer buf, int nidToConvert) {
         try {
             if (nidToConvert != 0 && Terms.get().hasConcept(nidToConvert)) {
                 buf.append("\"");
@@ -300,6 +299,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             super();
             this.index = index;
         }
+
+		@Override
+		public int getConceptNid() {
+			return enclosingConceptNid;
+		}
 
         public R getRevision() {
             if (index >= 0) {
@@ -1589,6 +1593,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 			return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
 		}
 		return false;
+	}
+
+
+    @Override
+	public int getConceptNid() {
+		return enclosingConceptNid;
 	}
 
 }

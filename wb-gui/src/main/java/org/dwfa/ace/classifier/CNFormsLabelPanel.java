@@ -96,7 +96,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
     public static class ConceptAttrVersion implements I_ConceptAttributeTuple {
         I_ConceptAttributeVersioned core;
 
-        public List<UUID> getUUIDs() {
+        public List<UUID> getUUIDs() throws IOException {
 			return core.getUUIDs();
 		}
 
@@ -318,13 +318,18 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		public void setAuthorNid(int authorNid) {
 			part.setAuthorNid(authorNid);
 		}
+
+		@Override
+		public int getConceptNid() {
+			return part.getConceptNid();
+		}
     }
 
     
     private static class RelVersion implements I_RelTuple {
 
         I_RelVersioned fixedPart;
-        public List<UUID> getUUIDs() {
+        public List<UUID> getUUIDs() throws IOException {
 			return fixedPart.getUUIDs();
 		}
 
@@ -351,6 +356,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 		}
 
 		public int getOriginNid() {
+			return fixedPart.getOriginNid();
+		}
+
+		public int getConceptNid() {
 			return fixedPart.getOriginNid();
 		}
 

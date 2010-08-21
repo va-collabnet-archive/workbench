@@ -8,7 +8,7 @@ import java.util.List;
  * <p>
  * Given a component's tuples and an optional time point (latest is assumed
  * without a time point), implementations of this interface will calculate the
- * "conflict resolved view" of the component at that time point.
+ * "contradiction resolved view" of the component at that time point.
  */
 
 public interface ContradictionManagerBI {

@@ -6,8 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +28,13 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.context.action.ContextualActions;
 import org.ihtsdo.arena.drools.EditPanelKb;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecBI;
@@ -46,12 +50,15 @@ public class ConceptView extends JPanel {
 
 	private ConceptViewSettings settings;
 	
+	private ContextualActions context;
+	
 	private EditPanelKb kb;
 
 	public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings) {
 		super();
 		this.config = config;
 		this.settings = settings;
+		this.context = new ContextualActions(config);
 		kb = new EditPanelKb(config);
 	}
 	
@@ -65,17 +72,6 @@ public class ConceptView extends JPanel {
 				List<? extends I_RelTuple> rels = concept.getSourceRelTuples(config.getAllowedStatus(), 
 						null, config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), config.getConflictResolutionStrategy());
-				HashMap<Integer, List<I_RelTuple>> relGroups = new HashMap<Integer, List<I_RelTuple>>();
-				
-				
-				for (I_RelTuple r: rels) {
-					 List<I_RelTuple> group = relGroups.get(r.getGroup());
-					 if (group == null) {
-						 group = new ArrayList<I_RelTuple>();
-						 relGroups.put(r.getGroup(), group);
-					 }
-					 group.add(r);
-				}
 				GridBagConstraints gbc = new GridBagConstraints();
 				gbc.weightx = 1;
 				gbc.weighty = 0;
@@ -94,16 +90,23 @@ public class ConceptView extends JPanel {
 					gbc.gridy++;
 				}
 				
-				List<I_RelTuple> group = relGroups.get(0);
-				if (group != null) {
-					for (I_RelTuple r: group) {
-						this.add(getRelComponent(r), gbc);
-						gbc.gridy++;
-					}				
+				Coordinate coordinate = new Coordinate(config.getPrecedence(), config.getViewPositionSetReadOnly(), 
+						config.getAllowedStatus(), config.getDestRelTypes(), config.getConflictResolutionStrategy());
+				
+				try {
+					Collection<? extends RelGroupVersionBI> group = Ts.get().getConceptVersion(coordinate, concept.getNid()).getRelGroups();
+					if (group != null) {
+						for (RelGroupVersionBI r: group) {
+							this.add(getRelGroupComponent(r), gbc);
+							gbc.gridy++;
+						}				
+					}
+				} catch (ContraditionException e) {
+					AceLog.getAppLog().alertAndLogException(e);
 				}
-				for (Entry<Integer, List<I_RelTuple>> e: relGroups.entrySet()) {
-					if (e.getKey() != 0) {
-						this.add(getRelGroupComponent(e.getValue()), gbc);
+				for (I_RelTuple r: rels) {
+					if (r.getGroup() == 0) {
+						this.add(getRelComponent(r), gbc);
 						gbc.gridy++;
 					}
 				}	
@@ -131,9 +134,9 @@ public class ConceptView extends JPanel {
 		}
 	}
 	
-	public JComponent getRelGroupComponent(List<I_RelTuple> group) throws TerminologyException, IOException {
-		DragPanelRelGroup relPanel = new DragPanelRelGroup(new GridBagLayout());
-		relPanel.setupDrag(new RelGroupForDragPanel(group));
+	public JComponent getRelGroupComponent(RelGroupVersionBI group) throws TerminologyException, IOException, ContraditionException {
+		DragPanelRelGroup relPanel = new DragPanelRelGroup(new GridBagLayout(), context);
+		relPanel.setupDrag(group);
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel relLabel = getJLabel(" ");
 		relLabel.setBackground(Color.GREEN);
@@ -143,7 +146,7 @@ public class ConceptView extends JPanel {
 		gbc.weightx = 0;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridheight = group.size();
+		gbc.gridheight = group.getRels().size();
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -152,7 +155,7 @@ public class ConceptView extends JPanel {
 		gbc.gridx = 1;
 		gbc.weightx = 1;
 		gbc.gridheight = 1;
-		for (I_RelTuple r: group) {
+		for (RelationshipVersionBI r: group.getRels()) {
 			relPanel.add(getRelComponent(r), gbc);
 			gbc.gridy++;
 		}
@@ -161,7 +164,7 @@ public class ConceptView extends JPanel {
 	
 	
 	public JComponent getDescComponent(I_DescriptionTuple desc) throws TerminologyException, IOException {
-		DragPanelDescription descPanel = new DragPanelDescription(new GridBagLayout());
+		DragPanelDescription descPanel = new DragPanelDescription(new GridBagLayout(), context);
 		descPanel.setupDrag(desc);
 		descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel descLabel = getJLabel(" ");
@@ -256,7 +259,7 @@ public class ConceptView extends JPanel {
 
 	
 	public JComponent getDescTemplate(DescriptionSpec desc) throws TerminologyException, IOException {
-		DragPanelDescription descPanel = new DragPanelDescription(new GridBagLayout());
+		DragPanelDescription descPanel = new DragPanelDescription(new GridBagLayout(), context);
 		//descPanel.setupDrag(desc);
 		descPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel descLabel = getJLabel("T");
@@ -354,7 +357,7 @@ public class ConceptView extends JPanel {
 				config.getViewPositionSetReadOnly(), config
 						.getAllowedStatus(), config.getDestRelTypes(),
 				config.getConflictResolutionStrategy());
-		DragPanelRel relPanel = new DragPanelRel(new GridBagLayout());
+		DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), context);
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel relLabel = getJLabel("T");
 		relLabel.setBackground(Color.YELLOW);
@@ -381,8 +384,8 @@ public class ConceptView extends JPanel {
 		return relPanel;
 	}
 
-	public JComponent getRelComponent(I_RelTuple r) throws TerminologyException, IOException {
-		DragPanelRel relPanel = new DragPanelRel(new GridBagLayout());
+	public JComponent getRelComponent(RelationshipVersionBI r) throws TerminologyException, IOException {
+		DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), context);
 		relPanel.setupDrag(r);
 		relPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		JLabel relLabel = getJLabel(" ");
@@ -404,7 +407,7 @@ public class ConceptView extends JPanel {
 		relPanel.add(new JSeparator(SwingConstants.VERTICAL), gbc);
 		gbc.weightx = 1;		
 		gbc.gridx++;
-		relPanel.add(getLabel(r.getC2Id()), gbc);
+		relPanel.add(getLabel(r.getDestinationNid()), gbc);
 		return relPanel;
 	}
 

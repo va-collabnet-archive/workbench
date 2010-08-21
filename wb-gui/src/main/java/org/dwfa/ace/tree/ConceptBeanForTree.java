@@ -51,6 +51,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -59,10 +60,20 @@ import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
-    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
+    public Collection<? extends RelGroupChronicleBI> getRelGroups()
+			throws IOException, ContraditionException {
+		return bean.getRelGroups();
+	}
+
+	public List<UUID> getUUIDs() throws IOException {
+		return bean.getUUIDs();
+	}
+
+	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
 			NidSetBI allowedStatus, PositionSetBI positions,
 			Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException,

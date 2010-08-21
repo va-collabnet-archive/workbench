@@ -627,17 +627,17 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 			TerminologyException {
 		UniversalAceRelationship universal = new UniversalAceRelationship(
 				getEnclosingConcept().getUidsForComponent(nid), 
-				getEnclosingConcept().getUids(), 
-				Bdb.getConceptDb().getConcept(c2Nid).getUids(),
+				getEnclosingConcept().getUUIDs(), 
+				Bdb.getConceptDb().getConcept(c2Nid).getUUIDs(),
 				revisions.size());
 		for (Version part : getVersions()) {
 			UniversalAceRelationshipPart universalPart = new UniversalAceRelationshipPart();
-			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathNid()).getUids());
-			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusNid()).getUids());
-			universalPart.setCharacteristicId(Bdb.getConceptDb().getConcept(part.getCharacteristicId()).getUids());
+			universalPart.setPathId(Bdb.getConceptDb().getConcept(part.getPathNid()).getUUIDs());
+			universalPart.setStatusId(Bdb.getConceptDb().getConcept(part.getStatusNid()).getUUIDs());
+			universalPart.setCharacteristicId(Bdb.getConceptDb().getConcept(part.getCharacteristicId()).getUUIDs());
 			universalPart.setGroup(part.getGroup());
-			universalPart.setRefinabilityId(Bdb.getConceptDb().getConcept(part.getRefinabilityId()).getUids());
-			universalPart.setTypeId(Bdb.getConceptDb().getConcept(part.getTypeNid()).getUids());
+			universalPart.setRefinabilityId(Bdb.getConceptDb().getConcept(part.getRefinabilityNid()).getUUIDs());
+			universalPart.setTypeId(Bdb.getConceptDb().getConcept(part.getTypeNid()).getUUIDs());
 			universalPart.setTime(part.getTime());
 			universal.addVersion(universalPart);
 		}

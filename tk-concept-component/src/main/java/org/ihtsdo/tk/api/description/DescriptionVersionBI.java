@@ -7,8 +7,6 @@ public interface DescriptionVersionBI
 	extends TypedComponentVersionBI, 
 			DescriptionChronicleBI, 
 			AnalogGeneratorBI<DescriptionAnalogBI> {
-
-	public int getConceptNid();
 	
 	public String getText();
 

@@ -13,19 +13,25 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.arena.context.action.I_HandleContext;
+import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
-public abstract class DragPanel<T> extends JPanel implements Transferable {
+public abstract class DragPanel<T extends ComponentBI> extends JPanel implements Transferable {
 	protected class DragPanelTransferHandler extends TransferHandler {
 
 		
@@ -117,15 +123,19 @@ public abstract class DragPanel<T> extends JPanel implements Transferable {
 
 	private boolean dragEnabled;
 	
+	@SuppressWarnings("unused")
 	private Set<DataFlavor> supportedImportFlavors = null;
 	
+	protected I_HandleContext context;
 	
-	public DragPanel() {
+	public DragPanel(I_HandleContext context) {
 		super();
+		this.context = context;
 	}
 
-	public DragPanel(LayoutManager layout) {
+	public DragPanel(LayoutManager layout, I_HandleContext context) {
 		super(layout);
+		this.context = context;
 	}
 
 	public T getThingToDrag() {
@@ -136,28 +146,42 @@ public abstract class DragPanel<T> extends JPanel implements Transferable {
 		return DragPanelDataFlavors.dragPanelFlavorSet;
 	}
 	
-	public void setThingToDrag(T thingToDrag) {
+	public void setDraggedThing(Object draggedThing) {
 		JPopupMenu popup = new JPopupMenu();
-        JMenuItem copyItem = new JMenuItem("Copy to Concept");
-        popup.add(copyItem);
-        JMenuItem moveItem = new JMenuItem("Move to Concept");
-        popup.add(moveItem);
-        
-		Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-        SwingUtilities.convertPointFromScreen(mouseLocation, this);
-        popup.show(this, mouseLocation.x, mouseLocation.y);
+		
+		if (ComponentBI.class.isAssignableFrom(draggedThing.getClass())) {
+			ComponentBI component = (ComponentBI) draggedThing;
+	     	for (Action a: getActions(thingToDrag, component)) {
+	    		popup.add(a);
+	    	}
+		}
+		
+		if (DescriptionChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
+			DescriptionChronicleBI desc = (DescriptionChronicleBI) draggedThing;
+	     	for (Action a: context.dropOnDesc(desc.getConceptNid(), desc.getNid())) {
+	    		popup.add(a);
+	    	}
+		} else if (RelationshipChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
+			
+		} else if (ConceptChronicleBI.class.isAssignableFrom(draggedThing.getClass())) {
+			
+		}
+
+		if (popup.getComponentCount() > 0) {
+			Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+	        SwingUtilities.convertPointFromScreen(mouseLocation, this);
+	        popup.show(this, mouseLocation.x, mouseLocation.y);
+		}
 	}
 
-	protected abstract void addToDropPopupMenu(JPopupMenu popup);
-	
-	public abstract String getDragPropertyString();
-	
+	protected abstract Collection<Action> getActions(ComponentBI targetComponent, ComponentBI droppedComponent);
+
 	public void setupDrag(T thingToDrag) {
 		// I_RelTuple r
 		// List<I_RelTuple> group
 		// I_DescriptionVersioned desc
 		this.thingToDrag = thingToDrag;
-		this.setTransferHandler(new DragPanelTransferHandler(getDragPropertyString()));
+		this.setTransferHandler(new DragPanelTransferHandler("draggedThing"));
 		this.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				int mode = getTransferMode(); 

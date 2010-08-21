@@ -93,7 +93,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
 	@Override
 	public void addUncommitted(ConceptVersionBI cv) throws IOException {
-		commit(cv.getConceptChronicle());
+		commit(cv);
 	}
 
 	@Override

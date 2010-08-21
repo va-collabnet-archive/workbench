@@ -57,7 +57,7 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
 	@Override
 	public void addUncommitted(ConceptVersionBI cv) throws IOException {
-		BdbCommitManager.addUncommitted(cv.getConceptChronicle());
+		BdbCommitManager.addUncommitted(cv);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
 	@Override
 	public void commit(ConceptVersionBI cv) throws IOException {
-		commit(cv.getConceptChronicle());
+		commit(cv);
 	}
 
 	@Override

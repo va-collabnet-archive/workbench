@@ -303,4 +303,9 @@ public abstract class Revision<V extends Revision<V, C>,
         }
 	}
 
+    @Override
+	public int getConceptNid() {
+		return primordialComponent.enclosingConceptNid;
+	}
+
 }
