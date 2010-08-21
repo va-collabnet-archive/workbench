@@ -12,10 +12,11 @@
 	<version>2008-01-31</version>
 	<name>ihtsdo-generate-econcepts -- Convert SNOMED Stated and Inferred to eConcepts</name>
 	<description>Convert SNOMED SCT RF1 Inferred release to eConcepts</description>
+
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-sct-stated-econcepts</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/wb-refset-sab/trunk/wb-refset-sab/ihtsdo-sct-stated-econcepts</developerConnection>
-		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/trunk/wb-refset-sab/ihtsdo-sct-stated-econcepts/?root=wb-refset-sab&amp;system=exsy1002</url>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk/ihtsdo-generate-econcepts-trek</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/wb-sample-pa/trunk/ihtsdo-generate-econcepts-trek</developerConnection>
+		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/workbench/wb-sample-pa/trunk/ihtsdo-generate-econcepts-trek/?wb-sample-pa&amp;system=exsy1002</url>
 	</scm>
 	<distributionManagement>
 	<site>
