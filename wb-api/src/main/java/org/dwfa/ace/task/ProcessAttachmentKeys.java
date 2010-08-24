@@ -132,7 +132,8 @@ public enum ProcessAttachmentKeys {
     REVIEWER_1_ROLE_INBOX,
     REVIEWER_2_ROLE_INBOX,
     SME_ROLE_INBOX,
-    EDITORIAL_BOARD_ROLE_INBOX;
+    EDITORIAL_BOARD_ROLE_INBOX,
+    LAST_USER_TASKID;
 
     public String getAttachmentKey() {
         return "A: " + this.name();
