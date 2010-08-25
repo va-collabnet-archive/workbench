@@ -19,7 +19,7 @@
     <parent>
         <groupId>au.gov.nehta</groupId>
         <artifactId>ace-modules</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.gov.nehta</groupId>
@@ -27,9 +27,9 @@
 	<packaging>jar</packaging>
     <name>DWFA foundation module</name>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/foundation/branches/nehta</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/foundation/branches/nehta</developerConnection>
-        <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.dwfa/scm</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.10</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.10</developerConnection>
+        <url>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/nehta/ace-modules-1.10</url>
     </scm>
     <dependencies>
         <dependency>
