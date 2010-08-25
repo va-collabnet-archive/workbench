@@ -60,7 +60,7 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 	 * Output directory
 	 *  *** CHANGE-ME ***
 	 * @parameter default-value=
-	 *            "${project.build.directory}/generated-resources/info/healthbase/dita/proc-lib"
+	 *            "${project.build.directory}/generated-resources/org/ihtsdo/dita/proc-lib"
 	 * @required  
 	 */
 	private File outputDirectory;
@@ -205,12 +205,12 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 	 */
 	private class ProcessDoc {
 		public String name =" ";
-		public String description = " ";
+		public String description = "";
 		public String author = "Informatics Inc.";
 		public String originator = "";
 		public String subject = "unknown";
 		public String detail = "no detail provided.";
-		public String location = " ";
+		public String location = "";
 		public Integer taskCount = 0;
 		public Integer internalAttachmentCount = 0;
 		public Integer exportedAttachmentCount = 0;
@@ -279,7 +279,6 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 	  }
 	}
 
-	
 	/*
 	 * =================================================================
 	 * 
@@ -435,46 +434,47 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 						processDoc.implClass  = processFile.getName();
 						processDoc.subject    = process.getSubject();
 						processDoc.name       = process.getName();
-				 		for (int i=0; i<inputDirectories.length; i++) {
-				 			String prefix = inputDirectories[i] + fileSep;
-						    if (processFile.getPath().startsWith(prefix)) {
-						    	processDoc.location = processFile.getParent().replaceFirst(prefix, "");
-						    }
-				 		}
-						processDoc.description = process.getProcessDocumentationSource();
-						if (processDoc.description == null) {
-							processDoc.description = ""; 
+						for (int i=0; i<inputDirectories.length; i++) {
+							String prefix = inputDirectories[i] + fileSep;
+							if (processFile.getParent() != null ) {
+								if (processFile.getParent().startsWith(prefix)) {
+									processDoc.location = processFile.getParent().substring( prefix.length());
+								}
+							}
 						}
-						if (processDoc.subject == null) {
-							processDoc.subject = ""; 
-						}
-						if (processDoc.location == null) {
-							processDoc.location = ""; 
-						}
-						//Collection<I_DefineTask> taskCollection = process.getTasks();
-						Iterator<I_DefineTask> taskItr = process.getTasks().iterator();
-						processDoc.taskCount = 0;
-				        while (taskItr.hasNext()) {
-				            I_DefineTask task = taskItr.next();
-				            if (task != null) {
-				            	processDoc.taskCount++;
-				            	TaskInfo taskInfo = new TaskInfo();
-				                BeanInfo beanInfo = task.getBeanInfo();
-						        debug("               task Name: " + task.getName());
-						        taskInfo.name = task.getName();
-						        
-								//String clean = StringEscapeUtils.unescapeHtml(beanInfo.getBeanDescriptor().getDisplayName());
-								String clean = beanInfo.getBeanDescriptor().getDisplayName();
-								clean = clean.replaceAll("<br>", " ");
-								taskInfo.description = clean.replaceAll(htmlRegex,"");
+					processDoc.description = process.getProcessDocumentationSource();
+					if (processDoc.description == null) {
+						processDoc.description = ""; 
+					}
+					if (processDoc.subject == null) {
+						processDoc.subject = ""; 
+					}
+					if (processDoc.location == null) {
+						processDoc.location = ""; 
+					}
+					Iterator<I_DefineTask> taskItr = process.getTasks().iterator();
+					processDoc.taskCount = 0;
+					while (taskItr.hasNext()) {
+						I_DefineTask task = taskItr.next();
+						if (task != null) {
+							processDoc.taskCount++;
+							TaskInfo taskInfo = new TaskInfo();
+							BeanInfo beanInfo = task.getBeanInfo();
+							debug("               task Name: " + task.getName());
+							taskInfo.name = task.getName();
 
-						        processDoc.tasks.put(task.getName(), taskInfo);
-				                PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
-				                for (int i = 0; i < properties.length; i++) {
-				                    debug("                          task property: " + properties[i].getName());
-				                }           		
-				            }
-				        }
+							//String clean = StringEscapeUtils.unescapeHtml(beanInfo.getBeanDescriptor().getDisplayName());
+							String clean = beanInfo.getBeanDescriptor().getDisplayName();
+							clean = clean.replaceAll("<br>", " ");
+							taskInfo.description = clean.replaceAll(htmlRegex,"");
+
+							processDoc.tasks.put(task.getName(), taskInfo);
+							PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
+							for (int i = 0; i < properties.length; i++) {
+								debug("                          task property: " + properties[i].getName());
+							}           		
+						}
+					}
 				        processDoc.internalAttachments = getInternalAttachmentInfo(process);
 				        processDoc.exportedAttachments = getExportedAttachmentInfo(process);
 				        processDoc.exportedTaskProperties = getExportedTaskPropertyInfo(process);
@@ -632,10 +632,10 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 		}
 
 		private void checkMisssingInfo() {
-			
+
 			List<String> badProcessList = new ArrayList<String>();
 			info("checking the " + processDocs.size() + " processs' data..");
-			
+
 			for (String process : processDocs.keySet()) {
 				if (process.equals(" ")) {
 					warn("Blank Bean name for process \"" + processDoc.name + "\" : SUPRESSING topic file");
@@ -676,7 +676,7 @@ public class GenerateDitaBusinessProcessTopicsMojo extends AbstractMojo {
 			}
 			info("removed data for " + badProcessList.size() + " processs.");
 		}
-		
+
 		
 		private HashMap<String, InternalAttachmentInfo> getInternalAttachmentInfo(I_EncodeBusinessProcess process) throws IntrospectionException {
 
