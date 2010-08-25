@@ -892,6 +892,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { FILE_LINK_CATEGORY }),
                     TRANSLATION_BUSINESS_PROCESS_CATEGORY("translation business process",
                     		new I_ConceptualizeUniversally[] { BUSINESS_PROCESS_CATEGORY }),
+                            TRANSLATION_QUEUE_UTILS_CATEGORY("translation queue utils",
+                            		new I_ConceptualizeUniversally[] { BUSINESS_PROCESS_CATEGORY }),
         	SEMTAGS_ROOT("semantic tags",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                     SEMTAG_SNOMED_ROOT("SNOMED RT+CTV3",
