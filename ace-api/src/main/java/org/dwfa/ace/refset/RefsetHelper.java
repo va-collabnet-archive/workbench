@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,14 +55,14 @@ public class RefsetHelper extends LineageHelper {
 
     protected Set<Integer> activeStatusIds;
     protected Set<Integer> inactiveStatusIds;
-    
+
     protected int unspecifiedUuid;
 
     protected Set<I_Path> editPaths;
 
     public RefsetHelper() {
         super();
-        
+
         try {
             currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
             retiredStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
@@ -70,7 +70,7 @@ public class RefsetHelper extends LineageHelper {
         } catch (Exception e) {
             throw new TerminologyRuntimeException(e);
         }
-        
+
         StatusHelper statusHelper = new StatusHelper();
         activeStatusIds = statusHelper.getActiveStatuses();
         inactiveStatusIds = statusHelper.getInactiveStatuses();
@@ -79,11 +79,11 @@ public class RefsetHelper extends LineageHelper {
     /**
      * Get the latest, current concept extension part for the FIRST extension
      * matching a specific refset.
-     * 
+     *
      * @param refsetId int
      * @param conceptId int
      * @return I_ThinExtByRefPartConcept with a status of current.
-     * 
+     *
      * @throws Exception if cannot get all extension for a concept id..
      */
     public I_ThinExtByRefPartConcept getFirstCurrentRefsetExtension(int refsetId, int conceptId) throws Exception {
@@ -113,10 +113,10 @@ public class RefsetHelper extends LineageHelper {
      * Obtain all current extensions (latest part only) for a particular refset
      * that exist on a
      * specific concept.
-     * 
+     *
      * This method is strongly typed. The caller must provide the actual type of
      * the refset.
-     * 
+     *
      * @param <T> the strong/concrete type of the refset extension
      * @param refsetId Only returns extensions matching this reference set
      * @param conceptId Only returns extensions that exists on this concept
@@ -151,8 +151,8 @@ public class RefsetHelper extends LineageHelper {
         }
 
         return result;
-    }    
-    
+    }
+
     public <T extends I_ThinExtByRefPart> T getLatestCurrentRefsetExtensions(int refsetId, int conceptId)
             throws Exception {
         T latestPart = null;
@@ -203,7 +203,7 @@ public class RefsetHelper extends LineageHelper {
 
     /**
      * Add a concept to a refset
-     * 
+     *
      * @param refsetId The subject refset
      * @param conceptId The concept to be added
      * @param type The class of extension to be created (must extend I_ThinExtByRefPart)
@@ -219,17 +219,13 @@ public class RefsetHelper extends LineageHelper {
         }
 
         //check for a retired version which needs to be reactivated (rather than creating a new extension)
-        I_ThinExtByRefVersioned extension = getInactiveExtension(refsetId, conceptId, extProps);       
-        
-        if (extension == null) {
-            // create a new extension (with a part for each path the user is editing)
-        UUID uuid = UUID.nameUUIDFromBytes(("org.dwfa." + termFactory.getUids(conceptId) + termFactory.getUids(refsetId)).getBytes("8859_1"));
+        I_ThinExtByRefVersioned extension = getInactiveExtension(refsetId, conceptId, extProps);
 
-        int newMemberId = termFactory.uuidToNativeWithGeneration(uuid, unspecifiedUuid, getEditPaths(),
-            Integer.MAX_VALUE);
-            extension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
+        if (extension == null) {
+	        int newMemberId = termFactory.uuidToNativeWithGeneration(UUID.randomUUID(), unspecifiedUuid, getEditPaths(), Integer.MAX_VALUE);
+	        extension = termFactory.newExtension(refsetId, newMemberId, conceptId, type);
         }
-        
+
         for (I_Path editPath : getEditPaths()) {
 
             I_ThinExtByRefPart newPart = termFactory.newExtensionPart(type);
@@ -247,16 +243,16 @@ public class RefsetHelper extends LineageHelper {
         return true;
     }
 
-    
-    
-    private I_ThinExtByRefVersioned getInactiveExtension(int refsetId, int conceptId, final BeanPropertyMap extProps) 
+
+
+    private I_ThinExtByRefVersioned getInactiveExtension(int refsetId, int conceptId, final BeanPropertyMap extProps)
             throws Exception {
 
         I_ThinExtByRefVersioned result = null;
-        
+
         // Ignore the status, just need to compare the value(s) (c1id, c2id, etc)
         BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);
-        
+
         for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
             if (extension.getRefsetId() == refsetId) {
                 I_ThinExtByRefPart part = extension.getLatestVersion();
@@ -267,12 +263,12 @@ public class RefsetHelper extends LineageHelper {
                 }
             }
         }
-        
+
         return result;
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param refsetId
      * @param conceptId
@@ -284,6 +280,7 @@ public class RefsetHelper extends LineageHelper {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public <T extends I_ThinExtByRefPart> boolean newRefsetExtension(int refsetId, int conceptId, Class<T> type,
             final BeanPropertyMap extProps, UUID memberUuid, UUID pathUuid, int effectiveTime) throws Exception {
 
@@ -321,7 +318,7 @@ public class RefsetHelper extends LineageHelper {
 
     /**
      * Remove a concept from a refset
-     * 
+     *
      * @param refsetId The subject refset
      * @param conceptId The concept to be removed
      * @param memberTypeId The value of the concept extension to be removed (the
@@ -362,7 +359,7 @@ public class RefsetHelper extends LineageHelper {
         return false;
     }
 
-   
+
     /**
      * @return The edit paths from the active config.
      *         Returns null if no config set or the config defines no paths for
@@ -481,71 +478,71 @@ public class RefsetHelper extends LineageHelper {
 
     /**
      * Create a new refset.
-     *  
+     *
      * @param refsetType
-     *          The refset type will be determined by the type of extension to be added (eg I_ThinExtByRefPartConcept.class). 
+     *          The refset type will be determined by the type of extension to be added (eg I_ThinExtByRefPartConcept.class).
      *          This should be the same type intended for use in {@link #newRefsetExtension(int, int, Class, BeanPropertyMap)}.
-     *               
-     * @param purpose 
-     *          The destination concept for the refset purpose relationship. 
-     *          Should be a descendant of {@link RefsetAuxiliary.Concept.REFSET_PURPOSE} 
+     *
+     * @param purpose
+     *          The destination concept for the refset purpose relationship.
+     *          Should be a descendant of {@link RefsetAuxiliary.Concept.REFSET_PURPOSE}
      *          (eg {@link RefsetAuxiliary.Concept.REFSET_MEMBER_PURPOSE}).
-     *            
+     *
      * @param description
-     *          The name for the new refset             
-     *             
+     *          The name for the new refset
+     *
      * @return The concept defining the new refset
      */
-    public static <T extends I_ThinExtByRefPart> I_GetConceptData newRefset(Class<T> refsetType, String description, I_ConceptualizeUniversally purpose) 
+    public static <T extends I_ThinExtByRefPart> I_GetConceptData newRefset(Class<T> refsetType, String description, I_ConceptualizeUniversally purpose)
             throws Exception {
-        
+
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
         // Load references
 
-        I_ConceptualizeLocally fullySpecifiedName = 
+        I_ConceptualizeLocally fullySpecifiedName =
             ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize();
-        I_ConceptualizeLocally preferredTerm = 
+        I_ConceptualizeLocally preferredTerm =
             ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize();
-        
-        I_GetConceptData isARel = 
+
+        I_GetConceptData isARel =
             //termFactory.getConcept(SNOMED.Concept.IS_A.localize().getNid());
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        I_GetConceptData refsetIdentity = 
+        I_GetConceptData refsetIdentity =
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
-        I_GetConceptData definingCharacteristic = 
+        I_GetConceptData definingCharacteristic =
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid());
-        I_GetConceptData optionalRefinability = 
+        I_GetConceptData optionalRefinability =
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid());
-        I_GetConceptData currentStatus = 
+        I_GetConceptData currentStatus =
             termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        I_GetConceptData refsetTypeRel = 
+        I_GetConceptData refsetTypeRel =
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.localize().getNid());
-        I_GetConceptData refsetPurposeRel = 
+        I_GetConceptData refsetPurposeRel =
             termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());
 
         I_GetConceptData conceptExtType =
             termFactory.getConcept(termFactory.getRefsetTypeIdByExtensionType(refsetType));
         I_GetConceptData refsetPurpose =
             termFactory.getConcept(purpose.localize().getNid());
-        
+
         I_GetConceptData newRefsetConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
         termFactory.newDescription(
             UUID.randomUUID(), newRefsetConcept, "en-AU", description.concat(" (refset)"), fullySpecifiedName, config);
         termFactory.newDescription(
             UUID.randomUUID(), newRefsetConcept, "en-AU", description, preferredTerm, config);
         termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, isARel, refsetIdentity, 
+            UUID.randomUUID(), newRefsetConcept, isARel, refsetIdentity,
             definingCharacteristic, optionalRefinability, currentStatus, 0, config);
         termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, refsetTypeRel, conceptExtType, 
+            UUID.randomUUID(), newRefsetConcept, refsetTypeRel, conceptExtType,
             definingCharacteristic, optionalRefinability, currentStatus, 0, config);
         termFactory.newRelationship(
-            UUID.randomUUID(), newRefsetConcept, refsetPurposeRel, refsetPurpose, 
-            definingCharacteristic, optionalRefinability, currentStatus, 0, config);        
-        
+            UUID.randomUUID(), newRefsetConcept, refsetPurposeRel, refsetPurpose,
+            definingCharacteristic, optionalRefinability, currentStatus, 0, config);
+
         return newRefsetConcept;
     }
-    
+
 }

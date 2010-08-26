@@ -63,7 +63,9 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
 
     UUID activeNid = null;
     UUID inactiveNid = null;
-    protected static final String COMPONENT_ID = "COMPONENT_ID";
+    protected Integer unspecifiedNid = null;
+
+	protected static final String COMPONENT_ID = "COMPONENT_ID";
     protected static final String STATUS_ID = "STATUS_ID";
     protected static final String VERSION = "VERSION";
     protected static final String PATH_ID = "PATH_ID";
@@ -131,6 +133,18 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
     public String getHeaderLine() {
         return BASIC_REFSET_HEADER;
     }
+
+    /**
+	 * @return the unspecifiedUuid
+     * @throws TerminologyException
+     * @throws IOException
+	 */
+	public final int getUnspecifiedNid() throws IOException, TerminologyException {
+		if (unspecifiedNid == null) {
+			unspecifiedNid = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid();
+		}
+		return unspecifiedNid;
+	}
 
     /**
      * @param tuple
@@ -532,9 +546,7 @@ public abstract class MemberRefsetHandler extends IterableFileReader<I_ThinExtBy
         }
 
         if (versioned == null) {
-            memberNid = getTermFactory().uuidToNativeWithGeneration(memberUuid,
-                ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.localize().getNid(), getTermFactory().getPaths(),
-                Integer.MAX_VALUE);
+            memberNid = getTermFactory().uuidToNativeWithGeneration(memberUuid, getUnspecifiedNid(), getTermFactory().getPaths(), Integer.MAX_VALUE);
 
             if (isTransactional()) {
                 versioned = getTermFactory().newExtension(refsetNid, memberNid, componentNid,
