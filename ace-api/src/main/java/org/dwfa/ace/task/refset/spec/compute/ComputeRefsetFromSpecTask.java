@@ -33,6 +33,7 @@ import java.util.UUID;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.api.BeanPropertyMap;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
@@ -40,9 +41,11 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.ebr.I_ThinExtByRefPartConcept;
 import org.dwfa.ace.api.ebr.I_ThinExtByRefVersioned;
+import org.dwfa.ace.api.ebr.ThinExtByRefPartProperty;
 import org.dwfa.ace.refset.ConceptConstants;
-import org.dwfa.ace.refset.spec.SpecMemberRefsetHelper;
+import org.dwfa.ace.refset.MemberRefsetHelper;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
@@ -185,8 +188,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             RefsetSpecQuery query =
                     RefsetQueryFactory.createQuery(configFrame, termFactory, refsetSpec, refset,
                         RefsetComputeType.CONCEPT);
-            SpecMemberRefsetHelper memberRefsetHelper =
-                    new SpecMemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
+            MemberRefsetHelper memberRefsetHelper =
+                    new MemberRefsetHelper(refset.getConceptId(), normalMemberConcept.getConceptId());
 
             // check validity of query
             if (query.getTotalStatementCount() == 0) {
@@ -325,8 +328,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             getLogger().info("Creating new member refsets.");
             // Step 3 : create new member refsets
             for (Integer memberId : newMembers) {
-                memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, normalMemberConcept
-                    .getConceptId(), false);
+                memberRefsetHelper.newRefsetExtension(refset.getConceptId(), memberId, 
+                    I_ThinExtByRefPartConcept.class,
+                    new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, normalMemberConcept.getConceptId()));
                 if (cancelComputation) {
                     break;
                 }
@@ -340,8 +344,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             // Step 4: retire old member refsets
             getLogger().info("Retiring old member refsets.");
             for (Integer retiredMemberId : retiredMembers) {
-                memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, normalMemberConcept
-                    .getConceptId());
+                memberRefsetHelper.retireRefsetExtension(refset.getConceptId(), retiredMemberId, 
+                    new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, normalMemberConcept.getConceptId()));
                 if (cancelComputation) {
                     break;
                 }
@@ -353,23 +357,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
 
             // Step 5 : add / remove marked parent refsets
-            if (termFactory.hasId(markedParentsUuid)) {
-                getLogger().info("Adding marked parents.");
-                for (Integer newMember : newMembers) {
-                    memberRefsetHelper.addMarkedParents(new Integer[] { newMember });
-                    if (cancelComputation) {
-                        break;
-                    }
-                }
+            getLogger().info("Adding marked parents.");
+            memberRefsetHelper.addMarkedParents(newMembers.toArray(new Integer[0]));
 
-                getLogger().info("Retiring marked parents.");
-                for (Integer retiredMember : retiredMembers) {
-                    memberRefsetHelper.removeMarkedParents(new Integer[] { retiredMember });
-                    if (cancelComputation) {
-                        break;
-                    }
-                }
-            }
+            getLogger().info("Retiring marked parents.");
+            memberRefsetHelper.removeMarkedParents(retiredMembers.toArray(new Integer[0]));
+                
             long elapsedTime = System.currentTimeMillis() - createComponentsStartTime;
             long minutes = elapsedTime / 60000;
             long seconds = (elapsedTime % 60000) / 1000;
@@ -496,11 +489,13 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     }
 
     private HashSet<Integer> filterNonCurrentRefsetMembers(List<I_ThinExtByRefVersioned> list,
-            SpecMemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
+            MemberRefsetHelper refsetHelper, int refsetId, int memberTypeId) throws Exception {
 
         HashSet<Integer> newList = new HashSet<Integer>();
         for (I_ThinExtByRefVersioned v : list) {
-            if (refsetHelper.hasCurrentRefsetExtension(refsetId, v.getComponentId(), memberTypeId)) {
+            //if (refsetHelper.hasCurrentRefsetExtension(refsetId, v.getComponentId(), memberTypeId)) {
+            if (refsetHelper.hasCurrentRefsetExtension(refsetId, v.getComponentId(), 
+                        new BeanPropertyMap().with(ThinExtByRefPartProperty.CONCEPT_ONE, memberTypeId))) {
                 newList.add(v.getComponentId());
             }
         }

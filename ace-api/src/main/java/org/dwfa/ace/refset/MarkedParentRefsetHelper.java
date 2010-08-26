@@ -168,41 +168,6 @@ public class MarkedParentRefsetHelper extends RefsetHelper {
         return parentRefset.getConceptId();
     }
 
-    /**
-     * Check for a is_a relationship type defined on the member refset concept
-     * otherwise default to just using
-     * either a SNOMED or ArchitectonicAuxiliary is_a relationship type
-     */
-    @Override
-    protected I_IntSet getIsARelTypes() throws Exception {
-        if (this.isARelTypes == null) {
-            try {
-                I_IntSet isATypes = termFactory.newIntSet();
-                isATypes.add(termFactory.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
-                    .getConceptId());
-                I_GetConceptData memberRefset = termFactory.getConcept(this.refsetId);
-                Set<I_GetConceptData> requiredIsAType = memberRefset.getSourceRelTargets(getAllowedStatuses(),
-                    isATypes, null, false, true);
-
-                if (requiredIsAType != null && requiredIsAType.size() > 0) {
-                    // relationship exists so use the is-a specified by the
-                    // marked-parent-is-a relationship
-                    this.isARelTypes = termFactory.newIntSet();
-                    this.isARelTypes.add(requiredIsAType.iterator().next().getConceptId());
-                } else {
-                    // no specified marked-parent-is-a relationship defined, so
-                    // first default to using
-                    // SNOMED or ArchitectonicAuxiliary is_a relationship type
-                    super.getIsARelTypes();
-                }
-            } catch (NoMappingException ex) {
-                // marked-parent-is-a relationship type is unknown so default
-                super.getIsARelTypes();
-            }
-        }
-        return this.isARelTypes;
-    }
-
     public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {
         return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, new BeanPropertyMap().with(
             ThinExtByRefPartProperty.CONCEPT_ONE, parentMemberTypeId));
