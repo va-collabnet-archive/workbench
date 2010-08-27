@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 International Health Terminology Standards Development  *  Organisation..
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -72,8 +72,8 @@ public final class OriginProcessorFactoryTest {
     public void testGetAmtOriginProcessor() throws Exception {
 
         String originProcessorType = "AMT";
-        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, positionDescriptor,
-                posDescriptorArray, conceptDescriptor);
+        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock,
+                posDescriptorArray, conceptDescriptor, positionDescriptor);
         OriginProcessor result = instance.getInstance(originProcessorType);
         assertTrue(result instanceof AmtOriginProcessor);
     }
@@ -90,8 +90,7 @@ public final class OriginProcessorFactoryTest {
 
         String originProcessorType = "SNOMED";
 
-        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, positionDescriptor,
-                posDescriptorArray, conceptDescriptor);
+        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, posDescriptorArray, conceptDescriptor, positionDescriptor);
 
         OriginProcessor result = instance.getInstance(originProcessorType);
 
@@ -104,8 +103,7 @@ public final class OriginProcessorFactoryTest {
     @Test
     public void testNullThrowsIllegalArgumentException() throws Exception {
         String originProcessorType = null;
-        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, positionDescriptor,
-                posDescriptorArray, conceptDescriptor);
+        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, posDescriptorArray, conceptDescriptor, positionDescriptor);
         OriginProcessor result = null;
         try {
             result = instance.getInstance(originProcessorType);
@@ -121,8 +119,8 @@ public final class OriginProcessorFactoryTest {
     @Test
     public void testInvalidFlagThrowsIllegalArgumentException() throws Exception {
         String originProcessorType = "invalid";
-        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock, positionDescriptor,
-                posDescriptorArray, conceptDescriptor);
+        OriginProcessorFactory instance = new OriginProcessorFactory(conceptDataMock,
+                posDescriptorArray, conceptDescriptor, positionDescriptor);
         OriginProcessor result = null;
         try {
             result = instance.getInstance(originProcessorType);

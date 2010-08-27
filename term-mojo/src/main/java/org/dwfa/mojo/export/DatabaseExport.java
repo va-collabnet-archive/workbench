@@ -73,7 +73,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      * @required
      */
-    private PositionDescriptor releasePosition;
+    private PositionDescriptor[] releasePositions;
 
     /**
      * Positions for export
@@ -246,7 +246,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
         try {
             currentConcept = getTermFactory().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-            
+
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DRIVER, uuidSctidDbDriver);
             System.setProperty(UuidSctidMapDb.SCT_ID_MAP_DATABASE_CONNECTION_URL, uuidSctidDbConnectionUrl);
             if (uuidSctidDbUsername != null) {
@@ -265,10 +265,10 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 position.setLastest(true);
                 positions.add(position);
             }
-            
+
             Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
-            OriginProcessor originProcessor = new OriginProcessorFactory(currentConcept, releasePosition,
-                    originsForExport, maintainedModuleParent).getInstance(exportFlag);
+            OriginProcessor originProcessor = new OriginProcessorFactory(currentConcept,
+                    originsForExport, maintainedModuleParent, releasePositions).getInstance(exportFlag);
 
             originProcessor.addOriginPositions(releasePathDateMap, positions, excludedPositions);
 
@@ -289,9 +289,9 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
             }
 
             releasePart = new ThinConPart();
-            releasePart.setPathId(releasePosition.getPosition().getPath().getConceptId());
+            releasePart.setPathId(releasePositions[0].getPosition().getPath().getConceptId());
             releasePart.setStatusId(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-            releasePart.setVersion(releasePosition.getPosition().getVersion());
+            releasePart.setVersion(releasePositions[0].getPosition().getVersion());
 
             //TODO Create Export Specification Factory or Builder.
             if(exportFlag.equalsIgnoreCase("amt")){
@@ -303,7 +303,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
                 ((SnomedExportSpecification)exportSpecification).setReleasePart(releasePart);
             }
 
-            
+
         } catch (IOException e) {
             throw new MojoExecutionException("Execute error: ", e);
         } catch (SQLException e) {

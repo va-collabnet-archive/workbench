@@ -17,11 +17,13 @@
  */
 package org.dwfa.mojo.export;
 
-import org.dwfa.mojo.export.amt.AmtOriginProcessor;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.mojo.ConceptDescriptor;
 import org.dwfa.mojo.PositionDescriptor;
+import org.dwfa.mojo.export.amt.AmtOriginProcessor;
 
 /**
  * {@code OriginProcessorFactory} is a factory class for determining what type of {@link OriginProcessor} to instantiate
@@ -35,7 +37,7 @@ final class OriginProcessorFactory {
     /** The active concept. */
     private final I_GetConceptData currentConcept;
     /**The release position.*/
-    private final PositionDescriptor releasePosition;
+    private final List<PositionDescriptor> releasePositions = new ArrayList<PositionDescriptor>();
     /**Origins to be Exported.*/
     private final PositionDescriptor[] originsForExport;
     /**The concept that groups all the maintained modules.*/
@@ -48,13 +50,17 @@ final class OriginProcessorFactory {
      * @param originsForExport the {@link I_GetConceptData} origins for export.
      * @param maintainedModuleParent the Maintained Module Parent.
      */
-    OriginProcessorFactory(final I_GetConceptData currentConcept, final PositionDescriptor releasePosition,
+    OriginProcessorFactory(final I_GetConceptData currentConcept,
             final PositionDescriptor[] originsForExport,
-            final ConceptDescriptor maintainedModuleParent) {
+            final ConceptDescriptor maintainedModuleParent,
+            final PositionDescriptor... releasePosition) {
         this.currentConcept = currentConcept;
-        this.releasePosition = releasePosition;
         this.originsForExport = originsForExport;
         this.maintainedModuleParent = maintainedModuleParent;
+
+        for (PositionDescriptor positionDescriptor : releasePosition) {
+        	releasePositions.add(positionDescriptor);
+		}
     }
 
     /**
@@ -76,9 +82,9 @@ final class OriginProcessorFactory {
         validate(originProcessorType);
 
         if (originProcessorType.equalsIgnoreCase(OriginProcessorType.AMT.toString())) {
-            return new AmtOriginProcessor(currentConcept, releasePosition, originsForExport);
+            return new AmtOriginProcessor(currentConcept, releasePositions, originsForExport);
         } else if (originProcessorType.equalsIgnoreCase(OriginProcessorType.SNOMED.toString())) {
-            return new SnomedOriginProcessor(currentConcept, releasePosition, originsForExport, maintainedModuleParent);
+            return new SnomedOriginProcessor(currentConcept, releasePositions, originsForExport, maintainedModuleParent);
         } else {
             throw new IllegalArgumentException(
                 String.format(ERROR_MESSAGE, OriginProcessorType.AMT, OriginProcessorType.SNOMED));

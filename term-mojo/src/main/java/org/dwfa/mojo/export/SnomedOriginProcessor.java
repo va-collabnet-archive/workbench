@@ -1,12 +1,12 @@
 /*
  *  Copyright 2010 International Health Terminology Standards Development  *  Organisation..
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,9 +48,9 @@ public class SnomedOriginProcessor extends AbstractOriginProcessor implements Or
     private final DatabaseExportUtility helper;
 
     public SnomedOriginProcessor(final I_GetConceptData currentConcept,
-            final PositionDescriptor releasePosition, final PositionDescriptor[] originsForExport,
+            final List<PositionDescriptor> releasePositions, final PositionDescriptor[] originsForExport,
             final ConceptDescriptor maintainedModuleParent) throws Exception {
-        super(currentConcept, releasePosition, originsForExport);
+        super(currentConcept, releasePositions, originsForExport);
         this.maintainedModuleParent = maintainedModuleParent;
         this.helper = new SnomedExportUtility();
         this.promotesToConcept = termFactory.getConcept(ConceptConstants.PROMOTES_TO.localize().getNid());
@@ -71,35 +71,32 @@ public class SnomedOriginProcessor extends AbstractOriginProcessor implements Or
             I_IntSet currentStatus = config.getAllowedStatus();
             config.setAllowedStatus(allowedStatus);
 
-            Set<I_Position> positionOrigins = new HashSet<I_Position>();
             for (PositionDescriptor positionDescriptor : originsForExport) {
-                positionOrigins.addAll(
-                        PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, termFactory));
+            	for (I_Position iPosition : PromoteToPath.getPositionsToCopy(positionDescriptor.getPath().getVerifiedConcept(), promotesToConcept, termFactory)) {
+                    UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
+                    if (!isExcludedPath(pathUuid, excludedPositions)) {
+                        Date timePoint = new Date();
+                        timePoint.setTime(iPosition.getTime());
+                        Position position = new Position(termFactory.getConcept(iPosition.getPath().getConceptId()),
+                                timePoint);
+                        position.setLastest(true);
+                        positions.add(position);
+
+                        if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus, null, null, false)) {
+                            if (!releasePathDateMap.containsKey(pathUuid)) {
+                                Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
+                                releasePathDateMap.put(pathUuid, mappedModuleDate);
+
+                                mappedModuleDate.put(UUID.fromString(positionDescriptor.getPath().getUuid()),
+                                        AceDateFormat.getVersionHelperDateFormat().parse(positionDescriptor.getTimeString()));
+                            }
+                        }
+                    }
+				}
             }
 
             config.setAllowedStatus(currentStatus);
 
-            for (I_Position iPosition : positionOrigins) {
-                UUID pathUuid = termFactory.getUids(iPosition.getPath().getConceptId()).iterator().next();
-                if (!isExcludedPath(pathUuid, excludedPositions)) {
-                    Date timePoint = new Date();
-                    timePoint.setTime(iPosition.getTime());
-                    Position position = new Position(termFactory.getConcept(iPosition.getPath().getConceptId()),
-                            timePoint);
-                    position.setLastest(true);
-                    positions.add(position);
-
-                    if (!matainedModuleParent.isParentOf(termFactory.getConcept(pathUuid), allowedStatus, null, null, false)) {
-                        if (!releasePathDateMap.containsKey(pathUuid)) {
-                            Map<UUID, Date> mappedModuleDate = new HashMap<UUID, Date>(1);
-                            releasePathDateMap.put(pathUuid, mappedModuleDate);
-
-                            mappedModuleDate.put(UUID.fromString(releasePosition.getPath().getUuid()),
-                                    AceDateFormat.getVersionHelperDateFormat().parse(releasePosition.getTimeString()));
-                        }
-                    }
-                }
-            }
         }
         return releasePathDateMap;
     }
