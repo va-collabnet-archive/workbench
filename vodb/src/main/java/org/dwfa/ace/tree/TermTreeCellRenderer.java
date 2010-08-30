@@ -180,8 +180,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                         }
 
                         if (showViewerImagesInTaxonomy) {
-                            for (I_ImageTuple imageTuple : cb.getImageTuples(aceConfig.getAllowedStatus(),
-                                viewerImageTypes, aceConfig.getViewPositionSet())) {
+                            List<I_ImageTuple> imageTupleList = 
+                                cb.getImageTuples(aceConfig.getAllowedStatus(), viewerImageTypes, aceConfig.getViewPositionSet(), true);
+                            for (I_ImageTuple imageTuple : imageTupleList) {
                                 htmlPrefixes.add("<img src='ace:" + imageTuple.getImageId() + "$"
                                     + imageTuple.getConceptId() + "' align=center>");
                             }
@@ -239,8 +240,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                         List<I_ThinExtByRefTuple> returnTuples = new ArrayList<I_ThinExtByRefTuple>();
                                         switch (ThinExtBinder.getExtensionType(ebr)) {
                                         case BOOLEAN:
-                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
-                                                returnTuples, false);
+                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), returnTuples, false, true);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
                                                 boolean extValue = ((I_ThinExtByRefPartBoolean) t.getPart()).getValue();
 
@@ -261,10 +261,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             }
                                             break;
                                         case CONCEPT:
-                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
-                                                returnTuples, false);
+                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), returnTuples, false, true);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                ConceptBean ebrCb = ConceptBean.get(((I_ThinExtByRefPartConcept) t.getPart()).getConceptId());
+                                                ConceptBean ebrCb = ConceptBean.get(((I_ThinExtByRefPartConcept) t.getPart()).getC1id());
                                                 for (I_ImageTuple imageTuple : ebrCb.getImageTuples(
                                                     aceConfig.getAllowedStatus(), viewerImageTypes,
                                                     aceConfig.getViewPositionSet())) {
@@ -274,10 +273,9 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                             }
                                             break;
                                         case INTEGER:
-                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
-                                                returnTuples, false);
+                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), returnTuples, false, true);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
-                                                int extValue = ((I_ThinExtByRefPartInteger) t.getPart()).getValue();
+                                                int extValue = ((I_ThinExtByRefPartInteger) t.getPart()).getIntValue();
                                                 htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
                                             }
                                             break;
@@ -288,8 +286,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                         case SCOPED_LANGUAGE:
                                             break;
                                         case STRING:
-                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(),
-                                                returnTuples, false);
+                                            ebr.addTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSet(), returnTuples, false, true);
                                             for (I_ThinExtByRefTuple t : returnTuples) {
                                                 String strExt = ((I_ThinExtByRefPartString) t.getPart()).getStringValue();
                                                 htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
