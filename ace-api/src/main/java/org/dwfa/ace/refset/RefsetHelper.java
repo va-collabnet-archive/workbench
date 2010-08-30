@@ -195,10 +195,27 @@ public class RefsetHelper extends LineageHelper {
 
     public boolean hasCurrentRefsetExtension(int refsetId, int conceptId, final BeanPropertyMap extProps)
             throws Exception {
-        if (!extProps.hasProperty("statusId")) {
-            extProps.with(ThinExtByRefPartProperty.STATUS, currentStatusId);
+        for (I_ThinExtByRefVersioned extension : termFactory.getAllExtensionsForComponent(conceptId, true)) {
+
+            if (extension.getRefsetId() == refsetId) {
+
+                // get the latest version
+                I_ThinExtByRefPart latestPart = null;
+                for (I_ThinExtByRefPart part : extension.getVersions()) {
+                    if ((latestPart == null) || (part.getVersion() >= latestPart.getVersion())) {
+                        latestPart = part;
+                    }
+                }
+
+                BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);                
+                
+                if (activeStatusIds.contains(latestPart.getStatusId()) 
+                        && validProps.validate(latestPart)) {
+                    return true;
+                }
+            }
         }
-        return hasRefsetExtension(refsetId, conceptId, extProps);
+        return false;
     }
 
     /**
@@ -339,12 +356,12 @@ public class RefsetHelper extends LineageHelper {
                     }
                 }
 
-                if (!extProps.hasProperty("statusId")) {
-                    extProps.with(ThinExtByRefPartProperty.STATUS, currentStatusId);
-                }
-
-                if (extProps.validate(latestPart)) {
-
+                // Ignore the status provided
+                BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);
+                
+                if (activeStatusIds.contains(latestPart.getStatusId()) 
+                        && validProps.validate(latestPart)) {
+                    
                     // found a member to retire
 
                     I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
