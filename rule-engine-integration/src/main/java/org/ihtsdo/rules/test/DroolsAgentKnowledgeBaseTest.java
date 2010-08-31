@@ -97,9 +97,9 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 			System.out.println("Done...");
 			System.out.println("Results size: " + results.getErrorCodes().size());
 			
-			for (int errorCode : results.getErrorCodes().keySet() ) {
-				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));
-			}
+//			for (int errorCode : results.getErrorCodes().keySet() ) {
+//				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));
+//			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();

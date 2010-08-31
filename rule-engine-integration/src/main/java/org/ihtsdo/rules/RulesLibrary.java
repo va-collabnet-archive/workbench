@@ -60,6 +60,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.tk.helper.ResultsItem;
 
 /**
  * The Class RulesLibrary.
@@ -123,9 +124,10 @@ public class RulesLibrary {
 
 		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		for (int errorCode : results.getErrorCodes().keySet() ) {
-			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-					results.getErrorCodes().get(errorCode), 
+		for (ResultsItem resultsItem : results.getErrorCodes() ) {
+			results.getAlertList().add(new AlertToDataConstraintFailure(
+					AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+					resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
 					concept));
 		}
 
@@ -209,17 +211,18 @@ public class RulesLibrary {
 
 		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		for (int errorCode : results.getErrorCodes().keySet() ) {
-			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-					results.getErrorCodes().get(errorCode), 
-					concept));
-		}
+//		for (int errorCode : results.getErrorCodes().keySet() ) {
+//			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+//					results.getErrorCodes().get(errorCode), 
+//					concept));
+//		}
 
 		ksession.dispose();
 
 		return results;
 	}
 
+	@Deprecated
 	public static ResultsCollectorWorkBench checkObjects(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
@@ -239,6 +242,7 @@ public class RulesLibrary {
 		return results;
 	}
 
+	@Deprecated
 	public static ResultsCollectorWorkBench checkObjectsTestModel(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
