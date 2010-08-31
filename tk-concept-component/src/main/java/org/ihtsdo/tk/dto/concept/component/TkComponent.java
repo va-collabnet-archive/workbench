@@ -14,7 +14,7 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
-public abstract class TkComponent<V extends TkRevision> extends TkRevision {
+public abstract class TkComponent<V extends TkRevision> extends TkRevision implements I_AmComponent<V> {
 
     public static final long serialVersionUID = 1;
 
@@ -81,6 +81,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         }
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getIdComponentCount()
+	 */
     public int getIdComponentCount() {
         if (additionalIds == null) {
             return 1;
@@ -88,6 +91,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         return additionalIds.size() + 1;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getEIdentifiers()
+	 */
     public List<TkIdentifier> getEIdentifiers() {
         List<TkIdentifier> ids;
         if (additionalIds != null) {
@@ -100,6 +106,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         return ids;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getUuids()
+	 */
     public List<UUID> getUuids() {
         List<UUID> uuids = new ArrayList<UUID>();
         uuids.add(primordialUuid);
@@ -113,6 +122,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         return uuids;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getVersionCount()
+	 */
     public int getVersionCount() {
         List<? extends TkRevision> extraVersions = getRevisionList();
         if (extraVersions == null) {
@@ -121,12 +133,21 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         return extraVersions.size() + 1;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getRevisionList()
+	 */
     public abstract List<? extends TkRevision> getRevisionList();
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getPrimordialComponentUuid()
+	 */
     public UUID getPrimordialComponentUuid() {
         return primordialUuid;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getAdditionalIdComponents()
+	 */
     public List<TkIdentifier> getAdditionalIdComponents() {
         return additionalIds;
     }
@@ -135,6 +156,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         this.additionalIds = additionalIdComponents;
     }
 
+    /* (non-Javadoc)
+	 * @see org.ihtsdo.tk.dto.concept.component.I_AmComponent#getRevisions()
+	 */
     public List<V> getRevisions() {
         return revisions;
     }
