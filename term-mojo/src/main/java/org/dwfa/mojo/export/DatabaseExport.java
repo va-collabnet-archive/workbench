@@ -91,13 +91,6 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
     private PositionDescriptor[] excludedPositions = new PositionDescriptor[0];
 
     /**
-     * Origins for export
-     *
-     * @parameter
-     */
-    private PositionDescriptor[] originsForExport;
-
-    /**
      * The concept that groups all the maintained modules.
      *
      * @parameter
@@ -268,7 +261,7 @@ public class DatabaseExport extends AbstractMojo implements I_ProcessConcepts {
 
             Map<UUID, Map<UUID, Date>> releasePathDateMap = new HashMap<UUID, Map<UUID,Date>>();
             OriginProcessor originProcessor = new OriginProcessorFactory(currentConcept,
-                    originsForExport, maintainedModuleParent, releasePositions).getInstance(exportFlag);
+                    releasePositions, maintainedModuleParent, releasePositions).getInstance(exportFlag);
 
             originProcessor.addOriginPositions(releasePathDateMap, positions, excludedPositions);
 
