@@ -62,6 +62,8 @@ import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 import org.dwfa.jini.ElectronicAddress;
 
 import com.collabnet.ce.soap50.types.SoapFieldValues;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactDependencySoapList;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactDependencySoapRow;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
 
 /**
@@ -215,15 +217,16 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
 
     private String doCollabNetArtfCreate(I_EncodeBusinessProcess process, TrackerAppSoapUtil tracker) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException, IOException {
         // CREATE ARTIFACT
+        int priority = 0;
+        int estimatedHours = 0;
         String artTitle = process.getName();
         String artDescription = (String) process.getProperty("A: DESCRIPTION");
         String group = "";
         String category = (String) process.getProperty("A: CATEGORY");
         String customer = (String) process.getProperty("A: CUSTOMER");
-        String status = (String) process.getProperty("A: SEND_STATUS");
-        int priority = 0;
-        int estimatedHours = 0;
-        String assignedUsername = (String) process.getProperty("A: SEND_TO_USER");
+        String sendStatus = (String) process.getProperty("A: SEND_STATUS");
+        String sendToUser = (String) process.getProperty("A: SEND_TO_USER");
+        String sendComment = (String) process.getProperty("A: SEND_COMMENT");
         String releasedId = "";
 
         // CUSTOM FLEX FIELDS (OPTIONAL)
@@ -233,19 +236,22 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         String attachName = process.getProcessID().getUuid().toString() + ".bp";
         String attachMimeType = "application/octet-stream";
 
+        process.setProperty("A: SEND_COMMENT", "");
         String attachmentFileId = tracker.uploadAttachment(process);
 
         // CREATE ARTIFACT
         ArtifactSoapDO asdo = tracker.createArtifact(repoTrackerIdStr, artTitle,
-                artDescription, group, category, status, customer, priority, estimatedHours,
-                assignedUsername, releasedId, sfv, attachName, attachMimeType,
+                artDescription, group, category, sendStatus, customer, priority, estimatedHours,
+                sendToUser, releasedId, sfv, attachName, attachMimeType,
                 attachmentFileId);
         
+        tracker.setArtifactData(asdo, sendComment);
+
         String originId = (String) process.getProperty("A: ID_ARTF_PARENT");
         String targetId = asdo.getId();
         String description = category + " detail for " + customer;
         tracker.createArtifactDependency(originId, targetId, description);
-
+        
         // logArtfSoapDO(asdo);
 
         return asdo.getId();
@@ -256,22 +262,48 @@ public class CollabOutboxQueueWorker extends Worker implements I_GetWorkFromQueu
         String sendStatus = (String) process.getProperty("A: SEND_STATUS");
         String sendToUser = (String) process.getProperty("A: SEND_TO_USER");
         String sendComment = (String) process.getProperty("A: SEND_COMMENT");
+        Integer rowTotal = (Integer) process.getProperty("A: ROW_TOTAL");
 
         // UPLOAD ATTACHMENT
         String attachName = process.getProcessID().getUuid().toString() + ".bp";
         String attachMimeType = "application/octet-stream";
         // String attachMimeType = "application/x-java-serialized-object";
+        process.setProperty("A: SEND_COMMENT", "");
         String attachId = tracker.uploadAttachment(process);
         
         // SET STATUS
         ArtifactSoapDO asdo = tracker.getArtifactData(sessionId, artfId);
         asdo.setAssignedTo(sendToUser);
         asdo.setStatus(sendStatus);
-        tracker.setArtifactData(asdo, sendComment, attachName, attachMimeType, attachId);        
+        tracker.setArtifactData(asdo, sendComment, attachName, attachMimeType, attachId);
         
-        if (sendStatus.equalsIgnoreCase(""))
-            ; // CLOSE PARENT :!!!:???:
-        
+        if (sendStatus.equalsIgnoreCase("Detail closed")) {
+
+            String sendParent = (String) process.getProperty("A: ID_ARTF_PARENT");
+            if (sendParent != null && sendParent.length() > 0) {
+                // CHECK IF PARENT NEEDS TO BE CLOSED
+                ArtifactDependencySoapRow[] children = tracker.getChildDependencyRows(sendParent);
+
+                // CASE: NOT ALL DETAILS STARTED
+                if (children.length < rowTotal)
+                    return;
+
+                // CASE: ALL DETAILS STARTED...
+                boolean allClosed = true;
+                for (ArtifactDependencySoapRow child : children)
+                    if (child.getTargetStatusClass().equalsIgnoreCase("Open"))
+                        allClosed = false;
+
+                if (allClosed) {
+                    // CLOSE PARENT
+                    ArtifactSoapDO asdoParent = tracker.getArtifactData(sessionId, sendParent);
+                    asdoParent.setStatus("Master closed");
+                    tracker.setArtifactData(asdoParent, "Details have been closed.", null, null,
+                            null);
+                }
+            }
+        }
+
     }
     
     public boolean doCollabNetDelivery(I_EncodeBusinessProcess process, Transaction t) throws IllegalArgumentException, IntrospectionException, IllegalAccessException, InvocationTargetException {

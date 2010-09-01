@@ -31,6 +31,8 @@ import com.collabnet.ce.soap50.webservices.cemain.AttachmentSoapRow;
 import com.collabnet.ce.soap50.webservices.cemain.ICollabNetSoap;
 import com.collabnet.ce.soap50.webservices.cemain.TrackerFieldSoapDO;
 import com.collabnet.ce.soap50.webservices.filestorage.IFileStorageAppSoap;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactDependencySoapList;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactDependencySoapRow;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactDetailSoapRow;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapList;
@@ -424,4 +426,13 @@ public class TrackerAppSoapUtil {
         m_trackerSoap.createArtifactDependency(m_sessionId, originId, targetId, description);   
     }
 
+    public ArtifactDependencySoapRow[] getChildDependencyRows(String artfId) throws RemoteException {
+        ArtifactDependencySoapList adsl = m_trackerSoap.getChildDependencyList(m_sessionId, artfId);
+        return adsl.getDataRows();
+    }
+
+    public ArtifactDependencySoapRow[] getParentDependencyRows(String artfId) throws RemoteException {
+        ArtifactDependencySoapList adsl =  m_trackerSoap.getParentDependencyList(m_sessionId, artfId);
+        return adsl.getDataRows();
+    }
 }

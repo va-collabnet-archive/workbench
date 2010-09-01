@@ -39,6 +39,7 @@ import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -98,6 +99,7 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
     private String repoTrackerIdStr;
     private String userNameStr;
     private String userPwdStr;
+    private HashMap<String, String> categoryBpMap; 
 
     // :NYI:!!!: CollabAuthenticator extends Authenticator see MailAuthenticator
     // :NYI:!!!: public class SvnPrompter implements PromptUserPassword3
@@ -133,6 +135,43 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                 String.class);
         props.put("user.pwd.str", userPwdStr);
 
+        categoryBpMap = new HashMap<String, String>(); 
+        String tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category01Str",
+                String.class);
+        props.put("category.bp.01", tmpStr);
+        int splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category02Str",
+                String.class);
+        props.put("category.bp.02", tmpStr);
+        splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+         
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category03Str",
+                String.class);
+        props.put("category.bp.03", tmpStr);
+        splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+        
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category04Str",
+                String.class);
+        props.put("category.bp.04", tmpStr);
+        splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+        
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category05Str",
+                String.class);
+        props.put("category.bp.05", tmpStr);
+        splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+        
+        tmpStr = (String) this.config.getEntry(this.getClass().getName(), "category06Str",
+                String.class);
+        props.put("category.bp.06", tmpStr);
+        splitIdx = tmpStr.indexOf("/");
+        categoryBpMap.put(tmpStr.substring(0, splitIdx), tmpStr.substring(splitIdx + 1));
+        
         // :NYI:!!!: ADD Authenticator. PROMPTS FOR PWD IF NOT PRESENT.
 
         this.setPluginForInterface(I_GetWorkFromQueue.class, this);
@@ -237,13 +276,6 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                             t = this.getActiveTransaction();
                             
                             // :DEBUG:BEGIN:
-//                            File file = new File(fName);
-//                            FileOutputStream fos = new FileOutputStream(file);
-//                            dh.writeTo(fos);
-//                            fos.close();
-//                            logger.info("RUN:  attachment file saved:  " + file);
-                            // :DEBUG:END:
-
                             ObjectInputStream ois = new ObjectInputStream(dh.getInputStream());
                             I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
                             process.setProperty("A: ID_ARTF", artifactId);
@@ -263,7 +295,6 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                             // String contentType = dh.getContentType();
                             // String name = dh.getName();
                             
-                            // :!!!: toFolder.getAbsolutePath() + File.separator + fName()
                             File file = new File(fName);
                             FileOutputStream fos = new FileOutputStream(file);
                             dh.writeTo(fos);
@@ -273,60 +304,87 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                             // ** READ ** each CSV line
                             FileReader     fr = new FileReader(file);
                             BufferedReader br = new BufferedReader(fr);
-                            String eachLine = br.readLine();                            
+                            String eachLine = br.readLine();    
+                            
                             if (eachLine != null) {
-                               String[] csvHeader = parseLine(eachLine);
-                               
-                               // if (csvHeader.length < 1)
-                               
-                               eachLine = br.readLine();
+                                String[] csvHeader = parseLine(eachLine);
 
-                               int rowCounter = 1;
-                               while (eachLine != null) {
-                                   String[] csvRow = parseLine(eachLine);
-                                   
-                                    if (csvRow.length > 1 && csvRow[0].length() > 0 && csvRow.length == csvHeader.length) {
-                                        t = this.getActiveTransaction();
-                                        // CREATE BP AND SAVE BP
-                                        String processName = asdo.getTitle() + " (detail#"
-                                                + Integer.toString(rowCounter)+ ")";
+                                // if (csvHeader.length < 1)
 
-                                        I_EncodeBusinessProcess newProcess = (I_EncodeBusinessProcess) Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
-                                        newProcess.setName(processName);
-                                                                                
-                                        newProcess.setProperty("A: CATEGORY", asdo.getCategory());
-                                        newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
-                                        newProcess.setProperty("A: DESCRIPTION", asdo.getDescription());
-                                        
-                                        newProcess.setProperty("A: ID_ARTF", "NA");
-                                        newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
-                                        
-                                        newProcess.setProperty("A: SEND_STATUS", "Detail ready to download");
-                                        newProcess.setProperty("A: SEND_TO_USER", "username");
-                                        newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
-
-                                        StringBuilder sb = new StringBuilder();
-                                        for (int ci = 0; ci < csvHeader.length ; ci++) 
-                                            sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci] + "<br>");
-                                        newProcess.setProperty("A: MESSAGE", sb.toString());
-
-                                        this.queue.write(newProcess, t);
-
-                                        // SET STATUS
-                                        asdo.setStatus("Master in process");
-                                        tracker.setArtifactData(asdo, "Master downloaded.");
-                                        
-                                        this.commitTransactionIfActive();
+                                // READ IN ALL "VALID" ROWS
+                                ArrayList<String[]> fileRows = new ArrayList<String[]>();
+                                eachLine = br.readLine();
+                                while (eachLine != null) {
+                                    String[] row = parseLine(eachLine);
+                                    // CHECK IF "VALID"
+                                    if (row.length > 1 && row[0].length() > 0
+                                            && row.length == csvHeader.length) {
+                                        fileRows.add(row);
                                     }
+                                    // READ NEXT CSV LINE
+                                    eachLine = br.readLine();
+                                }
+                                br.close();
+                                file.delete();
 
-                                   // READ NEXT CSV LINE
-                                   eachLine = br.readLine();
-                                   rowCounter = rowCounter + 1;
-                               }
-                               br.close();
+                                int rowCounter = 1;
+                                Integer rowTotal = Integer.valueOf(fileRows.size());
+                                for (String[] csvRow : fileRows) {
+
+                                    t = this.getActiveTransaction();
+                                    // CREATE BP AND SAVE BP
+                                    String processName = asdo.getTitle() + " (detail#"
+                                            + Integer.toString(rowCounter) + ")";
+
+                                    String bpStr = categoryBpMap.get(asdo.getCategory());
+
+                                    // I_EncodeBusinessProcess newProcess = (I_EncodeBusinessProcess) Class.forName("org.kp.bpa.KpetBusinessProcess").newInstance();
+                                    I_EncodeBusinessProcess newProcess = (I_EncodeBusinessProcess) Class
+                                            .forName(bpStr).newInstance();
+                                    newProcess.setName(processName);
+
+                                    newProcess.setProperty("A: CATEGORY", asdo.getCategory());
+                                    newProcess.setProperty("A: CUSTOMER", asdo.getCustomer());
+
+                                    newProcess.setProperty("A: ID_ARTF", "NA");
+                                    newProcess.setProperty("A: ID_ARTF_PARENT", asdo.getId());
+
+                                    newProcess.setProperty("A: SEND_STATUS",
+                                            "Detail ready to download");
+                                    newProcess.setProperty("A: SEND_TO_USER", "username");
+                                    newProcess.setProperty("A: SEND_COMMENT", "Remotely updated.");
+                                    newProcess.setProperty("A: ROW", rowCounter);
+                                    newProcess.setProperty("A: ROW_TOTAL", rowTotal);
+
+                                    StringBuilder sb = new StringBuilder();
+                                    for (int ci = 0; ci < csvHeader.length; ci++)
+                                        sb.append("<html>" + csvHeader[ci] + ": " + csvRow[ci]
+                                                + "<br>");
+                                    newProcess.setProperty("A: MESSAGE", sb.toString());
+
+                                    // Set artifact description.
+                                    sb = new StringBuilder();
+                                    for (int ci = 0; ci < csvHeader.length; ci++)
+                                        sb.append(csvHeader[ci] + ": " + csvRow[ci] + "\r\n");
+                                    if (asdo.getDescription().length() > 0)
+                                        newProcess.setProperty("A: DESCRIPTION", asdo
+                                                .getDescription()
+                                                + "\r\n" + sb.toString());
+                                    else
+                                        newProcess.setProperty("A: DESCRIPTION", sb.toString());
+
+                                    this.queue.write(newProcess, t);
+
+                                    // SET STATUS
+                                    asdo.setStatus("Master in process");
+                                    tracker.setArtifactData(asdo, "Master downloaded.");
+
+                                    this.commitTransactionIfActive();
+
+                                    rowCounter = rowCounter + 1;
+                                }
                             }
-
-                        }
+                        } // if (fName.endsWith("csv"))
                     }
 
                     logger.info("RUN:  priority SoapDO  " + asdo.getPriority());
