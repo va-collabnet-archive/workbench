@@ -207,9 +207,9 @@ public class RefsetHelper extends LineageHelper {
                     }
                 }
 
-                BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);                
-                
-                if (activeStatusIds.contains(latestPart.getStatusId()) 
+                BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);
+
+                if (activeStatusIds.contains(latestPart.getStatusId())
                         && validProps.validate(latestPart)) {
                     return true;
                 }
@@ -358,17 +358,18 @@ public class RefsetHelper extends LineageHelper {
 
                 // Ignore the status provided
                 BeanPropertyMap validProps = extProps.clone().without(ThinExtByRefPartProperty.STATUS);
-                
-                if (activeStatusIds.contains(latestPart.getStatusId()) 
-                        && validProps.validate(latestPart)) {
-                    
-                    // found a member to retire
 
-                    I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
-                    clone.setStatusId(retiredStatusId);
-                    clone.setVersion(Integer.MAX_VALUE);
-                    extension.addVersion(clone);
-                    termFactory.addUncommittedNoChecks(extension);
+                if (activeStatusIds.contains(latestPart.getStatusId()) && validProps.validate(latestPart)) {
+                	for (I_Path path : getEditPaths()) {
+                        // found a member to retire
+
+                        I_ThinExtByRefPartConcept clone = (I_ThinExtByRefPartConcept) latestPart.duplicate();
+                        clone.setStatusId(retiredStatusId);
+                        clone.setVersion(Integer.MAX_VALUE);
+                        clone.setPathId(path.getConceptId());
+                        extension.addVersion(clone);
+                        termFactory.addUncommittedNoChecks(extension);
+					}
                     return true;
                 }
             }
