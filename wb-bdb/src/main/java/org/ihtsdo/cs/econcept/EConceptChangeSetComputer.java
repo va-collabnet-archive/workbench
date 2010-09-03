@@ -79,7 +79,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
      * .Concept)
@@ -89,31 +88,34 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         AtomicBoolean changed = new AtomicBoolean(false);
 
         try {
-			ec.setPrimordialUuid(c.getPrimUuid());
-			ec.setConceptAttributes(processConceptAttributes(c, changed));
-			ec.setDescriptions(processDescriptions(c, changed));
-			ec.setRelationships(processRelationships(c, changed));
-			ec.setImages(processImages(c, changed));
-			ec.setRefsetMembers(processRefsetMembers(c, changed));
+            ec.setPrimordialUuid(c.getPrimUuid());
+            ec.setConceptAttributes(processConceptAttributes(c, changed));
+            ec.setDescriptions(processDescriptions(c, changed));
+            ec.setRelationships(processRelationships(c, changed));
+            ec.setImages(processImages(c, changed));
+            ec.setRefsetMembers(processRefsetMembers(c, changed));
 
-			if (processNidLists) {
-			    ec.setDestRelUuidTypeUuids(processNidNidList(c.getData().getDestRelNidTypeNidList(), changed));
-			    ec.setRefsetUuidMemberUuidForConcept(processNidNidList(c.getData().getRefsetNidMemberNidForConceptList(),
-			        changed));
-			    ec.setRefsetUuidMemberUuidForDescriptions(processNidNidList(c.getData()
-			        .getRefsetNidMemberNidForDescriptionsList(), changed));
-			    ec.setRefsetUuidMemberUuidForImages(processNidNidList(c.getData().getRefsetNidMemberNidForImagesList(), changed));
-			    ec.setRefsetUuidMemberUuidForRefsetMembers(processNidNidList(c.getData()
-			        .getRefsetNidMemberNidForRefsetMembersList(), changed));
-			    ec.setRefsetUuidMemberUuidForRels(processNidNidList(c.getData().getRefsetNidMemberNidForRelsList(), changed));
-			    return ec;
-			}
-			if (changed.get()) {
-			    return ec;
-			}
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(new IOException("getEConcept exception for " + c.toLongString(), e));
-		}
+            if (processNidLists) {
+                ec.setDestRelUuidTypeUuids(processNidNidList(c.getData().getDestRelNidTypeNidList(), changed));
+                ec.setRefsetUuidMemberUuidForConcept(processNidNidList(c.getData()
+                    .getRefsetNidMemberNidForConceptList(), changed));
+                ec.setRefsetUuidMemberUuidForDescriptions(processNidNidList(c.getData()
+                    .getRefsetNidMemberNidForDescriptionsList(), changed));
+                ec.setRefsetUuidMemberUuidForImages(processNidNidList(c.getData().getRefsetNidMemberNidForImagesList(),
+                    changed));
+                ec.setRefsetUuidMemberUuidForRefsetMembers(processNidNidList(c.getData()
+                    .getRefsetNidMemberNidForRefsetMembersList(), changed));
+                ec.setRefsetUuidMemberUuidForRels(processNidNidList(c.getData().getRefsetNidMemberNidForRelsList(),
+                    changed));
+                return ec;
+            }
+            if (changed.get()) {
+                return ec;
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog()
+                .alertAndLogException(new IOException("getEConcept exception for " + c.toLongString(), e));
+        }
         return null;
     }
 
@@ -304,37 +306,37 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ec.revisions.add(ev);
     }
 
-	@SuppressWarnings("unchecked")
-	private void setupFirstVersion(EComponent ec,
-			ConceptComponent<?, ?>.Version v) throws IOException {
-		ec.primordialUuid = v.getPrimUuid();
-		ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
-		ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
-		ec.setTime(v.getTime());
-		if (v.getAdditionalIdentifierParts() != null) {
-			List<EIdentifier> additionalIdComponents = new ArrayList<EIdentifier>(v.getAdditionalIdentifierParts().size());
-			for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
-				EIdentifier eIdv = null;
-				if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
-					if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
-						eIdv = new EIdentifierLong();
-					} else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
-						eIdv = new EIdentifierString();
-					} else if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
-						eIdv = new EIdentifierUuid();
-					}
-					eIdv.setDenotation(idv.getDenotation());
-					eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
-					eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathId()));
-					eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusId()));
-					eIdv.setTime(idv.getTime());
-					additionalIdComponents.add(eIdv);
-				}
-			}
-			if (additionalIdComponents.size() > 0) {
-				ec.setAdditionalIdComponents(additionalIdComponents);
-			}
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private void setupFirstVersion(EComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
+        ec.primordialUuid = v.getPrimUuid();
+        ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathId()));
+        ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusId()));
+        ec.setTime(v.getTime());
+        if (v.getAdditionalIdentifierParts() != null) {
+            List<EIdentifier> additionalIdComponents =
+                    new ArrayList<EIdentifier>(v.getAdditionalIdentifierParts().size());
+            for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
+                EIdentifier eIdv = null;
+                if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                    if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierLong();
+                    } else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierString();
+                    } else if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierUuid();
+                    }
+                    eIdv.setDenotation(idv.getDenotation());
+                    eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
+                    eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathId()));
+                    eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusId()));
+                    eIdv.setTime(idv.getTime());
+                    additionalIdComponents.add(eIdv);
+                }
+            }
+            if (additionalIdComponents.size() > 0) {
+                ec.setAdditionalIdComponents(additionalIdComponents);
+            }
+        }
+    }
 
 }
