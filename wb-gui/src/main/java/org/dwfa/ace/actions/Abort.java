@@ -22,14 +22,18 @@ import java.io.IOException;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.TerminologyException;
 
 public class Abort implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         try {
             Terms.get().cancel();
+            Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        } catch (TerminologyException e2) {
+            AceLog.getAppLog().alertAndLogException(e2);
         }
     }
 }

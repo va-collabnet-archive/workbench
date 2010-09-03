@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -360,6 +361,23 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
                 refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
                 computeTypeValueLabel.setText(spec.getComputeTypeString());
+
+                try {
+                    boolean needsCompute = spec.needsCompute();
+                    if (needsCompute) {
+                        computeStatusValueLabel.setText("spec has been modified since last compute");
+                        computeStatusValueLabel.setForeground(Color.red);
+                    } else {
+                        computeStatusValueLabel.setText("spec unmodified since last compute");
+                        computeStatusValueLabel.setForeground(Color.black);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    computeStatusValueLabel.setText("Unknown");
+                    computeStatusValueLabel.setForeground(Color.black);
+                    computeStatusValueLabel.setBorder(null);
+                }
+
                 if (leftTogglePane != null) {
                     leftTogglePane.validate();
                     if (leftTogglePane.getParent() != null) {
@@ -468,6 +486,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private JLabel refsetStatusValueLabel;
 
     private JLabel computeTypeValueLabel;
+
+    private JLabel computeStatusValueLabel;
 
     private LinkedList<I_GetConceptData> tabHistoryList;
 
@@ -602,7 +622,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         historyButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
         historyButton.setSelected(false);
         historyButton.addActionListener(fixedToggleChangeActionListener);
-        historyButton.setToolTipText("show/hide the history records"); // TODO
+        historyButton.setToolTipText("show/hide the history records");
 
         GridBagConstraints inner = new GridBagConstraints();
         inner.anchor = GridBagConstraints.WEST;
@@ -624,15 +644,22 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         inner.gridy++;
         JLabel computeTypeLabel = new JLabel("compute type: ");
         leftTogglePane.add(computeTypeLabel, inner);
+        inner.gridy++;
+        JLabel computeStatusLabel = new JLabel("compute status: ");
+        leftTogglePane.add(computeStatusLabel, inner);
 
         inner.anchor = GridBagConstraints.WEST;
         inner.gridx++;
+        inner.gridy--;
         inner.gridy--;
         refsetStatusValueLabel = new JLabel("");
         leftTogglePane.add(refsetStatusValueLabel, inner);
         inner.gridy++;
         computeTypeValueLabel = new JLabel("");
         leftTogglePane.add(computeTypeValueLabel, inner);
+        inner.gridy++;
+        computeStatusValueLabel = new JLabel("");
+        leftTogglePane.add(computeStatusValueLabel, inner);
 
         outer.gridx++;
         outer.weightx = 1.0;
