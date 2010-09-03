@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
@@ -48,6 +50,21 @@ public class ERefsetLongMember extends ERefsetMember<ERefsetLongRevision> {
 
     public ERefsetLongMember() {
         super();
+    }
+    
+    public ERefsetLongMember(I_ExtendByRefVersion m) throws TerminologyException, IOException {
+        if (I_Identify.class.isAssignableFrom(m.getClass())) {
+            convert((I_Identify) m);
+        } else {
+            convert(nidToIdentifier(m.getMemberId()));
+        }
+        refsetUuid = nidToUuid(m.getRefsetId());
+        componentUuid = nidToUuid(m.getComponentId());
+        I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutablePart();
+        longValue = part.getLongValue();
+        pathUuid = nidToUuid(part.getPathId());
+        statusUuid = nidToUuid(part.getStatusId());
+        time = part.getTime();
     }
 
     @Override

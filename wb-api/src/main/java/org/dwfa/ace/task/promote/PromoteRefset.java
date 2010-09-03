@@ -134,9 +134,19 @@ public class PromoteRefset extends AbstractTask {
                 promoteRefset(config, viewPosition, promotionPaths, tf, markedParentRefsetIdentity);
             }
             for (I_GetConceptData commentsRefsetIdentity : Terms.get().getRefsetHelper(config)
-                    .getCommentsRefsetForRefset(refsetToPromote, config)) {
+                .getCommentsRefsetForRefset(refsetToPromote, config)) {
                 promoteRefset(config, viewPosition, promotionPaths, tf, commentsRefsetIdentity);
-           }
+            }
+
+            for (I_GetConceptData editTimeRefsetIdentity : Terms.get().getRefsetHelper(config)
+                .getEditTimeRefsetForRefset(refsetToPromote, config)) {
+                promoteRefset(config, viewPosition, promotionPaths, tf, editTimeRefsetIdentity);
+            }
+
+            for (I_GetConceptData computeTimeRefsetIdentity : Terms.get().getRefsetHelper(config)
+                .getComputeTimeRefsetForRefset(refsetToPromote, config)) {
+                promoteRefset(config, viewPosition, promotionPaths, tf, computeTimeRefsetIdentity);
+            }
             tf.commit();
 
         } catch (Exception e) {
@@ -147,7 +157,8 @@ public class PromoteRefset extends AbstractTask {
 
     private void promoteRefset(I_ConfigAceFrame config, I_Position viewPosition, PathSetReadOnly promotionPaths,
             I_TermFactory tf, I_GetConceptData refsetIdentity) throws TerminologyException, IOException {
-        I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Promoting refset: " + refsetIdentity.toString(), false);
+        I_ShowActivity activity =
+                Terms.get().newActivityPanel(true, config, "Promoting refset: " + refsetIdentity.toString(), false);
         activity.setIndeterminate(true);
         long start = System.currentTimeMillis();
         Collection<? extends I_ExtendByRef> extensions = tf.getRefsetExtensionMembers(refsetIdentity.getConceptId());
