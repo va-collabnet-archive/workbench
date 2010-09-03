@@ -239,6 +239,10 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
             "marked parent is-a type", "marked parent is-a type" }, REFSET_RELATIONSHIP), PROMOTION_REL(new String[] {
             "promotion rel", "promotion rel" }, REFSET_RELATIONSHIP), COMMENTS_REL(new String[] { "comments rel",
             "comments rel" }, REFSET_RELATIONSHIP),
+            EDIT_TIME_REL(new String[] { "edit time rel",
+            "edit time rel" }, REFSET_RELATIONSHIP),
+            COMPUTE_TIME_REL(new String[] { "compute time rel",
+            "compute time rel" }, REFSET_RELATIONSHIP),
             REFSET_COMPUTE_TYPE_REL(new String[] { "refset compute type rel", "refset compute type rel" }, REFSET_RELATIONSHIP),
             LANGUAGE_ENUMERATION_ORIGIN_REL(new String[] { "language enumeration origin rel", "language enumeration origin rel" }, REFSET_RELATIONSHIP),
             LANGUAGE_SPEC_PREF_ORDER_REL(new String[] { "language spec pref order rel", "language spec pref order rel" }, REFSET_RELATIONSHIP),
