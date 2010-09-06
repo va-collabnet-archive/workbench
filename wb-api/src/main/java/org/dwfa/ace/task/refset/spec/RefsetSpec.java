@@ -501,7 +501,7 @@ public class RefsetSpec {
         }
     }
 
-    private Long getLastComputeTime() throws TerminologyException, IOException {
+    public Long getLastComputeTime() throws TerminologyException, IOException {
         I_GetConceptData specConcept = getRefsetSpecConcept();
         I_GetConceptData lastComputeTimeConcept = getComputeConcept();
         I_ExtendByRefPart latestPart = null;

@@ -39,6 +39,8 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,9 +81,12 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
@@ -365,17 +370,79 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 try {
                     boolean needsCompute = spec.needsCompute();
                     if (needsCompute) {
-                        computeStatusValueLabel.setText("spec has been modified since last compute");
-                        computeStatusValueLabel.setForeground(Color.red);
+                        Long lastComputeTime = spec.getLastComputeTime();
+                        if (lastComputeTime == null) {
+                            computeStatusValueLabel.setText("spec has never been computed");
+                            computeStatusValueLabel.setForeground(Color.red);
+                        } else {
+                            computeStatusValueLabel.setText("spec has been modified since last compute");
+                            computeStatusValueLabel.setForeground(Color.red);
+                        }
                     } else {
-                        computeStatusValueLabel.setText("spec unmodified since last compute");
-                        computeStatusValueLabel.setForeground(Color.black);
+                        Long lastComputeTime = spec.getLastComputeTime();
+                        if (lastComputeTime == null) {
+                            computeStatusValueLabel.setText("spec has never been computed");
+                            computeStatusValueLabel.setForeground(Color.black);
+                        } else {
+                            computeStatusValueLabel.setText("spec unmodified since last compute");
+                            computeStatusValueLabel.setForeground(Color.black);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     computeStatusValueLabel.setText("Unknown");
                     computeStatusValueLabel.setForeground(Color.black);
                     computeStatusValueLabel.setBorder(null);
+                }
+
+                try {
+                    Long lastComputeTime = spec.getLastComputeTime();
+
+                    if (lastComputeTime == null) {
+                        lastComputeTimeValueLabel.setText("never");
+                    } else {
+                        lastComputeTimeValueLabel.setText("" + new Date(lastComputeTime));
+                    }
+                } catch (Exception e) {
+                    lastComputeTimeValueLabel.setText("Error fetching last compute time");
+                    e.printStackTrace();
+                }
+
+                try {
+                    Collection<? extends I_ExtendByRef> extensions =
+                            Terms.get().getRefsetExtensionMembers(refset.getConceptId());
+                    int count = 0;
+                    I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(ace.getAceFrameConfig());
+
+                    for (I_ExtendByRef ext : extensions) {
+                        List<? extends I_ExtendByRefVersion> tuples =
+                                ext.getTuples(helper.getCurrentStatusIntSet(), ace.getAceFrameConfig()
+                                    .getViewPositionSetReadOnly(), ace.getAceFrameConfig().getPrecedence(), ace
+                                    .getAceFrameConfig().getConflictResolutionStrategy());
+                        I_ExtendByRefVersion latestTuple = null;
+
+                        for (I_ExtendByRefVersion currentTuple : tuples) {
+                            if (latestTuple == null || latestTuple.getVersion() > currentTuple.getVersion()) {
+                                latestTuple = currentTuple;
+                            }
+                        }
+
+                        if (latestTuple != null) {
+                            if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
+                                if (latestTuple.getRefsetId() == refset.getConceptId()) {
+                                    if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
+                                        count++;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    memberCountValueLabel.setText("" + count);
+                } catch (Exception e) {
+                    memberCountValueLabel.setText("Error computing member count");
+                    e.printStackTrace();
                 }
 
                 if (leftTogglePane != null) {
@@ -431,7 +498,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
         }
-
     }
 
     private class ShowHistoryListener implements ActionListener {
@@ -488,6 +554,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private JLabel computeTypeValueLabel;
 
     private JLabel computeStatusValueLabel;
+
+    private JLabel lastComputeTimeValueLabel;
+
+    private JLabel memberCountValueLabel;
 
     private LinkedList<I_GetConceptData> tabHistoryList;
 
@@ -647,9 +717,17 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         inner.gridy++;
         JLabel computeStatusLabel = new JLabel("compute status: ");
         leftTogglePane.add(computeStatusLabel, inner);
+        inner.gridy++;
+        JLabel memberCountLabel = new JLabel("member count at last compute: ");
+        leftTogglePane.add(memberCountLabel, inner);
+        inner.gridy++;
+        JLabel lastComputeTimeLabel = new JLabel("time of last compute: ");
+        leftTogglePane.add(lastComputeTimeLabel, inner);
 
         inner.anchor = GridBagConstraints.WEST;
         inner.gridx++;
+        inner.gridy--;
+        inner.gridy--;
         inner.gridy--;
         inner.gridy--;
         refsetStatusValueLabel = new JLabel("");
@@ -660,6 +738,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         inner.gridy++;
         computeStatusValueLabel = new JLabel("");
         leftTogglePane.add(computeStatusValueLabel, inner);
+        inner.gridy++;
+        memberCountValueLabel = new JLabel("");
+        leftTogglePane.add(memberCountValueLabel, inner);
+        inner.gridy++;
+        lastComputeTimeValueLabel = new JLabel("");
+        leftTogglePane.add(lastComputeTimeValueLabel, inner);
 
         outer.gridx++;
         outer.weightx = 1.0;
