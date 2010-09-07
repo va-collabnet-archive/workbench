@@ -23,6 +23,9 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +52,7 @@ import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
@@ -236,6 +240,21 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
     }
 
+    public static void addExtensionsToMap(Collection<? extends I_ExtendByRef> list,
+            HashMap<Integer, DefaultMutableTreeNode> extensionMap, HashSet<Integer> fetchedComponents, int refsetNid)
+            throws IOException {
+        for (I_ExtendByRef ext : list) {
+            if (ext.getRefsetId() == refsetNid) {
+                extensionMap.put(ext.getMemberId(), new DefaultMutableTreeNode(ext));
+                if (!fetchedComponents.contains(ext.getMemberId())) {
+                    fetchedComponents.add(ext.getMemberId());
+                    addExtensionsToMap(Terms.get().getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap,
+                        fetchedComponents, refsetNid);
+                }
+            }
+        }
+    }
+
     private class RetireSpecAction implements ActionListener {
         private I_ExtendByRefVersion thinExtByRefTuple;
 
@@ -247,35 +266,110 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         public void actionPerformed(ActionEvent arg0) {
             try {
                 I_ExtendByRefPart currentPart = thinExtByRefTuple.getMutablePart();
-                I_ExtendByRefPart newPart =
-                        (I_ExtendByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize()
-                            .getNid(), currentPart.getPathId(), Long.MAX_VALUE);
-                thinExtByRefTuple.getCore().addVersion(newPart);
 
-                I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-                boolean prevAutoCommit = helper.isAutocommitActive();
-                helper.setAutocommitActive(false);
-                I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-                RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig);
-                I_GetConceptData specConcept = refsetSpec.getRefsetSpecConcept();
-                I_GetConceptData editTimeConcept = refsetSpec.getEditConcept();
+                I_ExtendByRef clauseBeingRetired = (I_ExtendByRef) thinExtByRefTuple.getCore();
+                Collection<? extends I_ExtendByRef> extensions =
+                        Terms.get().getAllExtensionsForComponent(aceConfig.getRefsetSpecInSpecEditor().getConceptId(),
+                            true);
 
-                if (specConcept != null && editTimeConcept != null) {
-                    helper.newLongRefsetExtension(editTimeConcept.getConceptId(), specConcept.getConceptId(), System
-                        .currentTimeMillis());
+                HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+                HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+                fetchedComponents.add(aceConfig.getRefsetSpecInSpecEditor().getConceptId());
+
+                addExtensionsToMap(extensions, extensionMap, fetchedComponents, aceConfig.getRefsetSpecInSpecEditor()
+                    .getConceptId());
+
+                DefaultMutableTreeNode selectedRoot = new DefaultMutableTreeNode(clauseBeingRetired);
+                DefaultMutableTreeNode specRoot = new DefaultMutableTreeNode(clauseBeingRetired);
+                extensionMap.put(aceConfig.getRefsetSpecInSpecEditor().getConceptId(), specRoot);
+
+                for (DefaultMutableTreeNode extNode : extensionMap.values()) {
+                    I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
+                    if (ext.getComponentId() == clauseBeingRetired.getMemberId()) {
+                        selectedRoot.add(extNode);
+                    } else if (ext.getComponentId() == aceConfig.getRefsetSpecInSpecEditor().getConceptId()) {
+                        // do nothing
+                    } else {
+                        extensionMap.get(ext.getComponentId()).add(extNode);
+                    }
                 }
-                helper.setAutocommitActive(prevAutoCommit);
+
+                int childCount = selectedRoot.getChildCount();
+                if (childCount > 0) {
+                    // display dialog that alerts the user that there are children clauses which need to be retired
+
+                    Object[] options = { "Retire all", "Cancel" };
+                    int n =
+                            JOptionPane.showOptionDialog(OpenFrames.getActiveFrame(),
+                                "The selected clause has child-clauses. How would you like to proceed?",
+                                "Multiple clause retirement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                                null, options, options[0]);
+                    if (n == JOptionPane.YES_OPTION) {
+                        try {
+                            // retire all children as well as the selected/current clause
+                            retireClause(thinExtByRefTuple);
+
+                            for (int i = 0; i < childCount; i++) {
+
+                                DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) selectedRoot.getChildAt(i);
+                                I_ExtendByRef childClause = (I_ExtendByRef) childNode.getUserObject();
+                                List<? extends I_ExtendByRefVersion> childExtensions =
+                                        childClause.getTuples(aceConfig.getAllowedStatus(), aceConfig
+                                            .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
+                                            .getConflictResolutionStrategy());
+                                if (childExtensions.size() > 0) {
+                                    I_ExtendByRefVersion thinPart = childExtensions.get(0);// .getMutablePart();
+                                    retireClause(thinPart);
+                                }
+                            }
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    } else if (n == JOptionPane.NO_OPTION) {
+                        return; // user has opted to cancel the retiring
+                    }
+
+                } else {
+                    // retire only the clause as it has no children to deal with
+                    retireClause(thinExtByRefTuple);
+                }
 
             } catch (IOException e) {
+                e.printStackTrace();
                 throw new RuntimeException();
             } catch (TerminologyException e) {
+                e.printStackTrace();
                 throw new RuntimeException();
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException();
             }
-            Terms.get().addUncommitted(thinExtByRefTuple.getCore());
+
             specEditor.updateSpecTree(false);
             aceConfig.refreshRefsetTab();
+        }
+
+        private void retireClause(I_ExtendByRefVersion currentExtVersion) throws Exception {
+            I_ExtendByRefPart currentPart = currentExtVersion.getMutablePart();
+            I_ExtendByRefPart newPart =
+                    (I_ExtendByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize()
+                        .getNid(), currentPart.getPathId(), Long.MAX_VALUE);
+            currentExtVersion.getCore().addVersion(newPart);
+
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            boolean prevAutoCommit = helper.isAutocommitActive();
+            helper.setAutocommitActive(false);
+            I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
+            RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig);
+            I_GetConceptData specConcept = refsetSpec.getRefsetSpecConcept();
+            I_GetConceptData editTimeConcept = refsetSpec.getEditConcept();
+
+            if (specConcept != null && editTimeConcept != null) {
+                helper.newLongRefsetExtension(editTimeConcept.getConceptId(), specConcept.getConceptId(), System
+                    .currentTimeMillis());
+            }
+            helper.setAutocommitActive(prevAutoCommit);
+            Terms.get().addUncommitted(currentExtVersion.getCore());
         }
     }
 
