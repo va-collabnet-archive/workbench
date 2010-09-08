@@ -36,11 +36,13 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
@@ -134,7 +136,14 @@ import org.ihtsdo.tk.api.PositionBI;
  * 
  * @requiresDependencyResolution compile
  */
-public class VersionDiff extends AbstractMojo {
+public class VersionDiff extends DiffBase {
+
+	/**
+	 * The uuid for the path to create the refsets
+	 * 
+	 * @parameter
+	 */
+	protected String refset_path_uuid;
 
 	/**
 	 * The name to identify this comparison
@@ -142,405 +151,6 @@ public class VersionDiff extends AbstractMojo {
 	 * @parameter
 	 */
 	private String name;
-
-	/**
-	 * The uuid of the path.
-	 * 
-	 * @parameter
-	 */
-	private String path_uuid;
-
-	private PathBI path;
-
-	/**
-	 * The time for v1 in yyyy.mm.dd hh:mm:ss zzz format
-	 * 
-	 * @parameter
-	 */
-	private String v1;
-
-	/**
-	 * The id of v1.
-	 */
-	private Integer v1_id;
-
-	/**
-	 * The time for v2 in yyyy.mm.dd hh:mm:ss zzz format
-	 * 
-	 * @parameter
-	 */
-	private String v2;
-
-	/**
-	 * The id of v2.
-	 */
-	private Integer v2_id;
-
-	/**
-	 * Set to true to include added concepts.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean added_concepts;
-
-	/**
-	 * Set to true to include deleted concepts.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean deleted_concepts;
-
-	/**
-	 * Set to true to include concepts with changed status.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_concept_status;
-
-	/**
-	 * Optional list of concept status to filter v1 concept status changes
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_concept_status = new ArrayList<String>();
-
-	private List<Integer> v1_concept_status_int;
-
-	/**
-	 * Optional list of concept status to filter v2 concept status changes
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_concept_status = new ArrayList<String>();
-
-	private List<Integer> v2_concept_status_int;
-
-	/**
-	 * Set to true to include concepts with changed defined
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_defined;
-
-	/**
-	 * Optional list of isa to filter v1
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_isa_filter = new ArrayList<String>();
-
-	private List<Integer> v1_isa_filter_int;
-
-	/**
-	 * Optional list of isa to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_isa_filter = new ArrayList<String>();
-
-	private List<Integer> v2_isa_filter_int;
-
-	/**
-	 * Optional list of concept status to filter v1 concept status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_concept_status_filter = new ArrayList<String>();
-
-	private List<Integer> v1_concept_status_filter_int;
-
-	/**
-	 * Optional list of concept status to filter v2 concept status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_concept_status_filter = new ArrayList<String>();
-
-	private List<Integer> v2_concept_status_filter_int;
-
-	/**
-	 * Set to true to include added descriptions.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean added_descriptions;
-
-	/**
-	 * Set to true to include deleted descriptions.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean deleted_descriptions;
-
-	/**
-	 * Set to true to include descriptions with changed status.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_description_status;
-
-	/**
-	 * Optional list of description status to filter v1 changed status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_description_status = new ArrayList<String>();
-
-	private List<Integer> v1_description_status_int;
-
-	/**
-	 * Optional list of description status to filter v2 changed status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_description_status = new ArrayList<String>();
-
-	private List<Integer> v2_description_status_int;
-
-	/**
-	 * Set to true to include descriptions with changed term.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_description_term;
-
-	/**
-	 * Set to true to include descriptions with changed type.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_description_type;
-
-	/**
-	 * Set to true to include descriptions with changed language.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_description_language;
-
-	/**
-	 * Set to true to include descriptions with changed case.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_description_case;
-
-	/**
-	 * Optional list of description status to filter v1 status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_description_status_filter = new ArrayList<String>();
-
-	private List<Integer> v1_description_status_filter_int;
-
-	/**
-	 * Optional list of description status to filter v2 status
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_description_status_filter = new ArrayList<String>();
-
-	private List<Integer> v2_description_status_filter_int;
-
-	/**
-	 * Optional list of description type to filter v1 type
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_description_type_filter = new ArrayList<String>();
-
-	private List<Integer> v1_description_type_filter_int;
-
-	/**
-	 * Optional list of description type to filter v2 type
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_description_type_filter = new ArrayList<String>();
-
-	private List<Integer> v2_description_type_filter_int;
-
-	/**
-	 * Optional regex to filter v1 term
-	 * 
-	 * @parameter
-	 */
-	private String v1_description_term_filter;
-
-	/**
-	 * Optional regex to filter v2 term
-	 * 
-	 * @parameter
-	 */
-	private String v2_description_term_filter;
-
-	/**
-	 * Optional regex to filter v1 lang
-	 * 
-	 * @parameter
-	 */
-	private String v1_description_lang_filter;
-
-	/**
-	 * Optional regex to filter v2 lang
-	 * 
-	 * @parameter
-	 */
-	private String v2_description_lang_filter;
-
-	/**
-	 * Optional filter on v1 case
-	 * 
-	 * @parameter
-	 */
-	private Boolean v1_description_case_filter;
-
-	/**
-	 * Optional filter on v2 case
-	 * 
-	 * @parameter
-	 */
-	private Boolean v2_description_case_filter;
-
-	/**
-	 * Set to true to include added relationships.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean added_relationships;
-
-	/**
-	 * Set to true to include deleted relationships.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean deleted_relationships;
-
-	/**
-	 * Set to true to include relationships with changed status.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_relationship_status;
-
-	/**
-	 * Optional list of relationship status to filter v1
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_relationship_status = new ArrayList<String>();
-
-	private List<Integer> v1_relationship_status_int;
-
-	/**
-	 * Optional list of relationship status to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_relationship_status = new ArrayList<String>();
-
-	private List<Integer> v2_relationship_status_int;
-
-	/**
-	 * Set to true to include relationships with changed characteristic.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_relationship_characteristic;
-
-	/**
-	 * Set to true to include relationships with changed refinability.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_relationship_refinability;
-
-	/**
-	 * Set to true to include relationships with changed type.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_relationship_type;
-
-	/**
-	 * Set to true to include relationships with changed group.
-	 * 
-	 * @parameter default-value=true
-	 */
-	private boolean changed_relationship_group;
-
-	/**
-	 * Optional list of relationship status to filter v1
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_relationship_status_filter = new ArrayList<String>();
-
-	private List<Integer> v1_relationship_status_filter_int;
-
-	/**
-	 * Optional list of relationship status to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_relationship_status_filter = new ArrayList<String>();
-
-	private List<Integer> v2_relationship_status_filter_int;
-
-	/**
-	 * Optional list of relationship characteristic to filter v1 characteristic
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_relationship_characteristic_filter = new ArrayList<String>();
-
-	private List<Integer> v1_relationship_characteristic_filter_int;
-
-	/**
-	 * Optional list of relationship characteristic to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_relationship_characteristic_filter = new ArrayList<String>();
-
-	private List<Integer> v2_relationship_characteristic_filter_int;
-
-	/**
-	 * Optional list of relationship refinability to filter v1
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_relationship_refinability_filter = new ArrayList<String>();
-
-	private List<Integer> v1_relationship_refinability_filter_int;
-
-	/**
-	 * Optional list of relationship refinability to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_relationship_refinability_filter = new ArrayList<String>();
-
-	private List<Integer> v2_relationship_refinability_filter_int;
-
-	/**
-	 * Optional list of relationship type to filter v1
-	 * 
-	 * @parameter
-	 */
-	private List<String> v1_relationship_type_filter = new ArrayList<String>();
-
-	private List<Integer> v1_relationship_type_filter_int;
-
-	/**
-	 * Optional list of relationship type to filter v2
-	 * 
-	 * @parameter
-	 */
-	private List<String> v2_relationship_type_filter = new ArrayList<String>();
-
-	private List<Integer> v2_relationship_type_filter_int;
 
 	/**
 	 * List refset to file if present
@@ -603,8 +213,8 @@ public class VersionDiff extends AbstractMojo {
 	 * Creates the refset concept, if member_refset != null then create a member
 	 * refset
 	 */
-	private void createRefsetConcept(PositionBI pos1, PositionBI pos2,
-			Integer member_refset) throws Exception {
+	private void createRefsetConcept(PathBI path, PositionBI pos1,
+			PositionBI pos2, Integer member_refset) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData fully_specified_description_type = tf
 				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
@@ -638,43 +248,33 @@ public class VersionDiff extends AbstractMojo {
 		// Install the preferred term
 		tf.newDescription(UUID.randomUUID(), new_refset, "en", refset_name,
 				preferred_description_type, config_ace_frame);
-		tf
-				.newRelationship(
-						UUID.randomUUID(),
-						new_refset,
-						tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-								.getUids()),
-						(member_refset != null ? refset
-								: tf
-										.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY
-												.getUids())),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-										.getUids()),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-										.getUids()),
-						tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
+		tf.newRelationship(
+				UUID.randomUUID(),
+				new_refset,
+				tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+				(member_refset != null ? refset : tf
+						.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY
+								.getUids())),
+				tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+						.getUids()),
+				tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
+						.getUids()), tf
+						.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
 								.getUids()), 0, config_ace_frame);
-		tf
-				.newRelationship(
-						UUID.randomUUID(),
-						new_refset,
-						tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL
-								.getUids()),
-						(member_refset != null ? tf
-								.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
-										.getUids())
-								: tf
-										.getConcept(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION
-												.getUids())),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-										.getUids()),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-										.getUids()),
-						tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
+		tf.newRelationship(
+				UUID.randomUUID(),
+				new_refset,
+				tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids()),
+				(member_refset != null ? tf
+						.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION
+								.getUids())
+						: tf.getConcept(RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION
+								.getUids())),
+				tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
+						.getUids()),
+				tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
+						.getUids()), tf
+						.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
 								.getUids()), 0, config_ace_frame);
 		tf.commit();
 		if (member_refset != null) {
@@ -682,52 +282,6 @@ public class VersionDiff extends AbstractMojo {
 		} else {
 			refset = new_refset;
 		}
-	}
-
-	@Deprecated
-	protected I_GetConceptData createChangeTypeConcept(String name)
-			throws Exception {
-		I_TermFactory tf = Terms.get();
-		I_GetConceptData fully_specified_description_type = tf
-				.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-						.getUids());
-		I_GetConceptData preferred_description_type = tf
-				.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
-						.getUids());
-		I_ConfigAceFrame config = tf.newAceFrameConfig();
-		// PathBI path = tf
-		// .getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
-		// .getUids());
-		config.addEditingPath(path);
-		config.setDefaultStatus(tf
-				.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
-		UUID uuid = UUID.randomUUID();
-		I_GetConceptData newConcept = tf.newConcept(uuid, false, config);
-		// Install the FSN
-		tf.newDescription(UUID.randomUUID(), newConcept, "en", name,
-				fully_specified_description_type, config);
-		// Install the preferred term
-		tf.newDescription(UUID.randomUUID(), newConcept, "en", name,
-				preferred_description_type, config);
-		tf
-				.newRelationship(
-						UUID.randomUUID(),
-						newConcept,
-						tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-								.getUids()),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT
-										.getUids()),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC
-										.getUids()),
-						tf
-								.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-										.getUids()),
-						tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE
-								.getUids()), 0, config);
-		tf.commit();
-		return newConcept;
 	}
 
 	private boolean noop = false;
@@ -747,8 +301,8 @@ public class VersionDiff extends AbstractMojo {
 			refset_map.put(REFSET_PROPERTY.CID_ONE, change_id);
 			refset_map.put(REFSET_PROPERTY.STRING_VALUE, comment);
 			refsetHelper.getOrCreateRefsetExtension(refset.getConceptNid(),
-					concept_id, REFSET_TYPES.CID_STR, refset_map, UUID
-							.randomUUID());
+					concept_id, REFSET_TYPES.CID_STR, refset_map,
+					UUID.randomUUID());
 		}
 		//
 		if (change_id == this.config || change_id == this.stats)
@@ -760,145 +314,69 @@ public class VersionDiff extends AbstractMojo {
 				return;
 			}
 			refset_map_member.put(REFSET_PROPERTY.CID_ONE, concept_id);
-			refsetHelper.getOrCreateRefsetExtension(member_refset
-					.getConceptNid(), concept_id, REFSET_TYPES.CID,
-					refset_map_member, UUID.randomUUID());
+			refsetHelper.getOrCreateRefsetExtension(
+					member_refset.getConceptNid(), concept_id,
+					REFSET_TYPES.CID, refset_map_member, UUID.randomUUID());
 		}
 	}
 
-	private void setupConcepts() throws Exception {
-		// this.config = this.createChangeTypeConcept("Configuration")
-		// .getConceptNid();
-		this.config = RefsetAuxiliary.Concept.DIFFERENCE_CONFIGURATION
-				.localize().getNid();
-		// this.stats = this.createChangeTypeConcept("Statistics")
-		// .getConceptNid();
-		this.stats = RefsetAuxiliary.Concept.DIFFERENCE_STATISTICS.localize()
-				.getNid();
-
-		// this.added_concept_change = this.createChangeTypeConcept(
-		// "Added Concept").getConceptNid();
-		this.added_concept_change = RefsetAuxiliary.Concept.ADDED_CONCEPT
-				.localize().getNid();
-		// this.deleted_concept_change = this.createChangeTypeConcept(
-		// "Deleted Concept").getConceptNid();
-		this.deleted_concept_change = RefsetAuxiliary.Concept.DELETED_CONCEPT
-				.localize().getNid();
-		// this.concept_status_change = this.createChangeTypeConcept(
-		// "Changed Concept Status").getConceptNid();
-		this.concept_status_change = RefsetAuxiliary.Concept.CHANGED_CONCEPT_STATUS
-				.localize().getNid();
-		// this.defined_change = this.createChangeTypeConcept(
-		// "Changed Defined").getConceptNid();
-		this.defined_change = RefsetAuxiliary.Concept.CHANGED_DEFINED
-				.localize().getNid();
-
-		// this.added_description_change = this.createChangeTypeConcept(
-		// "Added Description").getConceptNid();
-		this.added_description_change = RefsetAuxiliary.Concept.ADDED_DESCRIPTION
-				.localize().getNid();
-		// this.deleted_description_change = this.createChangeTypeConcept(
-		// "Deleted Description").getConceptNid();
-		this.deleted_description_change = RefsetAuxiliary.Concept.DELETED_DESCRIPTION
-				.localize().getNid();
-		// this.description_status_change = this.createChangeTypeConcept(
-		// "Changed Description Status").getConceptNid();
-		this.description_status_change = RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_STATUS
-				.localize().getNid();
-		// this.description_term_change = this.createChangeTypeConcept(
-		// "Changed Description Term").getConceptNid();
-		this.description_term_change = RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_TERM
-				.localize().getNid();
-		// this.description_type_change = this.createChangeTypeConcept(
-		// "Changed Description Type").getConceptNid();
-		this.description_type_change = RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_TYPE
-				.localize().getNid();
-		// this.description_language_change = this.createChangeTypeConcept(
-		// "Changed Description Language").getConceptNid();
-		this.description_language_change = RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_LANGUAGE
-				.localize().getNid();
-		// this.description_case_change = this.createChangeTypeConcept(
-		// "Changed Description Case").getConceptNid();
-		this.description_case_change = RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_CASE
-				.localize().getNid();
-
-		// this.added_relationship_change = this.createChangeTypeConcept(
-		// "Added Relationship").getConceptNid();
-		this.added_relationship_change = RefsetAuxiliary.Concept.ADDED_RELATIONSHIP
-				.localize().getNid();
-		// this.deleted_relationship_change = this.createChangeTypeConcept(
-		// "Deleted Relationship").getConceptNid();
-		this.deleted_relationship_change = RefsetAuxiliary.Concept.DELETED_RELATIONSHIP
-				.localize().getNid();
-		// this.relationship_status_change = this.createChangeTypeConcept(
-		// "Changed Relationship Status").getConceptNid();
-		this.relationship_status_change = RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_STATUS
-				.localize().getNid();
-		// this.relationship_characteristic_change = this
-		// .createChangeTypeConcept(
-		// "Changed Relationship Characteristic")
-		// .getConceptNid();
-		this.relationship_characteristic_change = RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_CHARACTERISTIC
-				.localize().getNid();
-		// this.relationship_refinability_change = this
-		// .createChangeTypeConcept(
-		// "Changed Relationship Refinability").getConceptNid();
-		this.relationship_refinability_change = RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_REFINABILITY
-				.localize().getNid();
-		// this.relationship_type_change = this.createChangeTypeConcept(
-		// "Changed Relationship Type").getConceptNid();
-		this.relationship_type_change = RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_TYPE
-				.localize().getNid();
-		// this.relationship_group_change = this.createChangeTypeConcept(
-		// "Changed Relationship Group").getConceptNid();
-		this.relationship_group_change = RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_GROUP
-				.localize().getNid();
+	@Override
+	protected void addedConcept(I_GetConceptData c) throws Exception {
+		super.addedConcept(c);
+		addToRefset(c.getConceptNid(), this.added_concept_change, c.toString());
+		incr(this.added_concept_change);
 	}
 
-	private List<Integer> buildConceptEnum(List<String> concepts, String tag)
+	@Override
+	protected void deletedConcept(I_GetConceptData c) throws Exception {
+		super.deletedConcept(c);
+		addToRefset(c.getConceptNid(), this.deleted_concept_change,
+				c.toString());
+		incr(this.deleted_concept_change);
+	}
+
+	@Override
+	protected void changedConceptStatus(I_GetConceptData c, int v1, int v2)
 			throws Exception {
-		ArrayList<Integer> ret = new ArrayList<Integer>();
-		logConfig(tag + " size = " + concepts.size());
-		I_TermFactory tf = Terms.get();
-		for (String str : concepts) {
-			I_GetConceptData con = tf.getConcept(Arrays.asList(UUID
-					.fromString(str)));
-			if (con == null) {
-				logConfig(tag + " ERROR - Can't find " + str);
-				continue;
-			}
-			ret.add(con.getConceptNid());
-			logConfig(tag + " = " + str + " " + con.getInitialText());
-		}
-		return ret;
+		super.changedConceptStatus(c, v1, v2);
+		addToRefset(c.getConceptNid(), this.concept_status_change,
+				getConceptName(v1) + " -> " + getConceptName(v2));
+		incr(this.concept_status_change);
 	}
 
-	private void compareAttributes(I_GetConceptData c, PathBI path)
+	@Override
+	protected void changedDefined(I_GetConceptData c, boolean v1, boolean v2)
+			throws Exception {
+		super.changedDefined(c, v1, v2);
+		addToRefset(c.getConceptNid(), this.defined_change, v1 + " -> " + v2);
+		incr(this.defined_change);
+	}
+
+	private void compareAttributesOrig(I_GetConceptData c, PathBI path)
 			throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_ConceptAttributePart a1 = null;
 		I_ConceptAttributePart a2 = null;
 		for (I_ConceptAttributePart a : c.getConceptAttributes()
 				.getMutableParts()) {
-			// Must be on the path
-			if (a.getPathId() != path.getConceptNid())
-				continue;
 			// Find the greatest version <= the one of interest
-			if (a.getVersion() <= v1_id
-					&& (a1 == null || a1.getVersion() < a.getVersion()))
+			if (a.getPathNid() != pos1.getPath().getConceptNid()
+					&& a.getTime() <= pos1.getTime()
+					&& (a1 == null || a1.getTime() < a.getTime()))
 				a1 = a;
-			if (a.getVersion() <= v2_id
-					&& (a2 == null || a2.getVersion() < a.getVersion()))
+			if (a.getPathNid() != pos2.getPath().getConceptNid()
+					&& a.getTime() <= pos2.getTime()
+					&& (a2 == null || a2.getTime() < a.getTime()))
 				a2 = a;
 		}
 		if (this.added_concepts && a1 == null && a2 != null) {
-			addToRefset(c.getConceptNid(), this.added_concept_change, c
-					.toString());
+			addToRefset(c.getConceptNid(), this.added_concept_change,
+					c.toString());
 			incr(this.added_concept_change);
 		}
 		if (this.deleted_concepts && a1 != null && a2 == null) {
-			addToRefset(c.getConceptNid(), this.deleted_concept_change, c
-					.toString());
+			addToRefset(c.getConceptNid(), this.deleted_concept_change,
+					c.toString());
 			incr(this.deleted_concept_change);
 		}
 		if (a1 != null && a2 != null && a1.getVersion() != a2.getVersion()) {
@@ -916,33 +394,101 @@ public class VersionDiff extends AbstractMojo {
 				incr(this.concept_status_change);
 			}
 			if (this.changed_defined && a1.isDefined() != a2.isDefined()) {
-				addToRefset(c.getConceptNid(), this.defined_change, a1
-						.isDefined()
-						+ " -> " + a2.isDefined());
+				addToRefset(c.getConceptNid(), this.defined_change,
+						a1.isDefined() + " -> " + a2.isDefined());
 				incr(this.defined_change);
 			}
 		}
 	}
 
-	int descriptions = 0;
-
-	int descriptions_filtered = 0;
-
-	private void compareDescriptions(I_GetConceptData c, PathBI path)
+	@Override
+	protected void addedDescription(I_GetConceptData c, I_DescriptionTuple d)
 			throws Exception {
+		super.addedDescription(c, d);
+		addToRefset(c.getConceptNid(), this.added_description_change,
+				String.valueOf(d.getDescId()) + "\t" + d);
+		incr(this.added_description_change);
+
+	}
+
+	// @Override
+	protected void deletedDescription(I_GetConceptData c, I_DescriptionTuple d)
+			throws Exception {
+		// super.deletedDescription(c, d);
+		addToRefset(c.getConceptNid(), this.deleted_description_change,
+				String.valueOf(d.getDescId()) + "\t" + d);
+		incr(this.deleted_description_change);
+	}
+
+	@Override
+	protected void changedDescriptionStatus(I_GetConceptData c,
+			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
+		super.changedDescriptionStatus(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.description_status_change,
+				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
+						+ getConceptName(d1.getStatusNid()) + " -> "
+						+ getConceptName(d2.getStatusNid()));
+		incr(this.description_status_change);
+	}
+
+	@Override
+	protected void changedDescriptionTerm(I_GetConceptData c,
+			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
+		super.changedDescriptionTerm(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.description_term_change,
+				String.valueOf(d1.getDescId()) + "\t" + d1.getText() + " -> "
+						+ d2.getText());
+		incr(this.description_term_change);
+	}
+
+	@Override
+	protected void changedDescriptionLang(I_GetConceptData c,
+			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
+		super.changedDescriptionLang(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.description_language_change,
+				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
+						+ d1.getLang() + " -> " + d2.getLang());
+		incr(this.description_language_change);
+	}
+
+	@Override
+	protected void changedDescriptionCase(I_GetConceptData c,
+			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
+		super.changedDescriptionCase(c, d1, d2);
+		addToRefset(
+				c.getConceptNid(),
+				this.description_case_change,
+				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
+						+ d1.isInitialCaseSignificant() + " -> "
+						+ d2.isInitialCaseSignificant());
+		incr(this.description_case_change);
+	}
+
+	@Override
+	protected void changedDescriptionType(I_GetConceptData c,
+			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
+		super.changedDescriptionType(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.description_type_change,
+				String.valueOf(d1.getDescId()) + "\t" + d2.getText() + ": "
+						+ getConceptName(d1.getTypeNid()) + " -> "
+						+ getConceptName(d2.getTypeNid()));
+		incr(this.description_type_change);
+	}
+
+	private void compareDescriptionsOrig(I_GetConceptData c) throws Exception {
 		I_TermFactory tf = Terms.get();
 		for (I_DescriptionVersioned d : c.getDescriptions()) {
 			descriptions++;
 			I_DescriptionPart d1 = null;
 			I_DescriptionPart d2 = null;
 			for (I_DescriptionPart dd : d.getMutableParts()) {
-				if (dd.getPathId() != path.getConceptNid())
-					continue;
 				// Find the greatest version <= the one of interest
-				if (dd.getVersion() <= v1_id
+				if (dd.getPathId() != pos1.getPath().getConceptNid()
+						&& dd.getVersion() <= pos1.getVersion()
 						&& (d1 == null || d1.getVersion() < dd.getVersion()))
 					d1 = dd;
-				if (dd.getVersion() <= v2_id
+				if (dd.getPathId() != pos2.getPath().getConceptNid()
+						&& dd.getVersion() <= pos2.getVersion()
 						&& (d2 == null || d2.getVersion() < dd.getVersion()))
 					d2 = dd;
 			}
@@ -1006,8 +552,8 @@ public class VersionDiff extends AbstractMojo {
 						&& (this.v2_description_status.size() == 0 || this.v2_description_status_int
 								.contains(d2.getStatusId()))) {
 					addToRefset(c.getConceptNid(),
-							this.description_status_change, String.valueOf(d
-									.getDescId())
+							this.description_status_change,
+							String.valueOf(d.getDescId())
 									+ "\t"
 									+ d2.getText()
 									+ ": "
@@ -1021,7 +567,8 @@ public class VersionDiff extends AbstractMojo {
 				// term
 				if (this.changed_description_term
 						&& !d1.getText().equals(d2.getText())) {
-					addToRefset(c.getConceptNid(), this.description_term_change,
+					addToRefset(c.getConceptNid(),
+							this.description_term_change,
 							String.valueOf(d.getDescId()) + "\t" + d1.getText()
 									+ " -> " + d2.getText());
 					incr(this.description_term_change);
@@ -1029,7 +576,8 @@ public class VersionDiff extends AbstractMojo {
 				// type
 				if (this.changed_description_type
 						&& d1.getTypeId() != d2.getTypeId()) {
-					addToRefset(c.getConceptNid(), this.description_type_change,
+					addToRefset(c.getConceptNid(),
+							this.description_type_change,
 							String.valueOf(d.getDescId())
 									+ "\t"
 									+ d2.getText()
@@ -1044,21 +592,20 @@ public class VersionDiff extends AbstractMojo {
 				// lang
 				if (this.changed_description_language
 						&& !d1.getLang().equals(d2.getLang())) {
-					addToRefset(c.getConceptNid(),
-							this.description_language_change, String.valueOf(d
-									.getDescId())
-									+ "\t"
-									+ d2.getText()
-									+ ": "
-									+ d1.getLang()
-									+ " -> " + d2.getLang());
+					addToRefset(
+							c.getConceptNid(),
+							this.description_language_change,
+							String.valueOf(d.getDescId()) + "\t" + d2.getText()
+									+ ": " + d1.getLang() + " -> "
+									+ d2.getLang());
 					incr(this.description_language_change);
 				}
 				// case
 				if (this.changed_description_case
 						&& d1.isInitialCaseSignificant() != d2
 								.isInitialCaseSignificant()) {
-					addToRefset(c.getConceptNid(), this.description_case_change,
+					addToRefset(c.getConceptNid(),
+							this.description_case_change,
 							String.valueOf(d.getDescId()) + "\t" + d2.getText()
 									+ ": " + d1.isInitialCaseSignificant()
 									+ " -> " + d2.isInitialCaseSignificant());
@@ -1068,11 +615,80 @@ public class VersionDiff extends AbstractMojo {
 		}
 	}
 
-	int relationships = 0;
+	@Override
+	protected void addedRelationship(I_GetConceptData c, I_RelTuple d)
+			throws Exception {
+		super.addedRelationship(c, d);
+		addToRefset(c.getConceptNid(), this.added_relationship_change,
+				String.valueOf(d.getRelId()) + "\t" + d);
+		incr(this.added_relationship_change);
+	}
 
-	int relationships_filtered = 0;
+	protected void deletedRelationship(I_GetConceptData c, I_RelTuple d)
+			throws Exception {
+		// super.deletedRelationship(c, d);
+		addToRefset(c.getConceptNid(), this.deleted_relationship_change,
+				String.valueOf(d.getRelId()) + "\t" + d);
+		incr(this.deleted_relationship_change);
+	}
 
-	private void compareRelationships(I_GetConceptData c, PathBI path)
+	@Override
+	protected void changedRelationshipStatus(I_GetConceptData c, I_RelTuple d1,
+			I_RelTuple d2) throws Exception {
+		super.changedRelationshipStatus(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.relationship_status_change,
+				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
+						+ getConceptName(d1.getStatusNid()) + " -> "
+						+ getConceptName(d2.getStatusNid()));
+		incr(this.relationship_status_change);
+	}
+
+	@Override
+	protected void changedRelationshipType(I_GetConceptData c, I_RelTuple d1,
+			I_RelTuple d2) throws Exception {
+		super.changedRelationshipType(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.relationship_type_change,
+				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
+						+ getConceptName(d1.getTypeNid()) + " -> "
+						+ getConceptName(d2.getTypeNid()));
+		incr(this.relationship_type_change);
+	}
+
+	@Override
+	protected void changedRelationshipCharacteristic(I_GetConceptData c,
+			I_RelTuple d1, I_RelTuple d2) throws Exception {
+		super.changedRelationshipCharacteristic(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.relationship_characteristic_change,
+				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
+						+ getConceptName(d1.getCharacteristicId()) + " -> "
+						+ getConceptName(d2.getCharacteristicId()));
+		incr(this.relationship_characteristic_change);
+	}
+
+	@Override
+	protected void changedRelationshipRefinability(I_GetConceptData c,
+			I_RelTuple d1, I_RelTuple d2) throws Exception {
+		super.changedRelationshipRefinability(c, d1, d2);
+		addToRefset(c.getConceptNid(), this.relationship_refinability_change,
+				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
+						+ getConceptName(d1.getCharacteristicId()) + " -> "
+						+ getConceptName(d2.getCharacteristicId()));
+		incr(this.relationship_refinability_change);
+	}
+
+	@Override
+	protected void changedRelationshipGroup(I_GetConceptData c, I_RelTuple d1,
+			I_RelTuple d2) throws Exception {
+		super.changedRelationshipGroup(c, d1, d2);
+		addToRefset(
+				c.getConceptNid(),
+				this.relationship_group_change,
+				String.valueOf(d1.getRelId()) + "\t" + d2 + ": "
+						+ d1.getGroup() + " -> " + d2.getGroup());
+		incr(this.relationship_group_change);
+	}
+
+	private void compareRelationshipsOrig(I_GetConceptData c, PathBI path)
 			throws Exception {
 		I_TermFactory tf = Terms.get();
 		for (I_RelVersioned d : c.getSourceRels()) {
@@ -1083,10 +699,10 @@ public class VersionDiff extends AbstractMojo {
 				if (dd.getPathId() != path.getConceptNid())
 					continue;
 				// Find the greatest version <= the one of interest
-				if (dd.getVersion() <= v1_id
+				if (dd.getVersion() <= pos1.getTime()
 						&& (r1 == null || r1.getVersion() < dd.getVersion()))
 					r1 = dd;
-				if (dd.getVersion() <= v2_id
+				if (dd.getVersion() <= pos2.getTime()
 						&& (r2 == null || r2.getVersion() < dd.getVersion()))
 					r2 = dd;
 			}
@@ -1137,7 +753,8 @@ public class VersionDiff extends AbstractMojo {
 				incr(this.added_relationship_change);
 			}
 			if (this.deleted_relationships && r1 != null && r2 == null) {
-				addToRefset(c.getConceptNid(), this.deleted_relationship_change,
+				addToRefset(c.getConceptNid(),
+						this.deleted_relationship_change,
 						String.valueOf(d.getRelId()) + "\t" + r1);
 				incr(this.deleted_relationship_change);
 			}
@@ -1150,8 +767,8 @@ public class VersionDiff extends AbstractMojo {
 						&& (this.v2_relationship_status.size() == 0 || this.v2_relationship_status_int
 								.contains(r2.getStatusId()))) {
 					addToRefset(c.getConceptNid(),
-							this.relationship_status_change, String.valueOf(d
-									.getRelId())
+							this.relationship_status_change,
+							String.valueOf(d.getRelId())
 									+ "\t"
 									+ r2
 									+ ": "
@@ -1166,8 +783,8 @@ public class VersionDiff extends AbstractMojo {
 				if (this.changed_relationship_characteristic
 						&& r1.getCharacteristicId() != r2.getCharacteristicId()) {
 					addToRefset(c.getConceptNid(),
-							this.relationship_characteristic_change, String
-									.valueOf(d.getRelId())
+							this.relationship_characteristic_change,
+							String.valueOf(d.getRelId())
 									+ "\t"
 									+ r2
 									+ ": "
@@ -1182,8 +799,8 @@ public class VersionDiff extends AbstractMojo {
 				if (this.changed_relationship_refinability
 						&& r1.getRefinabilityId() != r2.getRefinabilityId()) {
 					addToRefset(c.getConceptNid(),
-							this.relationship_refinability_change, String
-									.valueOf(d.getRelId())
+							this.relationship_refinability_change,
+							String.valueOf(d.getRelId())
 									+ "\t"
 									+ r2
 									+ ": "
@@ -1198,8 +815,8 @@ public class VersionDiff extends AbstractMojo {
 				if (this.changed_relationship_type
 						&& r1.getTypeId() != r2.getTypeId()) {
 					addToRefset(c.getConceptNid(),
-							this.relationship_type_change, String.valueOf(d
-									.getRelId())
+							this.relationship_type_change,
+							String.valueOf(d.getRelId())
 									+ "\t"
 									+ r2
 									+ ": "
@@ -1214,46 +831,32 @@ public class VersionDiff extends AbstractMojo {
 				if (this.changed_relationship_group
 						&& r1.getGroup() != r2.getGroup()) {
 					addToRefset(c.getConceptNid(),
-							this.relationship_group_change, String.valueOf(d
-									.getRelId())
-									+ "\t"
-									+ r2
-									+ ": "
-									+ r1.getGroup()
-									+ " -> "
-									+ r2.getGroup());
+							this.relationship_group_change,
+							String.valueOf(d.getRelId()) + "\t" + r2 + ": "
+									+ r1.getGroup() + " -> " + r2.getGroup());
 					incr(this.relationship_group_change);
 				}
 			}
 		}
 	}
 
-	private HashMap<Integer, Integer> diff_count = new HashMap<Integer, Integer>();
-
-	private void incr(int id) {
-		this.diff_count.put(id, this.diff_count.get(id) + 1);
-	}
-
-	private void logConfig(String str) throws Exception {
+	protected void logConfig(String str) throws Exception {
+		super.logConfig(str);
 		addToRefset(refset.getConceptNid(), this.config, str);
-		getLog().info(str);
 	}
 
-	private void logStats(String str) throws Exception {
+	protected void logStats(String str) throws Exception {
+		super.logConfig(str);
 		addToRefset(refset.getConceptNid(), this.stats, str);
-		getLog().info(str);
 	}
 
-	private void processConfig() throws Exception {
+	protected void processConfigFilters() throws Exception {
+		super.processConfigFilters();
 		I_TermFactory tf = Terms.get();
 		this.config_ace_frame = tf.newAceFrameConfig();
-		// PathBI path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		this.v1_id = ThinVersionHelper.convertTz(this.v1);
-		this.v2_id = ThinVersionHelper.convertTz(this.v2);
-		PositionBI pos1 = tf.newPosition(path, v1_id);
-		PositionBI pos2 = tf.newPosition(path, v2_id);
-		this.createRefsetConcept(pos1, pos2, null);
+		PathBI path = tf.getPath(Arrays.asList(UUID
+				.fromString(refset_path_uuid)));
+		this.createRefsetConcept(path, pos1, pos2, null);
 		{
 			this.refset_map = new RefsetPropertyMap(REFSET_TYPES.CID_STR);
 			I_GetConceptData active_status = tf
@@ -1310,241 +913,10 @@ public class VersionDiff extends AbstractMojo {
 		if (this.changed_relationship_group)
 			change_cons.add(this.relationship_group_change);
 		for (int con : change_cons) {
-			this.createRefsetConcept(pos1, pos2, con);
+			this.createRefsetConcept(path, pos1, pos2, con);
 		}
 		getLog().info("Refset: " + refset.getInitialText());
 		getLog().info("Refset: " + refset.getUids().get(0));
-		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z");
-		// Date d = sdf.parse("2008.07.31 00:00:00 PDT");
-		// long v1x = ThinVersionHelper.convert(d.getTime());
-		// d = sdf.parse("2009.01.31 00:00:00 PST");
-		// long v2x = ThinVersionHelper.convert(d.getTime());
-		// logConfig("v1 parse = " + v1x + " " + (v1x - v1_id));
-		// logConfig("v2 parse = " + v2x + " " + (v2x - v2_id));
-		logConfig("v1: " + v1);
-		logConfig("v2: " + v2);
-		logConfig("v1_id = " + this.v1_id);
-		logConfig("v2_id = " + this.v2_id);
-		logConfig("v1 local tz: " + pos1.toString());
-		logConfig("v2 local tz: " + pos2.toString());
-		logConfig("added_concepts = " + this.added_concepts);
-		this.diff_count.put(this.added_concept_change, 0);
-		logConfig("deleted_concepts = " + this.deleted_concepts);
-		this.diff_count.put(this.deleted_concept_change, 0);
-		logConfig("changed_concept_status = " + this.changed_concept_status);
-		this.diff_count.put(this.concept_status_change, 0);
-		this.v1_concept_status_int = buildConceptEnum(this.v1_concept_status,
-				"v1_concept_status");
-		this.v2_concept_status_int = buildConceptEnum(this.v2_concept_status,
-				"v2_concept_status");
-		logConfig("changed_defined = " + this.changed_defined);
-		this.diff_count.put(this.defined_change, 0);
-		this.v1_isa_filter_int = buildConceptEnum(this.v1_isa_filter,
-				"v1_isa_filter");
-		this.v2_isa_filter_int = buildConceptEnum(this.v2_isa_filter,
-				"v2_isa_filter");
-		this.v1_concept_status_filter_int = buildConceptEnum(
-				this.v1_concept_status_filter, "v1_concept_status_filter");
-		this.v2_concept_status_filter_int = buildConceptEnum(
-				this.v2_concept_status_filter, "v2_concept_status_filter");
-		logConfig("added_descriptions = " + this.added_descriptions);
-		this.diff_count.put(this.added_description_change, 0);
-		logConfig("deleted_descriptions = " + this.deleted_descriptions);
-		this.diff_count.put(this.deleted_description_change, 0);
-		logConfig("changed_description_status = "
-				+ this.changed_description_status);
-		this.diff_count.put(this.description_status_change, 0);
-		this.v1_description_status_int = buildConceptEnum(
-				this.v1_description_status, "v1_description_status");
-		this.v2_description_status_int = buildConceptEnum(
-				this.v2_description_status, "v2_description_status");
-		logConfig("changed_description_term = " + this.changed_description_term);
-		this.diff_count.put(this.description_term_change, 0);
-		logConfig("changed_description_type = " + this.changed_description_type);
-		this.diff_count.put(this.description_type_change, 0);
-		logConfig("changed_description_language = "
-				+ this.changed_description_language);
-		this.diff_count.put(this.description_language_change, 0);
-		logConfig("changed_description_case = " + this.changed_description_case);
-		this.diff_count.put(this.description_case_change, 0);
-		this.v1_description_status_filter_int = buildConceptEnum(
-				this.v1_description_status_filter,
-				"v1_description_status_filter");
-		this.v2_description_status_filter_int = buildConceptEnum(
-				this.v2_description_status_filter,
-				"v2_description_status_filter");
-		this.v1_description_type_filter_int = buildConceptEnum(
-				this.v1_description_type_filter, "v1_description_type_filter");
-		this.v2_description_type_filter_int = buildConceptEnum(
-				this.v2_description_type_filter, "v2_description_type_filter");
-		logConfig("v1_description_term_filter = "
-				+ this.v1_description_term_filter);
-		logConfig("v2_description_term_filter = "
-				+ this.v2_description_term_filter);
-		logConfig("v1_description_lang_filter = "
-				+ this.v1_description_lang_filter);
-		logConfig("v2_description_lang_filter = "
-				+ this.v2_description_lang_filter);
-		logConfig("v1_description_case_filter = "
-				+ this.v1_description_case_filter);
-		logConfig("v2_description_case_filter = "
-				+ this.v2_description_case_filter);
-		logConfig("added_relationships = " + this.added_relationships);
-		this.diff_count.put(this.added_relationship_change, 0);
-		logConfig("deleted_relationships = " + this.deleted_relationships);
-		this.diff_count.put(this.deleted_relationship_change, 0);
-		logConfig("changed_relationship_status = "
-				+ this.changed_relationship_status);
-		this.diff_count.put(this.relationship_status_change, 0);
-		this.v1_relationship_status_int = buildConceptEnum(
-				this.v1_relationship_status, "v1_relationship_status");
-		this.v2_relationship_status_int = buildConceptEnum(
-				this.v2_relationship_status, "v2_relationship_status");
-		logConfig("changed_relationship_characteristic = "
-				+ this.changed_relationship_characteristic);
-		this.diff_count.put(this.relationship_characteristic_change, 0);
-		logConfig("changed_relationship_refinability = "
-				+ this.changed_relationship_refinability);
-		this.diff_count.put(this.relationship_refinability_change, 0);
-		logConfig("changed_relationship_type = "
-				+ this.changed_relationship_type);
-		this.diff_count.put(this.relationship_type_change, 0);
-		logConfig("changed_relationship_group = "
-				+ this.changed_relationship_group);
-		this.diff_count.put(this.relationship_group_change, 0);
-		this.v1_relationship_status_filter_int = buildConceptEnum(
-				this.v1_relationship_status_filter,
-				"v1_relationship_status_filter");
-		this.v2_relationship_status_filter_int = buildConceptEnum(
-				this.v2_relationship_status_filter,
-				"v2_relationship_status_filter");
-		this.v1_relationship_characteristic_filter_int = buildConceptEnum(
-				this.v1_relationship_characteristic_filter,
-				"v1_relationship_characteristic_filter");
-		this.v2_relationship_characteristic_filter_int = buildConceptEnum(
-				this.v2_relationship_characteristic_filter,
-				"v2_relationship_characteristic_filter");
-		this.v1_relationship_refinability_filter_int = buildConceptEnum(
-				this.v1_relationship_refinability_filter,
-				"v1_relationship_refinability_filter");
-		this.v2_relationship_refinability_filter_int = buildConceptEnum(
-				this.v2_relationship_refinability_filter,
-				"v2_relationship_refinability_filter");
-		this.v1_relationship_type_filter_int = buildConceptEnum(
-				this.v1_relationship_type_filter, "v1_relationship_type_filter");
-		this.v2_relationship_type_filter_int = buildConceptEnum(
-				this.v2_relationship_type_filter, "v2_relationship_type_filter");
-		// return path;
-	}
-
-	int concepts = 0;
-
-	int concepts_filtered = 0;
-
-	private void diff() throws Exception {
-		I_TermFactory tf = Terms.get();
-		// this.path = tf.getPath(Arrays.asList(UUID.fromString(path_uuid)));
-		processConfig();
-
-		listRoots(path);
-
-		HashSet<Integer> v1_isa_desc = new HashSet<Integer>();
-		for (int v1_i : v1_isa_filter_int) {
-			v1_isa_desc.addAll(getDescendants(v1_i, path, v1_id));
-		}
-		HashSet<Integer> v2_isa_desc = new HashSet<Integer>();
-		for (int v2_i : v2_isa_filter_int) {
-			v2_isa_desc.addAll(getDescendants(v2_i, path, v2_id));
-		}
-
-		ArrayList<Integer> all_concepts = new ArrayList<Integer>();
-		for (I_IterateIds i = tf.getConceptNidSet().iterator(); i.next();) {
-			all_concepts.add(i.nid());
-		}
-		long start = System.currentTimeMillis();
-		getLog().info(
-				"concepts " + concepts + " of " + all_concepts.size()
-						+ " Elapsed "
-						+ ((System.currentTimeMillis() - start) / 1000)
-						+ " secs.");
-		for (int nid : all_concepts) {
-			concepts++;
-//			if (concepts == 20001) {
-//				getLog().info("BREAK concepts " + concepts);
-//				break;
-//			}
-			if (concepts % 10000 == 0) {
-				long cur = System.currentTimeMillis();
-				float elap = cur - start;
-				float done = ((float) concepts) / ((float) all_concepts.size());
-				float total = elap / done;
-				getLog().info(
-						"concepts " + concepts + " of " + all_concepts.size()
-								+ ". Elapsed " + ((int) (elap / 1000))
-								+ " secs. " + ((int) (done * 100))
-								+ "% done. Remaining "
-								+ ((int) ((total - elap) / 1000)) + " secs.");
-			}
-			I_GetConceptData c = tf.getConcept(nid);
-
-			I_ConceptAttributePart a1 = null;
-			I_ConceptAttributePart a2 = null;
-			for (I_ConceptAttributePart a : c.getConceptAttributes()
-					.getMutableParts()) {
-				// Must be on the path
-				if (a.getPathId() != path.getConceptNid())
-					continue;
-				// Find the greatest version <= the one of interest
-				if (a.getVersion() <= v1_id
-						&& (a1 == null || a1.getVersion() < a.getVersion()))
-					a1 = a;
-				if (a.getVersion() <= v2_id
-						&& (a2 == null || a2.getVersion() < a.getVersion()))
-					a2 = a;
-			}
-
-			if (v1_concept_status_filter_int.size() > 0 && a1 != null
-					&& !v1_concept_status_filter_int.contains(a1.getStatusId()))
-				continue;
-			if (v2_concept_status_filter_int.size() > 0 && a2 != null
-					&& !v2_concept_status_filter_int.contains(a2.getStatusId()))
-				continue;
-
-			if (v1_isa_desc.size() > 0
-					&& !v1_isa_desc.contains(c.getConceptNid()))
-				continue;
-			if (v2_isa_desc.size() > 0
-					&& !v2_isa_desc.contains(c.getConceptNid()))
-				continue;
-			concepts_filtered++;
-
-			compareAttributes(c, path);
-			compareDescriptions(c, path);
-			compareRelationships(c, path);
-		}
-		tf.addUncommittedNoChecks(this.refset);
-		for (I_GetConceptData c : this.refsets.values()) {
-			tf.addUncommittedNoChecks(c);
-		}
-		getLog().info(
-				"concepts " + concepts + " of " + all_concepts.size()
-						+ " Elapsed "
-						+ ((System.currentTimeMillis() - start) / 1000)
-						+ " secs.");
-
-		logStats("concepts " + concepts);
-		logStats("concepts_filtered " + concepts_filtered);
-		logStats("descriptions " + descriptions);
-		logStats("descriptions_filtered " + descriptions_filtered);
-		logStats("relationships " + relationships);
-		logStats("relationships_filtered " + relationships_filtered);
-		for (Entry<Integer, Integer> e : this.diff_count.entrySet()) {
-			logStats(tf.getConcept(e.getKey()).getInitialText() + " "
-					+ e.getValue());
-		}
-
-		tf.commit();
-
 	}
 
 	private void listDiff() throws Exception {
@@ -1606,152 +978,6 @@ public class VersionDiff extends AbstractMojo {
 		out.close();
 	}
 
-	// Status: 2faa9261-8fb2-11db-b606-0800200c9a66 current (active status type)
-
-	// Status: 4bc081d8-9f64-3a89-a668-d11ca031979b limited
-
-	// Status: 11c24184-4d8a-3cd3-bc30-bb0aa4c76e93 pending move (active status
-	// type)
-
-	// Status: e1956e7b-08b4-3ad0-ab02-b411869f1c09 retired
-
-	// Status: cbe19851-49f7-32f7-bb27-2d24be0e77e8 duplicate
-
-	// Status: ad6b6532-0cb7-35d0-be04-47a9e4634ed8 outdated (inactive status
-	// type)
-
-	// Status: 3b397a0a-b510-391b-bd2e-5dd168c092ba ambiguous (inactive status
-	// type)
-
-	// Status: a09cc39f-2c01-3563-84cc-bad7d7fb597f erroneous (inactive status
-	// type)
-
-	// Status: 76367831-522f-3250-83a4-8609ab298436 moved elsewhere (inactive
-	// status type)
-
-	private void listStatus() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (Concept c : Arrays.asList(ArchitectonicAuxiliary.Concept.CURRENT,
-				ArchitectonicAuxiliary.Concept.LIMITED,
-				ArchitectonicAuxiliary.Concept.PENDING_MOVE,
-				ArchitectonicAuxiliary.Concept.RETIRED,
-				ArchitectonicAuxiliary.Concept.DUPLICATE,
-				ArchitectonicAuxiliary.Concept.OUTDATED,
-				ArchitectonicAuxiliary.Concept.AMBIGUOUS,
-				ArchitectonicAuxiliary.Concept.ERRONEOUS,
-				ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE)) {
-			getLog()
-					.info(
-							"Status: "
-									+ tf.getConcept(c.getUids()).getUids().get(
-											0)
-									+ " "
-									+ tf.getConcept(c.getUids())
-											.getInitialText());
-		}
-	}
-
-	private void listDescriptionType() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (Concept c : Arrays
-				.asList(
-						ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE,
-						ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE,
-						ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE)) {
-			getLog().info(
-					"Description type: "
-							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
-							+ tf.getConcept(c.getUids()).getInitialText());
-		}
-	}
-
-	private void listCharacteristic() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (Concept c : Arrays.asList(
-				ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC,
-				ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC,
-				ArchitectonicAuxiliary.Concept.QUALIFIER_CHARACTERISTIC,
-				ArchitectonicAuxiliary.Concept.ADDITIONAL_CHARACTERISTIC)) {
-			getLog().info(
-					"Characteristic type: "
-							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
-							+ tf.getConcept(c.getUids()).getInitialText());
-		}
-	}
-
-	private void listRefinability() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (Concept c : Arrays.asList(
-				ArchitectonicAuxiliary.Concept.NOT_REFINABLE,
-				ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY,
-				ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY)) {
-			getLog().info(
-					"Refinability type: "
-							+ tf.getConcept(c.getUids()).getUids().get(0) + " "
-							+ tf.getConcept(c.getUids()).getInitialText());
-		}
-	}
-
-	private void listRel() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (org.dwfa.cement.SNOMED.Concept c : Arrays
-				.asList(SNOMED.Concept.IS_A)) {
-			getLog()
-					.info(
-							"Rel type: "
-									+ tf.getConcept(c.getUids()).getUids().get(
-											0)
-									+ " "
-									+ tf.getConcept(c.getUids())
-											.getInitialText());
-		}
-	}
-
-	// SNOMED Clinical Terms version: 20080731 [R] (July 2008 Release)
-
-	// -612920153
-
-	// SNOMED Clinical Terms version: 20090131 [R] (January 2009 Release)
-
-	// -597018953
-
-	private void listVersions() throws Exception {
-		I_TermFactory tf = Terms.get();
-		I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
-		getLog().info(c.getInitialText());
-		I_ConceptAttributeVersioned cv = c.getConceptAttributes();
-		for (I_ConceptAttributePart cvp : cv.getMutableParts()) {
-			getLog().info("Attr: " + cvp.getVersion());
-		}
-		I_GetConceptData syn_type = tf
-				.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE
-						.getUids());
-		for (I_DescriptionVersioned cd : c.getDescriptions()) {
-			for (I_DescriptionPart cvp : cd.getMutableParts()) {
-				if (cvp.getTypeId() == syn_type.getConceptNid()
-						&& cvp.getText().contains("time")) {
-					getLog().info("Version: " + cvp.getText());
-					getLog().info("         " + cvp.getVersion());
-					getLog().info(
-							"         "
-									+ ThinVersionHelper
-											.format(cvp.getVersion()));
-					getLog().info(
-							"         "
-									+ ThinVersionHelper.formatTz(cvp
-											.getVersion()));
-					for (String tz : Arrays.asList("GMT", "EST", "PST",
-							"GMT-04:00")) {
-						getLog().info(
-								"         "
-										+ ThinVersionHelper.formatTz(cvp
-												.getVersion(), tz));
-					}
-				}
-			}
-		}
-	}
-
 	private HashSet<Integer> getDescendants(int concept_id, PathBI path,
 			int version) throws Exception {
 		HashSet<Integer> ret = new HashSet<Integer>();
@@ -1796,71 +1022,6 @@ public class VersionDiff extends AbstractMojo {
 		return ret;
 	}
 
-	private void listRoots(PathBI path) throws Exception {
-		I_TermFactory tf = Terms.get();
-		I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
-		for (I_RelVersioned d : c.getDestRels()) {
-			I_RelPart d1 = null;
-			I_RelPart d2 = null;
-			for (I_RelPart dd : d.getMutableParts()) {
-				if (dd.getPathId() != path.getConceptNid())
-					continue;
-				if (dd.getTypeId() != tf.getConcept(
-						SNOMED.Concept.IS_A.getUids()).getConceptNid())
-					continue;
-				// Find the greatest version <= the one of interest
-				if (dd.getVersion() <= v1_id
-						&& (d1 == null || d1.getVersion() < dd.getVersion()))
-					d1 = dd;
-				if (dd.getVersion() <= v2_id
-						&& (d2 == null || d2.getVersion() < dd.getVersion()))
-					d2 = dd;
-
-			}
-			getLog().info(
-					"Root- "
-							+ " 1: "
-							+ (d1 != null)
-							+ " "
-							+ (d1 != null ? tf.getConcept(d1.getStatusId())
-									.getInitialText() : d1)
-							+ " 2: "
-							+ (d2 != null)
-							+ " "
-							+ (d2 != null ? tf.getConcept(d2.getStatusId())
-									.getInitialText() : d2) + " "
-							+ tf.getConcept(d.getC1Id()).getUids().get(0) + " "
-							+ tf.getConcept(d.getC1Id()).getInitialText());
-		}
-		for (int ch : getChildren(c.getConceptNid(), path, v1_id)) {
-			getLog().info(
-					"Root 1: " + tf.getConcept(ch).getUids().get(0) + " "
-							+ tf.getConcept(ch).getInitialText());
-		}
-		for (int ch : getChildren(c.getConceptNid(), path, v2_id)) {
-			getLog().info(
-					"Root 2: " + tf.getConcept(ch).getUids().get(0) + " "
-							+ tf.getConcept(ch).getInitialText());
-		}
-	}
-
-	private void listPaths() throws Exception {
-		I_TermFactory tf = Terms.get();
-		for (PathBI path : tf.getPaths()) {
-			I_GetConceptData path_con = tf.getConcept(path.getConceptNid());
-			getLog().info("Path: " + path_con.getInitialText());
-			getLog().info("      " + path_con.getUids().get(0));
-			for (PositionBI position : path.getOrigins()) {
-				getLog().info("Position: " + position);
-				getLog().info("Version: " + position.getVersion());
-				I_GetConceptData position_con = tf.getConcept(position
-						.getPath().getConceptNid());
-				getLog().info("         " + position_con.getInitialText());
-				getLog().info("         " + position_con.getUids().get(0));
-			}
-		}
-	}
-
 	/*
 	 * 
 	 * Example use:
@@ -1896,43 +1057,70 @@ public class VersionDiff extends AbstractMojo {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			this.listVersions();
-			this.listPaths();
-			this.listStatus();
-			this.listDescriptionType();
-			this.listCharacteristic();
-			this.listRefinability();
-			this.listRel();
+			I_TermFactory tf = Terms.get();
+			processConfig();
 
-			this.setupConcepts();
+			ArrayList<Integer> all_concepts = getAllConcepts();
+			long start = System.currentTimeMillis();
+			getLog().info(
+					"concepts " + concepts + " of " + all_concepts.size()
+							+ " Elapsed "
+							+ ((System.currentTimeMillis() - start) / 1000)
+							+ " secs.");
+			for (int nid : all_concepts) {
+				concepts++;
+				// if (concepts == 20001) {
+				// getLog().info("BREAK concepts " + concepts);
+				// break;
+				// }
+				if (concepts % 10000 == 0) {
+					long cur = System.currentTimeMillis();
+					float elap = cur - start;
+					float done = ((float) concepts)
+							/ ((float) all_concepts.size());
+					float total = elap / done;
+					getLog().info(
+							"concepts " + concepts + " of "
+									+ all_concepts.size() + ". Elapsed "
+									+ ((int) (elap / 1000)) + " secs. "
+									+ ((int) (done * 100))
+									+ "% done. Remaining "
+									+ ((int) ((total - elap) / 1000))
+									+ " secs.");
+				}
+				I_GetConceptData c = tf.getConcept(nid);
 
-			this.diff();
+				compareAttributes(c);
+				compareDescriptions(c);
+				compareRelationships(c);
+			}
+			tf.addUncommittedNoChecks(this.refset);
+			for (I_GetConceptData c : this.refsets.values()) {
+				tf.addUncommittedNoChecks(c);
+			}
+			getLog().info(
+					"concepts " + concepts + " of " + all_concepts.size()
+							+ " Elapsed "
+							+ ((System.currentTimeMillis() - start) / 1000)
+							+ " secs.");
+
+			logStats("concepts " + concepts);
+			logStats("concepts_filtered " + concepts_filtered);
+			logStats("descriptions " + descriptions);
+			logStats("descriptions_filtered " + descriptions_filtered);
+			logStats("relationships " + relationships);
+			logStats("relationships_filtered " + relationships_filtered);
+			for (Entry<Integer, Integer> e : this.diff_count.entrySet()) {
+				logStats(tf.getConcept(e.getKey()).getInitialText() + " "
+						+ e.getValue());
+			}
+
+			tf.commit();
 			if (this.list_file != null)
 				this.listDiff();
 		} catch (Exception e) {
 			throw new MojoFailureException(e.getLocalizedMessage(), e);
 		}
 	}
-
-	// "Configuration"
-	// "Statistics"
-	// "Added Concept"
-	// "Deleted Concept"
-	// "Changed Concept Status"
-	// "Changed Defined"
-	// "Added Description"
-	// "Deleted Description"
-	// "Changed Description Status"
-	// "Changed Description Term"
-	// "Changed Description Type"
-	// "Changed Description Language"
-	// "Changed Description Case"
-	// "Added Relationship"
-	// "Deleted Relationship"
-	// "Changed Relationship Status"
-	// "Changed Relationship Characteristic"
-	// "Changed Relationship Refinability"
-	// "Changed Relationship Type"
-	// "Changed Relationship Group"
 
 }
