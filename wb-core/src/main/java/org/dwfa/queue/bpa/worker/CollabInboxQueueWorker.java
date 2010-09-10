@@ -234,7 +234,10 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                 SoapFilter sfStatusB = new SoapFilter();
                 sfStatusB.setName("status");
                 sfStatusB.setValue("Detail ready to download");
-                SoapFilter[] sf = new SoapFilter[] {sfStatusA, sfStatusB};
+                SoapFilter sfStatusC = new SoapFilter();
+                sfStatusC.setName("status");
+                sfStatusC.setValue("Unreviewed ready to download");
+                SoapFilter[] sf = new SoapFilter[] {sfStatusA, sfStatusB, sfStatusC};
 
                 // GET FILTERED LIST OF ARTIFACTS
                 List<ArtifactSoapRow> arts = tracker.getArtifactList(repoTrackerIdStr, sf);
@@ -285,7 +288,11 @@ public class CollabInboxQueueWorker extends Worker implements I_GetWorkFromQueue
                             tracker.deleteAttachment(artifactId, attachmentId);
                             
                             // SET STATUS
-                            asdo.setStatus("Detail in process");
+                            if (asdo.getStatus().equalsIgnoreCase("Unreviewed ready to download"))                                
+                                asdo.setStatus("Unreviewed in process");
+                            else
+                                asdo.setStatus("Detail in process");
+
                             tracker.setArtifactData(asdo, "Detail downloaded for next step.");
                             
                             this.commitTransactionIfActive();
